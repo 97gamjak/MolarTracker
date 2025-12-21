@@ -1,4 +1,4 @@
-qt_add_library(molartracker_ui
+qt_add_library(molartracker_ui STATIC
     main_window.cpp
     top_menu_bar.cpp
 )
