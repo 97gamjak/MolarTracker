@@ -1,30 +1,72 @@
 #include "main_window.hpp"
 
-#include <QApplication>
 #include <QLabel>
-#include <QMenuBar>
+#include <QMessageBox>
 #include <QStatusBar>
-#include <QTabWidget>
-#include <QToolBar>
 #include <QVBoxLayout>
-#include <QWidget>
 
 #include "top_menu_bar.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow{parent}
 {
-    setWindowTitle("App");
+    setWindowTitle("Molar Tracker");
     resize(1100, 700);
 
-    _topMenuBar = new TopMenuBar{*this};
-    _topMenuBar->build();
-
-    buildCentral();
-
+    _buildUI();
     statusBar()->showMessage("Ready");
 }
 
-void MainWindow::buildCentral()
+void MainWindow::_buildUI()
+{
+    _topMenuBar = new TopMenuBar{*this};
+    _topMenuBar->build();
+
+    connect(_topMenuBar, &TopMenuBar::requestQuit, this, &QWidget::close);
+    connect(
+        _topMenuBar,
+        &TopMenuBar::requestUndo,
+        this,
+        [this]() { statusBar()->showMessage("Undo requested"); }
+    );
+    connect(
+        _topMenuBar,
+        &TopMenuBar::requestRedo,
+        this,
+        [this]() { statusBar()->showMessage("Redo requested"); }
+    );
+    connect(
+        _topMenuBar,
+        &TopMenuBar::requestPreferences,
+        this,
+        [this]()
+        {
+            QMessageBox::information(
+                this,
+                "Preferences",
+                "Preferences requested"
+            );
+        }
+    );
+    connect(
+        _topMenuBar,
+        &TopMenuBar::requestAbout,
+        this,
+        [this]()
+        {
+            QMessageBox::information(
+                this,
+                "About Molar Tracker",
+                "Molar Tracker\nVersion 0.1.0\n\n(c) 2025-now Molar Tracker "
+                "Contributors: Jakob Gamper"
+            );
+        }
+    );
+
+    _buildCentral();
+    _refreshUndoRedoActions();
+}
+
+void MainWindow::_buildCentral()
 {
     auto* root = new QWidget{this};
     setCentralWidget(root);
@@ -39,4 +81,15 @@ void MainWindow::buildCentral()
     tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
     tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
     tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
+}
+
+void MainWindow::_refreshUndoRedoActions()
+{
+    // Placeholder implementation
+    // In a real application, this would check the undo/redo stack status
+    bool canUndo = false;
+    bool canRedo = false;
+
+    _topMenuBar->setUndoEnabled(canUndo);
+    _topMenuBar->setRedoEnabled(canRedo);
 }

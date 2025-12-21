@@ -9,13 +9,17 @@ class MainWindow final : public QMainWindow
 {
     Q_OBJECT
 
-   public:
-    explicit MainWindow(QWidget* parent = nullptr);
+   private:
+    TopMenuBar* _topMenuBar;
 
    private:
-    void buildCentral();
+    void _buildUI();
+    void _buildCentral();
 
-    TopMenuBar* _topMenuBar;
+    void _refreshUndoRedoActions();
+
+   public:
+    explicit MainWindow(QWidget* parent = nullptr);
 };
 
 #endif   // __UI__MAIN_WINDOW_HPP__

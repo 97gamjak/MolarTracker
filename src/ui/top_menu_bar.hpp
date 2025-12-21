@@ -1,9 +1,11 @@
 #ifndef __UI__TOP_MENU_BAR_HPP__
 #define __UI__TOP_MENU_BAR_HPP__
 
-#include <QMainWindow>
 #include <QObject>
-#include <QWidget>
+
+class QMainWindow;
+class QMenuBar;
+class QAction;
 
 class TopMenuBar : public QObject
 {
@@ -12,10 +14,32 @@ class TopMenuBar : public QObject
    private:
     QMainWindow& _mainWindow;
 
+    QAction* _undoAction        = nullptr;
+    QAction* _redoAction        = nullptr;
+    QAction* _quitAction        = nullptr;
+    QAction* _preferencesAction = nullptr;
+    QAction* _aboutAction       = nullptr;
+
+   private:
+    void _buildFileMenu(QMenuBar* menu);
+    void _buildEditMenu(QMenuBar* menu);
+    void _buildSettingsMenu(QMenuBar* menu);
+    void _buildHelpMenu(QMenuBar* menu);
+
+   signals:
+    void requestUndo();
+    void requestRedo();
+    void requestQuit();
+    void requestPreferences();
+    void requestAbout();
+
    public:
     explicit TopMenuBar(QMainWindow& mainWindow);
 
     void build();
+
+    void setUndoEnabled(bool enabled);
+    void setRedoEnabled(bool enabled);
 };
 
 #endif   // __UI__TOP_MENU_BAR_HPP__
