@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: ["*"]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      QT_VERSION: "6.8.3"
+      BUILD_TYPE: "Release"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # -------------------------
+      # Build tools
+      # -------------------------
+      - name: Install build tools (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build pkg-config
+
+      - name: Install build tools (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install -y ninja
+
+      # -------------------------
+      # Install Qt
+      # -------------------------
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+
+      - name: Install Qt (Windows, MSVC 2022)
+        if: runner.os == 'Windows'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+          arch: win64_msvc2022_64
+
+      # -------------------------
+      # Windows: MSVC env + SQLite via vcpkg
+      # -------------------------
+      - name: Setup MSVC dev cmd
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup vcpkg (Windows)
+        if: runner.os == 'Windows'
+        uses: lukka/run-vcpkg@v11
+        with:
+          runVcpkgInstall: false
+
+      - name: Install SQLite3 with vcpkg (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          vcpkg install sqlite3:x64-windows
+
+      # -------------------------
+      # Configure + build
+      # -------------------------
+      - name: Configure (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Build (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          cmake --build build
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -S . -B build -G Ninja ^
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} ^
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ^
+            -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake ^
+            -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake --build build
+
+      # -------------------------
+      # Windows: deploy with windeployqt + upload
+      # -------------------------
+      - name: Deploy Qt runtime (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = "build/bin/MolarTracker.exe"
+          if (-not (Test-Path $exe)) {
+            throw "Expected executable not found: $exe. Check your RUNTIME_OUTPUT_DIRECTORY and target name."
+          }
+
+          New-Item -ItemType Directory -Force deploy | Out-Null
+
+          # windeployqt should be available after install-qt-action
+          $windeployqt = (Get-Command windeployqt.exe -ErrorAction SilentlyContinue)?.Source
+          if (-not $windeployqt) { throw "windeployqt.exe not found on PATH." }
+
+          & $windeployqt --release --compiler-runtime --dir deploy $exe
+          Copy-Item $exe deploy\
+
+      - name: Upload Windows artifact (ready-to-run)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MolarTracker-windows
+          path: deploy/**
+
+      - name: Upload Linux artifact (build dir)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MolarTracker-linux
+          path: |
+            build/bin/MolarTracker
+            build/compile_commands.json
