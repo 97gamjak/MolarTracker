@@ -25,3 +25,8 @@ if (WIN32)
         WIN32_EXECUTABLE ON
     )
 endif()
+
+set_target_properties(MolarTracker PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY
+    ${CMAKE_BINARY_DIR}/bin
+)

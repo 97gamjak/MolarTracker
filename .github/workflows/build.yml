@@ -63,16 +63,12 @@ jobs:
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Setup vcpkg (Windows)
+      - name: Setup vcpkg (Windows, manifest mode)
         if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v11
         with:
-          runVcpkgInstall: false
-
-      - name: Install SQLite3 with vcpkg (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          vcpkg install sqlite3:x64-windows
+          vcpkgJsonGlob: "vcpkg.json"
+          runVcpkgInstall: true
 
       # -------------------------
       # Configure + build
@@ -91,12 +87,14 @@ jobs:
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          cmake -S . -B build -G Ninja ^
-            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} ^
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ^
-            -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake ^
+          cmake -S . -B build -G Ninja `
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows
+
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
