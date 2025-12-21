@@ -1,0 +1,8 @@
+{
+  "name": "molartracker",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "sqlite3"
+  ],
+  "builtin-baseline": "37dcabc43809a960f41758e00e615cc6e26e8bbf"
+}
