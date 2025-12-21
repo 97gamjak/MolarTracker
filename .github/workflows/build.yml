@@ -69,11 +69,6 @@ jobs:
         with:
           runVcpkgInstall: false
 
-      - name: Install SQLite3 with vcpkg (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          vcpkg install sqlite3:x64-windows
-
       # -------------------------
       # Configure + build
       # -------------------------
