@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "undo_redo/undo_stack.hpp"
+
 class TopMenuBar;
 
 class MainWindow final : public QMainWindow
@@ -10,7 +12,10 @@ class MainWindow final : public QMainWindow
     Q_OBJECT
 
    private:
-    TopMenuBar* _topMenuBar;
+    TopMenuBar* _topMenuBar = nullptr;
+
+    UndoStack _undoStack;
+    bool      _dummyFlag = false;
 
    private:
     void _buildUI();

@@ -73,3 +73,13 @@ void TopMenuBar::setRedoEnabled(bool enabled)
 {
     _redoAction->setEnabled(enabled);
 }
+
+void TopMenuBar::setUndoText(const QString& text)
+{
+    _undoAction->setText(text);
+}
+
+void TopMenuBar::setRedoText(const QString& text)
+{
+    _redoAction->setText(text);
+}

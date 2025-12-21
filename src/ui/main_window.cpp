@@ -5,6 +5,7 @@
 #include <QStatusBar>
 #include <QVBoxLayout>
 
+#include "toggle_flag_command.hpp"
 #include "top_menu_bar.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow{parent}
@@ -13,6 +14,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow{parent}
     resize(1100, 700);
 
     _buildUI();
+
+    _undoStack.pushAndRedo(
+        std::make_unique<ToggleFlagCommand>(_dummyFlag, "Toggle flag")
+    );
+    _refreshUndoRedoActions();
     statusBar()->showMessage("Ready");
 }
 
@@ -26,13 +32,23 @@ void MainWindow::_buildUI()
         _topMenuBar,
         &TopMenuBar::requestUndo,
         this,
-        [this]() { statusBar()->showMessage("Undo requested"); }
+        [this]()
+        {
+            _undoStack.undo();
+            statusBar()->showMessage("Undo requested");
+            _refreshUndoRedoActions();
+        }
     );
     connect(
         _topMenuBar,
         &TopMenuBar::requestRedo,
         this,
-        [this]() { statusBar()->showMessage("Redo requested"); }
+        [this]()
+        {
+            _undoStack.redo();
+            statusBar()->showMessage("Redo requested");
+            _refreshUndoRedoActions();
+        }
     );
     connect(
         _topMenuBar,
@@ -87,9 +103,18 @@ void MainWindow::_refreshUndoRedoActions()
 {
     // Placeholder implementation
     // In a real application, this would check the undo/redo stack status
-    bool canUndo = false;
-    bool canRedo = false;
+    bool canUndo = _undoStack.canUndo();
+    bool canRedo = _undoStack.canRedo();
 
     _topMenuBar->setUndoEnabled(canUndo);
+    _topMenuBar->setUndoText(
+        canUndo ? QString::fromStdString("Undo " + _undoStack.undoLabel())
+                : "Undo"
+    );
+
     _topMenuBar->setRedoEnabled(canRedo);
+    _topMenuBar->setRedoText(
+        canRedo ? QString::fromStdString("Redo " + _undoStack.redoLabel())
+                : "Redo"
+    );
 }

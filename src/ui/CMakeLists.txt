@@ -4,6 +4,8 @@ qt_add_library(molartracker_ui
 )
 
 target_link_libraries(molartracker_ui
+    PRIVATE
+        undo_redo_ui
     PUBLIC
         Qt6::Widgets
 )
@@ -12,3 +14,5 @@ target_include_directories(molartracker_ui
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_subdirectory(undo_redo)

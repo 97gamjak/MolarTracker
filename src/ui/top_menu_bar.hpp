@@ -40,6 +40,9 @@ class TopMenuBar : public QObject
 
     void setUndoEnabled(bool enabled);
     void setRedoEnabled(bool enabled);
+
+    void setUndoText(const QString& text);
+    void setRedoText(const QString& text);
 };
 
 #endif   // __UI__TOP_MENU_BAR_HPP__
