@@ -11,7 +11,13 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(SQLite3 REQUIRED)
+
+if (WIN32)
+  find_package(unofficial-sqlite3 CONFIG REQUIRED)
+  target_link_libraries(MolarTracker PRIVATE unofficial::sqlite3::sqlite3)
+else()
+  find_package(SQLite3 REQUIRED)
+endif()
 
 qt_standard_project_setup()
 
