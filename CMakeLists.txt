@@ -11,7 +11,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(SQLite3 REQUIRED)
 
 qt_standard_project_setup()
 

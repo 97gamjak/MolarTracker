@@ -5,10 +5,23 @@
 #include <QStatusBar>
 #include <QVBoxLayout>
 
+#include "app_context.hpp"
+#include "profile.hpp"
 #include "toggle_flag_command.hpp"
 #include "top_menu_bar.hpp"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow{parent}
+static QString makeUndoText(const std::string& label)
+{
+    return QString::fromStdString("Undo " + label);
+}
+
+static QString makeRedoText(const std::string& label)
+{
+    return QString::fromStdString("Redo " + label);
+}
+
+MainWindow::MainWindow(AppContext& appContext, QWidget* parent)
+    : _appContext{appContext}, QMainWindow{parent}
 {
     setWindowTitle("Molar Tracker");
     resize(1100, 700);
@@ -19,7 +32,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow{parent}
         std::make_unique<ToggleFlagCommand>(_dummyFlag, "Toggle flag")
     );
     _refreshUndoRedoActions();
-    statusBar()->showMessage("Ready");
+
+    _ensureDefaultProfile();
 }
 
 void MainWindow::_buildUI()
@@ -116,5 +130,18 @@ void MainWindow::_refreshUndoRedoActions()
     _topMenuBar->setRedoText(
         canRedo ? QString::fromStdString("Redo " + _undoStack.redoLabel())
                 : "Redo"
+    );
+}
+
+void MainWindow::_ensureDefaultProfile()
+{
+    auto& profileService = _appContext.services().profileService();
+    profileService.ensureDefaultProfile("Default Profile");
+
+    const auto profiles = profileService.getAllProfiles();
+    statusBar()->showMessage(
+        QString::fromStdString(
+            "Loaded " + std::to_string(profiles.size()) + " profile(s)"
+        )
     );
 }

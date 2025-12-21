@@ -1,8 +1,8 @@
-qt_add_library(undo_redo_ui
+add_library(molartracker_undo_redo_ui STATIC
     undo_stack.cpp
 )
 
-target_include_directories(undo_redo_ui
+target_include_directories(molartracker_undo_redo_ui
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

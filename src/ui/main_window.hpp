@@ -6,12 +6,14 @@
 #include "undo_redo/undo_stack.hpp"
 
 class TopMenuBar;
+class AppContext;
 
 class MainWindow final : public QMainWindow
 {
     Q_OBJECT
 
    private:
+    AppContext& _appContext;
     TopMenuBar* _topMenuBar = nullptr;
 
     UndoStack _undoStack;
@@ -23,8 +25,10 @@ class MainWindow final : public QMainWindow
 
     void _refreshUndoRedoActions();
 
+    void _ensureDefaultProfile();
+
    public:
-    explicit MainWindow(QWidget* parent = nullptr);
+    explicit MainWindow(AppContext& appContext, QWidget* parent = nullptr);
 };
 
 #endif   // __UI__MAIN_WINDOW_HPP__
