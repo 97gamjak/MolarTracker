@@ -5,7 +5,10 @@ void UndoStack::pushAndRedo(std::unique_ptr<ICommand> command)
     // If we are not at the end of the stack, remove all commands after the
     // cursor
     if (_cursor < _commands.size())
-        _commands.erase(_commands.begin() + _cursor, _commands.end());
+        _commands.erase(
+            _commands.begin() + static_cast<long int>(_cursor),
+            _commands.end()
+        );
 
     command->redo();
     _commands.push_back(std::move(command));

@@ -17,7 +17,7 @@ target_include_directories(molartracker_app
 
 target_link_libraries(molartracker_app
     PUBLIC
-        molartracker_infra
+        molartracker_db
         molartracker_app_repos
         molartracker_app_services
         molartracker_app_domain

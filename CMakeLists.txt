@@ -14,4 +14,42 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup()
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+
+        # correctness
+        -Wshadow
+        -Wconversion
+        -Wsign-conversion
+        -Wcast-align
+        -Wformat=2
+        -Wnull-dereference
+        -Wdouble-promotion
+        -Wimplicit-fallthrough
+        -Woverloaded-virtual
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Wuseless-cast
+        -Wduplicated-cond
+        -Wduplicated-branches
+        -Wlogical-op
+        -Wmisleading-indentation
+
+        # lifetime / safety
+        -Wuninitialized
+        -Wmaybe-uninitialized
+        -Winit-self
+
+        # switch needs to check all enum values
+        -Wswitch-enum
+        -Wswitch-default
+
+        -Wno-error=deprecated-declarations
+    )
+endif()
+
 add_subdirectory(src)

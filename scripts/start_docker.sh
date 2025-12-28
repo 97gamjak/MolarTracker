@@ -6,5 +6,4 @@ docker run -d \
   qtdev
 
 docker exec qtdev cmake -S /workspace -B /workspace/build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_CXX_COMPILER_LAUNCHER=ccache

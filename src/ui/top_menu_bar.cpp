@@ -5,7 +5,7 @@
 #include <QObject>
 
 TopMenuBar::TopMenuBar(QMainWindow& mainWindow)
-    : _mainWindow{mainWindow}, QObject{&mainWindow}
+    : QObject{&mainWindow}, _mainWindow{mainWindow}
 {
 }
 

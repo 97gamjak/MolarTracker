@@ -10,7 +10,7 @@
 class AppContext
 {
    private:
-    Database         _database;
+    db::Database     _database;
     RepoContainer    _repos;
     ServiceContainer _services;
 

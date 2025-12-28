@@ -6,7 +6,7 @@ target_link_libraries(molartracker_app_repos
     PUBLIC
     molartracker_app_repos_api
     PRIVATE
-    molartracker_infra
+    molartracker_db
     molartracker_app_domain
 )
 
