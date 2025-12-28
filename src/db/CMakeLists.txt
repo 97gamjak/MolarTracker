@@ -1,6 +1,7 @@
 add_library(molartracker_db STATIC
     database.cpp
     statement.cpp
+    transaction.cpp
 )
 
 target_include_directories(molartracker_db
