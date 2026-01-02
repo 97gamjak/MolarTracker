@@ -1,0 +1,3 @@
+[submodule "external/devops"]
+	path = external/devops
+	url = https://github.com/97gamjak/devops.git
