@@ -7,6 +7,8 @@ class IRepo
    public:
     virtual ~IRepo() = default;
 
-    virtual static inline Domain toDomain(const SQLRow& row) = 0;
-    virtual static inline SQLRow toRow(const Domain& domain) = 0;
-}
+    virtual inline Domain toDomain(const SQLRow& row) const = 0;
+    virtual inline SQLRow toRow(const Domain& domain) const = 0;
+};
+
+#endif   // __APP__REPOS__I_REPO_HPP__

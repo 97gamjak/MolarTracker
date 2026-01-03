@@ -5,11 +5,11 @@
 #include <stdexcept>
 #include <string>
 
-#include "binder.hpp"
-#include "database.hpp"
-#include "fields.hpp"
-#include "model_concept.hpp"
-#include "statement.hpp"
+#include "db/database.hpp"
+#include "db/statement.hpp"
+#include "orm/binder.hpp"
+#include "orm/fields.hpp"
+#include "orm/model_concept.hpp"
 
 namespace orm
 {
@@ -257,8 +257,8 @@ namespace orm
             primary_key_value
         );
 
-        bool const has_row = statement.step();
-        if (!has_row)
+        const db::StepResult result = statement.step();
+        if (result != db::StepResult::RowAvailable)
         {
             throw std::runtime_error("orm::select_by_pk did not find a row");
         }
@@ -276,6 +276,56 @@ namespace orm
 
         return loaded_model;
     }
+
+    template <db_model Model>
+    [[nodiscard]] std::vector<Model> select_all(db::Database& database)
+    {
+        Model      empty_instance{};
+        auto const empty_field_views = orm::fields(empty_instance);
+
+        std::string sql_statement_text;
+        sql_statement_text += "SELECT ";
+
+        bool first_select_column = true;
+
+        for (FieldView const& field : empty_field_views)
+        {
+            if (!first_select_column)
+            {
+                sql_statement_text += ", ";
+            }
+
+            first_select_column  = false;
+            sql_statement_text  += std::string{field.column_name()};
+        }
+
+        sql_statement_text += " FROM ";
+        sql_statement_text += std::string{Model::table_name.view()};
+        sql_statement_text += ";";
+
+        db::Statement statement = database.prepare(sql_statement_text);
+
+        std::vector<Model> results;
+
+        while (statement.step() == db::StepResult::RowAvailable)
+        {
+            Model      loaded_model{};
+            auto const loaded_field_views = orm::fields(loaded_model);
+
+            int column_index_zero_based = 0;
+
+            for (FieldView const& field : loaded_field_views)
+            {
+                field.read_from(statement, column_index_zero_based);
+                ++column_index_zero_based;
+            }
+
+            results.push_back(std::move(loaded_model));
+        }
+
+        return results;
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__CRUD_HPP__

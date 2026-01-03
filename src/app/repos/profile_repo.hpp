@@ -20,8 +20,11 @@ namespace app
        public:
         explicit ProfileRepo(db::Database& db);
 
-        static inline Profile    toDomain(const ProfileRow& row);
-        static inline ProfileRow toRow(const Profile& profile);
+        inline Profile              toDomain(const ProfileRow& row) const;
+        inline std::vector<Profile> toDomain(
+            const std::vector<ProfileRow>& rows
+        ) const;
+        inline ProfileRow toRow(const Profile& profile) const;
 
         void ensureSchema() override;
 

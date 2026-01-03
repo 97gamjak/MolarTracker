@@ -7,13 +7,15 @@
 
 #include "config/id_types.hpp"
 #include "domain/profile.hpp"
+#include "repos_api/i_repo.hpp"
+#include "sql_models/profile_row.hpp"
 
 namespace app
 {
 
     class Profile;
 
-    class IProfileRepo
+    class IProfileRepo : public IRepo<Profile, ProfileRow>
     {
        public:
         virtual ~IProfileRepo() = default;

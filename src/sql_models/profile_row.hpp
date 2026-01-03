@@ -1,20 +1,20 @@
-// sql_models/profile_row.hpp
-#pragma once
+#ifndef __SQL_MODELS__PROFILE_ROW_HPP__
+#define __SQL_MODELS__PROFILE_ROW_HPP__
 
 #include <optional>
 #include <string>
 #include <tuple>
 
 #include "config/id_types.hpp"
+#include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
-#include "orm/tags.hpp"
 
 struct ProfileRow final
 {
     static constexpr orm::fixed_string table_name = "profile";
 
-    orm::Field<"id", ProfileId, orm::primary_key_t, orm::auto_increment_t> id{};
+    orm::Field<"id", ProfileID, orm::primary_key_t, orm::auto_increment_t> id{};
     orm::Field<"name", std::string, orm::not_null_t> name{};
     orm::Field<"email", std::optional<std::string>>  email{};
 
@@ -27,3 +27,5 @@ struct ProfileRow final
         return std::tie(id, name, email);
     }
 };
+
+#endif   // __SQL_MODELS__PROFILE_ROW_HPP__

@@ -6,12 +6,12 @@
 #include <type_traits>
 #include <utility>
 
-#include "binder.hpp"
-#include "concepts.hpp"
-#include "constraints.hpp"
-#include "field.hpp"
-#include "fixed_string.hpp"
-#include "sqlite_type.hpp"
+#include "orm/binder.hpp"
+#include "orm/concepts.hpp"
+#include "orm/constraints.hpp"
+#include "orm/field.hpp"
+#include "orm/fixed_string.hpp"
+#include "orm/sql_type.hpp"
 
 namespace orm
 {
@@ -42,75 +42,6 @@ namespace orm
         return *this;
     }
 
-    template <fixed_string Name, typename Value, typename... Options>
-    static std::string Field<Name, Value, Options...>::ddl()
-    {
-        constexpr static bool is_optional = is_optional_v<Value>;
-        using opt_type                    = optional_inner_t<Value>;
-
-        using storage_type = std::conditional_t<is_optional, opt_type, Value>;
-
-        std::string definition;
-        definition += std::string{name.view()};
-        definition += " ";
-        definition += std::string{sqlite_type<storage_type>::name};
-
-        if constexpr (is_primary_key)
-            definition += " PRIMARY KEY";
-        if constexpr (is_auto_increment)
-            definition += " AUTOINCREMENT";
-        if constexpr (is_unique)
-            definition += " UNIQUE";
-        if constexpr (!is_nullable)
-            definition += " NOT NULL";
-
-        return definition;
-    }
-
-    template <typename StatementLike>
-    template <fixed_string Name, typename Value, typename... Options>
-    void Field<Name, Value, Options...>::bind(
-        StatementLike& statement,
-        int            index
-    ) const
-    {
-        if constexpr (is_optional_v<Value>)
-        {
-            if (!_value.has_value())
-            {
-                statement.bind_null(index);
-                return;
-            }
-
-            using inner_type = optional_inner_t<Value>;
-            binder<StatementLike, inner_type>::bind(statement, index, *_value);
-        }
-        else
-            binder<StatementLike, Value>::bind(statement, index, _value);
-    }
-
-    template <typename StatementLike>
-    template <fixed_string Name, typename Value, typename... Options>
-    void Field<Name, Value, Options...>::read_from(
-        StatementLike const& statement,
-        int                  col
-    )
-    {
-        if constexpr (is_optional_v<Value>)
-        {
-            using inner_type = optional_inner_t<Value>;
-
-            if (statement.column_is_null(col))
-            {
-                _value = std::nullopt;
-                return;
-            }
-
-            _value = binder<StatementLike, inner_type>::read(statement, col);
-        }
-        else
-            _value = binder<StatementLike, Value>::read(statement, col);
-    }
 }   // namespace orm
 
 #endif   // __ORM__FIELD_TPP__

@@ -6,8 +6,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "field_detail.hpp"
-#include "field_view.hpp"
+#include "orm/field_view.hpp"
+#include "orm/fields_detail.hpp"
 
 namespace orm::detail
 {
