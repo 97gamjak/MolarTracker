@@ -8,16 +8,21 @@ namespace db
     class Database;   // Forward declaration
 }   // namespace db
 
-class RepoContainer
+namespace app
 {
-   private:
-    ProfileRepo _profileRepo;
 
-   public:
-    explicit RepoContainer(db::Database& db);
+    class RepoContainer
+    {
+       private:
+        ProfileRepo _profileRepo;
 
-    IProfileRepo&       profileRepo() noexcept;
-    const IProfileRepo& profileRepo() const noexcept;
-};
+       public:
+        explicit RepoContainer(db::Database& db);
+
+        IProfileRepo&       profileRepo() noexcept;
+        const IProfileRepo& profileRepo() const noexcept;
+    };
+
+}   // namespace app
 
 #endif   // __APP__REPO_CONTAINER_HPP__

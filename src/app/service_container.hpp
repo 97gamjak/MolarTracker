@@ -5,18 +5,23 @@
 
 #include "profile_service.hpp"
 
-class RepoContainer;
-
-class ServiceContainer
+namespace app
 {
-   private:
-    ProfileService _profileService;
 
-   public:
-    explicit ServiceContainer(RepoContainer& repos);
+    class RepoContainer;
 
-    IProfileService&       profileService() noexcept;
-    const IProfileService& profileService() const noexcept;
-};
+    class ServiceContainer
+    {
+       private:
+        ProfileService _profileService;
+
+       public:
+        explicit ServiceContainer(RepoContainer& repos);
+
+        IProfileService&       profileService() noexcept;
+        const IProfileService& profileService() const noexcept;
+    };
+
+}   // namespace app
 
 #endif   // __APP__SERVICE_CONTAINER_HPP__

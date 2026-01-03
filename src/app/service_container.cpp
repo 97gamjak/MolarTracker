@@ -2,17 +2,22 @@
 
 #include "repo_container.hpp"
 
-ServiceContainer::ServiceContainer(RepoContainer& repos)
-    : _profileService{repos.profileRepo()}
+namespace app
 {
-}
 
-IProfileService& ServiceContainer::profileService() noexcept
-{
-    return _profileService;
-}
+    ServiceContainer::ServiceContainer(RepoContainer& repos)
+        : _profileService{repos.profileRepo()}
+    {
+    }
 
-const IProfileService& ServiceContainer::profileService() const noexcept
-{
-    return _profileService;
-}
+    IProfileService& ServiceContainer::profileService() noexcept
+    {
+        return _profileService;
+    }
+
+    const IProfileService& ServiceContainer::profileService() const noexcept
+    {
+        return _profileService;
+    }
+
+}   // namespace app

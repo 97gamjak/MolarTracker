@@ -3,22 +3,27 @@
 
 #include "command.hpp"
 
-class ToggleFlagCommand : public ICommand
+namespace ui
 {
-   private:
-    bool&       _flag;
-    std::string _label;
 
-   public:
-    ToggleFlagCommand(bool& flag, const std::string& label)
-        : _flag{flag}, _label{label}
+    class ToggleFlagCommand : public ICommand
     {
-    }
+       private:
+        bool&       _flag;
+        std::string _label;
 
-    void undo() override { _flag = !_flag; }
-    void redo() override { _flag = !_flag; }
+       public:
+        ToggleFlagCommand(bool& flag, const std::string& label)
+            : _flag{flag}, _label{label}
+        {
+        }
 
-    std::string label() const override { return _label; }
-};
+        void undo() override { _flag = !_flag; }
+        void redo() override { _flag = !_flag; }
+
+        std::string label() const override { return _label; }
+    };
+
+}   // namespace ui
 
 #endif   // __UI__UNDO_REDO__TOGGLE_FLAG_COMMAND_HPP__
