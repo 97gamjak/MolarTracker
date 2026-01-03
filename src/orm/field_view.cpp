@@ -4,8 +4,8 @@
 #include <string_view>
 #include <type_traits>
 
-#include "orm_exception.hpp"
-#include "statement.hpp"
+#include "db/statement.hpp"
+#include "orm/orm_exception.hpp"
 
 namespace orm
 {

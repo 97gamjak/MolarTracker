@@ -4,7 +4,7 @@ add_library(molartracker_orm STATIC
 
 target_include_directories(molartracker_orm
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 target_link_libraries(molartracker_orm

@@ -3,8 +3,8 @@
 #include <optional>
 #include <vector>
 
-#include "profile.hpp"
-#include "profile_repo.hpp"
+#include "domain/profile.hpp"
+#include "repos/profile_repo.hpp"
 
 namespace app
 {

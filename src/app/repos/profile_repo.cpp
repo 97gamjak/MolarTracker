@@ -3,8 +3,8 @@
 #include <optional>
 #include <vector>
 
-#include "database.hpp"
-#include "profile.hpp"
+#include "db/database.hpp"
+#include "domain/profile.hpp"
 
 namespace app
 {

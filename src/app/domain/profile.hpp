@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "id_types.hpp"
+#include "config/id_types.hpp"
 
 namespace app
 {

@@ -1,7 +1,7 @@
 #include <QApplication>
 
-#include "app_context.hpp"
-#include "main_window.hpp"
+#include "app/app_context.hpp"
+#include "ui/main_window.hpp"
 
 int main(int argc, char** argv)
 {

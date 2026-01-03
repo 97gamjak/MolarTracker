@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "database.hpp"
-#include "repo_container.hpp"
-#include "service_container.hpp"
+#include "app/repo_container.hpp"
+#include "app/service_container.hpp"
+#include "db/database.hpp"
 
 namespace app
 {

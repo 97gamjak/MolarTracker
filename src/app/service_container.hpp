@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "profile_service.hpp"
+#include "services/profile_service.hpp"
 
 namespace app
 {

@@ -15,5 +15,5 @@ target_link_libraries(molartracker_ui
 
 target_include_directories(molartracker_ui
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )

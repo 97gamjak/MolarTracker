@@ -12,7 +12,7 @@ add_subdirectory(repos_api)
 
 target_include_directories(molartracker_app
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 target_link_libraries(molartracker_app
