@@ -3,15 +3,18 @@
 
 #include "i_profile_repo.hpp"
 
-class Database;
+namespace db
+{
+    class Database;
+}   // namespace db
 
 class ProfileRepo : public IProfileRepo
 {
    private:
-    Database& _db;
+    db::Database& _db;
 
    public:
-    explicit ProfileRepo(Database& db);
+    explicit ProfileRepo(db::Database& db);
 
     void ensureSchema() override;
 

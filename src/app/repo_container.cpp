@@ -2,7 +2,7 @@
 
 #include "database.hpp"
 
-RepoContainer::RepoContainer(Database& database) : _profileRepo{database} {}
+RepoContainer::RepoContainer(db::Database& database) : _profileRepo{database} {}
 
 IProfileRepo& RepoContainer::profileRepo() noexcept { return _profileRepo; }
 

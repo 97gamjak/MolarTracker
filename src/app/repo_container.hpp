@@ -3,7 +3,10 @@
 
 #include "profile_repo.hpp"
 
-class Database;
+namespace db
+{
+    class Database;   // Forward declaration
+}   // namespace db
 
 class RepoContainer
 {
@@ -11,7 +14,7 @@ class RepoContainer
     ProfileRepo _profileRepo;
 
    public:
-    explicit RepoContainer(Database& db);
+    explicit RepoContainer(db::Database& db);
 
     IProfileRepo&       profileRepo() noexcept;
     const IProfileRepo& profileRepo() const noexcept;

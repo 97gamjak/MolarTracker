@@ -3,7 +3,8 @@ qt_add_executable(MolarTracker
 )
 
 add_subdirectory(config)
-add_subdirectory(infra)
+add_subdirectory(db)
+add_subdirectory(orm)
 add_subdirectory(app)
 add_subdirectory(ui)
 
@@ -11,8 +12,9 @@ target_link_libraries(MolarTracker
     PRIVATE 
     molartracker_ui
     molartracker_app
-    molartracker_infra
+    molartracker_db
     molartracker_config
+    molartracker_orm
 )
 
 set_target_properties(MolarTracker PROPERTIES

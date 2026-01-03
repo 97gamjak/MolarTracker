@@ -10,18 +10,8 @@
 #include "toggle_flag_command.hpp"
 #include "top_menu_bar.hpp"
 
-static QString makeUndoText(const std::string& label)
-{
-    return QString::fromStdString("Undo " + label);
-}
-
-static QString makeRedoText(const std::string& label)
-{
-    return QString::fromStdString("Redo " + label);
-}
-
 MainWindow::MainWindow(AppContext& appContext, QWidget* parent)
-    : _appContext{appContext}, QMainWindow{parent}
+    : QMainWindow{parent}, _appContext{appContext}
 {
     setWindowTitle("Molar Tracker");
     resize(1100, 700);
