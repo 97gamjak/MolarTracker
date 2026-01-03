@@ -24,9 +24,17 @@ namespace orm
         [[nodiscard]] constexpr std::string_view view() const noexcept;
     };
 
-    // Class template argument deduction guide
+    /**
+     * @brief helper deduction guide for fixed_string
+     *
+     * @tparam Size
+     */
     template <std::size_t Size>
     fixed_string(char const (&)[Size]) -> fixed_string<Size>;
 }   // namespace orm
+
+#ifndef __ORM__FIXED_STRING_TPP__
+#include "fixed_string.tpp"
+#endif   // __ORM__FIXED_STRING_TPP__
 
 #endif   // __ORM__FIXED_STRING_HPP__

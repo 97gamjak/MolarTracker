@@ -5,8 +5,6 @@
 #include <string>
 #include <utility>
 
-class sqlite3;
-
 namespace db
 {
     /**

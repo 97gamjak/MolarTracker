@@ -1,3 +1,10 @@
+#ifndef __ORM__FIXED_STRING_TPP__
+#define __ORM__FIXED_STRING_TPP__
+
+#include <array>
+#include <cstddef>
+#include <string_view>
+
 #include "fixed_string.hpp"
 
 namespace orm
@@ -12,11 +19,13 @@ namespace orm
     constexpr fixed_string<Size>::fixed_string(char const (&text)[Size])
     {
         for (std::size_t index = 0; index < Size; ++index)
+        {
             _data[index] = text[index];
+        }
     }
 
     /**
-     * @brief Get a string_view of the fixed_string
+     * @brief get a string_view of the fixed string
      *
      * @tparam Size
      * @return constexpr std::string_view
@@ -28,3 +37,5 @@ namespace orm
     }
 
 }   // namespace orm
+
+#endif   // __ORM__FIXED_STRING_TPP__
