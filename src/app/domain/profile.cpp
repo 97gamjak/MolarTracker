@@ -9,6 +9,11 @@ namespace app
 
     ProfileID Profile::id() const noexcept { return _id; }
 
-    const std::string& Profile::name() const noexcept { return _name; }
+    std::string& Profile::name() const noexcept { return _name; }
+
+    std::optional<std::string>& Profile::email() const noexcept
+    {
+        return _email;
+    }
 
 }   // namespace app

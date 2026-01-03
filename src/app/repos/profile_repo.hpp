@@ -2,6 +2,7 @@
 #define __APP__REPOS__DB_PROFILE_REPO_HPP__
 
 #include "repos_api/i_profile_repo.hpp"
+#include "sql_models/profile_row.hpp"
 
 namespace db
 {
@@ -18,6 +19,9 @@ namespace app
 
        public:
         explicit ProfileRepo(db::Database& db);
+
+        static inline Profile    toDomain(const ProfileRow& row);
+        static inline ProfileRow toRow(const Profile& profile);
 
         void ensureSchema() override;
 

@@ -11,14 +11,16 @@ namespace app
     class Profile
     {
        private:
-        ProfileID   _id;
-        std::string _name;
+        ProfileID                  _id;
+        std::string                _name;
+        std::optional<std::string> _email;
 
        public:
         Profile(ProfileID id, const std::string& name);
 
-        ProfileID          id() const noexcept;
-        const std::string& name() const noexcept;
+        ProfileID                   id() const noexcept;
+        std::string&                name() const noexcept;
+        std::optional<std::string>& email() const noexcept;
     };
 
 }   // namespace app

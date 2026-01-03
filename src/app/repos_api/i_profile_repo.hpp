@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "domain/profile.hpp"
 
 namespace app
 {
