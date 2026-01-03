@@ -2,11 +2,19 @@
 
 #include "database.hpp"
 
-RepoContainer::RepoContainer(db::Database& database) : _profileRepo{database} {}
-
-IProfileRepo& RepoContainer::profileRepo() noexcept { return _profileRepo; }
-
-const IProfileRepo& RepoContainer::profileRepo() const noexcept
+namespace app
 {
-    return _profileRepo;
-}
+
+    RepoContainer::RepoContainer(db::Database& database)
+        : _profileRepo{database}
+    {
+    }
+
+    IProfileRepo& RepoContainer::profileRepo() noexcept { return _profileRepo; }
+
+    const IProfileRepo& RepoContainer::profileRepo() const noexcept
+    {
+        return _profileRepo;
+    }
+
+}   // namespace app

@@ -6,24 +6,29 @@
 
 #include "i_profile_service.hpp"
 
-class IProfileRepo;
-
-class ProfileService : public IProfileService
+namespace app
 {
-   private:
-    IProfileRepo& _profileRepo;
 
-   public:
-    explicit ProfileService(IProfileRepo& profileRepo);
+    class IProfileRepo;
 
-    std::optional<Profile> getProfile(ProfileID id) const override;
-    std::vector<Profile>   getAllProfiles() const override;
+    class ProfileService : public IProfileService
+    {
+       private:
+        IProfileRepo& _profileRepo;
 
-    ProfileID createProfile(const std::string& name) override;
-    void      renameProfile(ProfileID id, const std::string& newName) override;
-    void      deleteProfile(ProfileID id) override;
+       public:
+        explicit ProfileService(IProfileRepo& profileRepo);
 
-    ProfileID ensureDefaultProfile(const std::string& defaultName) override;
-};
+        std::optional<Profile> getProfile(ProfileID id) const override;
+        std::vector<Profile>   getAllProfiles() const override;
+
+        ProfileID createProfile(const std::string& name) override;
+        void renameProfile(ProfileID id, const std::string& newName) override;
+        void deleteProfile(ProfileID id) override;
+
+        ProfileID ensureDefaultProfile(const std::string& defaultName) override;
+    };
+
+}   // namespace app
 
 #endif   // __APP__SERVICES__PROFILE_SERVICE_IMPL_HPP__

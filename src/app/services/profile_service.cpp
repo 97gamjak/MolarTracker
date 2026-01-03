@@ -6,38 +6,48 @@
 #include "profile.hpp"
 #include "profile_repo.hpp"
 
-ProfileService::ProfileService(IProfileRepo& profileRepo)
-    : _profileRepo{profileRepo}
+namespace app
 {
-}
 
-std::optional<Profile> ProfileService::getProfile(ProfileID id) const
-{
-    return _profileRepo.getByID(id);
-}
+    ProfileService::ProfileService(IProfileRepo& profileRepo)
+        : _profileRepo{profileRepo}
+    {
+    }
 
-std::vector<Profile> ProfileService::getAllProfiles() const
-{
-    return _profileRepo.getAll();
-}
+    std::optional<Profile> ProfileService::getProfile(ProfileID id) const
+    {
+        return _profileRepo.getByID(id);
+    }
 
-ProfileID ProfileService::createProfile(const std::string& name)
-{
-    return _profileRepo.create(name);
-}
+    std::vector<Profile> ProfileService::getAllProfiles() const
+    {
+        return _profileRepo.getAll();
+    }
 
-void ProfileService::renameProfile(ProfileID id, const std::string& newName)
-{
-    _profileRepo.rename(id, newName);
-}
+    ProfileID ProfileService::createProfile(const std::string& name)
+    {
+        return _profileRepo.create(name);
+    }
 
-void ProfileService::deleteProfile(ProfileID id) { _profileRepo.remove(id); }
+    void ProfileService::renameProfile(ProfileID id, const std::string& newName)
+    {
+        _profileRepo.rename(id, newName);
+    }
 
-ProfileID ProfileService::ensureDefaultProfile(const std::string& defaultName)
-{
-    const auto profiles = _profileRepo.getAll();
-    if (!profiles.empty())
-        return profiles.front().id();
+    void ProfileService::deleteProfile(ProfileID id)
+    {
+        _profileRepo.remove(id);
+    }
 
-    return _profileRepo.create(defaultName);
-}
+    ProfileID ProfileService::ensureDefaultProfile(
+        const std::string& defaultName
+    )
+    {
+        const auto profiles = _profileRepo.getAll();
+        if (!profiles.empty())
+            return profiles.front().id();
+
+        return _profileRepo.create(defaultName);
+    }
+
+}   // namespace app

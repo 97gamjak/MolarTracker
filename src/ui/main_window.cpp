@@ -13,7 +13,7 @@
 namespace ui
 {
 
-    MainWindow::MainWindow(AppContext& appContext, QWidget* parent)
+    MainWindow::MainWindow(app::AppContext& appContext, QWidget* parent)
         : QMainWindow{parent}, _appContext{appContext}
     {
         setWindowTitle("Molar Tracker");

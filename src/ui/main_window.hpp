@@ -5,7 +5,10 @@
 
 #include "undo_redo/undo_stack.hpp"
 
-class AppContext;   // Forward declaration
+namespace app
+{
+    class AppContext;   // Forward declaration
+}   // namespace app
 
 namespace ui
 {
@@ -16,11 +19,14 @@ namespace ui
         Q_OBJECT
 
        private:
-        AppContext& _appContext;
-        TopMenuBar* _topMenuBar = nullptr;
+        app::AppContext& _appContext;
+        TopMenuBar*      _topMenuBar = nullptr;
 
         UndoStack _undoStack;
         bool      _dummyFlag = false;
+
+       public:
+        explicit MainWindow(app::AppContext& app, QWidget* parent = nullptr);
 
        private:
         void _buildUI();
@@ -29,9 +35,6 @@ namespace ui
         void _refreshUndoRedoActions();
 
         void _ensureDefaultProfile();
-
-       public:
-        explicit MainWindow(AppContext& appContext, QWidget* parent = nullptr);
     };
 
 }   // namespace ui

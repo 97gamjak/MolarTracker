@@ -2,24 +2,29 @@
 
 #include "database.hpp"
 
-AppContext::AppContext(std::string dbPath)
-    : _database{dbPath}, _repos{_database}, _services{_repos}
+namespace app
 {
-    _ensureSchemaAndDefaults();
-}
 
-RepoContainer& AppContext::repos() noexcept { return _repos; }
+    AppContext::AppContext(std::string dbPath)
+        : _database{dbPath}, _repos{_database}, _services{_repos}
+    {
+        _ensureSchemaAndDefaults();
+    }
 
-const RepoContainer& AppContext::repos() const noexcept { return _repos; }
-ServiceContainer&    AppContext::services() noexcept { return _services; }
+    RepoContainer& AppContext::repos() noexcept { return _repos; }
 
-const ServiceContainer& AppContext::services() const noexcept
-{
-    return _services;
-}
+    const RepoContainer& AppContext::repos() const noexcept { return _repos; }
+    ServiceContainer&    AppContext::services() noexcept { return _services; }
 
-void AppContext::_ensureSchemaAndDefaults()
-{
-    _repos.profileRepo().ensureSchema();
-    _services.profileService().ensureDefaultProfile("Default Profile");
-}
+    const ServiceContainer& AppContext::services() const noexcept
+    {
+        return _services;
+    }
+
+    void AppContext::_ensureSchemaAndDefaults()
+    {
+        _repos.profileRepo().ensureSchema();
+        _services.profileService().ensureDefaultProfile("Default Profile");
+    }
+
+}   // namespace app

@@ -5,17 +5,22 @@
 
 #include "id_types.hpp"
 
-class Profile
+namespace app
 {
-   private:
-    ProfileID   _id;
-    std::string _name;
 
-   public:
-    Profile(ProfileID id, const std::string& name);
+    class Profile
+    {
+       private:
+        ProfileID   _id;
+        std::string _name;
 
-    ProfileID          id() const noexcept;
-    const std::string& name() const noexcept;
-};
+       public:
+        Profile(ProfileID id, const std::string& name);
+
+        ProfileID          id() const noexcept;
+        const std::string& name() const noexcept;
+    };
+
+}   // namespace app
 
 #endif   // __APP__DOMAIN__PROFILE_HPP__
