@@ -5,10 +5,10 @@
 #include <QStatusBar>
 #include <QVBoxLayout>
 
-#include "app_context.hpp"
-#include "profile.hpp"
-#include "toggle_flag_command.hpp"
-#include "top_menu_bar.hpp"
+#include "app/app_context.hpp"
+#include "domain/profile.hpp"
+#include "ui/top_menu_bar.hpp"
+#include "ui/undo_redo/toggle_flag_command.hpp"
 
 namespace ui
 {

@@ -1,7 +1,7 @@
 #ifndef __APP__REPO_CONTAINER_HPP__
 #define __APP__REPO_CONTAINER_HPP__
 
-#include "profile_repo.hpp"
+#include "repos/profile_repo.hpp"
 
 namespace db
 {

@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-#include "i_profile_service.hpp"
+#include "services_api/i_profile_service.hpp"
 
 namespace app
 {

@@ -1,7 +1,7 @@
 #ifndef __APP__REPOS__DB_PROFILE_REPO_HPP__
 #define __APP__REPOS__DB_PROFILE_REPO_HPP__
 
-#include "i_profile_repo.hpp"
+#include "repos_api/i_profile_repo.hpp"
 
 namespace db
 {

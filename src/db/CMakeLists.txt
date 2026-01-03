@@ -6,7 +6,7 @@ add_library(molartracker_db STATIC
 
 target_include_directories(molartracker_db
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 if (WIN32)

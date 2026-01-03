@@ -4,5 +4,5 @@ add_library(molartracker_undo_redo_ui STATIC
 
 target_include_directories(molartracker_undo_redo_ui
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
 )
