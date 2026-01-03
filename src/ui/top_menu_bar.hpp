@@ -3,46 +3,50 @@
 
 #include <QObject>
 
-class QMainWindow;
-class QMenuBar;
-class QAction;
+class QMainWindow;   // Forward declaration
+class QMenuBar;      // Forward declaration
+class QAction;       // Forward declaration
 
-class TopMenuBar : public QObject
+namespace ui
 {
-    Q_OBJECT
+    class TopMenuBar : public QObject
+    {
+        Q_OBJECT
 
-   private:
-    QMainWindow& _mainWindow;
+       private:
+        QMainWindow& _mainWindow;
 
-    QAction* _undoAction        = nullptr;
-    QAction* _redoAction        = nullptr;
-    QAction* _quitAction        = nullptr;
-    QAction* _preferencesAction = nullptr;
-    QAction* _aboutAction       = nullptr;
+        QAction* _undoAction        = nullptr;
+        QAction* _redoAction        = nullptr;
+        QAction* _quitAction        = nullptr;
+        QAction* _preferencesAction = nullptr;
+        QAction* _aboutAction       = nullptr;
 
-   private:
-    void _buildFileMenu(QMenuBar* menu);
-    void _buildEditMenu(QMenuBar* menu);
-    void _buildSettingsMenu(QMenuBar* menu);
-    void _buildHelpMenu(QMenuBar* menu);
+       private:
+        void _buildFileMenu(QMenuBar* menu);
+        void _buildEditMenu(QMenuBar* menu);
+        void _buildSettingsMenu(QMenuBar* menu);
+        void _buildHelpMenu(QMenuBar* menu);
 
-   signals:
-    void requestUndo();
-    void requestRedo();
-    void requestQuit();
-    void requestPreferences();
-    void requestAbout();
+       signals:
+        void requestUndo();
+        void requestRedo();
+        void requestQuit();
+        void requestPreferences();
+        void requestAbout();
 
-   public:
-    explicit TopMenuBar(QMainWindow& mainWindow);
+       public:
+        explicit TopMenuBar(QMainWindow& mainWindow);
 
-    void build();
+        void build();
 
-    void setUndoEnabled(bool enabled);
-    void setRedoEnabled(bool enabled);
+        void setUndoEnabled(bool enabled);
+        void setRedoEnabled(bool enabled);
 
-    void setUndoText(const QString& text);
-    void setRedoText(const QString& text);
-};
+        void setUndoText(const QString& text);
+        void setRedoText(const QString& text);
+    };
+
+}   // namespace ui
 
 #endif   // __UI__TOP_MENU_BAR_HPP__

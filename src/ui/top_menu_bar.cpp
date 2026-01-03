@@ -4,82 +4,107 @@
 #include <QMenuBar>
 #include <QObject>
 
-TopMenuBar::TopMenuBar(QMainWindow& mainWindow)
-    : QObject{&mainWindow}, _mainWindow{mainWindow}
+namespace ui
 {
-}
 
-void TopMenuBar::build()
-{
-    auto* bar = _mainWindow.menuBar();
+    TopMenuBar::TopMenuBar(QMainWindow& mainWindow)
+        : QObject{&mainWindow}, _mainWindow{mainWindow}
+    {
+    }
 
-    _buildFileMenu(bar);
-    _buildEditMenu(bar);
-    _buildSettingsMenu(bar);
-    _buildHelpMenu(bar);
-}
+    void TopMenuBar::build()
+    {
+        auto* bar = _mainWindow.menuBar();
 
-void TopMenuBar::_buildFileMenu(QMenuBar* menu)
-{
-    auto* fileMenu = menu->addMenu("&File");
+        _buildFileMenu(bar);
+        _buildEditMenu(bar);
+        _buildSettingsMenu(bar);
+        _buildHelpMenu(bar);
+    }
 
-    _quitAction = fileMenu->addAction("&Quit");
-    _quitAction->setShortcut(QKeySequence::Quit);
-    connect(_quitAction, &QAction::triggered, this, &TopMenuBar::requestQuit);
-}
+    void TopMenuBar::_buildFileMenu(QMenuBar* menu)
+    {
+        auto* fileMenu = menu->addMenu("&File");
 
-void TopMenuBar::_buildEditMenu(QMenuBar* menu)
-{
-    auto* editMenu = menu->addMenu("&Edit");
+        _quitAction = fileMenu->addAction("&Quit");
+        _quitAction->setShortcut(QKeySequence::Quit);
+        connect(
+            _quitAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestQuit
+        );
+    }
 
-    _undoAction = editMenu->addAction("&Undo");
-    _undoAction->setShortcut(QKeySequence::Undo);
-    _undoAction->setEnabled(false);
-    connect(_undoAction, &QAction::triggered, this, &TopMenuBar::requestUndo);
+    void TopMenuBar::_buildEditMenu(QMenuBar* menu)
+    {
+        auto* editMenu = menu->addMenu("&Edit");
 
-    _redoAction = editMenu->addAction("&Redo");
-    _redoAction->setShortcut(QKeySequence::Redo);
-    _redoAction->setEnabled(false);
-    connect(_redoAction, &QAction::triggered, this, &TopMenuBar::requestRedo);
-}
+        _undoAction = editMenu->addAction("&Undo");
+        _undoAction->setShortcut(QKeySequence::Undo);
+        _undoAction->setEnabled(false);
+        connect(
+            _undoAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestUndo
+        );
 
-void TopMenuBar::_buildSettingsMenu(QMenuBar* menu)
-{
-    auto* settingsMenu = menu->addMenu("&Settings");
+        _redoAction = editMenu->addAction("&Redo");
+        _redoAction->setShortcut(QKeySequence::Redo);
+        _redoAction->setEnabled(false);
+        connect(
+            _redoAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestRedo
+        );
+    }
 
-    _preferencesAction = settingsMenu->addAction("&Preferences");
-    connect(
-        _preferencesAction,
-        &QAction::triggered,
-        this,
-        &TopMenuBar::requestPreferences
-    );
-}
+    void TopMenuBar::_buildSettingsMenu(QMenuBar* menu)
+    {
+        auto* settingsMenu = menu->addMenu("&Settings");
 
-void TopMenuBar::_buildHelpMenu(QMenuBar* menu)
-{
-    auto* helpMenu = menu->addMenu("&Help");
+        _preferencesAction = settingsMenu->addAction("&Preferences");
+        connect(
+            _preferencesAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestPreferences
+        );
+    }
 
-    _aboutAction = helpMenu->addAction("&About");
-    connect(_aboutAction, &QAction::triggered, this, &TopMenuBar::requestAbout);
-}
+    void TopMenuBar::_buildHelpMenu(QMenuBar* menu)
+    {
+        auto* helpMenu = menu->addMenu("&Help");
 
-void TopMenuBar::setUndoEnabled(bool enabled)
-{
-    _undoAction->setEnabled(enabled);
-}
+        _aboutAction = helpMenu->addAction("&About");
+        connect(
+            _aboutAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestAbout
+        );
+    }
 
-void TopMenuBar::setRedoEnabled(bool enabled)
-{
-    _redoAction->setEnabled(enabled);
-}
+    void TopMenuBar::setUndoEnabled(bool enabled)
+    {
+        _undoAction->setEnabled(enabled);
+    }
 
-void TopMenuBar::setUndoText(const QString& text)
-{
-    _undoAction->setText(text);
-}
+    void TopMenuBar::setRedoEnabled(bool enabled)
+    {
+        _redoAction->setEnabled(enabled);
+    }
 
-void TopMenuBar::setRedoText(const QString& text)
-{
-    _redoAction->setText(text);
-}
+    void TopMenuBar::setUndoText(const QString& text)
+    {
+        _undoAction->setText(text);
+    }
+
+    void TopMenuBar::setRedoText(const QString& text)
+    {
+        _redoAction->setText(text);
+    }
+
+}   // namespace ui

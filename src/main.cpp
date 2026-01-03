@@ -7,8 +7,8 @@ int main(int argc, char** argv)
 {
     QApplication app{argc, argv};
 
-    AppContext appContext{"molartracker.db"};
-    MainWindow mainWindow{appContext};
+    AppContext     appContext{"molartracker.db"};
+    ui::MainWindow mainWindow{appContext};
 
     mainWindow.show();
 

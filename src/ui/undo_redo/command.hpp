@@ -3,15 +3,24 @@
 
 #include <string>
 
-class ICommand
+namespace ui
 {
-   public:
-    virtual ~ICommand() = default;
 
-    virtual void undo() = 0;
-    virtual void redo() = 0;
+    /**
+     * @brief Interface for undoable/redoable commands
+     *
+     */
+    class ICommand
+    {
+       public:
+        virtual ~ICommand() = default;
 
-    virtual std::string label() const = 0;
-};
+        virtual void undo() = 0;
+        virtual void redo() = 0;
+
+        virtual std::string label() const = 0;
+    };
+
+}   // namespace ui
 
 #endif   // __UI__UNDO_REDO__COMMAND_HPP__

@@ -5,30 +5,35 @@
 
 #include "undo_redo/undo_stack.hpp"
 
-class TopMenuBar;
-class AppContext;
+class AppContext;   // Forward declaration
 
-class MainWindow final : public QMainWindow
+namespace ui
 {
-    Q_OBJECT
+    class TopMenuBar;   // Forward declaration
 
-   private:
-    AppContext& _appContext;
-    TopMenuBar* _topMenuBar = nullptr;
+    class MainWindow final : public QMainWindow
+    {
+        Q_OBJECT
 
-    UndoStack _undoStack;
-    bool      _dummyFlag = false;
+       private:
+        AppContext& _appContext;
+        TopMenuBar* _topMenuBar = nullptr;
 
-   private:
-    void _buildUI();
-    void _buildCentral();
+        UndoStack _undoStack;
+        bool      _dummyFlag = false;
 
-    void _refreshUndoRedoActions();
+       private:
+        void _buildUI();
+        void _buildCentral();
 
-    void _ensureDefaultProfile();
+        void _refreshUndoRedoActions();
 
-   public:
-    explicit MainWindow(AppContext& appContext, QWidget* parent = nullptr);
-};
+        void _ensureDefaultProfile();
+
+       public:
+        explicit MainWindow(AppContext& appContext, QWidget* parent = nullptr);
+    };
+
+}   // namespace ui
 
 #endif   // __UI__MAIN_WINDOW_HPP__
