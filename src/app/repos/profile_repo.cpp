@@ -48,14 +48,34 @@ namespace app
         return row;
     }
 
-    std::optional<Profile> ProfileRepo::getByID(ProfileID id) const
-    {
-        return toDomain(orm::select_by_pk<ProfileRow>(_db, id));
-    }
-
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return toDomain(orm::select_all<ProfileRow>(_db));
+        return toDomain(orm::get_all<ProfileRow>(_db));
+    }
+
+    std::optional<Profile> ProfileRepo::getByID(ProfileID id) const
+    {
+        const auto profile = orm::get_by_pk<ProfileRow>(_db, id);
+
+        if (profile.has_value())
+            return toDomain(profile.value());
+
+        return std::nullopt;
+    }
+
+    std::optional<Profile> ProfileRepo::getByName(const std::string& name) const
+    {
+        using name_field = decltype(ProfileRow::name);
+
+        const auto profile = orm::get_by_unique_field<ProfileRow, name_field>(
+            _db,
+            name_field{name}
+        );
+
+        if (profile.has_value())
+            return toDomain(profile.value());
+
+        return std::nullopt;
     }
 
     ProfileID ProfileRepo::create(const std::string& /*name*/)

@@ -55,6 +55,7 @@ namespace orm
 
         return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
     }
+
 }   // namespace orm
 
 #endif   // __ORM__FIELDS_TPP__

@@ -12,11 +12,11 @@
 
 struct ProfileRow final
 {
-    static constexpr orm::fixed_string table_name = "profile";
+    static inline constexpr std::string table_name = "profile";
 
     orm::Field<"id", ProfileID, orm::primary_key_t, orm::auto_increment_t> id{};
-    orm::Field<"name", std::string, orm::not_null_t> name{};
-    orm::Field<"email", std::optional<std::string>>  email{};
+    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name{};
+    orm::Field<"email", std::optional<std::string>>                 email{};
 
     [[nodiscard]] constexpr auto fields() noexcept
     {

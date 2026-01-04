@@ -28,8 +28,9 @@ namespace app
 
         void ensureSchema() override;
 
-        std::optional<Profile> getByID(ProfileID id) const override;
         std::vector<Profile>   getAll() const override;
+        std::optional<Profile> getByID(ProfileID id) const override;
+        std::optional<Profile> getByName(const std::string&) const override;
 
         ProfileID create(const std::string& name) override;
 

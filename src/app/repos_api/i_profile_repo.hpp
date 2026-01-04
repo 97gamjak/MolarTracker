@@ -22,8 +22,9 @@ namespace app
 
         virtual void ensureSchema() = 0;
 
-        virtual std::optional<Profile> getByID(ProfileID id) const = 0;
-        virtual std::vector<Profile>   getAll() const              = 0;
+        virtual std::vector<Profile>   getAll() const                      = 0;
+        virtual std::optional<Profile> getByID(ProfileID id) const         = 0;
+        virtual std::optional<Profile> getByName(const std::string&) const = 0;
 
         virtual ProfileID create(const std::string& name) = 0;
 

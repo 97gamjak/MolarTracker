@@ -14,16 +14,16 @@ namespace orm
         return _column_name;
     }
 
-    bool FieldView::is_primary_key() const noexcept { return _is_primary_key; }
+    bool FieldView::is_pk() const noexcept { return _is_pk; }
 
     bool FieldView::is_auto_increment() const noexcept
     {
         return _is_auto_increment;
     }
 
-    bool FieldView::is_auto_increment_primary_key() const noexcept
+    bool FieldView::is_auto_increment_pk() const noexcept
     {
-        return _is_auto_increment_primary_key;
+        return _is_auto_increment_pk;
     }
 
     void FieldView::bind(db::Statement& statement, int index) const
