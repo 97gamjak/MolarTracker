@@ -26,7 +26,7 @@ namespace ui
         );
         _refreshUndoRedoActions();
 
-        _ensureDefaultProfile();
+        _ensureProfileExists();
     }
 
     void MainWindow::_buildUI()
@@ -127,17 +127,47 @@ namespace ui
         );
     }
 
-    void MainWindow::_ensureDefaultProfile()
+    void MainWindow::_ensureProfileExists()
     {
-        auto& profileService = _appContext.services().profileService();
-        profileService.ensureDefaultProfile("Default Profile");
+        // auto&      profileService = _appContext.services().profileService();
+        // const auto config         = _appContext.config();
 
-        const auto profiles = profileService.getAllProfiles();
-        statusBar()->showMessage(
-            QString::fromStdString(
-                "Loaded " + std::to_string(profiles.size()) + " profile(s)"
-            )
-        );
+        // const auto hasDefaultProfile = config.has_default_profile();
+
+        // if (hasDefaultProfile)
+        // {
+        //     const auto name = config().get_default_profile_name().value();
+        //     if (!profileService.profileExists(name))
+        //     {
+        //         // todo: create error message!!!
+        //     }
+        //     else
+        //     {
+        //         statusBar()->showMessage(
+        //             QString::fromStdString("Loaded default profile: " + name)
+        //         );
+        //         return;
+        //     }
+        // }
+
+        // if (profiles.empty())
+        // {
+        //     const std::string defaultProfileName = "Default Profile";
+        //     profileService.createProfile(defaultProfileName);
+        //     statusBar()->showMessage(
+        //         QString::fromStdString(
+        //             "No profiles found. Created default profile: " +
+        //             defaultProfileName
+        //         )
+        //     );
+        //     return;
+        // }
+
+        // statusBar()->showMessage(
+        //     QString::fromStdString(
+        //         "Loaded " + std::to_string(profiles.size()) + " profile(s)"
+        //     )
+        // );
     }
 
 }   // namespace ui

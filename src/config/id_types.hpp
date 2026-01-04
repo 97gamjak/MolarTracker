@@ -5,7 +5,7 @@
 
 // clang-format off
 struct ProfileTag {};
-using ProfileID = StrongId<ProfileTag>;
+using ProfileId = StrongId<ProfileTag>;
 // clang-format on
 
 #endif   // __APP__CONFIG__ID_TYPES_HPP__

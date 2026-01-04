@@ -42,9 +42,9 @@ namespace app
     inline ProfileRow ProfileRepo::toRow(const Profile& profile) const
     {
         ProfileRow row;
-        row.id    = profile.id();
-        row.name  = profile.name();
-        row.email = profile.email();
+        row.id    = profile.getId();
+        row.name  = profile.getName();
+        row.email = profile.getEmail();
         return row;
     }
 
@@ -53,7 +53,7 @@ namespace app
         return toDomain(orm::get_all<ProfileRow>(_db));
     }
 
-    std::optional<Profile> ProfileRepo::getByID(ProfileID id) const
+    std::optional<Profile> ProfileRepo::getById(ProfileId id) const
     {
         const auto profile = orm::get_by_pk<ProfileRow>(_db, id);
 
@@ -78,17 +78,17 @@ namespace app
         return std::nullopt;
     }
 
-    ProfileID ProfileRepo::create(const std::string& /*name*/)
+    ProfileId ProfileRepo::create(const std::string& /*name*/)
     {
-        return ProfileID::invalid();
+        return ProfileId::invalid();
     }
 
-    void ProfileRepo::rename(ProfileID /*id*/, const std::string& /*newName*/)
+    void ProfileRepo::rename(ProfileId /*id*/, const std::string& /*newName*/)
     {
         // TODO: Implement database update logic
     }
 
-    void ProfileRepo::remove(ProfileID /*id*/)
+    void ProfileRepo::remove(ProfileId /*id*/)
     {
         // TODO: Implement database deletion logic
     }

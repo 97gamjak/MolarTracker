@@ -29,13 +29,13 @@ namespace app
         void ensureSchema() override;
 
         std::vector<Profile>   getAll() const override;
-        std::optional<Profile> getByID(ProfileID id) const override;
+        std::optional<Profile> getById(ProfileId id) const override;
         std::optional<Profile> getByName(const std::string&) const override;
 
-        ProfileID create(const std::string& name) override;
+        ProfileId create(const std::string& name) override;
 
-        void rename(ProfileID id, const std::string& newName) override;
-        void remove(ProfileID id) override;
+        void rename(ProfileId id, const std::string& newName) override;
+        void remove(ProfileId id) override;
     };
 
 }   // namespace app

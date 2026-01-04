@@ -14,9 +14,9 @@ namespace app
     {
     }
 
-    std::optional<Profile> ProfileService::getProfile(ProfileID id) const
+    std::optional<Profile> ProfileService::getProfile(ProfileId id) const
     {
-        return _profileRepo.getByID(id);
+        return _profileRepo.getById(id);
     }
 
     std::vector<Profile> ProfileService::getAllProfiles() const
@@ -24,30 +24,28 @@ namespace app
         return _profileRepo.getAll();
     }
 
-    ProfileID ProfileService::createProfile(const std::string& name)
+    ProfileId ProfileService::createProfile(
+        const std::string& name,
+        const std::optional<std::string>& /*email*/   // TODO: implement email
+                                                      // support
+    )
     {
         return _profileRepo.create(name);
     }
 
-    void ProfileService::renameProfile(ProfileID id, const std::string& newName)
+    void ProfileService::renameProfile(ProfileId id, const std::string& newName)
     {
         _profileRepo.rename(id, newName);
     }
 
-    void ProfileService::deleteProfile(ProfileID id)
+    void ProfileService::deleteProfile(ProfileId id)
     {
         _profileRepo.remove(id);
     }
 
-    ProfileID ProfileService::ensureDefaultProfile(
-        const std::string& defaultName
-    )
+    bool ProfileService::profileExists(const std::string& name) const
     {
-        const auto profiles = _profileRepo.getAll();
-        if (!profiles.empty())
-            return profiles.front().id();
-
-        return _profileRepo.create(defaultName);
+        return _profileRepo.getByName(name).has_value();
     }
 
 }   // namespace app

@@ -98,6 +98,8 @@
         "regex": "cpp",
         "stack": "cpp",
         "any": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "expected": "cpp",
+        "slist": "cpp"
     }
 }

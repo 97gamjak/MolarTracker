@@ -19,14 +19,17 @@ namespace app
        public:
         explicit ProfileService(IProfileRepo& profileRepo);
 
-        std::optional<Profile> getProfile(ProfileID id) const override;
+        std::optional<Profile> getProfile(ProfileId id) const override;
         std::vector<Profile>   getAllProfiles() const override;
 
-        ProfileID createProfile(const std::string& name) override;
-        void renameProfile(ProfileID id, const std::string& newName) override;
-        void deleteProfile(ProfileID id) override;
+        ProfileId createProfile(
+            const std::string&                name,
+            const std::optional<std::string>& email
+        ) override;
+        void renameProfile(ProfileId id, const std::string& newName) override;
+        void deleteProfile(ProfileId id) override;
 
-        ProfileID ensureDefaultProfile(const std::string& defaultName) override;
+        bool profileExists(const std::string& name) const;
     };
 
 }   // namespace app

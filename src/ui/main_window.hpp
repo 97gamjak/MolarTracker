@@ -34,7 +34,7 @@ namespace ui
 
         void _refreshUndoRedoActions();
 
-        void _ensureDefaultProfile();
+        void _ensureProfileExists();
     };
 
 }   // namespace ui
