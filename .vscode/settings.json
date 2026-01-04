@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "*.tpp": "c++",
+        "*.tpp": "cpp",
         "qmainwindow": "cpp",
         "qobject": "cpp",
         "qmenubar": "cpp",
