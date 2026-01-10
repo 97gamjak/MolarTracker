@@ -30,13 +30,13 @@ namespace app
         Subscription(const Subscription&)            = delete;
         Subscription& operator=(const Subscription&) = delete;
 
-        Subscription(Subscription&& other) noexcept
+        Subscription(Subscription&& other)
             : _unsubscribe{std::move(other._unsubscribe)}, _id{other._id}
         {
             other._id = 0;
         }
 
-        Subscription& operator=(Subscription&& other) noexcept
+        Subscription& operator=(Subscription&& other)
         {
             if (this == &other)
                 return *this;

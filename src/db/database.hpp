@@ -30,14 +30,14 @@ namespace db
         Database(Database const&)            = delete;
         Database& operator=(Database const&) = delete;
 
-        Database(Database&& other) noexcept;
-        Database& operator=(Database&& other) noexcept;
+        Database(Database&& other);
+        Database& operator=(Database&& other);
 
         void open(const std::string& db_path);
-        void close() noexcept;
+        void close();
 
-        [[nodiscard]] bool     is_open() const noexcept;
-        [[nodiscard]] sqlite3* native_handle() const noexcept;
+        [[nodiscard]] bool     is_open() const;
+        [[nodiscard]] sqlite3* native_handle() const;
 
         void execute(std::string_view sql);
 
@@ -52,7 +52,7 @@ namespace db
        private:   // PRIVATE HELPER METHODS
         void                      _ensure_open() const;
         [[nodiscard]] std::string _sqlite_error_message() const;
-        void                      _move_from(Database&& other) noexcept;
+        void                      _move_from(Database&& other);
     };
 }   // namespace db
 

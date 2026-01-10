@@ -41,10 +41,10 @@ namespace orm
        public:
         FieldView() = default;
 
-        [[nodiscard]] std::string_view column_name() const noexcept;
-        [[nodiscard]] bool             is_pk() const noexcept;
-        [[nodiscard]] bool             is_auto_increment() const noexcept;
-        [[nodiscard]] bool             is_auto_increment_pk() const noexcept;
+        [[nodiscard]] std::string_view column_name() const;
+        [[nodiscard]] bool             is_pk() const;
+        [[nodiscard]] bool             is_auto_increment() const;
+        [[nodiscard]] bool             is_auto_increment_pk() const;
 
         void bind(db::Statement& statement, int index) const;
         void read_from(db::Statement const& statement, int col) const;

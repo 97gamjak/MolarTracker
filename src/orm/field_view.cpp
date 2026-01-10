@@ -9,19 +9,13 @@
 
 namespace orm
 {
-    std::string_view FieldView::column_name() const noexcept
-    {
-        return _column_name;
-    }
+    std::string_view FieldView::column_name() const { return _column_name; }
 
-    bool FieldView::is_pk() const noexcept { return _is_pk; }
+    bool FieldView::is_pk() const { return _is_pk; }
 
-    bool FieldView::is_auto_increment() const noexcept
-    {
-        return _is_auto_increment;
-    }
+    bool FieldView::is_auto_increment() const { return _is_auto_increment; }
 
-    bool FieldView::is_auto_increment_pk() const noexcept
+    bool FieldView::is_auto_increment_pk() const
     {
         return _is_auto_increment_pk;
     }

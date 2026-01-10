@@ -27,11 +27,11 @@ namespace app
         AppContext(const AppContext&)            = delete;
         AppContext& operator=(const AppContext&) = delete;
 
-        StoreContainer&       getStore() noexcept { return _store; }
-        const StoreContainer& getStore() const noexcept { return _store; }
+        StoreContainer&       getStore() { return _store; }
+        const StoreContainer& getStore() const { return _store; }
 
-        AppConfig&       getConfig() noexcept { return _config; }
-        const AppConfig& getConfig() const noexcept { return _config; }
+        AppConfig&       getConfig() { return _config; }
+        const AppConfig& getConfig() const { return _config; }
     };
 
 }   // namespace app

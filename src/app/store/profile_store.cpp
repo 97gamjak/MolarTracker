@@ -36,9 +36,7 @@ namespace app
         return names;
     }
 
-    ProfileStoreResult ProfileStore::setActiveProfile(
-        std::string_view name
-    ) noexcept
+    ProfileStoreResult ProfileStore::setActiveProfile(std::string_view name)
     {
         const auto profile = getProfile(name);
         if (!profile)
@@ -49,7 +47,7 @@ namespace app
         return ProfileStoreResult::Ok;
     }
 
-    std::optional<Profile> ProfileStore::getActiveProfile() const noexcept
+    std::optional<Profile> ProfileStore::getActiveProfile() const
     {
         if (!_activeProfileId)
             return std::nullopt;
@@ -57,7 +55,7 @@ namespace app
         return getProfile(_activeProfileId.value());
     }
 
-    bool ProfileStore::hasPendingChanges() const noexcept
+    bool ProfileStore::hasPendingChanges() const
     {
         return std::ranges::any_of(
             _profileStates,
@@ -65,7 +63,7 @@ namespace app
         );
     }
 
-    std::optional<Profile> ProfileStore::getProfile(ProfileId id) const noexcept
+    std::optional<Profile> ProfileStore::getProfile(ProfileId id) const
     {
         const auto it = std::ranges::find_if(
             _profiles,
@@ -78,9 +76,7 @@ namespace app
         return *it;
     }
 
-    std::optional<Profile> ProfileStore::getProfile(
-        std::string_view name
-    ) const noexcept
+    std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
     {
         const std::string normalized = normalizeName(name);
 
@@ -96,14 +92,14 @@ namespace app
         return *it;
     }
 
-    bool ProfileStore::profileExists(std::string_view name) const noexcept
+    bool ProfileStore::profileExists(std::string_view name) const
     {
         return getProfile(name).has_value();
     }
 
     ProfileStoreResult ProfileStore::addProfile(
         const drafts::ProfileDraft& draft
-    ) noexcept
+    )
     {
         if (profileExists(draft.name))
         {

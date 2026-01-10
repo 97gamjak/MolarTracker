@@ -24,7 +24,7 @@ namespace db
      * @brief Destroy the Transaction:: Transaction object
      *
      */
-    Transaction::~Transaction() noexcept
+    Transaction::~Transaction()
     {
         if (_is_active && _db != nullptr)
             try
@@ -41,7 +41,7 @@ namespace db
      *
      * @param other
      */
-    Transaction::Transaction(Transaction&& other) noexcept
+    Transaction::Transaction(Transaction&& other)
     {
         _move_from(std::move(other));
     }
@@ -52,7 +52,7 @@ namespace db
      * @param other
      * @return Transaction&
      */
-    Transaction& Transaction::operator=(Transaction&& other) noexcept
+    Transaction& Transaction::operator=(Transaction&& other)
     {
         if (this != &other)
             _move_from(std::move(other));
@@ -66,7 +66,7 @@ namespace db
      * @return true
      * @return false
      */
-    bool Transaction::is_active() const noexcept { return _is_active; }
+    bool Transaction::is_active() const { return _is_active; }
 
     /**
      * @brief commit the transaction
@@ -105,7 +105,7 @@ namespace db
      *
      * @param other
      */
-    void Transaction::_move_from(Transaction&& other) noexcept
+    void Transaction::_move_from(Transaction&& other)
     {
         _db        = other._db;
         _is_active = other._is_active;

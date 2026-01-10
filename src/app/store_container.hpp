@@ -17,8 +17,8 @@ namespace app
         StoreContainer(ServiceContainer& services);
 
         // clang-format off
-        ProfileStore&       getProfileStore() noexcept { return _profileStore; }
-        const ProfileStore& getProfileStore() const noexcept { return _profileStore; }
+        ProfileStore&       getProfileStore() { return _profileStore; }
+        const ProfileStore& getProfileStore() const { return _profileStore; }
         // clang-format on
     };
 

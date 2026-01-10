@@ -18,11 +18,8 @@ struct ProfileRow final
     orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name{};
     orm::Field<"email", std::optional<std::string>>                 email{};
 
-    [[nodiscard]] constexpr auto fields() noexcept
-    {
-        return std::tie(id, name, email);
-    }
-    [[nodiscard]] constexpr auto fields() const noexcept
+    [[nodiscard]] constexpr auto fields() { return std::tie(id, name, email); }
+    [[nodiscard]] constexpr auto fields() const
     {
         return std::tie(id, name, email);
     }

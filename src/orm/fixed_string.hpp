@@ -19,7 +19,7 @@ namespace orm
 
         constexpr fixed_string(char const (&text)[Size]);
 
-        [[nodiscard]] constexpr std::string_view view() const noexcept;
+        [[nodiscard]] constexpr std::string_view view() const;
     };
 
     /**

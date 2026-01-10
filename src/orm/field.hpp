@@ -41,8 +41,8 @@ namespace orm
         Field() = default;
         explicit Field(Value value);
 
-        [[nodiscard]] Value&       value() noexcept;
-        [[nodiscard]] Value const& value() const noexcept;
+        [[nodiscard]] Value&       value();
+        [[nodiscard]] Value const& value() const;
 
         Field& operator=(Value value);
 

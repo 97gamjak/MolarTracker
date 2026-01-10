@@ -21,6 +21,7 @@ namespace drafts
 
 namespace app
 {
+    // TODO: centralize this enum
     enum class StoreState
     {
         Clean,
@@ -44,9 +45,9 @@ namespace app
         IProfileService& _profileService;
 
         std::vector<Profile> _profiles;
+        std::set<ProfileId>  _usedIds;
         std::unordered_map<ProfileId, StoreState, ProfileId::Hash>
-                            _profileStates;
-        std::set<ProfileId> _usedIds;
+            _profileStates;
 
         std::optional<ProfileId> _activeProfileId;
         // std::size_t                               _nextObserverId = 0;
@@ -55,23 +56,23 @@ namespace app
        public:
         explicit ProfileStore(IProfileService& profileService);
 
-        bool hasProfiles() const;
+        [[nodiscard]] bool hasProfiles() const;
 
-        std::vector<std::string> getAllProfileNames() const;
+        [[nodiscard]] std::vector<std::string> getAllProfileNames() const;
 
-        ProfileStoreResult     setActiveProfile(std::string_view name) noexcept;
-        std::optional<Profile> getActiveProfile() const noexcept;
+        [[nodiscard]] ProfileStoreResult     setActiveProfile(std::string_view);
+        [[nodiscard]] std::optional<Profile> getActiveProfile() const;
 
-        bool hasPendingChanges() const noexcept;
+        [[nodiscard]] bool hasPendingChanges() const;
 
-        std::optional<Profile> getProfile(ProfileId id) const noexcept;
-        std::optional<Profile> getProfile(std::string_view name) const noexcept;
+        [[nodiscard]] std::optional<Profile> getProfile(ProfileId id) const;
+        [[nodiscard]] std::optional<Profile> getProfile(std::string_view) const;
 
-        bool profileExists(std::string_view name) const noexcept;
+        [[nodiscard]] bool profileExists(std::string_view name) const;
 
-        ProfileStoreResult addProfile(
+        [[nodiscard]] ProfileStoreResult addProfile(
             const drafts::ProfileDraft& draft
-        ) noexcept;
+        );
 
         // // ----- observation -----
         // using Observer = std::function<void()>;
@@ -96,9 +97,9 @@ namespace app
        private:
         // void notify();
 
-        static std::string normalizeName(std::string_view name);
+        [[nodiscard]] static std::string normalizeName(std::string_view name);
 
-        ProfileId _generateNewId();
+        [[nodiscard]] ProfileId _generateNewId();
 
         // void chooseFallbackActiveIfInvalid();
     };

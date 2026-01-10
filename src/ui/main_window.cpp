@@ -141,15 +141,25 @@ namespace ui
             const auto name = config.get_default_profile_name().value();
             if (!profileStore.profileExists(name))
             {
-                // todo: create error message!!!
+                // TODO: create error message!!!
             }
             else
             {
-                profileStore.setActiveProfile(name);   // TODO: check result
-                statusBar()->showMessage(
-                    QString::fromStdString("Loaded default profile: " + name)
-                );
-                return;
+                const auto result = profileStore.setActiveProfile(name);
+                if (result != app::ProfileStoreResult::Ok)
+                {
+                    // TODO: create error message!!!
+                    return;
+                }
+                else
+                {
+                    statusBar()->showMessage(
+                        QString::fromStdString(
+                            "Loaded default profile: " + name
+                        )
+                    );
+                    return;
+                }
             }
         }
         else
@@ -187,8 +197,18 @@ namespace ui
                         auto& store = _appContext.getStore().getProfileStore();
                         auto& _config = _appContext.getConfig();
 
-                        store.addProfile(profile);
-                        store.setActiveProfile(profile.name);
+                        if (store.addProfile(profile) !=
+                            app::ProfileStoreResult::Ok)
+                        {
+                            // TODO: show error message
+                            return;
+                        }
+                        if (store.setActiveProfile(profile.name) !=
+                            app::ProfileStoreResult::Ok)
+                        {
+                            // TODO: show error message
+                            return;
+                        }
                         _config.set_default_profile_name(profile.name);
                         statusBar()->showMessage("Profile added.");
                     }

@@ -22,13 +22,13 @@ namespace orm
     }
 
     template <fixed_string Name, typename Value, typename... Options>
-    Value& Field<Name, Value, Options...>::value() noexcept
+    Value& Field<Name, Value, Options...>::value()
     {
         return _value;
     }
 
     template <fixed_string Name, typename Value, typename... Options>
-    Value const& Field<Name, Value, Options...>::value() const noexcept
+    Value const& Field<Name, Value, Options...>::value() const
     {
         return _value;
     }

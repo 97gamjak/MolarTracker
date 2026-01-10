@@ -10,32 +10,32 @@ class StrongId final
    public:
     using rep_type = Rep;
 
-    constexpr StrongId() noexcept = default;
-    explicit constexpr StrongId(Rep value) noexcept : _value{value} {}
+    constexpr StrongId() = default;
+    explicit constexpr StrongId(Rep value) : _value{value} {}
 
-    [[nodiscard]] static constexpr StrongId invalid() noexcept
+    [[nodiscard]] static constexpr StrongId invalid()
     {
         return StrongId{static_cast<Rep>(-1)};
     }
 
-    [[nodiscard]] static constexpr StrongId from(Rep value) noexcept
+    [[nodiscard]] static constexpr StrongId from(Rep value)
     {
         return StrongId{value};
     }
-    [[nodiscard]] constexpr Rep value() const noexcept { return _value; }
+    [[nodiscard]] constexpr Rep value() const { return _value; }
 
-    [[nodiscard]] constexpr StrongId operator-() const noexcept
+    [[nodiscard]] constexpr StrongId operator-() const
     {
         return StrongId{-_value};
     }
 
-    bool operator==(const StrongId&) const noexcept  = default;
-    auto operator<=>(const StrongId&) const noexcept = default;
+    bool operator==(const StrongId&) const  = default;
+    auto operator<=>(const StrongId&) const = default;
 
     // For use in hash maps/sets
     struct Hash
     {
-        std::size_t operator()(StrongId id) const noexcept
+        std::size_t operator()(StrongId id) const
         {
             return std::hash<Rep>{}(id.value());
         }

@@ -18,8 +18,8 @@ namespace ui
        public:
         void pushAndRedo(std::unique_ptr<ICommand> command);
 
-        bool canUndo() const noexcept;
-        bool canRedo() const noexcept;
+        bool canUndo() const;
+        bool canRedo() const;
 
         void undo();
         void redo();
