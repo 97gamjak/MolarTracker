@@ -4,6 +4,7 @@
 #include <cctype>
 #include <unordered_map>
 
+#include "drafts/profile_draft.hpp"
 #include "services_api/i_profile_service.hpp"
 #include "store/profile_store.hpp"
 
@@ -13,257 +14,197 @@ namespace app
     ProfileStore::ProfileStore(IProfileService& profileService)
         : _profileService{profileService}
     {
+        _profiles = _profileService.getAll();
+
+        for (const auto& profile : _profiles)
+        {
+            _profileStates.emplace(profile.getId(), StoreState::Clean);
+            _usedIds.emplace(profile.getId());
+        }
     }
 
-    const std::vector<Profile>& ProfileStore::profiles() const noexcept
+    bool ProfileStore::hasProfiles() const { return !_profiles.empty(); }
+
+    std::vector<std::string> ProfileStore::getAllProfileNames() const
     {
-        return _profiles;
+        std::vector<std::string> names;
+        names.reserve(_profiles.size());
+
+        for (const auto& profile : _profiles)
+            names.push_back(profile.getName());
+
+        return names;
     }
 
-    std::optional<ProfileId> ProfileStore::activeProfileId() const noexcept
+    ProfileStoreResult ProfileStore::setActiveProfile(
+        std::string_view name
+    ) noexcept
     {
-        return _activeProfileId;
+        const auto profile = getProfile(name);
+        if (!profile)
+            return ProfileStoreResult::ProfileNotFound;
+
+        _activeProfileId = profile->getId();
+
+        return ProfileStoreResult::Ok;
     }
 
-    const Profile* ProfileStore::activeProfile() const noexcept
+    std::optional<Profile> ProfileStore::getActiveProfile() const noexcept
     {
         if (!_activeProfileId)
-            return nullptr;
-        return findProfileById(*_activeProfileId);
+            return std::nullopt;
+
+        return getProfile(_activeProfileId.value());
     }
 
     bool ProfileStore::hasPendingChanges() const noexcept
     {
-        return _hasPendingChanges;
+        return std::ranges::any_of(
+            _profileStates,
+            [](const auto& pair) { return pair.second != StoreState::Clean; }
+        );
     }
 
-    const Profile* ProfileStore::findProfileById(ProfileId id) const noexcept
+    std::optional<Profile> ProfileStore::getProfile(ProfileId id) const noexcept
     {
-        const auto it = std::find_if(
-            _profiles.begin(),
-            _profiles.end(),
+        const auto it = std::ranges::find_if(
+            _profiles,
             [id](const Profile& p) { return p.getId() == id; }
         );
-        return it == _profiles.end() ? nullptr : &(*it);
+
+        if (it == _profiles.end())
+            return std::nullopt;
+
+        return *it;
     }
 
-    const Profile* ProfileStore::findProfileByName(
+    std::optional<Profile> ProfileStore::getProfile(
         std::string_view name
     ) const noexcept
     {
         const std::string normalized = normalizeName(name);
 
-        const auto it = std::find_if(
-            _profiles.begin(),
-            _profiles.end(),
-            [&](const Profile& p)
+        const auto it = std::ranges::find_if(
+            _profiles,
+            [&normalized](const Profile& p)
             { return normalizeName(p.getName()) == normalized; }
         );
-        return it == _profiles.end() ? nullptr : &(*it);
-    }
 
-    bool ProfileStore::profileNameExists(std::string_view name) const noexcept
-    {
-        return findProfileByName(name) != nullptr;
-    }
-
-    bool ProfileStore::profileNameExists(
-        std::string_view name,
-        ProfileId        ignoreProfileId
-    ) const noexcept
-    {
-        const std::string normalized = normalizeName(name);
-
-        for (const auto& profile : _profiles)
-        {
-            if (profile.getId() == ignoreProfileId)
-                continue;
-            if (normalizeName(profile.getName()) == normalized)
-                return true;
-        }
-        return false;
-    }
-
-    Subscription ProfileStore::subscribe(Observer observer)
-    {
-        const std::size_t id = ++_nextObserverId;
-        _observers.emplace(id, std::move(observer));
-        return Subscription{
-            [this](std::size_t observerId) { _observers.erase(observerId); },
-            id
-        };
-    }
-
-    void ProfileStore::reload()
-    {
-        _baselineProfiles = _profileService.getAllProfiles();
-        _profiles         = _baselineProfiles;
-
-        _hasPendingChanges = false;
-
-        if (_profiles.empty())
-        {
-            _activeProfileId.reset();
-        }
-        else if (!_activeProfileId || !findProfileById(*_activeProfileId))
-        {
-            _activeProfileId = _profiles.front().getId();
-        }
-
-        notify();
-    }
-
-    void ProfileStore::discard()
-    {
-        _profiles          = _baselineProfiles;
-        _hasPendingChanges = false;
-
-        chooseFallbackActiveIfInvalid();
-        notify();
-    }
-
-    ProfileId ProfileStore::createProfile(
-        std::string                name,
-        std::optional<std::string> email
-    )
-    {
-        // In-memory only: we assign a temporary negative id policy later if you
-        // want. For now keep it simple: create with id=0 means “not persisted
-        // yet”. If you already have a temp-id scheme, tell me and I’ll match
-        // it.
-        Profile profile{ProfileId::from(0), name, email};
-
-        _profiles.push_back(profile);
-
-        if (!_activeProfileId)
-            _activeProfileId = profile.getId();
-
-        _hasPendingChanges = true;
-        notify();
-        return profile.getId();
-    }
-
-    void ProfileStore::renameProfile(ProfileId id, std::string newName)
-    {
-        auto it = std::find_if(
-            _profiles.begin(),
-            _profiles.end(),
-            [id](const Profile& p) { return p.getId() == id; }
-        );
         if (it == _profiles.end())
-            return;
+            return std::nullopt;
 
-        if (it->getName() == newName)
-            return;
-
-        it->setName(std::move(newName));
-        _hasPendingChanges = true;
-        notify();
+        return *it;
     }
 
-    void ProfileStore::setActiveProfile(ProfileId id)
+    bool ProfileStore::profileExists(std::string_view name) const noexcept
     {
-        if (_activeProfileId && *_activeProfileId == id)
-            return;
-
-        if (!findProfileById(id))
-            return;
-
-        _activeProfileId = id;
-        notify();
+        return getProfile(name).has_value();
     }
 
-    void ProfileStore::deleteProfile(ProfileId id)
+    ProfileStoreResult ProfileStore::addProfile(
+        const drafts::ProfileDraft& draft
+    ) noexcept
     {
-        const auto oldSize = _profiles.size();
-
-        _profiles.erase(
-            std::remove_if(
-                _profiles.begin(),
-                _profiles.end(),
-                [id](const Profile& p) { return p.getId() == id; }
-            ),
-            _profiles.end()
-        );
-
-        if (_profiles.size() == oldSize)
-            return;
-
-        _hasPendingChanges = true;
-
-        if (_activeProfileId && *_activeProfileId == id)
-            chooseFallbackActiveIfInvalid();
-
-        notify();
-    }
-
-    void ProfileStore::commit()
-    {
-        if (!_hasPendingChanges)
-            return;
-
-        // Diff baseline -> current and persist final state.
-        // Minimal approach:
-        // - detect deletes (in baseline but not in current)
-        // - detect creates (in current but not in baseline)
-        // - detect updates (same id but different fields)
-
-        std::unordered_map<std::int64_t, Profile> baselineById;
-        baselineById.reserve(_baselineProfiles.size());
-        for (const auto& p : _baselineProfiles)
-            baselineById.emplace(p.getId().value(), p);
-
-        std::unordered_map<std::int64_t, Profile> currentById;
-        currentById.reserve(_profiles.size());
-        for (const auto& p : _profiles)
-            currentById.emplace(p.getId().value(), p);
-
-        // Deletes
-        for (const auto& p : _baselineProfiles)
+        if (profileExists(draft.name))
         {
-            if (!currentById.contains(p.getId().value()))
-            {
-                _profileService.deleteProfile(p.getId());
-            }
+            return ProfileStoreResult::NameAlreadyExists;
         }
 
-        // Creates / Updates
-        for (const auto& p : _profiles)
-        {
-            const bool existedBefore = baselineById.contains(p.getId().value());
-
-            if (!existedBefore)
-            {
-                // If you use id=0 for new, service returns real id.
-                const ProfileId newId =
-                    _profileService.createProfile(p.getName(), p.getEmail());
-                (void) newId;   // if you want, we can remap in-memory ids and
-                                // keep active stable
-                continue;
-            }
-
-            const Profile& old = baselineById.at(p.getId().value());
-            if (old.getName() != p.getName() || old.getEmail() != p.getEmail())
-            {
-                // TODO:
-                // _profileService.updateProfile(
-                //     p
-                // );   // or rename/update depending on your service API
-            }
-        }
-
-        reload();
+        const ProfileId newId = _generateNewId();
+        Profile         newProfile{newId, draft.name, draft.email};
+        _profiles.push_back(newProfile);
+        _profileStates.emplace(newId, StoreState::New);
+        _usedIds.emplace(newId);
+        return ProfileStoreResult::Ok;
     }
 
-    void ProfileStore::notify()
-    {
-        const auto copy = _observers;
-        for (const auto& [_, observer] : copy)
-        {
-            if (observer)
-                observer();
-        }
-    }
+    // Subscription ProfileStore::subscribe(Observer observer)
+    // {
+    //     const std::size_t id = ++_nextObserverId;
+    //     _observers.emplace(id, std::move(observer));
+    //     return Subscription{
+    //         [this](std::size_t observerId) { _observers.erase(observerId); },
+    //         id
+    //     };
+    // }
+
+    // void ProfileStore::reload()
+    // {
+    //     _profiles = _profileService.getAllProfiles();
+
+    //     notify();
+    // }
+
+    // void ProfileStore::commit()
+    // {
+    //     if (!_hasPendingChanges)
+    //         return;
+
+    //     // Diff baseline -> current and persist final state.
+    //     // Minimal approach:
+    //     // - detect deletes (in baseline but not in current)
+    //     // - detect creates (in current but not in baseline)
+    //     // - detect updates (same id but different fields)
+
+    //     std::unordered_map<std::int64_t, Profile> baselineById;
+    //     baselineById.reserve(_baselineProfiles.size());
+    //     for (const auto& p : _baselineProfiles)
+    //         baselineById.emplace(p.getId().value(), p);
+
+    //     std::unordered_map<std::int64_t, Profile> currentById;
+    //     currentById.reserve(_profiles.size());
+    //     for (const auto& p : _profiles)
+    //         currentById.emplace(p.getId().value(), p);
+
+    //     // Deletes
+    //     for (const auto& p : _baselineProfiles)
+    //     {
+    //         if (!currentById.contains(p.getId().value()))
+    //         {
+    //             _profileService.deleteProfile(p.getId());
+    //         }
+    //     }
+
+    //     // Creates / Updates
+    //     for (const auto& p : _profiles)
+    //     {
+    //         const bool existedBefore =
+    //         baselineById.contains(p.getId().value());
+
+    //         if (!existedBefore)
+    //         {
+    //             // If you use id=0 for new, service returns real id.
+    //             const ProfileId newId =
+    //                 _profileService.createProfile(p.getName(), p.getEmail());
+    //             (void) newId;   // if you want, we can remap in-memory ids
+    //             and
+    //                             // keep active stable
+    //             continue;
+    //         }
+
+    //         const Profile& old = baselineById.at(p.getId().value());
+    //         if (old.getName() != p.getName() || old.getEmail() !=
+    //         p.getEmail())
+    //         {
+    //             // TODO:
+    //             // _profileService.updateProfile(
+    //             //     p
+    //             // );   // or rename/update depending on your service API
+    //         }
+    //     }
+
+    //     reload();
+    // }
+
+    // void ProfileStore::notify()
+    // {
+    //     const auto copy = _observers;
+    //     for (const auto& [_, observer] : copy)
+    //     {
+    //         if (observer)
+    //             observer();
+    //     }
+    // }
 
     std::string ProfileStore::normalizeName(std::string_view name)
     {
@@ -294,15 +235,26 @@ namespace app
         return result;
     }
 
-    void ProfileStore::chooseFallbackActiveIfInvalid()
+    ProfileId ProfileStore::_generateNewId()
     {
-        if (_activeProfileId && findProfileById(*_activeProfileId))
-            return;
-
-        if (_profiles.empty())
-            _activeProfileId.reset();
-        else
-            _activeProfileId = _profiles.front().getId();
+        ProfileId newId{0};
+        while (_usedIds.contains(newId) || _usedIds.contains(-newId))
+        {
+            newId = ProfileId::from(newId.value() + 1);
+        }
+        _usedIds.insert(newId);
+        return newId;
     }
+
+    // void ProfileStore::chooseFallbackActiveIfInvalid()
+    // {
+    //     if (_activeProfileId && findProfileById(*_activeProfileId))
+    //         return;
+
+    //     if (_profiles.empty())
+    //         _activeProfileId.reset();
+    //     else
+    //         _activeProfileId = _profiles.front().getId();
+    // }
 
 }   // namespace app

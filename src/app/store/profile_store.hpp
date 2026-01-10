@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include <optional>
+#include <set>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -13,77 +14,93 @@
 #include "services_api/i_profile_service.hpp"
 #include "store/subscription.hpp"
 
+namespace drafts
+{
+    struct ProfileDraft;
+}
+
 namespace app
 {
+    enum class StoreState
+    {
+        Clean,
+        New,
+        Modified,
+        Deleted
+    };
 
+    enum class ProfileStoreResult
+    {
+        Ok,
+        Error,
+        NameAlreadyExists,
+        ProfileNotFound,
+    };
+
+    // TODO: add nodiscard where appropriate
     class ProfileStore final
     {
-       public:
-        explicit ProfileStore(IProfileService& profileService);
-
-        // ----- state access -----
-        const std::vector<Profile>& profiles() const noexcept;
-        std::optional<ProfileId>    activeProfileId() const noexcept;
-        const Profile*              activeProfile() const noexcept;
-
-        bool hasPendingChanges() const noexcept;
-
-        // ----- lookup / validation helpers -----
-        const Profile* findProfileById(ProfileId id) const noexcept;
-        const Profile* findProfileByName(std::string_view name) const noexcept;
-
-        bool profileNameExists(std::string_view name) const noexcept;
-        bool profileNameExists(
-            std::string_view name,
-            ProfileId        ignoreProfileId
-        ) const noexcept;
-
-        // ----- observation -----
-        using Observer = std::function<void()>;
-        Subscription subscribe(Observer observer);
-
-        // ----- lifecycle -----
-        void reload();    // load from DB into store
-        void discard();   // drop in-memory changes -> back to last reload()
-
-        // ----- mutations (in-memory only) -----
-        ProfileId createProfile(
-            std::string                name,
-            std::optional<std::string> email = std::nullopt
-        );
-        void renameProfile(ProfileId id, std::string newName);
-        void setActiveProfile(ProfileId id);
-        void deleteProfile(ProfileId id);
-
-        // ----- persistence -----
-        void commit();   // apply changes to DB via service; then reload()
-
-       private:
-        void notify();
-
-        static std::string normalizeName(
-            std::string_view name
-        );   // define policy here (trim + maybe lower)
-
-        void chooseFallbackActiveIfInvalid();
-
        private:
         IProfileService& _profileService;
 
-        // last loaded committed snapshot
-        std::vector<Profile> _baselineProfiles;
-
-        // current in-memory truth
         std::vector<Profile> _profiles;
+        std::unordered_map<ProfileId, StoreState, ProfileId::Hash>
+                            _profileStates;
+        std::set<ProfileId> _usedIds;
 
         std::optional<ProfileId> _activeProfileId;
+        // std::size_t                               _nextObserverId = 0;
+        // std::unordered_map<std::size_t, Observer> _observers;
 
-        // observation
-        std::size_t                               _nextObserverId = 0;
-        std::unordered_map<std::size_t, Observer> _observers;
+       public:
+        explicit ProfileStore(IProfileService& profileService);
 
-        // dirty state
-        bool _hasPendingChanges = false;
+        bool hasProfiles() const;
+
+        std::vector<std::string> getAllProfileNames() const;
+
+        ProfileStoreResult     setActiveProfile(std::string_view name) noexcept;
+        std::optional<Profile> getActiveProfile() const noexcept;
+
+        bool hasPendingChanges() const noexcept;
+
+        std::optional<Profile> getProfile(ProfileId id) const noexcept;
+        std::optional<Profile> getProfile(std::string_view name) const noexcept;
+
+        bool profileExists(std::string_view name) const noexcept;
+
+        ProfileStoreResult addProfile(
+            const drafts::ProfileDraft& draft
+        ) noexcept;
+
+        // // ----- observation -----
+        // using Observer = std::function<void()>;
+        // Subscription subscribe(Observer observer);
+
+        // // ----- lifecycle -----
+        // void reload();    // load from DB into store
+        // void discard();   // drop in-memory changes -> back to last reload()
+
+        // // ----- mutations (in-memory only) -----
+        // ProfileId createProfile(
+        //     std::string                name,
+        //     std::optional<std::string> email = std::nullopt
+        // );
+        // void renameProfile(ProfileId id, std::string newName);
+        // void setActiveProfile(ProfileId id);
+        // void deleteProfile(ProfileId id);
+
+        // // ----- persistence -----
+        // void commit();   // apply changes to DB via service; then reload()
+
+       private:
+        // void notify();
+
+        static std::string normalizeName(std::string_view name);
+
+        ProfileId _generateNewId();
+
+        // void chooseFallbackActiveIfInvalid();
     };
 
 }   // namespace app

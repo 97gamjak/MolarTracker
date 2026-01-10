@@ -10,26 +10,21 @@
 namespace app
 {
 
-    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} {}
-
-    void ProfileRepo::ensureSchema()
+    ProfileRepo::ProfileRepo(db::Database& db) : _db{db}
     {
-        _db.execute(R"sql(
-        CREATE TABLE IF NOT EXISTS profiles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
-        )
-    )sql");
+        // TODO: centralize this somewhere
+        ensureSchema();
     }
 
-    inline Profile ProfileRepo::toDomain(const ProfileRow& row) const
+    void ProfileRepo::ensureSchema() { orm::create_table<ProfileRow>(_db); }
+
+    // TODO: create a static factory class to handle these conversions
+    Profile toDomain(const ProfileRow& row)
     {
         return Profile{row.id.value(), row.name.value(), row.email.value()};
     }
 
-    inline std::vector<Profile> ProfileRepo::toDomain(
-        const std::vector<ProfileRow>& rows
-    ) const
+    std::vector<Profile> toDomains(const std::vector<ProfileRow>& rows)
     {
         std::vector<Profile> profiles;
 
@@ -39,7 +34,7 @@ namespace app
         return profiles;
     }
 
-    inline ProfileRow ProfileRepo::toRow(const Profile& profile) const
+    ProfileRow toRow(const Profile& profile)
     {
         ProfileRow row;
         row.id    = profile.getId();
@@ -50,10 +45,10 @@ namespace app
 
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return toDomain(orm::get_all<ProfileRow>(_db));
+        return toDomains(orm::get_all<ProfileRow>(_db));
     }
 
-    std::optional<Profile> ProfileRepo::getById(ProfileId id) const
+    std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
         const auto profile = orm::get_by_pk<ProfileRow>(_db, id);
 
@@ -63,7 +58,7 @@ namespace app
         return std::nullopt;
     }
 
-    std::optional<Profile> ProfileRepo::getByName(const std::string& name) const
+    std::optional<Profile> ProfileRepo::get(const std::string& name) const
     {
         using name_field = decltype(ProfileRow::name);
 
@@ -78,7 +73,10 @@ namespace app
         return std::nullopt;
     }
 
-    ProfileId ProfileRepo::create(const std::string& /*name*/)
+    ProfileId ProfileRepo::create(
+        const std::string& /*name*/,
+        std::optional<std::string> /*email*/
+    )
     {
         return ProfileId::invalid();
     }

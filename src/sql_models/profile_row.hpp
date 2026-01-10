@@ -14,7 +14,7 @@ struct ProfileRow final
 {
     static inline constexpr std::string table_name = "profile";
 
-    orm::Field<"id", ProfileId, orm::primary_key_t, orm::auto_increment_t> id{};
+    orm::IdField<ProfileId>                                         id{};
     orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name{};
     orm::Field<"email", std::optional<std::string>>                 email{};
 

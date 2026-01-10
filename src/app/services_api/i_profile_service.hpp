@@ -17,15 +17,15 @@ namespace app
        public:
         virtual ~IProfileService() = default;
 
-        virtual std::optional<Profile> getProfile(ProfileId id) const = 0;
-        virtual std::vector<Profile>   getAllProfiles() const         = 0;
+        virtual std::optional<Profile> get(ProfileId id) const = 0;
+        virtual std::vector<Profile>   getAll() const          = 0;
 
-        virtual ProfileId createProfile(
+        virtual ProfileId create(
             const std::string&                name,
             const std::optional<std::string>& email
-        )                                                            = 0;
-        virtual void renameProfile(ProfileId id, const std::string&) = 0;
-        virtual void deleteProfile(ProfileId id)                     = 0;
+        )                                                     = 0;
+        virtual void rename(ProfileId id, const std::string&) = 0;
+        virtual void remove(ProfileId id)                     = 0;
     };
 
 }   // namespace app

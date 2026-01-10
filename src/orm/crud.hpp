@@ -31,7 +31,7 @@ namespace orm
     };
 
     template <db_model Model>
-    [[nodiscard]] std::string create_table_sql()
+    void create_table(db::Database& database)
     {
         const auto field_views = orm::fields(Model{});
         auto       sql_text    = SQL::create_table(Model::table_name) + " (";
@@ -47,7 +47,8 @@ namespace orm
         }
 
         sql_text += ");";
-        return sql_text;
+
+        database.execute(sql_text);
     }
 
     template <db_model Model>

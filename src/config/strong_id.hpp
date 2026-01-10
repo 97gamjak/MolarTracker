@@ -24,8 +24,22 @@ class StrongId final
     }
     [[nodiscard]] constexpr Rep value() const noexcept { return _value; }
 
-    friend constexpr bool operator==(StrongId, StrongId) noexcept  = default;
-    friend constexpr auto operator<=>(StrongId, StrongId) noexcept = default;
+    [[nodiscard]] constexpr StrongId operator-() const noexcept
+    {
+        return StrongId{-_value};
+    }
+
+    bool operator==(const StrongId&) const noexcept  = default;
+    auto operator<=>(const StrongId&) const noexcept = default;
+
+    // For use in hash maps/sets
+    struct Hash
+    {
+        std::size_t operator()(StrongId id) const noexcept
+        {
+            return std::hash<Rep>{}(id.value());
+        }
+    };
 
    private:
     Rep _value{};

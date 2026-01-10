@@ -1,6 +1,9 @@
 #ifndef __APP__REPOS__DB_PROFILE_REPO_HPP__
 #define __APP__REPOS__DB_PROFILE_REPO_HPP__
 
+#include <optional>
+#include <vector>
+
 #include "repos_api/i_profile_repo.hpp"
 #include "sql_models/profile_row.hpp"
 
@@ -20,19 +23,16 @@ namespace app
        public:
         explicit ProfileRepo(db::Database& db);
 
-        inline Profile              toDomain(const ProfileRow& row) const;
-        inline std::vector<Profile> toDomain(
-            const std::vector<ProfileRow>& rows
-        ) const;
-        inline ProfileRow toRow(const Profile& profile) const;
-
         void ensureSchema() override;
 
         std::vector<Profile>   getAll() const override;
-        std::optional<Profile> getById(ProfileId id) const override;
-        std::optional<Profile> getByName(const std::string&) const override;
+        std::optional<Profile> get(ProfileId id) const override;
+        std::optional<Profile> get(const std::string&) const override;
 
-        ProfileId create(const std::string& name) override;
+        ProfileId create(
+            const std::string&         name,
+            std::optional<std::string> email
+        ) override;
 
         void rename(ProfileId id, const std::string& newName) override;
         void remove(ProfileId id) override;

@@ -21,6 +21,11 @@ namespace app
         return _defaultProfileName;
     }
 
+    void AppConfig::set_default_profile_name(const std::string& name)
+    {
+        _defaultProfileName = name;
+    }
+
     void AppConfig::_to_json() const
     {
         nlohmann::json jsonData;

@@ -54,6 +54,10 @@ namespace orm
         template <typename Statement>
         void read_from(Statement const& statement, int col);
     };
+
+    template <typename Value>
+    using IdField = Field<"id", Value, primary_key_t, auto_increment_t>;
+
 }   // namespace orm
 
 #ifndef __ORM__FIELD_TPP__

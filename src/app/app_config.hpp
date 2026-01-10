@@ -16,9 +16,11 @@ namespace app
        public:
         AppConfig();
 
-        void                       save() const;
+        void save() const;
+
         bool                       has_default_profile() const;
         std::optional<std::string> get_default_profile_name() const;
+        void set_default_profile_name(const std::string& name);
 
        private:
         void _to_json() const;

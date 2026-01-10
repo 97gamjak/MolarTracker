@@ -7,6 +7,9 @@
 
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
+#include "drafts/profile_draft.hpp"
+#include "ui/profile/add_profile_dlg.hpp"
+#include "ui/profile/profile_selection_dlg.hpp"
 #include "ui/top_menu_bar.hpp"
 #include "ui/undo_redo/toggle_flag_command.hpp"
 
@@ -127,47 +130,75 @@ namespace ui
         );
     }
 
+    // TODO: rename to _loadInitialProfile or similar
     void MainWindow::_ensureProfileExists()
     {
-        // auto&      profileService = _appContext.services().profileService();
-        // const auto config         = _appContext.config();
+        auto& profileStore = _appContext.getStore().getProfileStore();
+        auto& config       = _appContext.getConfig();
 
-        // const auto hasDefaultProfile = config.has_default_profile();
+        if (config.has_default_profile())
+        {
+            const auto name = config.get_default_profile_name().value();
+            if (!profileStore.profileExists(name))
+            {
+                // todo: create error message!!!
+            }
+            else
+            {
+                profileStore.setActiveProfile(name);   // TODO: check result
+                statusBar()->showMessage(
+                    QString::fromStdString("Loaded default profile: " + name)
+                );
+                return;
+            }
+        }
+        else
+        {
+            statusBar()->showMessage("No default profile configured.");
+            if (profileStore.hasProfiles())
+            {
+                const auto profileNames = profileStore.getAllProfileNames();
+                ProfileSelectionDialog dialog{this, profileNames};
+                if (dialog.exec() == QDialog::Accepted)
+                {
+                    // do stuff
+                    statusBar()->showMessage("Profile selected.");
+                }
+                else
+                {
+                    statusBar()->showMessage("Profile selection canceled.");
+                }
+            }
+            else
+            {
+                statusBar()->showMessage("No profiles found.");
+                auto* dialog = new AddProfileDialog{this};
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->setModal(true);
 
-        // if (hasDefaultProfile)
-        // {
-        //     const auto name = config().get_default_profile_name().value();
-        //     if (!profileService.profileExists(name))
-        //     {
-        //         // todo: create error message!!!
-        //     }
-        //     else
-        //     {
-        //         statusBar()->showMessage(
-        //             QString::fromStdString("Loaded default profile: " + name)
-        //         );
-        //         return;
-        //     }
-        // }
+                connect(
+                    dialog,
+                    &QDialog::accepted,
+                    this,
+                    [this, dialog]()
+                    {
+                        const auto profile =
+                            dialog->getProfile();   // safe here (still alive)
+                        auto& store = _appContext.getStore().getProfileStore();
+                        auto& _config = _appContext.getConfig();
 
-        // if (profiles.empty())
-        // {
-        //     const std::string defaultProfileName = "Default Profile";
-        //     profileService.createProfile(defaultProfileName);
-        //     statusBar()->showMessage(
-        //         QString::fromStdString(
-        //             "No profiles found. Created default profile: " +
-        //             defaultProfileName
-        //         )
-        //     );
-        //     return;
-        // }
+                        store.addProfile(profile);
+                        store.setActiveProfile(profile.name);
+                        _config.set_default_profile_name(profile.name);
+                        statusBar()->showMessage("Profile added.");
+                    }
+                );
 
-        // statusBar()->showMessage(
-        //     QString::fromStdString(
-        //         "Loaded " + std::to_string(profiles.size()) + " profile(s)"
-        //     )
-        // );
+                dialog->show();
+                dialog->raise();
+                dialog->activateWindow();
+            }
+        }
     }
 
 }   // namespace ui
