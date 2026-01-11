@@ -5,13 +5,12 @@
 namespace app
 {
 
-    AppContext::AppContext(std::string dbPath)
-        : _database{dbPath},
+    AppContext::AppContext()
+        : _config{},
+          _database{_config.get_database_path()},
           _repos{_database},
           _services{_repos},
-          _store{_services},
-          _config{}
+          _store{_services}
     {
     }
-
 }   // namespace app

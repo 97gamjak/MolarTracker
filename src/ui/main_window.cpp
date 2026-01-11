@@ -184,6 +184,8 @@ namespace ui
                 statusBar()->showMessage("No profiles found.");
                 auto* dialog = new AddProfileDialog{profileStore, this};
                 dialog->setAsActive(true);
+                dialog->setWindowTitle("Create your first profile");
+                qDebug() << "qt windowtitle" << dialog->windowTitle();
                 dialog->setAttribute(Qt::WA_DeleteOnClose);
 
                 connect(

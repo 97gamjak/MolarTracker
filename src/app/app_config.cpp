@@ -26,6 +26,8 @@ namespace app
         _defaultProfileName = name;
     }
 
+    std::string AppConfig::get_database_path() const { return _databasePath; }
+
     void AppConfig::_to_json() const
     {
         nlohmann::json jsonData;

@@ -15,14 +15,14 @@ namespace app
     class AppContext
     {
        private:
+        AppConfig        _config;
         db::Database     _database;
         RepoContainer    _repos;
         ServiceContainer _services;
         StoreContainer   _store;
-        AppConfig        _config;
 
        public:
-        explicit AppContext(std::string dbPath);
+        explicit AppContext();
 
         AppContext(const AppContext&)            = delete;
         AppContext& operator=(const AppContext&) = delete;

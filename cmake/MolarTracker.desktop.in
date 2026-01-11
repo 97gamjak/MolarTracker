@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=@APP_NAME@
+Exec=@EXEC_PATH@
+Terminal=false
+Categories=Utility;

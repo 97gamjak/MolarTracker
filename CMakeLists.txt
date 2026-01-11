@@ -53,3 +53,28 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 add_subdirectory(src)
+
+target_compile_definitions(MolarTracker 
+    PUBLIC
+    MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
+)
+
+if(NOT DEFINED WIN32)
+    message(STATUS "Configuring desktop file installation target")
+    set(MT_EXEC_PATH "${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}")
+    set(DESKTOP_FILE_PATH "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.desktop")
+
+    configure_file(
+    "${CMAKE_SOURCE_DIR}/cmake/MolarTracker.desktop.in"
+    "${DESKTOP_FILE_PATH}"
+    @ONLY
+    )
+
+    add_custom_target(install-desktop-dev
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$ENV{HOME}/.local/share/applications"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${DESKTOP_FILE_PATH}"
+            "$ENV{HOME}/.local/share/applications/${PROJECT_NAME}.desktop"
+    VERBATIM
+    )
+endif()

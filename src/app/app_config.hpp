@@ -18,9 +18,11 @@ namespace app
 
         void save() const;
 
-        bool                       has_default_profile() const;
-        std::optional<std::string> get_default_profile_name() const;
+        [[nodiscard]] bool has_default_profile() const;
+        [[nodiscard]] std::optional<std::string> get_default_profile_name() const;
         void set_default_profile_name(const std::string& name);
+
+        [[nodiscard]] std::string get_database_path() const;
 
        private:
         void _to_json() const;
