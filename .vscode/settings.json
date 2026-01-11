@@ -100,6 +100,7 @@
         "any": "cpp",
         "*.inc": "cpp",
         "expected": "cpp",
-        "slist": "cpp"
+        "slist": "cpp",
+        "typeindex": "cpp"
     }
 }

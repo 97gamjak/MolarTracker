@@ -10,9 +10,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "domain/profile.hpp"
-#include "services_api/i_profile_service.hpp"
-#include "store/subscription.hpp"
+#include "app/domain/profile.hpp"
+#include "app/services_api/i_profile_service.hpp"
+#include "app/store/subscription.hpp"
 
 namespace drafts
 {

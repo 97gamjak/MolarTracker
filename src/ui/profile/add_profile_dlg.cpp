@@ -5,12 +5,17 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
+#include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 
 namespace ui
 {
 
-    AddProfileDialog::AddProfileDialog(QWidget* parent) : QDialog{parent}
+    AddProfileDialog::AddProfileDialog(
+        app::ProfileStore& profileStore,
+        QWidget*           parent
+    )
+        : QDialog{parent}, _profileStore{profileStore}
     {
         setWindowTitle("Add New Profile");
         resize(400, 200);
@@ -18,8 +23,37 @@ namespace ui
         _buildUI();
     }
 
+    void AddProfileDialog::accept()
+    {
+        // You can add validation logic here if needed
+        const auto draft = getProfile();
+
+        const auto result = _profileStore.addProfile(draft);
+
+        if (result != app::ProfileStoreResult::Ok)
+        {
+            // Handle errors (e.g., show a message box) if needed
+        }
+
+        if (_setAsActive)
+        {
+            const auto _result = _profileStore.setActiveProfile(draft.name);
+            if (_result != app::ProfileStoreResult::Ok)
+            {
+                // Handle error if needed
+            }
+            else
+            {
+                // add logging
+            }
+        }
+        QDialog::accept();
+    }
+
     void AddProfileDialog::_buildUI()
     {
+        QDialog::setModal(true);
+
         auto* mainLayout = new QVBoxLayout{this};
 
         auto* formLayout = new QFormLayout{};

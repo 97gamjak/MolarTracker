@@ -182,9 +182,9 @@ namespace ui
             else
             {
                 statusBar()->showMessage("No profiles found.");
-                auto* dialog = new AddProfileDialog{this};
+                auto* dialog = new AddProfileDialog{profileStore, this};
+                dialog->setAsActive(true);
                 dialog->setAttribute(Qt::WA_DeleteOnClose);
-                dialog->setModal(true);
 
                 connect(
                     dialog,
@@ -192,23 +192,8 @@ namespace ui
                     this,
                     [this, dialog]()
                     {
-                        const auto profile =
-                            dialog->getProfile();   // safe here (still alive)
-                        auto& store = _appContext.getStore().getProfileStore();
-                        auto& _config = _appContext.getConfig();
-
-                        if (store.addProfile(profile) !=
-                            app::ProfileStoreResult::Ok)
-                        {
-                            // TODO: show error message
-                            return;
-                        }
-                        if (store.setActiveProfile(profile.name) !=
-                            app::ProfileStoreResult::Ok)
-                        {
-                            // TODO: show error message
-                            return;
-                        }
+                        const auto profile = dialog->getProfile();
+                        auto&      _config = _appContext.getConfig();
                         _config.set_default_profile_name(profile.name);
                         statusBar()->showMessage("Profile added.");
                     }

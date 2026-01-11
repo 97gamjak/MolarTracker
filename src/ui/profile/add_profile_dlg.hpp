@@ -10,6 +10,12 @@ namespace drafts
     struct ProfileDraft;
 }
 
+namespace app
+{
+    class ProfileStore;
+    class AppConfig;
+}   // namespace app
+
 namespace ui
 {
     class AddProfileDialog : public QDialog
@@ -22,8 +28,19 @@ namespace ui
         QPushButton* _addProfileButton = nullptr;
         QPushButton* _cancelButton     = nullptr;
 
+        app::ProfileStore& _profileStore;
+        bool               _setAsActive = false;
+
+       protected:
+        void accept() override;
+
        public:
-        explicit AddProfileDialog(QWidget* parent = nullptr);
+        explicit AddProfileDialog(
+            app::ProfileStore& profileStore,
+            QWidget*           parent = nullptr
+        );
+
+        void setAsActive(bool value) { _setAsActive = value; }
 
         [[nodiscard]] struct drafts::ProfileDraft getProfile() const;
 
