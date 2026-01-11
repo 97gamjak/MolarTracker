@@ -26,6 +26,15 @@ namespace ui
     {
         auto* fileMenu = menu->addMenu("&File");
 
+        _saveAction = fileMenu->addAction("&Save");
+        _saveAction->setShortcut(QKeySequence::Save);
+        connect(
+            _saveAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestSave
+        );
+
         _quitAction = fileMenu->addAction("&Quit");
         _quitAction->setShortcut(QKeySequence::Quit);
         connect(

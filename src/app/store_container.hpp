@@ -11,10 +11,15 @@ namespace app
     class StoreContainer
     {
        private:
-        ProfileStore _profileStore;
+        ProfileStore         _profileStore;
+        std::vector<IStore*> _allStores{
+            &_profileStore,
+        };
 
        public:
         StoreContainer(ServiceContainer& services);
+
+        void commit();
 
         // clang-format off
         ProfileStore&       getProfileStore() { return _profileStore; }

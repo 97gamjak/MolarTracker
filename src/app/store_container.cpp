@@ -10,4 +10,10 @@ namespace app
     {
     }
 
+    void StoreContainer::commit()
+    {
+        for (auto* store : _allStores)
+            store->commit();
+    }
+
 }   // namespace app

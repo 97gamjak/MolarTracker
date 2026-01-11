@@ -88,6 +88,16 @@ namespace ui
                 );
             }
         );
+        connect(
+            _topMenuBar,
+            &TopMenuBar::requestSave,
+            this,
+            [this]()
+            {
+                _appContext.getStore().commit();
+                statusBar()->showMessage("Save requested");
+            }
+        );
 
         _buildCentral();
         _refreshUndoRedoActions();

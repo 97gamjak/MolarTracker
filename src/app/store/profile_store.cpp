@@ -131,66 +131,47 @@ namespace app
     //     notify();
     // }
 
-    // void ProfileStore::commit()
-    // {
-    //     if (!_hasPendingChanges)
-    //         return;
+    void ProfileStore::commit()
+    {
+        if (!hasPendingChanges())
+            return;
 
-    //     // Diff baseline -> current and persist final state.
-    //     // Minimal approach:
-    //     // - detect deletes (in baseline but not in current)
-    //     // - detect creates (in current but not in baseline)
-    //     // - detect updates (same id but different fields)
+        // Minimal approach:
+        // - detect deletes (in baseline but not in current)
+        // - detect creates (in current but not in baseline)
+        // - detect updates (same id but different fields)
 
-    //     std::unordered_map<std::int64_t, Profile> baselineById;
-    //     baselineById.reserve(_baselineProfiles.size());
-    //     for (const auto& p : _baselineProfiles)
-    //         baselineById.emplace(p.getId().value(), p);
+        for (const auto& p : _profiles)
+        {
+            if (_profileStates[p.getId()] == StoreState::New)
+            {
+                // TODO: handle ID assignment properly
+                _profileService.create(p.getName(), p.getEmail());
+                _profileStates[p.getId()] = StoreState::Clean;
+                continue;
+                ;
+            }
 
-    //     std::unordered_map<std::int64_t, Profile> currentById;
-    //     currentById.reserve(_profiles.size());
-    //     for (const auto& p : _profiles)
-    //         currentById.emplace(p.getId().value(), p);
+            if (_profileStates[p.getId()] == StoreState::Modified)
+            {
+                // TODO: handle ID assignment properly
+                // _profileService.update(p);
+                _profileStates[p.getId()] = StoreState::Clean;
+                continue;
+            }
 
-    //     // Deletes
-    //     for (const auto& p : _baselineProfiles)
-    //     {
-    //         if (!currentById.contains(p.getId().value()))
-    //         {
-    //             _profileService.deleteProfile(p.getId());
-    //         }
-    //     }
+            if (_profileStates[p.getId()] == StoreState::Deleted)
+            {
+                _profileService.remove(p.getId());
+                // Optionally remove from _profiles here
+                continue;
+            }
+            _profileStates[p.getId()] = StoreState::Clean;
+        }
 
-    //     // Creates / Updates
-    //     for (const auto& p : _profiles)
-    //     {
-    //         const bool existedBefore =
-    //         baselineById.contains(p.getId().value());
-
-    //         if (!existedBefore)
-    //         {
-    //             // If you use id=0 for new, service returns real id.
-    //             const ProfileId newId =
-    //                 _profileService.createProfile(p.getName(), p.getEmail());
-    //             (void) newId;   // if you want, we can remap in-memory ids
-    //             and
-    //                             // keep active stable
-    //             continue;
-    //         }
-
-    //         const Profile& old = baselineById.at(p.getId().value());
-    //         if (old.getName() != p.getName() || old.getEmail() !=
-    //         p.getEmail())
-    //         {
-    //             // TODO:
-    //             // _profileService.updateProfile(
-    //             //     p
-    //             // );   // or rename/update depending on your service API
-    //         }
-    //     }
-
-    //     reload();
-    // }
+        // TODO: handle deletions properly
+        // reload();
+    }
 
     // void ProfileStore::notify()
     // {

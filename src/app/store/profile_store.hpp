@@ -12,6 +12,7 @@
 
 #include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
+#include "app/store/i_store.hpp"
 #include "app/store/subscription.hpp"
 
 namespace drafts
@@ -39,7 +40,7 @@ namespace app
     };
 
     // TODO: add nodiscard where appropriate
-    class ProfileStore final
+    class ProfileStore : public IStore
     {
        private:
         IProfileService& _profileService;
@@ -91,8 +92,7 @@ namespace app
         // void setActiveProfile(ProfileId id);
         // void deleteProfile(ProfileId id);
 
-        // // ----- persistence -----
-        // void commit();   // apply changes to DB via service; then reload()
+        void commit() override;
 
        private:
         // void notify();
