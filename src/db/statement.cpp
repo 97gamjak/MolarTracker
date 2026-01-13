@@ -59,10 +59,7 @@ namespace db
      *
      * @param other
      */
-    Statement::Statement(Statement&& other) noexcept
-    {
-        _move_from(std::move(other));
-    }
+    Statement::Statement(Statement&& other) { _move_from(std::move(other)); }
 
     /**
      * @brief Move assignment operator
@@ -70,7 +67,7 @@ namespace db
      * @param other
      * @return Statement&
      */
-    Statement& Statement::operator=(Statement&& other) noexcept
+    Statement& Statement::operator=(Statement&& other)
     {
         if (this != &other)
         {
@@ -88,7 +85,7 @@ namespace db
      * @return true
      * @return false
      */
-    bool Statement::is_valid() const noexcept { return _statement != nullptr; }
+    bool Statement::is_valid() const { return _statement != nullptr; }
 
     /**
      * @brief take a step in the execution of the prepared statement
@@ -270,10 +267,7 @@ namespace db
         };
     }
 
-    sqlite3_stmt* Statement::native_handle() const noexcept
-    {
-        return _statement;
-    }
+    sqlite3_stmt* Statement::native_handle() const { return _statement; }
 
     //
     //
@@ -310,7 +304,7 @@ namespace db
         return SqliteError(msg);
     }
 
-    void Statement::_move_from(Statement&& other) noexcept
+    void Statement::_move_from(Statement&& other)
     {
         _db             = other._db;
         _statement      = other._statement;
@@ -321,7 +315,7 @@ namespace db
         other._sql_for_errors.clear();
     }
 
-    void Statement::_finalize() noexcept
+    void Statement::_finalize()
     {
         if (_statement != nullptr)
         {

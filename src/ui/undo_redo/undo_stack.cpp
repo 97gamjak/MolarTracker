@@ -18,12 +18,9 @@ namespace ui
         _cursor = _commands.size();
     }
 
-    bool UndoStack::canUndo() const noexcept { return _cursor > 0; }
+    bool UndoStack::canUndo() const { return _cursor > 0; }
 
-    bool UndoStack::canRedo() const noexcept
-    {
-        return _cursor < _commands.size();
-    }
+    bool UndoStack::canRedo() const { return _cursor < _commands.size(); }
 
     void UndoStack::undo()
     {

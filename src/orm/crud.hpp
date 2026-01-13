@@ -5,105 +5,100 @@
 #include <stdexcept>
 #include <string>
 
-#include "binder.hpp"
-#include "database.hpp"
-#include "fields.hpp"
-#include "model_concept.hpp"
-#include "statement.hpp"
+#include "db/database.hpp"
+#include "db/statement.hpp"
+#include "orm/binder.hpp"
+#include "orm/fields.hpp"
+#include "orm/model_concept.hpp"
 
 namespace orm
 {
-    template <db_model Model>
-    [[nodiscard]] std::string create_table_sql()
+    struct SQL
     {
-        Model      model_instance{};
-        auto const field_views = orm::fields(model_instance);
+        static inline constexpr std::string create_table(
+            const std::string& table_name
+        )
+        {
+            return "CREATE TABLE IF NOT EXISTS " + table_name;
+        }
 
-        std::string sql_statement_text;
-        sql_statement_text += "CREATE TABLE IF NOT EXISTS ";
-        sql_statement_text += std::string{Model::table_name.view()};
-        sql_statement_text += " (";
+        static inline constexpr std::string insert_into(
+            const std::string& table_name
+        )
+        {
+            return "INSERT INTO " + table_name;
+        }
+    };
 
-        bool first_column_definition = true;
+    template <db_model Model>
+    void create_table(db::Database& database)
+    {
+        const auto field_views = orm::fields(Model{});
+        auto       sql_text    = SQL::create_table(Model::table_name) + " (";
+        auto       first_col   = true;
 
         for (FieldView const& field : field_views)
         {
-            if (!first_column_definition)
-            {
-                sql_statement_text += ", ";
-            }
+            if (!first_col)
+                sql_text += ", ";
 
-            first_column_definition  = false;
-            sql_statement_text      += field.ddl();
+            first_col  = false;
+            sql_text  += field.ddl();
         }
 
-        sql_statement_text += ");";
-        return sql_statement_text;
+        sql_text += ");";
+
+        database.execute(sql_text);
     }
 
     template <db_model Model>
     [[nodiscard]] std::int64_t insert(db::Database& database, Model const& row)
     {
-        auto const field_views = orm::fields(row);
-
-        std::string sql_statement_text;
-        sql_statement_text += "INSERT INTO ";
-        sql_statement_text += std::string{Model::table_name.view()};
-        sql_statement_text += " (";
-
-        bool first_column = true;
+        auto const field_views  = orm::fields(row);
+        auto       sql_text     = SQL::insert_into(Model::table_name) + " (";
+        auto       first_column = true;
 
         for (FieldView const& field : field_views)
         {
-            if (field.is_auto_increment_primary_key())
-            {
+            if (field.is_auto_increment_pk())
                 continue;
-            }
 
             if (!first_column)
-            {
-                sql_statement_text += ", ";
-            }
+                sql_text += ", ";
 
-            first_column        = false;
-            sql_statement_text += std::string{field.column_name()};
+            first_column  = false;
+            sql_text     += std::string{field.column_name()};
         }
 
-        sql_statement_text += ") VALUES (";
+        sql_text += ") VALUES (";
 
-        bool first_placeholder = true;
+        first_column = true;
 
         for (FieldView const& field : field_views)
         {
-            if (field.is_auto_increment_primary_key())
-            {
+            if (field.is_auto_increment_pk())
                 continue;
-            }
 
-            if (!first_placeholder)
-            {
-                sql_statement_text += ", ";
-            }
+            if (!first_column)
+                sql_text += ", ";
 
-            first_placeholder   = false;
-            sql_statement_text += "?";
+            first_column  = false;
+            sql_text     += "?";
         }
 
-        sql_statement_text += ");";
+        sql_text += ");";
 
-        db::Statement statement = database.prepare(sql_statement_text);
+        db::Statement statement = database.prepare(sql_text);
 
-        int parameter_index_one_based = 1;
+        int index = 1;
 
         for (FieldView const& field : field_views)
         {
-            if (field.is_auto_increment_primary_key())
-            {
+            if (field.is_auto_increment_pk())
                 continue;
-            }
 
-            field.bind(statement, parameter_index_one_based);
-            ++parameter_index_one_based;
+            field.bind(statement, index);
+            ++index;
         }
 
         statement.execute_to_completion();
@@ -115,46 +110,40 @@ namespace orm
     {
         auto const field_views = orm::fields(row);
 
-        std::string sql_statement_text;
-        sql_statement_text += "UPDATE ";
-        sql_statement_text += std::string{Model::table_name.view()};
-        sql_statement_text += " SET ";
+        std::string sql_text;
+        sql_text += "UPDATE ";
+        sql_text += Model::table_name;
+        sql_text += " SET ";
 
         bool first_assignment = true;
 
         for (FieldView const& field : field_views)
         {
-            if (field.is_primary_key())
-            {
+            if (field.is_pk())
                 continue;
-            }
 
             if (!first_assignment)
-            {
-                sql_statement_text += ", ";
-            }
+                sql_text += ", ";
 
-            first_assignment    = false;
-            sql_statement_text += std::string{field.column_name()};
-            sql_statement_text += "=?";
+            first_assignment  = false;
+            sql_text         += std::string{field.column_name()};
+            sql_text         += "=?";
         }
 
-        sql_statement_text += " WHERE ";
+        sql_text += " WHERE ";
 
         bool where_is_present = false;
 
         for (FieldView const& field : field_views)
         {
-            if (!field.is_primary_key())
-            {
+            if (!field.is_pk())
                 continue;
-            }
 
             if (!where_is_present)
             {
-                where_is_present    = true;
-                sql_statement_text += std::string{field.column_name()};
-                sql_statement_text += "=?";
+                where_is_present  = true;
+                sql_text         += std::string{field.column_name()};
+                sql_text         += "=?";
             }
         }
 
@@ -165,47 +154,49 @@ namespace orm
             );
         }
 
-        sql_statement_text += ";";
+        sql_text += ";";
 
-        db::Statement statement = database.prepare(sql_statement_text);
+        db::Statement statement = database.prepare(sql_text);
 
-        int parameter_index_one_based = 1;
+        int index = 1;
 
         for (FieldView const& field : field_views)
         {
-            if (field.is_primary_key())
+            if (field.is_pk())
             {
                 continue;
             }
 
-            field.bind(statement, parameter_index_one_based);
-            ++parameter_index_one_based;
+            field.bind(statement, index);
+            ++index;
         }
 
         for (FieldView const& field : field_views)
         {
-            if (!field.is_primary_key())
+            if (!field.is_pk())
             {
                 continue;
             }
 
-            field.bind(statement, parameter_index_one_based);
+            field.bind(statement, index);
         }
 
         statement.execute_to_completion();
     }
 
-    template <db_model Model, typename PrimaryKeyValue>
-    [[nodiscard]] Model select_by_pk(
-        db::Database&          database,
-        PrimaryKeyValue const& primary_key_value
+    template <db_model Model, typename Field>
+    [[nodiscard]] std::vector<Model> get_by_field(
+        db::Database& database,
+        Field const&  field_to_match
     )
     {
+        const auto field_view = orm::FieldView::from(field_to_match);
+
         Model      empty_instance{};
         auto const empty_field_views = orm::fields(empty_instance);
 
-        std::string sql_statement_text;
-        sql_statement_text += "SELECT ";
+        std::string sql_text;
+        sql_text += "SELECT ";
 
         bool first_select_column = true;
 
@@ -213,31 +204,143 @@ namespace orm
         {
             if (!first_select_column)
             {
-                sql_statement_text += ", ";
+                sql_text += ", ";
             }
 
             first_select_column  = false;
-            sql_statement_text  += std::string{field.column_name()};
+            sql_text            += std::string{field.column_name()};
         }
 
-        sql_statement_text += " FROM ";
-        sql_statement_text += std::string{Model::table_name.view()};
-        sql_statement_text += " WHERE ";
+        sql_text += " FROM ";
+        sql_text += Model::table_name;
+        sql_text += " WHERE ";
+        sql_text += std::string{field_view.column_name()};
+        sql_text += "=?;";
+
+        db::Statement statement = database.prepare(sql_text);
+        field_view.bind(statement, 1);
+
+        std::vector<Model> results;
+
+        while (statement.step() == db::StepResult::RowAvailable)
+        {
+            Model      loaded_model{};
+            auto const loaded_field_views = orm::fields(loaded_model);
+
+            int col = 0;
+
+            for (FieldView const& field : loaded_field_views)
+            {
+                field.read_from(statement, col);
+                ++col;
+            }
+
+            results.push_back(std::move(loaded_model));
+        }
+
+        return results;
+    }
+
+    template <db_model Model, typename Field>
+    [[nodiscard]] std::optional<Model> get_by_unique_field(
+        db::Database& database,
+        Field const&  field_to_match
+    )
+    {
+        static_assert(Field::is_unique);
+        const auto field_view = orm::FieldView::from(field_to_match);
+
+        Model      empty_instance{};
+        auto const empty_field_views = orm::fields(empty_instance);
+
+        std::string sql_text;
+        sql_text += "SELECT ";
+
+        bool first_select_column = true;
+
+        for (FieldView const& field : empty_field_views)
+        {
+            if (!first_select_column)
+            {
+                sql_text += ", ";
+            }
+
+            first_select_column  = false;
+            sql_text            += std::string{field.column_name()};
+        }
+
+        sql_text += " FROM ";
+        sql_text += Model::table_name;
+        sql_text += " WHERE ";
+        sql_text += std::string{field_view.column_name()};
+        sql_text += "=?;";
+
+        db::Statement statement = database.prepare(sql_text);
+        field_view.bind(statement, 1);
+
+        const db::StepResult result = statement.step();
+        if (result != db::StepResult::RowAvailable)
+        {
+            return std::nullopt;
+        }
+
+        Model      loaded_model{};
+        auto const loaded_field_views = orm::fields(loaded_model);
+
+        int col = 0;
+
+        for (FieldView const& field : loaded_field_views)
+        {
+            field.read_from(statement, col);
+            ++col;
+        }
+
+        return loaded_model;
+    }
+
+    template <db_model Model, typename PrimaryKeyValue>
+    [[nodiscard]] std::optional<Model> get_by_pk(
+        db::Database&          database,
+        PrimaryKeyValue const& pk_value
+    )
+    {
+        Model      empty_instance{};
+        auto const empty_field_views = orm::fields(empty_instance);
+
+        std::string sql_text;
+        sql_text += "SELECT ";
+
+        bool first_select_column = true;
+
+        for (FieldView const& field : empty_field_views)
+        {
+            if (!first_select_column)
+            {
+                sql_text += ", ";
+            }
+
+            first_select_column  = false;
+            sql_text            += std::string{field.column_name()};
+        }
+
+        sql_text += " FROM ";
+        sql_text += Model::table_name;
+        sql_text += " WHERE ";
 
         bool where_is_present = false;
 
         for (FieldView const& field : empty_field_views)
         {
-            if (!field.is_primary_key())
+            if (!field.is_pk())
             {
                 continue;
             }
 
             if (!where_is_present)
             {
-                where_is_present    = true;
-                sql_statement_text += std::string{field.column_name()};
-                sql_statement_text += "=?";
+                where_is_present  = true;
+                sql_text         += std::string{field.column_name()};
+                sql_text         += "=?";
             }
         }
 
@@ -248,34 +351,84 @@ namespace orm
             );
         }
 
-        sql_statement_text += ";";
+        sql_text += ";";
 
-        db::Statement statement = database.prepare(sql_statement_text);
+        db::Statement statement = database.prepare(sql_text);
         orm::binder<db::Statement, PrimaryKeyValue>::bind(
             statement,
             1,
-            primary_key_value
+            pk_value
         );
 
-        bool const has_row = statement.step();
-        if (!has_row)
+        const db::StepResult result = statement.step();
+        if (result != db::StepResult::RowAvailable)
         {
-            throw std::runtime_error("orm::select_by_pk did not find a row");
+            return std::nullopt;
         }
 
         Model      loaded_model{};
         auto const loaded_field_views = orm::fields(loaded_model);
 
-        int column_index_zero_based = 0;
+        int col = 0;
 
         for (FieldView const& field : loaded_field_views)
         {
-            field.read_from(statement, column_index_zero_based);
-            ++column_index_zero_based;
+            field.read_from(statement, col);
+            ++col;
         }
 
         return loaded_model;
     }
+
+    template <db_model Model>
+    [[nodiscard]] std::vector<Model> get_all(db::Database& database)
+    {
+        Model      empty_instance{};
+        auto const empty_field_views = orm::fields(empty_instance);
+
+        std::string sql_text;
+        sql_text += "SELECT ";
+
+        bool first_select_column = true;
+
+        for (FieldView const& field : empty_field_views)
+        {
+            if (!first_select_column)
+            {
+                sql_text += ", ";
+            }
+
+            first_select_column  = false;
+            sql_text            += std::string{field.column_name()};
+        }
+
+        sql_text += " FROM ";
+        sql_text += Model::table_name;
+        sql_text += ";";
+
+        db::Statement statement = database.prepare(sql_text);
+
+        std::vector<Model> results;
+
+        while (statement.step() == db::StepResult::RowAvailable)
+        {
+            Model      loaded_model{};
+            auto const loaded_field_views = orm::fields(loaded_model);
+
+            int col = 0;
+
+            for (FieldView const& field : loaded_field_views)
+            {
+                field.read_from(statement, col);
+                ++col;
+            }
+
+            results.push_back(std::move(loaded_model));
+        }
+
+        return results;
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__CRUD_HPP__

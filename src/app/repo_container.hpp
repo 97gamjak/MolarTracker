@@ -19,8 +19,8 @@ namespace app
        public:
         explicit RepoContainer(db::Database& db);
 
-        IProfileRepo&       profileRepo() noexcept;
-        const IProfileRepo& profileRepo() const noexcept;
+        IProfileRepo&       profileRepo();
+        const IProfileRepo& profileRepo() const;
     };
 
 }   // namespace app

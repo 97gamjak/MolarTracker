@@ -2,3 +2,4 @@
 build
 build-docker/
 compile_commands.json
+*.db

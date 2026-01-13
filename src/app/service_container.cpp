@@ -10,12 +10,12 @@ namespace app
     {
     }
 
-    IProfileService& ServiceContainer::profileService() noexcept
+    IProfileService& ServiceContainer::profileService()
     {
         return _profileService;
     }
 
-    const IProfileService& ServiceContainer::profileService() const noexcept
+    const IProfileService& ServiceContainer::profileService() const
     {
         return _profileService;
     }

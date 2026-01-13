@@ -2,13 +2,13 @@
 
 namespace app
 {
-    Profile::Profile(ProfileID id, const std::string& name)
-        : _id{id}, _name{name}
+    Profile::Profile(
+        ProfileId                         id,
+        const std::string&                name,
+        const std::optional<std::string>& email
+    )
+        : _id{id}, _name{name}, _email{email}
     {
     }
-
-    ProfileID Profile::id() const noexcept { return _id; }
-
-    const std::string& Profile::name() const noexcept { return _name; }
 
 }   // namespace app

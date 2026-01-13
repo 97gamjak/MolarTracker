@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "*.tpp": "c++",
+        "*.tpp": "cpp",
         "qmainwindow": "cpp",
         "qobject": "cpp",
         "qmenubar": "cpp",
@@ -98,6 +98,9 @@
         "regex": "cpp",
         "stack": "cpp",
         "any": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "expected": "cpp",
+        "slist": "cpp",
+        "typeindex": "cpp"
     }
 }

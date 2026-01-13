@@ -3,8 +3,10 @@
 
 #include <string>
 
+#include "app/app_config.hpp"
 #include "app/repo_container.hpp"
 #include "app/service_container.hpp"
+#include "app/store_container.hpp"
 #include "db/database.hpp"
 
 namespace app
@@ -13,23 +15,23 @@ namespace app
     class AppContext
     {
        private:
+        AppConfig        _config;
         db::Database     _database;
         RepoContainer    _repos;
         ServiceContainer _services;
-
-        void _ensureSchemaAndDefaults();
+        StoreContainer   _store;
 
        public:
-        explicit AppContext(std::string dbPath);
+        explicit AppContext();
 
         AppContext(const AppContext&)            = delete;
         AppContext& operator=(const AppContext&) = delete;
 
-        RepoContainer&       repos() noexcept;
-        const RepoContainer& repos() const noexcept;
+        StoreContainer&       getStore() { return _store; }
+        const StoreContainer& getStore() const { return _store; }
 
-        ServiceContainer&       services() noexcept;
-        const ServiceContainer& services() const noexcept;
+        AppConfig&       getConfig() { return _config; }
+        const AppConfig& getConfig() const { return _config; }
     };
 
 }   // namespace app

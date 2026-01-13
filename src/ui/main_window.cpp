@@ -7,6 +7,9 @@
 
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
+#include "drafts/profile_draft.hpp"
+#include "ui/profile/add_profile_dlg.hpp"
+#include "ui/profile/profile_selection_dlg.hpp"
 #include "ui/top_menu_bar.hpp"
 #include "ui/undo_redo/toggle_flag_command.hpp"
 
@@ -26,7 +29,7 @@ namespace ui
         );
         _refreshUndoRedoActions();
 
-        _ensureDefaultProfile();
+        _ensureProfileExists();
     }
 
     void MainWindow::_buildUI()
@@ -85,6 +88,16 @@ namespace ui
                 );
             }
         );
+        connect(
+            _topMenuBar,
+            &TopMenuBar::requestSave,
+            this,
+            [this]()
+            {
+                _appContext.getStore().commit();
+                statusBar()->showMessage("Save requested");
+            }
+        );
 
         _buildCentral();
         _refreshUndoRedoActions();
@@ -127,17 +140,82 @@ namespace ui
         );
     }
 
-    void MainWindow::_ensureDefaultProfile()
+    // TODO: rename to _loadInitialProfile or similar
+    void MainWindow::_ensureProfileExists()
     {
-        auto& profileService = _appContext.services().profileService();
-        profileService.ensureDefaultProfile("Default Profile");
+        auto& profileStore = _appContext.getStore().getProfileStore();
+        auto& config       = _appContext.getConfig();
 
-        const auto profiles = profileService.getAllProfiles();
-        statusBar()->showMessage(
-            QString::fromStdString(
-                "Loaded " + std::to_string(profiles.size()) + " profile(s)"
-            )
-        );
+        if (config.has_default_profile())
+        {
+            const auto name = config.get_default_profile_name().value();
+            if (!profileStore.profileExists(name))
+            {
+                // TODO: create error message!!!
+            }
+            else
+            {
+                const auto result = profileStore.setActiveProfile(name);
+                if (result != app::ProfileStoreResult::Ok)
+                {
+                    // TODO: create error message!!!
+                    return;
+                }
+                else
+                {
+                    statusBar()->showMessage(
+                        QString::fromStdString(
+                            "Loaded default profile: " + name
+                        )
+                    );
+                    return;
+                }
+            }
+        }
+        else
+        {
+            statusBar()->showMessage("No default profile configured.");
+            if (profileStore.hasProfiles())
+            {
+                const auto profileNames = profileStore.getAllProfileNames();
+                ProfileSelectionDialog dialog{this, profileNames};
+                if (dialog.exec() == QDialog::Accepted)
+                {
+                    // do stuff
+                    statusBar()->showMessage("Profile selected.");
+                }
+                else
+                {
+                    statusBar()->showMessage("Profile selection canceled.");
+                }
+            }
+            else
+            {
+                statusBar()->showMessage("No profiles found.");
+                auto* dialog = new AddProfileDialog{profileStore, this};
+                dialog->setAsActive(true);
+                dialog->setWindowTitle("Create your first profile");
+                qDebug() << "qt windowtitle" << dialog->windowTitle();
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+                connect(
+                    dialog,
+                    &QDialog::accepted,
+                    this,
+                    [this, dialog]()
+                    {
+                        const auto profile = dialog->getProfile();
+                        auto&      _config = _appContext.getConfig();
+                        _config.set_default_profile_name(profile.name);
+                        statusBar()->showMessage("Profile added.");
+                    }
+                );
+
+                dialog->show();
+                dialog->raise();
+                dialog->activateWindow();
+            }
+        }
     }
 
 }   // namespace ui

@@ -10,6 +10,7 @@ namespace orm
     struct unique_t {};
     struct not_null_t {};
     struct nullable_t {};
+    struct id_t {};
 
     // clang-format on
 }   // namespace orm

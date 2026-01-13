@@ -28,10 +28,7 @@ namespace db
      *
      * @param other
      */
-    Database::Database(Database&& other) noexcept
-    {
-        _move_from(std::move(other));
-    }
+    Database::Database(Database&& other) { _move_from(std::move(other)); }
 
     /**
      * @brief Move assignment operator
@@ -39,7 +36,7 @@ namespace db
      * @param other
      * @return Database&
      */
-    Database& Database::operator=(Database&& other) noexcept
+    Database& Database::operator=(Database&& other)
     {
         if (this != &other)
         {
@@ -55,7 +52,7 @@ namespace db
      *
      * @param other
      */
-    void Database::_move_from(Database&& other) noexcept
+    void Database::_move_from(Database&& other)
     {
         _db      = other._db;
         _db_path = std::move(other._db_path);
@@ -112,7 +109,7 @@ namespace db
      * @brief close the database
      *
      */
-    void Database::close() noexcept
+    void Database::close()
     {
         if (_db != nullptr)
         {
@@ -129,14 +126,14 @@ namespace db
      * @return true
      * @return false
      */
-    bool Database::is_open() const noexcept { return _db != nullptr; }
+    bool Database::is_open() const { return _db != nullptr; }
 
     /**
      * @brief get the native sqlite3 database handle
      *
      * @return sqlite3*
      */
-    sqlite3* Database::native_handle() const noexcept { return _db; }
+    sqlite3* Database::native_handle() const { return _db; }
 
     /**
      * @brief execute a SQL statement

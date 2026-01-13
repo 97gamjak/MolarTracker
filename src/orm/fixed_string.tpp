@@ -31,7 +31,7 @@ namespace orm
      * @return constexpr std::string_view
      */
     template <std::size_t Size>
-    constexpr std::string_view fixed_string<Size>::view() const noexcept
+    constexpr std::string_view fixed_string<Size>::view() const
     {
         return std::string_view{_data.data(), Size - 1};
     }

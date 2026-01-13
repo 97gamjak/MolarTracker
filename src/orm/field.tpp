@@ -6,12 +6,12 @@
 #include <type_traits>
 #include <utility>
 
-#include "binder.hpp"
-#include "concepts.hpp"
-#include "constraints.hpp"
-#include "field.hpp"
-#include "fixed_string.hpp"
-#include "sqlite_type.hpp"
+#include "orm/binder.hpp"
+#include "orm/concepts.hpp"
+#include "orm/constraints.hpp"
+#include "orm/field.hpp"
+#include "orm/fixed_string.hpp"
+#include "orm/sql_type.hpp"
 
 namespace orm
 {
@@ -22,13 +22,13 @@ namespace orm
     }
 
     template <fixed_string Name, typename Value, typename... Options>
-    Value& Field<Name, Value, Options...>::value() noexcept
+    Value& Field<Name, Value, Options...>::value()
     {
         return _value;
     }
 
     template <fixed_string Name, typename Value, typename... Options>
-    Value const& Field<Name, Value, Options...>::value() const noexcept
+    Value const& Field<Name, Value, Options...>::value() const
     {
         return _value;
     }
@@ -43,19 +43,17 @@ namespace orm
     }
 
     template <fixed_string Name, typename Value, typename... Options>
-    static std::string Field<Name, Value, Options...>::ddl()
+    std::string Field<Name, Value, Options...>::ddl()
     {
-        constexpr static bool is_optional = is_optional_v<Value>;
-        using opt_type                    = optional_inner_t<Value>;
-
-        using storage_type = std::conditional_t<is_optional, opt_type, Value>;
+        using storage_type = std::
+            conditional_t<is_optional_v<Value>, optional_inner_t<Value>, Value>;
 
         std::string definition;
         definition += std::string{name.view()};
         definition += " ";
-        definition += std::string{sqlite_type<storage_type>::name};
+        definition += std::string{sql_type<storage_type>::name};
 
-        if constexpr (is_primary_key)
+        if constexpr (is_pk)
             definition += " PRIMARY KEY";
         if constexpr (is_auto_increment)
             definition += " AUTOINCREMENT";
@@ -67,11 +65,11 @@ namespace orm
         return definition;
     }
 
-    template <typename StatementLike>
     template <fixed_string Name, typename Value, typename... Options>
+    template <typename Statement>
     void Field<Name, Value, Options...>::bind(
-        StatementLike& statement,
-        int            index
+        Statement& statement,
+        int        index
     ) const
     {
         if constexpr (is_optional_v<Value>)
@@ -83,17 +81,19 @@ namespace orm
             }
 
             using inner_type = optional_inner_t<Value>;
-            binder<StatementLike, inner_type>::bind(statement, index, *_value);
+            binder<Statement, inner_type>::bind(statement, index, *_value);
         }
         else
-            binder<StatementLike, Value>::bind(statement, index, _value);
+        {
+            binder<Statement, Value>::bind(statement, index, _value);
+        }
     }
 
-    template <typename StatementLike>
     template <fixed_string Name, typename Value, typename... Options>
+    template <typename Statement>
     void Field<Name, Value, Options...>::read_from(
-        StatementLike const& statement,
-        int                  col
+        Statement const& statement,
+        int              col
     )
     {
         if constexpr (is_optional_v<Value>)
@@ -106,11 +106,14 @@ namespace orm
                 return;
             }
 
-            _value = binder<StatementLike, inner_type>::read(statement, col);
+            _value = binder<Statement, inner_type>::read(statement, col);
         }
         else
-            _value = binder<StatementLike, Value>::read(statement, col);
+        {
+            _value = binder<Statement, Value>::read(statement, col);
+        }
     }
+
 }   // namespace orm
 
 #endif   // __ORM__FIELD_TPP__

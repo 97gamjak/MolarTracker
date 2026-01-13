@@ -10,9 +10,9 @@ namespace app
     {
     }
 
-    IProfileRepo& RepoContainer::profileRepo() noexcept { return _profileRepo; }
+    IProfileRepo& RepoContainer::profileRepo() { return _profileRepo; }
 
-    const IProfileRepo& RepoContainer::profileRepo() const noexcept
+    const IProfileRepo& RepoContainer::profileRepo() const
     {
         return _profileRepo;
     }

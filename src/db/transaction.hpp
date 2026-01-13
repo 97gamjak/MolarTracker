@@ -17,21 +17,21 @@ namespace db
 
        public:
         explicit Transaction(Database& db, bool immediate = true);
-        ~Transaction() noexcept;
+        ~Transaction();
 
         Transaction(Transaction const&)            = delete;
         Transaction& operator=(Transaction const&) = delete;
 
-        Transaction(Transaction&& other) noexcept;
-        Transaction& operator=(Transaction&& other) noexcept;
+        Transaction(Transaction&& other);
+        Transaction& operator=(Transaction&& other);
 
-        [[nodiscard]] bool is_active() const noexcept;
+        [[nodiscard]] bool is_active() const;
 
         void commit();
         void rollback();
 
        private:   // PRIVATE HELPER METHODS
-        void _move_from(Transaction&& other) noexcept;
+        void _move_from(Transaction&& other);
     };
 }   // namespace db
 

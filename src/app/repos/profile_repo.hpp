@@ -1,7 +1,11 @@
 #ifndef __APP__REPOS__DB_PROFILE_REPO_HPP__
 #define __APP__REPOS__DB_PROFILE_REPO_HPP__
 
+#include <optional>
+#include <vector>
+
 #include "repos_api/i_profile_repo.hpp"
+#include "sql_models/profile_row.hpp"
 
 namespace db
 {
@@ -21,13 +25,17 @@ namespace app
 
         void ensureSchema() override;
 
-        std::optional<Profile> getByID(ProfileID id) const override;
         std::vector<Profile>   getAll() const override;
+        std::optional<Profile> get(ProfileId id) const override;
+        std::optional<Profile> get(const std::string&) const override;
 
-        ProfileID create(const std::string& name) override;
+        ProfileId create(
+            const std::string&         name,
+            std::optional<std::string> email
+        ) override;
 
-        void rename(ProfileID id, const std::string& newName) override;
-        void remove(ProfileID id) override;
+        void rename(ProfileId id, const std::string& newName) override;
+        void remove(ProfileId id) override;
     };
 
 }   // namespace app

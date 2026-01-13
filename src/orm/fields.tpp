@@ -12,32 +12,9 @@
 
 namespace orm
 {
-    namespace detail
-    {
-        /**
-         * @brief convert a tuple to an array of FieldView
-         *
-         * @tparam Tuple
-         * @tparam Indices
-         * @param tuple
-         * @param index_sequence
-         * @return constexpr auto
-         */
-        template <typename Tuple, std::size_t... Indices>
-        constexpr auto tuple_to_field_array(
-            Tuple&& tuple,
-            std::index_sequence<Indices...>
-        )
-        {
-            return std::array<FieldView, sizeof...(Indices)>{FieldView::from(
-                std::get<Indices>(std::forward<Tuple>(tuple))
-            )...};
-        }
-    }   // namespace detail
-
     // TODO(97gamjak): extract this to mstd
     // https://97gamjak.atlassian.net/browse/MSTD-84
-    template <size_t Indices...>
+    template <size_t... Indices>
     using index_seq = std::make_index_sequence<sizeof...(Indices)>;
 
     // TODO(97gamjak): extract this to mstd
@@ -78,6 +55,7 @@ namespace orm
 
         return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
     }
+
 }   // namespace orm
 
 #endif   // __ORM__FIELDS_TPP__

@@ -18,6 +18,7 @@ namespace ui
 
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
+        QAction* _saveAction        = nullptr;
         QAction* _quitAction        = nullptr;
         QAction* _preferencesAction = nullptr;
         QAction* _aboutAction       = nullptr;
@@ -34,6 +35,7 @@ namespace ui
         void requestQuit();
         void requestPreferences();
         void requestAbout();
+        void requestSave();
 
        public:
         explicit TopMenuBar(QMainWindow& mainWindow);

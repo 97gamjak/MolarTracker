@@ -55,10 +55,10 @@ namespace db
         Statement(Statement const&)            = delete;
         Statement& operator=(Statement const&) = delete;
 
-        Statement(Statement&& other) noexcept;
-        Statement& operator=(Statement&& other) noexcept;
+        Statement(Statement&& other);
+        Statement& operator=(Statement&& other);
 
-        [[nodiscard]] bool is_valid() const noexcept;
+        [[nodiscard]] bool is_valid() const;
 
         [[nodiscard]] StepResult step();
         void                     execute_to_completion();
@@ -74,7 +74,7 @@ namespace db
         [[nodiscard]] double       column_double(const int col) const;
         [[nodiscard]] std::string  column_text(const int col) const;
 
-        [[nodiscard]] sqlite3_stmt* native_handle() const noexcept;
+        [[nodiscard]] sqlite3_stmt* native_handle() const;
 
        private:   // PRIVATE HELPER METHODS
         void        _ensure_valid() const;
@@ -83,8 +83,8 @@ namespace db
             const int        result
         ) const;
 
-        void _finalize() noexcept;
-        void _move_from(Statement&& other) noexcept;
+        void _finalize();
+        void _move_from(Statement&& other);
     };
 }   // namespace db
 

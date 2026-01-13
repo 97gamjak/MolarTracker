@@ -18,8 +18,8 @@ namespace app
        public:
         explicit ServiceContainer(RepoContainer& repos);
 
-        IProfileService&       profileService() noexcept;
-        const IProfileService& profileService() const noexcept;
+        IProfileService&       profileService();
+        const IProfileService& profileService() const;
     };
 
 }   // namespace app
