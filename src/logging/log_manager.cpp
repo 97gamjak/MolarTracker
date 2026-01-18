@@ -1,5 +1,7 @@
 #include "log_manager.hpp"
 
+#include "logging_base.hpp"
+
 // LogManager& LogManager::getInstance()
 // {
 //     static LogManager instance;

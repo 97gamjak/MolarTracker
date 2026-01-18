@@ -4,8 +4,7 @@
 #include <string>
 
 class LogLevel;
-enum class LogCategoryId;
-class LogCategory;
+enum class LogCategory : size_t;
 
 class LogManager
 {
@@ -15,7 +14,7 @@ class LogManager
     bool isEnabled(const LogCategory& category, LogLevel level) const;
 
     void registerBuiltInCategories();
-    void registerCategory(LogCategoryId id, std::string_view name);
+    void registerCategory(LogCategory id, std::string_view name);
 
     void log(
         LogLevel           level,
