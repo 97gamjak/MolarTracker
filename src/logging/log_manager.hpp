@@ -1,6 +1,12 @@
 #ifndef __LOGGING__LOG_MANAGER_HPP__
 #define __LOGGING__LOG_MANAGER_HPP__
 
+#include <string>
+
+class LogLevel;
+enum class LogCategoryId;
+class LogCategory;
+
 class LogManager
 {
    public:
