@@ -12,4 +12,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 - make checks and updates for both `CHANGELOG.md` and `DEV-CHANGELOG.md` files available
 
+### Dependencies
+
+- Add `mstd 0.0.2`
+
 <!-- insertion marker -->
