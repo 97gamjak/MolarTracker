@@ -1,11 +1,6 @@
 #ifndef __LOGGING__LOGGING_HPP__
 #define __LOGGING__LOGGING_HPP__
 
-struct LogCategory
-{
-    const char* name;
-};
-
 class LogStream
 {
    public:

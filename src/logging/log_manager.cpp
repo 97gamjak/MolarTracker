@@ -2,27 +2,32 @@
 
 #include "logging_base.hpp"
 
-// LogManager& LogManager::getInstance()
-// {
-//     static LogManager instance;
-//     return instance;
-// }
+LogManager& LogManager::getInstance()
+{
+    static LogManager instance;
+    return instance;
+}
 
-// bool LogManager::isEnabled(const LogCategory& category, LogLevel level) const
-// {
-//     // TODO: Implementation to check if logging is enabled
-//     return true;
-// }
+LogManager::LogManager() { initCategoryMap(); }
 
-// void registerBuiltInCategories()
-// {
-//     // TODO: Implementation to register built-in categories
-// }
+void LogManager::initCategoryMap()
+{
+    for (const auto category : LogCategoryMeta::values)
+        _categories[category] = LogLevel::Info;   // Default log level
+}
 
-// void LogManager::registerCategory(LogCategoryId id, std::string_view name)
-// {
-//     // TODO: Implementation to register a category
-// }
+bool LogManager::isEnabled(
+    const LogCategory& category,
+    const LogLevel&    level
+) const
+{
+    return _categories.at(category) >= level;
+}
+
+void LogManager::setLogLevel(const LogCategory& category, const LogLevel& level)
+{
+    _categories[category] = level;
+}
 
 // void LogManager::log(
 //     LogLevel           level,

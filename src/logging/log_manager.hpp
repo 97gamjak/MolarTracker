@@ -2,19 +2,22 @@
 #define __LOGGING__LOG_MANAGER_HPP__
 
 #include <string>
+#include <unordered_map>
 
-class LogLevel;
+enum class LogLevel;
 enum class LogCategory : size_t;
 
 class LogManager
 {
+   private:
+    std::unordered_map<LogCategory, LogLevel> _categories;
+
    public:
     static LogManager& getInstance();
 
-    bool isEnabled(const LogCategory& category, LogLevel level) const;
+    bool isEnabled(const LogCategory& category, const LogLevel& level) const;
 
-    void registerBuiltInCategories();
-    void registerCategory(LogCategory id, std::string_view name);
+    void setLogLevel(const LogCategory& category, const LogLevel& level);
 
     void log(
         LogLevel           level,
@@ -24,6 +27,11 @@ class LogManager
         const char*        function,
         const std::string& message
     );
+
+   private:
+    LogManager();
+
+    void initCategoryMap();
 };
 
 #endif   // __LOGGING__LOG_MANAGER_HPP__
