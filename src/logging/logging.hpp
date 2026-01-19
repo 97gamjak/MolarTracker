@@ -1,61 +1,6 @@
 #ifndef __LOGGING__LOGGING_HPP__
 #define __LOGGING__LOGGING_HPP__
 
-class LogStream
-{
-   public:
-    LogStream(
-        LogLevel           level,
-        const LogCategory& category,
-        const char*        file,
-        int                line,
-        const char*        function
-    )
-        : _enabled{LogManager::instance().isEnabled(category, level)},
-          _level{level},
-          _category{category},
-          _file{file},
-          _line{line},
-          _function{function}
-    {
-    }
-
-    ~LogStream()
-    {
-        if (_enabled)
-        {
-            LogManager::instance().write(
-                _level,
-                _category,
-                _file,
-                _line,
-                _function,
-                std::move(_buffer)
-            );
-        }
-    }
-
-    template <typename T>
-    LogStream& operator<<(const T& v)
-    {
-        if (_enabled)
-        {
-            _buffer +=
-                QString::fromUtf8(QVariant::fromValue(v).toString().toUtf8());
-        }
-        return *this;
-    }
-
-   private:
-    bool               _enabled;
-    LogLevel           _level;
-    const LogCategory& _category;
-    const char*        _file;
-    int                _line;
-    const char*        _function;
-    QString            _buffer;
-};
-
 class LogEntryScope
 {
    public:
@@ -73,9 +18,11 @@ class LogEntryScope
           _line{line},
           _enabled{LogManager::instance().isEnabled(category, level)}
     {
+        // TODO: document why _enabled is used and not the global logger
+        // instance to check if logging should be done
         if (_enabled)
         {
-            LogManager::instance().write(
+            LogManager::instance().log(
                 _level,
                 _category,
                 _file,
@@ -90,7 +37,7 @@ class LogEntryScope
     {
         if (_enabled)
         {
-            LogManager::instance().write(
+            LogManager::instance().log(
                 _level,
                 _category,
                 _file,
@@ -137,7 +84,7 @@ class TimedLogEntryScope final : public LogEntryScope
                 )
                     .count();
 
-            LogManager::instance().write(
+            LogManager::instance().log(
                 _level,
                 _category,
                 _file,
@@ -151,35 +98,5 @@ class TimedLogEntryScope final : public LogEntryScope
    private:
     Clock::time_point _start;
 };
-
-#pragma once
-#include <array>
-#include <string_view>
-
-enum class LogCategoryId : uint16_t
-{
-#define LOG_CATEGORY(token, str) token,
-#include "log_categories.def"
-#undef LOG_CATEGORY
-    _count
-};
-
-struct LogCategory
-{
-    LogCategoryId id;
-    const char*   name;   // stable C string for display/rules
-};
-
-inline constexpr std::array<LogCategory, static_cast<size_t>(LogCategoryId::_count)>
-kAllLogCategories = {{
-#define LOG_CATEGORY(token, str) LogCategory{LogCategoryId::token, str},
-#include "log_categories.def"
-#undef LOG_CATEGORY
-}};
-
-inline constexpr const LogCategory& logCategory(LogCategoryId id) noexcept
-{
-    return kAllLogCategories[static_cast<size_t>(id)];
-}
 
 #endif   // __LOGGING__LOGGING_HPP__

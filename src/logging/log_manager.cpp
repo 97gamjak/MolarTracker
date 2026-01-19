@@ -29,14 +29,26 @@ void LogManager::setLogLevel(const LogCategory& category, const LogLevel& level)
     _categories[category] = level;
 }
 
-// void LogManager::log(
-//     LogLevel           level,
-//     const LogCategory& category,
-//     const char*        file,
-//     int                line,
-//     const char*        function,
-//     const std::string& message
-// )
-// {
-//     // TODO: Implementation to log the message
-// }
+void LogManager::log(
+    LogLevel           level,
+    const LogCategory& category,
+    const char*        file,
+    int                line,
+    const char*        function,
+    const std::string& message
+)
+{
+    if (!isEnabled(category, level))
+        return;
+
+    // TODO(97gamjak): implement global Timestamp helper, probably best to move
+    // to mstd later on
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-46
+    const auto timeStamp = "";
+
+    std::string buffer;
+
+    // TODO: implement this based on the level - not all logging needs for
+    // example line and function
+    buffer << timeStamp << level << category << line << function << message;
+}
