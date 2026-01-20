@@ -27,4 +27,15 @@
 #endif
 // clang-format on
 
+// clang-format off
+#define LOG_ENTRY                        \
+    LogEntryScope __logEntryScope__(     \
+        LogLevel::Trace,                 \
+        __LOG_CATEGORY__,                \
+        __func__,                        \
+        __FILE__,                        \
+        __LINE__                         \
+    )
+// clang-format on
+
 #endif   // __LOGGING__LOG_MACROS_HPP__
