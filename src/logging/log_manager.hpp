@@ -20,11 +20,11 @@ class LogManager
     void setLogLevel(const LogCategory& category, const LogLevel& level);
 
     void log(
-        LogLevel           level,
+        const LogLevel&    level,
         const LogCategory& category,
-        const char*        file,
-        int                line,
-        const char*        function,
+        const std::string& file,
+        const int          line,
+        const std::string& function,
         const std::string& message
     );
 

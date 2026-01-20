@@ -1,5 +1,7 @@
 #include "log_manager.hpp"
 
+#include <iostream>
+
 #include "logging_base.hpp"
 
 LogManager& LogManager::getInstance()
@@ -30,11 +32,11 @@ void LogManager::setLogLevel(const LogCategory& category, const LogLevel& level)
 }
 
 void LogManager::log(
-    LogLevel           level,
+    const LogLevel&    level,
     const LogCategory& category,
-    const char*        file,
-    int                line,
-    const char*        function,
+    const std::string& /*file*/,
+    const int          line,
+    const std::string& function,
     const std::string& message
 )
 {
@@ -50,5 +52,8 @@ void LogManager::log(
 
     // TODO: implement this based on the level - not all logging needs for
     // example line and function
-    buffer << timeStamp << level << category << line << function << message;
+    buffer = timeStamp + line + function + message;
+
+    // TODO: Replace with proper logging sink(s)
+    std::cout << buffer << std::endl;
 }

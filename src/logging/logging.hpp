@@ -28,7 +28,7 @@ class LogEntryScope
                 _file,
                 _line,
                 _function,
-                QStringLiteral("→ enter ") + _function
+                "→ enter " + std::string(_function)
             );
         }
     }
@@ -43,7 +43,7 @@ class LogEntryScope
                 _file,
                 _line,
                 _function,
-                QStringLiteral("← exit  ") + _function
+                "← exit  " + std::string(_function)
             );
         }
     }
@@ -78,11 +78,11 @@ class TimedLogEntryScope final : public LogEntryScope
     {
         if (_enabled)
         {
-            const auto ms =
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                    Clock::now() - _start
-                )
-                    .count();
+            using namespace std::chrono;
+
+            const auto timeDifference = Clock::now() - _start;
+            const auto _ms = duration_cast<milliseconds>(timeDifference);
+            const auto ms  = _ms.count();
 
             LogManager::instance().log(
                 _level,
@@ -90,7 +90,8 @@ class TimedLogEntryScope final : public LogEntryScope
                 _file,
                 _line,
                 _function,
-                QString("← exit %1 (%2 ms)").arg(_function).arg(ms)
+                "⧖ exit  " + std::string(_function) +
+                    " (duration: " + std::to_string(ms) + " ms)"
             );
         }
     }
