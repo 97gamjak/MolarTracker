@@ -26,13 +26,14 @@ class RingFile
         std::size_t           maxFiles{10};
         bool                  append{true};
         bool                  ignoreZeroIndex{true};
-        std::size_t           maxSizeMB{50};
+        std::uintmax_t        maxSizeMB{50};
     };
 
    private:
-    Config        _config{};
-    std::size_t   _current_index{0};
-    std::ofstream _file{};
+    Config         _config{};
+    std::ofstream  _file{};
+    std::uintmax_t _initialFileSize{0};
+    std::uintmax_t _bytesWritten{0};
 
    public:
     explicit RingFile(const Config& config);
@@ -51,7 +52,6 @@ class RingFile
     void flush();
     void close();
 
-    std::filesystem::path              currentPath() const;
     std::vector<std::filesystem::path> listFilesSorted() const;
 
    private:
@@ -59,6 +59,7 @@ class RingFile
     void _rotateIfNeeded();
     void _openCurrent();
 
+    std::filesystem::path _path() const;
     std::filesystem::path _pathForIndex(std::size_t index) const;
     std::size_t           _findNextIndex() const;
 };

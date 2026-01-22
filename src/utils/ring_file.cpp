@@ -25,10 +25,8 @@ RingFile& RingFile::operator=(RingFile&& other)
         return *this;
 
     close();
-    _config              = std::move(other._config);
-    _current_index       = other._current_index;
-    _file                = std::move(other._file);
-    other._current_index = 0;
+    _config = std::move(other._config);
+    _file   = std::move(other._file);
     return *this;
 }
 
@@ -66,11 +64,6 @@ void RingFile::close()
         _file.close();
 }
 
-std::filesystem::path RingFile::currentPath() const
-{
-    return _pathForIndex(_current_index);
-}
-
 std::vector<std::filesystem::path> RingFile::listFilesSorted() const
 {
     std::vector<std::filesystem::path> result;
@@ -99,30 +92,41 @@ void RingFile::_normalizeConfig()
 
 void RingFile::_rotateIfNeeded()
 {
-    // check if we need a new file
-    const auto p = _pathForIndex(0);
+    const auto p = _path();
 
-    if (std::filesystem::file_size(p) > 1024 * 1024)
+    if (!std::filesystem::exists(p))
+        return;
+
+    if (_initialFileSize + _bytesWritten > 1024 * 1024)
     {
-        // we need to rotate!!! so pushing all files back for at one index!
+        // we need to rotate! so pushing all files back for one index!
         for (std::size_t i = _config.maxFiles - 1; i > 0; --i)
         {
-            const auto      src = _pathForIndex(i - 1);
-            const auto      dst = _pathForIndex(i);
-            std::error_code ec;
-            std::filesystem::rename(src, dst, ec);
+            const auto src = _pathForIndex(i - 1);
+            const auto dst = _pathForIndex(i);
+
+            if (std::filesystem::exists(src))
+            {
+                std::error_code ec;
+                std::filesystem::rename(src, dst, ec);
+            }
         }
     }
-
-    // we need to open the file!!!
 }
 
 void RingFile::_openCurrent()
 {
-    const auto p = _pathForIndex(_current_index);
+    const auto p = _path();
 
     std::ios::openmode mode = std::ios::out;
     mode |= (_config.append ? std::ios::app : std::ios::trunc);
+
+    if (_config.append && std::filesystem::exists(p))
+        _initialFileSize = std::filesystem::file_size(p);
+    else
+        _initialFileSize = 0;
+
+    _bytesWritten = 0;
 
     _file.open(p, mode);
 }
@@ -138,6 +142,8 @@ std::size_t RingFile::_findNextIndex() const
 
     return 0;
 }
+
+std::filesystem::path RingFile::_path() const { return _pathForIndex(0); }
 
 std::filesystem::path RingFile::_pathForIndex(std::size_t index) const
 {
