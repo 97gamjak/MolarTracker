@@ -7,7 +7,8 @@
  * @brief Constructs a RingFile with the given configuration
  *
  * @note The directory specified in the configuration will be created if it
- * does not exist. Files will be created/opened upon the first write.
+ * does not exist, and the current log file will be created/opened during
+ * construction.
  *
  * @param config Configuration for the RingFile
  */
