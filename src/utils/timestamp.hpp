@@ -26,11 +26,8 @@ class Timestamp final
 
     [[nodiscard]] static std::int64_t unixMilliseconds();
 
-    // ISO-8601, UTC: 2026-01-20T11:34:05Z
-    [[nodiscard]] static std::string iso8601Utc();
-
-    // ISO-8601, local time: 2026-01-20T12:34:05
-    [[nodiscard]] static std::string iso8601Local();
+    // ISO-8601, UTC: 2026-01-20T11:34:05
+    [[nodiscard]] static std::string iso8601();
 
     // Human readable: 2026-01-20 12:34:05
     [[nodiscard]] static std::string humanReadable();

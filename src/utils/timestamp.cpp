@@ -33,25 +33,13 @@ std::int64_t Timestamp::unixMilliseconds()
 }
 
 /**
- * @brief Returns the current time formatted as ISO-8601 in UTC
- *
- * Example: 2026-01-20T11:34:05Z
- *
- * @return std::string
- */
-std::string Timestamp::iso8601Utc()
-{
-    return std::format("{:%FT%TZ}", floor<seconds>(now()));
-}
-
-/**
  * @brief Returns the current time formatted as ISO-8601 in local time
  *
  * Example: 2026-01-20T12:34:05
  *
  * @return std::string
  */
-std::string Timestamp::iso8601Local()
+std::string Timestamp::iso8601()
 {
     return std::format("{:%FT%T}", floor<seconds>(now()));
 }
