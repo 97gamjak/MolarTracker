@@ -4,6 +4,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Utils
+
+- Implement `Timestamp` static utility class
+
 ### Docs
 
 - Add `CHANGELOG.md` and `DEV-CHANGELOG.md` support
