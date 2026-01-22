@@ -278,7 +278,9 @@ std::size_t RingFile::_findNextIndex() const
  */
 std::filesystem::path RingFile::_pathForIndex(const std::size_t index) const
 {
-    const auto nIndicesDigits = (_config.maxFiles - 1) / 10;
+    std::size_t nIndicesDigits = 1;
+    if (_config.maxFiles > 1)
+        nIndicesDigits = std::to_string(_config.maxFiles - 1).size();
 
     auto format = "{}_{:0" + std::to_string(nIndicesDigits) + "}{}";
 
