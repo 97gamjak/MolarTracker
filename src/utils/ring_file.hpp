@@ -14,6 +14,11 @@
 /**
  * @brief A class for writing ring files
  *
+ * A ring file is a set of files that are used in a circular manner. When the
+ * current file reaches a specified maximum size, it is closed and a new file is
+ * opened. The oldest file is deleted when the maximum number of files is
+ * reached.
+ *
  */
 class RingFile
 {
@@ -52,15 +57,15 @@ class RingFile
     void flush();
     void close();
 
-    std::vector<std::filesystem::path> listFilesSorted() const;
-
    private:
     void _normalizeConfig();
-    void _rotateIfNeeded();
     void _openCurrent();
 
-    std::filesystem::path _path() const;
-    std::filesystem::path _pathForIndex(std::size_t index) const;
+    bool _wouldExceed(const std::uintmax_t additionalBytes) const;
+    void _ensureOpenAndRotateIfNeeded(const std::uintmax_t additionalBytes);
+    void _rotateNow();
+
+    std::filesystem::path _pathForIndex(const std::size_t index) const;
     std::size_t           _findNextIndex() const;
 };
 
