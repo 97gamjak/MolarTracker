@@ -9,18 +9,24 @@
 #include <vector>
 
 // TODO: migrate this RingFile to mstd
-// ... issue link
+// https://97gamjak.atlassian.net/browse/MSTD-90
 
+/**
+ * @brief A class for writing ring files
+ *
+ */
 class RingFile
 {
    public:
     struct Config
     {
         std::filesystem::path directory{};
-        std::string           base_name{"log"};
+        std::string           baseName{"log"};
         std::string           extension{".txt"};
-        std::size_t           max_files{10};
+        std::size_t           maxFiles{10};
         bool                  append{true};
+        bool                  ignoreZeroIndex{true};
+        std::size_t           maxSizeMB{50};
     };
 
    private:

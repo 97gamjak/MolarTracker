@@ -1,6 +1,7 @@
 #include "utils/ring_file.hpp"
 
 #include <filesystem>
+#include <format>
 
 RingFile::RingFile(const Config& config) : _config(config)
 {
@@ -73,7 +74,7 @@ std::filesystem::path RingFile::currentPath() const
 std::vector<std::filesystem::path> RingFile::listFilesSorted() const
 {
     std::vector<std::filesystem::path> result;
-    for (std::size_t i = 0; i < _config.max_files; ++i)
+    for (std::size_t i = 0; i < _config.maxFiles; ++i)
     {
         const auto p = _pathForIndex(i);
         if (std::filesystem::exists(p))
@@ -86,10 +87,10 @@ std::vector<std::filesystem::path> RingFile::listFilesSorted() const
 
 void RingFile::_normalizeConfig()
 {
-    if (_config.max_files == 0)
-        _config.max_files = 1;
+    if (_config.maxFiles == 0)
+        _config.maxFiles = 1;
 
-    if (_config.extension.empty() || _config.extension.front() != '.')
+    if (!_config.extension.empty() && _config.extension.front() != '.')
         _config.extension = "." + _config.extension;
 
     if (_config.directory.empty())
@@ -98,14 +99,22 @@ void RingFile::_normalizeConfig()
 
 void RingFile::_rotateIfNeeded()
 {
-    _current_index = _findNextIndex();
+    // check if we need a new file
+    const auto p = _pathForIndex(0);
 
-    const auto p = _pathForIndex(_current_index);
-    if (std::filesystem::exists(p))
+    if (std::filesystem::file_size(p) > 1024 * 1024)
     {
-        std::error_code ec;
-        std::filesystem::remove(p, ec);
+        // we need to rotate!!! so pushing all files back for at one index!
+        for (std::size_t i = _config.maxFiles - 1; i > 0; --i)
+        {
+            const auto      src = _pathForIndex(i - 1);
+            const auto      dst = _pathForIndex(i);
+            std::error_code ec;
+            std::filesystem::rename(src, dst, ec);
+        }
     }
+
+    // we need to open the file!!!
 }
 
 void RingFile::_openCurrent()
@@ -120,43 +129,28 @@ void RingFile::_openCurrent()
 
 std::size_t RingFile::_findNextIndex() const
 {
-    // Picks the oldest file index to overwrite based on
-    // last_write_time. If not all files exist yet, picks the first
-    // missing index.
-
-    std::vector<std::pair<std::size_t, std::filesystem::file_time_type>>
-        existing;
-
-    for (std::size_t i = 0; i < _config.max_files; ++i)
+    for (std::size_t i = 0; i < _config.maxFiles; ++i)
     {
         const auto p = _pathForIndex(i);
         if (!std::filesystem::exists(p))
             return i;
-
-        existing.push_back({i, std::filesystem::last_write_time(p)});
     }
 
-    const auto it = std::ranges::min_element(
-        existing,
-        [](const auto& a, const auto& b) { return a.second < b.second; }
-    );
-
-    return it->first;
+    return 0;
 }
 
 std::filesystem::path RingFile::_pathForIndex(std::size_t index) const
 {
-    // TODO(97gamjak): implement number of indices according to max files
-    // ... issue link
-    // TODO: clean this up!!!
-    char buffer[64]{};
-    std::snprintf(
-        buffer,
-        sizeof(buffer),
-        "%s_%04zu%s",
-        _config.base_name.c_str(),
-        index,
-        _config.extension.c_str()
+    std::size_t nIndicesDigits = (_config.maxFiles - 1) / 10;
+
+    std::string format = "{}_{:0" + std::to_string(nIndicesDigits) + "}{}";
+
+    if (_config.ignoreZeroIndex && index == 0)
+        format = "{}{}";
+
+    std::string buffer = std::vformat(
+        format,
+        std::make_format_args(_config.baseName, index, _config.extension)
     );
 
     return _config.directory / buffer;
