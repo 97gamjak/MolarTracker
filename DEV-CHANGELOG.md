@@ -6,7 +6,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Utils
 
-- Implement `Timestamp` static utility class
+- Implement `Timestamp` static utility class (will be migrated to mstd in the future)
+- Implement `RingFile` class for logging (will be migrated to mstd in the future)
 
 ### Docs
 
