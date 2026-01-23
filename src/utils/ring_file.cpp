@@ -279,19 +279,27 @@ std::size_t RingFile::_findNextIndex() const
  */
 std::filesystem::path RingFile::_pathForIndex(const std::size_t index) const
 {
-    std::size_t nIndicesDigits = 1;
-    if (_config.maxFiles > 1)
-        nIndicesDigits = std::to_string(_config.maxFiles - 1).size();
-
-    auto format = "{}_{:0" + std::to_string(nIndicesDigits) + "}{}";
+    std::string buffer;
 
     if (_config.ignoreZeroIndex && index == 0)
-        format = "{}{}";
+    {
+        // For index 0, when ignoreZeroIndex is enabled, use baseName +
+        // extension
+        buffer = std::format("{}{}", _config.baseName, _config.extension);
+    }
+    else
+    {
+        std::size_t nIndicesDigits = 1;
+        if (_config.maxFiles > 1)
+            nIndicesDigits = std::to_string(_config.maxFiles - 1).size();
 
-    const auto buffer = std::vformat(
-        format,
-        std::make_format_args(_config.baseName, index, _config.extension)
-    );
+        auto format = "{}_{:0" + std::to_string(nIndicesDigits) + "}{}";
+
+        buffer = std::vformat(
+            format,
+            std::make_format_args(_config.baseName, index, _config.extension)
+        );
+    }
 
     return _config.directory / buffer;
 }
