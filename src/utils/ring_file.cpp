@@ -255,23 +255,6 @@ void RingFile::_openCurrent()
 }
 
 /**
- * @brief Finds the next available index for a new ring file
- *
- * @return std::size_t The next available index
- */
-std::size_t RingFile::_findNextIndex() const
-{
-    for (std::size_t i = 0; i < _config.maxFiles; ++i)
-    {
-        const auto p = _pathForIndex(i);
-        if (!std::filesystem::exists(p))
-            return i;
-    }
-
-    return 0;
-}
-
-/**
  * @brief Constructs the path for the given index
  *
  * @param index The index of the ring file

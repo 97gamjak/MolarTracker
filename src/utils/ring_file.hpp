@@ -66,7 +66,6 @@ class RingFile
     void _rotateNow();
 
     std::filesystem::path _pathForIndex(const std::size_t index) const;
-    std::size_t           _findNextIndex() const;
 };
 
 #endif   // __UTILS__RING_FILE_HPP__
