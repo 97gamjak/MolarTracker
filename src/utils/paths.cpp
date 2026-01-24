@@ -1,0 +1,222 @@
+#include "utils/paths.hpp"
+
+/**
+ * @brief Retrieve the current user's home directory from the environment.
+ *
+ * This helper reads the HOME environment variable and converts it to a
+ * std::filesystem::path wrapped in the project's PathResult type.
+ *
+ * Behavior:
+ * - If the HOME environment variable is not present, returns
+ * std::unexpected(EnvError::NotFound).
+ * - If the HOME environment variable is present but empty, returns
+ * std::unexpected(EnvError::Empty).
+ * - Otherwise returns the path constructed from HOME.
+ *
+ * @return PathResult Either a valid std::filesystem::path on success or an
+ * unexpected EnvError on failure.
+ */
+PathResult _linux_home()
+{
+    const auto* home = std::getenv("HOME");
+
+    if (!home)
+        return std::unexpected(EnvError::NotFound);
+
+    if (!*home)
+        return std::unexpected(EnvError::Empty);
+
+    return std::filesystem::path(home);
+}
+
+/**
+ * @brief Resolve an XDG-style directory using an environment variable with a
+ * fallback under $HOME.
+ *
+ * This function attempts to read an environment variable specified by @p
+ * env_name. If that variable is set and non-empty, its value is returned as a
+ * std::filesystem::path wrapped in PathResult. If the environment variable is
+ * missing or empty, the function falls back to using the user's home directory
+ * (via _linux_home) and appends @p fallback_suffix to it (e.g. ".config" or
+ * ".local/share").
+ *
+ * Notes:
+ * - The @p env_name parameter should be the name of an environment variable
+ * (for example "XDG_CONFIG_HOME").
+ * - The @p fallback_suffix should be a relative path component to append to
+ * $HOME when the env var is unset.
+ *
+ * @param env_name Name of the environment variable to consult (e.g.
+ * "XDG_CONFIG_HOME").
+ * @param fallback_suffix Path suffix to append to $HOME when the environment
+ * variable is missing (e.g. ".config").
+ * @return PathResult Either a resolved std::filesystem::path on success or an
+ * unexpected EnvError propagated from _linux_home.
+ */
+PathResult _linux_xdg(
+    std::string_view env_name,
+    std::string_view fallback_suffix
+)
+{
+    const auto* env_path = std::getenv(std::string(env_name).c_str());
+
+    if (env_path && *env_path)
+        return std::filesystem::path(env_path);
+
+    const auto home = _linux_home();
+
+    if (!home)
+        return home;
+
+    return home.value() / std::filesystem::path(fallback_suffix);
+}
+
+#if defined(_WIN32)
+/**
+ * @brief Query a Windows Known Folder and return it as a std::filesystem::path.
+ *
+ * This convenience wrapper calls SHGetKnownFolderPath for the provided Known
+ * Folder ID and converts the returned PWSTR into a std::filesystem::path.
+ * Allocated memory is freed via CoTaskMemFree.
+ *
+ * Behavior:
+ * - On success returns the folder path.
+ * - On failure (HRESULT indicates failure or returned pointer is null) returns
+ * an empty std::filesystem::path.
+ *
+ * @note This function is only available on Windows builds.
+ *
+ * @param id The REFKNOWNFOLDERID to query (e.g. FOLDERID_RoamingAppData).
+ * @return std::filesystem::path The resolved folder path, or an empty path on
+ * error.
+ */
+std::filesystem::path _win_known_folder(REFKNOWNFOLDERID id)
+{
+    PWSTR      wide = nullptr;
+    const auto hr   = SHGetKnownFolderPath(id, KF_FLAG_DEFAULT, nullptr, &wide);
+
+    if (FAILED(hr) || wide == nullptr)
+        return std::filesystem::path();
+
+    std::filesystem::path p(wide);
+    CoTaskMemFree(wide);
+    return p;
+}
+#endif
+
+/**
+ * @brief Compute the per-user application directory for the requested kind.
+ *
+ * On Windows:
+ * - Both Config and Data currently map to the roaming AppData known folder
+ * (FOLDERID_RoamingAppData).
+ * - If resolution fails, an empty std::filesystem::path is returned.
+ *
+ * On POSIX (Linux/UNIX):
+ * - For DirKind::Config, consult XDG_CONFIG_HOME with fallback "$HOME/.config".
+ * - For DirKind::Data, consult XDG_DATA_HOME with fallback
+ * "$HOME/.local/share".
+ * - If the base directory cannot be resolved (e.g. missing HOME), an empty
+ * std::filesystem::path is returned.
+ *
+ * The returned path is the base user directory joined with @p app_name (i.e.
+ * base/app_name).
+ *
+ * @param kind Which kind of per-user directory to resolve (Config or Data).
+ * @param app_name Name of the application subdirectory to append to the base
+ * directory.
+ * @return std::filesystem::path The full per-user application directory, or an
+ * empty path if resolution fails.
+ */
+std::filesystem::path user_dir(DirKind kind, std::string_view app_name)
+{
+#if defined(_WIN32)
+    std::filesystem::path base;
+    switch (kind)
+    {
+        case DirKind::Config:
+        case DirKind::Data:
+            base = _win_known_folder(FOLDERID_RoamingAppData);
+            break;
+    }
+    if (base.empty())
+        return std::filesystem::path();
+
+    return base / std::filesystem::path(app_name);
+#else
+    PathResult base;
+    switch (kind)
+    {
+        case DirKind::Config:
+            base = _linux_xdg("XDG_CONFIG_HOME", ".config");
+            break;
+        case DirKind::Data:
+            base = _linux_xdg("XDG_DATA_HOME", ".local/share");
+            break;
+    }
+    if (!base)
+    {
+        // TODO: implement a warning here or any kind of better solution
+        return std::filesystem::path();
+    }
+
+    return base.value() / std::filesystem::path(app_name);
+#endif
+}
+
+/**
+ * @brief Ensure that a directory exists, creating any missing parent
+ * directories.
+ *
+ * If @p path is empty this function is a no-op and simply returns the empty
+ * path. When @p path is non-empty, std::filesystem::create_directories is
+ * invoked with a non-throwing overload that accepts a std::error_code; any
+ * creation errors are intentionally ignored here.
+ *
+ * @param path The directory path to ensure exists.
+ * @return std::filesystem::path The same path that was passed in.
+ */
+std::filesystem::path ensure_dir(const std::filesystem::path& path)
+{
+    if (!path.empty())
+    {
+        std::error_code ec;
+        std::filesystem::create_directories(path, ec);
+    }
+
+    return path;
+}
+
+/**
+ * @brief Return the per-user configuration directory for the given application,
+ * creating it if necessary.
+ *
+ * This is a small convenience wrapper that resolves the application config
+ * directory via user_dir(DirKind::Config, app_name) and then calls ensure_dir
+ * to create it on disk if it does not yet exist.
+ *
+ * @param app_name Name of the application subdirectory.
+ * @return std::filesystem::path The ensured config directory path, or an empty
+ * path if resolution or creation failed.
+ */
+std::filesystem::path config_dir(std::string_view app_name)
+{
+    return ensure_dir(user_dir(DirKind::Config, app_name));
+}
+
+/**
+ * @brief Return the per-user data directory for the given application, creating
+ * it if necessary.
+ *
+ * This is a small convenience wrapper that resolves the application data
+ * directory via user_dir(DirKind::Data, app_name) and then calls ensure_dir to
+ * create it on disk if it does not yet exist.
+ *
+ * @param app_name Name of the application subdirectory.
+ * @return std::filesystem::path The ensured data directory path, or an empty
+ * path if resolution or creation failed.
+ */
+std::filesystem::path data_dir(std::string_view app_name)
+{
+    return ensure_dir(user_dir(DirKind::Data, app_name));
+}

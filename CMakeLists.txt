@@ -46,7 +46,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
         # switch needs to check all enum values
         -Wswitch-enum
-        -Wswitch-default
 
         -Wno-error=deprecated-declarations
     )
