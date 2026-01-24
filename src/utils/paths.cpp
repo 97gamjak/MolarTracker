@@ -224,13 +224,13 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
  * @brief Ensure that a directory exists, creating any missing parent
  * directories.
  *
- * If @p path is empty this function is a no-op and simply returns the empty
- * path. When @p path is non-empty, std::filesystem::create_directories is
- * invoked with a non-throwing overload that accepts a std::error_code; any
- * creation errors are intentionally ignored here.
+ * If @p path is empty this function returns PathError::Empty. When @p path is
+ * non-empty, std::filesystem::create_directories is invoked with a
+ * non-throwing overload that accepts a std::error_code; on failure this
+ * function returns PathError::FailedCreate and on success it returns @p path.
  *
  * @param path The directory path to ensure exists.
- * @return PathErrorResult The ensured directory path, or an PathError on
+ * @return PathErrorResult The ensured directory path, or a PathError on
  * failure.
  */
 PathErrorResult ensure_dir(const std::filesystem::path& path)
