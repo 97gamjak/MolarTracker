@@ -208,7 +208,7 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
     if (base.empty())
         return std::unexpected(PathError::Empty);
 
-    return base / std::filesystem::path(app_name);
+    return base / app_name;
 #else
     PathResult base;
     switch (kind)
@@ -223,7 +223,7 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
     if (!base)
         return std::unexpected(PathError::Empty);
 
-    return base.value() / std::filesystem::path(app_name);
+    return base.value() / app_name;
 #endif
 }
 
