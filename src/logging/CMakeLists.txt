@@ -8,3 +8,8 @@ target_include_directories(molartracker_logging
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${PROJECT_SOURCE_DIR}/external/mstd/include
 )
+
+target_link_libraries(molartracker_logging
+    PUBLIC
+        molartracker_utils
+)
