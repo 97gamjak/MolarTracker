@@ -32,11 +32,11 @@ Constants::Constants()
     }
 }
 
-std::filesystem::path Constants::get_config_path() const { return _configPath; }
+std::filesystem::path Constants::getConfigPath() const { return _configPath; }
 
-std::filesystem::path Constants::get_data_path() const { return _dataPath; }
+std::filesystem::path Constants::getDataPath() const { return _dataPath; }
 
-std::filesystem::path Constants::get_database_path() const
+std::filesystem::path Constants::getDatabasePath() const
 {
     return _dataPath / _databaseFile;
 }

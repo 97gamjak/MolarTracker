@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "logging_base.hpp"
+#include "utils/ring_file.hpp"
 
 LogManager& LogManager::getInstance()
 {
@@ -11,6 +12,23 @@ LogManager& LogManager::getInstance()
 }
 
 LogManager::LogManager() { initCategoryMap(); }
+
+/**
+ * @brief Initializes the ring file logger
+ *
+ * @param directory Directory where the log files will be stored
+ */
+void LogManager::initializeRingFileLogger(
+    const std::filesystem::path& configDir
+)
+{
+    RingFile::Config config;
+    _logDirectory    = configDir / "logs";
+    config.directory = _logDirectory;
+
+    // TODO: add here all possible logging stuff including name of the file!
+    _ringFile = RingFile(config);
+}
 
 void LogManager::initCategoryMap()
 {

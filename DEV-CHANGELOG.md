@@ -22,6 +22,11 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Create `MolarTrackerApplication` wrapper for a cleaner setup
 
+### Logging
+
+- Use `std::cerr` as output if no RingFile is configured inside the logger
+- Add `initGlobalConfig` for all singleton instances
+
 ### CI
 
 - make checks and updates for both `CHANGELOG.md` and `DEV-CHANGELOG.md` files available

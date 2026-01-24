@@ -3,10 +3,25 @@
 #include <exception>
 
 #include "app/app_context.hpp"
+#include "config/constants.hpp"
 #include "exceptions/base.hpp"
+#include "logging/log_manager.hpp"
 #include "ui/application.hpp"
 #include "ui/exceptions/exception_dialog.hpp"
 #include "ui/main_window.hpp"
+
+// TODO: move this to some initialization module
+/**
+ * @brief Initializes the global configuration
+ *
+ * @note Sets up logging and other global settings.
+ */
+void initGlobalConfig()
+{
+    // Initialize logging
+    const auto configDir = Constants::getInstance().getConfigPath();
+    LogManager::getInstance().initializeRingFileLogger(configDir);
+}
 
 int main(int argc, char** argv)
 {
@@ -14,6 +29,8 @@ int main(int argc, char** argv)
 
     try
     {
+        initGlobalConfig();
+
         app::AppContext appContext;
         ui::MainWindow  mainWindow{appContext};
 
