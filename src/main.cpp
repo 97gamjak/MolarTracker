@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <cstdlib>
 #include <exception>
 
 #include "app/app_context.hpp"
