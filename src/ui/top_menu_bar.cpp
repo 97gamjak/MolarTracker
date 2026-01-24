@@ -19,6 +19,7 @@ namespace ui
         _buildFileMenu(bar);
         _buildEditMenu(bar);
         _buildSettingsMenu(bar);
+        _buildDebugMenu(bar);
         _buildHelpMenu(bar);
     }
 
@@ -80,6 +81,19 @@ namespace ui
             &QAction::triggered,
             this,
             &TopMenuBar::requestPreferences
+        );
+    }
+
+    void TopMenuBar::_buildDebugMenu(QMenuBar* menu)
+    {
+        auto* debugMenu = menu->addMenu("&Debug");
+
+        _debugAction = debugMenu->addAction("&Debug Flags");
+        connect(
+            _debugAction,
+            &QAction::triggered,
+            this,
+            &TopMenuBar::requestDebug
         );
     }
 

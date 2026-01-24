@@ -21,12 +21,14 @@ namespace ui
         QAction* _saveAction        = nullptr;
         QAction* _quitAction        = nullptr;
         QAction* _preferencesAction = nullptr;
+        QAction* _debugAction       = nullptr;
         QAction* _aboutAction       = nullptr;
 
        private:
         void _buildFileMenu(QMenuBar* menu);
         void _buildEditMenu(QMenuBar* menu);
         void _buildSettingsMenu(QMenuBar* menu);
+        void _buildDebugMenu(QMenuBar* menu);
         void _buildHelpMenu(QMenuBar* menu);
 
        signals:
@@ -34,6 +36,7 @@ namespace ui
         void requestRedo();
         void requestQuit();
         void requestPreferences();
+        void requestDebug();
         void requestAbout();
         void requestSave();
 
