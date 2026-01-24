@@ -51,6 +51,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     )
 endif()
 
+if (MSVC)
+    add_compile_options(/Zc:preprocessor)
+endif()
+
 add_subdirectory(src)
 
 target_compile_definitions(MolarTracker 
@@ -76,6 +80,4 @@ if(NOT DEFINED WIN32)
             "$ENV{HOME}/.local/share/applications/${PROJECT_NAME}.desktop"
     VERBATIM
     )
-else()
-    target_compile_options(MolarTracker PRIVATE /Zc:preprocessor)
 endif()
