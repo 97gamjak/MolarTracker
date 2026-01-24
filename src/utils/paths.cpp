@@ -2,6 +2,7 @@
 
 #if defined(_WIN32)
 #include <algorithm>
+#include <cctype>
 #include <string>
 #endif
 
