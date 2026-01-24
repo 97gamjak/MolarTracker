@@ -30,7 +30,7 @@ using PathErrorResult = std::expected<std::filesystem::path, PathError>;
 
 PathErrorResult user_dir(DirKind kind, std::string_view app_name);
 
-std::filesystem::path ensure_dir(const std::filesystem::path& p);
+std::filesystem::path ensure_dir(const std::filesystem::path& path);
 
 PathErrorResult config_dir(std::string_view app_name);
 PathErrorResult data_dir(std::string_view app_name);
