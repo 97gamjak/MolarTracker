@@ -83,7 +83,7 @@ jobs:
       - name: Build (Ubuntu)
         if: runner.os == 'Linux'
         run: |
-          cmake --build build
+          cmake --build build --verbose
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'
@@ -99,7 +99,7 @@ jobs:
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          cmake --build build
+          cmake --build build --verbose
 
       # -------------------------
       # Windows: deploy with windeployqt + upload

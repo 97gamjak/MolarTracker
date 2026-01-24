@@ -52,6 +52,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if (MSVC)
+    message(STATUS "Adding MSVC specific compile options")
     add_compile_options(/Zc:preprocessor)
 endif()
 
