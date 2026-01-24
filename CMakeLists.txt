@@ -52,12 +52,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     )
 endif()
 
-add_subdirectory(src)
-
-target_compile_definitions(MolarTracker 
+add_compile_definitions( 
     PUBLIC
     MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
 )
+
+add_subdirectory(src)
 
 if(NOT DEFINED WIN32)
     message(STATUS "Configuring desktop file installation target")
