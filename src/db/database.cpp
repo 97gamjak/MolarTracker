@@ -18,7 +18,12 @@ namespace db
      */
     Database::Database(const std::filesystem::path& db_path)
     {
-        open(std::filesystem::absolute(db_path).string());
+        std::filesystem::path path = db_path;
+        if (!path.is_absolute())
+        {
+            path = std::filesystem::absolute(path);
+        }
+        open(path.string());
     }
 
     /**
