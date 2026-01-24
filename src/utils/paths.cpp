@@ -1,5 +1,67 @@
 #include "utils/paths.hpp"
 
+// TODO: migrate this to mstd later on
+enum class EnvError
+{
+    NotFound,
+    Empty
+};
+
+using PathResult = std::expected<std::filesystem::path, EnvError>;
+
+/**
+ * @brief Validate that an application name is safe for use in paths.
+ *
+ * This function checks that the provided string @p s is a valid application
+ * name that can be safely used as a directory name under user config/data
+ * directories. It performs checks to disallow control characters, path
+ * separators, Windows reserved characters, and path traversal patterns.
+ *
+ * @param s The application name to validate.
+ * @return true If the application name is safe.
+ * @return false If the application name is unsafe.
+ */
+bool is_safe_app_name(std::string_view s) noexcept
+{
+    if (s.empty())
+        return false;
+
+    // Disallow leading/trailing spaces (optional, but avoids weird folders)
+    if (s.front() == ' ' || s.back() == ' ')
+        return false;
+
+    for (const auto& ch : s)
+    {
+        // control chars
+        if (ch < 0x20 || ch == 0x7F)
+            return false;
+
+        // path separators / traversal enablers
+        if (ch == '/' || ch == '\\')
+            return false;
+
+        // Windows reserved characters (also safe to ban on Linux)
+        if (ch == '<' || ch == '>' || ch == ':' || ch == '"' || ch == '|' ||
+            ch == '?' || ch == '*')
+            return false;
+
+        // NUL
+        if (ch == '\0')
+            return false;
+    }
+
+    // Disallow "." or ".." exactly
+    if (s == "." || s == "..")
+        return false;
+
+    // Disallow segments like "a/..", "a\.." already blocked by separators,
+    // but also reject any occurrence of ".." to be conservative:
+    if (s.find("..") != std::string_view::npos)
+        return false;
+
+    return true;
+}
+
 /**
  * @brief Retrieve the current user's home directory from the environment.
  *
@@ -125,11 +187,14 @@ std::filesystem::path _win_known_folder(REFKNOWNFOLDERID id)
  * @param kind Which kind of per-user directory to resolve (Config or Data).
  * @param app_name Name of the application subdirectory to append to the base
  * directory.
- * @return std::filesystem::path The full per-user application directory, or an
- * empty path if resolution fails.
+ * @return PathErrorResult The resolved per-user application directory path or
+ * an PathError on failure.
  */
-std::filesystem::path user_dir(DirKind kind, std::string_view app_name)
+PathErrorResult user_dir(DirKind kind, std::string_view app_name)
 {
+    if (!is_safe_app_name(app_name))
+        return std::unexpected(PathError::InvalidAppName);
+
 #if defined(_WIN32)
     std::filesystem::path base;
     switch (kind)
@@ -140,7 +205,7 @@ std::filesystem::path user_dir(DirKind kind, std::string_view app_name)
             break;
     }
     if (base.empty())
-        return std::filesystem::path();
+        return std::unexpected(PathError::Empty);
 
     return base / std::filesystem::path(app_name);
 #else
@@ -155,10 +220,7 @@ std::filesystem::path user_dir(DirKind kind, std::string_view app_name)
             break;
     }
     if (!base)
-    {
-        // TODO: implement a warning here or any kind of better solution
-        return std::filesystem::path();
-    }
+        return std::unexpected(PathError::Empty);
 
     return base.value() / std::filesystem::path(app_name);
 #endif
@@ -196,12 +258,17 @@ std::filesystem::path ensure_dir(const std::filesystem::path& path)
  * to create it on disk if it does not yet exist.
  *
  * @param app_name Name of the application subdirectory.
- * @return std::filesystem::path The ensured config directory path, or an empty
- * path if resolution or creation failed.
+ * @return PathErrorResult The ensured config directory path, or an PathError on
+ * failure.
  */
-std::filesystem::path config_dir(std::string_view app_name)
+PathErrorResult config_dir(std::string_view app_name)
 {
-    return ensure_dir(user_dir(DirKind::Config, app_name));
+    const auto dir = user_dir(DirKind::Config, app_name);
+
+    if (!dir)
+        return dir;
+
+    return ensure_dir(dir.value());
 }
 
 /**
@@ -213,10 +280,15 @@ std::filesystem::path config_dir(std::string_view app_name)
  * create it on disk if it does not yet exist.
  *
  * @param app_name Name of the application subdirectory.
- * @return std::filesystem::path The ensured data directory path, or an empty
- * path if resolution or creation failed.
+ * @return PathErrorResult The ensured data directory path, or an PathError on
+ * failure.
  */
-std::filesystem::path data_dir(std::string_view app_name)
+PathErrorResult data_dir(std::string_view app_name)
 {
-    return ensure_dir(user_dir(DirKind::Data, app_name));
+    const auto dir = user_dir(DirKind::Data, app_name);
+
+    if (!dir)
+        return dir;
+
+    return ensure_dir(dir.value());
 }

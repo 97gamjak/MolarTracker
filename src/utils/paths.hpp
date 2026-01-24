@@ -20,19 +20,19 @@ enum class DirKind
     Data,     // persistent data (SQLite DB, user-created content)
 };
 
-enum class EnvError
+enum class PathError
 {
-    NotFound,
-    Empty
+    Empty,
+    InvalidAppName,
 };
 
-using PathResult = std::expected<std::filesystem::path, EnvError>;
+using PathErrorResult = std::expected<std::filesystem::path, PathError>;
 
-std::filesystem::path user_dir(DirKind kind, std::string_view app_name);
+PathErrorResult user_dir(DirKind kind, std::string_view app_name);
 
 std::filesystem::path ensure_dir(const std::filesystem::path& p);
 
-std::filesystem::path config_dir(std::string_view app_name);
-std::filesystem::path data_dir(std::string_view app_name);
+PathErrorResult config_dir(std::string_view app_name);
+PathErrorResult data_dir(std::string_view app_name);
 
 #endif   // __UTILS__PATHS_HPP__
