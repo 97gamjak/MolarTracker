@@ -28,17 +28,6 @@ enum class EnvError
 
 using PathResult = std::expected<std::filesystem::path, EnvError>;
 
-PathResult _linux_home();
-
-PathResult _linux_xdg(
-    std::string_view env_name,
-    std::string_view fallback_suffix
-);
-
-#if defined(_WIN32)
-std::filesystem::path _win_known_folder(REFKNOWNFOLDERID id);
-#endif
-
 std::filesystem::path user_dir(DirKind kind, std::string_view app_name);
 
 std::filesystem::path ensure_dir(const std::filesystem::path& p);
