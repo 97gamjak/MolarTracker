@@ -1,5 +1,10 @@
 #include "utils/paths.hpp"
 
+#if defined(_WIN32)
+#include <algorithm>
+#include <string>
+#endif
+
 // TODO: migrate this to mstd later on
 enum class EnvError
 {
@@ -8,6 +13,61 @@ enum class EnvError
 };
 
 using PathResult = std::expected<std::filesystem::path, EnvError>;
+
+#if defined(_WIN32)
+/**
+ * @brief Normalize a Windows filename for reserved name checking.
+ *
+ * This function converts the input string @p s to uppercase and trims
+ * trailing spaces and dots, following Windows filename normalization rules.
+ *
+ * @param s The input string to normalize.
+ * @return std::string The normalized string.
+ */
+inline std::string _win_normalize_name(std::string_view s)
+{
+    // Trim trailing spaces and dots (Windows behavior)
+    while (!s.empty() && (s.back() == ' ' || s.back() == '.'))
+        s.remove_suffix(1);
+
+    std::string out(s);
+    std::transform(
+        out.begin(),
+        out.end(),
+        out.begin(),
+        [](unsigned char c) { return static_cast<char>(std::toupper(c)); }
+    );
+    return out;
+}
+#endif
+
+#if defined(_WIN32)
+/**
+ * @brief Check if a string is a Windows reserved name.
+ *
+ * @param s The input string to check.
+ * @return true If the string is a reserved name.
+ * @return false If the string is not a reserved name.
+ */
+inline bool _is_windows_reserved_name(std::string_view s)
+{
+    const std::string name = _win_normalize_name(s);
+
+    if (name == "CON" || name == "PRN" || name == "AUX" || name == "NUL")
+        return true;
+
+    if (name.size() == 4)
+    {
+        if (name.starts_with("COM") || name.starts_with("LPT"))
+        {
+            const char d = name[3];
+            return d >= '1' && d <= '9';
+        }
+    }
+
+    return false;
+}
+#endif
 
 /**
  * @brief Validate that an application name is safe for use in paths.
@@ -56,6 +116,11 @@ bool is_safe_app_name(std::string_view s) noexcept
     // but also reject any occurrence of ".." to be conservative:
     if (s.find("..") != std::string_view::npos)
         return false;
+
+#if defined(_WIN32)
+    if (_is_windows_reserved_name(s))
+        return false;
+#endif
 
     return true;
 }
