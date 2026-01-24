@@ -32,6 +32,9 @@ class Timestamp final
     // ISO-8601, UTC: 2026-01-20T11:34:05
     [[nodiscard]] static std::string iso8601();
 
+    // ISO-8601 time only with milliseconds precision: 12:34:05.123
+    [[nodiscard]] static std::string iso8601TimeMs();
+
     // Human readable: 2026-01-20 12:34:05
     [[nodiscard]] static std::string humanReadable();
 

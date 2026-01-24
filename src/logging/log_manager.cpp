@@ -1,6 +1,8 @@
 #include "log_manager.hpp"
 
+#include <format>
 #include <iostream>
+#include <ranges>
 
 #include "logging_base.hpp"
 #include "utils/ring_file.hpp"
@@ -12,7 +14,7 @@ LogManager& LogManager::getInstance()
     return instance;
 }
 
-LogManager::LogManager() { initCategoryMap(); }
+LogManager::LogManager() { _initCategoryMap(); }
 
 /**
  * @brief Initializes the ring file logger
@@ -33,7 +35,7 @@ void LogManager::initializeRingFileLogger(
     _ringFile = RingFile(config);
 }
 
-void LogManager::initCategoryMap()
+void LogManager::_initCategoryMap()
 {
     for (const auto category : LogCategoryMeta::values)
         _categories[category] = LogLevel::Info;   // Default log level
@@ -55,7 +57,7 @@ void LogManager::setLogLevel(const LogCategory& category, const LogLevel& level)
 void LogManager::log(
     const LogLevel&    level,
     const LogCategory& category,
-    const std::string& /*file*/,
+    const std::string& file,
     const int          line,
     const std::string& function,
     const std::string& message
@@ -64,17 +66,35 @@ void LogManager::log(
     if (!isEnabled(category, level))
         return;
 
-    // TODO(97gamjak): implement global Timestamp helper, probably best to move
-    // to mstd later on
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-46
-    const auto timeStamp = "";
-
     std::string buffer;
 
-    // TODO: implement this based on the level - not all logging needs for
-    // example line and function
-    buffer = timeStamp + line + function + message;
+    buffer += _logLevelToString(level);
+    buffer += " [" + Timestamp::iso8601TimeMs() + "] ";
+    buffer += message;
+    if (level >= LogLevel::Debug)
+    {
+        buffer += " (";
+        buffer += file + ":" + std::to_string(line);
+        buffer += " in ";
+        buffer += function;
+        buffer += ")";
+    }
 
-    // TODO: Replace with proper logging sink(s)
-    std::cout << buffer << std::endl;
+    _ringFile.writeLine(buffer);
+}
+
+std::string LogManager::_logLevelToString(const LogLevel& level) const
+{
+    const auto maxLength = std::ranges::max_element(
+                               LogLevelMeta::names,
+                               {},
+                               [](const auto& name) { return name.size(); }
+    )->size();
+
+    const auto format = "{:*>" + std::to_string(maxLength) + "}";
+
+    const auto levelStr      = std::string{LogLevelMeta::name(level)};
+    const auto cleanLevelStr = "<" + levelStr + ">:";
+
+    return std::vformat(format, std::make_format_args(cleanLevelStr));
 }

@@ -56,6 +56,19 @@ std::string Timestamp::iso8601()
 }
 
 /**
+ * @brief Returns the current time formatted as ISO-8601 time only with
+ * milliseconds precision
+ *
+ * Example: 12:34:05.123
+ *
+ * @return std::string
+ */
+std::string Timestamp::iso8601TimeMs()
+{
+    return std::format("{:%T}", floor<milliseconds>(now()));
+}
+
+/**
  * @brief Returns the current time formatted as human readable string
  *
  * Example: 2026-01-20 12:34:05

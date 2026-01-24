@@ -7,7 +7,7 @@
 
 #include "utils/ring_file.hpp"
 
-enum class LogLevel;
+enum class LogLevel : size_t;
 enum class LogCategory : size_t;
 
 class LogManager
@@ -38,7 +38,9 @@ class LogManager
    private:
     LogManager();
 
-    void initCategoryMap();
+    void _initCategoryMap();
+
+    std::string _logLevelToString(const LogLevel& level) const;
 };
 
 #endif   // __LOGGING__LOG_MANAGER_HPP__

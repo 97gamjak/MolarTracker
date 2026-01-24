@@ -8,20 +8,16 @@
     X(app_service_profileService) \
     X(ui_mainWindow)
 
-MSTD_ENUM(LogCategory, size_t, LOG_CATEGORY)
+MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
 
-/**
- * @brief Log levels for logging messages
- */
-enum class LogLevel
-{
-    Off = 0,
-    Error,
-    Warning,
-    Info,
-    Debug,
-    DebugVerbose,
-    Trace
-};
+#define LOG_LEVEL(X) \
+    X(Off, 0)        \
+    X(Error)         \
+    X(Warning)       \
+    X(Info)          \
+    X(Debug)         \
+    X(Trace)
+
+MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL)
 
 #endif   // __LOGGING__LOGGING_BASE_HPP__
