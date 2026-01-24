@@ -6,7 +6,9 @@
 
 namespace ui
 {
-
+    /**
+     * @brief A dialog for displaying exceptions
+     */
     class ExceptionDialog final : public QDialog
     {
         Q_OBJECT

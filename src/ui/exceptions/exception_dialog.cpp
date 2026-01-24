@@ -9,6 +9,13 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Exception Dialog:: Exception Dialog object
+     *
+     * @param title
+     * @param details
+     * @param parent
+     */
     ExceptionDialog::ExceptionDialog(
         const QString& title,
         const QString& details,
@@ -32,8 +39,9 @@ namespace ui
         detailBox->setVisible(false);
 
         auto* toggleButton = new QPushButton("Show details");
-        auto* copyButton   = new QPushButton("Copy");
-        auto* closeButton  = new QPushButton("Close");
+        // TODO: make this a bug report button for github later on
+        auto* copyButton  = new QPushButton("Copy");
+        auto* closeButton = new QPushButton("Close");
 
         connect(
             toggleButton,
@@ -66,6 +74,12 @@ namespace ui
         layout->addWidget(closeButton);
     }
 
+    /**
+     * @brief Show a fatal exception dialog
+     *
+     * @param title The title of the dialog
+     * @param details The details of the exception
+     */
     void ExceptionDialog::showFatal(
         const QString& title,
         const QString& details
