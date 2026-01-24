@@ -23,11 +23,11 @@ RingFile::RingFile(const Config& config) : _config(config)
 /**
  * @brief Destructor for RingFile
  *
- * @note Flushes and closes the file if open, unless writing to std::err.
+ * @note Flushes and closes the file if open, unless writing to std::cerr.
  */
 RingFile::~RingFile()
 {
-    // if we don't have a file we decided to write to std::err
+    // if we don't have a file we decided to write to std::cerr
     if (_file)
     {
         flush();

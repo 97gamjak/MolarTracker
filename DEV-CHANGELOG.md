@@ -24,7 +24,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Logging
 
-- Use `std::err` as output if no RingFile is configured inside the logger
+- Use `std::cerr` as output if no RingFile is configured inside the logger
 - Add `initGlobalConfig` for all singleton instances
 
 ### CI
