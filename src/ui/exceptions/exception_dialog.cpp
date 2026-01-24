@@ -39,7 +39,7 @@ namespace ui
         detailBox->setVisible(false);
 
         auto* toggleButton = new QPushButton("Show details");
-        // TODO: make this a bug report button for github later on
+        // TODO: make this a bug report button for GitHub later on
         auto* copyButton  = new QPushButton("Copy");
         auto* closeButton = new QPushButton("Close");
 
