@@ -78,7 +78,7 @@ bool is_safe_app_name(std::string_view s) noexcept
  * @return PathResult Either a valid std::filesystem::path on success or an
  * unexpected EnvError on failure.
  */
-PathResult _linux_home()
+PathResult linux_home()
 {
     const auto* home = std::getenv("HOME");
 
@@ -99,7 +99,7 @@ PathResult _linux_home()
  * env_name. If that variable is set and non-empty, its value is returned as a
  * std::filesystem::path wrapped in PathResult. If the environment variable is
  * missing or empty, the function falls back to using the user's home directory
- * (via _linux_home) and appends @p fallback_suffix to it (e.g. ".config" or
+ * (via linux_home) and appends @p fallback_suffix to it (e.g. ".config" or
  * ".local/share").
  *
  * Notes:
@@ -113,9 +113,9 @@ PathResult _linux_home()
  * @param fallback_suffix Path suffix to append to $HOME when the environment
  * variable is missing (e.g. ".config").
  * @return PathResult Either a resolved std::filesystem::path on success or an
- * unexpected EnvError propagated from _linux_home.
+ * unexpected EnvError propagated from linux_home.
  */
-PathResult _linux_xdg(
+PathResult linux_xdg(
     std::string_view env_name,
     std::string_view fallback_suffix
 )
@@ -125,7 +125,7 @@ PathResult _linux_xdg(
     if (env_path && *env_path)
         return std::filesystem::path(env_path);
 
-    const auto home = _linux_home();
+    const auto home = linux_home();
 
     if (!home)
         return home;
@@ -152,7 +152,7 @@ PathResult _linux_xdg(
  * @return std::filesystem::path The resolved folder path, or an empty path on
  * error.
  */
-std::filesystem::path _win_known_folder(REFKNOWNFOLDERID id)
+std::filesystem::path win_known_folder(REFKNOWNFOLDERID id)
 {
     PWSTR      wide = nullptr;
     const auto hr   = SHGetKnownFolderPath(id, KF_FLAG_DEFAULT, nullptr, &wide);
@@ -196,12 +196,13 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
         return std::unexpected(PathError::InvalidAppName);
 
 #if defined(_WIN32)
-    std::filesystem::path base;
+    std::filesystem::path base = std::filesystem::path();
+
     switch (kind)
     {
         case DirKind::Config:
         case DirKind::Data:
-            base = _win_known_folder(FOLDERID_RoamingAppData);
+            base = win_known_folder(FOLDERID_RoamingAppData);
             break;
     }
     if (base.empty())
@@ -213,10 +214,10 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
     switch (kind)
     {
         case DirKind::Config:
-            base = _linux_xdg("XDG_CONFIG_HOME", ".config");
+            base = linux_xdg("XDG_CONFIG_HOME", ".config");
             break;
         case DirKind::Data:
-            base = _linux_xdg("XDG_DATA_HOME", ".local/share");
+            base = linux_xdg("XDG_DATA_HOME", ".local/share");
             break;
     }
     if (!base)
