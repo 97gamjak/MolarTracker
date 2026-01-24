@@ -39,6 +39,6 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Bugs
 
-- Fix `Timestamp` using UTC instead of local time
+- Update `Timestamp` to format local time using the current time zone instead of UTC
 
 <!-- insertion marker -->
