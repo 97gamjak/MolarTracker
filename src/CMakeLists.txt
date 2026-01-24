@@ -3,6 +3,8 @@ qt_add_executable(MolarTracker
 )
 
 add_subdirectory(config)
+add_subdirectory(logging)
+add_subdirectory(utils)
 add_subdirectory(drafts)
 add_subdirectory(sql_models)
 add_subdirectory(db)
@@ -20,6 +22,8 @@ target_link_libraries(MolarTracker
     molartracker_drafts
     molartracker_orm
     molartracker_sql_models
+    molartracker_logging
+    molartracker_utils
     molartracker_exceptions
 )
 

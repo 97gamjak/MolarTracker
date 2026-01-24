@@ -1,5 +1,6 @@
 add_library(molartracker_exceptions STATIC
     base.cpp
+    file_exceptions.cpp
 )
 
 target_include_directories(molartracker_exceptions

@@ -12,6 +12,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
+message(STATUS "CMAKE_SYSTEM_NAME       = ${CMAKE_SYSTEM_NAME}")
+message(STATUS "CMAKE_GENERATOR         = ${CMAKE_GENERATOR}")
+message(STATUS "CMAKE_CXX_COMPILER_ID   = ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMAKE_CXX_COMPILER      = ${CMAKE_CXX_COMPILER}")
+message(STATUS "MSVC                    = ${MSVC}")
+message(STATUS "WIN32                   = ${WIN32}")
+
 qt_standard_project_setup()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -46,10 +53,14 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
         # switch needs to check all enum values
         -Wswitch-enum
-        -Wswitch-default
 
         -Wno-error=deprecated-declarations
     )
+endif()
+
+if (MSVC)
+    message(STATUS "Adding MSVC specific compile options")
+    add_compile_options(/Zc:preprocessor)
 endif()
 
 add_compile_definitions( 
