@@ -9,12 +9,12 @@
 class LogEntryScope
 {
    protected:
-    const LogLevel&    _level;
-    const LogCategory& _category;
-    const std::string& _function;
-    const std::string& _file;
-    int                _line;
-    bool               _enabled;
+    LogLevel    _level;
+    LogCategory _category;
+    std::string _function;
+    std::string _file;
+    int         _line;
+    bool        _enabled;
 
    public:
     LogEntryScope(
