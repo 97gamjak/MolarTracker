@@ -165,14 +165,14 @@ std::filesystem::path win_known_folder(REFKNOWNFOLDERID id)
  * On Windows:
  * - Both Config and Data currently map to the roaming AppData known folder
  * (FOLDERID_RoamingAppData).
- * - If resolution fails, an empty std::filesystem::path is returned.
+ * - If resolution fails, std::unexpected(PathError::Empty) is returned.
  *
  * On POSIX (Linux/UNIX):
  * - For DirKind::Config, consult XDG_CONFIG_HOME with fallback "$HOME/.config".
  * - For DirKind::Data, consult XDG_DATA_HOME with fallback
  * "$HOME/.local/share".
- * - If the base directory cannot be resolved (e.g. missing HOME), an empty
- * std::filesystem::path is returned.
+ * - If the base directory cannot be resolved (e.g. missing HOME),
+ *   std::unexpected(PathError::Empty) is returned.
  *
  * The returned path is the base user directory joined with @p app_name (i.e.
  * base/app_name).
