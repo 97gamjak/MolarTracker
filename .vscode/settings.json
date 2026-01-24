@@ -101,6 +101,8 @@
         "*.inc": "cpp",
         "expected": "cpp",
         "slist": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "codecvt": "cpp",
+        "valarray": "cpp"
     }
 }

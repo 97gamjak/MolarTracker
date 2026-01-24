@@ -9,6 +9,7 @@ add_subdirectory(db)
 add_subdirectory(orm)
 add_subdirectory(app)
 add_subdirectory(ui)
+add_subdirectory(exceptions)
 
 target_link_libraries(MolarTracker
     PRIVATE 
@@ -19,6 +20,7 @@ target_link_libraries(MolarTracker
     molartracker_drafts
     molartracker_orm
     molartracker_sql_models
+    molartracker_exceptions
 )
 
 set_target_properties(MolarTracker PROPERTIES
