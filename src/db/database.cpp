@@ -2,6 +2,7 @@
 
 #include <sqlite3.h>
 
+#include <filesystem>
 #include <string>
 #include <utility>
 
@@ -15,7 +16,15 @@ namespace db
      *
      * @param db_path
      */
-    Database::Database(const std::string& db_path) { open(db_path); }
+    Database::Database(const std::filesystem::path& db_path)
+    {
+        std::filesystem::path path = db_path;
+        if (!path.is_absolute())
+        {
+            path = std::filesystem::absolute(path);
+        }
+        open(path.string());
+    }
 
     /**
      * @brief Destroy the Database:: Database object

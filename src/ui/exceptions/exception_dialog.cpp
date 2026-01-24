@@ -62,7 +62,7 @@ namespace ui
             copyButton,
             &QPushButton::clicked,
             this,
-            [=]() { QApplication::clipboard()->setText(details); }
+            [details]() { QApplication::clipboard()->setText(details); }
         );
 
         connect(closeButton, &QPushButton::clicked, this, &QDialog::accept);

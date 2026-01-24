@@ -14,26 +14,31 @@
 #include <Windows.h>
 #endif
 
-enum class DirKind
+namespace utils
 {
-    Config,   // settings, preferences
-    Data,     // persistent data (SQLite DB, user-created content)
-};
 
-enum class PathError
-{
-    Empty,
-    InvalidAppName,
-    FailedCreate,
-};
+    enum class DirKind
+    {
+        Config,   // settings, preferences
+        Data,     // persistent data (SQLite DB, user-created content)
+    };
 
-using PathErrorResult = std::expected<std::filesystem::path, PathError>;
+    enum class PathError
+    {
+        Empty,
+        InvalidAppName,
+        FailedCreate,
+    };
 
-PathErrorResult user_dir(DirKind kind, std::string_view app_name);
+    using PathErrorResult = std::expected<std::filesystem::path, PathError>;
 
-PathErrorResult ensure_dir(const std::filesystem::path& path);
+    PathErrorResult user_dir(DirKind kind, std::string_view app_name);
 
-PathErrorResult config_dir(std::string_view app_name);
-PathErrorResult data_dir(std::string_view app_name);
+    PathErrorResult ensure_dir(const std::filesystem::path& path);
+
+    PathErrorResult config_dir(std::string_view app_name);
+    PathErrorResult data_dir(std::string_view app_name);
+
+}   // namespace utils
 
 #endif   // __UTILS__PATHS_HPP__
