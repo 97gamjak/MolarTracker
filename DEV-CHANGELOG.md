@@ -10,6 +10,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Implement `RingFile` class for logging (will be migrated to mstd in the future)
 - Implement smart config paths for Linux and Windows
 
+### Config
+
+- Implement global singleton for `Constants` to handle dynamic config and data dirs
+
 ### Docs
 
 - Add `CHANGELOG.md` and `DEV-CHANGELOG.md` support

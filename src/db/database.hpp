@@ -2,6 +2,7 @@
 #define __DB__DATABASE_HPP__
 
 #include <cstdint>
+#include <filesystem>
 #include <string>
 #include <string_view>
 
@@ -22,8 +23,8 @@ namespace db
         std::string _db_path{};
 
        public:
-        Database() = default;
-        explicit Database(const std::string& db_path);
+        Database() = delete;
+        explicit Database(const std::filesystem::path& db_path);
 
         ~Database();
 

@@ -1,7 +1,20 @@
-add_library(molartracker_config INTERFACE)
+add_library(molartracker_config STATIC
+    constants.hpp
+    constants.cpp
+)
 
 target_include_directories(molartracker_config
-    INTERFACE
+    PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${PROJECT_SOURCE_DIR}/external/json/single_include
+)
+
+target_link_libraries(molartracker_config
+    PRIVATE
+    molartracker_utils
+)
+
+target_compile_definitions(molartracker_config
+    PUBLIC
+    MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
 )

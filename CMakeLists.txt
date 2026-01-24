@@ -65,11 +65,6 @@ endif()
 
 add_subdirectory(src)
 
-target_compile_definitions(MolarTracker 
-    PUBLIC
-    MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
-)
-
 if(NOT DEFINED WIN32)
     message(STATUS "Configuring desktop file installation target")
     set(MT_EXEC_PATH "${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}")
