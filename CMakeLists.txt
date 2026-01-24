@@ -58,6 +58,10 @@ target_compile_definitions(MolarTracker
     MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
 )
 
+if (MSVC)
+    target_compile_options(MolarTracker PRIVATE /Zc:preprocessor)
+endif()
+
 if(NOT DEFINED WIN32)
     message(STATUS "Configuring desktop file installation target")
     set(MT_EXEC_PATH "${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}")
