@@ -4,6 +4,7 @@
 
 #include "logging_base.hpp"
 #include "utils/ring_file.hpp"
+#include "utils/timestamp.hpp"
 
 LogManager& LogManager::getInstance()
 {
@@ -25,6 +26,8 @@ void LogManager::initializeRingFileLogger(
     RingFile::Config config;
     _logDirectory    = configDir / "logs";
     config.directory = _logDirectory;
+    config.baseName  = "molar_tracker_" + Timestamp::fileSafe();
+    config.extension = ".log";
 
     // TODO: add here all possible logging stuff including name of the file!
     _ringFile = RingFile(config);

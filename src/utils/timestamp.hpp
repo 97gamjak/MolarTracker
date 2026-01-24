@@ -8,6 +8,8 @@
 // TODO(97gamjak): migrate to mstd later on
 // https://97gamjak.atlassian.net/browse/MSTD-89
 
+// TODO: implement this with timezone support later on
+
 /**
  * @brief Utility class for handling timestamps
  */
@@ -15,7 +17,8 @@ class Timestamp final
 {
    public:
     using Clock     = std::chrono::system_clock;
-    using TimePoint = Clock::time_point;
+    using Duration  = Clock::duration;
+    using TimePoint = std::chrono::local_time<Duration>;
 
     // Delete default constructor to prevent instantiation
     Timestamp() = delete;
