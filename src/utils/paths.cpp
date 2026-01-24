@@ -167,14 +167,14 @@ std::filesystem::path win_known_folder(REFKNOWNFOLDERID id)
  * On Windows:
  * - Both Config and Data currently map to the roaming AppData known folder
  * (FOLDERID_RoamingAppData).
- * - If resolution fails, an empty std::filesystem::path is returned.
+ * - If resolution fails, std::unexpected(PathError::Empty) is returned.
  *
  * On POSIX (Linux/UNIX):
  * - For DirKind::Config, consult XDG_CONFIG_HOME with fallback "$HOME/.config".
  * - For DirKind::Data, consult XDG_DATA_HOME with fallback
  * "$HOME/.local/share".
- * - If the base directory cannot be resolved (e.g. missing HOME), an empty
- * std::filesystem::path is returned.
+ * - If the base directory cannot be resolved (e.g. missing HOME),
+ *   std::unexpected(PathError::Empty) is returned.
  *
  * The returned path is the base user directory joined with @p app_name (i.e.
  * base/app_name).
@@ -226,13 +226,13 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
  * @brief Ensure that a directory exists, creating any missing parent
  * directories.
  *
- * If @p path is empty this function is a no-op and simply returns the empty
- * path. When @p path is non-empty, std::filesystem::create_directories is
- * invoked with a non-throwing overload that accepts a std::error_code; any
- * creation errors are intentionally ignored here.
+ * If @p path is empty this function returns PathError::Empty. When @p path is
+ * non-empty, std::filesystem::create_directories is invoked with a
+ * non-throwing overload that accepts a std::error_code; on failure this
+ * function returns PathError::FailedCreate and on success it returns @p path.
  *
  * @param path The directory path to ensure exists.
- * @return PathErrorResult The ensured directory path, or an PathError on
+ * @return PathErrorResult The ensured directory path, or a PathError on
  * failure.
  */
 PathErrorResult ensure_dir(const std::filesystem::path& path)
