@@ -3,19 +3,14 @@
 #include <exception>
 
 #include "app/app_context.hpp"
-#include "config/constants.hpp"
 #include "exceptions/base.hpp"
+#include "ui/application.hpp"
 #include "ui/exceptions/exception_dialog.hpp"
 #include "ui/main_window.hpp"
 
 int main(int argc, char** argv)
 {
-    QApplication app{argc, argv};
-
-    app.setApplicationName(Constants::APP_NAME);
-    app.setApplicationDisplayName(Constants::APP_NAME);
-
-    app.setDesktopFileName(Constants::DESKTOP_APP_NAME);
+    ui::MolarTrackerApplication app{argc, argv};
 
     try
     {

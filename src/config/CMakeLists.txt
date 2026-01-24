@@ -1,5 +1,4 @@
 add_library(molartracker_config STATIC
-    constants.hpp
     constants.cpp
 )
 
@@ -13,9 +12,4 @@ target_link_libraries(molartracker_config
     PRIVATE
     molartracker_utils
     molartracker_exceptions
-)
-
-target_compile_definitions(molartracker_config
-    PUBLIC
-    MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
 )

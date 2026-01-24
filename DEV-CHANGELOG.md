@@ -18,6 +18,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Add `CHANGELOG.md` and `DEV-CHANGELOG.md` support
 
+### UI
+
+- Create `MolarTrackerApplication` wrapper for a cleaner setup
+
 ### CI
 
 - make checks and updates for both `CHANGELOG.md` and `DEV-CHANGELOG.md` files available

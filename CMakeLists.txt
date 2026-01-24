@@ -63,6 +63,11 @@ if (MSVC)
     add_compile_options(/Zc:preprocessor)
 endif()
 
+add_compile_definitions( 
+    PUBLIC
+    MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
+)
+
 add_subdirectory(src)
 
 if(NOT DEFINED WIN32)
