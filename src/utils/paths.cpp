@@ -40,13 +40,9 @@ bool is_safe_app_name(std::string_view s) noexcept
         if (ch == '/' || ch == '\\')
             return false;
 
-        // Windows reserved characters (also safe to ban on Linux)
+        // Windows reserved characters (also safe to ban on Unix)
         if (ch == '<' || ch == '>' || ch == ':' || ch == '"' || ch == '|' ||
             ch == '?' || ch == '*')
-            return false;
-
-        // NUL
-        if (ch == '\0')
             return false;
     }
 
@@ -78,7 +74,7 @@ bool is_safe_app_name(std::string_view s) noexcept
  * @return PathResult Either a valid std::filesystem::path on success or an
  * unexpected EnvError on failure.
  */
-PathResult linux_home()
+PathResult unix_home()
 {
     const auto* home = std::getenv("HOME");
 
@@ -99,7 +95,7 @@ PathResult linux_home()
  * env_name. If that variable is set and non-empty, its value is returned as a
  * std::filesystem::path wrapped in PathResult. If the environment variable is
  * missing or empty, the function falls back to using the user's home directory
- * (via linux_home) and appends @p fallback_suffix to it (e.g. ".config" or
+ * (via unix_home) and appends @p fallback_suffix to it (e.g. ".config" or
  * ".local/share").
  *
  * Notes:
@@ -113,19 +109,16 @@ PathResult linux_home()
  * @param fallback_suffix Path suffix to append to $HOME when the environment
  * variable is missing (e.g. ".config").
  * @return PathResult Either a resolved std::filesystem::path on success or an
- * unexpected EnvError propagated from linux_home.
+ * unexpected EnvError propagated from unix_home.
  */
-PathResult linux_xdg(
-    std::string_view env_name,
-    std::string_view fallback_suffix
-)
+PathResult unix_xdg(std::string_view env_name, std::string_view fallback_suffix)
 {
     const auto* env_path = std::getenv(std::string(env_name).c_str());
 
     if (env_path && *env_path)
         return std::filesystem::path(env_path);
 
-    const auto home = linux_home();
+    const auto home = unix_home();
 
     if (!home)
         return home;
@@ -214,10 +207,10 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
     switch (kind)
     {
         case DirKind::Config:
-            base = linux_xdg("XDG_CONFIG_HOME", ".config");
+            base = unix_xdg("XDG_CONFIG_HOME", ".config");
             break;
         case DirKind::Data:
-            base = linux_xdg("XDG_DATA_HOME", ".local/share");
+            base = unix_xdg("XDG_DATA_HOME", ".local/share");
             break;
     }
     if (!base)
@@ -255,7 +248,7 @@ PathErrorResult ensure_dir(const std::filesystem::path& path)
     // cases where the path exists but is not a directory, or where a race or
     // permission issue prevented the directory from being usable.
     std::error_code status_ec;
-    const auto st = std::filesystem::status(path, status_ec);
+    const auto      st = std::filesystem::status(path, status_ec);
     if (status_ec || !std::filesystem::is_directory(st))
         return std::unexpected(PathError::FailedCreate);
     return path;
