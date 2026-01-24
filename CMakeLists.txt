@@ -76,6 +76,6 @@ if(NOT DEFINED WIN32)
             "$ENV{HOME}/.local/share/applications/${PROJECT_NAME}.desktop"
     VERBATIM
     )
-
+else()
     target_compile_options(MolarTracker PRIVATE /Zc:preprocessor)
 endif()
