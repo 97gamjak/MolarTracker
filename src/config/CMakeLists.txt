@@ -12,6 +12,7 @@ target_include_directories(molartracker_config
 target_link_libraries(molartracker_config
     PRIVATE
     molartracker_utils
+    molartracker_exceptions
 )
 
 target_compile_definitions(molartracker_config
