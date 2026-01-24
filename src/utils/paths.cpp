@@ -248,10 +248,16 @@ PathErrorResult ensure_dir(const std::filesystem::path& path)
     std::error_code ec;
     std::filesystem::create_directories(path, ec);
 
-    // TODO: distinguish failure reasons?
     if (ec)
         return std::unexpected(PathError::FailedCreate);
 
+    // Verify that the resulting path exists and is a directory. This catches
+    // cases where the path exists but is not a directory, or where a race or
+    // permission issue prevented the directory from being usable.
+    std::error_code status_ec;
+    const auto st = std::filesystem::status(path, status_ec);
+    if (status_ec || !std::filesystem::is_directory(st))
+        return std::unexpected(PathError::FailedCreate);
     return path;
 }
 
