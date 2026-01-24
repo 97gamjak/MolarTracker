@@ -2,6 +2,7 @@
 #define __LOGGING__LOG_MACROS_HPP__
 
 #include "log_manager.hpp"
+#include "log_entry_scope.hpp"
 #include "mstd/error.hpp"
 
 // clang-format off
