@@ -32,17 +32,19 @@ bool is_safe_app_name(std::string_view s) noexcept
 
     for (const auto& ch : s)
     {
+        const auto uch = static_cast<unsigned char>(ch);
+
         // control chars
-        if (ch < 0x20 || ch == 0x7F)
+        if (uch < 0x20 || uch == 0x7F)
             return false;
 
         // path separators / traversal enablers
-        if (ch == '/' || ch == '\\')
+        if (uch == '/' || uch == '\\')
             return false;
 
-        // Windows reserved characters (also safe to ban on Unix)
-        if (ch == '<' || ch == '>' || ch == ':' || ch == '"' || ch == '|' ||
-            ch == '?' || ch == '*')
+        // Windows reserved characters (also safe to ban on Linux)
+        if (uch == '<' || uch == '>' || uch == ':' || uch == '"' ||
+            uch == '|' || uch == '?' || uch == '*')
             return false;
     }
 
