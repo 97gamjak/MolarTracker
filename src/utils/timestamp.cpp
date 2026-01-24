@@ -24,26 +24,6 @@ Timestamp::TimePoint Timestamp::now()
 }
 
 /**
- * @brief Returns the current Unix timestamp in seconds
- *
- * @return std::int64_t
- */
-std::int64_t Timestamp::unixSeconds()
-{
-    return duration_cast<seconds>(now().time_since_epoch()).count();
-}
-
-/**
- * @brief Returns the current Unix timestamp in milliseconds
- *
- * @return std::int64_t
- */
-std::int64_t Timestamp::unixMilliseconds()
-{
-    return duration_cast<milliseconds>(now().time_since_epoch()).count();
-}
-
-/**
  * @brief Returns the current time formatted as ISO-8601 in local time
  *
  * Example: 2026-01-20T12:34:05

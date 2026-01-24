@@ -25,11 +25,7 @@ class Timestamp final
 
     [[nodiscard]] static TimePoint now();
 
-    [[nodiscard]] static std::int64_t unixSeconds();
-
-    [[nodiscard]] static std::int64_t unixMilliseconds();
-
-    // ISO-8601, UTC: 2026-01-20T11:34:05
+    // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] static std::string iso8601();
 
     // ISO-8601 time only with milliseconds precision: 12:34:05.123
