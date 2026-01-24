@@ -1,16 +1,27 @@
 #include "utils/timestamp.hpp"
 
+using std::chrono::current_zone;
 using std::chrono::duration_cast;
 using std::chrono::floor;
 using std::chrono::milliseconds;
 using std::chrono::seconds;
+using std::chrono::zoned_time;
 
 /**
  * @brief Returns the current time point from the system clock
  *
  * @return Timestamp::TimePoint
  */
-Timestamp::TimePoint Timestamp::now() { return Clock::now(); }
+Timestamp::TimePoint Timestamp::now()
+{
+    const auto now = Clock::now();
+
+    const auto* tz = current_zone();
+
+    zoned_time local_time{tz, now};
+
+    return local_time.get_local_time();
+}
 
 /**
  * @brief Returns the current Unix timestamp in seconds
