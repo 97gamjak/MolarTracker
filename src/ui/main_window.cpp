@@ -19,6 +19,7 @@ namespace ui
     MainWindow::MainWindow(app::AppContext& appContext, QWidget* parent)
         : QMainWindow{parent}, _appContext{appContext}
     {
+        setWindowState(Qt::WindowFullScreen);
         setWindowTitle("Molar Tracker");
         resize(1100, 700);
 
