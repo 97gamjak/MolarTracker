@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <format>
+#include <iostream>
 
 /**
  * @brief Constructs a RingFile with the given configuration
@@ -22,12 +23,16 @@ RingFile::RingFile(const Config& config) : _config(config)
 /**
  * @brief Destructor for RingFile
  *
- * @note Flushes and closes the file if open
+ * @note Flushes and closes the file if open, unless writing to std::err.
  */
 RingFile::~RingFile()
 {
-    flush();
-    close();
+    // if we don't have a file we decided to write to std::err
+    if (_file)
+    {
+        flush();
+        close();
+    }
 }
 
 /**
@@ -70,13 +75,18 @@ RingFile& RingFile::operator=(RingFile&& other)
  */
 void RingFile::writeLine(const std::string& line)
 {
-    const auto additional = line.size() + 1;
+    if (_file)
+    {
+        const auto additional = line.size() + 1;
 
-    _ensureOpenAndRotateIfNeeded(additional);
+        _ensureOpenAndRotateIfNeeded(additional);
 
-    _file << line << '\n';
+        _file << line << '\n';
 
-    _bytesWritten += additional;
+        _bytesWritten += additional;
+    }
+    else
+        std::cerr << line << '\n';
 }
 
 /**
@@ -89,13 +99,18 @@ void RingFile::writeLine(const std::string& line)
  */
 void RingFile::write(const std::string& text)
 {
-    const auto additional = text.size();
+    if (_file)
+    {
+        const auto additional = text.size();
 
-    _ensureOpenAndRotateIfNeeded(additional);
+        _ensureOpenAndRotateIfNeeded(additional);
 
-    _file << text;
+        _file << text;
 
-    _bytesWritten += additional;
+        _bytesWritten += additional;
+    }
+    else
+        std::cerr << text;
 }
 
 /**
@@ -103,7 +118,7 @@ void RingFile::write(const std::string& text)
  */
 void RingFile::flush()
 {
-    if (_file.is_open())
+    if (_file && _file.is_open())
         _file.flush();
 }
 
@@ -112,7 +127,7 @@ void RingFile::flush()
  */
 void RingFile::close()
 {
-    if (_file.is_open())
+    if (_file && _file.is_open())
         _file.close();
 }
 

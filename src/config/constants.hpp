@@ -21,9 +21,9 @@ class Constants
    public:
     static Constants& getInstance();
 
-    [[nodiscard]] std::filesystem::path get_config_path() const;
-    [[nodiscard]] std::filesystem::path get_data_path() const;
-    [[nodiscard]] std::filesystem::path get_database_path() const;
+    [[nodiscard]] std::filesystem::path getConfigPath() const;
+    [[nodiscard]] std::filesystem::path getDataPath() const;
+    [[nodiscard]] std::filesystem::path getDatabasePath() const;
 
    private:
     Constants();
