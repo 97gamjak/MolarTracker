@@ -236,15 +236,20 @@ PathErrorResult user_dir(DirKind kind, std::string_view app_name)
  * creation errors are intentionally ignored here.
  *
  * @param path The directory path to ensure exists.
- * @return std::filesystem::path The same path that was passed in.
+ * @return PathErrorResult The ensured directory path, or an PathError on
+ * failure.
  */
-std::filesystem::path ensure_dir(const std::filesystem::path& path)
+PathErrorResult ensure_dir(const std::filesystem::path& path)
 {
-    if (!path.empty())
-    {
-        std::error_code ec;
-        std::filesystem::create_directories(path, ec);
-    }
+    if (path.empty())
+        return std::unexpected(PathError::Empty);
+
+    std::error_code ec;
+    std::filesystem::create_directories(path, ec);
+
+    // TODO: distinguish failure reasons?
+    if (ec)
+        return std::unexpected(PathError::FailedCreate);
 
     return path;
 }
