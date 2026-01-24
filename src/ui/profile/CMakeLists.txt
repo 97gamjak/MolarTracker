@@ -11,5 +11,4 @@ target_include_directories(molartracker_profile_ui
 target_link_libraries(molartracker_profile_ui
     PUBLIC
     Qt6::Widgets
-
 )
