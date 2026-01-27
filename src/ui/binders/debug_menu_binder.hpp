@@ -23,7 +23,7 @@ namespace ui
         void _onRequestDebugSlots();
 
        public:
-        explicit DebugMenuBinder(MainWindow& mainWindow, MenuBar& debugMenu);
+        explicit DebugMenuBinder(MainWindow& mainWindow, MenuBar& menuBar);
 
        private:
         void _ensureDialog();
