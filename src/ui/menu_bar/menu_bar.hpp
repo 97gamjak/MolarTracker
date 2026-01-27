@@ -10,6 +10,7 @@ class QAction;       // Forward declaration
 namespace ui
 {
     class DebugMenu;   // Forward declaration
+    class FileMenu;    // Forward declaration
 
     class MenuBar : public QObject
     {
@@ -19,11 +20,10 @@ namespace ui
         QMainWindow& _mainWindow;
 
         DebugMenu* _debugMenu = nullptr;
+        FileMenu*  _fileMenu  = nullptr;
 
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
-        QAction* _saveAction        = nullptr;
-        QAction* _quitAction        = nullptr;
         QAction* _preferencesAction = nullptr;
         QAction* _aboutAction       = nullptr;
 
@@ -35,13 +35,18 @@ namespace ui
         void _buildHelpMenu(QMenuBar* menu);
 
        signals:
+        // edit menu
         void requestUndo();
         void requestRedo();
+        // file menu
         void requestQuit();
-        void requestPreferences();
-        void requestDebug();
-        void requestAbout();
         void requestSave();
+        // debug menu
+        void requestDebugSlots();
+        // settings menu
+        void requestPreferences();
+        // help menu
+        void requestAbout();
 
        public:
         explicit MenuBar(QMainWindow& mainWindow);

@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "debug_menu.hpp"
+#include "file_menu.hpp"
 
 namespace ui
 {
@@ -12,7 +13,15 @@ namespace ui
     MenuBar::MenuBar(QMainWindow& mainWindow)
         : QObject{&mainWindow}, _mainWindow{mainWindow}
     {
+        _fileMenu  = new FileMenu{_mainWindow};
         _debugMenu = new DebugMenu{_mainWindow};
+
+        // clang-format off
+        connect(_fileMenu, &FileMenu::requestSave, this, &MenuBar::requestSave);
+        connect(_fileMenu, &FileMenu::requestQuit, this, &MenuBar::requestQuit);
+
+        connect(_debugMenu, &DebugMenu::requestDebugSlots, this, &MenuBar::requestDebugSlots);
+        // clang-format on
     }
 
     void MenuBar::build()
@@ -30,13 +39,7 @@ namespace ui
     {
         auto* fileMenu = menu->addMenu("&File");
 
-        _saveAction = fileMenu->addAction("&Save");
-        _saveAction->setShortcut(QKeySequence::Save);
-        connect(_saveAction, &QAction::triggered, this, &MenuBar::requestSave);
-
-        _quitAction = fileMenu->addAction("&Quit");
-        _quitAction->setShortcut(QKeySequence::Quit);
-        connect(_quitAction, &QAction::triggered, this, &MenuBar::requestQuit);
+        _fileMenu->build(fileMenu);
     }
 
     void MenuBar::_buildEditMenu(QMenuBar* menu)
