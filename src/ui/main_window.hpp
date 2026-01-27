@@ -12,8 +12,9 @@ namespace app
 
 namespace ui
 {
-    class MenuBar;          // Forward declaration
-    class UndoRedoBinder;   // Forward declaration
+    class MenuBar;           // Forward declaration
+    class UndoRedoBinder;    // Forward declaration
+    class DebugMenuBinder;   // Forward declaration
 
     class MainWindow final : public QMainWindow
     {
@@ -21,8 +22,9 @@ namespace ui
 
        private:
         app::AppContext& _appContext;
-        MenuBar*         _menuBar        = nullptr;
-        UndoRedoBinder*  _undoRedoBinder = nullptr;
+        MenuBar*         _menuBar         = nullptr;
+        UndoRedoBinder*  _undoRedoBinder  = nullptr;
+        DebugMenuBinder* _debugMenuBinder = nullptr;
 
         UndoStack _undoStack;
         bool      _dummyFlag = false;

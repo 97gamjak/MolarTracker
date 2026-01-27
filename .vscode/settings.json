@@ -103,7 +103,12 @@
         "slist": "cpp",
         "typeindex": "cpp",
         "codecvt": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "qstatusbar": "cpp",
+        "qstringlist": "cpp",
+        "__tree": "cpp",
+        "filesystem": "cpp",
+        "qdialogbuttonbox": "cpp"
     },
     "cSpell.words": [
         "MSTD"

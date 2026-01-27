@@ -14,7 +14,7 @@ LogManager& LogManager::getInstance()
     return instance;
 }
 
-LogManager::LogManager() { _initCategoryMap(); }
+LogManager::LogManager() { _categories = getDefaultCategories(); }
 
 /**
  * @brief Initializes the ring file logger
@@ -35,10 +35,14 @@ void LogManager::initializeRingFileLogger(
     _ringFile = RingFile(config);
 }
 
-void LogManager::_initCategoryMap()
+std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
+) const
 {
+    std::unordered_map<LogCategory, LogLevel> defaultCategories;
     for (const auto category : LogCategoryMeta::values)
-        _categories[category] = LogLevel::Info;   // Default log level
+        defaultCategories[category] = LogLevel::Info;
+
+    return defaultCategories;
 }
 
 bool LogManager::isEnabled(
@@ -52,6 +56,11 @@ bool LogManager::isEnabled(
 void LogManager::setLogLevel(const LogCategory& category, const LogLevel& level)
 {
     _categories[category] = level;
+}
+
+std::unordered_map<LogCategory, LogLevel> LogManager::getCategories() const
+{
+    return _categories;
 }
 
 void LogManager::log(
