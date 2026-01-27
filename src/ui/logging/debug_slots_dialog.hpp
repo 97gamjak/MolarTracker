@@ -38,9 +38,9 @@ namespace ui
         explicit DebugSlotsDialog(MainWindow& parent);
 
        private:
-        void _build_ui();
-        void _populate_tree();
-        void _connect_buttons();
+        void _buildUi();
+        void _populateTree();
+        void _connectButtons();
         void _initCategories();
         void _applyChanges();
     };

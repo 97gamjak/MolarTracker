@@ -33,12 +33,12 @@ namespace ui
     {
         _initCategories();
 
-        _build_ui();
-        _connect_buttons();
-        _populate_tree();
+        _buildUi();
+        _connectButtons();
+        _populateTree();
     }
 
-    void DebugSlotsDialog::_build_ui()
+    void DebugSlotsDialog::_buildUi()
     {
         setWindowTitle("Debug / Logging Settings");
         resize(820, 560);
@@ -82,7 +82,7 @@ namespace ui
         setLayout(root);
     }
 
-    void DebugSlotsDialog::_connect_buttons()
+    void DebugSlotsDialog::_connectButtons()
     {
         connect(
             _defaultsButton,
@@ -93,7 +93,7 @@ namespace ui
                 _currentCategories =
                     LogManager::getInstance().getDefaultCategories();
 
-                _populate_tree();
+                _populateTree();
             }
         );
 
@@ -105,7 +105,7 @@ namespace ui
             {
                 // revert current categories to original
                 _currentCategories = _categories;
-                _populate_tree();
+                _populateTree();
             }
         );
 
@@ -116,7 +116,7 @@ namespace ui
             [this](bool on)
             {
                 _modifiedOnly = on;
-                _populate_tree();
+                _populateTree();
             }
         );
 
@@ -167,7 +167,7 @@ namespace ui
         );
     }
 
-    void DebugSlotsDialog::_populate_tree()
+    void DebugSlotsDialog::_populateTree()
     {
         _tree->blockSignals(true);
         _tree->clear();
