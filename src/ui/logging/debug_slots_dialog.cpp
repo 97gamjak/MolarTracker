@@ -52,7 +52,7 @@ namespace ui
         header->setSectionResizeMode(QHeaderView::Stretch);
         _tree->setAlternatingRowColors(true);
 
-        _defaultsButton       = new QPushButton("Use default Flags", this);
+        _defaultsButton       = new QPushButton("Use default flags", this);
         _discardChangesButton = new QPushButton("Discard Changes", this);
 
         _showOnlyModifiedCheckBox = new QCheckBox("Show only modified", this);
