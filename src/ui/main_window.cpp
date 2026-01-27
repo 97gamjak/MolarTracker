@@ -9,9 +9,9 @@
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
 #include "ui/binders/undo_redo_binder.hpp"
+#include "ui/menu_bar/menu_bar.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
-#include "ui/top_menu_bar.hpp"
 #include "ui/undo_redo/toggle_flag_command.hpp"
 
 namespace ui
@@ -37,16 +37,16 @@ namespace ui
 
     void MainWindow::_buildMenuBar()
     {
-        _topMenuBar = new TopMenuBar{*this};
-        _topMenuBar->build();
+        _menuBar = new MenuBar{*this};
+        _menuBar->build();
 
-        _undoRedoBinder = new UndoRedoBinder{*this, *_topMenuBar, _undoStack};
+        _undoRedoBinder = new UndoRedoBinder{*this, *_menuBar, _undoStack};
 
         // clang-format off
-        connect(_topMenuBar, &TopMenuBar::requestQuit, this, &QWidget::close);
-        connect(_topMenuBar, &TopMenuBar::requestSave, this, &MainWindow::_onSaveRequested);
-        connect(_topMenuBar, &TopMenuBar::requestPreferences, this, &MainWindow::_onPreferencesRequested);
-        connect(_topMenuBar, &TopMenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
+        connect(_menuBar, &MenuBar::requestQuit, this, &QWidget::close);
+        connect(_menuBar, &MenuBar::requestSave, this, &MainWindow::_onSaveRequested);
+        connect(_menuBar, &MenuBar::requestPreferences, this, &MainWindow::_onPreferencesRequested);
+        connect(_menuBar, &MenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
         // clang-format on
     }
 

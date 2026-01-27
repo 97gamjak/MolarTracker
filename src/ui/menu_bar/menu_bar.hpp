@@ -1,5 +1,5 @@
-#ifndef __UI__TOP_MENU_BAR_HPP__
-#define __UI__TOP_MENU_BAR_HPP__
+#ifndef __UI__MENU_BAR__MENU_BAR_HPP__
+#define __UI__MENU_BAR__MENU_BAR_HPP__
 
 #include <QObject>
 
@@ -9,19 +9,22 @@ class QAction;       // Forward declaration
 
 namespace ui
 {
-    class TopMenuBar : public QObject
+    class DebugMenu;   // Forward declaration
+
+    class MenuBar : public QObject
     {
         Q_OBJECT
 
        private:
         QMainWindow& _mainWindow;
 
+        DebugMenu* _debugMenu = nullptr;
+
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
         QAction* _saveAction        = nullptr;
         QAction* _quitAction        = nullptr;
         QAction* _preferencesAction = nullptr;
-        QAction* _debugAction       = nullptr;
         QAction* _aboutAction       = nullptr;
 
        private:
@@ -41,7 +44,7 @@ namespace ui
         void requestSave();
 
        public:
-        explicit TopMenuBar(QMainWindow& mainWindow);
+        explicit MenuBar(QMainWindow& mainWindow);
 
         void build();
 
@@ -54,4 +57,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__TOP_MENU_BAR_HPP__
+#endif   // __UI__MENU_BAR__MENU_BAR_HPP__

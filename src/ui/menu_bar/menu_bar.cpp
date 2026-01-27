@@ -1,18 +1,21 @@
-#include "top_menu_bar.hpp"
+#include "menu_bar.hpp"
 
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QObject>
 
+#include "debug_menu.hpp"
+
 namespace ui
 {
 
-    TopMenuBar::TopMenuBar(QMainWindow& mainWindow)
+    MenuBar::MenuBar(QMainWindow& mainWindow)
         : QObject{&mainWindow}, _mainWindow{mainWindow}
     {
+        _debugMenu = new DebugMenu{_mainWindow};
     }
 
-    void TopMenuBar::build()
+    void MenuBar::build()
     {
         auto* bar = _mainWindow.menuBar();
 
@@ -23,55 +26,35 @@ namespace ui
         _buildHelpMenu(bar);
     }
 
-    void TopMenuBar::_buildFileMenu(QMenuBar* menu)
+    void MenuBar::_buildFileMenu(QMenuBar* menu)
     {
         auto* fileMenu = menu->addMenu("&File");
 
         _saveAction = fileMenu->addAction("&Save");
         _saveAction->setShortcut(QKeySequence::Save);
-        connect(
-            _saveAction,
-            &QAction::triggered,
-            this,
-            &TopMenuBar::requestSave
-        );
+        connect(_saveAction, &QAction::triggered, this, &MenuBar::requestSave);
 
         _quitAction = fileMenu->addAction("&Quit");
         _quitAction->setShortcut(QKeySequence::Quit);
-        connect(
-            _quitAction,
-            &QAction::triggered,
-            this,
-            &TopMenuBar::requestQuit
-        );
+        connect(_quitAction, &QAction::triggered, this, &MenuBar::requestQuit);
     }
 
-    void TopMenuBar::_buildEditMenu(QMenuBar* menu)
+    void MenuBar::_buildEditMenu(QMenuBar* menu)
     {
         auto* editMenu = menu->addMenu("&Edit");
 
         _undoAction = editMenu->addAction("&Undo");
         _undoAction->setShortcut(QKeySequence::Undo);
         _undoAction->setEnabled(false);
-        connect(
-            _undoAction,
-            &QAction::triggered,
-            this,
-            &TopMenuBar::requestUndo
-        );
+        connect(_undoAction, &QAction::triggered, this, &MenuBar::requestUndo);
 
         _redoAction = editMenu->addAction("&Redo");
         _redoAction->setShortcut(QKeySequence::Redo);
         _redoAction->setEnabled(false);
-        connect(
-            _redoAction,
-            &QAction::triggered,
-            this,
-            &TopMenuBar::requestRedo
-        );
+        connect(_redoAction, &QAction::triggered, this, &MenuBar::requestRedo);
     }
 
-    void TopMenuBar::_buildSettingsMenu(QMenuBar* menu)
+    void MenuBar::_buildSettingsMenu(QMenuBar* menu)
     {
         auto* settingsMenu = menu->addMenu("&Settings");
 
@@ -80,24 +63,18 @@ namespace ui
             _preferencesAction,
             &QAction::triggered,
             this,
-            &TopMenuBar::requestPreferences
+            &MenuBar::requestPreferences
         );
     }
 
-    void TopMenuBar::_buildDebugMenu(QMenuBar* menu)
+    void MenuBar::_buildDebugMenu(QMenuBar* menu)
     {
         auto* debugMenu = menu->addMenu("&Debug");
 
-        _debugAction = debugMenu->addAction("&Debug Flags");
-        connect(
-            _debugAction,
-            &QAction::triggered,
-            this,
-            &TopMenuBar::requestDebug
-        );
+        _debugMenu->build(debugMenu);
     }
 
-    void TopMenuBar::_buildHelpMenu(QMenuBar* menu)
+    void MenuBar::_buildHelpMenu(QMenuBar* menu)
     {
         auto* helpMenu = menu->addMenu("&Help");
 
@@ -106,26 +83,26 @@ namespace ui
             _aboutAction,
             &QAction::triggered,
             this,
-            &TopMenuBar::requestAbout
+            &MenuBar::requestAbout
         );
     }
 
-    void TopMenuBar::setUndoEnabled(bool enabled)
+    void MenuBar::setUndoEnabled(bool enabled)
     {
         _undoAction->setEnabled(enabled);
     }
 
-    void TopMenuBar::setRedoEnabled(bool enabled)
+    void MenuBar::setRedoEnabled(bool enabled)
     {
         _redoAction->setEnabled(enabled);
     }
 
-    void TopMenuBar::setUndoText(const QString& text)
+    void MenuBar::setUndoText(const QString& text)
     {
         _undoAction->setText(text);
     }
 
-    void TopMenuBar::setRedoText(const QString& text)
+    void MenuBar::setRedoText(const QString& text)
     {
         _redoAction->setText(text);
     }

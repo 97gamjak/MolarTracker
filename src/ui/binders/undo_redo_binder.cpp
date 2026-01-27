@@ -3,14 +3,14 @@
 #include <QStatusBar>
 
 #include "ui/main_window.hpp"
-#include "ui/top_menu_bar.hpp"
+#include "ui/menu_bar/menu_bar.hpp"
 #include "ui/undo_redo/undo_stack.hpp"
 
 namespace ui
 {
     UndoRedoBinder::UndoRedoBinder(
         MainWindow& mainWindow,
-        TopMenuBar& menuBar,
+        MenuBar&    menuBar,
         UndoStack&  undoStack
     )
         : QObject(&mainWindow),
@@ -20,13 +20,13 @@ namespace ui
     {
         connect(
             &_menuBar,
-            &TopMenuBar::requestUndo,
+            &MenuBar::requestUndo,
             this,
             &UndoRedoBinder::_onUndoRequested
         );
         connect(
             &_menuBar,
-            &TopMenuBar::requestRedo,
+            &MenuBar::requestRedo,
             this,
             &UndoRedoBinder::_onRedoRequested
         );

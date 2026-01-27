@@ -6,7 +6,7 @@
 namespace ui
 {
     class MainWindow;   // Forward declaration
-    class TopMenuBar;   // Forward declaration
+    class MenuBar;      // Forward declaration
     class UndoStack;    // Forward declaration
 
     class UndoRedoBinder final : public QObject
@@ -15,7 +15,7 @@ namespace ui
 
        private:
         MainWindow& _mainWindow;
-        TopMenuBar& _menuBar;
+        MenuBar&    _menuBar;
         UndoStack&  _undoStack;
 
        private slots:
@@ -25,7 +25,7 @@ namespace ui
        public:
         UndoRedoBinder(
             MainWindow& mainWindow,
-            TopMenuBar& menuBar,
+            MenuBar&    menuBar,
             UndoStack&  undoStack
         );
 

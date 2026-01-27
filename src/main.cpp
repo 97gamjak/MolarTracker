@@ -1,4 +1,3 @@
-#include <QApplication>
 #include <cstdlib>
 #include <exception>
 
