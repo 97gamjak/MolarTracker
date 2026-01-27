@@ -17,6 +17,9 @@
 #include "ui/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
 
+#define __LOG_CATEGORY__ LogCategory::ui_logging
+#include "logging/log_macros.hpp"
+
 namespace ui
 {
 
@@ -189,10 +192,15 @@ namespace ui
             auto* combo = new QComboBox(_tree);
             combo->addItems(utils::toQStringList(LogLevelMeta::names));
 
-            const auto* it    = std::ranges::find(LogLevelMeta::values, level);
-            const auto  index = std::distance(LogLevelMeta::values.begin(), it);
+            const auto indexOpt = indexOfLogLevel(level);
 
-            combo->setCurrentIndex(static_cast<int>(index));
+            if (!indexOpt.has_value())
+                LOG_ERROR(
+                    "LogLevel for category " + categoryStr +
+                    " is invalid, defaulting to Off"
+                );
+
+            combo->setCurrentIndex(static_cast<int>(indexOpt.value_or(0)));
             _tree->setItemWidget(treeItem, LEVEL_COL, combo);
 
             connect(
