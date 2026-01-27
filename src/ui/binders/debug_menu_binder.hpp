@@ -24,6 +24,9 @@ namespace ui
 
        public:
         explicit DebugMenuBinder(MainWindow& mainWindow, MenuBar& debugMenu);
+
+       private:
+        void _ensureDialog();
     };
 
 }   // namespace ui

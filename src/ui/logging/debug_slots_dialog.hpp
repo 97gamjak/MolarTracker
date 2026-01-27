@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <cstdint>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 enum class LogCategory : size_t;
 enum class LogLevel : size_t;
@@ -41,6 +41,8 @@ namespace ui
         void _build_ui();
         void _populate_tree();
         void _connect_buttons();
+        void _initCategories();
+        void _applyChanges();
     };
 
 }   // namespace ui

@@ -19,10 +19,18 @@ namespace ui
         );
     }
 
-    void DebugMenuBinder::_onRequestDebugSlots()
+    void DebugMenuBinder::_ensureDialog()
     {
+        if (_dialog != nullptr)
+            return;
+
         _dialog = new DebugSlotsDialog{_mainWindow};
         _dialog->setModal(false);
+    }
+
+    void DebugMenuBinder::_onRequestDebugSlots()
+    {
+        _ensureDialog();
 
         _dialog->show();
         _dialog->raise();

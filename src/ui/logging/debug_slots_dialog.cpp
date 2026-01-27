@@ -28,9 +28,7 @@ namespace ui
     DebugSlotsDialog::DebugSlotsDialog(MainWindow& mainWindow)
         : QDialog(&mainWindow)
     {
-        // initialize categories from global logger
-        _categories        = LogManager::getInstance().getCategories();
-        _currentCategories = _categories;
+        _initCategories();
 
         _build_ui();
         _connect_buttons();
@@ -40,7 +38,6 @@ namespace ui
     void DebugSlotsDialog::_build_ui()
     {
         setWindowTitle("Debug / Logging Settings");
-        setModal(true);
         resize(820, 560);
 
         _tree = new QTreeWidget(this);
@@ -133,6 +130,9 @@ namespace ui
 
                     if (res == QMessageBox::No)
                         return;
+
+                    // revert changes
+                    _currentCategories = _categories;
                 }
 
                 reject();
@@ -145,9 +145,7 @@ namespace ui
             this,
             [this]()
             {
-                for (const auto& [category, level] : _currentCategories)
-                    LogManager::getInstance().setLogLevel(category, level);
-
+                _applyChanges();
                 accept();
             }
         );
@@ -161,12 +159,7 @@ namespace ui
                 using enum QDialogButtonBox::StandardButton;
 
                 if (_buttonBox->standardButton(button) == Apply)
-                {
-                    for (const auto& [category, level] : _currentCategories)
-                        LogManager::getInstance().setLogLevel(category, level);
-
-                    _categories = _currentCategories;
-                }
+                    _applyChanges();
             }
         );
     }
@@ -224,6 +217,20 @@ namespace ui
 
         _tree->expandAll();
         _tree->blockSignals(false);
+    }
+
+    void DebugSlotsDialog::_initCategories()
+    {
+        _categories        = LogManager::getInstance().getCategories();
+        _currentCategories = _categories;
+    }
+
+    void DebugSlotsDialog::_applyChanges()
+    {
+        for (const auto& [category, level] : _currentCategories)
+            LogManager::getInstance().setLogLevel(category, level);
+
+        _categories = _currentCategories;
     }
 
 }   // namespace ui
