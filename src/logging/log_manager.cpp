@@ -14,7 +14,7 @@ LogManager& LogManager::getInstance()
     return instance;
 }
 
-LogManager::LogManager() { _initCategoryMap(); }
+LogManager::LogManager() { _categories = getDefaultCategories(); }
 
 /**
  * @brief Initializes the ring file logger
@@ -35,10 +35,14 @@ void LogManager::initializeRingFileLogger(
     _ringFile = RingFile(config);
 }
 
-void LogManager::_initCategoryMap()
+std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
+) const
 {
+    std::unordered_map<LogCategory, LogLevel> defaultCategories;
     for (const auto category : LogCategoryMeta::values)
-        _categories[category] = LogLevel::Info;   // Default log level
+        defaultCategories[category] = LogLevel::Info;
+
+    return defaultCategories;
 }
 
 bool LogManager::isEnabled(
@@ -49,9 +53,33 @@ bool LogManager::isEnabled(
     return _categories.at(category) >= level;
 }
 
-void LogManager::setLogLevel(const LogCategory& category, const LogLevel& level)
+void LogManager::changeLogLevel(
+    const LogCategory& category,
+    const LogLevel&    level
+)
 {
-    _categories[category] = level;
+    if (_categories[category] != level)
+    {
+        const auto previousLevel = _categories[category];
+
+        _categories[category] = level;
+        log(LogLevel::Info,
+            LogCategory::logging_manager,
+            __FILE__,
+            __LINE__,
+            __func__,
+            std::format(
+                "Log level for category '{}' changed from '{}' to '{}'",
+                std::string{LogCategoryMeta::name(category)},
+                std::string{LogLevelMeta::name(previousLevel)},
+                std::string{LogLevelMeta::name(level)}
+            ));
+    }
+}
+
+std::unordered_map<LogCategory, LogLevel> LogManager::getCategories() const
+{
+    return _categories;
 }
 
 void LogManager::log(

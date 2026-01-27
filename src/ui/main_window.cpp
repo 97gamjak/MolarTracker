@@ -8,9 +8,11 @@
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
+#include "ui/binders/debug_menu_binder.hpp"
+#include "ui/binders/undo_redo_binder.hpp"
+#include "ui/menu_bar/menu_bar.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
-#include "ui/top_menu_bar.hpp"
 #include "ui/undo_redo/toggle_flag_command.hpp"
 
 namespace ui
@@ -25,83 +27,31 @@ namespace ui
 
         _buildUI();
 
-        _undoStack.pushAndRedo(
-            std::make_unique<ToggleFlagCommand>(_dummyFlag, "Toggle flag")
-        );
-        _refreshUndoRedoActions();
-
         _ensureProfileExists();
     }
 
     void MainWindow::_buildUI()
     {
-        _topMenuBar = new TopMenuBar{*this};
-        _topMenuBar->build();
-
-        connect(_topMenuBar, &TopMenuBar::requestQuit, this, &QWidget::close);
-        connect(
-            _topMenuBar,
-            &TopMenuBar::requestUndo,
-            this,
-            [this]()
-            {
-                _undoStack.undo();
-                statusBar()->showMessage("Undo requested");
-                _refreshUndoRedoActions();
-            }
-        );
-        connect(
-            _topMenuBar,
-            &TopMenuBar::requestRedo,
-            this,
-            [this]()
-            {
-                _undoStack.redo();
-                statusBar()->showMessage("Redo requested");
-                _refreshUndoRedoActions();
-            }
-        );
-        connect(
-            _topMenuBar,
-            &TopMenuBar::requestPreferences,
-            this,
-            [this]()
-            {
-                QMessageBox::information(
-                    this,
-                    "Preferences",
-                    "Preferences requested"
-                );
-            }
-        );
-        connect(
-            _topMenuBar,
-            &TopMenuBar::requestAbout,
-            this,
-            [this]()
-            {
-                QMessageBox::information(
-                    this,
-                    "About Molar Tracker",
-                    "Molar Tracker\nVersion 0.1.0\n\n(c) 2025-now Molar "
-                    "Tracker "
-                    "Contributors: Jakob Gamper"
-                );
-            }
-        );
-        connect(
-            _topMenuBar,
-            &TopMenuBar::requestSave,
-            this,
-            [this]()
-            {
-                _appContext.getStore().commit();
-                statusBar()->showMessage("Save requested");
-            }
-        );
-
+        _buildMenuBar();
         _buildCentral();
-        _refreshUndoRedoActions();
+    }
+
+    void MainWindow::_buildMenuBar()
+    {
+        _menuBar = new MenuBar{*this};
+        _menuBar->build();
+
+        // clang-format off
+        _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
+        _debugMenuBinder = new DebugMenuBinder{*this, *_menuBar};
+        // clang-format on
+
+        // clang-format off
+        connect(_menuBar, &MenuBar::requestQuit, this, &QWidget::close);
+        connect(_menuBar, &MenuBar::requestSave, this, &MainWindow::_onSaveRequested);
+        connect(_menuBar, &MenuBar::requestPreferences, this, &MainWindow::_onPreferencesRequested);
+        connect(_menuBar, &MenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
+        // clang-format on
     }
 
     void MainWindow::_buildCentral()
@@ -121,23 +71,24 @@ namespace ui
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
     }
 
-    void MainWindow::_refreshUndoRedoActions()
+    void MainWindow::_onSaveRequested()
     {
-        // Placeholder implementation
-        // In a real application, this would check the undo/redo stack status
-        bool canUndo = _undoStack.canUndo();
-        bool canRedo = _undoStack.canRedo();
+        _appContext.getStore().commit();
+        statusBar()->showMessage("Save requested");
+    }
 
-        _topMenuBar->setUndoEnabled(canUndo);
-        _topMenuBar->setUndoText(
-            canUndo ? QString::fromStdString("Undo " + _undoStack.undoLabel())
-                    : "Undo"
-        );
+    void MainWindow::_onPreferencesRequested()
+    {
+        QMessageBox::information(this, "Preferences", "Preferences requested");
+    }
 
-        _topMenuBar->setRedoEnabled(canRedo);
-        _topMenuBar->setRedoText(
-            canRedo ? QString::fromStdString("Redo " + _undoStack.redoLabel())
-                    : "Redo"
+    void MainWindow::_onAboutRequested()
+    {
+        QMessageBox::information(
+            this,
+            "About Molar Tracker",
+            "Molar Tracker\nVersion 0.1.0\n\n(c) 2025-now Molar Tracker "
+            "Contributors: Jakob Gamper"
         );
     }
 

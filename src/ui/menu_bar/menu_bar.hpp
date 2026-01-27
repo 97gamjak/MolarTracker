@@ -1,5 +1,5 @@
-#ifndef __UI__TOP_MENU_BAR_HPP__
-#define __UI__TOP_MENU_BAR_HPP__
+#ifndef __UI__MENU_BAR__MENU_BAR_HPP__
+#define __UI__MENU_BAR__MENU_BAR_HPP__
 
 #include <QObject>
 
@@ -9,17 +9,21 @@ class QAction;       // Forward declaration
 
 namespace ui
 {
-    class TopMenuBar : public QObject
+    class DebugMenu;   // Forward declaration
+    class FileMenu;    // Forward declaration
+
+    class MenuBar : public QObject
     {
         Q_OBJECT
 
        private:
         QMainWindow& _mainWindow;
 
+        DebugMenu* _debugMenu = nullptr;
+        FileMenu*  _fileMenu  = nullptr;
+
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
-        QAction* _saveAction        = nullptr;
-        QAction* _quitAction        = nullptr;
         QAction* _preferencesAction = nullptr;
         QAction* _aboutAction       = nullptr;
 
@@ -27,18 +31,25 @@ namespace ui
         void _buildFileMenu(QMenuBar* menu);
         void _buildEditMenu(QMenuBar* menu);
         void _buildSettingsMenu(QMenuBar* menu);
+        void _buildDebugMenu(QMenuBar* menu);
         void _buildHelpMenu(QMenuBar* menu);
 
        signals:
+        // edit menu
         void requestUndo();
         void requestRedo();
+        // file menu
         void requestQuit();
-        void requestPreferences();
-        void requestAbout();
         void requestSave();
+        // debug menu
+        void requestDebugSlots();
+        // settings menu
+        void requestPreferences();
+        // help menu
+        void requestAbout();
 
        public:
-        explicit TopMenuBar(QMainWindow& mainWindow);
+        explicit MenuBar(QMainWindow& mainWindow);
 
         void build();
 
@@ -51,4 +62,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__TOP_MENU_BAR_HPP__
+#endif   // __UI__MENU_BAR__MENU_BAR_HPP__
