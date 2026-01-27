@@ -7,7 +7,8 @@
 #define LOG_CATEGORY(X)           \
     X(app_service_profileService) \
     X(ui_mainWindow)              \
-    X(ui_logging)
+    X(ui_logging)                 \
+    X(logging_manager)
 
 MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
 

@@ -21,7 +21,7 @@ class LogManager
     static LogManager& getInstance();
 
     void initializeRingFileLogger(const std::filesystem::path& configDir);
-    void setLogLevel(const LogCategory& category, const LogLevel& level);
+    void changeLogLevel(const LogCategory& category, const LogLevel& level);
     bool isEnabled(const LogCategory& category, const LogLevel& level) const;
 
     std::unordered_map<LogCategory, LogLevel> getCategories() const;

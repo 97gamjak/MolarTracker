@@ -236,7 +236,7 @@ namespace ui
     void DebugSlotsDialog::_applyChanges()
     {
         for (const auto& [category, level] : _currentCategories)
-            LogManager::getInstance().setLogLevel(category, level);
+            LogManager::getInstance().changeLogLevel(category, level);
 
         _categories = _currentCategories;
     }
