@@ -14,20 +14,26 @@
 #include "logging/log_manager.hpp"
 #include "logging/logging_base.hpp"
 #include "ui/main_window.hpp"
+#include "ui/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
-
-static constexpr int COL_NAME  = 0;
-static constexpr int COL_VALUE = 1;
 
 namespace ui
 {
 
+    /**
+     * @brief Constructs the DebugSlotsDialog
+     *
+     * @param mainWindow Parent main window
+     */
     DebugSlotsDialog::DebugSlotsDialog(MainWindow& mainWindow)
         : QDialog(&mainWindow)
     {
+        // initialize categories from global logger
         _categories        = LogManager::getInstance().getCategories();
         _currentCategories = _categories;
+
         _build_ui();
+        _connect_buttons();
         _populate_tree();
     }
 
@@ -49,44 +55,8 @@ namespace ui
         _defaultsButton       = new QPushButton("Use default Flags", this);
         _discardChangesButton = new QPushButton("Discard Changes", this);
 
-        connect(
-            _discardChangesButton,
-            &QPushButton::clicked,
-            this,
-            [this]()
-            {
-                // revert current categories to original
-                _currentCategories = _categories;
-                _populate_tree();
-            }
-        );
-
         _showOnlyModifiedCheckBox = new QCheckBox("Show only modified", this);
         _showOnlyModifiedCheckBox->setChecked(false);
-
-        connect(
-            _showOnlyModifiedCheckBox,
-            &QCheckBox::toggled,
-            this,
-            [this](bool on)
-            {
-                _modifiedOnly = on;
-                _populate_tree();
-            }
-        );
-
-        connect(
-            _defaultsButton,
-            &QPushButton::clicked,
-            this,
-            [this]()
-            {
-                // set current categories to default
-                _currentCategories =
-                    LogManager::getInstance().getDefaultCategories();
-                _populate_tree();
-            }
-        );
 
         _buttonBox = new QDialogButtonBox(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
@@ -110,6 +80,45 @@ namespace ui
         root->addLayout(upperBottomRow);
         root->addLayout(bottomRow);
         setLayout(root);
+    }
+
+    void DebugSlotsDialog::_connect_buttons()
+    {
+        connect(
+            _defaultsButton,
+            &QPushButton::clicked,
+            this,
+            [this]()
+            {
+                _currentCategories =
+                    LogManager::getInstance().getDefaultCategories();
+
+                _populate_tree();
+            }
+        );
+
+        connect(
+            _discardChangesButton,
+            &QPushButton::clicked,
+            this,
+            [this]()
+            {
+                // revert current categories to original
+                _currentCategories = _categories;
+                _populate_tree();
+            }
+        );
+
+        connect(
+            _showOnlyModifiedCheckBox,
+            &QCheckBox::toggled,
+            this,
+            [this](bool on)
+            {
+                _modifiedOnly = on;
+                _populate_tree();
+            }
+        );
 
         connect(
             _buttonBox,
@@ -120,13 +129,7 @@ namespace ui
                 // if something changed ask for confirmation
                 if (_currentCategories != _categories)
                 {
-                    const auto res = QMessageBox::question(
-                        this,
-                        "Discard changes?",
-                        "Are you sure you want to discard your changes?",
-                        QMessageBox::Yes | QMessageBox::No,
-                        QMessageBox::No
-                    );
+                    const auto res = askDiscardChanges(this);
 
                     if (res == QMessageBox::No)
                         return;
@@ -142,11 +145,8 @@ namespace ui
             this,
             [this]()
             {
-                // apply changes
                 for (const auto& [category, level] : _currentCategories)
-                {
                     LogManager::getInstance().setLogLevel(category, level);
-                }
 
                 accept();
             }
@@ -158,16 +158,13 @@ namespace ui
             this,
             [this](QAbstractButton* button)
             {
-                if (_buttonBox->standardButton(button) ==
-                    QDialogButtonBox::Apply)
-                {
-                    // apply changes
-                    for (const auto& [category, level] : _currentCategories)
-                    {
-                        LogManager::getInstance().setLogLevel(category, level);
-                    }
+                using enum QDialogButtonBox::StandardButton;
 
-                    // update original categories
+                if (_buttonBox->standardButton(button) == Apply)
+                {
+                    for (const auto& [category, level] : _currentCategories)
+                        LogManager::getInstance().setLogLevel(category, level);
+
                     _categories = _currentCategories;
                 }
             }
@@ -179,17 +176,20 @@ namespace ui
         _tree->blockSignals(true);
         _tree->clear();
 
+        static constexpr int CAT_COL   = 0;
+        static constexpr int LEVEL_COL = 1;
+
         for (const auto& [category, level] : _currentCategories)
         {
             if (_modifiedOnly && level == _categories[category])
                 continue;
 
-            const auto categoryName =
-                std::string{LogCategoryMeta::name(category)};
-            const auto categoryQStr = QString::fromStdString(categoryName);
+            const auto categoryName = LogCategoryMeta::name(category);
+            const auto categoryStr  = std::string(categoryName);
+            const auto categoryQStr = QString::fromStdString(categoryStr);
 
             auto* treeItem = new QTreeWidgetItem(_tree);
-            treeItem->setText(COL_NAME, categoryQStr);
+            treeItem->setText(CAT_COL, categoryQStr);
             treeItem->setFirstColumnSpanned(false);
             treeItem->setFlags(treeItem->flags() & ~Qt::ItemIsUserCheckable);
 
@@ -200,7 +200,7 @@ namespace ui
             const auto  index = std::distance(LogLevelMeta::values.begin(), it);
 
             combo->setCurrentIndex(static_cast<int>(index));
-            _tree->setItemWidget(treeItem, COL_VALUE, combo);
+            _tree->setItemWidget(treeItem, LEVEL_COL, combo);
 
             connect(
                 combo,
@@ -209,12 +209,12 @@ namespace ui
                 [category, this]()
                 {
                     // column 2 of this row changed
-                    const QString value =
+                    const auto levelText =
                         static_cast<QComboBox*>(QObject::sender())
-                            ->currentText();
+                            ->currentText()
+                            .toStdString();
 
-                    const auto levelOpt =
-                        LogLevelMeta::from_string(value.toStdString());
+                    const auto levelOpt = LogLevelMeta::from_string(levelText);
 
                     if (levelOpt.has_value())
                         _currentCategories[category] = levelOpt.value();

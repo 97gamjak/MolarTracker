@@ -9,6 +9,7 @@ add_subdirectory(exceptions)
 add_subdirectory(binders)
 add_subdirectory(menu_bar)
 add_subdirectory(logging)
+add_subdirectory(utils)
 
 target_link_libraries(molartracker_ui
     PUBLIC
@@ -21,6 +22,7 @@ target_link_libraries(molartracker_ui
         molartracker_binders_ui
         molartracker_menu_bar_ui
         molartracker_logging_ui
+        molartracker_utils_ui
 )
 
 target_include_directories(molartracker_ui

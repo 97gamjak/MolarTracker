@@ -39,6 +39,7 @@ namespace ui
        private:
         void _build_ui();
         void _populate_tree();
+        void _connect_buttons();
     };
 
 }   // namespace ui
