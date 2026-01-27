@@ -132,6 +132,16 @@ void RingFile::close()
 }
 
 /**
+ * @brief Returns the current log file path (index 0)
+ *
+ * @return std::filesystem::path The current log file path
+ */
+std::filesystem::path RingFile::getCurrentLogFilePath() const
+{
+    return _pathForIndex(0);
+}
+
+/**
  * @brief Normalizes the configuration
  *
  * @note Ensures maxFiles is at least 1, adds a dot to the extension if missing,

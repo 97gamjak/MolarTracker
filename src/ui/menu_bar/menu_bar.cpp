@@ -21,6 +21,7 @@ namespace ui
         connect(_fileMenu, &FileMenu::requestQuit, this, &MenuBar::requestQuit);
 
         connect(_debugMenu, &DebugMenu::requestDebugSlots, this, &MenuBar::requestDebugSlots);
+        connect(_debugMenu, &DebugMenu::requestLogViewer, this, &MenuBar::requestLogViewer);
         // clang-format on
     }
 

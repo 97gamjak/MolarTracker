@@ -20,6 +20,14 @@ namespace ui
             this,
             &DebugMenu::requestDebugSlots
         );
+
+        _logViewerAction = parentMenu->addAction("View Log File");
+        connect(
+            _logViewerAction,
+            &QAction::triggered,
+            this,
+            &DebugMenu::requestLogViewer
+        );
     }
 
 }   // namespace ui

@@ -45,6 +45,11 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
     return defaultCategories;
 }
 
+std::filesystem::path LogManager::getCurrentLogFilePath() const
+{
+    return _ringFile.getCurrentLogFilePath();
+}
+
 bool LogManager::isEnabled(
     const LogCategory& category,
     const LogLevel&    level
@@ -52,6 +57,8 @@ bool LogManager::isEnabled(
 {
     return _categories.at(category) >= level;
 }
+
+void LogManager::flush() { _ringFile.flush(); }
 
 void LogManager::changeLogLevel(
     const LogCategory& category,

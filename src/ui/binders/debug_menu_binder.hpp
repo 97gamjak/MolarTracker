@@ -8,6 +8,7 @@ namespace ui
     class MenuBar;            // Forward declaration
     class MainWindow;         // Forward declaration
     class DebugSlotsDialog;   // Forward declaration
+    class LogViewerDialog;    // Forward declaration
 
     class DebugMenuBinder : public QObject
     {
@@ -17,16 +18,19 @@ namespace ui
         MainWindow& _mainWindow;
         MenuBar&    _menuBar;
 
-        DebugSlotsDialog* _dialog = nullptr;
+        DebugSlotsDialog* _debugSlotDialog = nullptr;
+        LogViewerDialog*  _logViewerDialog = nullptr;
 
        private slots:
         void _onRequestDebugSlots();
+        void _onRequestLogViewer();
 
        public:
         explicit DebugMenuBinder(MainWindow& mainWindow, MenuBar& menuBar);
 
        private:
-        void _ensureDialog();
+        void _ensureDebugSlotDialog();
+        void _ensureLogViewerDialog();
     };
 
 }   // namespace ui
