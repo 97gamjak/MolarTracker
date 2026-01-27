@@ -24,7 +24,7 @@ namespace ui
 
        private:
         std::unordered_map<LogCategory, LogLevel> _categories;
-        std::unordered_map<LogCategory, LogLevel> _currentCategories{};
+        std::unordered_map<LogCategory, LogLevel> _currentCategories;
 
         bool _modifiedOnly = false;
 
