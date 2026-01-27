@@ -7,6 +7,7 @@ qt_add_library(molartracker_ui STATIC
 add_subdirectory(undo_redo)
 add_subdirectory(profile)
 add_subdirectory(exceptions)
+add_subdirectory(binders)
 
 target_link_libraries(molartracker_ui
     PUBLIC
@@ -16,6 +17,7 @@ target_link_libraries(molartracker_ui
         molartracker_profile_ui
         molartracker_exceptions_ui
         molartracker_app
+        molartracker_binders_ui
 )
 
 target_include_directories(molartracker_ui
