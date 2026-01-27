@@ -2,9 +2,7 @@
 #define __UI__LOGGING__DEBUG_SLOTS_DIALOG_HPP__
 
 #include <QDialog>
-#include <cstdint>
 #include <unordered_map>
-#include <vector>
 
 enum class LogCategory : size_t;
 enum class LogLevel : size_t;
