@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <cstdint>
 #include <vector>
+#include <unordered_map>
 
 enum class LogCategory : size_t;
 enum class LogLevel : size_t;
