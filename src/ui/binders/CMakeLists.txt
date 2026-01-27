@@ -12,4 +12,5 @@ target_link_libraries(molartracker_binders_ui
     PRIVATE
         Qt6::Widgets
         molartracker_undo_redo_ui
+        molartracker_logging_ui
 )
