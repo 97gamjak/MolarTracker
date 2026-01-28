@@ -15,7 +15,7 @@ namespace app
     class AppContext
     {
        private:
-        settings::Settings _config;
+        settings::Settings _settings;
         db::Database       _database;
         RepoContainer      _repos;
         ServiceContainer   _services;
@@ -30,8 +30,8 @@ namespace app
         StoreContainer&       getStore() { return _store; }
         const StoreContainer& getStore() const { return _store; }
 
-        settings::Settings&       getConfig() { return _config; }
-        const settings::Settings& getConfig() const { return _config; }
+        settings::Settings&       getSettings() { return _settings; }
+        const settings::Settings& getSettings() const { return _settings; }
     };
 
 }   // namespace app
