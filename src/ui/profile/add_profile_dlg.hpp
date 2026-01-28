@@ -13,7 +13,6 @@ namespace drafts
 namespace app
 {
     class ProfileStore;
-    class AppConfig;
 }   // namespace app
 
 namespace ui

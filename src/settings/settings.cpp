@@ -1,42 +1,44 @@
-#include "app/app_config.hpp"
+#include "settings.hpp"
 
 #include <filesystem>
 #include <fstream>
 
 #include "config/json.hpp"
 
-namespace app
+namespace settings
 {
 
-    AppConfig::AppConfig(const std::filesystem::path& configDir)
-        : _configPath{std::filesystem::absolute(configDir / _configFileName)}
+    Settings::Settings(const std::filesystem::path& configDir)
+        : _settingsPath{
+              std::filesystem::absolute(configDir / _settingsFileName)
+          }
     {
         _from_json();
     }
 
-    void AppConfig::save() const { _to_json(); }
+    void Settings::save() const { _to_json(); }
 
-    bool AppConfig::has_default_profile() const
+    bool Settings::has_default_profile() const
     {
         return _defaultProfileName.has_value();
     }
 
-    std::optional<std::string> AppConfig::get_default_profile_name() const
+    std::optional<std::string> Settings::get_default_profile_name() const
     {
         return _defaultProfileName;
     }
 
-    void AppConfig::set_default_profile_name(const std::string& name)
+    void Settings::set_default_profile_name(const std::string& name)
     {
         _defaultProfileName = name;
     }
 
-    void AppConfig::_to_json() const
+    void Settings::_to_json() const
     {
         nlohmann::json jsonData;
         jsonData[_defaultProfileNameKey] = _defaultProfileName;
 
-        std::ofstream file{_configPath.string()};
+        std::ofstream file{_settingsPath.string()};
         if (file.is_open())
         {
             file << jsonData.dump(4);
@@ -44,9 +46,9 @@ namespace app
         }
     }
 
-    void AppConfig::_from_json()
+    void Settings::_from_json()
     {
-        std::ifstream file{_configPath.string()};
+        std::ifstream file{_settingsPath.string()};
         if (file.is_open())
         {
             nlohmann::json jsonData;
@@ -59,4 +61,4 @@ namespace app
         }
     }
 
-}   // namespace app
+}   // namespace settings
