@@ -41,4 +41,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Update `Timestamp` to format local time using the current time zone instead of UTC
 
+### Cleanup
+
+- Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 <!-- insertion marker -->
