@@ -34,7 +34,8 @@ namespace ui
         _textEdit->setMaximumBlockCount(50000);
 
         _autoReloadCheckBox->setChecked(false);
-        _reloadTimer->setInterval(100);   // 100 ms
+        // TODO: make this changeable via config and dialog
+        _reloadTimer->setInterval(1000);   // 1000 ms
 
         auto* buttonLayout = new QHBoxLayout();
         buttonLayout->addWidget(_reloadButton);
@@ -89,6 +90,8 @@ namespace ui
         const auto qStrPath = QString::fromStdString(absPath.string());
 
         // we need to flush here to ensure all logs are written before reading
+        // TODO: think of a clever flushing strategy to avoid performance issues
+        // especially when auto-reload is enabled
         LogManager::getInstance().flush();
 
         QFile file(qStrPath);
