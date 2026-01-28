@@ -29,7 +29,7 @@ namespace ui
         explicit DebugMenuBinder(MainWindow& mainWindow, MenuBar& menuBar);
 
        private:
-        void _ensureDebugSlotDialog();
+        void _ensureDebugSlotsDialog();
         void _ensureLogViewerDialog();
     };
 

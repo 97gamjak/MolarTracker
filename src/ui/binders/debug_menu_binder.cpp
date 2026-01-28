@@ -27,7 +27,7 @@ namespace ui
         );
     }
 
-    void DebugMenuBinder::_ensureDebugSlotDialog()
+    void DebugMenuBinder::_ensureDebugSlotsDialog()
     {
         if (_debugSlotDialog != nullptr)
             return;
@@ -47,7 +47,7 @@ namespace ui
 
     void DebugMenuBinder::_onRequestDebugSlots()
     {
-        _ensureDebugSlotDialog();
+        _ensureDebugSlotsDialog();
 
         _debugSlotDialog->show();
         _debugSlotDialog->raise();
