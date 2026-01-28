@@ -29,11 +29,11 @@ namespace ui
 
     void DebugMenuBinder::_ensureDebugSlotsDialog()
     {
-        if (_debugSlotDialog != nullptr)
+        if (_debugSlotsDialog != nullptr)
             return;
 
-        _debugSlotDialog = new DebugSlotsDialog{_mainWindow};
-        _debugSlotDialog->setModal(false);
+        _debugSlotsDialog = new DebugSlotsDialog{_mainWindow};
+        _debugSlotsDialog->setModal(false);
     }
 
     void DebugMenuBinder::_ensureLogViewerDialog()
@@ -49,9 +49,9 @@ namespace ui
     {
         _ensureDebugSlotsDialog();
 
-        _debugSlotDialog->show();
-        _debugSlotDialog->raise();
-        _debugSlotDialog->activateWindow();
+        _debugSlotsDialog->show();
+        _debugSlotsDialog->raise();
+        _debugSlotsDialog->activateWindow();
 
         _mainWindow.statusBar()->showMessage("Debug slots opened");
     }

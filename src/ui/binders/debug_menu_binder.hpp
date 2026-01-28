@@ -18,8 +18,8 @@ namespace ui
         MainWindow& _mainWindow;
         MenuBar&    _menuBar;
 
-        DebugSlotsDialog* _debugSlotDialog = nullptr;
-        LogViewerDialog*  _logViewerDialog = nullptr;
+        DebugSlotsDialog* _debugSlotsDialog = nullptr;
+        LogViewerDialog*  _logViewerDialog  = nullptr;
 
        private slots:
         void _onRequestDebugSlots();
