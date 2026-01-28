@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <mstd/enum.hpp>
+#include <nlohmann/json.hpp>
 
 #define LOG_CATEGORY(X)           \
     X(app_service_profileService) \
@@ -41,5 +42,49 @@ inline std::optional<size_t> indexOfLogLevel(LogLevel level)
 
     return std::nullopt;
 }
+
+NLOHMANN_JSON_NAMESPACE_BEGIN
+// TODO: migrate and standardize adl_serializer usage
+// for mstd enums in mstd library itself
+template <>
+struct adl_serializer<LogLevel>
+{
+    static void to_json(json& j, const LogLevel& level)
+    {
+        j = LogLevelMeta::name(level);
+    }
+
+    static void from_json(const json& j, LogLevel& level)
+    {
+        const auto levelStr = j.get<std::string_view>();
+        const auto levelOpt = LogLevelMeta::from_string(levelStr);
+
+        if (levelOpt.has_value())
+            level = *levelOpt;
+        else
+            throw std::invalid_argument("Invalid LogLevel string");
+    }
+};
+
+template <>
+struct adl_serializer<LogCategory>
+{
+    static void to_json(json& j, const LogCategory& category)
+    {
+        j = LogCategoryMeta::name(category);
+    }
+
+    static void from_json(const json& j, LogCategory& category)
+    {
+        const auto categoryStr = j.get<std::string_view>();
+        const auto categoryOpt = LogCategoryMeta::from_string(categoryStr);
+
+        if (categoryOpt.has_value())
+            category = *categoryOpt;
+        else
+            throw std::invalid_argument("Invalid LogCategory string");
+    }
+};
+NLOHMANN_JSON_NAMESPACE_END
 
 #endif   // __LOGGING__LOGGING_BASE_HPP__
