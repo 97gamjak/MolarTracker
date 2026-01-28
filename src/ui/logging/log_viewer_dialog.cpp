@@ -56,9 +56,8 @@ namespace ui
             _autoReloadCheckBox,
             &QCheckBox::toggled,
             this,
-            [this](bool checked)
+            [this](bool isAutoReloadEnabled)
             {
-                isAutoReloadEnabled = checked;
                 if (isAutoReloadEnabled)
                 {
                     _reloadButton->setEnabled(false);

@@ -17,8 +17,6 @@ namespace ui
         Q_OBJECT
 
        private:
-        bool isAutoReloadEnabled = false;
-
         QPlainTextEdit* _textEdit;
         QPushButton*    _reloadButton;
         QCheckBox*      _autoReloadCheckBox;
