@@ -109,11 +109,34 @@ namespace ui
         _textEdit->setPlainText(stream.readAll());
 
         // Scroll to bottom
+        // TODO: think of a better way to handle this
+        // maybe only scroll to bottom if user did not scroll up manually
         auto cursor = _textEdit->textCursor();
         cursor.movePosition(QTextCursor::End);
         _textEdit->setTextCursor(cursor);
     }
 
     void LogViewerDialog::reloadLog() { _loadLogFile(); }
+
+    void LogViewerDialog::hideEvent(QHideEvent* event)
+    {
+        QDialog::hideEvent(event);
+        if (_autoReloadCheckBox->isChecked())
+            _reloadTimer->stop();
+    }
+
+    void LogViewerDialog::showEvent(QShowEvent* event)
+    {
+        QDialog::showEvent(event);
+        if (_autoReloadCheckBox->isChecked())
+            _reloadTimer->start();
+    }
+
+    void LogViewerDialog::closeEvent(QCloseEvent* event)
+    {
+        QDialog::closeEvent(event);
+        if (_autoReloadCheckBox->isChecked())
+            _reloadTimer->stop();
+    }
 
 }   // namespace ui

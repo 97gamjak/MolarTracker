@@ -25,6 +25,11 @@ namespace ui
        public:
         explicit LogViewerDialog(MainWindow& parent);
 
+       protected:
+        void hideEvent(QHideEvent* event) override;
+        void showEvent(QShowEvent* event) override;
+        void closeEvent(QCloseEvent* event) override;
+
        private slots:
         void reloadLog();
 
