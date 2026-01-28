@@ -1,8 +1,10 @@
 #include "main_window.hpp"
 
+#include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QTabWidget>
 #include <QVBoxLayout>
 
 #include "app/app_context.hpp"
@@ -14,6 +16,7 @@
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
 #include "ui/undo_redo/toggle_flag_command.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -145,7 +148,9 @@ namespace ui
                 auto* dialog = new AddProfileDialog{profileStore, this};
                 dialog->setAsActive(true);
                 dialog->setWindowTitle("Create your first profile");
+                dialog->setModal(true);
                 dialog->setAttribute(Qt::WA_DeleteOnClose);
+                utils::moveDialogToParentScreenCenter(dialog, this);
 
                 connect(
                     dialog,
