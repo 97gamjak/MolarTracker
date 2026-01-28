@@ -15,11 +15,13 @@ namespace ui
 
        signals:
         void requestDebugSlots();
+        void requestLogViewer();
 
        private:
         QMainWindow& _mainWindow;
 
         QAction* _debugSlotsAction = nullptr;
+        QAction* _logViewerAction  = nullptr;
 
        public:
         explicit DebugMenu(QMainWindow& mainWindow);

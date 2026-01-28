@@ -7,7 +7,8 @@ All changes and updates, that are relevant for a user will be documented here
 ### UI
 
 - Main window always opens in full screen mode
-- Add Dialog to set Debug flags for logging
+- Add Dialog to set Debug flags for logging (Debug Menu)
+- Add Dialog to display current log file (Debug Menu)
 
 ### Error Handling
 

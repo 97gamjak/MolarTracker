@@ -43,6 +43,7 @@ namespace ui
         void requestSave();
         // debug menu
         void requestDebugSlots();
+        void requestLogViewer();
         // settings menu
         void requestPreferences();
         // help menu

@@ -60,6 +60,8 @@ class RingFile
     void flush();
     void close();
 
+    std::filesystem::path getCurrentLogFilePath() const;
+
    private:
     void _normalizeConfig();
     void _openCurrent();

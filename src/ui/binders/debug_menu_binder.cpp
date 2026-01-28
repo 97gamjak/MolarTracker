@@ -3,6 +3,7 @@
 #include <QStatusBar>
 
 #include "ui/logging/debug_slots_dialog.hpp"
+#include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/main_window.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 
@@ -17,26 +18,53 @@ namespace ui
             this,
             &DebugMenuBinder::_onRequestDebugSlots
         );
+
+        connect(
+            &_menuBar,
+            &MenuBar::requestLogViewer,
+            this,
+            &DebugMenuBinder::_onRequestLogViewer
+        );
     }
 
-    void DebugMenuBinder::_ensureDialog()
+    void DebugMenuBinder::_ensureDebugSlotsDialog()
     {
-        if (_dialog != nullptr)
+        if (_debugSlotsDialog != nullptr)
             return;
 
-        _dialog = new DebugSlotsDialog{_mainWindow};
-        _dialog->setModal(false);
+        _debugSlotsDialog = new DebugSlotsDialog{_mainWindow};
+        _debugSlotsDialog->setModal(false);
+    }
+
+    void DebugMenuBinder::_ensureLogViewerDialog()
+    {
+        if (_logViewerDialog != nullptr)
+            return;
+
+        _logViewerDialog = new LogViewerDialog{_mainWindow};
+        _logViewerDialog->setModal(false);
     }
 
     void DebugMenuBinder::_onRequestDebugSlots()
     {
-        _ensureDialog();
+        _ensureDebugSlotsDialog();
 
-        _dialog->show();
-        _dialog->raise();
-        _dialog->activateWindow();
+        _debugSlotsDialog->show();
+        _debugSlotsDialog->raise();
+        _debugSlotsDialog->activateWindow();
 
         _mainWindow.statusBar()->showMessage("Debug slots opened");
+    }
+
+    void DebugMenuBinder::_onRequestLogViewer()
+    {
+        _ensureLogViewerDialog();
+
+        _logViewerDialog->show();
+        _logViewerDialog->raise();
+        _logViewerDialog->activateWindow();
+
+        _mainWindow.statusBar()->showMessage("Log File opened");
     }
 
 }   // namespace ui
