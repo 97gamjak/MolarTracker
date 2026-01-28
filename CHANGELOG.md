@@ -21,5 +21,6 @@ All changes and updates, that are relevant for a user will be documented here
 #### UI
 
 - make main window resizable again
+- make add profile startup dialog center above main window
 
 <!-- insertion marker -->

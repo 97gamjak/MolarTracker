@@ -13,4 +13,5 @@ target_include_directories(molartracker_utils
 target_link_libraries(molartracker_utils
     PUBLIC
         Qt6::Core
+        Qt6::Widgets
 )
