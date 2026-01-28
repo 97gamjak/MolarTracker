@@ -8,6 +8,9 @@
 #include "services_api/i_profile_service.hpp"
 #include "store/profile_store.hpp"
 
+#define __LOG_CATEGORY__ LogCategory::app_store_ProfileStore
+#include "logging/log_macros.hpp"
+
 namespace app
 {
 
@@ -134,7 +137,10 @@ namespace app
     void ProfileStore::commit()
     {
         if (!hasPendingChanges())
+        {
+            LOG_DEBUG("No changes to commit in ProfileStore");
             return;
+        }
 
         // Minimal approach:
         // - detect deletes (in baseline but not in current)

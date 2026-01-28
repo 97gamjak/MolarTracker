@@ -6,6 +6,8 @@
 
 #define LOG_CATEGORY(X)           \
     X(app_service_profileService) \
+    X(app_storeContainer)         \
+    X(app_store_ProfileStore)     \
     X(ui_mainWindow)              \
     X(ui_logging)                 \
     X(logging_manager)

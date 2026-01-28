@@ -25,4 +25,5 @@ target_link_libraries(molartracker_app
     molartracker_app_services
     molartracker_app_domain
     molartracker_app_store
+    molartracker_logging
 )
