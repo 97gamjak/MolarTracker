@@ -7,7 +7,7 @@ namespace app
 {
 
     AppContext::AppContext()
-        : _config{Constants::getInstance().getConfigPath()},
+        : _settings{Constants::getInstance().getConfigPath()},
           _database{Constants::getInstance().getDatabasePath()},
           _repos{_database},
           _services{_repos},

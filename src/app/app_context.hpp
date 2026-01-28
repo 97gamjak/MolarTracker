@@ -3,11 +3,11 @@
 
 #include <string>
 
-#include "app/app_config.hpp"
 #include "app/repo_container.hpp"
 #include "app/service_container.hpp"
 #include "app/store_container.hpp"
 #include "db/database.hpp"
+#include "settings/settings.hpp"
 
 namespace app
 {
@@ -15,11 +15,11 @@ namespace app
     class AppContext
     {
        private:
-        AppConfig        _config;
-        db::Database     _database;
-        RepoContainer    _repos;
-        ServiceContainer _services;
-        StoreContainer   _store;
+        settings::Settings _settings;
+        db::Database       _database;
+        RepoContainer      _repos;
+        ServiceContainer   _services;
+        StoreContainer     _store;
 
        public:
         explicit AppContext();
@@ -30,8 +30,8 @@ namespace app
         StoreContainer&       getStore() { return _store; }
         const StoreContainer& getStore() const { return _store; }
 
-        AppConfig&       getConfig() { return _config; }
-        const AppConfig& getConfig() const { return _config; }
+        settings::Settings&       getSettings() { return _settings; }
+        const settings::Settings& getSettings() const { return _settings; }
     };
 
 }   // namespace app

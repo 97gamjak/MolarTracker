@@ -3,7 +3,6 @@ add_library(molartracker_app STATIC
     service_container.cpp
     store_container.cpp
     app_context.cpp
-    app_config.cpp
 )
 
 add_subdirectory(repos)

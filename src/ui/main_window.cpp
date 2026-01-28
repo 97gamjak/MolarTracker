@@ -97,7 +97,7 @@ namespace ui
     void MainWindow::_ensureProfileExists()
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
-        auto& config       = _appContext.getConfig();
+        auto& config       = _appContext.getSettings();
 
         if (config.has_default_profile())
         {
@@ -158,9 +158,9 @@ namespace ui
                     this,
                     [this, dialog]()
                     {
-                        const auto profile = dialog->getProfile();
-                        auto&      _config = _appContext.getConfig();
-                        _config.set_default_profile_name(profile.name);
+                        const auto profile   = dialog->getProfile();
+                        auto&      _settings = _appContext.getSettings();
+                        _settings.set_default_profile_name(profile.name);
                         statusBar()->showMessage("Profile added.");
                     }
                 );
