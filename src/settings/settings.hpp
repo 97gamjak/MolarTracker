@@ -1,30 +1,30 @@
-#ifndef __APP__APP_CONFIG_HPP__
-#define __APP__APP_CONFIG_HPP__
+#ifndef __SETTINGS__SETTINGS_HPP__
+#define __SETTINGS__SETTINGS_HPP__
 
 #include <filesystem>
 #include <optional>
 #include <string>
 
-namespace app
+namespace settings
 {
 
     /**
-     * @brief Application configuration management
+     * @brief Application settings management
      */
-    class AppConfig
+    class Settings
     {
        private:
         // clang-format off
-        static constexpr const char* _configFileName = "config.json";
+        static constexpr const char* _settingsFileName = "settings.json";
         static constexpr const char* _defaultProfileNameKey = "defaultProfileName";
         // clang-format on
 
-        std::filesystem::path      _configPath;
+        std::filesystem::path      _settingsPath;
         std::optional<std::string> _defaultProfileName = std::nullopt;
 
        public:
-        AppConfig() = delete;
-        explicit AppConfig(const std::filesystem::path& configDir);
+        Settings() = delete;
+        explicit Settings(const std::filesystem::path& configDir);
 
         void save() const;
 
@@ -38,6 +38,6 @@ namespace app
         void _from_json();
     };
 
-}   // namespace app
+}   // namespace settings
 
-#endif   // __APP__APP_CONFIG_HPP__
+#endif   // __SETTINGS__SETTINGS_HPP__
