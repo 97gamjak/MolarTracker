@@ -128,6 +128,9 @@ namespace ui
     void LogViewerDialog::showEvent(QShowEvent* event)
     {
         QDialog::showEvent(event);
+
+        // Always reload the log when the dialog is shown to avoid stale content.
+        reloadLog();
         if (_autoReloadCheckBox->isChecked())
             _reloadTimer->start();
     }
