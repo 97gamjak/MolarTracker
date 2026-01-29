@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <format>
 #include <unordered_map>
 
 #include "drafts/profile_draft.hpp"
