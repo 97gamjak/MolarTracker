@@ -66,7 +66,7 @@ namespace app
         return getProfile(_activeProfileId.value());
     }
 
-    std::optional<std::string_view> ProfileStore::getActiveProfileName() const
+    std::optional<std::string> ProfileStore::getActiveProfileName() const
     {
         if (const auto profile = getActiveProfile())
             return profile->getName();

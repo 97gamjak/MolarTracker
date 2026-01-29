@@ -66,9 +66,8 @@ namespace app
         [[nodiscard]] ProfileStoreResult setActiveProfile(
             std::optional<std::string_view> name
         );
-        [[nodiscard]] std::optional<Profile>          getActiveProfile() const;
-        [[nodiscard]] std::optional<std::string_view> getActiveProfileName(
-        ) const;
+        [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
+        [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 
         [[nodiscard]] bool hasPendingChanges() const;
 
