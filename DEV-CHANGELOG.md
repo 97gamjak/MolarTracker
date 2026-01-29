@@ -39,6 +39,12 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Bugs
 
+#### ORM
+
+- Fix `index_seq` to return an index sequence with a correct length
+
+#### Utils
+
 - Update `Timestamp` to format local time using the current time zone instead of UTC
 
 ### Cleanup

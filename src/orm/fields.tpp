@@ -14,8 +14,8 @@ namespace orm
 {
     // TODO(97gamjak): extract this to mstd
     // https://97gamjak.atlassian.net/browse/MSTD-84
-    template <size_t... Indices>
-    using index_seq = std::make_index_sequence<sizeof...(Indices)>;
+    template <std::size_t N>
+    using index_seq = std::make_index_sequence<N>;
 
     // TODO(97gamjak): extract this to mstd
     // https://97gamjak.atlassian.net/browse/MSTD-85
