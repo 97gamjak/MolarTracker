@@ -29,8 +29,8 @@ namespace ui
         bool _setAsActive  = false;
         bool _setAsDefault = false;
 
-        std::optional<std::string_view> _activeProfileBeforeAdd  = std::nullopt;
-        std::optional<std::string>      _defaultProfileBeforeAdd = std::nullopt;
+        std::optional<std::string> _activeProfileBeforeAdd  = std::nullopt;
+        std::optional<std::string> _defaultProfileBeforeAdd = std::nullopt;
 
        public:
         AddProfileCommand(
