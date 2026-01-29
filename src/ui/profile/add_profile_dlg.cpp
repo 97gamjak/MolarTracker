@@ -1,21 +1,32 @@
 #include "ui/profile/add_profile_dlg.hpp"
 
+#include <QCheckBox>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
+#include "settings/settings.hpp"
+#include "ui/undo_redo/add_profile_command.hpp"
+#include "ui/undo_redo/undo_stack.hpp"
 
 namespace ui
 {
 
     AddProfileDialog::AddProfileDialog(
-        app::ProfileStore& profileStore,
-        QWidget*           parent
+        app::ProfileStore&  profileStore,
+        settings::Settings& settings,
+        UndoStack&          undoStack,
+        QWidget*            parent
     )
-        : QDialog{parent}, _profileStore{profileStore}
+        : QDialog{parent},
+          _profileStore{profileStore},
+          _settings{settings},
+          _undoStack{undoStack}
     {
         setWindowTitle("Add New Profile");
         resize(400, 200);
@@ -25,28 +36,17 @@ namespace ui
 
     void AddProfileDialog::accept()
     {
-        // You can add validation logic here if needed
-        const auto draft = getProfile();
+        const auto result = _undoStack.makeAndDo<AddProfileCommand>(
+            _profileStore,
+            _settings,
+            getProfile(),
+            _setActiveCheckBox->isChecked(),
+            _setAsDefaultCheckBox->isChecked()
+        );
 
-        const auto result = _profileStore.addProfile(draft);
+        if (!result)
+            return;
 
-        if (result != app::ProfileStoreResult::Ok)
-        {
-            // Handle errors (e.g., show a message box) if needed
-        }
-
-        if (_setAsActive)
-        {
-            const auto _result = _profileStore.setActiveProfile(draft.name);
-            if (_result != app::ProfileStoreResult::Ok)
-            {
-                // Handle error if needed
-            }
-            else
-            {
-                // add logging
-            }
-        }
         QDialog::accept();
     }
 
@@ -54,8 +54,17 @@ namespace ui
     {
         QDialog::setModal(true);
 
-        auto* mainLayout = new QVBoxLayout{this};
+        _mainLayout = new QVBoxLayout{this};
 
+        _buildFormSection();
+
+        _buildToggleSection();
+
+        _buildButtonSection();
+    }
+
+    void AddProfileDialog::_buildFormSection()
+    {
         auto* formLayout = new QFormLayout{};
         _nameLineEdit    = new QLineEdit{this};
         formLayout->addRow(new QLabel{"Name:"}, _nameLineEdit);
@@ -63,8 +72,29 @@ namespace ui
         _emailLineEdit = new QLineEdit{this};
         formLayout->addRow(new QLabel{"Email:"}, _emailLineEdit);
 
-        mainLayout->addLayout(formLayout);
+        _mainLayout->addLayout(formLayout);
+    }
 
+    void AddProfileDialog::_buildToggleSection()
+    {
+        auto* toggleLayout = new QHBoxLayout{};
+
+        _setActiveCheckBox = new QCheckBox{"Set as Active Profile", this};
+        toggleLayout->addWidget(_setActiveCheckBox);
+
+        _setAsDefaultCheckBox = new QCheckBox{"Set as Default Profile", this};
+        toggleLayout->addWidget(_setAsDefaultCheckBox);
+
+        _setActiveCheckBox->setChecked(false);
+        _setAsDefaultCheckBox->setChecked(false);
+
+        _updateToggleStates();
+
+        _mainLayout->addLayout(toggleLayout);
+    }
+
+    void AddProfileDialog::_buildButtonSection()
+    {
         auto* buttonLayout = new QHBoxLayout{};
 
         _addProfileButton = new QPushButton{"Add Profile", this};
@@ -80,7 +110,14 @@ namespace ui
         buttonLayout->addWidget(_cancelButton);
         connect(_cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-        mainLayout->addLayout(buttonLayout);
+        _mainLayout->addLayout(buttonLayout);
+    }
+
+    void AddProfileDialog::setEnforceDefaultProfile(bool value)
+    {
+        _enforceDefaultProfile = value;
+
+        _updateToggleStates();
     }
 
     drafts::ProfileDraft AddProfileDialog::getProfile() const
@@ -89,6 +126,22 @@ namespace ui
             _nameLineEdit->text().toStdString(),
             _emailLineEdit->text().toStdString()
         };
+    }
+
+    void AddProfileDialog::_updateToggleStates()
+    {
+        if (!_enforceDefaultProfile)
+        {
+            _setActiveCheckBox->setEnabled(true);
+            _setAsDefaultCheckBox->setEnabled(true);
+        }
+        else
+        {
+            _setActiveCheckBox->setChecked(true);
+            _setActiveCheckBox->setEnabled(false);
+            _setAsDefaultCheckBox->setChecked(true);
+            _setAsDefaultCheckBox->setEnabled(false);
+        }
     }
 
 }   // namespace ui

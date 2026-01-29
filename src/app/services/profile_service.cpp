@@ -32,9 +32,13 @@ namespace app
         return _profileRepo.create(name, email);
     }
 
-    void ProfileService::rename(ProfileId id, const std::string& newName)
+    void ProfileService::update(
+        ProfileId                         id,
+        const std::string&                newName,
+        const std::optional<std::string>& newEmail
+    )
     {
-        _profileRepo.rename(id, newName);
+        _profileRepo.update(id, newName, newEmail);
     }
 
     void ProfileService::remove(ProfileId id) { _profileRepo.remove(id); }

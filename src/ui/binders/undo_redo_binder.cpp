@@ -31,9 +31,12 @@ namespace ui
             &UndoRedoBinder::_onRedoRequested
         );
 
-        // If you add this signal later, you get automatic refresh everywhere:
-        // connect(&_undoStack, &UndoStack::changed, this,
-        // &UndoRedoBinder::refresh);
+        connect(
+            &_undoStack,
+            &UndoStack::changed,
+            this,
+            &UndoRedoBinder::refresh
+        );
 
         refresh();
     }
@@ -42,14 +45,12 @@ namespace ui
     {
         _undoStack.undo();
         _mainWindow.statusBar()->showMessage("Undo requested");
-        refresh();
     }
 
     void UndoRedoBinder::_onRedoRequested()
     {
         _undoStack.redo();
         _mainWindow.statusBar()->showMessage("Redo requested");
-        refresh();
     }
 
     void UndoRedoBinder::refresh()

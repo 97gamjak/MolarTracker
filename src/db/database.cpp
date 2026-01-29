@@ -3,11 +3,15 @@
 #include <sqlite3.h>
 
 #include <filesystem>
+#include <format>
 #include <string>
 #include <utility>
 
 #include "db_exception.hpp"
 #include "statement.hpp"
+
+#define __LOG_CATEGORY__ LogCategory::database
+#include "logging/log_macros.hpp"
 
 namespace db
 {
@@ -215,6 +219,8 @@ namespace db
 
             throw SqliteError(msg);
         }
+
+        LOG_DEBUG(std::format("Prepared SQL statement: {}", sql));
 
         return Statement{_db, prepared_statement, std::string(sql)};
     }

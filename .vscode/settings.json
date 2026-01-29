@@ -108,7 +108,8 @@
         "qstringlist": "cpp",
         "__tree": "cpp",
         "filesystem": "cpp",
-        "qdialogbuttonbox": "cpp"
+        "qdialogbuttonbox": "cpp",
+        "qlineedit": "cpp"
     },
     "cSpell.words": [
         "MSTD"

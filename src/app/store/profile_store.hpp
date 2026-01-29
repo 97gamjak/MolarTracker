@@ -57,12 +57,17 @@ namespace app
        public:
         explicit ProfileStore(IProfileService& profileService);
 
+        void reload();
+
         [[nodiscard]] bool hasProfiles() const;
 
         [[nodiscard]] std::vector<std::string> getAllProfileNames() const;
 
-        [[nodiscard]] ProfileStoreResult     setActiveProfile(std::string_view);
-        [[nodiscard]] std::optional<Profile> getActiveProfile() const;
+        [[nodiscard]] ProfileStoreResult setActiveProfile(
+            std::optional<std::string_view> name
+        );
+        [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
+        [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 
         [[nodiscard]] bool hasPendingChanges() const;
 
@@ -75,33 +80,30 @@ namespace app
             const drafts::ProfileDraft& draft
         );
 
-        // // ----- observation -----
-        // using Observer = std::function<void()>;
-        // Subscription subscribe(Observer observer);
-
-        // // ----- lifecycle -----
-        // void reload();    // load from DB into store
-        // void discard();   // drop in-memory changes -> back to last reload()
-
-        // // ----- mutations (in-memory only) -----
-        // ProfileId createProfile(
-        //     std::string                name,
-        //     std::optional<std::string> email = std::nullopt
-        // );
-        // void renameProfile(ProfileId id, std::string newName);
-        // void setActiveProfile(ProfileId id);
-        // void deleteProfile(ProfileId id);
+        [[nodiscard]] ProfileStoreResult removeProfile(
+            const drafts::ProfileDraft& draft
+        );
 
         void commit() override;
 
        private:
-        // void notify();
+        [[nodiscard]] static std::string _normalizeName(std::string_view name);
+        [[nodiscard]] ProfileId          _generateNewId();
+        [[nodiscard]] bool               _isDeleted(ProfileId id) const;
 
-        [[nodiscard]] static std::string normalizeName(std::string_view name);
+        [[nodiscard]] std::optional<Profile> _findProfile(ProfileId id) const;
+        [[nodiscard]] std::optional<Profile> _findProfile(
+            std::string_view name
+        ) const;
 
-        [[nodiscard]] ProfileId _generateNewId();
+        void _removeInternal(ProfileId id);
+        void _removeInternal(std::string_view name);
 
-        // void chooseFallbackActiveIfInvalid();
+        void _updateInternal(
+            ProfileId                  id,
+            std::string_view           newName,
+            std::optional<std::string> newEmail
+        );
     };
 
 }   // namespace app

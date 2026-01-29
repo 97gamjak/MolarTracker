@@ -32,7 +32,9 @@ namespace app
         const std::string                getName() const noexcept { return _name; }
         const std::optional<std::string> getEmail() const noexcept { return _email; }
 
+        void setId(ProfileId newId) { _id = newId; }
         void setName(const std::string& newName) { _name = newName; }
+        void setEmail(const std::optional<std::string>& newEmail) { _email = newEmail; }
         // clang-format on
     };
 

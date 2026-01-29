@@ -105,14 +105,29 @@ namespace app
         return createdProfile->getId();
     }
 
-    void ProfileRepo::rename(ProfileId /*id*/, const std::string& /*newName*/)
+    void ProfileRepo::update(
+        ProfileId                         id,
+        const std::string&                newName,
+        const std::optional<std::string>& newEmail
+    )
     {
-        // TODO: Implement database update logic
+        const auto existingProfileOpt = get(id);
+        if (!existingProfileOpt.has_value())
+        {
+            throw std::runtime_error(
+                std::format("Profile with ID {} not found", id.value())
+            );
+        }
+
+        const auto& existingProfile = existingProfileOpt.value();
+        Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
+
+        orm::update(_db, toRow(updatedProfile));
     }
 
-    void ProfileRepo::remove(ProfileId /*id*/)
+    void ProfileRepo::remove(ProfileId id)
     {
-        // TODO: Implement database deletion logic
+        orm::delete_by_pk<ProfileRow>(_db, id);
     }
 
 }   // namespace app

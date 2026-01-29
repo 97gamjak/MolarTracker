@@ -31,6 +31,7 @@ namespace settings
         [[nodiscard]] bool                       has_default_profile() const;
         [[nodiscard]] std::optional<std::string> get_default_profile_name(
         ) const;
+        void set_default_profile_name(const std::optional<std::string>& name);
         void set_default_profile_name(const std::string& name);
 
        private:
