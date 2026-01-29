@@ -23,6 +23,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### UI
 
 - Create `MolarTrackerApplication` wrapper for a cleaner setup
+- Add `OK` and `Cancel` button to profile selection dialog (logic still missing)
 
 #### Logging
 

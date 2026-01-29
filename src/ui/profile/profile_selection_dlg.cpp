@@ -1,5 +1,7 @@
 #include "ui/profile/profile_selection_dlg.hpp"
 
+#include <QDialogButtonBox>
+#include <QListWidget>
 #include <QVBoxLayout>
 
 namespace ui
@@ -27,6 +29,12 @@ namespace ui
             _profileListWidget->addItem(QString::fromStdString(profileName));
         }
         mainLayout->addWidget(_profileListWidget);
+
+        _buttonBox = new QDialogButtonBox{
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            this
+        };
+        mainLayout->addWidget(_buttonBox);
     }
 
 }   // namespace ui

@@ -2,8 +2,10 @@
 #define __UI__PROFILE__PROFILE_SELECTION_DLG_HPP__
 
 #include <QDialog>
-#include <QListWidget>
 #include <vector>
+
+class QListWidget;        // Forward declaration
+class QDialogButtonBox;   // Forward declaration
 
 namespace ui
 {
@@ -12,7 +14,8 @@ namespace ui
         Q_OBJECT
 
        private:
-        QListWidget* _profileListWidget = nullptr;
+        QListWidget*      _profileListWidget = nullptr;
+        QDialogButtonBox* _buttonBox         = nullptr;
 
        public:
         explicit ProfileSelectionDialog(
