@@ -120,11 +120,7 @@ namespace app
         }
 
         const auto& existingProfile = existingProfileOpt.value();
-        Profile     updatedProfile{
-            existingProfile.getId(),
-            newName,
-            newEmail.has_value() ? newEmail : existingProfile.getEmail()
-        };
+        Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
         orm::update(_db, toRow(updatedProfile));
     }

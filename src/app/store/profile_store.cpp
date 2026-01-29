@@ -307,6 +307,11 @@ namespace app
                     _profileStates.emplace(newId, StoreState::Clean);
                     _usedIds.insert(newId);
                     p.setId(newId);
+                    if (_activeProfileId.has_value() &&
+                        _activeProfileId.value() == p.getId())
+                    {
+                        _activeProfileId = newId;
+                    }
                 }
                 else
                     _profileStates[p.getId()] = StoreState::Clean;
