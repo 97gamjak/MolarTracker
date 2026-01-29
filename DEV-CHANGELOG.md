@@ -6,6 +6,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Features
 
+#### Profile Management
+
+- Add UndoStack command for add profiles in a clean and persistent way
+
 #### Utils
 
 - Implement `Timestamp` static utility class (will be migrated to mstd in the future)
