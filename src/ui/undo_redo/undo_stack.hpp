@@ -4,6 +4,7 @@
 #include <QObject>
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "command.hpp"
 
