@@ -152,10 +152,20 @@ namespace app
             if (_profileStates[p.getId()] == StoreState::New)
             {
                 // TODO: handle ID assignment properly
-                _profileService.create(p.getName(), p.getEmail());
-                _profileStates[p.getId()] = StoreState::Clean;
+                const auto newId =
+                    _profileService.create(p.getName(), p.getEmail());
+                if (newId != p.getId())
+                {
+                    // TODO: handle this is a centralized manner
+                    _profileStates.erase(p.getId());
+                    _usedIds.erase(p.getId());
+                    _profileStates.emplace(newId, StoreState::Clean);
+                    _usedIds.insert(newId);
+                }
+                else
+                    _profileStates[p.getId()] = StoreState::Clean;
+
                 continue;
-                ;
             }
 
             if (_profileStates[p.getId()] == StoreState::Modified)

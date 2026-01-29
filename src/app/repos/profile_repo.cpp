@@ -1,5 +1,6 @@
 #include "profile_repo.hpp"
 
+#include <format>
 #include <optional>
 #include <vector>
 
@@ -74,11 +75,34 @@ namespace app
     }
 
     ProfileId ProfileRepo::create(
-        const std::string& /*name*/,
-        std::optional<std::string> /*email*/
+        const std::string&         name,
+        std::optional<std::string> email
     )
     {
-        return ProfileId::invalid();
+        const auto rowId =
+            orm::insert(_db, toRow(Profile{ProfileId::from(0), name, email}));
+
+        if (rowId <= 0)
+        {
+            // TODO: introduce MT specific error handling
+            throw std::runtime_error(
+                std::format("Failed to insert new profile with name '{}'", name)
+            );
+        }
+
+        const auto createdProfile = get(name);
+        if (!createdProfile.has_value())
+        {
+            // TODO: introduce MT specific error handling
+            throw std::runtime_error(
+                std::format(
+                    "Failed to retrieve newly created profile with name '{}'",
+                    name
+                )
+            );
+        }
+
+        return createdProfile->getId();
     }
 
     void ProfileRepo::rename(ProfileId /*id*/, const std::string& /*newName*/)
