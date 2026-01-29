@@ -1,5 +1,7 @@
 #include "add_profile_command.hpp"
 
+#include <format>
+
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "settings/settings.hpp"
