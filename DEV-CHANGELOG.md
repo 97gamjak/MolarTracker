@@ -9,12 +9,17 @@ All changes and updates, that are relevant for developers will be documented her
 #### Profile Management
 
 - Add UndoStack command for add profiles in a clean and persistent way
+- Add error handling for add profile commands
 
 #### Utils
 
 - Implement `Timestamp` static utility class (will be migrated to mstd in the future)
 - Implement `RingFile` class for logging (will be migrated to mstd in the future)
 - Implement smart config paths for Linux and Windows
+
+#### Commands
+
+- Add `ICommandError` for better handling error cases in commands
 
 #### Config
 
