@@ -1,5 +1,5 @@
-#ifndef __UI__UNDO_REDO__UNDO_STACK_HPP__
-#define __UI__UNDO_REDO__UNDO_STACK_HPP__
+#ifndef __UI__COMMANDS__UNDO_STACK_HPP__
+#define __UI__COMMANDS__UNDO_STACK_HPP__
 
 #include <QObject>
 #include <memory>
@@ -45,4 +45,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__UNDO_REDO__UNDO_STACK_HPP__
+#endif   // __UI__COMMANDS__UNDO_STACK_HPP__

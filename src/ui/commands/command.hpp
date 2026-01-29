@@ -1,5 +1,5 @@
-#ifndef __UI__UNDO_REDO__COMMAND_HPP__
-#define __UI__UNDO_REDO__COMMAND_HPP__
+#ifndef __UI__COMMANDS__COMMAND_HPP__
+#define __UI__COMMANDS__COMMAND_HPP__
 
 #include <string>
 
@@ -23,4 +23,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__UNDO_REDO__COMMAND_HPP__
+#endif   // __UI__COMMANDS__COMMAND_HPP__
