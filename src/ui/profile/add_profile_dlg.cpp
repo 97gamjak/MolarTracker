@@ -36,13 +36,17 @@ namespace ui
 
     void AddProfileDialog::accept()
     {
-        _undoStack.make_and_do<AddProfileCommand>(
+        const auto result = _undoStack.make_and_do<AddProfileCommand>(
             _profileStore,
             _settings,
             getProfile(),
             _setActiveCheckBox->isChecked(),
             _setAsDefaultCheckBox->isChecked()
         );
+
+        if (!result)
+            return;
+
         QDialog::accept();
     }
 
