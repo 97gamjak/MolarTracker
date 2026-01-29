@@ -205,15 +205,6 @@ namespace app
                 _profileService.remove(p.getId());
                 _usedIds.erase(p.getId());
                 _profileStates.erase(p.getId());
-                _profiles.erase(
-                    std::remove_if(
-                        _profiles.begin(),
-                        _profiles.end(),
-                        [&p](const Profile& profile)
-                        { return profile.getId() == p.getId(); }
-                    ),
-                    _profiles.end()
-                );
 
                 LOG_INFO(
                     std::format(
