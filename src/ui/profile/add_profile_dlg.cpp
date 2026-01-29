@@ -1,4 +1,4 @@
-#include "ui/profile/add_profile_dlg.hpp"
+#include "add_profile_dlg.hpp"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -11,8 +11,8 @@
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "settings/settings.hpp"
-#include "ui/undo_redo/add_profile_command.hpp"
-#include "ui/undo_redo/undo_stack.hpp"
+#include "ui/commands/add_profile_command.hpp"
+#include "ui/commands/undo_stack.hpp"
 
 namespace ui
 {

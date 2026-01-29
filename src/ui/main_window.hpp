@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include "undo_redo/undo_stack.hpp"
+#include "commands/undo_stack.hpp"
 
 namespace app
 {
