@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 
 #include <filesystem>
+#include <format>
 #include <string>
 #include <utility>
 
