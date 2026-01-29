@@ -438,7 +438,6 @@ namespace orm
         std::string sql_text;
         sql_text += "DELETE FROM ";
         sql_text += Model::table_name;
-        ;
         sql_text += " WHERE ";
 
         bool where_is_present = false;
