@@ -36,7 +36,7 @@ namespace ui
 
     void AddProfileDialog::accept()
     {
-        const auto result = _undoStack.make_and_do<AddProfileCommand>(
+        const auto result = _undoStack.makeAndDo<AddProfileCommand>(
             _profileStore,
             _settings,
             getProfile(),

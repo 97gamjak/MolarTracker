@@ -3,7 +3,7 @@
 namespace ui
 {
 
-    bool UndoStack::do_(std::unique_ptr<ICommand> command)
+    bool UndoStack::_do(std::unique_ptr<ICommand> command)
     {
         if (!command)
             return false;

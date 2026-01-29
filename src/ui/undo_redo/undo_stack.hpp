@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "command.hpp"
 
@@ -24,13 +24,11 @@ namespace ui
 
        public:
         template <typename Cmd, typename... Args>
-        bool make_and_do(Args&&... args)
+        bool makeAndDo(Args&&... args)
         {
             auto cmd = std::make_unique<Cmd>(std::forward<Args>(args)...);
-            return do_(std::move(cmd));
+            return _do(std::move(cmd));
         }
-
-        bool do_(std::unique_ptr<ICommand> command);
 
         bool canUndo() const;
         bool canRedo() const;
@@ -40,6 +38,9 @@ namespace ui
 
         std::string undoLabel() const;
         std::string redoLabel() const;
+
+       private:
+        bool _do(std::unique_ptr<ICommand> command);
     };
 
 }   // namespace ui
