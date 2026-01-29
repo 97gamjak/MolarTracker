@@ -1,6 +1,9 @@
 #ifndef __UI__UNDO_REDO__ADD_PROFILE_COMMAND_HPP__
 #define __UI__UNDO_REDO__ADD_PROFILE_COMMAND_HPP__
 
+#include <optional>
+#include <string_view>
+
 #include "command.hpp"
 #include "drafts/profile_draft.hpp"
 
