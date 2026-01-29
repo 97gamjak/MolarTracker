@@ -3,7 +3,8 @@
 
 #include <compare>
 #include <cstdint>
-#include <iostream>
+#include <ostream>
+#include <string>
 #include <typeinfo>
 
 template <class Tag, class Rep = std::int64_t>
