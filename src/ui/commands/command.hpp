@@ -1,7 +1,10 @@
 #ifndef __UI__COMMANDS__COMMAND_HPP__
 #define __UI__COMMANDS__COMMAND_HPP__
 
+#include <expected>
 #include <string>
+
+#include "command_error.hpp"
 
 namespace ui
 {
@@ -15,8 +18,8 @@ namespace ui
        public:
         virtual ~ICommand() = default;
 
-        virtual void undo() = 0;
-        virtual bool redo() = 0;
+        virtual void                                 undo() = 0;
+        virtual std::expected<void, CommandErrorPtr> redo() = 0;
 
         virtual std::string label() const = 0;
     };

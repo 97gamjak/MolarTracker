@@ -78,23 +78,24 @@ namespace app
      * @param name
      * @return ProfileStoreResult
      */
-    ProfileStoreResult ProfileStore::setActiveProfile(
-        std::optional<std::string_view> name
-    )
+    void ProfileStore::setActiveProfile(std::optional<std::string_view> name)
     {
         if (!name.has_value())
         {
             _activeProfileId.reset();
-            return ProfileStoreResult::Ok;
+            return;
         }
 
         const auto profile = getProfile(name.value());
         if (!profile)
-            return ProfileStoreResult::ProfileNotFound;
+        {
+            // TODO: make here MT specific error handling
+            throw std::runtime_error(
+                std::format("Profile '{}' not found", name.value())
+            );
+        }
 
         _activeProfileId = profile->getId();
-
-        return ProfileStoreResult::Ok;
     }
 
     /**

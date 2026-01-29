@@ -108,21 +108,11 @@ namespace ui
             }
             else
             {
-                const auto result = profileStore.setActiveProfile(name);
-                if (result != app::ProfileStoreResult::Ok)
-                {
-                    // TODO: create error message!!!
-                    return;
-                }
-                else
-                {
-                    statusBar()->showMessage(
-                        QString::fromStdString(
-                            "Loaded default profile: " + name
-                        )
-                    );
-                    return;
-                }
+                profileStore.setActiveProfile(name);
+                statusBar()->showMessage(
+                    QString::fromStdString("Loaded default profile: " + name)
+                );
+                return;
             }
         }
         else

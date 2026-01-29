@@ -1,6 +1,7 @@
 add_library(molartracker_commands_ui STATIC
     undo_stack.cpp
     add_profile_command.cpp
+    add_profile_command_error.cpp
 )
 
 target_include_directories(molartracker_commands_ui

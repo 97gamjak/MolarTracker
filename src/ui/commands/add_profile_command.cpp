@@ -1,7 +1,9 @@
 #include "add_profile_command.hpp"
 
+#include <expected>
 #include <format>
 
+#include "add_profile_command_error.hpp"
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "settings/settings.hpp"
@@ -30,9 +32,15 @@ namespace ui
     {
         const auto result = _profileStore.removeProfile(_profile);
 
-        if (result != app::ProfileStoreResult::Ok)
+        if (result == app::ProfileStoreResult::ProfileNotFound)
         {
-            // Handle errors (e.g., show a message box) if needed
+            // TODO: think about handling errors also on undo
+            LOG_ERROR(
+                std::format(
+                    "Failed to undo add profile: '{}' not found",
+                    _profile.name
+                )
+            );
         }
         else
         {
@@ -41,24 +49,16 @@ namespace ui
 
         if (_setAsActive)
         {
-            const auto _result =
-                _profileStore.setActiveProfile(_activeProfileBeforeAdd);
+            _profileStore.setActiveProfile(_activeProfileBeforeAdd);
 
-            if (_result != app::ProfileStoreResult::Ok)
-            {
-                // Handle error if needed
-            }
-            else
-            {
-                LOG_INFO(
-                    std::format(
-                        "Active profile restored to '{}'",
-                        _activeProfileBeforeAdd.has_value()
-                            ? std::string{_activeProfileBeforeAdd.value()}
-                            : "none"
-                    )
-                );
-            }
+            LOG_INFO(
+                std::format(
+                    "Active profile restored to '{}'",
+                    _activeProfileBeforeAdd.has_value()
+                        ? std::string{_activeProfileBeforeAdd.value()}
+                        : "none"
+                )
+            );
         }
 
         if (_setAsDefault)
@@ -75,33 +75,51 @@ namespace ui
         }
     }
 
-    bool AddProfileCommand::redo()
+    std::expected<void, CommandErrorPtr> AddProfileCommand::redo()
     {
         const auto result = _profileStore.addProfile(_profile);
 
-        if (result != app::ProfileStoreResult::Ok)
+        if (result == app::ProfileStoreResult::Ok)
         {
-            // Handle errors (e.g., show a message box) if needed
+            LOG_INFO(std::format("Profile added: '{}'", _profile.name));
+        }
+        else if (result == app::ProfileStoreResult::NameAlreadyExists)
+        {
+            const auto errorMessage =
+                std::format("Profile name '{}' already exists", _profile.name);
+
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> errorMessagePtr =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::NameAlreadyExists
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
         else
         {
-            LOG_INFO(std::format("Profile added: '{}'", _profile.name));
+            const auto errorMessage =
+                std::format("Unknown error adding profile '{}'", _profile.name);
+
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> errorMessagePtr =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::UnknownError
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
         if (_setAsActive)
         {
             _activeProfileBeforeAdd = _profileStore.getActiveProfileName();
-            const auto _result = _profileStore.setActiveProfile(_profile.name);
-            if (_result != app::ProfileStoreResult::Ok)
-            {
-                // Handle error if needed
-            }
-            else
-            {
-                LOG_INFO(
-                    std::format("Active profile set to '{}'", _profile.name)
-                );
-            }
+            _profileStore.setActiveProfile(_profile.name);
+
+            LOG_INFO(std::format("Active profile set to '{}'", _profile.name));
         }
 
         if (_setAsDefault)
@@ -111,7 +129,7 @@ namespace ui
             LOG_INFO(std::format("Default profile set to '{}'", _profile.name));
         }
 
-        return true;
+        return std::expected<void, CommandErrorPtr>{};
     }
 
     std::string AddProfileCommand::label() const

@@ -42,8 +42,8 @@ namespace ui
         );
         ~AddProfileCommand() override = default;
 
-        void undo() override;
-        bool redo() override;
+        void                                 undo() override;
+        std::expected<void, CommandErrorPtr> redo() override;
 
         std::string label() const override;
     };
