@@ -110,9 +110,9 @@ namespace app
         // TODO: Implement database update logic
     }
 
-    void ProfileRepo::remove(ProfileId /*id*/)
+    void ProfileRepo::remove(ProfileId id)
     {
-        // TODO: Implement database deletion logic
+        orm::delete_by_pk<ProfileRow>(_db, id);
     }
 
 }   // namespace app

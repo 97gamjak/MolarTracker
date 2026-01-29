@@ -28,6 +28,13 @@ namespace settings
         return _defaultProfileName;
     }
 
+    void Settings::set_default_profile_name(
+        const std::optional<std::string>& name
+    )
+    {
+        _defaultProfileName = name;
+    }
+
     void Settings::set_default_profile_name(const std::string& name)
     {
         _defaultProfileName = name;

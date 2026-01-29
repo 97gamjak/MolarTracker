@@ -4,12 +4,14 @@
 #include <cstddef>
 #include <mstd/enum.hpp>
 
-#define LOG_CATEGORY(X)           \
-    X(app_service_profileService) \
-    X(app_storeContainer)         \
-    X(app_store_ProfileStore)     \
-    X(ui_mainWindow)              \
-    X(ui_logging)                 \
+#define LOG_CATEGORY(X)             \
+    X(app_service_profileService)   \
+    X(app_storeContainer)           \
+    X(app_store_ProfileStore)       \
+    X(ui_command_AddProfileCommand) \
+    X(ui_mainWindow)                \
+    X(ui_logging)                   \
+    X(database)                     \
     X(logging_manager)
 
 MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)

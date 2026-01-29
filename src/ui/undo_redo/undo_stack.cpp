@@ -3,19 +3,29 @@
 namespace ui
 {
 
-    void UndoStack::pushAndRedo(std::unique_ptr<ICommand> command)
+    bool UndoStack::do_(std::unique_ptr<ICommand> command)
     {
-        // If we are not at the end of the stack, remove all commands after the
-        // cursor
+        if (!command)
+            return false;
+
+        // Execute first; only push on success.
+        if (!command->redo())
+            return false;
+
+        // Drop redo history (everything after cursor).
         if (_cursor < _commands.size())
+        {
             _commands.erase(
-                _commands.begin() + static_cast<long int>(_cursor),
+                _commands.begin() + static_cast<std::ptrdiff_t>(_cursor),
                 _commands.end()
             );
+        }
 
-        command->redo();
         _commands.push_back(std::move(command));
         _cursor = _commands.size();
+
+        emit changed();
+        return true;
     }
 
     bool UndoStack::canUndo() const { return _cursor > 0; }
@@ -29,15 +39,24 @@ namespace ui
 
         --_cursor;
         _commands[_cursor]->undo();
+
+        emit changed();
     }
 
-    void UndoStack::redo()
+    bool UndoStack::redo()
     {
         if (!canRedo())
-            return;
+            return false;
 
-        _commands[_cursor]->redo();
+        // Policy: if redo fails, keep cursor unchanged and do not advance.
+        if (!_commands[_cursor]->redo())
+            return false;
+
         ++_cursor;
+
+        emit changed();
+
+        return true;
     }
 
     std::string UndoStack::undoLabel() const

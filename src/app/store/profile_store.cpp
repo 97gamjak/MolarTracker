@@ -39,9 +39,17 @@ namespace app
         return names;
     }
 
-    ProfileStoreResult ProfileStore::setActiveProfile(std::string_view name)
+    ProfileStoreResult ProfileStore::setActiveProfile(
+        std::optional<std::string_view> name
+    )
     {
-        const auto profile = getProfile(name);
+        if (!name.has_value())
+        {
+            _activeProfileId.reset();
+            return ProfileStoreResult::Ok;
+        }
+
+        const auto profile = getProfile(name.value());
         if (!profile)
             return ProfileStoreResult::ProfileNotFound;
 
@@ -56,6 +64,14 @@ namespace app
             return std::nullopt;
 
         return getProfile(_activeProfileId.value());
+    }
+
+    std::optional<std::string_view> ProfileStore::getActiveProfileName() const
+    {
+        if (const auto profile = getActiveProfile())
+            return profile->getName();
+
+        return std::nullopt;
     }
 
     bool ProfileStore::hasPendingChanges() const
@@ -81,12 +97,12 @@ namespace app
 
     std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
     {
-        const std::string normalized = normalizeName(name);
+        const std::string normalized = _normalizeName(name);
 
         const auto it = std::ranges::find_if(
             _profiles,
             [&normalized](const Profile& p)
-            { return normalizeName(p.getName()) == normalized; }
+            { return _normalizeName(p.getName()) == normalized; }
         );
 
         if (it == _profiles.end())
@@ -117,35 +133,38 @@ namespace app
         return ProfileStoreResult::Ok;
     }
 
-    // Subscription ProfileStore::subscribe(Observer observer)
-    // {
-    //     const std::size_t id = ++_nextObserverId;
-    //     _observers.emplace(id, std::move(observer));
-    //     return Subscription{
-    //         [this](std::size_t observerId) { _observers.erase(observerId); },
-    //         id
-    //     };
-    // }
+    ProfileStoreResult ProfileStore::removeProfile(
+        const drafts::ProfileDraft& draft
+    )
+    {
+        // TODO: centralize name normalization and finding logic
+        const auto it = std::ranges::find_if(
+            _profiles,
+            [&draft](const Profile& p)
+            {
+                return _normalizeName(p.getName()) ==
+                       _normalizeName(draft.name);
+            }
+        );
 
-    // void ProfileStore::reload()
-    // {
-    //     _profiles = _profileService.getAllProfiles();
+        if (it == _profiles.end())
+            return ProfileStoreResult::ProfileNotFound;
 
-    //     notify();
-    // }
+        const ProfileId idToRemove = it->getId();
+        _profileStates[idToRemove] = StoreState::Deleted;
+        // Optionally remove from _profiles here or during commit
+        return ProfileStoreResult::Ok;
+    }
+
+    void ProfileStore::reload() { _profiles = _profileService.getAll(); }
 
     void ProfileStore::commit()
     {
         if (!hasPendingChanges())
         {
-            LOG_DEBUG("No changes to commit in ProfileStore");
+            LOG_DEBUG("No changes to save in ProfileStore");
             return;
         }
-
-        // Minimal approach:
-        // - detect deletes (in baseline but not in current)
-        // - detect creates (in current but not in baseline)
-        // - detect updates (same id but different fields)
 
         for (const auto& p : _profiles)
         {
@@ -165,6 +184,10 @@ namespace app
                 else
                     _profileStates[p.getId()] = StoreState::Clean;
 
+                LOG_INFO(
+                    std::format("Profile '{}' saved to database", p.getName())
+                );
+
                 continue;
             }
 
@@ -179,27 +202,33 @@ namespace app
             if (_profileStates[p.getId()] == StoreState::Deleted)
             {
                 _profileService.remove(p.getId());
-                // Optionally remove from _profiles here
+                _usedIds.erase(p.getId());
+                _profileStates.erase(p.getId());
+                _profiles.erase(
+                    std::remove_if(
+                        _profiles.begin(),
+                        _profiles.end(),
+                        [&p](const Profile& profile)
+                        { return profile.getId() == p.getId(); }
+                    ),
+                    _profiles.end()
+                );
+
+                LOG_INFO(
+                    std::format(
+                        "Profile '{}' removed from database",
+                        p.getName()
+                    )
+                );
                 continue;
             }
             _profileStates[p.getId()] = StoreState::Clean;
         }
 
-        // TODO: handle deletions properly
-        // reload();
+        reload();
     }
 
-    // void ProfileStore::notify()
-    // {
-    //     const auto copy = _observers;
-    //     for (const auto& [_, observer] : copy)
-    //     {
-    //         if (observer)
-    //             observer();
-    //     }
-    // }
-
-    std::string ProfileStore::normalizeName(std::string_view name)
+    std::string ProfileStore::_normalizeName(std::string_view name)
     {
         // Policy: trim + case-insensitive
         // If you want case-sensitive, remove the tolower part.
@@ -238,16 +267,5 @@ namespace app
         _usedIds.insert(newId);
         return newId;
     }
-
-    // void ProfileStore::chooseFallbackActiveIfInvalid()
-    // {
-    //     if (_activeProfileId && findProfileById(*_activeProfileId))
-    //         return;
-
-    //     if (_profiles.empty())
-    //         _activeProfileId.reset();
-    //     else
-    //         _activeProfileId = _profiles.front().getId();
-    // }
 
 }   // namespace app

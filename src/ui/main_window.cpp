@@ -15,7 +15,6 @@
 #include "ui/menu_bar/menu_bar.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
-#include "ui/undo_redo/toggle_flag_command.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -75,6 +74,7 @@ namespace ui
     void MainWindow::_onSaveRequested()
     {
         _appContext.getStore().commit();
+        _appContext.getSettings().save();
         statusBar()->showMessage("Save requested");
     }
 
@@ -97,11 +97,11 @@ namespace ui
     void MainWindow::_ensureProfileExists()
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
-        auto& config       = _appContext.getSettings();
+        auto& settings     = _appContext.getSettings();
 
-        if (config.has_default_profile())
+        if (settings.has_default_profile())
         {
-            const auto name = config.get_default_profile_name().value();
+            const auto name = settings.get_default_profile_name().value();
             if (!profileStore.profileExists(name))
             {
                 // TODO: create error message!!!
@@ -145,11 +145,16 @@ namespace ui
             else
             {
                 statusBar()->showMessage("No profiles found.");
-                auto* dialog = new AddProfileDialog{profileStore, this};
-                dialog->setAsActive(true);
+                auto* dialog = new AddProfileDialog{
+                    profileStore,
+                    settings,
+                    _undoStack,
+                    this
+                };
                 dialog->setWindowTitle("Create your first profile");
                 dialog->setModal(true);
                 dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->setEnforceDefaultProfile(true);
                 utils::moveDialogToParentScreenCenter(dialog, this);
 
                 connect(

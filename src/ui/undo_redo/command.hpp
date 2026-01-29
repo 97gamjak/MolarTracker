@@ -16,7 +16,7 @@ namespace ui
         virtual ~ICommand() = default;
 
         virtual void undo() = 0;
-        virtual void redo() = 0;
+        virtual bool redo() = 0;
 
         virtual std::string label() const = 0;
     };

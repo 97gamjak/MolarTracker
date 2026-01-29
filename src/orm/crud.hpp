@@ -429,6 +429,53 @@ namespace orm
         return results;
     }
 
+    template <db_model Model, typename PrimaryKeyValue>
+    void delete_by_pk(db::Database& database, PrimaryKeyValue const& pk_value)
+    {
+        Model      empty_instance{};
+        auto const empty_field_views = orm::fields(empty_instance);
+
+        std::string sql_text;
+        sql_text += "DELETE FROM ";
+        sql_text += Model::table_name;
+        ;
+        sql_text += " WHERE ";
+
+        bool where_is_present = false;
+
+        for (FieldView const& field : empty_field_views)
+        {
+            if (!field.is_pk())
+            {
+                continue;
+            }
+
+            if (!where_is_present)
+            {
+                where_is_present  = true;
+                sql_text         += std::string{field.column_name()};
+                sql_text         += "=?";
+            }
+        }
+
+        if (!where_is_present)
+        {
+            throw std::runtime_error(
+                "orm::delete_by_pk requires a primary key field"
+            );
+        }
+
+        sql_text                += ";";
+        db::Statement statement  = database.prepare(sql_text);
+        orm::binder<db::Statement, PrimaryKeyValue>::bind(
+            statement,
+            1,
+            pk_value
+        );
+
+        statement.execute_to_completion();
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__CRUD_HPP__

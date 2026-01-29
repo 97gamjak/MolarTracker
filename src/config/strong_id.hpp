@@ -3,6 +3,8 @@
 
 #include <compare>
 #include <cstdint>
+#include <iostream>
+#include <typeinfo>
 
 template <class Tag, class Rep = std::int64_t>
 class StrongId final
@@ -40,6 +42,13 @@ class StrongId final
             return std::hash<Rep>{}(id.value());
         }
     };
+
+    // iostream support
+    friend std::ostream& operator<<(std::ostream& os, StrongId id)
+    {
+        os << std::string(typeid(Tag).name()) << "(" << id.value() << ")";
+        return os;
+    }
 
    private:
     Rep _value{};
