@@ -88,15 +88,22 @@ namespace app
 
        private:
         [[nodiscard]] static std::string _normalizeName(std::string_view name);
+        [[nodiscard]] ProfileId          _generateNewId();
+        [[nodiscard]] bool               _isDeleted(ProfileId id) const;
 
-        [[nodiscard]] ProfileId _generateNewId();
+        [[nodiscard]] std::optional<Profile> _findProfile(ProfileId id) const;
+        [[nodiscard]] std::optional<Profile> _findProfile(
+            std::string_view name
+        ) const;
 
-        // [[nodiscard]] std::optional<Profile> findProfileById(
-        //     ProfileId id
-        // ) const;
-        // [[nodiscard]] std::optional<Profile> findProfileByName(
-        //     std::string_view name
-        // ) const;
+        void _removeInternal(ProfileId id);
+        void _removeInternal(std::string_view name);
+
+        void _updateInternal(
+            ProfileId                  id,
+            std::string_view           newName,
+            std::optional<std::string> newEmail
+        );
     };
 
 }   // namespace app

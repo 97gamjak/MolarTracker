@@ -34,7 +34,11 @@ namespace app
             std::optional<std::string> email
         ) override;
 
-        void rename(ProfileId id, const std::string& newName) override;
+        void update(
+            ProfileId                         id,
+            const std::string&                newName,
+            const std::optional<std::string>& newEmail
+        ) override;
         void remove(ProfileId id) override;
     };
 

@@ -30,8 +30,13 @@ namespace app
             std::optional<std::string> email
         ) = 0;
 
-        virtual void rename(ProfileId id, const std::string& newName) = 0;
-        virtual void remove(ProfileId id)                             = 0;
+        virtual void update(
+            ProfileId                         id,
+            const std::string&                newName,
+            const std::optional<std::string>& newEmail
+        ) = 0;
+
+        virtual void remove(ProfileId id) = 0;
     };
 
 }   // namespace app
