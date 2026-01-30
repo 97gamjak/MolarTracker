@@ -145,7 +145,6 @@ namespace ui
                 dialog->setModal(true);
                 dialog->setAttribute(Qt::WA_DeleteOnClose);
                 dialog->setEnforceDefaultProfile(true);
-                utils::moveDialogToParentScreenCenter(dialog, this);
 
                 dialog->show();
                 dialog->raise();

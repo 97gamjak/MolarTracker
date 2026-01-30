@@ -13,10 +13,19 @@
 #include "settings/settings.hpp"
 #include "ui/commands/add_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
 
+    /**
+     * @brief Constructs a new Add Profile Dialog
+     *
+     * @param profileStore Reference to the Profile Store
+     * @param settings Reference to the Settings
+     * @param undoStack Reference to the Undo Stack
+     * @param parent Parent widget
+     */
     AddProfileDialog::AddProfileDialog(
         app::ProfileStore&  profileStore,
         settings::Settings& settings,
@@ -30,12 +39,22 @@ namespace ui
     {
         setWindowTitle("Add New Profile");
         resize(400, 200);
+        utils::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI();
     }
 
+    /**
+     * @brief Accepts the dialog and adds the new profile
+     *
+     * @note Overrides QDialog::accept()
+     */
     void AddProfileDialog::accept()
     {
+        // TODO(97gamjak): wait for std::expected implementation in UndoStack
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-80
+        // TODO(97gamjak): add error handling and display error message to user
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-73
         const auto result = _undoStack.makeAndDo<AddProfileCommand>(
             _profileStore,
             _settings,
@@ -50,6 +69,10 @@ namespace ui
         QDialog::accept();
     }
 
+    /**
+     * @brief build the UI
+     *
+     */
     void AddProfileDialog::_buildUI()
     {
         QDialog::setModal(true);
@@ -63,6 +86,10 @@ namespace ui
         _buildButtonSection();
     }
 
+    /**
+     * @brief build the form section for user input
+     *
+     */
     void AddProfileDialog::_buildFormSection()
     {
         auto* formLayout = new QFormLayout{};
@@ -75,6 +102,10 @@ namespace ui
         _mainLayout->addLayout(formLayout);
     }
 
+    /**
+     * @brief build the toggle section
+     *
+     */
     void AddProfileDialog::_buildToggleSection()
     {
         auto* toggleLayout = new QHBoxLayout{};
@@ -93,18 +124,17 @@ namespace ui
         _mainLayout->addLayout(toggleLayout);
     }
 
+    /**
+     * @brief build the button section
+     *
+     */
     void AddProfileDialog::_buildButtonSection()
     {
         auto* buttonLayout = new QHBoxLayout{};
 
-        _addProfileButton = new QPushButton{"Add Profile", this};
-        buttonLayout->addWidget(_addProfileButton);
-        connect(
-            _addProfileButton,
-            &QPushButton::clicked,
-            this,
-            &QDialog::accept
-        );
+        _addButton = new QPushButton{"Add Profile", this};
+        buttonLayout->addWidget(_addButton);
+        connect(_addButton, &QPushButton::clicked, this, &QDialog::accept);
 
         _cancelButton = new QPushButton{"Cancel", this};
         buttonLayout->addWidget(_cancelButton);
@@ -113,6 +143,13 @@ namespace ui
         _mainLayout->addLayout(buttonLayout);
     }
 
+    /**
+     * @brief set the enforce default flag
+     *
+     * @note setting this flag needs a subsequent update of the toggle states
+     *
+     * @param value
+     */
     void AddProfileDialog::setEnforceDefaultProfile(bool value)
     {
         _enforceDefaultProfile = value;
@@ -120,6 +157,11 @@ namespace ui
         _updateToggleStates();
     }
 
+    /**
+     * @brief get a profile draft from the line edits
+     *
+     * @return drafts::ProfileDraft
+     */
     drafts::ProfileDraft AddProfileDialog::_getProfile() const
     {
         return drafts::ProfileDraft{
@@ -128,6 +170,11 @@ namespace ui
         };
     }
 
+    /**
+     * @brief update the toggle states, if enforceDefaultProfile
+     * is true set active and set default will be disabled
+     *
+     */
     void AddProfileDialog::_updateToggleStates()
     {
         if (!_enforceDefaultProfile)

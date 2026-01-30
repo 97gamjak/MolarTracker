@@ -44,7 +44,7 @@ namespace ui
         QVBoxLayout* _mainLayout           = nullptr;
         QLineEdit*   _nameLineEdit         = nullptr;
         QLineEdit*   _emailLineEdit        = nullptr;
-        QPushButton* _addProfileButton     = nullptr;
+        QPushButton* _addButton            = nullptr;
         QPushButton* _cancelButton         = nullptr;
         QCheckBox*   _setActiveCheckBox    = nullptr;
         QCheckBox*   _setAsDefaultCheckBox = nullptr;

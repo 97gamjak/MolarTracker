@@ -23,6 +23,8 @@ namespace ui
         void changed();
 
        public:
+        // TODO(97gamjak): implement std::expected for error handling
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-80
         template <typename Cmd, typename... Args>
         bool makeAndDo(Args&&... args)
         {
@@ -34,6 +36,8 @@ namespace ui
         bool canRedo() const;
 
         void undo();
+        // TODO(97gamjak): implement std::expected for error handling
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-80
         bool redo();
 
         std::string undoLabel() const;
