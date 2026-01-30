@@ -6,6 +6,10 @@
 
 namespace drafts
 {
+    /**
+     * @brief A draft representation of a user profile
+     *
+     */
     struct ProfileDraft
     {
         std::string                name;
