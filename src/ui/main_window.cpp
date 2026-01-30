@@ -145,20 +145,6 @@ namespace ui
                 dialog->setModal(true);
                 dialog->setAttribute(Qt::WA_DeleteOnClose);
                 dialog->setEnforceDefaultProfile(true);
-                utils::moveDialogToParentScreenCenter(dialog, this);
-
-                connect(
-                    dialog,
-                    &QDialog::accepted,
-                    this,
-                    [this, dialog]()
-                    {
-                        const auto profile   = dialog->getProfile();
-                        auto&      _settings = _appContext.getSettings();
-                        _settings.set_default_profile_name(profile.name);
-                        statusBar()->showMessage("Profile added.");
-                    }
-                );
 
                 dialog->show();
                 dialog->raise();
