@@ -19,6 +19,10 @@ namespace settings
 
 namespace ui
 {
+    /**
+     * @brief A command for adding a profile
+     *
+     */
     class AddProfileCommand : public ICommand
     {
        private:
@@ -45,7 +49,7 @@ namespace ui
         void                                 undo() override;
         std::expected<void, CommandErrorPtr> redo() override;
 
-        std::string label() const override;
+        std::string getLabel() const override;
     };
 }   // namespace ui
 

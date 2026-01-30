@@ -64,7 +64,7 @@ namespace ui
         if (!canUndo())
             return "";
 
-        return _commands[_cursor - 1]->label();
+        return _commands[_cursor - 1]->getLabel();
     }
 
     std::string UndoStack::redoLabel() const
@@ -72,7 +72,7 @@ namespace ui
         if (!canRedo())
             return "";
 
-        return _commands[_cursor]->label();
+        return _commands[_cursor]->getLabel();
     }
 
 }   // namespace ui

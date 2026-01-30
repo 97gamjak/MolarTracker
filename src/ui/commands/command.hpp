@@ -21,7 +21,7 @@ namespace ui
         virtual void                                 undo() = 0;
         virtual std::expected<void, CommandErrorPtr> redo() = 0;
 
-        virtual std::string label() const = 0;
+        virtual std::string getLabel() const = 0;
     };
 
 }   // namespace ui

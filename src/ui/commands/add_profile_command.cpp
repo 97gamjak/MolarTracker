@@ -13,6 +13,15 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Add Profile Command:: Add Profile Command object
+     *
+     * @param profileStore
+     * @param settings
+     * @param profile
+     * @param setAsActive
+     * @param setAsDefault
+     */
     AddProfileCommand::AddProfileCommand(
         app::ProfileStore&   profileStore,
         settings::Settings&  settings,
@@ -28,19 +37,25 @@ namespace ui
     {
     }
 
+    /**
+     * @brief Undo the add profile command
+     *
+     */
     void AddProfileCommand::undo()
     {
         const auto result = _profileStore.removeProfile(_profile);
 
         if (result == app::ProfileStoreResult::ProfileNotFound)
         {
-            // TODO: think about handling errors also on undo
-            LOG_ERROR(
-                std::format(
-                    "Failed to undo add profile: '{}' not found",
-                    _profile.name
-                )
+            // TODO(97gamjak): think about handling errors also on undo
+            // https://97gamjak.atlassian.net/browse/MOLTRACK-72
+
+            const auto msg = std::format(
+                "Failed to undo add profile: '{}' not found",
+                _profile.name
             );
+
+            LOG_ERROR(msg);
         }
         else
         {
@@ -51,30 +66,37 @@ namespace ui
         {
             _profileStore.setActiveProfile(_activeProfileBeforeAdd);
 
-            LOG_INFO(
-                std::format(
-                    "Active profile restored to '{}'",
-                    _activeProfileBeforeAdd.has_value()
-                        ? std::string{_activeProfileBeforeAdd.value()}
-                        : "none"
-                )
-            );
+            const auto name = _activeProfileBeforeAdd.has_value()
+                                  ? std::string{_activeProfileBeforeAdd.value()}
+                                  : "none";
+
+            const auto msg =
+                std::format("Active profile restored to '{}'", name);
+
+            LOG_INFO(msg);
         }
 
         if (_setAsDefault)
         {
             _settings.set_default_profile_name(_defaultProfileBeforeAdd);
-            LOG_INFO(
-                std::format(
-                    "Default profile restored to '{}'",
-                    _defaultProfileBeforeAdd.has_value()
-                        ? _defaultProfileBeforeAdd.value()
-                        : "none"
-                )
-            );
+
+            const auto name =
+                _defaultProfileBeforeAdd.has_value()
+                    ? std::string{_defaultProfileBeforeAdd.value()}
+                    : "none";
+
+            const auto msg =
+                std::format("Default profile restored to '{}'", name);
+
+            LOG_INFO(msg);
         }
     }
 
+    /**
+     * @brief Redo the add profile command
+     *
+     * @return std::expected<void, CommandErrorPtr>
+     */
     std::expected<void, CommandErrorPtr> AddProfileCommand::redo()
     {
         const auto result = _profileStore.addProfile(_profile);
@@ -132,7 +154,12 @@ namespace ui
         return std::expected<void, CommandErrorPtr>{};
     }
 
-    std::string AddProfileCommand::label() const
+    /**
+     * @brief Get the Label object
+     *
+     * @return std::string
+     */
+    std::string AddProfileCommand::getLabel() const
     {
         return "Add Profile '" + _profile.name + "'";
     }
