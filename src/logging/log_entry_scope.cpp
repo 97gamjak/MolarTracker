@@ -3,6 +3,15 @@
 #include "log_manager.hpp"
 #include "logging_base.hpp"
 
+/**
+ * @brief Construct a new Log Entry Scope:: Log Entry Scope object
+ *
+ * @param level
+ * @param category
+ * @param function
+ * @param file
+ * @param line
+ */
 LogEntryScope::LogEntryScope(
     const LogLevel&    level,
     const LogCategory& category,
@@ -17,8 +26,6 @@ LogEntryScope::LogEntryScope(
       _line{line},
       _enabled{LogManager::getInstance().isEnabled(category, level)}
 {
-    // TODO: document why _enabled is used and not the global logger
-    // instance to check if logging should be done
     if (_enabled)
     {
         LogManager::getInstance().log(
@@ -32,6 +39,10 @@ LogEntryScope::LogEntryScope(
     }
 }
 
+/**
+ * @brief Destroy the Log Entry Scope:: Log Entry Scope object
+ *
+ */
 LogEntryScope::~LogEntryScope()
 {
     if (_enabled)
@@ -47,6 +58,15 @@ LogEntryScope::~LogEntryScope()
     }
 }
 
+/**
+ * @brief Construct a new Timed Log Entry Scope:: Timed Log Entry Scope object
+ *
+ * @param level
+ * @param category
+ * @param function
+ * @param file
+ * @param line
+ */
 TimedLogEntryScope::TimedLogEntryScope(
     const LogLevel&    level,
     const LogCategory& category,
@@ -58,6 +78,10 @@ TimedLogEntryScope::TimedLogEntryScope(
 {
 }
 
+/**
+ * @brief Destroy the Timed Log Entry Scope:: Timed Log Entry Scope object
+ *
+ */
 TimedLogEntryScope::~TimedLogEntryScope()
 {
     if (_enabled)

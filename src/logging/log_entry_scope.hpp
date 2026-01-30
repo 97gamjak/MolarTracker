@@ -6,6 +6,10 @@
 
 #include "logging_base.hpp"
 
+/**
+ * @brief RAII scope for logging entry and exit of a code block
+ *
+ */
 class LogEntryScope
 {
    protected:
@@ -28,6 +32,10 @@ class LogEntryScope
     ~LogEntryScope();
 };
 
+/**
+ * @brief RAII scope for logging entry and exit of a code block with timing
+ *
+ */
 class TimedLogEntryScope final : public LogEntryScope
 {
    private:

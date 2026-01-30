@@ -10,6 +10,10 @@
 enum class LogLevel : size_t;
 enum class LogCategory : size_t;
 
+/**
+ * @brief Singleton class managing logging categories and levels
+ *
+ */
 class LogManager
 {
    private:
