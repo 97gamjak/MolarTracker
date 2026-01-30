@@ -3,16 +3,21 @@
 namespace ui
 {
 
+    /**
+     * @brief Execute a command and add it to the undo stack
+     *
+     * @param command The command to execute
+     * @return true if the command was executed and added to the stack, false
+     * otherwise
+     */
     bool UndoStack::_do(std::unique_ptr<ICommand> command)
     {
         if (!command)
             return false;
 
-        // Execute first; only push on success.
         if (!command->redo())
             return false;
 
-        // Drop redo history (everything after cursor).
         if (_cursor < _commands.size())
         {
             _commands.erase(
@@ -28,10 +33,24 @@ namespace ui
         return true;
     }
 
+    /**
+     * @brief Check if there are commands to undo
+     *
+     * @return true if there are commands to undo, false otherwise
+     */
     bool UndoStack::canUndo() const { return _cursor > 0; }
 
+    /**
+     * @brief Check if there are commands to redo
+     *
+     * @return true if there are commands to redo, false otherwise
+     */
     bool UndoStack::canRedo() const { return _cursor < _commands.size(); }
 
+    /**
+     * @brief Undo the last command
+     *
+     */
     void UndoStack::undo()
     {
         if (!canUndo())
@@ -43,6 +62,11 @@ namespace ui
         emit changed();
     }
 
+    /**
+     * @brief Redo the next command
+     *
+     * @return true if the command was redone, false otherwise
+     */
     bool UndoStack::redo()
     {
         if (!canRedo())
@@ -59,6 +83,12 @@ namespace ui
         return true;
     }
 
+    /**
+     * @brief Get the label of the command that can be undone
+     *
+     * @return std::string The label of the command that can be undone, or an
+     * empty string if there are no commands to undo
+     */
     std::string UndoStack::undoLabel() const
     {
         if (!canUndo())
@@ -67,6 +97,12 @@ namespace ui
         return _commands[_cursor - 1]->getLabel();
     }
 
+    /**
+     * @brief Get the label of the command that can be redone
+     *
+     * @return std::string The label of the command that can be redone, or an
+     * empty string if there are no commands to redo
+     */
     std::string UndoStack::redoLabel() const
     {
         if (!canRedo())

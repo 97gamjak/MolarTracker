@@ -6,6 +6,10 @@
 
 namespace ui
 {
+    /**
+     * @brief Interface for command errors
+     *
+     */
     class ICommandError
     {
        public:

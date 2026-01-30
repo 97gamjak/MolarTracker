@@ -11,6 +11,10 @@
 namespace ui
 {
 
+    /**
+     * @brief Undo/redo stack for ICommand objects
+     *
+     */
     class UndoStack : public QObject
     {
         Q_OBJECT
