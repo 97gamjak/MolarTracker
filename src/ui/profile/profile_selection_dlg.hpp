@@ -2,13 +2,19 @@
 #define __UI__PROFILE__PROFILE_SELECTION_DLG_HPP__
 
 #include <QDialog>
+#include <string>
 #include <vector>
 
+class QWidget;            // Forward declaration
 class QListWidget;        // Forward declaration
 class QDialogButtonBox;   // Forward declaration
 
 namespace ui
 {
+    /**
+     * @brief Dialog for selecting a profile from existing profiles.
+     *
+     */
     class ProfileSelectionDialog : public QDialog
     {
         Q_OBJECT
