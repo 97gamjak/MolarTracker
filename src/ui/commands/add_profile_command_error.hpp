@@ -20,6 +20,12 @@ MSTD_ENUM(
 
 namespace ui
 {
+    /**
+     * @brief A class for representing errors when adding a profile
+     *
+     * @notes inherits from ICommandError interface
+     *
+     */
     class AddProfileCommandError final : public ICommandError
     {
        private:
