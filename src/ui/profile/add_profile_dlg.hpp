@@ -27,6 +27,10 @@ namespace ui
 {
     class UndoStack;   // Forward declaration
 
+    /**
+     * @brief Dialog for adding a new profile.
+     *
+     */
     class AddProfileDialog : public QDialog
     {
         Q_OBJECT
@@ -58,8 +62,6 @@ namespace ui
 
         void setEnforceDefaultProfile(bool value);
 
-        [[nodiscard]] struct drafts::ProfileDraft getProfile() const;
-
        private:
         void _buildUI();
         void _buildFormSection();
@@ -67,6 +69,8 @@ namespace ui
         void _buildButtonSection();
 
         void _updateToggleStates();
+
+        [[nodiscard]] struct drafts::ProfileDraft _getProfile() const;
     };
 
 }   // namespace ui

@@ -39,7 +39,7 @@ namespace ui
         const auto result = _undoStack.makeAndDo<AddProfileCommand>(
             _profileStore,
             _settings,
-            getProfile(),
+            _getProfile(),
             _setActiveCheckBox->isChecked(),
             _setAsDefaultCheckBox->isChecked()
         );
@@ -120,7 +120,7 @@ namespace ui
         _updateToggleStates();
     }
 
-    drafts::ProfileDraft AddProfileDialog::getProfile() const
+    drafts::ProfileDraft AddProfileDialog::_getProfile() const
     {
         return drafts::ProfileDraft{
             _nameLineEdit->text().toStdString(),
