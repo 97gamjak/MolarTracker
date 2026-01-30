@@ -1,5 +1,5 @@
-#ifndef __UI__UNDO_REDO__ADD_PROFILE_COMMAND_HPP__
-#define __UI__UNDO_REDO__ADD_PROFILE_COMMAND_HPP__
+#ifndef __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
+#define __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
 
 #include <optional>
 #include <string_view>
@@ -42,11 +42,11 @@ namespace ui
         );
         ~AddProfileCommand() override = default;
 
-        void undo() override;
-        bool redo() override;
+        void                                 undo() override;
+        std::expected<void, CommandErrorPtr> redo() override;
 
         std::string label() const override;
     };
 }   // namespace ui
 
-#endif   // __UI__UNDO_REDO__ADD_PROFILE_COMMAND_HPP__
+#endif   // __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__

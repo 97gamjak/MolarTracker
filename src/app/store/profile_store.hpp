@@ -63,9 +63,7 @@ namespace app
 
         [[nodiscard]] std::vector<std::string> getAllProfileNames() const;
 
-        [[nodiscard]] ProfileStoreResult setActiveProfile(
-            std::optional<std::string_view> name
-        );
+        void setActiveProfile(std::optional<std::string_view> name);
         [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
         [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 

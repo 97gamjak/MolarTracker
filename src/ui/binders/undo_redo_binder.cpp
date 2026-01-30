@@ -1,10 +1,10 @@
-#include "ui/binders/undo_redo_binder.hpp"
+#include "undo_redo_binder.hpp"
 
 #include <QStatusBar>
 
+#include "ui/commands/undo_stack.hpp"
 #include "ui/main_window.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
-#include "ui/undo_redo/undo_stack.hpp"
 
 namespace ui
 {
