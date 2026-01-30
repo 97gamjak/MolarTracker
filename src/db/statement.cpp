@@ -35,16 +35,14 @@ namespace db
      *
      * @param db
      * @param statement
-     * @param sql_for_errors
+     * @param sqlForErrors
      */
     Statement::Statement(
         sqlite3*      db,
         sqlite3_stmt* statement,
-        std::string   sql_for_errors
+        std::string   sqlForErrors
     )
-        : _db(db),
-          _statement(statement),
-          _sql_for_errors(std::move(sql_for_errors))
+        : _db(db), _statement(statement), _sqlForErrors(std::move(sqlForErrors))
     {
     }
 
@@ -59,7 +57,7 @@ namespace db
      *
      * @param other
      */
-    Statement::Statement(Statement&& other) { _move_from(std::move(other)); }
+    Statement::Statement(Statement&& other) { _moveFrom(std::move(other)); }
 
     /**
      * @brief Move assignment operator
@@ -72,7 +70,7 @@ namespace db
         if (this != &other)
         {
             _finalize();
-            _move_from(std::move(other));
+            _moveFrom(std::move(other));
         }
 
         return *this;
@@ -94,14 +92,14 @@ namespace db
      */
     StepResult Statement::step()
     {
-        _ensure_valid();
+        _ensureValid();
 
         const auto result = sqlite3_step(_statement);
 
         if (StepResultMeta::is_valid(result))
             return static_cast<StepResult>(result);
 
-        throw _generate_error("step", result);
+        throw _generateError("step", result);
     }
 
     /**
@@ -109,16 +107,14 @@ namespace db
      * produced
      *
      */
-    void Statement::execute_to_completion()
+    void Statement::executeToCompletion()
     {
         const auto result = step();
 
         if (result != StepResult::Done)
-        {
             throw SqliteError(
                 "Statement was expected to finish but produced a row"
             );
-        }
     }
 
     /**
@@ -128,15 +124,15 @@ namespace db
      */
     void Statement::reset()
     {
-        _ensure_valid();
+        _ensureValid();
 
         const auto reset_result = sqlite3_reset(_statement);
         if (reset_result != SQLITE_OK)
-            throw _generate_error("reset", reset_result);
+            throw _generateError("reset", reset_result);
 
         const auto clear_result = sqlite3_clear_bindings(_statement);
         if (clear_result != SQLITE_OK)
-            throw _generate_error("clear_bindings", clear_result);
+            throw _generateError("clear_bindings", clear_result);
     }
 
     /**
@@ -144,14 +140,14 @@ namespace db
      *
      * @param index
      */
-    void Statement::bind_null(const int index)
+    void Statement::bindNull(const int index)
     {
-        _ensure_valid();
+        _ensureValid();
 
         const auto result = sqlite3_bind_null(_statement, index);
 
         if (result != SQLITE_OK)
-            throw _generate_error("bind_null", result);
+            throw _generateError("bindNull", result);
     }
 
     /**
@@ -160,15 +156,15 @@ namespace db
      * @param index
      * @param value
      */
-    void Statement::bind_int64(const int index, const std::int64_t value)
+    void Statement::bindInt64(const int index, const std::int64_t value)
     {
-        _ensure_valid();
+        _ensureValid();
         const auto sql_value = static_cast<sqlite3_int64>(value);
 
         const auto result = sqlite3_bind_int64(_statement, index, sql_value);
 
         if (result != SQLITE_OK)
-            throw _generate_error("bind_int64", result);
+            throw _generateError("bindInt64", result);
     }
 
     /**
@@ -177,13 +173,13 @@ namespace db
      * @param index
      * @param value
      */
-    void Statement::bind_double(const int index, const double value)
+    void Statement::bindDouble(const int index, const double value)
     {
-        _ensure_valid();
+        _ensureValid();
 
         const auto result = sqlite3_bind_double(_statement, index, value);
         if (result != SQLITE_OK)
-            throw _generate_error("bind_double", result);
+            throw _generateError("bindDouble", result);
     }
 
     /**
@@ -192,9 +188,9 @@ namespace db
      * @param index
      * @param value
      */
-    void Statement::bind_text(const int index, const std::string_view value)
+    void Statement::bindText(const int index, const std::string_view value)
     {
-        _ensure_valid();
+        _ensureValid();
 
         const auto result = sqlite3_bind_text(
             _statement,
@@ -205,7 +201,7 @@ namespace db
         );
 
         if (result != SQLITE_OK)
-            throw _generate_error("bind_text", result);
+            throw _generateError("bindText", result);
     }
 
     /**
@@ -215,9 +211,9 @@ namespace db
      * @return true
      * @return false
      */
-    bool Statement::column_is_null(const int col) const
+    bool Statement::columnIsNull(const int col) const
     {
-        _ensure_valid();
+        _ensureValid();
         return sqlite3_column_type(_statement, col) == SQLITE_NULL;
     }
 
@@ -227,9 +223,9 @@ namespace db
      * @param col
      * @return std::int64_t
      */
-    std::int64_t Statement::column_int64(const int col) const
+    std::int64_t Statement::columnInt64(const int col) const
     {
-        _ensure_valid();
+        _ensureValid();
         return static_cast<std::int64_t>(sqlite3_column_int64(_statement, col));
     }
 
@@ -239,9 +235,9 @@ namespace db
      * @param col
      * @return double
      */
-    double Statement::column_double(const int col) const
+    double Statement::columnDouble(const int col) const
     {
-        _ensure_valid();
+        _ensureValid();
         return sqlite3_column_double(_statement, col);
     }
 
@@ -251,23 +247,23 @@ namespace db
      * @param col
      * @return std::string
      */
-    std::string Statement::column_text(const int col) const
+    std::string Statement::columnText(const int col) const
     {
-        _ensure_valid();
+        _ensureValid();
 
         auto const* bytes      = sqlite3_column_text(_statement, col);
-        const auto  byte_count = sqlite3_column_bytes(_statement, col);
+        const auto  byteCount = sqlite3_column_bytes(_statement, col);
 
-        if (bytes == nullptr || byte_count <= 0)
+        if (bytes == nullptr || byteCount <= 0)
             return {};
 
         return std::string{
             reinterpret_cast<char const*>(bytes),
-            static_cast<std::size_t>(byte_count)
+            static_cast<std::size_t>(byteCount)
         };
     }
 
-    sqlite3_stmt* Statement::native_handle() const { return _statement; }
+    sqlite3_stmt* Statement::nativeHandle() const { return _statement; }
 
     //
     //
@@ -275,13 +271,13 @@ namespace db
     //
     //
 
-    void Statement::_ensure_valid() const
+    void Statement::_ensureValid() const
     {
         if (_statement == nullptr)
             throw SqliteError("Statement is not valid");
     }
 
-    SqliteError Statement::_generate_error(
+    SqliteError Statement::_generateError(
         const std::string_view operation,
         const int              result
     ) const
@@ -293,26 +289,26 @@ namespace db
 
         if (_db != nullptr)
         {
-            char const* sql_msg = sqlite3_errmsg(_db);
-            if (sql_msg != nullptr)
-                msg += " : " + std::string(sql_msg);
+            char const* sqlMsg = sqlite3_errmsg(_db);
+            if (sqlMsg != nullptr)
+                msg += " : " + std::string(sqlMsg);
         }
 
-        if (!_sql_for_errors.empty())
-            msg += " | sql: " + _sql_for_errors;
+        if (!_sqlForErrors.empty())
+            msg += " | sql: " + _sqlForErrors;
 
         return SqliteError(msg);
     }
 
-    void Statement::_move_from(Statement&& other)
+    void Statement::_moveFrom(Statement&& other)
     {
-        _db             = other._db;
-        _statement      = other._statement;
-        _sql_for_errors = std::move(other._sql_for_errors);
+        _db           = other._db;
+        _statement    = other._statement;
+        _sqlForErrors = std::move(other._sqlForErrors);
 
         other._db        = nullptr;
         other._statement = nullptr;
-        other._sql_for_errors.clear();
+        other._sqlForErrors.clear();
     }
 
     void Statement::_finalize()
@@ -325,7 +321,7 @@ namespace db
         }
 
         _db = nullptr;
-        _sql_for_errors.clear();
+        _sqlForErrors.clear();
     }
 
 }   // namespace db

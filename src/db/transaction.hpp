@@ -13,7 +13,7 @@ namespace db
     {
        private:
         Database* _db{nullptr};
-        bool      _is_active{false};
+        bool      _isActive{false};
 
        public:
         explicit Transaction(Database& db, bool immediate = true);
@@ -25,13 +25,13 @@ namespace db
         Transaction(Transaction&& other);
         Transaction& operator=(Transaction&& other);
 
-        [[nodiscard]] bool is_active() const;
+        [[nodiscard]] bool isActive() const;
 
         void commit();
         void rollback();
 
        private:   // PRIVATE HELPER METHODS
-        void _move_from(Transaction&& other);
+        void _moveFrom(Transaction&& other);
     };
 }   // namespace db
 

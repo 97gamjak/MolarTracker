@@ -101,8 +101,8 @@ namespace orm
             ++index;
         }
 
-        statement.execute_to_completion();
-        return database.last_insert_rowid();
+        statement.executeToCompletion();
+        return database.lastInsertRowid();
     }
 
     template <db_model Model>
@@ -181,7 +181,7 @@ namespace orm
             field.bind(statement, index);
         }
 
-        statement.execute_to_completion();
+        statement.executeToCompletion();
     }
 
     template <db_model Model, typename Field>
@@ -472,7 +472,7 @@ namespace orm
             pk_value
         );
 
-        statement.execute_to_completion();
+        statement.executeToCompletion();
     }
 
 }   // namespace orm

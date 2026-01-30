@@ -18,15 +18,14 @@ namespace db
     /**
      * @brief Construct a new Database:: Database object
      *
-     * @param db_path
+     * @param dbPath
      */
-    Database::Database(const std::filesystem::path& db_path)
+    Database::Database(const std::filesystem::path& dbPath)
     {
-        std::filesystem::path path = db_path;
+        std::filesystem::path path = dbPath;
         if (!path.is_absolute())
-        {
             path = std::filesystem::absolute(path);
-        }
+
         open(path.string());
     }
 
@@ -41,7 +40,7 @@ namespace db
      *
      * @param other
      */
-    Database::Database(Database&& other) { _move_from(std::move(other)); }
+    Database::Database(Database&& other) { _moveFrom(std::move(other)); }
 
     /**
      * @brief Move assignment operator
@@ -54,7 +53,7 @@ namespace db
         if (this != &other)
         {
             close();
-            _move_from(std::move(other));
+            _moveFrom(std::move(other));
         }
 
         return *this;
@@ -65,29 +64,29 @@ namespace db
      *
      * @param other
      */
-    void Database::_move_from(Database&& other)
+    void Database::_moveFrom(Database&& other)
     {
-        _db      = other._db;
-        _db_path = std::move(other._db_path);
+        _db     = other._db;
+        _dbPath = std::move(other._dbPath);
 
         other._db = nullptr;
-        other._db_path.clear();
+        other._dbPath.clear();
     }
 
     /**
      * @brief open the database at the specified path
      *
-     * @param db_path
+     * @param dbPath
      */
-    void Database::open(const std::string& db_path)
+    void Database::open(const std::string& dbPath)
     {
         close();
 
-        sqlite3* opened_handle = nullptr;
+        sqlite3* openedHandle = nullptr;
 
         const auto result = sqlite3_open_v2(
-            db_path.c_str(),
-            &opened_handle,
+            dbPath.c_str(),
+            &openedHandle,
             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
             nullptr
         );
@@ -95,27 +94,27 @@ namespace db
         if (result != SQLITE_OK)
         {
             std::string msg  = "Failed to open sqlite database ";
-            msg             += '"' + db_path + '"';
+            msg             += '"' + dbPath + '"';
 
-            if (opened_handle != nullptr)
+            if (openedHandle != nullptr)
             {
-                char const* open_msg = sqlite3_errmsg(opened_handle);
-                if (open_msg != nullptr)
+                char const* openMsg = sqlite3_errmsg(openedHandle);
+                if (openMsg != nullptr)
                 {
                     msg += " : ";
-                    msg += open_msg;
+                    msg += openMsg;
                 }
-                sqlite3_close(opened_handle);
+                sqlite3_close(openedHandle);
             }
 
             throw SqliteError(msg);
         }
 
-        _db      = opened_handle;
-        _db_path = db_path;
+        _db     = openedHandle;
+        _dbPath = dbPath;
 
-        enable_foreign_keys(true);
-        set_busy_timeout_ms(5000);
+        enableForeignKeys(true);
+        setBusyTimeout(5000);
     }
 
     /**
@@ -130,7 +129,7 @@ namespace db
             _db = nullptr;
         }
 
-        _db_path.clear();
+        _dbPath.clear();
     }
 
     /**
@@ -139,14 +138,14 @@ namespace db
      * @return true
      * @return false
      */
-    bool Database::is_open() const { return _db != nullptr; }
+    bool Database::isOpen() const { return _db != nullptr; }
 
     /**
      * @brief get the native sqlite3 database handle
      *
      * @return sqlite3*
      */
-    sqlite3* Database::native_handle() const { return _db; }
+    sqlite3* Database::nativeHandle() const { return _db; }
 
     /**
      * @brief execute a SQL statement
@@ -155,32 +154,32 @@ namespace db
      */
     void Database::execute(std::string_view sql)
     {
-        _ensure_open();
+        _ensureOpen();
 
-        char* raw_error_message = nullptr;
+        char* rawError = nullptr;
 
         const auto result = sqlite3_exec(
             _db,
             std::string(sql).c_str(),
             nullptr,
             nullptr,
-            &raw_error_message
+            &rawError
         );
 
         if (result != SQLITE_OK)
         {
             std::string msg = "sqlite execute failed";
 
-            if (raw_error_message != nullptr)
+            if (rawError != nullptr)
             {
                 msg += " : ";
-                msg += raw_error_message;
-                sqlite3_free(raw_error_message);
+                msg += rawError;
+                sqlite3_free(rawError);
             }
             else
             {
                 msg += " : ";
-                msg += _sqlite_error_message();
+                msg += _sqliteErrorMessage();
             }
 
             msg += " | sql: ";
@@ -198,22 +197,22 @@ namespace db
      */
     Statement Database::prepare(std::string_view sql)
     {
-        _ensure_open();
+        _ensureOpen();
 
-        sqlite3_stmt* prepared_statement = nullptr;
+        sqlite3_stmt* preparedStatement = nullptr;
 
         const auto result = sqlite3_prepare_v2(
             _db,
             sql.data(),
             static_cast<int>(sql.size()),
-            &prepared_statement,
+            &preparedStatement,
             nullptr
         );
 
         if (result != SQLITE_OK)
         {
             std::string msg  = "sqlite prepare failed : ";
-            msg             += _sqlite_error_message();
+            msg             += _sqliteErrorMessage();
             msg             += " | sql: ";
             msg             += std::string(sql);
 
@@ -222,7 +221,7 @@ namespace db
 
         LOG_DEBUG(std::format("Prepared SQL statement: {}", sql));
 
-        return Statement{_db, prepared_statement, std::string(sql)};
+        return Statement{_db, preparedStatement, std::string(sql)};
     }
 
     /**
@@ -230,9 +229,9 @@ namespace db
      *
      * @return std::int64_t
      */
-    std::int64_t Database::last_insert_rowid() const
+    std::int64_t Database::lastInsertRowid() const
     {
-        _ensure_open();
+        _ensureOpen();
         return static_cast<std::int64_t>(sqlite3_last_insert_rowid(_db));
     }
 
@@ -243,7 +242,7 @@ namespace db
      */
     int Database::changes() const
     {
-        _ensure_open();
+        _ensureOpen();
         return sqlite3_changes(_db);
     }
 
@@ -252,15 +251,15 @@ namespace db
      *
      * @param timeout_milliseconds
      */
-    void Database::set_busy_timeout_ms(int timeout_milliseconds)
+    void Database::setBusyTimeout(int timeout_milliseconds)
     {
-        _ensure_open();
+        _ensureOpen();
 
         const auto result = sqlite3_busy_timeout(_db, timeout_milliseconds);
 
         if (result != SQLITE_OK)
             throw SqliteError(
-                "Failed to set sqlite busy timeout : " + _sqlite_error_message()
+                "Failed to set sqlite busy timeout : " + _sqliteErrorMessage()
             );
     }
 
@@ -269,7 +268,7 @@ namespace db
      *
      * @param enabled
      */
-    void Database::enable_foreign_keys(bool enabled)
+    void Database::enableForeignKeys(bool enabled)
     {
         if (enabled)
             execute("PRAGMA foreign_keys = ON;");
@@ -287,7 +286,7 @@ namespace db
      * @brief ensure that the database is open
      *
      */
-    void Database::_ensure_open() const
+    void Database::_ensureOpen() const
     {
         if (_db == nullptr)
             throw SqliteError("Database is not open");
@@ -298,7 +297,7 @@ namespace db
      *
      * @return std::string
      */
-    std::string Database::_sqlite_error_message() const
+    std::string Database::_sqliteErrorMessage() const
     {
         if (_db == nullptr)
             return "sqlite error: database handle is null";

@@ -40,14 +40,14 @@ namespace db
        private:
         sqlite3*      _db{nullptr};
         sqlite3_stmt* _statement{nullptr};
-        std::string   _sql_for_errors{};
+        std::string   _sqlForErrors{};
 
        public:
         Statement() = default;
         Statement(
             sqlite3*      database_handle,
             sqlite3_stmt* statement_handle,
-            std::string   sql_for_errors
+            std::string   sqlForErrors
         );
 
         ~Statement();
@@ -61,30 +61,30 @@ namespace db
         [[nodiscard]] bool is_valid() const;
 
         [[nodiscard]] StepResult step();
-        void                     execute_to_completion();
+        void                     executeToCompletion();
         void                     reset();
 
-        void bind_null(const int index);
-        void bind_int64(const int index, std::int64_t value);
-        void bind_double(const int index, double value);
-        void bind_text(const int index, std::string_view value);
+        void bindNull(const int index);
+        void bindInt64(const int index, std::int64_t value);
+        void bindDouble(const int index, double value);
+        void bindText(const int index, std::string_view value);
 
-        [[nodiscard]] bool         column_is_null(const int col) const;
-        [[nodiscard]] std::int64_t column_int64(const int col) const;
-        [[nodiscard]] double       column_double(const int col) const;
-        [[nodiscard]] std::string  column_text(const int col) const;
+        [[nodiscard]] bool         columnIsNull(const int col) const;
+        [[nodiscard]] std::int64_t columnInt64(const int col) const;
+        [[nodiscard]] double       columnDouble(const int col) const;
+        [[nodiscard]] std::string  columnText(const int col) const;
 
-        [[nodiscard]] sqlite3_stmt* native_handle() const;
+        [[nodiscard]] sqlite3_stmt* nativeHandle() const;
 
        private:   // PRIVATE HELPER METHODS
-        void        _ensure_valid() const;
-        SqliteError _generate_error(
+        void        _ensureValid() const;
+        SqliteError _generateError(
             std::string_view operation,
             const int        result
         ) const;
 
         void _finalize();
-        void _move_from(Statement&& other);
+        void _moveFrom(Statement&& other);
     };
 }   // namespace db
 

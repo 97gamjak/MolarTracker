@@ -76,7 +76,7 @@ namespace orm
         {
             if (!_value.has_value())
             {
-                statement.bind_null(index);
+                statement.bindNull(index);
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace orm
         {
             using inner_type = optional_inner_t<Value>;
 
-            if (statement.column_is_null(col))
+            if (statement.columnIsNull(col))
             {
                 _value = std::nullopt;
                 return;

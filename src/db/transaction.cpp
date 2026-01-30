@@ -12,7 +12,7 @@ namespace db
      * @param immediate
      */
     Transaction::Transaction(Database& db, bool immediate)
-        : _db(&db), _is_active(true)
+        : _db(&db), _isActive(true)
     {
         if (immediate)
             _db->execute("BEGIN IMMEDIATE;");
@@ -26,7 +26,8 @@ namespace db
      */
     Transaction::~Transaction()
     {
-        if (_is_active && _db != nullptr)
+        if (_isActive && _db != nullptr)
+        {
             try
             {
                 rollback();
@@ -34,6 +35,7 @@ namespace db
             catch (...)
             {
             }
+        }
     }
 
     /**
@@ -43,7 +45,7 @@ namespace db
      */
     Transaction::Transaction(Transaction&& other)
     {
-        _move_from(std::move(other));
+        _moveFrom(std::move(other));
     }
 
     /**
@@ -55,7 +57,7 @@ namespace db
     Transaction& Transaction::operator=(Transaction&& other)
     {
         if (this != &other)
-            _move_from(std::move(other));
+            _moveFrom(std::move(other));
 
         return *this;
     }
@@ -66,7 +68,7 @@ namespace db
      * @return true
      * @return false
      */
-    bool Transaction::is_active() const { return _is_active; }
+    bool Transaction::isActive() const { return _isActive; }
 
     /**
      * @brief commit the transaction
@@ -74,11 +76,11 @@ namespace db
      */
     void Transaction::commit()
     {
-        if (!_is_active || _db == nullptr)
+        if (!_isActive || _db == nullptr)
             return;
 
         _db->execute("COMMIT;");
-        _is_active = false;
+        _isActive = false;
     }
 
     /**
@@ -87,11 +89,11 @@ namespace db
      */
     void Transaction::rollback()
     {
-        if (!_is_active || _db == nullptr)
+        if (!_isActive || _db == nullptr)
             return;
 
         _db->execute("ROLLBACK;");
-        _is_active = false;
+        _isActive = false;
     }
 
     //
@@ -105,13 +107,13 @@ namespace db
      *
      * @param other
      */
-    void Transaction::_move_from(Transaction&& other)
+    void Transaction::_moveFrom(Transaction&& other)
     {
-        _db        = other._db;
-        _is_active = other._is_active;
+        _db       = other._db;
+        _isActive = other._isActive;
 
-        other._db        = nullptr;
-        other._is_active = false;
+        other._db       = nullptr;
+        other._isActive = false;
     }
 
 }   // namespace db

@@ -21,12 +21,12 @@ namespace orm
             std::int64_t value
         )
         {
-            statement.bind_int64(index, value);
+            statement.bindInt64(index, value);
         }
 
         static std::int64_t read(Statement const& statement, int col)
         {
-            return statement.column_int64(col);
+            return statement.columnInt64(col);
         }
     };
 
@@ -35,12 +35,12 @@ namespace orm
     {
         static void bind(Statement& statement, int index, int value)
         {
-            statement.bind_int64(index, static_cast<std::int64_t>(value));
+            statement.bindInt64(index, static_cast<std::int64_t>(value));
         }
 
         static int read(Statement const& statement, int col)
         {
-            return static_cast<int>(statement.column_int64(col));
+            return static_cast<int>(statement.columnInt64(col));
         }
     };
 
@@ -49,12 +49,12 @@ namespace orm
     {
         static void bind(Statement& statement, int index, bool value)
         {
-            statement.bind_int64(index, value ? 1 : 0);
+            statement.bindInt64(index, value ? 1 : 0);
         }
 
         static bool read(Statement const& statement, int col)
         {
-            return statement.column_int64(col) != 0;
+            return statement.columnInt64(col) != 0;
         }
     };
 
@@ -63,12 +63,12 @@ namespace orm
     {
         static void bind(Statement& statement, int index, double value)
         {
-            statement.bind_double(index, value);
+            statement.bindDouble(index, value);
         }
 
         static double read(Statement const& statement, int col)
         {
-            return statement.column_double(col);
+            return statement.columnDouble(col);
         }
     };
 
@@ -81,12 +81,12 @@ namespace orm
             std::string const& value
         )
         {
-            statement.bind_text(index, value);
+            statement.bindText(index, value);
         }
 
         static std::string read(Statement const& statement, int col)
         {
-            return statement.column_text(col);
+            return statement.columnText(col);
         }
     };
 
@@ -95,12 +95,12 @@ namespace orm
     {
         static void bind(Statement& statement, int index, T const& value)
         {
-            statement.bind_int64(index, value.value());
+            statement.bindInt64(index, value.value());
         }
 
         static T read(Statement const& statement, int col)
         {
-            return T::from(statement.column_int64(col));
+            return T::from(statement.columnInt64(col));
         }
     };
 }   // namespace orm
