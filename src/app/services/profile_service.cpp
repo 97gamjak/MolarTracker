@@ -9,8 +9,8 @@
 namespace app
 {
 
-    ProfileService::ProfileService(IProfileRepo& profileRepo)
-        : _profileRepo{profileRepo}
+    ProfileService::ProfileService(IProfileRepo& getProfileRepo)
+        : _profileRepo{getProfileRepo}
     {
     }
 

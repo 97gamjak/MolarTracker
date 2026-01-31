@@ -6,7 +6,7 @@ namespace app
 {
 
     ServiceContainer::ServiceContainer(RepoContainer& repos)
-        : _profileService{repos.profileRepo()}
+        : _profileService{repos.getProfileRepo()}
     {
     }
 

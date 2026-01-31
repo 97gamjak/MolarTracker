@@ -17,7 +17,7 @@ namespace app
         IProfileRepo& _profileRepo;
 
        public:
-        explicit ProfileService(IProfileRepo& profileRepo);
+        explicit ProfileService(IProfileRepo& getProfileRepo);
 
         std::optional<Profile> get(ProfileId id) const override;
         std::vector<Profile>   getAll() const override;

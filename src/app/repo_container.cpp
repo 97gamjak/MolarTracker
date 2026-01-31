@@ -5,14 +5,29 @@
 namespace app
 {
 
+    /**
+     * @brief Construct a new Repo Container object
+     *
+     * @param database
+     */
     RepoContainer::RepoContainer(db::Database& database)
         : _profileRepo{database}
     {
     }
 
-    IProfileRepo& RepoContainer::profileRepo() { return _profileRepo; }
+    /**
+     * @brief Get the Profile Repo
+     *
+     * @return IProfileRepo&
+     */
+    IProfileRepo& RepoContainer::getProfileRepo() { return _profileRepo; }
 
-    const IProfileRepo& RepoContainer::profileRepo() const
+    /**
+     * @brief Get the Profile Repo (const version)
+     *
+     * @return const IProfileRepo&
+     */
+    const IProfileRepo& RepoContainer::getProfileRepo() const
     {
         return _profileRepo;
     }

@@ -11,6 +11,10 @@ namespace db
 namespace app
 {
 
+    /**
+     * @brief Container for all repositories
+     *
+     */
     class RepoContainer
     {
        private:
@@ -19,8 +23,8 @@ namespace app
        public:
         explicit RepoContainer(db::Database& db);
 
-        IProfileRepo&       profileRepo();
-        const IProfileRepo& profileRepo() const;
+        IProfileRepo&       getProfileRepo();
+        const IProfileRepo& getProfileRepo() const;
     };
 
 }   // namespace app
