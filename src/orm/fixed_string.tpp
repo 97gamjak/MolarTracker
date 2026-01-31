@@ -19,9 +19,7 @@ namespace orm
     constexpr fixed_string<Size>::fixed_string(char const (&text)[Size])
     {
         for (std::size_t index = 0; index < Size; ++index)
-        {
             _data[index] = text[index];
-        }
     }
 
     /**

@@ -8,6 +8,15 @@
 
 namespace orm::detail
 {
+    /**
+     * @brief Convert a tuple of fields to an array of field views
+     *
+     * @tparam Tuple
+     * @tparam Indices
+     * @param tuple
+     * @param indices
+     * @return constexpr auto
+     */
     template <typename Tuple, std::size_t... Indices>
     constexpr auto tuple_to_field_array(
         Tuple&& tuple,

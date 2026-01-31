@@ -9,10 +9,20 @@
 
 namespace orm
 {
+    /**
+     * @brief Concept to check if a type is tuple-like
+     *
+     * @tparam T
+     */
     template <typename T>
     concept tuple_like =
         requires { std::tuple_size<std::remove_reference_t<T>>::value; };
 
+    /**
+     * @brief Concept for database models
+     *
+     * @tparam T
+     */
     template <typename T>
     concept db_model = requires(T instance) {
         { T::table_name } -> std::convertible_to<std::string>;
