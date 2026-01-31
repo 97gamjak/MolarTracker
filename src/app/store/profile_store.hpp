@@ -50,7 +50,7 @@ namespace app
         std::optional<ProfileId> _activeProfileId;
 
        public:
-        explicit ProfileStore(IProfileService& profileService);
+        explicit ProfileStore(IProfileService& getProfileService);
 
         void reload();
 

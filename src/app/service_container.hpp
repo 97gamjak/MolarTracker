@@ -8,8 +8,12 @@
 namespace app
 {
 
-    class RepoContainer;
+    class RepoContainer;   // Forward declaration
 
+    /**
+     * @brief Container for all services
+     *
+     */
     class ServiceContainer
     {
        private:
@@ -18,8 +22,8 @@ namespace app
        public:
         explicit ServiceContainer(RepoContainer& repos);
 
-        IProfileService&       profileService();
-        const IProfileService& profileService() const;
+        IProfileService&       getProfileService();
+        const IProfileService& getProfileService() const;
     };
 
 }   // namespace app

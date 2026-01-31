@@ -14,7 +14,7 @@ namespace app
      * @param services
      */
     StoreContainer::StoreContainer(ServiceContainer& services)
-        : _profileStore{services.profileService()}
+        : _profileStore{services.getProfileService()}
     {
     }
 

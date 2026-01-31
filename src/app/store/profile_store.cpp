@@ -23,10 +23,10 @@ namespace app
      * for each profile and maintains a set of used IDs to ensure uniqueness
      * when generating new profile IDs.
      *
-     * @param profileService
+     * @param getProfileService
      */
-    ProfileStore::ProfileStore(IProfileService& profileService)
-        : _profileService{profileService}
+    ProfileStore::ProfileStore(IProfileService& getProfileService)
+        : _profileService{getProfileService}
     {
         _profiles = _profileService.getAll();
 

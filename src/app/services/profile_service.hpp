@@ -9,8 +9,12 @@
 namespace app
 {
 
-    class IProfileRepo;
+    class IProfileRepo;   // forward declaration
 
+    /**
+     * @brief Implementation of Profile service
+     *
+     */
     class ProfileService : public IProfileService
     {
        private:
@@ -26,11 +30,13 @@ namespace app
             const std::string&                name,
             const std::optional<std::string>& email
         ) override;
+
         void update(
             ProfileId                         id,
             const std::string&                newName,
             const std::optional<std::string>& newEmail
         ) override;
+
         void remove(ProfileId id) override;
     };
 

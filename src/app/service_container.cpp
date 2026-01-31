@@ -5,17 +5,32 @@
 namespace app
 {
 
+    /**
+     * @brief Construct a new Service Container object
+     *
+     * @param repos
+     */
     ServiceContainer::ServiceContainer(RepoContainer& repos)
         : _profileService{repos.getProfileRepo()}
     {
     }
 
-    IProfileService& ServiceContainer::profileService()
+    /**
+     * @brief Get the Profile Service
+     *
+     * @return IProfileService&
+     */
+    IProfileService& ServiceContainer::getProfileService()
     {
         return _profileService;
     }
 
-    const IProfileService& ServiceContainer::profileService() const
+    /**
+     * @brief Get the Profile Service (const version)
+     *
+     * @return const IProfileService&
+     */
+    const IProfileService& ServiceContainer::getProfileService() const
     {
         return _profileService;
     }
