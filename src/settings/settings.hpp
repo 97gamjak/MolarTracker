@@ -28,15 +28,14 @@ namespace settings
 
         void save() const;
 
-        [[nodiscard]] bool                       has_default_profile() const;
-        [[nodiscard]] std::optional<std::string> get_default_profile_name(
-        ) const;
-        void set_default_profile_name(const std::optional<std::string>& name);
-        void set_default_profile_name(const std::string& name);
+        [[nodiscard]] bool                       hasDefaultProfile() const;
+        [[nodiscard]] std::optional<std::string> getDefaultProfileName() const;
+        void setDefaultProfileName(const std::optional<std::string>& name);
+        void setDefaultProfileName(const std::string& name);
 
        private:
-        void _to_json() const;
-        void _from_json();
+        void _toJson() const;
+        void _fromJson();
     };
 
 }   // namespace settings

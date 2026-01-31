@@ -99,9 +99,9 @@ namespace ui
         auto& profileStore = _appContext.getStore().getProfileStore();
         auto& settings     = _appContext.getSettings();
 
-        if (settings.has_default_profile())
+        if (settings.hasDefaultProfile())
         {
-            const auto name = settings.get_default_profile_name().value();
+            const auto name = settings.getDefaultProfileName().value();
             if (!profileStore.profileExists(name))
             {
                 // TODO: create error message!!!

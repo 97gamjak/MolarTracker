@@ -78,7 +78,7 @@ namespace ui
 
         if (_setAsDefault)
         {
-            _settings.set_default_profile_name(_defaultProfileBeforeAdd);
+            _settings.setDefaultProfileName(_defaultProfileBeforeAdd);
 
             const auto name =
                 _defaultProfileBeforeAdd.has_value()
@@ -146,8 +146,8 @@ namespace ui
 
         if (_setAsDefault)
         {
-            _defaultProfileBeforeAdd = _settings.get_default_profile_name();
-            _settings.set_default_profile_name(_profile.name);
+            _defaultProfileBeforeAdd = _settings.getDefaultProfileName();
+            _settings.setDefaultProfileName(_profile.name);
             LOG_INFO(std::format("Default profile set to '{}'", _profile.name));
         }
 

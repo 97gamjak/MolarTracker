@@ -7,40 +7,72 @@
 
 namespace settings
 {
+    using std::filesystem::absolute;
+    using std::filesystem::path;
 
-    Settings::Settings(const std::filesystem::path& configDir)
-        : _settingsPath{
-              std::filesystem::absolute(configDir / _settingsFileName)
-          }
+    /**
+     * @brief Construct a new Settings:: Settings object
+     *
+     * @param configDir
+     */
+    Settings::Settings(const path& configDir)
+        : _settingsPath{absolute(configDir / _settingsFileName)}
     {
-        _from_json();
+        _fromJson();
     }
 
-    void Settings::save() const { _to_json(); }
+    /**
+     * @brief Save settings to the JSON file
+     *
+     */
+    void Settings::save() const { _toJson(); }
 
-    bool Settings::has_default_profile() const
+    /**
+     * @brief Check if a default profile is set
+     *
+     * @return true
+     * @return false
+     */
+    bool Settings::hasDefaultProfile() const
     {
         return _defaultProfileName.has_value();
     }
 
-    std::optional<std::string> Settings::get_default_profile_name() const
+    /**
+     * @brief Get the default profile name
+     *
+     * @return std::optional<std::string>
+     */
+    std::optional<std::string> Settings::getDefaultProfileName() const
     {
         return _defaultProfileName;
     }
 
-    void Settings::set_default_profile_name(
-        const std::optional<std::string>& name
-    )
+    /**
+     * @brief Set the default profile name
+     *
+     * @param name
+     */
+    void Settings::setDefaultProfileName(const std::optional<std::string>& name)
     {
         _defaultProfileName = name;
     }
 
-    void Settings::set_default_profile_name(const std::string& name)
+    /**
+     * @brief Set the default profile name
+     *
+     * @param name
+     */
+    void Settings::setDefaultProfileName(const std::string& name)
     {
         _defaultProfileName = name;
     }
 
-    void Settings::_to_json() const
+    /**
+     * @brief Serialize settings to JSON and save to file
+     *
+     */
+    void Settings::_toJson() const
     {
         nlohmann::json jsonData;
         jsonData[_defaultProfileNameKey] = _defaultProfileName;
@@ -53,7 +85,11 @@ namespace settings
         }
     }
 
-    void Settings::_from_json()
+    /**
+     * @brief Load settings from JSON file
+     *
+     */
+    void Settings::_fromJson()
     {
         std::ifstream file{_settingsPath.string()};
         if (file.is_open())
