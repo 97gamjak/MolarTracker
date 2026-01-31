@@ -6,6 +6,10 @@
 namespace app
 {
 
+    /**
+     * @brief Construct a new App Context:: App Context object
+     *
+     */
     AppContext::AppContext()
         : _settings{Constants::getInstance().getConfigPath()},
           _database{Constants::getInstance().getDatabasePath()},

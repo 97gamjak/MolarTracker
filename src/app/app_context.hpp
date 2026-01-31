@@ -12,6 +12,11 @@
 namespace app
 {
 
+    /**
+     * @brief Application context holding settings, database, repositories,
+     * services, and store
+     *
+     */
     class AppContext
     {
        private:
