@@ -25,7 +25,11 @@ Constants::Constants()
     if (configDir)
         _configPath = std::filesystem::absolute(configDir.value());
     else
+    {
+        // TODO(97gamjak): Add reason to exception
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-91
         throw DirException("Failed to resolve config directory");
+    }
 
     const auto& dataDir = utils::data_dir(Constants::DIR_PREFIX);
 
@@ -33,6 +37,8 @@ Constants::Constants()
         _dataPath = std::filesystem::absolute(dataDir.value());
     else
     {
+        // TODO(97gamjak): Add reason to exception
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-91
         throw DirException("Failed to resolve data directory");
     }
 }

@@ -17,12 +17,20 @@
 namespace utils
 {
 
+    /**
+     * @brief Kinds of user directories
+     *
+     */
     enum class DirKind
     {
         Config,   // settings, preferences
         Data,     // persistent data (SQLite DB, user-created content)
     };
 
+    /**
+     * @brief Errors that can occur when resolving or creating paths
+     *
+     */
     enum class PathError
     {
         Empty,

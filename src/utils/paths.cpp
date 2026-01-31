@@ -10,6 +10,7 @@ namespace utils
 {
 
     // TODO: migrate this to mstd later on
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-90
     enum class EnvError
     {
         NotFound,
