@@ -10,6 +10,10 @@ namespace ui
     class DebugSlotsDialog;   // Forward declaration
     class LogViewerDialog;    // Forward declaration
 
+    /**
+     * @brief Binds the debug menu actions to their respective dialogs.
+     *
+     */
     class DebugMenuBinder : public QObject
     {
         Q_OBJECT

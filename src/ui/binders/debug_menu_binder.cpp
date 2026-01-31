@@ -9,6 +9,12 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new DebugMenuBinder:: Debug Menu Binder object
+     *
+     * @param mainWindow The main window of the application
+     * @param menuBar The menu bar containing debug menu actions
+     */
     DebugMenuBinder::DebugMenuBinder(MainWindow& mainWindow, MenuBar& menuBar)
         : QObject(&mainWindow), _mainWindow(mainWindow), _menuBar(menuBar)
     {
@@ -27,6 +33,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Ensures that the Debug Slots dialog is created
+     *
+     */
     void DebugMenuBinder::_ensureDebugSlotsDialog()
     {
         if (_debugSlotsDialog != nullptr)
@@ -36,6 +46,10 @@ namespace ui
         _debugSlotsDialog->setModal(false);
     }
 
+    /**
+     * @brief Ensures that the Log Viewer dialog is created
+     *
+     */
     void DebugMenuBinder::_ensureLogViewerDialog()
     {
         if (_logViewerDialog != nullptr)
@@ -45,6 +59,10 @@ namespace ui
         _logViewerDialog->setModal(false);
     }
 
+    /**
+     * @brief Slot called when the Debug Slots dialog is requested from the UI
+     *
+     */
     void DebugMenuBinder::_onRequestDebugSlots()
     {
         _ensureDebugSlotsDialog();
@@ -56,6 +74,10 @@ namespace ui
         _mainWindow.statusBar()->showMessage("Debug slots opened");
     }
 
+    /**
+     * @brief Slot called when the Log Viewer dialog is requested from the UI
+     *
+     */
     void DebugMenuBinder::_onRequestLogViewer()
     {
         _ensureLogViewerDialog();

@@ -9,6 +9,10 @@ namespace ui
     class MenuBar;      // Forward declaration
     class UndoStack;    // Forward declaration
 
+    /**
+     * @brief Binds the undo and redo actions to the UI elements.
+     *
+     */
     class UndoRedoBinder final : public QObject
     {
         Q_OBJECT

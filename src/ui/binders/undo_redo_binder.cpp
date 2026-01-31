@@ -8,6 +8,13 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new UndoRedoBinder:: Undo Redo Binder object
+     *
+     * @param mainWindow The main window of the application
+     * @param menuBar The menu bar containing undo/redo actions
+     * @param undoStack The undo stack managing undo/redo operations
+     */
     UndoRedoBinder::UndoRedoBinder(
         MainWindow& mainWindow,
         MenuBar&    menuBar,
@@ -30,7 +37,6 @@ namespace ui
             this,
             &UndoRedoBinder::_onRedoRequested
         );
-
         connect(
             &_undoStack,
             &UndoStack::changed,
@@ -41,18 +47,30 @@ namespace ui
         refresh();
     }
 
+    /**
+     * @brief Slot called when an undo is requested from the UI
+     *
+     */
     void UndoRedoBinder::_onUndoRequested()
     {
         _undoStack.undo();
         _mainWindow.statusBar()->showMessage("Undo requested");
     }
 
+    /**
+     * @brief Slot called when a redo is requested from the UI
+     *
+     */
     void UndoRedoBinder::_onRedoRequested()
     {
         _undoStack.redo();
         _mainWindow.statusBar()->showMessage("Redo requested");
     }
 
+    /**
+     * @brief Refreshes the state of the undo and redo actions in the UI
+     *
+     */
     void UndoRedoBinder::refresh()
     {
         const bool canUndo = _undoStack.canUndo();
