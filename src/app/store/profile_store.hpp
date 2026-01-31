@@ -13,24 +13,18 @@
 #include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
 #include "app/store/i_store.hpp"
-#include "app/store/subscription.hpp"
 
 namespace drafts
 {
-    struct ProfileDraft;
+    struct ProfileDraft;   // forward declaration
 }
 
 namespace app
 {
-    // TODO: centralize this enum
-    enum class StoreState
-    {
-        Clean,
-        New,
-        Modified,
-        Deleted
-    };
-
+    /**
+     * @brief Result of profile store operations
+     *
+     */
     enum class ProfileStoreResult
     {
         Ok,
@@ -39,7 +33,10 @@ namespace app
         ProfileNotFound,
     };
 
-    // TODO: add nodiscard where appropriate
+    /**
+     * @brief Store for managing profiles
+     *
+     */
     class ProfileStore : public IStore
     {
        private:
@@ -51,8 +48,6 @@ namespace app
             _profileStates;
 
         std::optional<ProfileId> _activeProfileId;
-        // std::size_t                               _nextObserverId = 0;
-        // std::unordered_map<std::size_t, Observer> _observers;
 
        public:
         explicit ProfileStore(IProfileService& profileService);

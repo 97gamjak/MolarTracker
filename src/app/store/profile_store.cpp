@@ -89,7 +89,8 @@ namespace app
         const auto profile = getProfile(name.value());
         if (!profile)
         {
-            // TODO: make here MT specific error handling
+            // TODO: make here MT specific error handling for stores
+            // https://97gamjak.atlassian.net/browse/MOLTRACK-88
             throw std::runtime_error(
                 std::format("Profile '{}' not found", name.value())
             );
@@ -370,6 +371,7 @@ namespace app
     std::string ProfileStore::_normalizeName(std::string_view name)
     {
         // TODO: clean this up
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-89
         //  Policy: trim + case-insensitive
         //  If you want case-sensitive, remove the tolower part.
         std::size_t start = 0;
