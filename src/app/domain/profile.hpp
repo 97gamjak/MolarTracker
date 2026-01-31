@@ -9,6 +9,10 @@
 namespace app
 {
 
+    /**
+     * @brief Domain model for a user profile
+     *
+     */
     class Profile
     {
        private:
