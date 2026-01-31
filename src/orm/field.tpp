@@ -53,9 +53,9 @@ namespace orm
         definition += " ";
         definition += std::string{sql_type<storage_type>::name};
 
-        if constexpr (is_pk)
+        if constexpr (isPk)
             definition += " PRIMARY KEY";
-        if constexpr (is_auto_increment)
+        if constexpr (isAutoIncrement)
             definition += " AUTOINCREMENT";
         if constexpr (is_unique)
             definition += " UNIQUE";
@@ -91,7 +91,7 @@ namespace orm
 
     template <fixed_string Name, typename Value, typename... Options>
     template <typename Statement>
-    void Field<Name, Value, Options...>::read_from(
+    void Field<Name, Value, Options...>::readFrom(
         Statement const& statement,
         int              col
     )

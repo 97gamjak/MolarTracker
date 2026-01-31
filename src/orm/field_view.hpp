@@ -9,111 +9,131 @@
 
 namespace orm
 {
+    /**
+     * @brief A view into a field of a database model
+     *
+     */
     class FieldView
     {
        private:
         using bind_function_type = void (*)(
-            void const*    field_address,
+            void const*    fieldAddress,
             db::Statement& statement,
             int            index
         );
 
         using read_function_type = void (*)(
-            void*                field_address,
+            void*                fieldAddress,
             db::Statement const& statement,
             int                  col
         );
 
         using ddl_function_type = std::string (*)();
 
-        void*       _mutable_field_address{nullptr};
-        void const* _const_field_address{nullptr};
+        void*       _mutableFieldAddress{nullptr};
+        void const* _constFieldAddress{nullptr};
 
-        std::string_view _column_name{};
-        bool             _is_pk{false};
-        bool             _is_auto_increment{false};
-        bool             _is_auto_increment_pk{false};
+        std::string_view _columnName{};
+        bool             _isPk{false};
+        bool             _isAutoIncrement{false};
+        bool             _isAutoIncrementPk{false};
 
-        bind_function_type _bind_function{nullptr};
-        read_function_type _read_function{nullptr};
-        ddl_function_type  _ddl_function{nullptr};
+        bind_function_type _bindFunction{nullptr};
+        read_function_type _readFunction{nullptr};
+        ddl_function_type  _ddlFunction{nullptr};
 
        public:
         FieldView() = default;
 
-        [[nodiscard]] std::string_view column_name() const;
-        [[nodiscard]] bool             is_pk() const;
-        [[nodiscard]] bool             is_auto_increment() const;
-        [[nodiscard]] bool             is_auto_increment_pk() const;
+        [[nodiscard]] std::string_view getColumnName() const;
+        [[nodiscard]] bool             isPk() const;
+        [[nodiscard]] bool             isAutoIncrement() const;
+        [[nodiscard]] bool             isAutoIncrementPk() const;
 
         void bind(db::Statement& statement, int index) const;
-        void read_from(db::Statement const& statement, int col) const;
+        void readFrom(db::Statement const& statement, int col) const;
         [[nodiscard]] std::string ddl() const;
 
+        /**
+         * @brief Create a FieldView from a field instance
+         *
+         * @tparam Field
+         * @param field
+         * @return FieldView
+         */
         template <typename Field>
         static FieldView from(Field& field)
         {
             FieldView view{};
-            view._mutable_field_address = static_cast<void*>(&field);
-            view._const_field_address   = static_cast<void const*>(&field);
+            view._mutableFieldAddress = static_cast<void*>(&field);
+            view._constFieldAddress   = static_cast<void const*>(&field);
 
-            view._column_name          = Field::name.view();
-            view._is_pk                = Field::is_pk;
-            view._is_auto_increment    = Field::is_auto_increment;
-            view._is_auto_increment_pk = Field::is_auto_increment_pk;
+            view._columnName        = Field::name.view();
+            view._isPk              = Field::isPk;
+            view._isAutoIncrement   = Field::isAutoIncrement;
+            view._isAutoIncrementPk = Field::isAutoIncrementPk;
 
-            view._bind_function = [](void const*    field_address,
-                                     db::Statement& statement,
-                                     int            index)
+            view._bindFunction = [](void const*    fieldAddress,
+                                    db::Statement& statement,
+                                    int            index)
             {
                 auto const* typed_field =
-                    static_cast<Field const*>(field_address);
+                    static_cast<Field const*>(fieldAddress);
+
                 typed_field->bind(statement, index);
             };
 
-            view._read_function =
-                [](void* field_address, db::Statement const& statement, int col)
+            view._readFunction =
+                [](void* fieldAddress, db::Statement const& statement, int col)
             {
-                auto* typed_field = static_cast<Field*>(field_address);
-                typed_field->read_from(statement, col);
+                auto* typed_field = static_cast<Field*>(fieldAddress);
+                typed_field->readFrom(statement, col);
             };
 
-            view._ddl_function = []() -> std::string { return Field::ddl(); };
+            view._ddlFunction = []() -> std::string { return Field::ddl(); };
 
             return view;
         }
 
+        /**
+         * @brief Create a FieldView from a const field instance
+         *
+         * @tparam Field
+         * @param field
+         * @return FieldView
+         */
         template <typename Field>
         static FieldView from(Field const& field)
         {
             FieldView view{};
-            view._mutable_field_address = nullptr;
-            view._const_field_address   = static_cast<void const*>(&field);
+            view._mutableFieldAddress = nullptr;
+            view._constFieldAddress   = static_cast<void const*>(&field);
 
-            view._column_name          = Field::name.view();
-            view._is_pk                = Field::is_pk;
-            view._is_auto_increment    = Field::is_auto_increment;
-            view._is_auto_increment_pk = Field::is_auto_increment_pk;
+            view._columnName        = Field::name.view();
+            view._isPk              = Field::isPk;
+            view._isAutoIncrement   = Field::isAutoIncrement;
+            view._isAutoIncrementPk = Field::isAutoIncrementPk;
 
-            view._bind_function = [](void const*    field_address,
-                                     db::Statement& statement,
-                                     int            index)
+            view._bindFunction = [](void const*    fieldAddress,
+                                    db::Statement& statement,
+                                    int            index)
             {
                 auto const* typed_field =
-                    static_cast<Field const*>(field_address);
+                    static_cast<Field const*>(fieldAddress);
+
                 typed_field->bind(statement, index);
             };
 
-            view._read_function = nullptr;   // cannot read into const field
-            view._ddl_function  = []() -> std::string { return Field::ddl(); };
+            view._readFunction = nullptr;   // cannot read into const field
+            view._ddlFunction  = []() -> std::string { return Field::ddl(); };
 
             return view;
         }
 
        private:
-        void _ensure_bindable() const;
-        void _ensure_readable() const;
-        void _ensure_has_ddl() const;
+        void _ensureBindable() const;
+        void _ensureReadable() const;
+        void _ensureHasDDL() const;
     };
 }   // namespace orm
 

@@ -9,33 +9,70 @@
 
 namespace orm
 {
-    std::string_view FieldView::column_name() const { return _column_name; }
+    /**
+     * @brief Get the column name
+     *
+     * @return std::string_view
+     */
+    std::string_view FieldView::getColumnName() const { return _columnName; }
 
-    bool FieldView::is_pk() const { return _is_pk; }
+    /**
+     * @brief Check if the field is a primary key
+     *
+     * @return true
+     * @return false
+     */
+    bool FieldView::isPk() const { return _isPk; }
 
-    bool FieldView::is_auto_increment() const { return _is_auto_increment; }
+    /**
+     * @brief Check if the field is auto-incrementing
+     *
+     * @return true
+     * @return false
+     */
+    bool FieldView::isAutoIncrement() const { return _isAutoIncrement; }
 
-    bool FieldView::is_auto_increment_pk() const
-    {
-        return _is_auto_increment_pk;
-    }
+    /**
+     * @brief Check if the field is an auto-incrementing primary key
+     *
+     * @return true
+     * @return false
+     */
+    bool FieldView::isAutoIncrementPk() const { return _isAutoIncrementPk; }
 
+    /**
+     * @brief Bind the field value to the specified parameter index
+     *
+     * @param statement
+     * @param index
+     */
     void FieldView::bind(db::Statement& statement, int index) const
     {
-        _ensure_bindable();
-        _bind_function(_const_field_address, statement, index);
+        _ensureBindable();
+        _bindFunction(_constFieldAddress, statement, index);
     }
 
-    void FieldView::read_from(db::Statement const& statement, int col) const
+    /**
+     * @brief Read the field value from the specified column
+     *
+     * @param statement
+     * @param col
+     */
+    void FieldView::readFrom(db::Statement const& statement, int col) const
     {
-        _ensure_readable();
-        _read_function(_mutable_field_address, statement, col);
+        _ensureReadable();
+        _readFunction(_mutableFieldAddress, statement, col);
     }
 
+    /**
+     * @brief Get the DDL string for the field
+     *
+     * @return std::string
+     */
     std::string FieldView::ddl() const
     {
-        _ensure_has_ddl();
-        return _ddl_function();
+        _ensureHasDDL();
+        return _ddlFunction();
     }
 
     //
@@ -44,28 +81,34 @@ namespace orm
     //
     //
 
-    void FieldView::_ensure_bindable() const
+    /**
+     * @brief Ensure the field is bindable
+     *
+     */
+    void FieldView::_ensureBindable() const
     {
-        if (_const_field_address == nullptr || _bind_function == nullptr)
-        {
+        if (_constFieldAddress == nullptr || _bindFunction == nullptr)
             throw ORMError("FieldView is not bindable");
-        }
     }
 
-    void FieldView::_ensure_readable() const
+    /**
+     * @brief Ensure the field is readable
+     *
+     */
+    void FieldView::_ensureReadable() const
     {
-        if (_mutable_field_address == nullptr || _read_function == nullptr)
-        {
+        if (_mutableFieldAddress == nullptr || _readFunction == nullptr)
             throw ORMError("FieldView is not readable");
-        }
     }
 
-    void FieldView::_ensure_has_ddl() const
+    /**
+     * @brief Ensure the field has a DDL function
+     *
+     */
+    void FieldView::_ensureHasDDL() const
     {
-        if (_ddl_function == nullptr)
-        {
+        if (_ddlFunction == nullptr)
             throw ORMError("FieldView has no ddl function");
-        }
     }
 
 }   // namespace orm

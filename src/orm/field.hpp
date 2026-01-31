@@ -31,9 +31,9 @@ namespace orm
         static constexpr fixed_string name = Name;
 
         // clang-format off
-        static constexpr bool is_pk                = has_option_v<primary_key_t, Options...>;
-        static constexpr bool is_auto_increment    = has_option_v<auto_increment_t, Options...>;
-        static constexpr bool is_auto_increment_pk = is_pk && is_auto_increment;
+        static constexpr bool isPk                = has_option_v<primary_key_t, Options...>;
+        static constexpr bool isAutoIncrement    = has_option_v<auto_increment_t, Options...>;
+        static constexpr bool isAutoIncrementPk = isPk && isAutoIncrement;
         static constexpr bool is_unique            = has_option_v<unique_t, Options...>;
         static constexpr bool is_nullable          = is_nullable_v<Value, Options...>;
         // clang-format on
@@ -52,7 +52,7 @@ namespace orm
         void bind(Statement& statement, int index) const;
 
         template <typename Statement>
-        void read_from(Statement const& statement, int col);
+        void readFrom(Statement const& statement, int col);
     };
 
     template <typename Value>

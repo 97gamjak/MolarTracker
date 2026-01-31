@@ -91,14 +91,14 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (field.is_auto_increment_pk())
+            if (field.isAutoIncrementPk())
                 continue;
 
             if (!firstCol)
                 sqlText += ", ";
 
             firstCol  = false;
-            sqlText  += std::string{field.column_name()};
+            sqlText  += std::string{field.getColumnName()};
         }
 
         sqlText += ") VALUES (";
@@ -107,7 +107,7 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (field.is_auto_increment_pk())
+            if (field.isAutoIncrementPk())
                 continue;
 
             if (!firstCol)
@@ -125,7 +125,7 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (field.is_auto_increment_pk())
+            if (field.isAutoIncrementPk())
                 continue;
 
             field.bind(statement, index);
@@ -157,14 +157,14 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (field.is_pk())
+            if (field.isPk())
                 continue;
 
             if (!firstAssignment)
                 sqlText += ", ";
 
             firstAssignment  = false;
-            sqlText         += std::string{field.column_name()};
+            sqlText         += std::string{field.getColumnName()};
             sqlText         += "=?";
         }
 
@@ -174,13 +174,13 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (!field.is_pk())
+            if (!field.isPk())
                 continue;
 
             if (!whereIsPresent)
             {
                 whereIsPresent  = true;
-                sqlText        += std::string{field.column_name()};
+                sqlText        += std::string{field.getColumnName()};
                 sqlText        += "=?";
             }
         }
@@ -200,7 +200,7 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (field.is_pk())
+            if (field.isPk())
                 continue;
 
             field.bind(statement, index);
@@ -209,7 +209,7 @@ namespace orm
 
         for (FieldView const& field : fieldViews)
         {
-            if (!field.is_pk())
+            if (!field.isPk())
                 continue;
 
             field.bind(statement, index);
@@ -249,13 +249,13 @@ namespace orm
                 sqlText += ", ";
 
             firstSelectColumn  = false;
-            sqlText           += std::string{field.column_name()};
+            sqlText           += std::string{field.getColumnName()};
         }
 
         sqlText += " FROM ";
         sqlText += Model::table_name;
         sqlText += " WHERE ";
-        sqlText += std::string{fieldView.column_name()};
+        sqlText += std::string{fieldView.getColumnName()};
         sqlText += "=?;";
 
         db::Statement statement = database.prepare(sqlText);
@@ -272,7 +272,7 @@ namespace orm
 
             for (FieldView const& field : loadedFieldViews)
             {
-                field.read_from(statement, col);
+                field.readFrom(statement, col);
                 ++col;
             }
 
@@ -314,13 +314,13 @@ namespace orm
                 sqlText += ", ";
 
             firstSelectColumn  = false;
-            sqlText           += std::string{field.column_name()};
+            sqlText           += std::string{field.getColumnName()};
         }
 
         sqlText += " FROM ";
         sqlText += Model::table_name;
         sqlText += " WHERE ";
-        sqlText += std::string{fieldView.column_name()};
+        sqlText += std::string{fieldView.getColumnName()};
         sqlText += "=?;";
 
         db::Statement statement = database.prepare(sqlText);
@@ -337,7 +337,7 @@ namespace orm
 
         for (FieldView const& field : loadedFieldViews)
         {
-            field.read_from(statement, col);
+            field.readFrom(statement, col);
             ++col;
         }
 
@@ -364,7 +364,7 @@ namespace orm
                 sqlText += ", ";
 
             firstSelectColumn  = false;
-            sqlText           += std::string{field.column_name()};
+            sqlText           += std::string{field.getColumnName()};
         }
 
         sqlText += " FROM ";
@@ -375,13 +375,13 @@ namespace orm
 
         for (FieldView const& field : emptyFieldViews)
         {
-            if (!field.is_pk())
+            if (!field.isPk())
                 continue;
 
             if (!whereIsPresent)
             {
                 whereIsPresent  = true;
-                sqlText        += std::string{field.column_name()};
+                sqlText        += std::string{field.getColumnName()};
                 sqlText        += "=?";
             }
         }
@@ -411,7 +411,7 @@ namespace orm
 
         for (FieldView const& field : loadedFieldViews)
         {
-            field.read_from(statement, col);
+            field.readFrom(statement, col);
             ++col;
         }
 
@@ -442,7 +442,7 @@ namespace orm
                 sqlText += ", ";
 
             firstSelectColumn  = false;
-            sqlText           += std::string{field.column_name()};
+            sqlText           += std::string{field.getColumnName()};
         }
 
         sqlText += " FROM ";
@@ -462,7 +462,7 @@ namespace orm
 
             for (FieldView const& field : loadedFieldViews)
             {
-                field.read_from(statement, col);
+                field.readFrom(statement, col);
                 ++col;
             }
 
@@ -495,13 +495,13 @@ namespace orm
 
         for (FieldView const& field : emptyFieldViews)
         {
-            if (!field.is_pk())
+            if (!field.isPk())
                 continue;
 
             if (!whereIsPresent)
             {
                 whereIsPresent  = true;
-                sqlText        += std::string{field.column_name()};
+                sqlText        += std::string{field.getColumnName()};
                 sqlText        += "=?";
             }
         }
