@@ -8,6 +8,10 @@ namespace app
 
     class ServiceContainer;   // Forward declaration
 
+    /**
+     * @brief Container for all stores
+     *
+     */
     class StoreContainer
     {
        private:

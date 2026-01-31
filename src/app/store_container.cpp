@@ -8,11 +8,20 @@
 namespace app
 {
 
+    /**
+     * @brief Construct a new Store Container object
+     *
+     * @param services
+     */
     StoreContainer::StoreContainer(ServiceContainer& services)
         : _profileStore{services.profileService()}
     {
     }
 
+    /**
+     * @brief Save all temporary changes to the database
+     *
+     */
     void StoreContainer::commit()
     {
         LOG_INFO("Saving all temporary changes to database");
