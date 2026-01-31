@@ -34,8 +34,8 @@ namespace orm
         static constexpr bool isPk                = has_option_v<primary_key_t, Options...>;
         static constexpr bool isAutoIncrement    = has_option_v<auto_increment_t, Options...>;
         static constexpr bool isAutoIncrementPk = isPk && isAutoIncrement;
-        static constexpr bool is_unique            = has_option_v<unique_t, Options...>;
-        static constexpr bool is_nullable          = is_nullable_v<Value, Options...>;
+        static constexpr bool isUnique            = has_option_v<unique_t, Options...>;
+        static constexpr bool isNullable          = is_nullable_v<Value, Options...>;
         // clang-format on
 
         Field() = default;

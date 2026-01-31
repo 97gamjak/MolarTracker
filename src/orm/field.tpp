@@ -15,24 +15,57 @@
 
 namespace orm
 {
+    /**
+     * @brief Construct a Field with the specified value
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @param value
+     */
     template <fixed_string Name, typename Value, typename... Options>
     Field<Name, Value, Options...>::Field(Value value)
         : _value(std::move(value))
     {
     }
 
+    /**
+     * @brief Get the value of the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return Value&
+     */
     template <fixed_string Name, typename Value, typename... Options>
     Value& Field<Name, Value, Options...>::value()
     {
         return _value;
     }
 
+    /**
+     * @brief Get the value of the field (const version)
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return Value const&
+     */
     template <fixed_string Name, typename Value, typename... Options>
     Value const& Field<Name, Value, Options...>::value() const
     {
         return _value;
     }
 
+    /**
+     * @brief Assign a new value to the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @param value
+     * @return Field&
+     */
     template <fixed_string Name, typename Value, typename... Options>
     Field<Name, Value, Options...>& Field<Name, Value, Options...>::operator=(
         Value value
@@ -42,6 +75,14 @@ namespace orm
         return *this;
     }
 
+    /**
+     * @brief Get the DDL string for the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return std::string
+     */
     template <fixed_string Name, typename Value, typename... Options>
     std::string Field<Name, Value, Options...>::ddl()
     {
@@ -57,14 +98,24 @@ namespace orm
             definition += " PRIMARY KEY";
         if constexpr (isAutoIncrement)
             definition += " AUTOINCREMENT";
-        if constexpr (is_unique)
+        if constexpr (isUnique)
             definition += " UNIQUE";
-        if constexpr (!is_nullable)
+        if constexpr (!isNullable)
             definition += " NOT NULL";
 
         return definition;
     }
 
+    /**
+     * @brief Bind the field value to the specified parameter index
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @tparam Statement
+     * @param statement
+     * @param index
+     */
     template <fixed_string Name, typename Value, typename... Options>
     template <typename Statement>
     void Field<Name, Value, Options...>::bind(
@@ -89,6 +140,16 @@ namespace orm
         }
     }
 
+    /**
+     * @brief Read the field value from the specified column
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @tparam Statement
+     * @param statement
+     * @param col
+     */
     template <fixed_string Name, typename Value, typename... Options>
     template <typename Statement>
     void Field<Name, Value, Options...>::readFrom(

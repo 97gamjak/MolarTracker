@@ -297,7 +297,7 @@ namespace orm
         Field const&  fieldToMatch
     )
     {
-        static_assert(Field::is_unique);
+        static_assert(Field::isUnique);
         const auto fieldView = orm::FieldView::from(fieldToMatch);
 
         Model      emptyInstance{};
