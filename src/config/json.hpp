@@ -5,6 +5,11 @@
 #include <optional>
 
 NLOHMANN_JSON_NAMESPACE_BEGIN
+/**
+ * @brief Serializer for std::optional<T>
+ *
+ * @tparam T
+ */
 template <typename T>
 struct adl_serializer<std::optional<T>>
 {

@@ -3,6 +3,10 @@
 
 #include <filesystem>
 
+/**
+ * @brief Application-wide constants and paths, this is a singleton class
+ *
+ */
 class Constants
 {
    private:
