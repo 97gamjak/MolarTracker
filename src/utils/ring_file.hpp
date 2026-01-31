@@ -43,6 +43,7 @@ class RingFile
    public:
     // TODO: as soon as migration to mstd is done, create a nice Sink interface,
     // so that std::cerr can be passed as a sink
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-93
     explicit RingFile() = default;   // for std::cerr outputs
     explicit RingFile(const Config& config);
 

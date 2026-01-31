@@ -10,6 +10,7 @@
 #include "ui/main_window.hpp"
 
 // TODO: move this to some initialization module
+// https://97gamjak.atlassian.net/browse/MOLTRACK-96
 /**
  * @brief Initializes the global configuration
  *

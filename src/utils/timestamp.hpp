@@ -7,8 +7,10 @@
 
 // TODO(97gamjak): migrate to mstd later on
 // https://97gamjak.atlassian.net/browse/MSTD-89
+// https://97gamjak.atlassian.net/browse/MOLTRACK-94
 
-// TODO: implement this with timezone support later on
+// TODO: implement this with timezone support
+// https://97gamjak.atlassian.net/browse/MOLTRACK-95
 
 /**
  * @brief Utility class for handling timestamps

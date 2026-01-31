@@ -174,6 +174,7 @@ bool RingFile::_wouldExceed(const std::uintmax_t additionalBytes) const
     const auto logicalSize = _initialFileSize + _bytesWritten + additionalBytes;
 
     // TODO: clean this MB conversion later on
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-92
     return logicalSize > _config.maxSizeMB * 1024 * 1024;
 }
 

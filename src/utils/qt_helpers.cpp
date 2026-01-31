@@ -7,6 +7,12 @@
 
 namespace utils
 {
+    /**
+     * @brief Converts a span of string_views to a QStringList
+     *
+     * @param vec
+     * @return QStringList
+     */
     QStringList toQStringList(const std::span<const std::string_view> vec)
     {
         QStringList list;
