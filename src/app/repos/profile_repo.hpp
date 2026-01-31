@@ -15,6 +15,10 @@ namespace db
 namespace app
 {
 
+    /**
+     * @brief Database implementation of Profile repository
+     *
+     */
     class ProfileRepo : public IProfileRepo
     {
        private:
@@ -39,6 +43,7 @@ namespace app
             const std::string&                newName,
             const std::optional<std::string>& newEmail
         ) override;
+
         void remove(ProfileId id) override;
     };
 

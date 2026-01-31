@@ -12,8 +12,12 @@
 namespace app
 {
 
-    class Profile;
+    class Profile;   // forward declaration
 
+    /**
+     * @brief Interface for Profile repository
+     *
+     */
     class IProfileRepo
     {
        public:
