@@ -1,26 +1,25 @@
 #ifndef __UI__MENU_BAR__MENU_BAR_HPP__
 #define __UI__MENU_BAR__MENU_BAR_HPP__
 
+#include <QMenuBar>
 #include <QObject>
 
+#include "file_menu.hpp"
+
 class QMainWindow;   // Forward declaration
-class QMenuBar;      // Forward declaration
 class QAction;       // Forward declaration
 
 namespace ui
 {
     class DebugMenu;   // Forward declaration
-    class FileMenu;    // Forward declaration
 
-    class MenuBar : public QObject
+    class MenuBar : public QMenuBar
     {
         Q_OBJECT
 
        private:
-        QMainWindow& _mainWindow;
-
         DebugMenu* _debugMenu = nullptr;
-        FileMenu*  _fileMenu  = nullptr;
+        FileMenu   _fileMenu;
 
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
@@ -50,7 +49,9 @@ namespace ui
         void requestAbout();
 
        public:
-        explicit MenuBar(QMainWindow& mainWindow);
+        explicit MenuBar(QWidget* parent = nullptr);
+
+        FileMenu& getFileMenu() { return _fileMenu; }
 
         void build();
 

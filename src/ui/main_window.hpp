@@ -2,8 +2,10 @@
 #define __UI__MAIN_WINDOW_HPP__
 
 #include <QMainWindow>
+#include <memory>
 
 #include "commands/undo_stack.hpp"
+#include "ui/controller/file_menu_controller.hpp"
 
 namespace app
 {
@@ -25,6 +27,8 @@ namespace ui
         MenuBar*         _menuBar         = nullptr;
         UndoRedoBinder*  _undoRedoBinder  = nullptr;
         DebugMenuBinder* _debugMenuBinder = nullptr;
+
+        std::unique_ptr<FileMenuController> _fileMenuController;
 
         UndoStack _undoStack;
         bool      _dummyFlag = false;

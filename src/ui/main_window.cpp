@@ -38,8 +38,14 @@ namespace ui
 
     void MainWindow::_buildMenuBar()
     {
-        _menuBar = new MenuBar{*this};
-        _menuBar->build();
+        _menuBar = new MenuBar{this};
+        setMenuBar(_menuBar);
+
+        _fileMenuController = std::make_unique<FileMenuController>(
+            *this,
+            _menuBar->getFileMenu(),
+            _appContext
+        );
 
         // clang-format off
         _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
@@ -47,8 +53,6 @@ namespace ui
         // clang-format on
 
         // clang-format off
-        connect(_menuBar, &MenuBar::requestQuit, this, &QWidget::close);
-        connect(_menuBar, &MenuBar::requestSave, this, &MainWindow::_onSaveRequested);
         connect(_menuBar, &MenuBar::requestPreferences, this, &MainWindow::_onPreferencesRequested);
         connect(_menuBar, &MenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
         // clang-format on
@@ -69,13 +73,6 @@ namespace ui
         tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
         tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
-    }
-
-    void MainWindow::_onSaveRequested()
-    {
-        _appContext.getStore().commit();
-        _appContext.getSettings().save();
-        statusBar()->showMessage("Save requested");
     }
 
     void MainWindow::_onPreferencesRequested()

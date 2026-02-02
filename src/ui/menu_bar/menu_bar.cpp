@@ -10,37 +10,24 @@
 namespace ui
 {
 
-    MenuBar::MenuBar(QMainWindow& mainWindow)
-        : QObject{&mainWindow}, _mainWindow{mainWindow}
+    MenuBar::MenuBar(QWidget* parent) : QMenuBar{parent}, _fileMenu{*this}
     {
-        _fileMenu  = new FileMenu{_mainWindow};
-        _debugMenu = new DebugMenu{_mainWindow};
+        // _debugMenu = new DebugMenu{*parent};
 
         // clang-format off
-        connect(_fileMenu, &FileMenu::requestSave, this, &MenuBar::requestSave);
-        connect(_fileMenu, &FileMenu::requestQuit, this, &MenuBar::requestQuit);
-
-        connect(_debugMenu, &DebugMenu::requestDebugSlots, this, &MenuBar::requestDebugSlots);
-        connect(_debugMenu, &DebugMenu::requestLogViewer, this, &MenuBar::requestLogViewer);
+        // connect(_debugMenu, &DebugMenu::requestDebugSlots, this, &MenuBar::requestDebugSlots);
+        // connect(_debugMenu, &DebugMenu::requestLogViewer, this, &MenuBar::requestLogViewer);
         // clang-format on
+
+        build();
     }
 
     void MenuBar::build()
     {
-        auto* bar = _mainWindow.menuBar();
-
-        _buildFileMenu(bar);
-        _buildEditMenu(bar);
-        _buildSettingsMenu(bar);
-        _buildDebugMenu(bar);
-        _buildHelpMenu(bar);
-    }
-
-    void MenuBar::_buildFileMenu(QMenuBar* menu)
-    {
-        auto* fileMenu = menu->addMenu("&File");
-
-        _fileMenu->build(fileMenu);
+        _buildEditMenu(this);
+        _buildSettingsMenu(this);
+        _buildDebugMenu(this);
+        _buildHelpMenu(this);
     }
 
     void MenuBar::_buildEditMenu(QMenuBar* menu)
@@ -71,11 +58,11 @@ namespace ui
         );
     }
 
-    void MenuBar::_buildDebugMenu(QMenuBar* menu)
+    void MenuBar::_buildDebugMenu(QMenuBar* /*menu*/)
     {
-        auto* debugMenu = menu->addMenu("&Debug");
+        // auto* debugMenu = menu->addMenu("&Debug");
 
-        _debugMenu->build(debugMenu);
+        // _debugMenu->build(debugMenu);
     }
 
     void MenuBar::_buildHelpMenu(QMenuBar* menu)

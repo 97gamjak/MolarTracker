@@ -3,9 +3,9 @@
 
 #include <QObject>
 
-class QAction;       // Forward declaration
-class QMainWindow;   // Forward declaration
-class QMenu;         // Forward declaration
+class QAction;    // Forward declaration
+class QMenu;      // Forward declaration
+class QMenuBar;   // Forward declaration
 
 namespace ui
 {
@@ -18,15 +18,13 @@ namespace ui
         void requestQuit();
 
        private:
-        QMainWindow& _mainWindow;
+        QMenu* _fileMenu = nullptr;
 
         QAction* _saveAction = nullptr;
         QAction* _quitAction = nullptr;
 
        public:
-        explicit FileMenu(QMainWindow& mainWindow);
-
-        void build(QMenu* parentMenu);
+        explicit FileMenu(QMenuBar& menuBar);
     };
 
 }   // namespace ui

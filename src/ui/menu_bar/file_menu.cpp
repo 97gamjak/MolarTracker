@@ -7,18 +7,15 @@
 namespace ui
 {
 
-    FileMenu::FileMenu(QMainWindow& mainWindow)
-        : QObject{&mainWindow}, _mainWindow{mainWindow}
+    FileMenu::FileMenu(QMenuBar& menuBar) : QObject{&menuBar}
     {
-    }
+        _fileMenu = menuBar.addMenu("&File");
 
-    void FileMenu::build(QMenu* parentMenu)
-    {
-        _saveAction = parentMenu->addAction("&Save");
+        _saveAction = _fileMenu->addAction("&Save");
         _saveAction->setShortcut(QKeySequence::Save);
         connect(_saveAction, &QAction::triggered, this, &FileMenu::requestSave);
 
-        _quitAction = parentMenu->addAction("&Quit");
+        _quitAction = _fileMenu->addAction("&Quit");
         _quitAction->setShortcut(QKeySequence::Quit);
         connect(_quitAction, &QAction::triggered, this, &FileMenu::requestQuit);
     }
