@@ -18,7 +18,7 @@ namespace ui
 
     class DebugMenuController : public QObject
     {
-        Q_OBJECT;
+        Q_OBJECT
 
        private:
         QMainWindow&     _mainWindow;

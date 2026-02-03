@@ -52,12 +52,16 @@ namespace ui
             _appContext
         );
 
+        _settingsMenuController = std::make_unique<SettingsMenuController>(
+            *this,
+            _menuBar->getSettingsMenu()
+        );
+
         // clang-format off
         _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
         // clang-format on
 
         // clang-format off
-        connect(_menuBar, &MenuBar::requestPreferences, this, &MainWindow::_onPreferencesRequested);
         connect(_menuBar, &MenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
         // clang-format on
     }
@@ -77,11 +81,6 @@ namespace ui
         tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
         tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
-    }
-
-    void MainWindow::_onPreferencesRequested()
-    {
-        QMessageBox::information(this, "Preferences", "Preferences requested");
     }
 
     void MainWindow::_onAboutRequested()

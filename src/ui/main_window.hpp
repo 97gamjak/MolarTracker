@@ -7,6 +7,7 @@
 #include "commands/undo_stack.hpp"
 #include "ui/controller/debug_menu_controller.hpp"
 #include "ui/controller/file_menu_controller.hpp"
+#include "ui/controller/settings_menu_controller.hpp"
 
 namespace app
 {
@@ -15,9 +16,8 @@ namespace app
 
 namespace ui
 {
-    class MenuBar;           // Forward declaration
-    class UndoRedoBinder;    // Forward declaration
-    class DebugMenuBinder;   // Forward declaration
+    class MenuBar;          // Forward declaration
+    class UndoRedoBinder;   // Forward declaration
 
     class MainWindow final : public QMainWindow
     {
@@ -28,8 +28,9 @@ namespace ui
         MenuBar*         _menuBar        = nullptr;
         UndoRedoBinder*  _undoRedoBinder = nullptr;
 
-        std::unique_ptr<FileMenuController>  _fileMenuController;
-        std::unique_ptr<DebugMenuController> _debugMenuController;
+        std::unique_ptr<FileMenuController>     _fileMenuController;
+        std::unique_ptr<DebugMenuController>    _debugMenuController;
+        std::unique_ptr<SettingsMenuController> _settingsMenuController;
 
         UndoStack _undoStack;
         bool      _dummyFlag = false;

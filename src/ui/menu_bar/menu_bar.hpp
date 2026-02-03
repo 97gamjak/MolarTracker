@@ -24,10 +24,9 @@ namespace ui
         DebugMenu    _debugMenu;
         SettingsMenu _settingsMenu;
 
-        QAction* _undoAction        = nullptr;
-        QAction* _redoAction        = nullptr;
-        QAction* _preferencesAction = nullptr;
-        QAction* _aboutAction       = nullptr;
+        QAction* _undoAction  = nullptr;
+        QAction* _redoAction  = nullptr;
+        QAction* _aboutAction = nullptr;
 
        private:
         void _buildEditMenu(QMenuBar* menu);
@@ -45,8 +44,9 @@ namespace ui
        public:
         explicit MenuBar(QWidget* parent = nullptr);
 
-        FileMenu&  getFileMenu() { return _fileMenu; }
-        DebugMenu& getDebugMenu() { return _debugMenu; }
+        FileMenu&     getFileMenu() { return _fileMenu; }
+        DebugMenu&    getDebugMenu() { return _debugMenu; }
+        SettingsMenu& getSettingsMenu() { return _settingsMenu; }
 
         void build();
 
