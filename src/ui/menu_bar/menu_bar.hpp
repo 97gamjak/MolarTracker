@@ -17,6 +17,10 @@ namespace ui
 {
     class DebugMenu;   // Forward declaration
 
+    /**
+     * @brief Application menu bar inheriting from QMenuBar
+     *
+     */
     class MenuBar : public QMenuBar
     {
         Q_OBJECT
@@ -31,11 +35,11 @@ namespace ui
        public:
         explicit MenuBar(QWidget* parent = nullptr);
 
-        FileMenu&     getFileMenu() { return _fileMenu; }
-        EditMenu&     getEditMenu() { return _editMenu; }
-        DebugMenu&    getDebugMenu() { return _debugMenu; }
-        SettingsMenu& getSettingsMenu() { return _settingsMenu; }
-        HelpMenu&     getHelpMenu() { return _helpMenu; }
+        FileMenu&     getFileMenu();
+        EditMenu&     getEditMenu();
+        DebugMenu&    getDebugMenu();
+        SettingsMenu& getSettingsMenu();
+        HelpMenu&     getHelpMenu();
     };
 
 }   // namespace ui
