@@ -10,6 +10,10 @@ namespace ui
     class EditMenu;
     class UndoStack;
 
+    /**
+     * @brief Binds the edit menu actions to their respective functionalities.
+     *
+     */
     class EditMenuController : public QObject
     {
         Q_OBJECT

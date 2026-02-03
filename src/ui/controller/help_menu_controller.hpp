@@ -9,6 +9,10 @@ namespace ui
 {
     class HelpMenu;
 
+    /**
+     * @brief Controller for the help menu actions
+     *
+     */
     class HelpMenuController : public QObject
     {
         Q_OBJECT

@@ -8,6 +8,13 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Settings Menu Controller:: Settings Menu
+     * Controller object
+     *
+     * @param mainWindow
+     * @param settingsMenu
+     */
     SettingsMenuController::SettingsMenuController(
         QMainWindow&  mainWindow,
         SettingsMenu& settingsMenu
@@ -24,6 +31,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Handle preferences request
+     *
+     */
     void SettingsMenuController::_onPreferencesRequested()
     {
         QMessageBox::information(

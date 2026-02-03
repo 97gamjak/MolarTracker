@@ -8,6 +8,12 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Help Menu Controller:: Help Menu Controller object
+     *
+     * @param mainWindow
+     * @param helpMenu
+     */
     HelpMenuController::HelpMenuController(
         QMainWindow& mainWindow,
         HelpMenu&    helpMenu
@@ -22,6 +28,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Handle about request
+     *
+     */
     void HelpMenuController::_onAboutRequested()
     {
         QMessageBox::information(

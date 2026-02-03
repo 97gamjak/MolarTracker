@@ -13,6 +13,14 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Debug Menu Controller:: Debug Menu Controller
+     * object
+     *
+     * @param mainWindow
+     * @param debugMenu
+     * @param appContext
+     */
     DebugMenuController::DebugMenuController(
         QMainWindow&     mainWindow,
         DebugMenu&       debugMenu,
@@ -38,6 +46,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Handle log viewer request
+     *
+     */
     void DebugMenuController::_onRequestLogViewer()
     {
         _ensureDebugSlotsDialog();
@@ -52,6 +64,10 @@ namespace ui
             statusBar->showMessage("Debug slots opened");
     }
 
+    /**
+     * @brief Handle debug slots request
+     *
+     */
     void DebugMenuController::_onRequestDebugSlots()
     {
         _ensureLogViewerDialog();

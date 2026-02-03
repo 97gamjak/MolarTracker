@@ -16,6 +16,10 @@ namespace ui
     class DebugSlotsDialog;
     class LogViewerDialog;
 
+    /**
+     * @brief Controller for the debug menu actions
+     *
+     */
     class DebugMenuController : public QObject
     {
         Q_OBJECT

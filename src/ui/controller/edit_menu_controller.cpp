@@ -9,6 +9,13 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Edit Menu Controller:: Edit Menu Controller object
+     *
+     * @param mainWindow The main window of the application
+     * @param editMenu The edit menu containing undo/redo actions
+     * @param undoStack The undo stack managing undo/redo operations
+     */
     EditMenuController::EditMenuController(
         QMainWindow& mainWindow,
         EditMenu&    editMenu,
@@ -33,6 +40,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Slot called when an undo is requested from the UI
+     *
+     */
     void EditMenuController::_onUndoRequested()
     {
         _undoStack.undo();
@@ -43,6 +54,10 @@ namespace ui
             statusBar->showMessage("Undo requested");
     }
 
+    /**
+     * @brief Slot called when a redo is requested from the UI
+     *
+     */
     void EditMenuController::_onRedoRequested()
     {
         _undoStack.redo();
