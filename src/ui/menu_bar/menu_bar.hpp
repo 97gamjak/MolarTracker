@@ -6,6 +6,7 @@
 
 #include "debug_menu.hpp"
 #include "file_menu.hpp"
+#include "help_menu.hpp"
 #include "settings_menu.hpp"
 
 class QMainWindow;   // Forward declaration
@@ -23,6 +24,7 @@ namespace ui
         FileMenu     _fileMenu;
         DebugMenu    _debugMenu;
         SettingsMenu _settingsMenu;
+        HelpMenu     _helpMenu;
 
         QAction* _undoAction  = nullptr;
         QAction* _redoAction  = nullptr;
@@ -47,6 +49,7 @@ namespace ui
         FileMenu&     getFileMenu() { return _fileMenu; }
         DebugMenu&    getDebugMenu() { return _debugMenu; }
         SettingsMenu& getSettingsMenu() { return _settingsMenu; }
+        HelpMenu&     getHelpMenu() { return _helpMenu; }
 
         void build();
 

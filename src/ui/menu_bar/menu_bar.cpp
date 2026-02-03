@@ -14,16 +14,13 @@ namespace ui
         : QMenuBar{parent},
           _fileMenu{*this},
           _debugMenu{*this},
-          _settingsMenu{*this}
+          _settingsMenu{*this},
+          _helpMenu{*this}
     {
         build();
     }
 
-    void MenuBar::build()
-    {
-        _buildEditMenu(this);
-        _buildHelpMenu(this);
-    }
+    void MenuBar::build() { _buildEditMenu(this); }
 
     void MenuBar::_buildEditMenu(QMenuBar* menu)
     {
@@ -38,19 +35,6 @@ namespace ui
         _redoAction->setShortcut(QKeySequence::Redo);
         _redoAction->setEnabled(false);
         connect(_redoAction, &QAction::triggered, this, &MenuBar::requestRedo);
-    }
-
-    void MenuBar::_buildHelpMenu(QMenuBar* menu)
-    {
-        auto* helpMenu = menu->addMenu("&Help");
-
-        _aboutAction = helpMenu->addAction("&About");
-        connect(
-            _aboutAction,
-            &QAction::triggered,
-            this,
-            &MenuBar::requestAbout
-        );
     }
 
     void MenuBar::setUndoEnabled(bool enabled)
