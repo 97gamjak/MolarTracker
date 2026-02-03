@@ -13,7 +13,7 @@ namespace ui
     {
         _settingsMenu = menuBar.addMenu("&Settings");
 
-        _preferencesAction = _settingsMenu->addAction("Preferences");
+        _preferencesAction = _settingsMenu->addAction("&Preferences");
 
         connect(
             _preferencesAction,
