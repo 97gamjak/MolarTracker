@@ -27,6 +27,11 @@ namespace ui
 
        public:
         explicit EditMenu(QMenuBar& menuBar);
+
+        void setUndoEnabled(bool enabled);
+        void setRedoEnabled(bool enabled);
+        void setUndoText(const QString& text);
+        void setRedoText(const QString& text);
     };
 
 }   // namespace ui

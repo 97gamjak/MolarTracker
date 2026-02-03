@@ -6,6 +6,7 @@
 
 #include "commands/undo_stack.hpp"
 #include "ui/controller/debug_menu_controller.hpp"
+#include "ui/controller/edit_menu_controller.hpp"
 #include "ui/controller/file_menu_controller.hpp"
 #include "ui/controller/help_menu_controller.hpp"
 #include "ui/controller/settings_menu_controller.hpp"
@@ -30,6 +31,7 @@ namespace ui
         UndoRedoBinder*  _undoRedoBinder = nullptr;
 
         std::unique_ptr<FileMenuController>     _fileMenuController;
+        std::unique_ptr<EditMenuController>     _editMenuController;
         std::unique_ptr<DebugMenuController>    _debugMenuController;
         std::unique_ptr<SettingsMenuController> _settingsMenuController;
         std::unique_ptr<HelpMenuController>     _helpMenuController;

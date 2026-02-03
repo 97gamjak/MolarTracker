@@ -22,4 +22,24 @@ namespace ui
         connect(_redoAction, &QAction::triggered, this, &EditMenu::requestRedo);
     }
 
+    void EditMenu::setUndoEnabled(bool enabled)
+    {
+        _undoAction->setEnabled(enabled);
+    }
+
+    void EditMenu::setRedoEnabled(bool enabled)
+    {
+        _redoAction->setEnabled(enabled);
+    }
+
+    void EditMenu::setUndoText(const QString& text)
+    {
+        _undoAction->setText(text);
+    }
+
+    void EditMenu::setRedoText(const QString& text)
+    {
+        _redoAction->setText(text);
+    }
+
 }   // namespace ui

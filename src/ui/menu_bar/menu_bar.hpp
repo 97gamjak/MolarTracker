@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "debug_menu.hpp"
+#include "edit_menu.hpp"
 #include "file_menu.hpp"
 #include "help_menu.hpp"
 #include "settings_menu.hpp"
@@ -22,42 +23,19 @@ namespace ui
 
        private:
         FileMenu     _fileMenu;
+        EditMenu     _editMenu;
         DebugMenu    _debugMenu;
         SettingsMenu _settingsMenu;
         HelpMenu     _helpMenu;
-
-        QAction* _undoAction  = nullptr;
-        QAction* _redoAction  = nullptr;
-        QAction* _aboutAction = nullptr;
-
-       private:
-        void _buildEditMenu(QMenuBar* menu);
-        void _buildHelpMenu(QMenuBar* menu);
-
-       signals:
-        // edit menu
-        void requestUndo();
-        void requestRedo();
-        // settings menu
-        void requestPreferences();
-        // help menu
-        void requestAbout();
 
        public:
         explicit MenuBar(QWidget* parent = nullptr);
 
         FileMenu&     getFileMenu() { return _fileMenu; }
+        EditMenu&     getEditMenu() { return _editMenu; }
         DebugMenu&    getDebugMenu() { return _debugMenu; }
         SettingsMenu& getSettingsMenu() { return _settingsMenu; }
         HelpMenu&     getHelpMenu() { return _helpMenu; }
-
-        void build();
-
-        void setUndoEnabled(bool enabled);
-        void setRedoEnabled(bool enabled);
-
-        void setUndoText(const QString& text);
-        void setRedoText(const QString& text);
     };
 
 }   // namespace ui

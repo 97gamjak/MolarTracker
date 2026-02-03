@@ -13,48 +13,11 @@ namespace ui
     MenuBar::MenuBar(QWidget* parent)
         : QMenuBar{parent},
           _fileMenu{*this},
+          _editMenu{*this},
           _debugMenu{*this},
           _settingsMenu{*this},
           _helpMenu{*this}
     {
-        build();
-    }
-
-    void MenuBar::build() { _buildEditMenu(this); }
-
-    void MenuBar::_buildEditMenu(QMenuBar* menu)
-    {
-        auto* editMenu = menu->addMenu("&Edit");
-
-        _undoAction = editMenu->addAction("&Undo");
-        _undoAction->setShortcut(QKeySequence::Undo);
-        _undoAction->setEnabled(false);
-        connect(_undoAction, &QAction::triggered, this, &MenuBar::requestUndo);
-
-        _redoAction = editMenu->addAction("&Redo");
-        _redoAction->setShortcut(QKeySequence::Redo);
-        _redoAction->setEnabled(false);
-        connect(_redoAction, &QAction::triggered, this, &MenuBar::requestRedo);
-    }
-
-    void MenuBar::setUndoEnabled(bool enabled)
-    {
-        _undoAction->setEnabled(enabled);
-    }
-
-    void MenuBar::setRedoEnabled(bool enabled)
-    {
-        _redoAction->setEnabled(enabled);
-    }
-
-    void MenuBar::setUndoText(const QString& text)
-    {
-        _undoAction->setText(text);
-    }
-
-    void MenuBar::setRedoText(const QString& text)
-    {
-        _redoAction->setText(text);
     }
 
 }   // namespace ui
