@@ -38,6 +38,14 @@ namespace ui
             this,
             &EditMenuController::_onRedoRequested
         );
+        connect(
+            &_undoStack,
+            &UndoStack::changed,
+            this,
+            &EditMenuController::refresh
+        );
+
+        refresh();
     }
 
     /**
