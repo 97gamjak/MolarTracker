@@ -10,8 +10,6 @@
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
-#include "ui/binders/debug_menu_binder.hpp"
-#include "ui/binders/undo_redo_binder.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
@@ -38,20 +36,36 @@ namespace ui
 
     void MainWindow::_buildMenuBar()
     {
-        _menuBar = new MenuBar{*this};
-        _menuBar->build();
+        _menuBar = new MenuBar{this};
+        setMenuBar(_menuBar);
 
-        // clang-format off
-        _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
-        _debugMenuBinder = new DebugMenuBinder{*this, *_menuBar};
-        // clang-format on
+        _fileMenuController = std::make_unique<FileMenuController>(
+            *this,
+            _menuBar->getFileMenu(),
+            _appContext
+        );
 
-        // clang-format off
-        connect(_menuBar, &MenuBar::requestQuit, this, &QWidget::close);
-        connect(_menuBar, &MenuBar::requestSave, this, &MainWindow::_onSaveRequested);
-        connect(_menuBar, &MenuBar::requestPreferences, this, &MainWindow::_onPreferencesRequested);
-        connect(_menuBar, &MenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
-        // clang-format on
+        _editMenuController = std::make_unique<EditMenuController>(
+            *this,
+            _menuBar->getEditMenu(),
+            _undoStack
+        );
+
+        _debugMenuController = std::make_unique<DebugMenuController>(
+            *this,
+            _menuBar->getDebugMenu(),
+            _appContext
+        );
+
+        _settingsMenuController = std::make_unique<SettingsMenuController>(
+            *this,
+            _menuBar->getSettingsMenu()
+        );
+
+        _helpMenuController = std::make_unique<HelpMenuController>(
+            *this,
+            _menuBar->getHelpMenu()
+        );
     }
 
     void MainWindow::_buildCentral()
@@ -69,28 +83,6 @@ namespace ui
         tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
         tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
-    }
-
-    void MainWindow::_onSaveRequested()
-    {
-        _appContext.getStore().commit();
-        _appContext.getSettings().save();
-        statusBar()->showMessage("Save requested");
-    }
-
-    void MainWindow::_onPreferencesRequested()
-    {
-        QMessageBox::information(this, "Preferences", "Preferences requested");
-    }
-
-    void MainWindow::_onAboutRequested()
-    {
-        QMessageBox::information(
-            this,
-            "About Molar Tracker",
-            "Molar Tracker\nVersion 0.1.0\n\n(c) 2025-now Molar Tracker "
-            "Contributors: Jakob Gamper"
-        );
     }
 
     // TODO: rename to _loadInitialProfile or similar

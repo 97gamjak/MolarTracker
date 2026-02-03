@@ -1,64 +1,43 @@
 #ifndef __UI__MENU_BAR__MENU_BAR_HPP__
 #define __UI__MENU_BAR__MENU_BAR_HPP__
 
+#include <QMenuBar>
 #include <QObject>
 
+#include "debug_menu.hpp"
+#include "edit_menu.hpp"
+#include "file_menu.hpp"
+#include "help_menu.hpp"
+#include "settings_menu.hpp"
+
 class QMainWindow;   // Forward declaration
-class QMenuBar;      // Forward declaration
 class QAction;       // Forward declaration
 
 namespace ui
 {
-    class DebugMenu;   // Forward declaration
-    class FileMenu;    // Forward declaration
-
-    class MenuBar : public QObject
+    /**
+     * @brief Application menu bar inheriting from QMenuBar
+     *
+     */
+    class MenuBar : public QMenuBar
     {
         Q_OBJECT
 
        private:
-        QMainWindow& _mainWindow;
-
-        DebugMenu* _debugMenu = nullptr;
-        FileMenu*  _fileMenu  = nullptr;
-
-        QAction* _undoAction        = nullptr;
-        QAction* _redoAction        = nullptr;
-        QAction* _preferencesAction = nullptr;
-        QAction* _aboutAction       = nullptr;
-
-       private:
-        void _buildFileMenu(QMenuBar* menu);
-        void _buildEditMenu(QMenuBar* menu);
-        void _buildSettingsMenu(QMenuBar* menu);
-        void _buildDebugMenu(QMenuBar* menu);
-        void _buildHelpMenu(QMenuBar* menu);
-
-       signals:
-        // edit menu
-        void requestUndo();
-        void requestRedo();
-        // file menu
-        void requestQuit();
-        void requestSave();
-        // debug menu
-        void requestDebugSlots();
-        void requestLogViewer();
-        // settings menu
-        void requestPreferences();
-        // help menu
-        void requestAbout();
+        FileMenu     _fileMenu;
+        EditMenu     _editMenu;
+        DebugMenu    _debugMenu;
+        SettingsMenu _settingsMenu;
+        HelpMenu     _helpMenu;
 
        public:
-        explicit MenuBar(QMainWindow& mainWindow);
+        explicit MenuBar(QWidget* parent = nullptr);
 
-        void build();
-
-        void setUndoEnabled(bool enabled);
-        void setRedoEnabled(bool enabled);
-
-        void setUndoText(const QString& text);
-        void setRedoText(const QString& text);
+        FileMenu&     getFileMenu();
+        EditMenu&     getEditMenu();
+        DebugMenu&    getDebugMenu();
+        SettingsMenu& getSettingsMenu();
+        HelpMenu&     getHelpMenu();
     };
 
 }   // namespace ui

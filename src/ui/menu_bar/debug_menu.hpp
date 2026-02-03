@@ -3,12 +3,16 @@
 
 #include <QObject>
 
-class QAction;       // Forward declaration
-class QMainWindow;   // Forward declaration
-class QMenu;         // Forward declaration
+class QAction;    // Forward declaration
+class QMenuBar;   // Forward declaration
+class QMenu;      // Forward declaration
 
 namespace ui
 {
+    /**
+     * @brief Debug menu in the menu bar
+     *
+     */
     class DebugMenu : public QObject
     {
         Q_OBJECT
@@ -18,15 +22,13 @@ namespace ui
         void requestLogViewer();
 
        private:
-        QMainWindow& _mainWindow;
+        QMenu* _debugMenu = nullptr;
 
         QAction* _debugSlotsAction = nullptr;
         QAction* _logViewerAction  = nullptr;
 
        public:
-        explicit DebugMenu(QMainWindow& mainWindow);
-
-        void build(QMenu* parentMenu);
+        explicit DebugMenu(QMenuBar& menuBar);
     };
 
 }   // namespace ui

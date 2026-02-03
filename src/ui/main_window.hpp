@@ -2,8 +2,14 @@
 #define __UI__MAIN_WINDOW_HPP__
 
 #include <QMainWindow>
+#include <memory>
 
 #include "commands/undo_stack.hpp"
+#include "ui/controller/debug_menu_controller.hpp"
+#include "ui/controller/edit_menu_controller.hpp"
+#include "ui/controller/file_menu_controller.hpp"
+#include "ui/controller/help_menu_controller.hpp"
+#include "ui/controller/settings_menu_controller.hpp"
 
 namespace app
 {
@@ -12,9 +18,7 @@ namespace app
 
 namespace ui
 {
-    class MenuBar;           // Forward declaration
-    class UndoRedoBinder;    // Forward declaration
-    class DebugMenuBinder;   // Forward declaration
+    class MenuBar;   // Forward declaration
 
     class MainWindow final : public QMainWindow
     {
@@ -22,12 +26,15 @@ namespace ui
 
        private:
         app::AppContext& _appContext;
-        MenuBar*         _menuBar         = nullptr;
-        UndoRedoBinder*  _undoRedoBinder  = nullptr;
-        DebugMenuBinder* _debugMenuBinder = nullptr;
+        MenuBar*         _menuBar = nullptr;
+
+        std::unique_ptr<FileMenuController>     _fileMenuController;
+        std::unique_ptr<EditMenuController>     _editMenuController;
+        std::unique_ptr<DebugMenuController>    _debugMenuController;
+        std::unique_ptr<SettingsMenuController> _settingsMenuController;
+        std::unique_ptr<HelpMenuController>     _helpMenuController;
 
         UndoStack _undoStack;
-        bool      _dummyFlag = false;
 
        public:
         explicit MainWindow(app::AppContext& app, QWidget* parent = nullptr);
@@ -38,10 +45,6 @@ namespace ui
         void _buildCentral();
 
         void _ensureProfileExists();
-
-        void _onSaveRequested();
-        void _onPreferencesRequested();
-        void _onAboutRequested();
     };
 
 }   // namespace ui

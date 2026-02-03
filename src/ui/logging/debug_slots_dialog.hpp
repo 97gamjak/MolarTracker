@@ -11,10 +11,10 @@ class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration
 class QTreeWidget;        // Forward declaration
 class QDialogButtonBox;   // Forward declaration
+class QMainWindow;        // Forward declaration
 
 namespace ui
 {
-    class MainWindow;   // Forward declaration
 
     class DebugSlotsDialog final : public QDialog
     {
@@ -33,7 +33,7 @@ namespace ui
         QDialogButtonBox* _buttonBox{};
 
        public:
-        explicit DebugSlotsDialog(MainWindow& parent);
+        explicit DebugSlotsDialog(QMainWindow& parent);
 
        private:
         void _buildUi();
