@@ -6,6 +6,7 @@
 
 #include "debug_menu.hpp"
 #include "file_menu.hpp"
+#include "settings_menu.hpp"
 
 class QMainWindow;   // Forward declaration
 class QAction;       // Forward declaration
@@ -19,8 +20,9 @@ namespace ui
         Q_OBJECT
 
        private:
-        FileMenu  _fileMenu;
-        DebugMenu _debugMenu;
+        FileMenu     _fileMenu;
+        DebugMenu    _debugMenu;
+        SettingsMenu _settingsMenu;
 
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
@@ -29,7 +31,6 @@ namespace ui
 
        private:
         void _buildEditMenu(QMenuBar* menu);
-        void _buildSettingsMenu(QMenuBar* menu);
         void _buildHelpMenu(QMenuBar* menu);
 
        signals:

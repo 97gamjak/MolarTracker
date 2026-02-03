@@ -11,7 +11,10 @@ namespace ui
 {
 
     MenuBar::MenuBar(QWidget* parent)
-        : QMenuBar{parent}, _fileMenu{*this}, _debugMenu{*this}
+        : QMenuBar{parent},
+          _fileMenu{*this},
+          _debugMenu{*this},
+          _settingsMenu{*this}
     {
         build();
     }
@@ -19,7 +22,6 @@ namespace ui
     void MenuBar::build()
     {
         _buildEditMenu(this);
-        _buildSettingsMenu(this);
         _buildHelpMenu(this);
     }
 
@@ -36,19 +38,6 @@ namespace ui
         _redoAction->setShortcut(QKeySequence::Redo);
         _redoAction->setEnabled(false);
         connect(_redoAction, &QAction::triggered, this, &MenuBar::requestRedo);
-    }
-
-    void MenuBar::_buildSettingsMenu(QMenuBar* menu)
-    {
-        auto* settingsMenu = menu->addMenu("&Settings");
-
-        _preferencesAction = settingsMenu->addAction("&Preferences");
-        connect(
-            _preferencesAction,
-            &QAction::triggered,
-            this,
-            &MenuBar::requestPreferences
-        );
     }
 
     void MenuBar::_buildHelpMenu(QMenuBar* menu)
