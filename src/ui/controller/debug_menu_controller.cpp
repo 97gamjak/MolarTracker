@@ -8,7 +8,6 @@
 #include "app/app_context.hpp"
 #include "ui/logging/debug_slots_dialog.hpp"
 #include "ui/logging/log_viewer_dialog.hpp"
-#include "ui/main_window.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
 
 namespace ui
