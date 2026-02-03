@@ -1,5 +1,7 @@
 #include "settings_menu.hpp"
 
+#include <QAction>
+#include <QMenu>
 #include <QMenuBar>
 
 namespace ui
