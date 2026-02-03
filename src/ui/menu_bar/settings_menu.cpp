@@ -9,7 +9,7 @@ namespace ui
      *
      * @param menuBar
      */
-    SettingsMenu::SettingsMenu(QMenuBar& menuBar)
+    SettingsMenu::SettingsMenu(QMenuBar& menuBar) : QObject{&menuBar}
     {
         _settingsMenu = menuBar.addMenu("&Settings");
 
