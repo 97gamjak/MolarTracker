@@ -28,7 +28,8 @@ namespace ui
      *
      * @param mainWindow Parent main window
      */
-    DebugSlotsDialog::DebugSlotsDialog(MainWindow& mainWindow)
+    // TODO: check if mainwindow is necessary
+    DebugSlotsDialog::DebugSlotsDialog(QMainWindow& mainWindow)
         : QDialog(&mainWindow)
     {
         _initCategories();

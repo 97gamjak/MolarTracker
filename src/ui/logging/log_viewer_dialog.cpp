@@ -18,7 +18,8 @@
 namespace ui
 {
 
-    LogViewerDialog::LogViewerDialog(MainWindow& mainWindow)
+    // TODO: check if mainwindow is necessary
+    LogViewerDialog::LogViewerDialog(QMainWindow& mainWindow)
         : QDialog(&mainWindow),
           _textEdit(new QPlainTextEdit(this)),
           _reloadButton(new QPushButton(tr("Reload"), this)),
@@ -129,7 +130,8 @@ namespace ui
     {
         QDialog::showEvent(event);
 
-        // Always reload the log when the dialog is shown to avoid stale content.
+        // Always reload the log when the dialog is shown to avoid stale
+        // content.
         reloadLog();
         if (_autoReloadCheckBox->isChecked())
             _reloadTimer->start();

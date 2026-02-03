@@ -1,6 +1,5 @@
 add_library(molartracker_binders_ui STATIC
     undo_redo_binder.cpp
-    debug_menu_binder.cpp
 )
 
 target_include_directories(molartracker_binders_ui

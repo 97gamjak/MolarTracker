@@ -10,7 +10,6 @@
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
-#include "ui/binders/debug_menu_binder.hpp"
 #include "ui/binders/undo_redo_binder.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
@@ -47,9 +46,14 @@ namespace ui
             _appContext
         );
 
+        _debugMenuController = std::make_unique<DebugMenuController>(
+            *this,
+            _menuBar->getDebugMenu(),
+            _appContext
+        );
+
         // clang-format off
         _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
-        _debugMenuBinder = new DebugMenuBinder{*this, *_menuBar};
         // clang-format on
 
         // clang-format off

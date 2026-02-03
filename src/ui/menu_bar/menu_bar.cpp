@@ -10,15 +10,9 @@
 namespace ui
 {
 
-    MenuBar::MenuBar(QWidget* parent) : QMenuBar{parent}, _fileMenu{*this}
+    MenuBar::MenuBar(QWidget* parent)
+        : QMenuBar{parent}, _fileMenu{*this}, _debugMenu{*this}
     {
-        // _debugMenu = new DebugMenu{*parent};
-
-        // clang-format off
-        // connect(_debugMenu, &DebugMenu::requestDebugSlots, this, &MenuBar::requestDebugSlots);
-        // connect(_debugMenu, &DebugMenu::requestLogViewer, this, &MenuBar::requestLogViewer);
-        // clang-format on
-
         build();
     }
 
@@ -26,7 +20,6 @@ namespace ui
     {
         _buildEditMenu(this);
         _buildSettingsMenu(this);
-        _buildDebugMenu(this);
         _buildHelpMenu(this);
     }
 
@@ -56,13 +49,6 @@ namespace ui
             this,
             &MenuBar::requestPreferences
         );
-    }
-
-    void MenuBar::_buildDebugMenu(QMenuBar* /*menu*/)
-    {
-        // auto* debugMenu = menu->addMenu("&Debug");
-
-        // _debugMenu->build(debugMenu);
     }
 
     void MenuBar::_buildHelpMenu(QMenuBar* menu)

@@ -8,7 +8,7 @@ namespace app
     class AppContext;   // Forward declaration
 }   // namespace app
 
-class QMainWindow;
+class QMainWindow;   // Forward declaration
 
 namespace ui
 {

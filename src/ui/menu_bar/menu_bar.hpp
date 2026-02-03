@@ -4,6 +4,7 @@
 #include <QMenuBar>
 #include <QObject>
 
+#include "debug_menu.hpp"
 #include "file_menu.hpp"
 
 class QMainWindow;   // Forward declaration
@@ -18,8 +19,8 @@ namespace ui
         Q_OBJECT
 
        private:
-        DebugMenu* _debugMenu = nullptr;
-        FileMenu   _fileMenu;
+        FileMenu  _fileMenu;
+        DebugMenu _debugMenu;
 
         QAction* _undoAction        = nullptr;
         QAction* _redoAction        = nullptr;
@@ -27,22 +28,14 @@ namespace ui
         QAction* _aboutAction       = nullptr;
 
        private:
-        void _buildFileMenu(QMenuBar* menu);
         void _buildEditMenu(QMenuBar* menu);
         void _buildSettingsMenu(QMenuBar* menu);
-        void _buildDebugMenu(QMenuBar* menu);
         void _buildHelpMenu(QMenuBar* menu);
 
        signals:
         // edit menu
         void requestUndo();
         void requestRedo();
-        // file menu
-        void requestQuit();
-        void requestSave();
-        // debug menu
-        void requestDebugSlots();
-        void requestLogViewer();
         // settings menu
         void requestPreferences();
         // help menu
@@ -51,7 +44,8 @@ namespace ui
        public:
         explicit MenuBar(QWidget* parent = nullptr);
 
-        FileMenu& getFileMenu() { return _fileMenu; }
+        FileMenu&  getFileMenu() { return _fileMenu; }
+        DebugMenu& getDebugMenu() { return _debugMenu; }
 
         void build();
 

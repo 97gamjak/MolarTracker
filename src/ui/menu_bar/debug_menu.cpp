@@ -2,18 +2,16 @@
 
 #include <QMainWindow>
 #include <QMenu>
+#include <QMenuBar>
 
 namespace ui
 {
 
-    DebugMenu::DebugMenu(QMainWindow& mainWindow)
-        : QObject{&mainWindow}, _mainWindow{mainWindow}
+    DebugMenu::DebugMenu(QMenuBar& menuBar) : QObject(&menuBar)
     {
-    }
+        _debugMenu = menuBar.addMenu("&Debug");
 
-    void DebugMenu::build(QMenu* parentMenu)
-    {
-        _debugSlotsAction = parentMenu->addAction("Debug Slots");
+        _debugSlotsAction = _debugMenu->addAction("Debug Slots");
         connect(
             _debugSlotsAction,
             &QAction::triggered,
@@ -21,7 +19,7 @@ namespace ui
             &DebugMenu::requestDebugSlots
         );
 
-        _logViewerAction = parentMenu->addAction("View Log File");
+        _logViewerAction = _debugMenu->addAction("View Log File");
         connect(
             _logViewerAction,
             &QAction::triggered,
