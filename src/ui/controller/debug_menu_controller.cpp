@@ -49,7 +49,7 @@ namespace ui
      * @brief Handle log viewer request
      *
      */
-    void DebugMenuController::_onRequestLogViewer()
+    void DebugMenuController::_onRequestDebugSlots()
     {
         _ensureDebugSlotsDialog();
 
@@ -67,7 +67,7 @@ namespace ui
      * @brief Handle debug slots request
      *
      */
-    void DebugMenuController::_onRequestDebugSlots()
+    void DebugMenuController::_onRequestLogViewer()
     {
         _ensureLogViewerDialog();
 
