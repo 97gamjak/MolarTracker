@@ -14,7 +14,7 @@ namespace ui
      * @brief Construct a new FileMenuController:: File Menu Controller object
      *
      * @param mainWindow The main window of the application
-     * @param menuBar The menu bar containing file menu actions
+     * @param fileMenu The file menu containing save/quit actions
      * @param appContext The application context
      */
     FileMenuController::FileMenuController(
