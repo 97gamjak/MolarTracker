@@ -22,7 +22,7 @@ namespace ui
         void requestLogViewer();
 
        private:
-        QMenu* _debugMenu;
+        QMenu* _debugMenu = nullptr;
 
         QAction* _debugSlotsAction = nullptr;
         QAction* _logViewerAction  = nullptr;
