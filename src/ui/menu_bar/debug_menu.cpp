@@ -7,6 +7,11 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Debug Menu:: Debug Menu object
+     *
+     * @param menuBar
+     */
     DebugMenu::DebugMenu(QMenuBar& menuBar) : QObject(&menuBar)
     {
         _debugMenu = menuBar.addMenu("&Debug");

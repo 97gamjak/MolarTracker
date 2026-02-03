@@ -9,6 +9,10 @@ class QAction;
 
 namespace ui
 {
+    /**
+     * @brief Help menu in the menu bar
+     *
+     */
     class HelpMenu : public QObject
     {
         Q_OBJECT

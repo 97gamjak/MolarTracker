@@ -7,6 +7,11 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new File Menu:: File Menu object
+     *
+     * @param menuBar
+     */
     FileMenu::FileMenu(QMenuBar& menuBar) : QObject{&menuBar}
     {
         _fileMenu = menuBar.addMenu("&File");

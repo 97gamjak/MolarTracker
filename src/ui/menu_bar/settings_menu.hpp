@@ -9,6 +9,10 @@ class QAction;
 
 namespace ui
 {
+    /**
+     * @brief Settings menu in the menu bar
+     *
+     */
     class SettingsMenu : public QObject
     {
         Q_OBJECT

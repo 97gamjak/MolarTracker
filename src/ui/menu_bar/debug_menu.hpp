@@ -9,6 +9,10 @@ class QMenu;      // Forward declaration
 
 namespace ui
 {
+    /**
+     * @brief Debug menu in the menu bar
+     *
+     */
     class DebugMenu : public QObject
     {
         Q_OBJECT
