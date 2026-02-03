@@ -2,6 +2,7 @@ add_library(molartracker_controller_ui STATIC
     file_menu_controller.cpp
     debug_menu_controller.cpp
     settings_menu_controller.cpp
+    help_menu_controller.cpp
 )
 
 target_include_directories(molartracker_controller_ui

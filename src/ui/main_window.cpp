@@ -57,12 +57,13 @@ namespace ui
             _menuBar->getSettingsMenu()
         );
 
-        // clang-format off
-        _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
-        // clang-format on
+        _helpMenuController = std::make_unique<HelpMenuController>(
+            *this,
+            _menuBar->getHelpMenu()
+        );
 
         // clang-format off
-        connect(_menuBar, &MenuBar::requestAbout, this, &MainWindow::_onAboutRequested);
+        _undoRedoBinder  = new UndoRedoBinder{*this, *_menuBar, _undoStack};
         // clang-format on
     }
 
@@ -81,16 +82,6 @@ namespace ui
         tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
         tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
-    }
-
-    void MainWindow::_onAboutRequested()
-    {
-        QMessageBox::information(
-            this,
-            "About Molar Tracker",
-            "Molar Tracker\nVersion 0.1.0\n\n(c) 2025-now Molar Tracker "
-            "Contributors: Jakob Gamper"
-        );
     }
 
     // TODO: rename to _loadInitialProfile or similar
