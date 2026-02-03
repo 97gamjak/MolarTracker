@@ -34,6 +34,8 @@ namespace ui
      */
     void HelpMenuController::_onAboutRequested()
     {
+        // TODO(97gamjak): Update with real version and info
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-98
         QMessageBox::information(
             &_mainWindow,
             "About Molar Tracker",
