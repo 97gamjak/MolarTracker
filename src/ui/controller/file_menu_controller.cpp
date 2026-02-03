@@ -6,7 +6,6 @@
 #include <QStatusBar>
 
 #include "app/app_context.hpp"
-#include "ui/main_window.hpp"
 #include "ui/menu_bar/file_menu.hpp"
 
 namespace ui
