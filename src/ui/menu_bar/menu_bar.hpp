@@ -15,8 +15,6 @@ class QAction;       // Forward declaration
 
 namespace ui
 {
-    class DebugMenu;   // Forward declaration
-
     /**
      * @brief Application menu bar inheriting from QMenuBar
      *
