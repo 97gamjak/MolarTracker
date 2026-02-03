@@ -34,7 +34,7 @@ namespace ui
        public:
         explicit FileMenuController(
             QMainWindow&     mainWindow,
-            FileMenu&        menuBar,
+            FileMenu&        fileMenu,
             app::AppContext& appContext
         );
     };
