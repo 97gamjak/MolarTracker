@@ -2,6 +2,7 @@
 #define __UI__CONTROLLER__DEBUG_MENU_CONTROLLER_HPP__
 
 #include <QObject>
+#include <QPointer>
 
 namespace app
 {
@@ -29,8 +30,8 @@ namespace ui
         DebugMenu&       _debugMenu;
         app::AppContext& _appContext;
 
-        DebugSlotsDialog* _debugSlotsDialog = nullptr;
-        LogViewerDialog*  _logViewerDialog  = nullptr;
+        DebugSlotsDialog*         _debugSlotsDialog = nullptr;
+        QPointer<LogViewerDialog> _logViewerDialog;
 
        private slots:
         void _onRequestDebugSlots();
