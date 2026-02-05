@@ -75,13 +75,13 @@ namespace ui
 
             LOG_ERROR(errorMessage);
 
-            std::unique_ptr<AddProfileCommandError> errorMessagePtr =
+            std::unique_ptr<AddProfileCommandError> error =
                 std::make_unique<AddProfileCommandError>(
                     errorMessage,
                     AddProfileCommandErrorCode::UnknownError
                 );
 
-            return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
+            return std::unexpected<CommandErrorPtr>(std::move(error));
         }
 
         if (_setAsActive)
