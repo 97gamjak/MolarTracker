@@ -27,6 +27,8 @@ namespace ui
     class CommandError : public ICommandError
     {
        public:
+        // TODO(97gamjak): implement this via mstd::enum
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-110
         enum class Type
         {
             InvalidCommand,
@@ -34,50 +36,15 @@ namespace ui
             NothingToUndo
         };
 
-        CommandError(Type type) : _type(type) {}
+        CommandError(Type type);
 
-        std::string getMessage() const override
-        {
-            switch (_type)
-            {
-                case Type::InvalidCommand:
-                    return "Invalid command";
-                case Type::NothingToRedo:
-                    return "Nothing to redo";
-                case Type::NothingToUndo:
-                    return "Nothing to undo";
-            }
-            return "Unknown error";
-        }
+        std::string getMessage() const override;
 
-        std::string getCodeStr() const override
-        {
-            switch (_type)
-            {
-                case Type::InvalidCommand:
-                    return "invalid_command";
-                case Type::NothingToRedo:
-                    return "nothing_to_redo";
-                case Type::NothingToUndo:
-                    return "nothing_to_undo";
-            }
-            return "unknown_error";
-        }
+        std::string getCodeStr() const override;
 
-        static std::unique_ptr<CommandError> makeNothingToUndoErrorPtr()
-        {
-            return std::make_unique<CommandError>(Type::NothingToUndo);
-        }
-
-        static std::unique_ptr<CommandError> makeNothingToRedoErrorPtr()
-        {
-            return std::make_unique<CommandError>(Type::NothingToRedo);
-        }
-
-        static std::unique_ptr<CommandError> makeInvalidCommandErrorPtr()
-        {
-            return std::make_unique<CommandError>(Type::InvalidCommand);
-        }
+        static std::unique_ptr<CommandError> makeNothingToUndoErrorPtr();
+        static std::unique_ptr<CommandError> makeNothingToRedoErrorPtr();
+        static std::unique_ptr<CommandError> makeInvalidCommandErrorPtr();
 
        private:
         Type _type;

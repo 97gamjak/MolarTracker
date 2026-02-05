@@ -40,6 +40,8 @@ namespace ui
     /**
      * @brief Undo the add profile command
      *
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
+     *
      */
     std::expected<void, CommandErrorPtr> AddProfileCommand::undo()
     {
@@ -121,7 +123,7 @@ namespace ui
     /**
      * @brief Redo the add profile command
      *
-     * @return std::expected<void, CommandErrorPtr>
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
      */
     std::expected<void, CommandErrorPtr> AddProfileCommand::redo()
     {

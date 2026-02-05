@@ -7,8 +7,7 @@ namespace ui
      * @brief Execute a command and add it to the undo stack
      *
      * @param command The command to execute
-     * @return true if the command was executed and added to the stack, false
-     * otherwise
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
      */
     std::expected<void, CommandErrorPtr> UndoStack::_do(
         std::unique_ptr<ICommand> command
@@ -54,6 +53,7 @@ namespace ui
     /**
      * @brief Undo the last command
      *
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
      */
     std::expected<void, CommandErrorPtr> UndoStack::undo()
     {
@@ -74,7 +74,7 @@ namespace ui
     /**
      * @brief Redo the next command
      *
-     * @return true if the command was redone, false otherwise
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
      */
     std::expected<void, CommandErrorPtr> UndoStack::redo()
     {
