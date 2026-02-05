@@ -162,7 +162,7 @@ void LogManager::log(
     buffer += _logLevelToString(level);
     buffer += " [" + Timestamp::iso8601TimeMs() + "] ";
     buffer += message;
-    if (level >= LogLevel::Debug)
+    if (level >= LogLevel::Debug || level == LogLevel::Error)
     {
         buffer += " (";
         buffer += file + ":" + std::to_string(line);
