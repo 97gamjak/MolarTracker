@@ -15,6 +15,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Error Handling
 
 - Add Global Exception Dialog for unrecoverable errors
+- Log errors show now file, line and function
 
 ### Bug Fixes
 
