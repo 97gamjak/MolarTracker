@@ -100,10 +100,10 @@ namespace ui
      */
     void DebugMenuController::_ensureLogViewerDialog()
     {
-        if (_logViewerDialog != nullptr)
+        if (_logViewerDialog)
             return;
 
-        _logViewerDialog = new LogViewerDialog{_mainWindow};
+        _logViewerDialog = new LogViewerDialog{&_mainWindow};
         _logViewerDialog->setModal(false);
     }
 

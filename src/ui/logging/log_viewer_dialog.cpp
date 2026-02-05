@@ -18,9 +18,13 @@
 namespace ui
 {
 
-    // TODO: check if mainwindow is necessary
-    LogViewerDialog::LogViewerDialog(QMainWindow& mainWindow)
-        : QDialog(&mainWindow),
+    /**
+     * @brief Construct a new Log Viewer Dialog:: Log Viewer Dialog object
+     *
+     * @param parent
+     */
+    LogViewerDialog::LogViewerDialog(QWidget* parent)
+        : QDialog(parent),
           _textEdit(new QPlainTextEdit(this)),
           _reloadButton(new QPushButton(tr("Reload"), this)),
           _autoReloadCheckBox(new QCheckBox(tr("Auto Reload"), this)),
@@ -30,12 +34,14 @@ namespace ui
         resize(900, 600);
 
         _textEdit->setReadOnly(true);
-        // TODO: maybe this should be configurable
+        // TODO(97gamjak): maybe this should be configurable
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-103
         _textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
         _textEdit->setMaximumBlockCount(50000);
 
         _autoReloadCheckBox->setChecked(false);
-        // TODO: make this changeable via config and dialog
+        // TODO(97gamjak): make this changeable via config and dialog
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-104
         _reloadTimer->setInterval(1000);   // 1000 ms
 
         auto* buttonLayout = new QHBoxLayout();
@@ -83,17 +89,22 @@ namespace ui
         _loadLogFile();
     }
 
+    /**
+     * @brief Load the log file content into the text edit.
+     *
+     */
     void LogViewerDialog::_loadLogFile()
     {
-        const auto& logFilePath =
-            LogManager::getInstance().getCurrentLogFilePath();
-        const auto absPath  = std::filesystem::absolute(logFilePath);
-        const auto qStrPath = QString::fromStdString(absPath.string());
+        const auto& logManager  = LogManager::getInstance();
+        const auto& logFilePath = logManager.getCurrentLogFilePath();
+        const auto  absPath     = std::filesystem::absolute(logFilePath);
+        const auto  qStrPath    = QString::fromStdString(absPath.string());
 
         // we need to flush here to ensure all logs are written before reading
-        // TODO: think of a clever flushing strategy to avoid performance issues
-        // especially when auto-reload is enabled
-        LogManager::getInstance().flush();
+        // TODO(97gamjak): think of a clever flushing strategy to avoid
+        // performance issues especially when auto-reload is enabled
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-105
+        logManager.flush();
 
         QFile file(qStrPath);
 
@@ -110,38 +121,54 @@ namespace ui
         _textEdit->setPlainText(stream.readAll());
 
         // Scroll to bottom
-        // TODO: think of a better way to handle this
+        // TODO(97gamjak): think of a better way to handle this
         // maybe only scroll to bottom if user did not scroll up manually
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-106
         auto cursor = _textEdit->textCursor();
         cursor.movePosition(QTextCursor::End);
         _textEdit->setTextCursor(cursor);
     }
 
+    /**
+     * @brief Reload the log file content.
+     *
+     */
     void LogViewerDialog::reloadLog() { _loadLogFile(); }
 
+    /**
+     * @brief Handle the hide event.
+     *
+     * @param event
+     */
     void LogViewerDialog::hideEvent(QHideEvent* event)
     {
         QDialog::hideEvent(event);
-        if (_autoReloadCheckBox->isChecked())
-            _reloadTimer->stop();
+        _reloadTimer->stop();
     }
 
+    /**
+     * @brief Handle the show event.
+     *
+     * @param event
+     */
     void LogViewerDialog::showEvent(QShowEvent* event)
     {
         QDialog::showEvent(event);
 
-        // Always reload the log when the dialog is shown to avoid stale
-        // content.
         reloadLog();
         if (_autoReloadCheckBox->isChecked())
             _reloadTimer->start();
     }
 
+    /**
+     * @brief Handle the close event.
+     *
+     * @param event
+     */
     void LogViewerDialog::closeEvent(QCloseEvent* event)
     {
         QDialog::closeEvent(event);
-        if (_autoReloadCheckBox->isChecked())
-            _reloadTimer->stop();
+        _reloadTimer->stop();
     }
 
 }   // namespace ui

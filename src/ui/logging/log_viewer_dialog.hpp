@@ -7,11 +7,15 @@ class QPlainTextEdit;   // Forward declaration
 class QPushButton;      // Forward declaration
 class QCheckBox;        // Forward declaration
 class QTimer;           // Forward declaration
-class QMainWindow;      // Forward declaration
+class QWidget;          // Forward declaration
 
 namespace ui
 {
 
+    /**
+     * @brief Dialog for viewing application log files.
+     *
+     */
     class LogViewerDialog final : public QDialog
     {
         Q_OBJECT
@@ -23,7 +27,7 @@ namespace ui
         QTimer*         _reloadTimer;
 
        public:
-        explicit LogViewerDialog(QMainWindow& parent);
+        explicit LogViewerDialog(QWidget* parent = nullptr);
 
        protected:
         void hideEvent(QHideEvent* event) override;
