@@ -60,7 +60,7 @@ namespace ui
                     AddProfileCommandErrorCode::ProfileNotFound
                 );
 
-            return error;
+            return std::unexpected<CommandErrorPtr>(std::move(error));
         }
         else if (result == app::ProfileStoreResult::Ok)
         {
