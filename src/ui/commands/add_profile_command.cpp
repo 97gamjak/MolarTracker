@@ -68,8 +68,10 @@ namespace ui
         }
         else
         {
-            const auto errorMessage =
-                std::format("Unknown error adding profile '{}'", _profile.name);
+            const auto errorMessage = std::format(
+                "Unknown error removing profile '{}'",
+                _profile.name
+            );
 
             LOG_ERROR(errorMessage);
 
