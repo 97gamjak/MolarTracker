@@ -10,13 +10,17 @@ namespace ui
      * @return true if the command was executed and added to the stack, false
      * otherwise
      */
-    bool UndoStack::_do(std::unique_ptr<ICommand> command)
+    std::expected<void, CommandErrorPtr> UndoStack::_do(
+        std::unique_ptr<ICommand> command
+    )
     {
         if (!command)
-            return false;
+            return std::unexpected(CommandError::makeInvalidCommandErrorPtr());
 
-        if (!command->redo())
-            return false;
+        auto result = command->redo();
+
+        if (!result)
+            return std::unexpected(std::move(result).error());
 
         if (_cursor < _commands.size())
         {
@@ -30,7 +34,7 @@ namespace ui
         _cursor = _commands.size();
 
         emit changed();
-        return true;
+        return {};
     }
 
     /**
@@ -51,15 +55,20 @@ namespace ui
      * @brief Undo the last command
      *
      */
-    void UndoStack::undo()
+    std::expected<void, CommandErrorPtr> UndoStack::undo()
     {
         if (!canUndo())
-            return;
+            return std::unexpected(CommandError::makeNothingToUndoErrorPtr());
 
         --_cursor;
-        _commands[_cursor]->undo();
+        auto result = _commands[_cursor]->undo();
+
+        if (!result)
+            return std::unexpected(std::move(result).error());
 
         emit changed();
+
+        return {};
     }
 
     /**
@@ -67,20 +76,21 @@ namespace ui
      *
      * @return true if the command was redone, false otherwise
      */
-    bool UndoStack::redo()
+    std::expected<void, CommandErrorPtr> UndoStack::redo()
     {
         if (!canRedo())
-            return false;
+            return std::unexpected(CommandError::makeNothingToRedoErrorPtr());
 
         // Policy: if redo fails, keep cursor unchanged and do not advance.
-        if (!_commands[_cursor]->redo())
-            return false;
+        auto result = _commands[_cursor]->redo();
+        if (!result)
+            return std::unexpected(std::move(result).error());
 
         ++_cursor;
 
         emit changed();
 
-        return true;
+        return {};
     }
 
     /**
@@ -89,7 +99,7 @@ namespace ui
      * @return std::string The label of the command that can be undone, or an
      * empty string if there are no commands to undo
      */
-    std::string UndoStack::undoLabel() const
+    std::string UndoStack::getUndoLabel() const
     {
         if (!canUndo())
             return "";
@@ -103,7 +113,7 @@ namespace ui
      * @return std::string The label of the command that can be redone, or an
      * empty string if there are no commands to redo
      */
-    std::string UndoStack::redoLabel() const
+    std::string UndoStack::getRedoLabel() const
     {
         if (!canRedo())
             return "";

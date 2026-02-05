@@ -41,29 +41,49 @@ namespace ui
      * @brief Undo the add profile command
      *
      */
-    void AddProfileCommand::undo()
+    std::expected<void, CommandErrorPtr> AddProfileCommand::undo()
     {
         const auto result = _profileStore.removeProfile(_profile);
 
         if (result == app::ProfileStoreResult::ProfileNotFound)
         {
-            // TODO(97gamjak): think about handling errors also on undo
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-72
-
-            const auto msg = std::format(
+            const auto errorMessage = std::format(
                 "Failed to undo add profile: '{}' not found",
                 _profile.name
             );
 
-            LOG_ERROR(msg);
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> error =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::ProfileNotFound
+                );
+        }
+        else if (result == app::ProfileStoreResult::Ok)
+        {
+            LOG_INFO(std::format("Profile removed: '{}'", _profile.name));
         }
         else
         {
-            LOG_INFO(std::format("Profile removed: '{}'", _profile.name));
+            const auto errorMessage =
+                std::format("Unknown error adding profile '{}'", _profile.name);
+
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> errorMessagePtr =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::UnknownError
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
         if (_setAsActive)
         {
+            // here no check is done if old profile exists... we will let this
+            // fail with an exception as this should really really never happen
             _profileStore.setActiveProfile(_activeProfileBeforeAdd);
 
             const auto name = _activeProfileBeforeAdd.has_value()
@@ -90,6 +110,8 @@ namespace ui
 
             LOG_INFO(msg);
         }
+
+        return {};
     }
 
     /**

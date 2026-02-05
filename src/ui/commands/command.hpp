@@ -18,7 +18,7 @@ namespace ui
        public:
         virtual ~ICommand() = default;
 
-        virtual void                                 undo() = 0;
+        virtual std::expected<void, CommandErrorPtr> undo() = 0;
         virtual std::expected<void, CommandErrorPtr> redo() = 0;
 
         virtual std::string getLabel() const = 0;
