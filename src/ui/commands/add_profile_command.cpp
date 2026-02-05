@@ -59,6 +59,8 @@ namespace ui
                     errorMessage,
                     AddProfileCommandErrorCode::ProfileNotFound
                 );
+
+            return error;
         }
         else if (result == app::ProfileStoreResult::Ok)
         {
