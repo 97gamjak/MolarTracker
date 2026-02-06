@@ -190,6 +190,16 @@ namespace ui
                 "There happened an unexpected error while updating the debug "
                 "flags! Please contact the developer!"
             );
+
+            // this should not happen, but if it does, we should not leave the
+            // dialog in an inconsistent state, so we will just reset the
+            // categories to the current values and repopulate the tree
+            const auto& logManager        = LogManager::getInstance();
+            const auto  currentCategories = logManager.getCategories();
+            _debugSlotsDialog->setCategories(currentCategories, false);
+            _debugSlotsDialog->populateTree();
+
+            return;
         }
 
         _debugSlotsDialog->setCategories(categories);
