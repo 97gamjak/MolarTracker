@@ -203,14 +203,6 @@ namespace ui
         _tree->blockSignals(false);
     }
 
-    void DebugSlotsDialog::_applyChanges()
-    {
-        for (const auto& [category, level] : _currentCategories)
-            LogManager::getInstance().changeLogLevel(category, level);
-
-        _categories = _currentCategories;
-    }
-
     void DebugSlotsDialog::_emit(const Action& action)
     {
         emit requested(action, _currentCategories);

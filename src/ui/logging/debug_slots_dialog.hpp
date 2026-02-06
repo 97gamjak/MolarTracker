@@ -51,8 +51,6 @@ namespace ui
        private:
         void _buildUi();
         void _connectButtons();
-        void _initCategories();
-        void _applyChanges();
 
         void _emit(const Action& action);
         void _emitApply();
