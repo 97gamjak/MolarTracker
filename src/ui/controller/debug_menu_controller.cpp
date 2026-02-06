@@ -13,8 +13,8 @@
 #include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
 
-#define __LOG_CATEGORY__ ui_debugMenuController
-#include "logging/logging_macros.hpp"
+#define __LOG_CATEGORY__ LogCategory::ui_debugMenuController
+#include "logging/log_macros.hpp"
 
 namespace ui
 {
