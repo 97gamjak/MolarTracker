@@ -66,7 +66,7 @@ namespace ui
 
     void DebugMenuController::_onDebugSlotsChangeRequested(
         const DebugSlotsDialog::Action& action,
-        const LogCategoryMap& /*categories*/
+        const LogCategoryMap&           categories
     )
     {
         using enum DebugSlotsDialog::Action;
@@ -77,7 +77,10 @@ namespace ui
                 _resetDefaultDebugFlags();
                 break;
             case Apply:
+                _applyDebugFlagChanges(categories);
+                break;
             case ApplyAndClose:
+                _applyDebugFlagChangesAndClose(categories);
                 break;
         }
     }
@@ -110,6 +113,12 @@ namespace ui
         {
             _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
             _debugSlotsDialog->setModal(false);
+
+            const auto& logManager = LogManager::getInstance();
+            const auto  categories = logManager.getDefaultCategories();
+
+            _debugSlotsDialog->setCategories(categories);
+            _debugSlotsDialog->populateTree();
         }
 
         connect(
@@ -135,9 +144,29 @@ namespace ui
 
     void DebugMenuController::_resetDefaultDebugFlags()
     {
-        const auto categories = LogManager::getInstance().getCategories();
-        _debugSlotsDialog->setCategories(categories);
+        const auto& logManager = LogManager::getInstance();
+        const auto  categories = logManager.getDefaultCategories();
+
+        _debugSlotsDialog->setCategories(categories, false);
         _debugSlotsDialog->populateTree();
+    }
+
+    void DebugMenuController::_applyDebugFlagChanges(
+        const LogCategoryMap& categories
+    )
+    {
+        for (const auto& [category, level] : categories)
+            LogManager::getInstance().changeLogLevel(category, level);
+
+        _debugSlotsDialog->setCategories(categories);
+    }
+
+    void DebugMenuController::_applyDebugFlagChangesAndClose(
+        const LogCategoryMap& categories
+    )
+    {
+        _applyDebugFlagChanges(categories);
+        _debugSlotsDialog->accept();
     }
 
 }   // namespace ui

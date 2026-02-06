@@ -30,16 +30,23 @@ namespace ui
      */
     DebugSlotsDialog::DebugSlotsDialog(QWidget* parent) : QDialog(parent)
     {
-        _initCategories();
-
         _buildUi();
         _connectButtons();
-        populateTree();
     }
 
     void DebugSlotsDialog::setCategories(const LogCategoryMap& categories)
     {
-        _categories        = categories;
+        setCategories(categories, true);
+    }
+
+    void DebugSlotsDialog::setCategories(
+        const LogCategoryMap& categories,
+        const bool            overrideReference
+    )
+    {
+        if (overrideReference)
+            _categories = categories;
+
         _currentCategories = categories;
     }
 
@@ -100,12 +107,28 @@ namespace ui
             _discardChangesButton,
             &QPushButton::clicked,
             this,
-            [this]()
-            {
-                // revert current categories to original
-                _currentCategories = _categories;
-                populateTree();
-            }
+            &DebugSlotsDialog::_discardChanges
+        );
+
+        connect(
+            _buttonBox,
+            &QDialogButtonBox::rejected,
+            this,
+            &DebugSlotsDialog::_rejectChanges
+        );
+
+        connect(
+            _buttonBox,
+            &QDialogButtonBox::accepted,
+            this,
+            &DebugSlotsDialog::_emitApplyAndClose
+        );
+
+        connect(
+            _buttonBox,
+            &QDialogButtonBox::clicked,
+            this,
+            &DebugSlotsDialog::_emitApply
         );
 
         connect(
@@ -116,52 +139,6 @@ namespace ui
             {
                 _modifiedOnly = on;
                 populateTree();
-            }
-        );
-
-        connect(
-            _buttonBox,
-            &QDialogButtonBox::rejected,
-            this,
-            [this]()
-            {
-                // if something changed ask for confirmation
-                if (_currentCategories != _categories)
-                {
-                    const auto res = askDiscardChanges(this);
-
-                    if (res == QMessageBox::No)
-                        return;
-
-                    // revert changes
-                    _currentCategories = _categories;
-                }
-
-                reject();
-            }
-        );
-
-        connect(
-            _buttonBox,
-            &QDialogButtonBox::accepted,
-            this,
-            [this]()
-            {
-                _applyChanges();
-                accept();
-            }
-        );
-
-        connect(
-            _buttonBox,
-            &QDialogButtonBox::clicked,
-            this,
-            [this](QAbstractButton* button)
-            {
-                using enum QDialogButtonBox::StandardButton;
-
-                if (_buttonBox->standardButton(button) == Apply)
-                    _applyChanges();
             }
         );
     }
@@ -226,12 +203,6 @@ namespace ui
         _tree->blockSignals(false);
     }
 
-    void DebugSlotsDialog::_initCategories()
-    {
-        _categories        = LogManager::getInstance().getCategories();
-        _currentCategories = _categories;
-    }
-
     void DebugSlotsDialog::_applyChanges()
     {
         for (const auto& [category, level] : _currentCategories)
@@ -247,6 +218,34 @@ namespace ui
 
     void DebugSlotsDialog::_emitApply() { _emit(Action::Apply); }
 
+    void DebugSlotsDialog::_emitApplyAndClose()
+    {
+        _emit(Action::ApplyAndClose);
+    }
+
     void DebugSlotsDialog::_emitDefaults() { _emit(Action::ResetDefault); }
+
+    void DebugSlotsDialog::_discardChanges()
+    {
+        _currentCategories = _categories;
+        populateTree();
+    }
+
+    void DebugSlotsDialog::_rejectChanges()
+    {
+        // if something changed ask for confirmation
+        if (_currentCategories != _categories)
+        {
+            const auto res = askDiscardChanges(this);
+
+            if (res == QMessageBox::No)
+                return;
+
+            // revert changes
+            _currentCategories = _categories;
+        }
+
+        reject();
+    }
 
 }   // namespace ui

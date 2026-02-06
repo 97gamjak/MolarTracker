@@ -36,12 +36,13 @@ namespace ui
         {
             Apply,
             ApplyAndClose,
-            ResetDefault,
+            ResetDefault
         };
 
         explicit DebugSlotsDialog(QWidget* parent = nullptr);
 
         void setCategories(const LogCategoryMap& categories);
+        void setCategories(const LogCategoryMap&, const bool);
         void populateTree();
 
        signals:
@@ -55,7 +56,10 @@ namespace ui
 
         void _emit(const Action& action);
         void _emitApply();
+        void _emitApplyAndClose();
         void _emitDefaults();
+        void _discardChanges();
+        void _rejectChanges();
     };
 
 }   // namespace ui
