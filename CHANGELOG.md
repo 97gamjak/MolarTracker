@@ -24,4 +24,8 @@ All changes and updates, that are relevant for a user will be documented here
 - make main window resizable again
 - make add profile startup dialog center above main window
 
+#### Logging
+
+- Fix formatting issue in log file
+
 <!-- insertion marker -->
