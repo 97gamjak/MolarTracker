@@ -58,7 +58,6 @@ namespace ui
         void _ensureDebugSlotsDialog();
         void _ensureLogViewerDialog();
         void _resetDefaultDebugFlags();
-        void _discardDebugFlagChanges();
         void _applyDebugFlagChanges(const LogCategoryMap& categories);
         void _applyDebugFlagChangesAndClose(const LogCategoryMap& categories);
     };
