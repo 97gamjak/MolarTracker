@@ -1,4 +1,4 @@
-#include "ui/profile/profile_selection_dlg.hpp"
+#include "profile_selection_dlg.hpp"
 
 #include <QDialogButtonBox>
 #include <QListWidget>

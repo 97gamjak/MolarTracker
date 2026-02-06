@@ -5,7 +5,7 @@
 #include <QPointer>
 
 #include "logging/logging_base.hpp"
-#include "ui/logging/debug_slots_dialog.hpp"
+#include "ui/widgets/logging/debug_slots_dialog.hpp"
 
 namespace app
 {

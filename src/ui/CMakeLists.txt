@@ -4,25 +4,17 @@ qt_add_library(molartracker_ui STATIC
 )
 
 add_subdirectory(commands)
-add_subdirectory(profile)
-add_subdirectory(exceptions)
-add_subdirectory(menu_bar)
-add_subdirectory(logging)
-add_subdirectory(utils)
 add_subdirectory(controller)
+add_subdirectory(widgets)
 
 target_link_libraries(molartracker_ui
     PUBLIC
         Qt6::Widgets
     PRIVATE
-        molartracker_commands_ui
-        molartracker_profile_ui
-        molartracker_exceptions_ui
+        molartracker_ui_commands
+        molartracker_ui_widgets
+        molartracker_ui_controller
         molartracker_app
-        molartracker_controller_ui
-        molartracker_menu_bar_ui
-        molartracker_logging_ui
-        molartracker_utils_ui
 )
 
 target_include_directories(molartracker_ui

@@ -10,9 +10,9 @@
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
-#include "ui/menu_bar/menu_bar.hpp"
-#include "ui/profile/add_profile_dlg.hpp"
-#include "ui/profile/profile_selection_dlg.hpp"
+#include "ui/widgets/menu_bar/menu_bar.hpp"
+#include "ui/widgets/profile/add_profile_dlg.hpp"
+#include "ui/widgets/profile/profile_selection_dlg.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui

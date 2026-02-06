@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
-#include "ui/menu_bar/help_menu.hpp"
+#include "ui/widgets/menu_bar/help_menu.hpp"
 
 namespace ui
 {

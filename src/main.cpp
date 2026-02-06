@@ -6,8 +6,8 @@
 #include "exceptions/base.hpp"
 #include "logging/log_manager.hpp"
 #include "ui/application.hpp"
-#include "ui/exceptions/exception_dialog.hpp"
 #include "ui/main_window.hpp"
+#include "ui/widgets/exceptions/exception_dialog.hpp"
 
 // TODO: move this to some initialization module
 // https://97gamjak.atlassian.net/browse/MOLTRACK-96

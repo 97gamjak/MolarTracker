@@ -7,6 +7,12 @@ class QWidget;
 
 namespace ui
 {
+    /**
+     * @brief Show a confirmation dialog to discard changes
+     *
+     * @param parent The parent widget for the dialog
+     * @return QMessageBox::StandardButton The button clicked by the user
+     */
     QMessageBox::StandardButton askDiscardChanges(QWidget* parent);
 
 }   // namespace ui

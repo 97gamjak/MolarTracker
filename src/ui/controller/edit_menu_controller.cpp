@@ -4,7 +4,7 @@
 #include <QStatusBar>
 
 #include "ui/commands/undo_stack.hpp"
-#include "ui/menu_bar/edit_menu.hpp"
+#include "ui/widgets/menu_bar/edit_menu.hpp"
 
 namespace ui
 {

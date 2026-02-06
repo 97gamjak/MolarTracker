@@ -9,9 +9,9 @@
 #include "logging/log_manager.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "ui/commands/update_debug_flags_command.hpp"
-#include "ui/logging/debug_slots_dialog.hpp"
-#include "ui/logging/log_viewer_dialog.hpp"
-#include "ui/menu_bar/debug_menu.hpp"
+#include "ui/widgets/logging/debug_slots_dialog.hpp"
+#include "ui/widgets/logging/log_viewer_dialog.hpp"
+#include "ui/widgets/menu_bar/debug_menu.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_debugMenuController
 #include "logging/log_macros.hpp"
