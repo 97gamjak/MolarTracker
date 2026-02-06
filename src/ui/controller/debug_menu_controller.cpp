@@ -6,6 +6,7 @@
 #include <QStatusBar>
 
 #include "app/app_context.hpp"
+#include "logging/log_manager.hpp"
 #include "ui/logging/debug_slots_dialog.hpp"
 #include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
@@ -63,6 +64,24 @@ namespace ui
             statusBar->showMessage("Debug slots opened");
     }
 
+    void DebugMenuController::_onDebugSlotsChangeRequested(
+        const DebugSlotsDialog::Action& action,
+        const LogCategoryMap& /*categories*/
+    )
+    {
+        using enum DebugSlotsDialog::Action;
+
+        switch (action)
+        {
+            case ResetDefault:
+                _resetDefaultDebugFlags();
+                break;
+            case Apply:
+            case ApplyAndClose:
+                break;
+        }
+    }
+
     /**
      * @brief Handle debug slots request
      *
@@ -87,11 +106,18 @@ namespace ui
      */
     void DebugMenuController::_ensureDebugSlotsDialog()
     {
-        if (_debugSlotsDialog != nullptr)
-            return;
+        if (!_debugSlotsDialog)
+        {
+            _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
+            _debugSlotsDialog->setModal(false);
+        }
 
-        _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
-        _debugSlotsDialog->setModal(false);
+        connect(
+            _debugSlotsDialog,
+            &DebugSlotsDialog::requested,
+            this,
+            &DebugMenuController::_onDebugSlotsChangeRequested
+        );
     }
 
     /**
@@ -105,6 +131,13 @@ namespace ui
 
         _logViewerDialog = new LogViewerDialog{&_mainWindow};
         _logViewerDialog->setModal(false);
+    }
+
+    void DebugMenuController::_resetDefaultDebugFlags()
+    {
+        const auto categories = LogManager::getInstance().getCategories();
+        _debugSlotsDialog->setCategories(categories);
+        _debugSlotsDialog->populateTree();
     }
 
 }   // namespace ui

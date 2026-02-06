@@ -34,12 +34,18 @@ namespace ui
 
         _buildUi();
         _connectButtons();
-        _populateTree();
+        populateTree();
+    }
+
+    void DebugSlotsDialog::setCategories(const LogCategoryMap& categories)
+    {
+        _categories        = categories;
+        _currentCategories = categories;
     }
 
     void DebugSlotsDialog::_buildUi()
     {
-        setWindowTitle("Debug / Logging Settings");
+        setWindowTitle("Logging Debug Flags");
         resize(820, 560);
 
         _tree = new QTreeWidget(this);
@@ -87,13 +93,7 @@ namespace ui
             _defaultsButton,
             &QPushButton::clicked,
             this,
-            [this]()
-            {
-                _currentCategories =
-                    LogManager::getInstance().getDefaultCategories();
-
-                _populateTree();
-            }
+            &DebugSlotsDialog::_emitDefaults
         );
 
         connect(
@@ -104,7 +104,7 @@ namespace ui
             {
                 // revert current categories to original
                 _currentCategories = _categories;
-                _populateTree();
+                populateTree();
             }
         );
 
@@ -115,7 +115,7 @@ namespace ui
             [this](bool on)
             {
                 _modifiedOnly = on;
-                _populateTree();
+                populateTree();
             }
         );
 
@@ -166,7 +166,7 @@ namespace ui
         );
     }
 
-    void DebugSlotsDialog::_populateTree()
+    void DebugSlotsDialog::populateTree()
     {
         _tree->blockSignals(true);
         _tree->clear();
@@ -239,5 +239,14 @@ namespace ui
 
         _categories = _currentCategories;
     }
+
+    void DebugSlotsDialog::_emit(const Action& action)
+    {
+        emit requested(action, _currentCategories);
+    }
+
+    void DebugSlotsDialog::_emitApply() { _emit(Action::Apply); }
+
+    void DebugSlotsDialog::_emitDefaults() { _emit(Action::ResetDefault); }
 
 }   // namespace ui

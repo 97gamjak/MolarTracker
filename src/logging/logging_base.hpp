@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <mstd/enum.hpp>
+#include <unordered_map>
 
 #define LOG_CATEGORY(X)             \
     X(app_service_profileService)   \
@@ -44,5 +45,7 @@ inline std::optional<size_t> indexOfLogLevel(LogLevel level)
 
     return std::nullopt;
 }
+
+using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
 #endif   // __LOGGING__LOGGING_BASE_HPP__
