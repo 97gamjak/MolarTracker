@@ -12,6 +12,7 @@
     X(ui_command_AddProfileCommand) \
     X(ui_mainWindow)                \
     X(ui_logging)                   \
+    X(ui_debugMenuController)       \
     X(database)                     \
     X(logging_manager)
 

@@ -214,12 +214,7 @@ namespace ui
         emit requested(action, _currentCategories);
     }
 
-    void DebugSlotsDialog::_emitApply()
-    {
-        if(_buttonBox->
-        
-        _emit(Action::Apply);
-    }
+    void DebugSlotsDialog::_emitApply() { _emit(Action::Apply); }
 
     void DebugSlotsDialog::_emitApplyAndClose()
     {

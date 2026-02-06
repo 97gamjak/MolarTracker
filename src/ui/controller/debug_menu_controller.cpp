@@ -7,9 +7,14 @@
 
 #include "app/app_context.hpp"
 #include "logging/log_manager.hpp"
+#include "ui/commands/undo_stack.hpp"
+#include "ui/commands/update_debug_flags_command.hpp"
 #include "ui/logging/debug_slots_dialog.hpp"
 #include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
+
+#define __LOG_CATEGORY__ ui_debugMenuController
+#include "logging/logging_macros.hpp"
 
 namespace ui
 {
@@ -24,12 +29,14 @@ namespace ui
     DebugMenuController::DebugMenuController(
         QMainWindow&     mainWindow,
         DebugMenu&       debugMenu,
-        app::AppContext& appContext
+        app::AppContext& appContext,
+        UndoStack&       undoStack
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
           _debugMenu(debugMenu),
-          _appContext(appContext)
+          _appContext(appContext),
+          _undoStack(undoStack)
     {
         connect(
             &debugMenu,
@@ -53,6 +60,15 @@ namespace ui
     void DebugMenuController::_onRequestDebugSlots()
     {
         _ensureDebugSlotsDialog();
+
+        // we need to update here the logging categories as
+        // an undo can always happen outside of the dialog
+        // and hence it could be out of sync
+        const auto& logManager = LogManager::getInstance();
+        const auto  categories = logManager.getCategories();
+
+        _debugSlotsDialog->setCategories(categories);
+        _debugSlotsDialog->populateTree();
 
         _debugSlotsDialog->show();
         _debugSlotsDialog->raise();
@@ -115,12 +131,6 @@ namespace ui
         _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
         _debugSlotsDialog->setModal(false);
 
-        const auto& logManager = LogManager::getInstance();
-        const auto  categories = logManager.getCategories();
-
-        _debugSlotsDialog->setCategories(categories);
-        _debugSlotsDialog->populateTree();
-
         connect(
             _debugSlotsDialog,
             &DebugSlotsDialog::requested,
@@ -155,8 +165,18 @@ namespace ui
         const LogCategoryMap& categories
     )
     {
-        for (const auto& [category, level] : categories)
-            LogManager::getInstance().changeLogLevel(category, level);
+        const auto result =
+            _undoStack.makeAndDo<UpdateDebugFlagsCommand>(categories);
+
+        if (!result)
+        {
+            // TODO: create general exception message for unexpected errors
+            // https://97gamjak.atlassian.net/browse/MOLTRACK-112
+            LOG_ERROR(
+                "There happened an unexpected error while updating the debug "
+                "flags! Please contact the developer!"
+            );
+        }
 
         _debugSlotsDialog->setCategories(categories);
     }

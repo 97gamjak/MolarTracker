@@ -3,6 +3,7 @@ add_library(molartracker_commands_ui STATIC
     add_profile_command.cpp
     add_profile_command_error.cpp
     command_error.cpp
+    update_debug_flags_command.cpp
 )
 
 target_include_directories(molartracker_commands_ui

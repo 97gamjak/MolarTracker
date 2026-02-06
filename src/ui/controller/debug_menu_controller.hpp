@@ -19,6 +19,7 @@ namespace ui
     class DebugMenu;          // Forward declaration
     class DebugSlotsDialog;   // Forward declaration
     class LogViewerDialog;    // Forward declaration
+    class UndoStack;          // Forward declaration
 
     /**
      * @brief Controller for the debug menu actions
@@ -32,6 +33,7 @@ namespace ui
         QMainWindow&     _mainWindow;
         DebugMenu&       _debugMenu;
         app::AppContext& _appContext;
+        UndoStack&       _undoStack;
 
         QPointer<DebugSlotsDialog> _debugSlotsDialog;
         QPointer<LogViewerDialog>  _logViewerDialog;
@@ -48,7 +50,8 @@ namespace ui
         explicit DebugMenuController(
             QMainWindow&     mainWindow,
             DebugMenu&       debugMenu,
-            app::AppContext& appContext
+            app::AppContext& appContext,
+            UndoStack&       undoStack
         );
 
        private:
