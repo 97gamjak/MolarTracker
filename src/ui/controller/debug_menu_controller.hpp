@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QPointer>
 
+#include "logging/logging_base.hpp"
+#include "ui/logging/debug_slots_dialog.hpp"
+
 namespace app
 {
     class AppContext;   // Forward declaration
@@ -13,9 +16,10 @@ class QMainWindow;   // Forward declaration
 
 namespace ui
 {
-    class DebugMenu;
-    class DebugSlotsDialog;
-    class LogViewerDialog;
+    class DebugMenu;          // Forward declaration
+    class DebugSlotsDialog;   // Forward declaration
+    class LogViewerDialog;    // Forward declaration
+    class UndoStack;          // Forward declaration
 
     /**
      * @brief Controller for the debug menu actions
@@ -29,24 +33,33 @@ namespace ui
         QMainWindow&     _mainWindow;
         DebugMenu&       _debugMenu;
         app::AppContext& _appContext;
+        UndoStack&       _undoStack;
 
-        DebugSlotsDialog*         _debugSlotsDialog = nullptr;
-        QPointer<LogViewerDialog> _logViewerDialog;
+        QPointer<DebugSlotsDialog> _debugSlotsDialog;
+        QPointer<LogViewerDialog>  _logViewerDialog;
 
        private slots:
         void _onRequestDebugSlots();
+        void _onDebugSlotsChangeRequested(
+            const DebugSlotsDialog::Action& action,
+            const LogCategoryMap&           categories
+        );
         void _onRequestLogViewer();
 
        public:
         explicit DebugMenuController(
             QMainWindow&     mainWindow,
             DebugMenu&       debugMenu,
-            app::AppContext& appContext
+            app::AppContext& appContext,
+            UndoStack&       undoStack
         );
 
        private:
         void _ensureDebugSlotsDialog();
         void _ensureLogViewerDialog();
+        void _resetDefaultDebugFlags();
+        void _applyDebugFlagChanges(const LogCategoryMap& categories);
+        void _applyDebugFlagChangesAndClose(const LogCategoryMap& categories);
     };
 
 }   // namespace ui

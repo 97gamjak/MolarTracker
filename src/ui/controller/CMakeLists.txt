@@ -17,4 +17,5 @@ target_link_libraries(molartracker_controller_ui
         molartracker_commands_ui
         molartracker_logging_ui
         molartracker_app_repos_api
+        molartracker_logging
 )

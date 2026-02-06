@@ -54,7 +54,8 @@ namespace ui
         _debugMenuController = std::make_unique<DebugMenuController>(
             *this,
             _menuBar->getDebugMenu(),
-            _appContext
+            _appContext,
+            _undoStack
         );
 
         _settingsMenuController = std::make_unique<SettingsMenuController>(

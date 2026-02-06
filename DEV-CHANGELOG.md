@@ -38,6 +38,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Use `std::cerr` as output if no RingFile is configured inside the logger
 - Add `initGlobalConfig` for all singleton instances
+- Add `UpdateDebugFlagsCommand` for handling undo and redo
 
 #### CI
 

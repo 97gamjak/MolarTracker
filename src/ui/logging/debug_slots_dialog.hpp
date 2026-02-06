@@ -4,8 +4,7 @@
 #include <QDialog>
 #include <unordered_map>
 
-enum class LogCategory : size_t;
-enum class LogLevel : size_t;
+#include "logging/logging_base.hpp"
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration
@@ -16,13 +15,17 @@ class QMainWindow;        // Forward declaration
 namespace ui
 {
 
+    /**
+     * @brief Dialog for managing debug flag categories
+     *
+     */
     class DebugSlotsDialog final : public QDialog
     {
         Q_OBJECT
 
        private:
-        std::unordered_map<LogCategory, LogLevel> _categories;
-        std::unordered_map<LogCategory, LogLevel> _currentCategories;
+        LogCategoryMap _categories;
+        LogCategoryMap _currentCategories;
 
         bool _modifiedOnly = false;
 
@@ -33,14 +36,35 @@ namespace ui
         QDialogButtonBox* _buttonBox{};
 
        public:
-        explicit DebugSlotsDialog(QMainWindow& parent);
+        enum class Action
+        {
+            Apply,
+            ApplyAndClose,
+            ResetDefault
+        };
+
+        explicit DebugSlotsDialog(QWidget* parent = nullptr);
+
+        void setCategories(const LogCategoryMap& categories);
+        void setCategories(
+            const LogCategoryMap& categories,
+            const bool            overrideReference
+        );
+        void populateTree();
+
+       signals:
+        void requested(const Action& action, const LogCategoryMap& categories);
 
        private:
         void _buildUi();
-        void _populateTree();
         void _connectButtons();
-        void _initCategories();
-        void _applyChanges();
+
+        void _emit(const Action& action);
+        void _emitApply();
+        void _emitApplyAndClose();
+        void _emitDefaults();
+        void _discardChanges();
+        void _rejectChanges();
     };
 
 }   // namespace ui
