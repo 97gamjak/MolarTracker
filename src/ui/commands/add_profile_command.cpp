@@ -40,30 +40,56 @@ namespace ui
     /**
      * @brief Undo the add profile command
      *
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
+     *
      */
-    void AddProfileCommand::undo()
+    std::expected<void, CommandErrorPtr> AddProfileCommand::undo()
     {
         const auto result = _profileStore.removeProfile(_profile);
 
         if (result == app::ProfileStoreResult::ProfileNotFound)
         {
-            // TODO(97gamjak): think about handling errors also on undo
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-72
-
-            const auto msg = std::format(
+            const auto errorMessage = std::format(
                 "Failed to undo add profile: '{}' not found",
                 _profile.name
             );
 
-            LOG_ERROR(msg);
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> error =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::ProfileNotFound
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(error));
+        }
+        else if (result == app::ProfileStoreResult::Ok)
+        {
+            LOG_INFO(std::format("Profile removed: '{}'", _profile.name));
         }
         else
         {
-            LOG_INFO(std::format("Profile removed: '{}'", _profile.name));
+            const auto errorMessage = std::format(
+                "Unknown error removing profile '{}'",
+                _profile.name
+            );
+
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> error =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::UnknownError
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(error));
         }
 
         if (_setAsActive)
         {
+            // here no check is done if old profile exists... we will let this
+            // fail with an exception as this should really really never happen
             _profileStore.setActiveProfile(_activeProfileBeforeAdd);
 
             const auto name = _activeProfileBeforeAdd.has_value()
@@ -90,12 +116,14 @@ namespace ui
 
             LOG_INFO(msg);
         }
+
+        return {};
     }
 
     /**
      * @brief Redo the add profile command
      *
-     * @return std::expected<void, CommandErrorPtr>
+     * @return std::expected<void, CommandErrorPtr> Result of the operation
      */
     std::expected<void, CommandErrorPtr> AddProfileCommand::redo()
     {

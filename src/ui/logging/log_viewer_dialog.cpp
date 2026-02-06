@@ -95,7 +95,7 @@ namespace ui
      */
     void LogViewerDialog::_loadLogFile()
     {
-        const auto& logManager  = LogManager::getInstance();
+        auto&       logManager  = LogManager::getInstance();
         const auto& logFilePath = logManager.getCurrentLogFilePath();
         const auto  absPath     = std::filesystem::absolute(logFilePath);
         const auto  qStrPath    = QString::fromStdString(absPath.string());

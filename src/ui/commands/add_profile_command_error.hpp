@@ -10,6 +10,7 @@
 #define ADD_PROFILE_COMMAND_ERROR_CODE(X) \
     X(NameAlreadyExists)                  \
     X(InvalidEmail)                       \
+    X(ProfileNotFound)                    \
     X(UnknownError)
 
 MSTD_ENUM(

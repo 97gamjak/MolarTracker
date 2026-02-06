@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "command.hpp"
+#include "command_error.hpp"
 
 namespace ui
 {
@@ -27,10 +28,16 @@ namespace ui
         void changed();
 
        public:
-        // TODO(97gamjak): implement std::expected for error handling
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-80
+        /**
+         * @brief Create and execute a command
+         *
+         * @tparam Cmd
+         * @tparam Args
+         * @param args
+         * @return std::expected<void, CommandErrorPtr>
+         */
         template <typename Cmd, typename... Args>
-        bool makeAndDo(Args&&... args)
+        std::expected<void, CommandErrorPtr> makeAndDo(Args&&... args)
         {
             auto cmd = std::make_unique<Cmd>(std::forward<Args>(args)...);
             return _do(std::move(cmd));
@@ -39,16 +46,14 @@ namespace ui
         bool canUndo() const;
         bool canRedo() const;
 
-        void undo();
-        // TODO(97gamjak): implement std::expected for error handling
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-80
-        bool redo();
+        std::expected<void, CommandErrorPtr> undo();
+        std::expected<void, CommandErrorPtr> redo();
 
-        std::string undoLabel() const;
-        std::string redoLabel() const;
+        std::string getUndoLabel() const;
+        std::string getRedoLabel() const;
 
        private:
-        bool _do(std::unique_ptr<ICommand> command);
+        std::expected<void, CommandErrorPtr> _do(std::unique_ptr<ICommand> cmd);
     };
 
 }   // namespace ui

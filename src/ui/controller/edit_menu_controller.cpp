@@ -54,12 +54,17 @@ namespace ui
      */
     void EditMenuController::_onUndoRequested()
     {
-        _undoStack.undo();
+        std::string msg = _undoStack.getUndoLabel();
+
+        const auto& result = _undoStack.undo();
+
+        if (!result)
+            msg = result.error()->getMessage();
 
         auto* statusBar = _mainWindow.statusBar();
 
         if (statusBar)
-            statusBar->showMessage("Undo requested");
+            statusBar->showMessage(QString::fromStdString(msg));
     }
 
     /**
@@ -68,12 +73,17 @@ namespace ui
      */
     void EditMenuController::_onRedoRequested()
     {
-        _undoStack.redo();
+        std::string msg = _undoStack.getRedoLabel();
+
+        const auto& result = _undoStack.redo();
+
+        if (!result)
+            msg = result.error()->getMessage();
 
         auto* statusBar = _mainWindow.statusBar();
 
         if (statusBar)
-            statusBar->showMessage("Redo requested");
+            statusBar->showMessage(QString::fromStdString(msg));
     }
 
     void EditMenuController::refresh()
@@ -83,14 +93,16 @@ namespace ui
 
         _editMenu.setUndoEnabled(canUndo);
         _editMenu.setUndoText(
-            canUndo ? QString::fromStdString("Undo " + _undoStack.undoLabel())
-                    : "Undo"
+            canUndo
+                ? QString::fromStdString("Undo " + _undoStack.getUndoLabel())
+                : "Undo"
         );
 
         _editMenu.setRedoEnabled(canRedo);
         _editMenu.setRedoText(
-            canRedo ? QString::fromStdString("Redo " + _undoStack.redoLabel())
-                    : "Redo"
+            canRedo
+                ? QString::fromStdString("Redo " + _undoStack.getRedoLabel())
+                : "Redo"
         );
     }
 
