@@ -182,13 +182,20 @@ void LogManager::log(
  */
 std::string LogManager::_logLevelToString(const LogLevel& level) const
 {
+    // TODO: move this length determination logic to utils
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-113
     const auto maxLength = std::ranges::max_element(
                                LogLevelMeta::names,
                                {},
                                [](const auto& name) { return name.size(); }
     )->size();
 
-    const auto format = "{:*>" + std::to_string(maxLength) + "}";
+    constexpr auto additionalPadding = 3;
+    const auto     size              = maxLength + additionalPadding;
+
+    const auto format = "{:*>" + std::to_string(size) + "}";
+
+    std::cout << format << std::endl;
 
     const auto levelStr      = std::string{LogLevelMeta::name(level)};
     const auto cleanLevelStr = "<" + levelStr + ">:";
