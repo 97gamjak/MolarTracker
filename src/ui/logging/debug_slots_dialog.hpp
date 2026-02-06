@@ -46,7 +46,10 @@ namespace ui
         explicit DebugSlotsDialog(QWidget* parent = nullptr);
 
         void setCategories(const LogCategoryMap& categories);
-        void setCategories(const LogCategoryMap&, const bool);
+        void setCategories(
+            const LogCategoryMap& categories,
+            const bool            overrideReference
+        );
         void populateTree();
 
        signals:
