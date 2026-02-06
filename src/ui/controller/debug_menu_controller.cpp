@@ -116,7 +116,7 @@ namespace ui
         _debugSlotsDialog->setModal(false);
 
         const auto& logManager = LogManager::getInstance();
-        const auto  categories = logManager.getDefaultCategories();
+        const auto  categories = logManager.getCategories();
 
         _debugSlotsDialog->setCategories(categories);
         _debugSlotsDialog->populateTree();
