@@ -33,7 +33,7 @@ namespace ui
         QDialogButtonBox* _buttonBox{};
 
        public:
-        explicit DebugSlotsDialog(QMainWindow& parent);
+        explicit DebugSlotsDialog(QWidget* parent = nullptr);
 
        private:
         void _buildUi();

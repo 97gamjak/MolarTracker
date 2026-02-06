@@ -90,7 +90,7 @@ namespace ui
         if (_debugSlotsDialog != nullptr)
             return;
 
-        _debugSlotsDialog = new DebugSlotsDialog{_mainWindow};
+        _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
         _debugSlotsDialog->setModal(false);
     }
 
