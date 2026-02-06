@@ -109,17 +109,17 @@ namespace ui
      */
     void DebugMenuController::_ensureDebugSlotsDialog()
     {
-        if (!_debugSlotsDialog)
-        {
-            _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
-            _debugSlotsDialog->setModal(false);
+        if (_debugSlotsDialog != nullptr)
+            return;
 
-            const auto& logManager = LogManager::getInstance();
-            const auto  categories = logManager.getDefaultCategories();
+        _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
+        _debugSlotsDialog->setModal(false);
 
-            _debugSlotsDialog->setCategories(categories);
-            _debugSlotsDialog->populateTree();
-        }
+        const auto& logManager = LogManager::getInstance();
+        const auto  categories = logManager.getDefaultCategories();
+
+        _debugSlotsDialog->setCategories(categories);
+        _debugSlotsDialog->populateTree();
 
         connect(
             _debugSlotsDialog,
