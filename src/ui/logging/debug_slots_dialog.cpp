@@ -128,7 +128,13 @@ namespace ui
             _buttonBox,
             &QDialogButtonBox::clicked,
             this,
-            &DebugSlotsDialog::_emitApply
+            [this](QAbstractButton* button)
+            {
+                using enum QDialogButtonBox::StandardButton;
+
+                if (_buttonBox->standardButton(button) == Apply)
+                    _emitApply();
+            }
         );
 
         connect(
@@ -208,7 +214,12 @@ namespace ui
         emit requested(action, _currentCategories);
     }
 
-    void DebugSlotsDialog::_emitApply() { _emit(Action::Apply); }
+    void DebugSlotsDialog::_emitApply()
+    {
+        if(_buttonBox->
+        
+        _emit(Action::Apply);
+    }
 
     void DebugSlotsDialog::_emitApplyAndClose()
     {
