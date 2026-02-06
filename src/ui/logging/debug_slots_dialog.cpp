@@ -184,7 +184,7 @@ namespace ui
 
         for (const auto& [category, level] : _currentCategories)
         {
-            if (_modifiedOnly && level == _categories[category])
+            if (_modifiedOnly && level == _categories.at(category))
                 continue;
 
             const auto categoryName = LogCategoryMeta::name(category);
