@@ -80,6 +80,12 @@ namespace ui
             statusBar->showMessage("Debug slots opened");
     }
 
+    /**
+     * @brief Handle debug slots change request
+     *
+     * @param action The action to perform (reset, apply, apply and close)
+     * @param categories The new debug flag categories to set
+     */
     void DebugMenuController::_onDebugSlotsChangeRequested(
         const DebugSlotsDialog::Action& action,
         const LogCategoryMap&           categories
@@ -152,6 +158,10 @@ namespace ui
         _logViewerDialog->setModal(false);
     }
 
+    /**
+     * @brief Reset debug flags to default values
+     *
+     */
     void DebugMenuController::_resetDefaultDebugFlags()
     {
         const auto& logManager = LogManager::getInstance();
@@ -161,6 +171,10 @@ namespace ui
         _debugSlotsDialog->populateTree();
     }
 
+    /**
+     * @brief Discard debug flag changes and reset to current values
+     *
+     */
     void DebugMenuController::_applyDebugFlagChanges(
         const LogCategoryMap& categories
     )
@@ -181,6 +195,11 @@ namespace ui
         _debugSlotsDialog->setCategories(categories);
     }
 
+    /**
+     * @brief Apply debug flag changes and close the dialog
+     *
+     * @param categories The new debug flag categories to set
+     */
     void DebugMenuController::_applyDebugFlagChangesAndClose(
         const LogCategoryMap& categories
     )

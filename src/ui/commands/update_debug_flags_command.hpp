@@ -8,6 +8,10 @@
 
 namespace ui
 {
+    /**
+     * @brief A command for updating debug flag categories
+     *
+     */
     class UpdateDebugFlagsCommand : public ICommand
     {
        private:

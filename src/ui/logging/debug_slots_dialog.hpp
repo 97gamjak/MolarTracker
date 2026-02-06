@@ -15,6 +15,10 @@ class QMainWindow;        // Forward declaration
 namespace ui
 {
 
+    /**
+     * @brief Dialog for managing debug flag categories
+     *
+     */
     class DebugSlotsDialog final : public QDialog
     {
         Q_OBJECT
