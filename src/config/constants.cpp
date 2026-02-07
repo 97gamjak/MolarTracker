@@ -104,3 +104,10 @@ const std::string Constants::getGithubIssuesUrl()
 {
     return std::string(_githubRepoUrl) + "/issues";
 }
+
+/**
+ * @brief Get the application version
+ *
+ * @return const std::string
+ */
+const std::string Constants::getVersion() { return _version; }

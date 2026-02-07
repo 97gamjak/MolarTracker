@@ -16,9 +16,11 @@ namespace ui
         const auto appName = QString::fromStdString(Constants::getAppName());
         const auto desktopAppName =
             QString::fromStdString(Constants::getDesktopAppName());
+        const auto version = QString::fromStdString(Constants::getVersion());
 
         setApplicationName(appName);
-        setApplicationDisplayName(appName);
+        setApplicationDisplayName(appName + " " + version);
+        setApplicationVersion(version);
 
         setDesktopFileName(desktopAppName);
     }

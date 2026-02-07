@@ -11,6 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core)
+find_package(CURL REQUIRED)
 
 message(STATUS "CMAKE_SYSTEM_NAME       = ${CMAKE_SYSTEM_NAME}")
 message(STATUS "CMAKE_GENERATOR         = ${CMAKE_GENERATOR}")
@@ -63,9 +64,16 @@ if (MSVC)
     add_compile_options(/Zc:preprocessor)
 endif()
 
-add_compile_definitions( 
-    PUBLIC
+include(cmake/version.cmake)
+
+add_compile_definitions(
+    MOLARTRACKER_VERSION=\"${MOLARTRACKER_VERSION}\"
+    MOLARTRACKER_VERSION_FULL=\"${MOLARTRACKER_VERSION_FULL}\"
+    MOLARTRACKER_GIT_SHA=\"${MOLARTRACKER_GIT_SHA}\"
+    MOLARTRACKER_GIT_DIRTY=${MOLARTRACKER_GIT_DIRTY}
+
     MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
+    MOLARTRACKER_GIT_TAG=\"${MOLARTRACKER_GIT_TAG}\"
 )
 
 add_subdirectory(src)
