@@ -3,6 +3,7 @@ add_library(molartracker_utils STATIC
     ring_file.cpp
     paths.cpp
     qt_helpers.cpp
+    version.cpp
 )
 
 target_include_directories(molartracker_utils
