@@ -9,6 +9,9 @@ on:
       - "*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -32,7 +35,7 @@ jobs:
       # -------------------------
       # Compute artifact/version names (only on dev branch or tags)
       # -------------------------
-      - name: Compute artifact name(s)
+      - name: Compute names
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev'
         shell: bash
         run: |
@@ -54,12 +57,12 @@ jobs:
           echo "ARTIFACT_VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "IS_TAG=${IS_TAG}" >> "$GITHUB_ENV"
 
-          echo "WINDOWS_ARTIFACT=MolarTracker-windows-${VERSION}" >> "$GITHUB_ENV"
-          echo "LINUX_ARTIFACT=MolarTracker-linux-${VERSION}" >> "$GITHUB_ENV"
+          echo "WINDOWS_NAME=MolarTracker-windows-${VERSION}" >> "$GITHUB_ENV"
+          echo "LINUX_NAME=MolarTracker-linux-${VERSION}" >> "$GITHUB_ENV"
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "WINDOWS_ARTIFACT_LATEST=MolarTracker-windows-latest" >> "$GITHUB_ENV"
-            echo "LINUX_ARTIFACT_LATEST=MolarTracker-linux-latest" >> "$GITHUB_ENV"
+            echo "WINDOWS_LATEST=MolarTracker-windows-latest" >> "$GITHUB_ENV"
+            echo "LINUX_LATEST=MolarTracker-linux-latest" >> "$GITHUB_ENV"
           fi
 
       # -------------------------
@@ -69,8 +72,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build pkg-config
-          sudo apt-get install -y libcurl4-openssl-dev
+          sudo apt-get install -y ninja-build pkg-config libcurl4-openssl-dev
 
       - name: Install build tools (Windows)
         if: runner.os == 'Windows'
@@ -96,7 +98,7 @@ jobs:
           arch: win64_msvc2022_64
 
       # -------------------------
-      # Windows: MSVC env + SQLite via vcpkg
+      # Windows: MSVC env + vcpkg deps
       # -------------------------
       - name: Setup MSVC dev cmd
         if: runner.os == 'Windows'
@@ -106,7 +108,7 @@ jobs:
         if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: "vcpkg.json"
+          vcpkgJsonGlob: "**/vcpkg.json"
           runVcpkgInstall: true
 
       # -------------------------
@@ -117,7 +119,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           IS_TAG_FLAG=OFF
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then IS_TAG_FLAG=ON; fi
 
@@ -171,42 +172,87 @@ jobs:
           Copy-Item $exe deploy\
 
       # -------------------------
-      # Upload artifacts (ONLY on tags/dev)
+      # Package for Release assets (ONLY on tags)
       # -------------------------
-      - name: Upload Windows artifact (versioned)
+      - name: Package (Windows, tag)
+        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $zip = "MolarTracker-windows-${{ github.ref_name }}.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path deploy\* -DestinationPath $zip -Force
+
+      - name: Package (Linux, tag)
+        if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f build/bin/MolarTracker || test -f build/bin/MolarTracker.exe || true
+          tar -C build/bin -czf "MolarTracker-linux-${GITHUB_REF_NAME}.tar.gz" MolarTracker
+          cp build/compile_commands.json "compile_commands-${GITHUB_REF_NAME}.json"
+
+      # -------------------------
+      # Upload to GitHub Release (ONLY on tags)
+      # Requires the Release to already exist for that tag (your other workflow creates it)
+      # -------------------------
+      - name: Upload release assets (Windows)
+        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            MolarTracker-windows-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release assets (Linux)
+        if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            MolarTracker-linux-${{ github.ref_name }}.tar.gz
+            compile_commands-${{ github.ref_name }}.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # -------------------------
+      # Upload Actions artifacts (ONLY on tags/dev; convenient for quick download)
+      # -------------------------
+      - name: Upload Windows artifact (Actions, versioned)
         if: runner.os == 'Windows' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.WINDOWS_ARTIFACT }}
+          name: ${{ env.WINDOWS_NAME }}
           path: deploy/**
           if-no-files-found: error
 
-      - name: Upload Linux artifact (versioned)
+      - name: Upload Linux artifact (Actions, versioned)
         if: runner.os == 'Linux' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.LINUX_ARTIFACT }}
+          name: ${{ env.LINUX_NAME }}
           path: |
             build/bin/MolarTracker*
             build/compile_commands.json
           if-no-files-found: error
 
       # -------------------------
-      # Tag pushes: also upload "latest" artifacts
+      # Tag pushes: also upload "latest" Actions artifacts
       # -------------------------
-      - name: Upload Windows artifact (latest)
+      - name: Upload Windows artifact (Actions, latest)
         if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.WINDOWS_ARTIFACT_LATEST }}
+          name: ${{ env.WINDOWS_LATEST }}
           path: deploy/**
           if-no-files-found: error
 
-      - name: Upload Linux artifact (latest)
+      - name: Upload Linux artifact (Actions, latest)
         if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.LINUX_ARTIFACT_LATEST }}
+          name: ${{ env.LINUX_LATEST }}
           path: |
             build/bin/MolarTracker*
             build/compile_commands.json
