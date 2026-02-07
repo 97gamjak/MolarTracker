@@ -1,6 +1,7 @@
 #ifndef __UTILS__VERSION_HPP__
 #define __UTILS__VERSION_HPP__
 
+#include <optional>
 #include <string>
 
 #include "nlohmann/json.hpp"
