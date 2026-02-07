@@ -41,6 +41,7 @@ namespace ui
        private:
         void _buildUI(std::vector<std::string> profiles);
 
+        void _emit(const Action& action, const std::string& profileName);
         void _emit(const Action& action);
         void _emitOk();
         void _emitCancel();

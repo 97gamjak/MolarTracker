@@ -83,7 +83,20 @@ namespace ui
         mainLayout->addWidget(_buttonBox);
     }
 
+    void ProfileSelectionDialog::_emit(
+        const Action&      action,
+        const std::string& profileName
+    )
+    {
+        emit requested(action, profileName);
+    }
+
     void ProfileSelectionDialog::_emit(const Action& action)
+    {
+        emit requested(action, "");
+    }
+
+    void ProfileSelectionDialog::_emitOk()
     {
         const auto selectedItems = _profileListWidget->selectedItems();
 
@@ -103,10 +116,8 @@ namespace ui
 
         const auto profileName = selectedItems.first()->text().toStdString();
 
-        emit requested(action, profileName);
+        _emit(Action::Ok, profileName);
     }
-
-    void ProfileSelectionDialog::_emitOk() { _emit(Action::Ok); }
 
     void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
 
