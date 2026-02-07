@@ -157,8 +157,8 @@ namespace ui
         const auto& settings =
             _appContext.getSettings().getUISettings().getLogViewerSettings();
 
-        _logViewerSettings.autoReload        = settings.isAutoReloadEnabled();
-        _logViewerSettings.reloadIntervalSec = settings.getReloadIntervalSec();
+        _logViewerSettings.setAutoReload(settings.isAutoReloadEnabled());
+        _logViewerSettings.setIntervalSec(settings.getReloadIntervalSec());
 
         _logViewerDialog =
             new LogViewerDialog{_logViewerSettings, &_mainWindow};

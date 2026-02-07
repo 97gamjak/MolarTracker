@@ -40,9 +40,8 @@ namespace ui
         _textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
         _textEdit->setMaximumBlockCount(50000);
 
-        _autoReloadCheckBox->setChecked(_settings.autoReload);
-        const auto intervalMs = _settings.reloadIntervalSec * 1000;
-        _reloadTimer->setInterval(static_cast<int>(intervalMs));
+        _autoReloadCheckBox->setChecked(_settings.isAutoReloadEnabled());
+        _reloadTimer->setInterval(_settings.getIntervalMs());
 
         auto* buttonLayout = new QHBoxLayout();
         buttonLayout->addWidget(_reloadButton);
@@ -169,6 +168,48 @@ namespace ui
     {
         QDialog::closeEvent(event);
         _reloadTimer->stop();
+    }
+
+    /**
+     * @brief set the reload interval in seconds, this will update the timer
+     * interval accordingly
+     *
+     * @param intervalSec
+     */
+    void LogViewerDialog::Settings::setIntervalSec(double intervalSec)
+    {
+        const auto intervalMs = static_cast<int>(intervalSec * 1000);
+        _reloadIntervalMs     = std::max(0, intervalMs);
+    }
+
+    /**
+     * @brief Get the reload interval in milliseconds
+     *
+     * @return int
+     */
+    int LogViewerDialog::Settings::getIntervalMs() const
+    {
+        return _reloadIntervalMs;
+    }
+
+    /**
+     * @brief Enable or disable auto reload
+     *
+     * @param autoReload
+     */
+    void LogViewerDialog::Settings::setAutoReload(bool autoReload)
+    {
+        _autoReload = autoReload;
+    }
+
+    /**
+     * @brief Check if auto reload is enabled
+     *
+     * @return true if auto reload is enabled, false otherwise
+     */
+    bool LogViewerDialog::Settings::isAutoReloadEnabled() const
+    {
+        return _autoReload;
     }
 
 }   // namespace ui

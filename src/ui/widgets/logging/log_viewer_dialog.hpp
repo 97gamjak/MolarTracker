@@ -21,16 +21,7 @@ namespace ui
         Q_OBJECT
 
        public:
-        /**
-         * @brief settings for LogViewerDialog, this is a simple struct to hold
-         * the settings
-         *
-         */
-        struct Settings
-        {
-            bool   autoReload        = false;
-            double reloadIntervalSec = 1.0;
-        };
+        class Settings;
 
        private:
         Settings& _settings;
@@ -53,6 +44,24 @@ namespace ui
 
        private:
         void _loadLogFile();
+    };
+
+    /**
+     * @brief Settings for LogViewerDialog
+     *
+     */
+    class LogViewerDialog::Settings
+    {
+       private:
+        int  _reloadIntervalMs = 1000;
+        bool _autoReload       = false;
+
+       public:
+        void              setIntervalSec(double intervalSec);
+        [[nodiscard]] int getIntervalMs() const;
+
+        void               setAutoReload(bool enabled);
+        [[nodiscard]] bool isAutoReloadEnabled() const;
     };
 
 }   // namespace ui
