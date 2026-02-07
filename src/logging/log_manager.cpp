@@ -30,11 +30,11 @@ LogManager::LogManager() { _categories = getDefaultCategories(); }
  * @param directory Directory where the log files will be stored
  */
 void LogManager::initializeRingFileLogger(
-    const std::filesystem::path& configDir
+    const std::filesystem::path& directory
 )
 {
     RingFile::Config config;
-    _logDirectory    = configDir / "logs";
+    _logDirectory    = directory / "logs";
     config.directory = _logDirectory;
     config.baseName  = "molar_tracker_" + Timestamp::fileSafe();
     config.extension = ".log";
