@@ -5,7 +5,8 @@
 #include <optional>
 #include <string>
 
-#include "utils/version.hpp"   // IWYU pragma: keep
+#include "ui_settings.hpp"
+#include "utils/version.hpp"
 
 namespace settings
 {
@@ -20,6 +21,8 @@ namespace settings
         static constexpr const char* _settingsFileName = "settings.json";
         static constexpr const char* _defaultProfileNameKey = "defaultProfileName";
         static constexpr const char* _versionKey = "version";
+
+        static constexpr const char* _uiSettingsKey = "uiSettings";
         // clang-format on
 
         std::filesystem::path      _settingsPath;
@@ -27,6 +30,8 @@ namespace settings
 
         utils::SemVer _version;
         utils::SemVer _oldVersion{utils::SemVer::getInvalidVersion()};
+
+        UISettings _uiSettings;
 
        public:
         Settings() = delete;
@@ -43,6 +48,13 @@ namespace settings
        private:
         void _toJson() const;
         void _fromJson();
+
+        void _toJsonProfileName(nlohmann::json& jsonData) const;
+        void _fromJsonProfileName(const nlohmann::json& jsonData);
+        void _toJsonVersion(nlohmann::json& jsonData) const;
+        void _fromJsonOldVersion(const nlohmann::json& jsonData);
+        void _toJsonUISettings(nlohmann::json& jsonData) const;
+        void _fromJsonUISettings(const nlohmann::json& jsonData);
     };
 
 }   // namespace settings

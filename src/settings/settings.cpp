@@ -84,8 +84,10 @@ namespace settings
     void Settings::_toJson() const
     {
         nlohmann::json jsonData;
-        jsonData[_defaultProfileNameKey] = _defaultProfileName;
-        jsonData[_versionKey]            = _version;
+
+        _toJsonProfileName(jsonData);
+        _toJsonVersion(jsonData);
+        _toJsonUISettings(jsonData);
 
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
@@ -107,12 +109,73 @@ namespace settings
             nlohmann::json jsonData;
             file >> jsonData;
 
-            _defaultProfileName =
-                jsonData.value(_defaultProfileNameKey, _defaultProfileName);
-            _oldVersion = jsonData.value(_versionKey, _oldVersion);
+            _fromJsonProfileName(jsonData);
+            _fromJsonOldVersion(jsonData);
+            _fromJsonUISettings(jsonData);
 
             file.close();
         }
+    }
+
+    /**
+     * @brief Serialize the default profile name to JSON
+     *
+     * @param jsonData
+     */
+    void Settings::_toJsonProfileName(nlohmann::json& jsonData) const
+    {
+        jsonData[_defaultProfileNameKey] = _defaultProfileName;
+    }
+
+    /**
+     * @brief Deserialize the default profile name from JSON
+     *
+     * @param jsonData
+     */
+    void Settings::_fromJsonProfileName(const nlohmann::json& jsonData)
+    {
+        const auto key          = _defaultProfileNameKey;
+        const auto defaultValue = _defaultProfileName;
+
+        _defaultProfileName = jsonData.value(key, defaultValue);
+    }
+
+    /**
+     * @brief Serialize the version to JSON
+     *
+     * @param jsonData
+     */
+    void Settings::_toJsonVersion(nlohmann::json& jsonData) const
+    {
+        jsonData[_versionKey] = _version;
+    }
+
+    /**
+     * @brief Deserialize the old version from JSON
+     *
+     * @param jsonData
+     */
+    void Settings::_fromJsonOldVersion(const nlohmann::json& jsonData)
+    {
+        const auto key          = _versionKey;
+        const auto defaultValue = _oldVersion;
+
+        _oldVersion = jsonData.value(key, defaultValue);
+    }
+
+    /**
+     * @brief Serialize UI settings to JSON
+     *
+     * @param jsonData
+     */
+    void Settings::_toJsonUISettings(nlohmann::json& jsonData) const
+    {
+        jsonData[_uiSettingsKey] = _uiSettings;
+    }
+
+    void Settings::_fromJsonUISettings(const nlohmann::json& jsonData)
+    {
+        _uiSettings = jsonData.value(_uiSettingsKey, _uiSettings);
     }
 
 }   // namespace settings
