@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
+#include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
 
 class QMainWindow;   // Forward declaration
@@ -13,10 +14,14 @@ namespace app
     class AppContext;   // Forward declaration
 }   // namespace app
 
+namespace drafts
+{
+    struct ProfileDraft;   // Forward declaration
+}
+
 namespace ui
 {
-    class UndoStack;          // Forward declaration
-    class AddProfileDialog;   // Forward declaration
+    class UndoStack;   // Forward declaration
 
     /**
      * @brief Controller to ensure a profile exists on application startup
@@ -47,6 +52,10 @@ namespace ui
         void _onProfileSelectionRequested(
             const ProfileSelectionDialog::Action& action,
             const std::string&                    profileName
+        );
+        void _onAddProfileRequested(
+            const AddProfileDialog::Action& action,
+            const drafts::ProfileDraft&     profileDraft
         );
 
        private:

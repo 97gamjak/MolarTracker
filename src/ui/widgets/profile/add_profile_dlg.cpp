@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -42,31 +43,6 @@ namespace ui
         utils::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI();
-    }
-
-    /**
-     * @brief Accepts the dialog and adds the new profile
-     *
-     * @note Overrides QDialog::accept()
-     */
-    void AddProfileDialog::accept()
-    {
-        // TODO(97gamjak): wait for std::expected implementation in UndoStack
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-80
-        // TODO(97gamjak): add error handling and display error message to user
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-73
-        const auto result = _undoStack.makeAndDo<AddProfileCommand>(
-            _profileStore,
-            _settings,
-            _getProfile(),
-            _setActiveCheckBox->isChecked(),
-            _setAsDefaultCheckBox->isChecked()
-        );
-
-        if (!result)
-            return;
-
-        QDialog::accept();
     }
 
     /**
@@ -134,11 +110,21 @@ namespace ui
 
         _addButton = new QPushButton{"Add Profile", this};
         buttonLayout->addWidget(_addButton);
-        connect(_addButton, &QPushButton::clicked, this, &QDialog::accept);
+        connect(
+            _addButton,
+            &QPushButton::clicked,
+            this,
+            &AddProfileDialog::_emitOk
+        );
 
         _cancelButton = new QPushButton{"Cancel", this};
         buttonLayout->addWidget(_cancelButton);
-        connect(_cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+        connect(
+            _cancelButton,
+            &QPushButton::clicked,
+            this,
+            &AddProfileDialog::_emitCancel
+        );
 
         _mainLayout->addLayout(buttonLayout);
     }
@@ -155,6 +141,29 @@ namespace ui
         _enforceDefaultProfile = value;
 
         _updateToggleStates();
+    }
+
+    bool AddProfileDialog::isActiveChecked() const
+    {
+        return _setActiveCheckBox->isChecked();
+    }
+
+    bool AddProfileDialog::isDefaultChecked() const
+    {
+        return _setAsDefaultCheckBox->isChecked();
+    }
+
+    void AddProfileDialog::showNameAlreadyExistsError()
+    {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setWindowTitle("Profile Name Already Exists");
+        msgBox.setText(
+            "A profile with the same name already exists. Please choose a "
+            "different name."
+        );
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
     }
 
     /**
@@ -190,5 +199,14 @@ namespace ui
             _setAsDefaultCheckBox->setEnabled(false);
         }
     }
+
+    void AddProfileDialog::_emit(const Action& action)
+    {
+        emit requested(action, _getProfile());
+    }
+
+    void AddProfileDialog::_emitOk() { _emit(Action::Ok); }
+
+    void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
 
 }   // namespace ui

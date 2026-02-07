@@ -1,8 +1,8 @@
 #ifndef __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
 #define __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
 
+#include <expected>
 #include <optional>
-#include <string_view>
 
 #include "command.hpp"
 #include "drafts/profile_draft.hpp"

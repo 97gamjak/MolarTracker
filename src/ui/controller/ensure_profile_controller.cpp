@@ -7,10 +7,12 @@
 #include "app/app_context.hpp"
 #include "config/constants.hpp"
 #include "logging/logging_base.hpp"
+#include "ui/commands/add_profile_command.hpp"
+#include "ui/commands/add_profile_command_error.hpp"
+#include "ui/commands/undo_stack.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
-#include "utils/qt_helpers.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_ensureProfileController
 #include "logging/log_macros.hpp"
@@ -162,6 +164,14 @@ namespace ui
             _undoStack,
             &_mainWindow
         };
+
+        connect(
+            _addProfileDialog,
+            &AddProfileDialog::requested,
+            this,
+            &EnsureProfileController::_onAddProfileRequested
+        );
+
         _addProfileDialog->setWindowTitle("Create your first profile");
         _addProfileDialog->setModal(true);
         _addProfileDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -186,6 +196,13 @@ namespace ui
             profileStore.getAllProfileNames()
         };
 
+        connect(
+            _profileSelectionDialog,
+            &ProfileSelectionDialog::requested,
+            this,
+            &EnsureProfileController::_onProfileSelectionRequested
+        );
+
         _profileSelectionDialog->setWindowTitle("Select a profile");
         _profileSelectionDialog->setModal(true);
         _profileSelectionDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -203,6 +220,7 @@ namespace ui
         switch (action)
         {
             case ProfileSelectionDialog::Action::Ok:
+            {
                 _appContext.getStore().getProfileStore().setActiveProfile(
                     profileName
                 );
@@ -211,8 +229,10 @@ namespace ui
 
                 _relaunch();
                 break;
+            }
 
             case ProfileSelectionDialog::Action::Cancel:
+            {
                 LOG_WARNING(
                     "No profile selected. Application cannot continue without "
                     "an active profile. Trying to ensure profile existence "
@@ -222,6 +242,77 @@ namespace ui
                 );
                 _relaunch();
                 break;
+            }
+        }
+    }
+
+    void EnsureProfileController::_onAddProfileRequested(
+        const AddProfileDialog::Action& action,
+        const drafts::ProfileDraft&     profileDraft
+    )
+    {
+        switch (action)
+        {
+            case AddProfileDialog::Action::Ok:
+            {
+                // we don't need to do anything here, as the AddProfileCommand
+                // already adds the profile and sets it as active if needed.
+                const auto result = _undoStack.makeAndDo<AddProfileCommand>(
+                    _appContext.getStore().getProfileStore(),
+                    _appContext.getSettings(),
+                    profileDraft,
+                    _addProfileDialog->isActiveChecked(),
+                    _addProfileDialog->isDefaultChecked()
+                );
+
+                if (!result)
+                {
+                    // cast to AddProfileCommandError to get the error message
+                    // and code
+                    auto* addProfileError =
+                        dynamic_cast<AddProfileCommandError*>(
+                            std::move(result).error().get()
+                        );
+
+                    if (addProfileError->getCode() ==
+                        AddProfileCommandErrorCode::NameAlreadyExists)
+                    {
+                        _addProfileDialog->showNameAlreadyExistsError();
+                    }
+                    else
+                    {
+                        const auto errorMsg = "Failed to add profile: " +
+                                              addProfileError->getMessage();
+
+                        LOG_ERROR(errorMsg);
+
+                        ExceptionDialog::showFatal(
+                            "Add Profile Error",
+                            QString::fromStdString(errorMsg)
+                        );
+                    }
+                }
+                else
+                {
+                    _addProfileDialog->close();
+                }
+
+                _relaunch();
+                break;
+            }
+
+            case AddProfileDialog::Action::Cancel:
+            {
+                LOG_WARNING(
+                    "No profile created. Application cannot continue without "
+                    "an active profile. Trying to ensure profile existence "
+                    "again. If you keep seeing this message, please report it "
+                    "to the developers under " +
+                    Constants::getGithubIssuesUrl()
+                );
+                _relaunch();
+                break;
+            }
         }
     }
 

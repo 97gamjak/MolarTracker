@@ -17,6 +17,7 @@ target_link_libraries(molartracker_ui_controller
         Qt6::Widgets
         molartracker_ui_widgets
         molartracker_ui_logging
+        molartracker_ui_commands
         molartracker_app_repos_api
         molartracker_logging
 )
