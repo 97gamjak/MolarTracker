@@ -1,0 +1,7 @@
+if [[ -n $@ ]]; then
+    docker exec qtdev rm -r /workspace/build/*
+    docker exec qtdev cmake -S /workspace -B /workspace/build -G Ninja \
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+fi
+
+docker exec qtdev cmake --build /workspace/build -j

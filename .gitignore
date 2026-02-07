@@ -1,3 +1,8 @@
 .build
-build/
+build
+build-docker/
 compile_commands.json
+*.db
+.venv
+venv
+.cache

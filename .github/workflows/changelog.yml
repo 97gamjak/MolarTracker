@@ -1,0 +1,110 @@
+name: Check Changelog
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    if: github.ref_name != 'main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check PR labels for changelog skip
+        id: check-skip
+        run: |
+          labels="${{ join(github.event.pull_request.labels.*.name, ' ') }}"
+          echo "PR labels: $labels"
+
+          if [[ "$labels" == *"skip-changelog"* ]]; then
+            echo "Found 'skip-changelog' label - skipping changelog check"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No 'skip-changelog' label found - proceeding with changelog check"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch target branch
+        if: steps.check-skip.outputs.skip != 'true'
+        run: |
+          git fetch origin "${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}"
+
+      - name: Check changelog update (CHANGELOG.md OR DEV-CHANGELOG.md)
+        if: steps.check-skip.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          marker="<!-- insertion marker -->"
+          base_ref="origin/${{ github.event.pull_request.base.ref }}"
+
+          extract_above_marker() {
+            local file="$1"
+            local src="$2" # "base" or "pr"
+            local out="$3"
+
+            if [[ "$src" == "base" ]]; then
+              # If the file doesn't exist on base, treat as empty.
+              if ! git cat-file -e "$base_ref:$file" 2>/dev/null; then
+                : > "$out"
+                return 0
+              fi
+              git show "$base_ref:$file" \
+                | awk -v marker="$marker" 'BEGIN{found=0} $0 ~ marker {found=1; exit} {if(!found) print}' \
+                | sed '/^[[:space:]]*$/d' > "$out"
+            else
+              # If the file doesn't exist in PR branch, treat as empty.
+              if [[ ! -f "$file" ]]; then
+                : > "$out"
+                return 0
+              fi
+              cat "$file" \
+                | awk -v marker="$marker" 'BEGIN{found=0} $0 ~ marker {found=1; exit} {if(!found) print}' \
+                | sed '/^[[:space:]]*$/d' > "$out"
+            fi
+          }
+
+          check_one_file_updated() {
+            local file="$1"
+            local base_out="base_${file//\//_}_above.txt"
+            local pr_out="pr_${file//\//_}_above.txt"
+
+            extract_above_marker "$file" "base" "$base_out"
+            extract_above_marker "$file" "pr"   "$pr_out"
+
+            if ! diff -q "$base_out" "$pr_out" >/dev/null; then
+              echo "✅ Update detected in $file (content above insertion marker differs)."
+              return 0
+            fi
+
+            echo "ℹ️ No update detected in $file."
+            return 1
+          }
+
+          updated=false
+
+          if check_one_file_updated "CHANGELOG.md"; then
+            updated=true
+          fi
+
+          if check_one_file_updated "DEV-CHANGELOG.md"; then
+            updated=true
+          fi
+
+          if [[ "$updated" == "true" ]]; then
+            echo "✅ Changelog requirement satisfied (at least one file updated)."
+            exit 0
+          fi
+
+          echo "❌ Neither CHANGELOG.md nor DEV-CHANGELOG.md was updated above the insertion marker."
+          echo "   Add an entry to at least one file, or apply the 'skip-changelog' label."
+          exit 1
+
+      - name: Skip changelog check
+        if: steps.check-skip.outputs.skip == 'true'
+        run: |
+          echo "Changelog check skipped due to PR label"
