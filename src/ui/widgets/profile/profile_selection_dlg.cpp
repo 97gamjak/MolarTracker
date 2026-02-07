@@ -83,6 +83,13 @@ namespace ui
         mainLayout->addWidget(_buttonBox);
     }
 
+    /**
+     * @brief Emit the requested signal with the given action and profile name
+     *
+     * @param action The action performed by the user (Ok or Cancel)
+     * @param profileName The name of the selected profile (only valid if action
+     * is Ok)
+     */
     void ProfileSelectionDialog::_emit(
         const Action&      action,
         const std::string& profileName
@@ -91,11 +98,22 @@ namespace ui
         emit requested(action, profileName);
     }
 
+    /**
+     * @brief Emit the requested signal with the given action and an empty
+     * profile name
+     *
+     * @param action The action performed by the user (Ok or Cancel)
+     */
     void ProfileSelectionDialog::_emit(const Action& action)
     {
         emit requested(action, "");
     }
 
+    /**
+     * @brief Emit the requested signal with the Ok action and the selected
+     * profile name
+     *
+     */
     void ProfileSelectionDialog::_emitOk()
     {
         const auto selectedItems = _profileListWidget->selectedItems();
@@ -119,6 +137,10 @@ namespace ui
         _emit(Action::Ok, profileName);
     }
 
+    /**
+     * @brief Emit the requested signal with the Cancel action
+     *
+     */
     void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
 
 }   // namespace ui
