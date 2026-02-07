@@ -143,4 +143,15 @@ namespace ui
      */
     void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
 
+    /**
+     * @brief Handle the close event, emit the cancel action
+     *
+     * @param event
+     */
+    void ProfileSelectionDialog::closeEvent(QCloseEvent* event)
+    {
+        QDialog::closeEvent(event);
+        _emit(Action::Cancel);
+    }
+
 }   // namespace ui

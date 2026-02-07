@@ -38,6 +38,9 @@ namespace ui
        signals:
         void requested(const Action& action, const std::string& profileName);
 
+       protected:
+        void closeEvent(QCloseEvent* event) override;
+
        private:
         void _buildUI(std::vector<std::string> profiles);
 
