@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 
+#include "nlohmann/json.hpp"
 #include "ui_settings.hpp"
 #include "utils/version.hpp"
 
