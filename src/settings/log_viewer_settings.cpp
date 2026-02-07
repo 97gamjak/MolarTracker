@@ -25,7 +25,7 @@ namespace settings
         LogViewerSettings settings;
 
         const auto key          = _reloadIntervalSecKey;
-        const auto defaultValue = __DEFAULT_RELOAD_INTERVAL_SEC;
+        const auto defaultValue = _DEFAULT_RELOAD_INTERVAL_SEC;
 
         settings._reloadIntervalSec = j.value(key, defaultValue);
 

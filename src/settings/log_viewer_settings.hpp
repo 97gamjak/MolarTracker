@@ -14,10 +14,10 @@ namespace settings
        private:
         // clang-format off
         static constexpr const char* _reloadIntervalSecKey         = "reloadIntervalSec";
-        static constexpr double      __DEFAULT_RELOAD_INTERVAL_SEC = 1.0;
+        static constexpr double      _DEFAULT_RELOAD_INTERVAL_SEC  = 1.0;
         // clang-format on
 
-        double _reloadIntervalSec = __DEFAULT_RELOAD_INTERVAL_SEC;
+        double _reloadIntervalSec = _DEFAULT_RELOAD_INTERVAL_SEC;
 
        public:
         LogViewerSettings() = default;
