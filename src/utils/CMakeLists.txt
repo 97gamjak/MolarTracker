@@ -3,6 +3,8 @@ add_library(molartracker_utils STATIC
     ring_file.cpp
     paths.cpp
     qt_helpers.cpp
+    git.hpp
+    version.cpp
 )
 
 target_include_directories(molartracker_utils
@@ -14,4 +16,5 @@ target_link_libraries(molartracker_utils
     PUBLIC
         Qt6::Core
         Qt6::Widgets
+        CURL::libcurl
 )

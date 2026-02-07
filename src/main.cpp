@@ -8,6 +8,7 @@
 #include "ui/application.hpp"
 #include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
+#include "utils/check_updates.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::application
 #include "logging/log_macros.hpp"
@@ -29,6 +30,8 @@ void initGlobalConfig()
 int main(int argc, char** argv)
 {
     ui::MolarTrackerApplication app{argc, argv};
+
+    utils::check_for_updates();
 
     try
     {
