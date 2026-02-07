@@ -65,7 +65,7 @@ namespace ui
         );
 
         // disable buttons until a profile is selected
-        _buttonBox->setEnabled(false);
+        _buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
         connect(
             _profileListWidget,
             &QListWidget::itemSelectionChanged,
