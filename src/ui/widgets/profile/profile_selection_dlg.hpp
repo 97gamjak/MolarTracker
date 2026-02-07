@@ -29,8 +29,21 @@ namespace ui
             std::vector<std::string> profiles
         );
 
+        enum class Action
+        {
+            Ok,
+            Cancel
+        };
+
+       signals:
+        void requested(const Action& action, const std::string& profileName);
+
        private:
         void _buildUI(std::vector<std::string> profiles);
+
+        void _emit(const Action& action);
+        void _emitOk();
+        void _emitCancel();
     };
 
 }   // namespace ui

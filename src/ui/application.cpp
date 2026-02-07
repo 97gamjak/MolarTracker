@@ -13,10 +13,14 @@ namespace ui
     MolarTrackerApplication::MolarTrackerApplication(int& argc, char** argv)
         : QApplication(argc, argv)
     {
-        setApplicationName(Constants::APP_NAME);
-        setApplicationDisplayName(Constants::APP_NAME);
+        const auto appName = QString::fromStdString(Constants::getAppName());
+        const auto desktopAppName =
+            QString::fromStdString(Constants::getDesktopAppName());
 
-        setDesktopFileName(Constants::DESKTOP_APP_NAME);
+        setApplicationName(appName);
+        setApplicationDisplayName(appName);
+
+        setDesktopFileName(desktopAppName);
     }
 
 }   // namespace ui

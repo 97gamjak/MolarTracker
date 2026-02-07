@@ -10,16 +10,15 @@
 class Constants
 {
    private:
-    static constexpr const char* _databaseFile = "molar_tracker.db";
-
     std::filesystem::path _configPath;
     std::filesystem::path _dataPath;
 
-   public:
     // clang-format off
-    static constexpr const char* APP_NAME = "Molar Tracker";
-    static constexpr const char* DIR_PREFIX = "molartracker";
-    static constexpr const char* DESKTOP_APP_NAME = MOLARTRACKER_DESKTOP_APP_NAME;
+    static constexpr const char* _databaseFile    = "molar_tracker.db";
+    static constexpr const char* _appName         = "Molar Tracker";
+    static constexpr const char* _dirPrefix       = "molartracker";
+    static constexpr const char* _desktopAppName  = MOLARTRACKER_DESKTOP_APP_NAME;
+    static constexpr const char* _githubRepoUrl   = "https://github.com/97gamjak/molartracker";
     // clang-format on
 
    public:
@@ -28,6 +27,12 @@ class Constants
     [[nodiscard]] std::filesystem::path getConfigPath() const;
     [[nodiscard]] std::filesystem::path getDataPath() const;
     [[nodiscard]] std::filesystem::path getDatabasePath() const;
+
+    [[nodiscard]] static const std::string getAppName();
+    [[nodiscard]] static const std::string getDirPrefix();
+    [[nodiscard]] static const std::string getDesktopAppName();
+    [[nodiscard]] static const std::string getGithubRepoUrl();
+    [[nodiscard]] static const std::string getGithubIssuesUrl();
 
    private:
     Constants();

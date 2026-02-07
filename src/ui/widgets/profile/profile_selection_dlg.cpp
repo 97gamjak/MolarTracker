@@ -4,7 +4,12 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 
+#include "config/constants.hpp"
+#include "logging/logging_base.hpp"
 #include "utils/qt_helpers.hpp"
+
+#define __LOG_CATEGORY__ LogCategory::ui_profileSelectionDialog
+#include "logging/log_macros.hpp"
 
 namespace ui
 {
@@ -46,10 +51,60 @@ namespace ui
         using enum QDialogButtonBox::StandardButton;
         _buttonBox = new QDialogButtonBox{Ok | Cancel, this};
 
-        // TODO(97gamjak): make these buttons actually do something useful
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-77
+        connect(
+            _buttonBox,
+            &QDialogButtonBox::accepted,
+            this,
+            &ProfileSelectionDialog::_emitOk
+        );
+        connect(
+            _buttonBox,
+            &QDialogButtonBox::rejected,
+            this,
+            &ProfileSelectionDialog::_emitCancel
+        );
+
+        // disable buttons until a profile is selected
+        _buttonBox->setEnabled(false);
+        connect(
+            _profileListWidget,
+            &QListWidget::itemSelectionChanged,
+            [this]()
+            {
+                _buttonBox->setEnabled(
+                    !_profileListWidget->selectedItems().empty()
+                );
+            }
+        );
 
         mainLayout->addWidget(_buttonBox);
     }
+
+    void ProfileSelectionDialog::_emit(const Action& action)
+    {
+        const auto selectedItems = _profileListWidget->selectedItems();
+
+        if (selectedItems.empty())
+        {
+            // this should never happen, as the OK button is disabled when no
+            // profile is selected. But we check it just in case to prevent
+            // crashes in case of unexpected issues.
+            LOG_ERROR(
+                "No profile selected, but OK button was clicked. This should "
+                "never happen. If you see this message, please report it to "
+                "the developers under " +
+                Constants::getGithubIssuesUrl()
+            );
+            return;
+        }
+
+        const auto profileName = selectedItems.first()->text().toStdString();
+
+        emit requested(action, profileName);
+    }
+
+    void ProfileSelectionDialog::_emitOk() { _emit(Action::Ok); }
+
+    void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
 
 }   // namespace ui

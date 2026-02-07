@@ -59,6 +59,7 @@ namespace app
         [[nodiscard]] std::vector<std::string> getAllProfileNames() const;
 
         void setActiveProfile(std::optional<std::string_view> name);
+        [[nodiscard]] bool                       hasActiveProfile() const;
         [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
         [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 
