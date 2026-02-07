@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QStatusBar>
+#include <format>
 
 #include "app/app_context.hpp"
 #include "config/constants.hpp"
