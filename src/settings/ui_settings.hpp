@@ -14,7 +14,7 @@ namespace settings
     {
        private:
         // clang-format off
-         static constexpr const char* _logViewerSettingsKey = "logViewerSettings";
+        static constexpr const char* _logViewerSettingsKey = "logViewerSettings";
         // clang-format on
 
         LogViewerSettings _logViewerSettings;
