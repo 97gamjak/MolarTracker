@@ -27,7 +27,12 @@ namespace utils
         if (parsedVersion.has_value())
             *this = *parsedVersion;
         else
+        {
             _isInvalid = true;
+            _major     = 0;
+            _minor     = 0;
+            _patch     = 0;
+        }
     }
 
     /**
@@ -62,9 +67,13 @@ namespace utils
             ++idx;
         }
 
-        // no trailing characters allowed
+        // Allow SemVer build metadata: "+anything"
         if (first != last)
-            return std::nullopt;
+        {
+            if (*first != '+')
+                return std::nullopt;
+            // everything after '+' is ignored
+        }
 
         return SemVer(values[0], values[1], values[2]);
     }

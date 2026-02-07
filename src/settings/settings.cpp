@@ -19,7 +19,7 @@ namespace settings
      */
     Settings::Settings(const path& configDir)
         : _settingsPath{absolute(configDir / _settingsFileName)},
-          _version{utils::SemVer(Constants::getGitTag())}
+          _version{utils::SemVer(Constants::getVersion())}
     {
         _fromJson();
     }
