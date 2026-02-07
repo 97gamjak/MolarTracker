@@ -38,6 +38,7 @@ class Constants
     [[nodiscard]] static const std::string getGithubIssuesUrl();
 
     [[nodiscard]] static const std::string getVersion();
+    [[nodiscard]] static const std::string getGitTag();
 
    private:
     Constants();

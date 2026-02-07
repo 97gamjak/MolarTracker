@@ -5,6 +5,8 @@
 #include <optional>
 #include <string>
 
+#include "utils/version.hpp"   // IWYU pragma: keep
+
 namespace settings
 {
 
@@ -17,10 +19,14 @@ namespace settings
         // clang-format off
         static constexpr const char* _settingsFileName = "settings.json";
         static constexpr const char* _defaultProfileNameKey = "defaultProfileName";
+        static constexpr const char* _versionKey = "version";
         // clang-format on
 
         std::filesystem::path      _settingsPath;
         std::optional<std::string> _defaultProfileName = std::nullopt;
+
+        utils::SemVer _version;
+        utils::SemVer _oldVersion{utils::SemVer::getInvalidVersion()};
 
        public:
         Settings() = delete;

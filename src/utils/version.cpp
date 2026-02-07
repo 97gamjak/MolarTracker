@@ -1,5 +1,7 @@
 #include "version.hpp"
 
+#include <charconv>
+
 namespace utils
 {
     /**
@@ -21,7 +23,59 @@ namespace utils
      */
     SemVer::SemVer(const std::string& versionStr)
     {
-        sscanf(versionStr.c_str(), "%zu.%zu.%zu", &_major, &_minor, &_patch);
+        auto parsedVersion = _parse(versionStr);
+        if (parsedVersion.has_value())
+            *this = *parsedVersion;
+        else
+        {
+            _isInvalid = true;
+            _major     = 0;
+            _minor     = 0;
+            _patch     = 0;
+        }
+    }
+
+    /**
+     * @brief Parse a version string into a SemVer object
+     *
+     * @param versionStr
+     * @return std::optional<SemVer>
+     */
+    std::optional<SemVer> SemVer::_parse(const std::string& versionStr)
+    {
+        std::size_t values[3]{};
+        std::size_t idx = 0;
+
+        const char* first = versionStr.data();
+        const char* last  = first + versionStr.size();
+
+        while (idx < 3)
+        {
+            auto [ptr, ec] = std::from_chars(first, last, values[idx]);
+            if (ec != std::errc{})
+                return std::nullopt;
+
+            first = ptr;
+
+            if (idx < 2)
+            {
+                if (first == last || *first != '.')
+                    return std::nullopt;
+                ++first;
+            }
+
+            ++idx;
+        }
+
+        // Allow SemVer build metadata: "+anything"
+        if (first != last)
+        {
+            if (*first != '+')
+                return std::nullopt;
+            // everything after '+' is ignored
+        }
+
+        return SemVer(values[0], values[1], values[2]);
     }
 
     /**

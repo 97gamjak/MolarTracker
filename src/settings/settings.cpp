@@ -3,7 +3,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include "config/constants.hpp"
 #include "config/json.hpp"   // IWYU pragma: keep
+#include "utils/version.hpp"
 
 namespace settings
 {
@@ -16,7 +18,8 @@ namespace settings
      * @param configDir
      */
     Settings::Settings(const path& configDir)
-        : _settingsPath{absolute(configDir / _settingsFileName)}
+        : _settingsPath{absolute(configDir / _settingsFileName)},
+          _version{utils::SemVer(Constants::getVersion())}
     {
         _fromJson();
     }
@@ -82,6 +85,7 @@ namespace settings
     {
         nlohmann::json jsonData;
         jsonData[_defaultProfileNameKey] = _defaultProfileName;
+        jsonData[_versionKey]            = _version;
 
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
@@ -105,6 +109,7 @@ namespace settings
 
             _defaultProfileName =
                 jsonData.value(_defaultProfileNameKey, _defaultProfileName);
+            _oldVersion = jsonData.value(_versionKey, _oldVersion);
 
             file.close();
         }

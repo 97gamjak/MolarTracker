@@ -9,6 +9,7 @@ add_library(molartracker_utils STATIC
 target_include_directories(molartracker_utils
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${PROJECT_SOURCE_DIR}/external/json/single_include
 )
 
 target_link_libraries(molartracker_utils
