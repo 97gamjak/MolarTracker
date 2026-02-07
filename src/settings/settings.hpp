@@ -40,11 +40,15 @@ namespace settings
 
         void save() const;
 
+       public:   // getters and setters
         void unsetDefaultProfileName();
         void setDefaultProfileName(const std::optional<std::string>& name);
         void setDefaultProfileName(const std::string& name);
         [[nodiscard]] bool                       hasDefaultProfile() const;
         [[nodiscard]] std::optional<std::string> getDefaultProfileName() const;
+
+        [[nodiscard]] UISettings&       getUISettings();
+        [[nodiscard]] const UISettings& getUISettings() const;
 
        private:
         void _toJson() const;

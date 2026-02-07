@@ -6,6 +6,7 @@
 
 #include "logging/logging_base.hpp"
 #include "ui/widgets/logging/debug_slots_dialog.hpp"
+#include "ui/widgets/logging/log_viewer_dialog.hpp"
 
 namespace app
 {
@@ -18,7 +19,6 @@ namespace ui
 {
     class DebugMenu;          // Forward declaration
     class DebugSlotsDialog;   // Forward declaration
-    class LogViewerDialog;    // Forward declaration
     class UndoStack;          // Forward declaration
 
     /**
@@ -37,6 +37,7 @@ namespace ui
 
         QPointer<DebugSlotsDialog> _debugSlotsDialog;
         QPointer<LogViewerDialog>  _logViewerDialog;
+        LogViewerDialog::Settings  _logViewerSettings;
 
        private slots:
         void _onRequestDebugSlots();

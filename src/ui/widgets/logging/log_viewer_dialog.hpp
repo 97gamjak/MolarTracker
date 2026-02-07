@@ -20,14 +20,28 @@ namespace ui
     {
         Q_OBJECT
 
+       public:
+        /**
+         * @brief settings for LogViewerDialog, this is a simple struct to hold
+         * the settings
+         *
+         */
+        struct Settings
+        {
+            bool   autoReload        = false;
+            double reloadIntervalSec = 1.0;
+        };
+
        private:
+        Settings& _settings;
+
         QPlainTextEdit* _textEdit;
         QPushButton*    _reloadButton;
         QCheckBox*      _autoReloadCheckBox;
         QTimer*         _reloadTimer;
 
        public:
-        explicit LogViewerDialog(QWidget* parent = nullptr);
+        explicit LogViewerDialog(Settings& settings, QWidget* parent = nullptr);
 
        protected:
         void hideEvent(QHideEvent* event) override;

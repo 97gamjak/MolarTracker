@@ -52,6 +52,20 @@ namespace settings
     }
 
     /**
+     * @brief Get the UI settings
+     *
+     * @return UISettings&
+     */
+    UISettings& Settings::getUISettings() { return _uiSettings; }
+
+    /**
+     * @brief Get the UI settings (const version)
+     *
+     * @return const UISettings&
+     */
+    const UISettings& Settings::getUISettings() const { return _uiSettings; }
+
+    /**
      * @brief Unset the default profile name
      *
      */

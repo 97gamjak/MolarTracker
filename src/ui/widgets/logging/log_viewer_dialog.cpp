@@ -20,10 +20,12 @@ namespace ui
     /**
      * @brief Construct a new Log Viewer Dialog:: Log Viewer Dialog object
      *
+     * @param settings
      * @param parent
      */
-    LogViewerDialog::LogViewerDialog(QWidget* parent)
+    LogViewerDialog::LogViewerDialog(Settings& settings, QWidget* parent)
         : QDialog(parent),
+          _settings(settings),
           _textEdit(new QPlainTextEdit(this)),
           _reloadButton(new QPushButton(tr("Reload"), this)),
           _autoReloadCheckBox(new QCheckBox(tr("Auto Reload"), this)),
@@ -38,10 +40,9 @@ namespace ui
         _textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
         _textEdit->setMaximumBlockCount(50000);
 
-        _autoReloadCheckBox->setChecked(false);
-        // TODO(97gamjak): make this changeable via config and dialog
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-104
-        _reloadTimer->setInterval(1000);   // 1000 ms
+        _autoReloadCheckBox->setChecked(_settings.autoReload);
+        const auto intervalMs = _settings.reloadIntervalSec * 1000;
+        _reloadTimer->setInterval(static_cast<int>(intervalMs));
 
         auto* buttonLayout = new QHBoxLayout();
         buttonLayout->addWidget(_reloadButton);

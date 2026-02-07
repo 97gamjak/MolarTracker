@@ -24,6 +24,9 @@ namespace settings
 
         nlohmann::json    toJson() const;
         static UISettings fromJson(const nlohmann::json& j);
+
+        [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
+        [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
     };
 
 }   // namespace settings
