@@ -37,10 +37,10 @@ template <>
 struct adl_serializer<settings::UISettings>
 {
     /**
-     * @brief Serialize SemVer to JSON
+     * @brief Serialize UISettings to JSON
      *
      * @param j
-     * @param version
+     * @param settings
      */
     static void to_json(nlohmann::json& j, const settings::UISettings& settings)
     {
@@ -48,7 +48,7 @@ struct adl_serializer<settings::UISettings>
     }
 
     /**
-     * @brief Deserialize SemVer from JSON
+     * @brief Deserialize UISettings from JSON
      *
      * @param j
      * @return settings::UISettings
