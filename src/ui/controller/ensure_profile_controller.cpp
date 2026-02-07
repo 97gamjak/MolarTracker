@@ -86,11 +86,10 @@ namespace ui
                 "Default Profile Not Found",
                 LOG_WARNING_OBJECT(
                     std::format(
-                        "Default Profile not Found The default profile '{}' "
-                        "could not be found. It might have been deleted or "
-                        "there there might be an issue with the profile store. "
-                        "You will need to select an existing profile or create "
-                        "a new one to continue.",
+                        "The default profile '{}' could not be found. It "
+                        "might have been deleted or there might be an issue "
+                        "with the profile store. Please select an existing "
+                        "profile or create a new one to continue.",
                         name
                     )
                 )
