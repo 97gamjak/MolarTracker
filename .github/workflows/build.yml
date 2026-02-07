@@ -24,6 +24,8 @@ jobs:
     env:
       QT_VERSION: "6.8.3"
       BUILD_TYPE: "Release"
+      # Use static vcpkg triplet on Windows so we don't ship sqlite3.dll/curl DLLs
+      VCPKG_TRIPLET: "x64-windows-static"
 
     steps:
       - name: Checkout
@@ -110,6 +112,7 @@ jobs:
         with:
           vcpkgJsonGlob: "**/vcpkg.json"
           runVcpkgInstall: true
+          vcpkgTriplet: ${{ env.VCPKG_TRIPLET }}
 
       # -------------------------
       # Configure + build
@@ -144,7 +147,7 @@ jobs:
             -DMOLARTRACKER_IS_TAG="$isTag" `
             -DMOLARTRACKER_GIT_TAG="${{ github.ref_name }}" `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=x64-windows
+            -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_TRIPLET }}
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
