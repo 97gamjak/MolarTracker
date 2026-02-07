@@ -209,4 +209,10 @@ namespace ui
 
     void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
 
+    void AddProfileDialog::closeEvent(QCloseEvent* event)
+    {
+        QDialog::closeEvent(event);
+        _emitCancel();
+    }
+
 }   // namespace ui

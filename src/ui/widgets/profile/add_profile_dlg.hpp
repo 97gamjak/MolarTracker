@@ -76,6 +76,9 @@ namespace ui
             const drafts::ProfileDraft& profile
         );
 
+       protected:
+        void closeEvent(QCloseEvent* event) override;
+
        private:
         void _buildUI();
         void _buildFormSection();
