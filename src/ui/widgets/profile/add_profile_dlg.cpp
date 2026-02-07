@@ -143,16 +143,30 @@ namespace ui
         _updateToggleStates();
     }
 
+    /**
+     * @brief check if the active checkbox is checked
+     *
+     * @return true if checked, false otherwise
+     */
     bool AddProfileDialog::isActiveChecked() const
     {
         return _setActiveCheckBox->isChecked();
     }
 
+    /**
+     * @brief check if the default checkbox is checked
+     *
+     * @return true if checked, false otherwise
+     */
     bool AddProfileDialog::isDefaultChecked() const
     {
         return _setAsDefaultCheckBox->isChecked();
     }
 
+    /**
+     * @brief show an error message if the profile name already exists
+     *
+     */
     void AddProfileDialog::showNameAlreadyExistsError()
     {
         QMessageBox msgBox;
@@ -200,15 +214,38 @@ namespace ui
         }
     }
 
+    /**
+     * @brief emit the requested signal with the given action and profile draft
+     *
+     * @param action
+     * @param profileDraft
+     */
     void AddProfileDialog::_emit(const Action& action)
     {
         emit requested(action, _getProfile());
     }
 
+    /**
+     * @brief emit the requested signal with the Ok action and profile draft
+     *
+     * @param action
+     * @param profileDraft
+     */
     void AddProfileDialog::_emitOk() { _emit(Action::Ok); }
 
+    /**
+     * @brief emit the requested signal with the Cancel action
+     *
+     * @param action
+     * @param profileDraft
+     */
     void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
 
+    /**
+     * @brief handle the close event, emit the cancel action
+     *
+     * @param event
+     */
     void AddProfileDialog::closeEvent(QCloseEvent* event)
     {
         QDialog::closeEvent(event);
