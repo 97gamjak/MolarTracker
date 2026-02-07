@@ -2,10 +2,8 @@
 #define __LOGGING__LOG_ENTRY_SCOPE_HPP__
 
 #include <chrono>
-#include <string>
 
 #include "log_object.hpp"
-#include "logging_base.hpp"
 
 /**
  * @brief RAII scope for logging entry and exit of a code block

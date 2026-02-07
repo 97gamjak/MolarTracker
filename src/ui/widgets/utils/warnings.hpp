@@ -2,8 +2,9 @@
 #define __UI__WIDGETS__UTILS__WARNINGS_HPP__
 
 #include <QMessageBox>
+#include <string>
 
-class LogObject;
+#include "logging/log_object.hpp"
 
 namespace ui
 {

@@ -173,11 +173,10 @@ namespace ui
                     "the "
                     "developers under " +
                     Constants::getGithubIssuesUrl();
-                LOG_ERROR(errorMsg);
 
                 ExceptionDialog::showFatal(
                     "Ensure Profile Error",
-                    QString::fromStdString(errorMsg)
+                    LOG_ERROR_OBJECT(errorMsg)
                 );
 
                 _callCount = MAX_PROFILE_CHECKS;   // reset call count for
@@ -210,11 +209,6 @@ namespace ui
      */
     void EnsureProfileController::_showAddProfileDialog()
     {
-        auto* statusBar = _mainWindow.statusBar();
-
-        if (statusBar)
-            statusBar->showMessage("No profiles found.");
-
         _addProfileDialog = new AddProfileDialog{
             _appContext.getStore().getProfileStore(),
             _appContext.getSettings(),
@@ -245,11 +239,6 @@ namespace ui
      */
     void EnsureProfileController::_showProfileSelectionDialog()
     {
-        auto* statusBar = _mainWindow.statusBar();
-
-        if (statusBar)
-            statusBar->showMessage("Select a profile to continue.");
-
         const auto& profileStore = _appContext.getStore().getProfileStore();
 
         _profileSelectionDialog = new ProfileSelectionDialog{
@@ -297,7 +286,12 @@ namespace ui
                 );
                 _appContext.getSettings().setDefaultProfileName(profileName);
 
-                LOG_INFO("Selected profile: " + profileName);
+                showInfoStatusBar(
+                    LOG_INFO_OBJECT(
+                        "Profile '" + profileName + "' selected successfully."
+                    ),
+                    _mainWindow.statusBar()
+                );
 
                 _profileSelectionDialog->close();
 
@@ -394,11 +388,9 @@ namespace ui
                             const auto errorMsg = "Failed to add profile: " +
                                                   addError->getMessage();
 
-                            LOG_ERROR(errorMsg);
-
                             ExceptionDialog::showFatal(
                                 "Add Profile Error",
-                                QString::fromStdString(errorMsg)
+                                LOG_ERROR_OBJECT(errorMsg)
                             );
                         }
                     }

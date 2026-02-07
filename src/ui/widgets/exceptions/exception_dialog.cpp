@@ -7,6 +7,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "logging/log_manager.hpp"
+#include "logging/logging_base.hpp"
+
 namespace ui
 {
     /**
@@ -81,12 +84,15 @@ namespace ui
      * @param title The title of the dialog
      * @param details The details of the exception
      */
-    void ExceptionDialog::showFatal(
-        const QString& title,
-        const QString& details
-    )
+    void ExceptionDialog::showFatal(const QString& title, LogObject logObject)
     {
-        ExceptionDialog dlg(title, details);
+        // we set the log level to error to make sure it is visible in the log
+        // viewer and stands out from other log messages
+        logObject.level = LogLevel::Error;
+
+        LogManager::getInstance().log(logObject);
+
+        ExceptionDialog dlg(title, QString::fromStdString(logObject.message));
         dlg.exec();
     }
 

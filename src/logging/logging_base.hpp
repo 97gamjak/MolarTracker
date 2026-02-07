@@ -16,7 +16,8 @@
     X(ui_ensureProfileController) \
     X(ui_profileSelectionDialog)  \
     X(database)                   \
-    X(logging_manager)
+    X(logging_manager)            \
+    X(application)
 
 MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
 

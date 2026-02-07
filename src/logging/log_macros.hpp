@@ -1,9 +1,9 @@
 #ifndef __LOGGING__LOG_MACROS_HPP__
 #define __LOGGING__LOG_MACROS_HPP__
 
-#include "log_entry_scope.hpp"
-#include "log_manager.hpp"
-#include "log_object.hpp"
+#include "log_entry_scope.hpp"   // IWYU pragma: keep
+#include "log_manager.hpp"       // IWYU pragma: keep
+#include "log_object.hpp"        // IWYU pragma: keep
 #include "mstd/error.hpp"
 
 #define LOG_OBJECT_INTERNAL(level, category, message) \
