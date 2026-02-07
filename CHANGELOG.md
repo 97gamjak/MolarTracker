@@ -5,6 +5,8 @@ All changes and updates, that are relevant for a user will be documented here
 ## Next Release
 
 <!-- insertion marker -->
+## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
+
 ## [0.0.1](https://github.com/repo/owner/releases/tag/0.0.1) - 2026-02-07
 
 ### New Features
@@ -31,5 +33,6 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
