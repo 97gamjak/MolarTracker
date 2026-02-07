@@ -22,8 +22,8 @@
 void initGlobalConfig()
 {
     // Initialize logging
-    const auto configDir = Constants::getInstance().getConfigPath();
-    LogManager::getInstance().initializeRingFileLogger(configDir);
+    const auto dataPath = Constants::getInstance().getDataPath();
+    LogManager::getInstance().initializeRingFileLogger(dataPath);
 }
 
 int main(int argc, char** argv)

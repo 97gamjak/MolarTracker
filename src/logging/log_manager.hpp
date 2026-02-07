@@ -26,7 +26,7 @@ class LogManager
    public:
     static LogManager& getInstance();
 
-    void initializeRingFileLogger(const std::filesystem::path& configDir);
+    void initializeRingFileLogger(const std::filesystem::path& directory);
     void changeLogLevel(const LogCategory& category, const LogLevel& level);
     bool isEnabled(const LogCategory& category, const LogLevel& level) const;
     void flush();
