@@ -2,10 +2,10 @@
 
 #include <QDialogButtonBox>
 #include <QListWidget>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 #include "config/constants.hpp"
-#include "logging/logging_base.hpp"
 #include "utils/qt_helpers.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_profileSelectionDialog
@@ -71,9 +71,12 @@ namespace ui
             &QListWidget::itemSelectionChanged,
             [this]()
             {
-                _buttonBox->setEnabled(
-                    !_profileListWidget->selectedItems().empty()
-                );
+                // disable the OK button if no profile is selected, enable it
+                // otherwise
+                const bool hasSelection =
+                    !_profileListWidget->selectedItems().empty();
+                _buttonBox->button(QDialogButtonBox::Ok)
+                    ->setEnabled(hasSelection);
             }
         );
 
