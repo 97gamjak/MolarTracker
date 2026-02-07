@@ -18,8 +18,9 @@ namespace ui
             QString::fromStdString(Constants::getDesktopAppName());
         const auto version = QString::fromStdString(Constants::getVersion());
 
-        setApplicationName(appName + " " + version);
+        setApplicationName(appName);
         setApplicationDisplayName(appName + " " + version);
+        setApplicationVersion(version);
 
         setDesktopFileName(desktopAppName);
     }

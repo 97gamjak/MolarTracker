@@ -43,7 +43,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### CI
 
 - make checks and updates for both `CHANGELOG.md` and `DEV-CHANGELOG.md` files available
-- introduce nice versioning scheme for artifacts on github
+- introduce nice versioning scheme for artifacts on GitHub
 
 #### Dependencies
 
