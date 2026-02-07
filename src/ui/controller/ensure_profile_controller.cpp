@@ -1,6 +1,7 @@
 #include "ensure_profile_controller.hpp"
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QObject>
 #include <QStatusBar>
 
@@ -37,8 +38,6 @@ namespace ui
     {
     }
 
-    // TODO: add max recursion with exception to prevent infinite loop in case
-    // of unexpected errors
     void EnsureProfileController::ensureProfileExists()
     {
         const auto& settings = _appContext.getSettings();
@@ -68,7 +67,7 @@ namespace ui
             const auto msg =
                 "Default profile '" + name + "' not found in database.";
 
-            LOG_ERROR(msg);
+            LOG_WARNING(msg);
             if (statusBar)
                 statusBar->showMessage(QString::fromStdString(msg));
 
@@ -136,6 +135,9 @@ namespace ui
                     "Ensure Profile Error",
                     QString::fromStdString(errorMsg)
                 );
+
+                _callCount = MAX_PROFILE_CHECKS;   // reset call count for
+                                                   // future attempts
             }
 
             LOG_WARNING(
@@ -224,8 +226,11 @@ namespace ui
                 _appContext.getStore().getProfileStore().setActiveProfile(
                     profileName
                 );
+                _appContext.getSettings().setDefaultProfileName(profileName);
 
                 LOG_INFO("Selected profile: " + profileName);
+
+                _profileSelectionDialog->close();
 
                 _relaunch();
                 break;
@@ -233,6 +238,8 @@ namespace ui
 
             case ProfileSelectionDialog::Action::Cancel:
             {
+                _profileSelectionDialog->close();
+
                 LOG_WARNING(
                     "No profile selected. Application cannot continue without "
                     "an active profile. Trying to ensure profile existence "
@@ -240,6 +247,18 @@ namespace ui
                     "to the developers under " +
                     Constants::getGithubIssuesUrl()
                 );
+
+                QMessageBox msgBox;
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setWindowTitle("No Profile Selected");
+                msgBox.setText(
+                    "You must select a profile to continue. Please select a "
+                    "profile to proceed."
+                );
+                msgBox.setStandardButtons(QMessageBox::Ok);
+
+                msgBox.exec();
+
                 _relaunch();
                 break;
             }
@@ -267,33 +286,39 @@ namespace ui
 
                 if (!result)
                 {
-                    // cast to AddProfileCommandError to get the error message
-                    // and code
-                    auto* addProfileError =
-                        dynamic_cast<AddProfileCommandError*>(
-                            std::move(result).error().get()
-                        );
+                    const auto& addProfileError = result.error();
+                    auto*       errorPtr        = addProfileError.get();
 
-                    if (addProfileError->getCode() ==
-                        AddProfileCommandErrorCode::NameAlreadyExists)
+                    if (auto* addError =
+                            dynamic_cast<AddProfileCommandError*>(errorPtr))
                     {
-                        _addProfileDialog->showNameAlreadyExistsError();
-                    }
-                    else
-                    {
-                        const auto errorMsg = "Failed to add profile: " +
-                                              addProfileError->getMessage();
+                        if (addError->getCode() ==
+                            AddProfileCommandErrorCode::NameAlreadyExists)
+                        {
+                            _addProfileDialog->showNameAlreadyExistsError();
+                        }
+                        else
+                        {
+                            const auto errorMsg = "Failed to add profile: " +
+                                                  addError->getMessage();
 
-                        LOG_ERROR(errorMsg);
+                            LOG_ERROR(errorMsg);
 
-                        ExceptionDialog::showFatal(
-                            "Add Profile Error",
-                            QString::fromStdString(errorMsg)
-                        );
+                            ExceptionDialog::showFatal(
+                                "Add Profile Error",
+                                QString::fromStdString(errorMsg)
+                            );
+                        }
                     }
                 }
                 else
                 {
+                    auto*      statusBar = _mainWindow.statusBar();
+                    const auto msg       = "Profile '" + profileDraft.name +
+                                     "' created successfully.";
+                    if (statusBar)
+                        statusBar->showMessage(QString::fromStdString(msg));
+
                     _addProfileDialog->close();
                 }
 
@@ -310,6 +335,7 @@ namespace ui
                     "to the developers under " +
                     Constants::getGithubIssuesUrl()
                 );
+                _addProfileDialog->close();
                 _relaunch();
                 break;
             }

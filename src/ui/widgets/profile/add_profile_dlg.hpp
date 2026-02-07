@@ -58,8 +58,9 @@ namespace ui
         );
 
         void setEnforceDefaultProfile(bool value);
-        bool isActiveChecked() const;
-        bool isDefaultChecked() const;
+
+        [[nodiscard]] bool isActiveChecked() const;
+        [[nodiscard]] bool isDefaultChecked() const;
 
         void showNameAlreadyExistsError();
 

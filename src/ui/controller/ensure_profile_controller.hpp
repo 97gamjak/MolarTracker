@@ -19,6 +19,10 @@ namespace drafts
     struct ProfileDraft;   // Forward declaration
 }
 
+// TODO: implement this via a settings value that has a max number of checks
+// predefined
+constexpr std::size_t MAX_PROFILE_CHECKS = 10;
+
 namespace ui
 {
     class UndoStack;   // Forward declaration
@@ -35,7 +39,7 @@ namespace ui
         QMainWindow&                     _mainWindow;
         app::AppContext&                 _appContext;
         UndoStack&                       _undoStack;
-        std::size_t                      _callCount = 10;
+        std::size_t                      _callCount = MAX_PROFILE_CHECKS;
         QPointer<ProfileSelectionDialog> _profileSelectionDialog;
         QPointer<AddProfileDialog>       _addProfileDialog;
 

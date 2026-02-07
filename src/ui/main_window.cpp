@@ -89,14 +89,13 @@ namespace ui
 
     void MainWindow::_ensureProfileExists()
     {
-        auto ensureProfileController =
-            std::make_unique<EnsureProfileController>(
-                *this,
-                _appContext,
-                _undoStack
-            );
+        _ensureProfileController = std::make_unique<EnsureProfileController>(
+            *this,
+            _appContext,
+            _undoStack
+        );
 
-        ensureProfileController->ensureProfileExists();
+        _ensureProfileController->ensureProfileExists();
     }
 
 }   // namespace ui
