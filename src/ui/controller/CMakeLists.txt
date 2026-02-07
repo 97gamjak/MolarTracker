@@ -4,6 +4,7 @@ add_library(molartracker_ui_controller STATIC
     settings_menu_controller.cpp
     help_menu_controller.cpp
     edit_menu_controller.cpp
+    ensure_profile_controller.cpp
 )
 
 target_include_directories(molartracker_ui_controller
@@ -16,6 +17,7 @@ target_link_libraries(molartracker_ui_controller
         Qt6::Widgets
         molartracker_ui_widgets
         molartracker_ui_logging
+        molartracker_ui_commands
         molartracker_app_repos_api
         molartracker_logging
 )

@@ -20,7 +20,7 @@ Constants& Constants::getInstance()
  */
 Constants::Constants()
 {
-    const auto& configDir = utils::config_dir(Constants::DIR_PREFIX);
+    const auto& configDir = utils::config_dir(Constants::getDirPrefix());
 
     if (configDir)
         _configPath = std::filesystem::absolute(configDir.value());
@@ -31,7 +31,7 @@ Constants::Constants()
         throw DirException("Failed to resolve config directory");
     }
 
-    const auto& dataDir = utils::data_dir(Constants::DIR_PREFIX);
+    const auto& dataDir = utils::data_dir(Constants::getDirPrefix());
 
     if (dataDir)
         _dataPath = std::filesystem::absolute(dataDir.value());
@@ -65,4 +65,42 @@ std::filesystem::path Constants::getDataPath() const { return _dataPath; }
 std::filesystem::path Constants::getDatabasePath() const
 {
     return _dataPath / _databaseFile;
+}
+
+/**
+ * @brief Get the application name
+ *
+ * @return const std::string
+ */
+const std::string Constants::getAppName() { return _appName; }
+
+/**
+ * @brief Get the directory prefix used for config and data directories
+ *
+ * @return const std::string
+ */
+const std::string Constants::getDirPrefix() { return _dirPrefix; }
+
+/**
+ * @brief Get the desktop application name
+ *
+ * @return const std::string
+ */
+const std::string Constants::getDesktopAppName() { return _desktopAppName; }
+
+/**
+ * @brief Get the GitHub repository URL
+ *
+ * @return const std::string
+ */
+const std::string Constants::getGithubRepoUrl() { return _githubRepoUrl; }
+
+/**
+ * @brief Get the GitHub issues URL
+ *
+ * @return const std::string
+ */
+const std::string Constants::getGithubIssuesUrl()
+{
+    return std::string(_githubRepoUrl) + "/issues";
 }

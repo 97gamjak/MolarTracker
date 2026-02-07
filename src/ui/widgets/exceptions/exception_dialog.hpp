@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QString>
 
+#include "logging/log_object.hpp"
+
 namespace ui
 {
     /**
@@ -14,7 +16,7 @@ namespace ui
         Q_OBJECT
 
        public:
-        static void showFatal(const QString& title, const QString& details);
+        static void showFatal(const QString& title, LogObject logObject);
 
        private:
         explicit ExceptionDialog(

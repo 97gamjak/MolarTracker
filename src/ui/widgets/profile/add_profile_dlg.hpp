@@ -49,9 +49,6 @@ namespace ui
         QCheckBox*   _setActiveCheckBox    = nullptr;
         QCheckBox*   _setAsDefaultCheckBox = nullptr;
 
-       protected:
-        void accept() override;
-
        public:
         explicit AddProfileDialog(
             app::ProfileStore&  profileStore,
@@ -62,6 +59,26 @@ namespace ui
 
         void setEnforceDefaultProfile(bool value);
 
+        [[nodiscard]] bool isActiveChecked() const;
+        [[nodiscard]] bool isDefaultChecked() const;
+
+        void showNameAlreadyExistsError();
+
+        enum class Action
+        {
+            Ok,
+            Cancel
+        };
+
+       signals:
+        void requested(
+            const Action&               action,
+            const drafts::ProfileDraft& profile
+        );
+
+       protected:
+        void closeEvent(QCloseEvent* event) override;
+
        private:
         void _buildUI();
         void _buildFormSection();
@@ -71,6 +88,10 @@ namespace ui
         void _updateToggleStates();
 
         [[nodiscard]] struct drafts::ProfileDraft _getProfile() const;
+
+        void _emit(const Action& action);
+        void _emitOk();
+        void _emitCancel();
     };
 
 }   // namespace ui

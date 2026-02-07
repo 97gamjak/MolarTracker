@@ -10,4 +10,5 @@ target_include_directories(molartracker_ui_exceptions
 target_link_libraries(molartracker_ui_exceptions
     PUBLIC
     Qt6::Widgets
+    molartracker_logging
 )

@@ -10,7 +10,6 @@
 #include <filesystem>
 
 #include "logging/log_manager.hpp"
-#include "ui/main_window.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_logging
 #include "logging/log_macros.hpp"

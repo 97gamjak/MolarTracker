@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "config/json.hpp"
+#include "config/json.hpp"   // IWYU pragma: keep
 
 namespace settings
 {
@@ -47,6 +47,12 @@ namespace settings
     {
         return _defaultProfileName;
     }
+
+    /**
+     * @brief Unset the default profile name
+     *
+     */
+    void Settings::unsetDefaultProfileName() { _defaultProfileName.reset(); }
 
     /**
      * @brief Set the default profile name

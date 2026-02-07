@@ -5,16 +5,19 @@
 #include <mstd/enum.hpp>
 #include <unordered_map>
 
-#define LOG_CATEGORY(X)             \
-    X(app_service_profileService)   \
-    X(app_storeContainer)           \
-    X(app_store_ProfileStore)       \
-    X(ui_command_AddProfileCommand) \
-    X(ui_mainWindow)                \
-    X(ui_logging)                   \
-    X(ui_debugMenuController)       \
-    X(database)                     \
-    X(logging_manager)
+#define LOG_CATEGORY(X)           \
+    X(app_service_profileService) \
+    X(app_storeContainer)         \
+    X(app_store_ProfileStore)     \
+    X(ui_AddProfileCommand)       \
+    X(ui_mainWindow)              \
+    X(ui_logging)                 \
+    X(ui_debugMenuController)     \
+    X(ui_ensureProfileController) \
+    X(ui_profileSelectionDialog)  \
+    X(database)                   \
+    X(logging_manager)            \
+    X(application)
 
 MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
 

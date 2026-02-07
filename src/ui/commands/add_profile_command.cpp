@@ -8,7 +8,7 @@
 #include "drafts/profile_draft.hpp"
 #include "settings/settings.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_command_AddProfileCommand
+#define __LOG_CATEGORY__ LogCategory::ui_AddProfileCommand
 #include "logging/log_macros.hpp"
 
 namespace ui

@@ -10,6 +10,7 @@
 #include "app/app_context.hpp"
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
+#include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
@@ -86,64 +87,15 @@ namespace ui
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
     }
 
-    // TODO: rename to _loadInitialProfile or similar
     void MainWindow::_ensureProfileExists()
     {
-        auto& profileStore = _appContext.getStore().getProfileStore();
-        auto& settings     = _appContext.getSettings();
+        _ensureProfileController = std::make_unique<EnsureProfileController>(
+            *this,
+            _appContext,
+            _undoStack
+        );
 
-        if (settings.hasDefaultProfile())
-        {
-            const auto name = settings.getDefaultProfileName().value();
-            if (!profileStore.profileExists(name))
-            {
-                // TODO: create error message!!!
-            }
-            else
-            {
-                profileStore.setActiveProfile(name);
-                statusBar()->showMessage(
-                    QString::fromStdString("Loaded default profile: " + name)
-                );
-                return;
-            }
-        }
-        else
-        {
-            statusBar()->showMessage("No default profile configured.");
-            if (profileStore.hasProfiles())
-            {
-                const auto profileNames = profileStore.getAllProfileNames();
-                ProfileSelectionDialog dialog{this, profileNames};
-                if (dialog.exec() == QDialog::Accepted)
-                {
-                    // do stuff
-                    statusBar()->showMessage("Profile selected.");
-                }
-                else
-                {
-                    statusBar()->showMessage("Profile selection canceled.");
-                }
-            }
-            else
-            {
-                statusBar()->showMessage("No profiles found.");
-                auto* dialog = new AddProfileDialog{
-                    profileStore,
-                    settings,
-                    _undoStack,
-                    this
-                };
-                dialog->setWindowTitle("Create your first profile");
-                dialog->setModal(true);
-                dialog->setAttribute(Qt::WA_DeleteOnClose);
-                dialog->setEnforceDefaultProfile(true);
-
-                dialog->show();
-                dialog->raise();
-                dialog->activateWindow();
-            }
-        }
+        _ensureProfileController->ensureProfileExists();
     }
 
 }   // namespace ui

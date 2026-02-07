@@ -100,6 +100,17 @@ namespace app
     }
 
     /**
+     * @brief Check if there is an active profile set
+     *
+     * @return true
+     * @return false
+     */
+    bool ProfileStore::hasActiveProfile() const
+    {
+        return _activeProfileId.has_value();
+    }
+
+    /**
      * @brief Get the currently active profile
      *
      * @return std::optional<Profile>

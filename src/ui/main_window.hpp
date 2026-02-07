@@ -7,6 +7,7 @@
 #include "commands/undo_stack.hpp"
 #include "ui/controller/debug_menu_controller.hpp"
 #include "ui/controller/edit_menu_controller.hpp"
+#include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/controller/file_menu_controller.hpp"
 #include "ui/controller/help_menu_controller.hpp"
 #include "ui/controller/settings_menu_controller.hpp"
@@ -33,6 +34,8 @@ namespace ui
         std::unique_ptr<DebugMenuController>    _debugMenuController;
         std::unique_ptr<SettingsMenuController> _settingsMenuController;
         std::unique_ptr<HelpMenuController>     _helpMenuController;
+
+        std::unique_ptr<EnsureProfileController> _ensureProfileController;
 
         UndoStack _undoStack;
 

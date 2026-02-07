@@ -28,10 +28,11 @@ namespace settings
 
         void save() const;
 
-        [[nodiscard]] bool                       hasDefaultProfile() const;
-        [[nodiscard]] std::optional<std::string> getDefaultProfileName() const;
+        void unsetDefaultProfileName();
         void setDefaultProfileName(const std::optional<std::string>& name);
         void setDefaultProfileName(const std::string& name);
+        [[nodiscard]] bool                       hasDefaultProfile() const;
+        [[nodiscard]] std::optional<std::string> getDefaultProfileName() const;
 
        private:
         void _toJson() const;

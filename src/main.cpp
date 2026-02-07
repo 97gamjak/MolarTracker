@@ -9,6 +9,9 @@
 #include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 
+#define __LOG_CATEGORY__ LogCategory::application
+#include "logging/log_macros.hpp"
+
 // TODO: move this to some initialization module
 // https://97gamjak.atlassian.net/browse/MOLTRACK-96
 /**
@@ -40,13 +43,15 @@ int main(int argc, char** argv)
     }
     catch (const MolarTrackerException& e)
     {
-        ui::ExceptionDialog::showFatal("A fatal error occurred", e.what());
+        const auto& logObject = LOG_ERROR_OBJECT(e.what());
+        ui::ExceptionDialog::showFatal("A fatal error occurred", logObject);
     }
     catch (const std::exception& e)
     {
+        const auto& logObject = LOG_ERROR_OBJECT(e.what());
         ui::ExceptionDialog::showFatal(
             "An unexpected error occurred",
-            e.what()
+            logObject
         );
     }
 

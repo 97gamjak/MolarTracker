@@ -13,4 +13,5 @@ target_link_libraries(molartracker_ui_profile
         Qt6::Widgets
     PRIVATE
         molartracker_ui_commands
+        molartracker_logging
 )
