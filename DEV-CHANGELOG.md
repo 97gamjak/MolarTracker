@@ -4,6 +4,9 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.0.1](https://github.com/repo/owner/releases/tag/0.0.1) - 2026-02-07
+
 ### Features
 
 #### Profile Management
@@ -63,4 +66,4 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
 
-<!-- insertion marker -->
+

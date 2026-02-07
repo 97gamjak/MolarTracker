@@ -4,6 +4,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.0.1](https://github.com/repo/owner/releases/tag/0.0.1) - 2026-02-07
+
 ### New Features
 
 #### UI
@@ -29,4 +32,4 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Fix formatting issue in log file
 
-<!-- insertion marker -->
+
