@@ -19,6 +19,9 @@ class Constants
     static constexpr const char* _dirPrefix       = "molartracker";
     static constexpr const char* _desktopAppName  = MOLARTRACKER_DESKTOP_APP_NAME;
     static constexpr const char* _githubRepoUrl   = "https://github.com/97gamjak/molartracker";
+
+    static constexpr const char* _version         = MOLARTRACKER_VERSION_FULL;
+    static constexpr const char* _gitTag          = MOLARTRACKER_GIT_TAG;
     // clang-format on
 
    public:
@@ -33,6 +36,8 @@ class Constants
     [[nodiscard]] static const std::string getDesktopAppName();
     [[nodiscard]] static const std::string getGithubRepoUrl();
     [[nodiscard]] static const std::string getGithubIssuesUrl();
+
+    [[nodiscard]] static const std::string getVersion();
 
    private:
     Constants();
