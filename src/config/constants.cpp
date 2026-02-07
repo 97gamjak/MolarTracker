@@ -111,3 +111,10 @@ const std::string Constants::getGithubIssuesUrl()
  * @return const std::string
  */
 const std::string Constants::getVersion() { return _version; }
+
+/**
+ * @brief Get the Git tag corresponding to the current version
+ *
+ * @return const std::string
+ */
+const std::string Constants::getGitTag() { return _gitTag; }

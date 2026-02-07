@@ -15,4 +15,5 @@ target_link_libraries(molartracker_utils
     PUBLIC
         Qt6::Core
         Qt6::Widgets
+        molartracker_config
 )

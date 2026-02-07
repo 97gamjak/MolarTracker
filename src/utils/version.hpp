@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "nlohmann/json.hpp"
+
 namespace utils
 {
 
@@ -15,6 +17,8 @@ namespace utils
         std::size_t _major;
         std::size_t _minor;
         std::size_t _patch;
+
+        bool _isInvalid = false;
 
        public:
         SemVer() = delete;
@@ -30,8 +34,45 @@ namespace utils
         [[nodiscard]] std::size_t getPatch() const;
 
         [[nodiscard]] std::string toString() const;
+
+        static const SemVer getInvalidVersion() { return SemVer{"invalid"}; }
+
+       private:
+        std::optional<SemVer> _parse(const std::string& versionStr);
     };
 
 }   // namespace utils
+
+NLOHMANN_JSON_NAMESPACE_BEGIN
+/**
+ * @brief Serializer for utils::SemVer
+ *
+ */
+template <>
+struct adl_serializer<utils::SemVer>
+{
+    /**
+     * @brief Serialize SemVer to JSON
+     *
+     * @param j
+     * @param version
+     */
+    static void to_json(nlohmann::json& j, const utils::SemVer& version)
+    {
+        j = version.toString();
+    }
+
+    /**
+     * @brief Deserialize SemVer from JSON
+     *
+     * @param j
+     * @return utils::SemVer
+     */
+    static utils::SemVer from_json(const nlohmann::json& j)
+    {
+        return utils::SemVer(j.get<std::string>());
+    }
+};
+NLOHMANN_JSON_NAMESPACE_END
 
 #endif   // __UTILS__VERSION_HPP__
