@@ -1,9 +1,8 @@
 #include "log_manager.hpp"
 
 #include <format>
-#include <iostream>
-#include <ranges>
 
+#include "log_object.hpp"
 #include "logging_base.hpp"
 #include "utils/ring_file.hpp"
 #include "utils/timestamp.hpp"
@@ -111,17 +110,20 @@ void LogManager::changeLogLevel(
         const auto previousLevel = _categories[category];
 
         _categories[category] = level;
-        log(LogLevel::Info,
+        const auto logObject  = LogObject{
+            LogLevel::Info,
             LogCategory::logging_manager,
-            __FILE__,
-            __LINE__,
-            __func__,
             std::format(
                 "Log level for category '{}' changed from '{}' to '{}'",
                 std::string{LogCategoryMeta::name(category)},
                 std::string{LogLevelMeta::name(previousLevel)},
                 std::string{LogLevelMeta::name(level)}
-            ));
+            ),
+            __FILE__,
+            __LINE__,
+            __func__
+        };
+        log(logObject);
     }
 }
 
@@ -145,33 +147,31 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getCategories() const
  * @param function
  * @param message
  */
-void LogManager::log(
-    const LogLevel&    level,
-    const LogCategory& category,
-    const std::string& file,
-    const int          line,
-    const std::string& function,
-    const std::string& message
-)
+void LogManager::log(const LogObject& logObject)
 {
-    if (!isEnabled(category, level))
+    if (!isEnabled(logObject.category, logObject.level))
         return;
 
     std::string buffer;
 
-    buffer += _logLevelToString(level);
+    buffer += _logLevelToString(logObject.level);
     buffer += " [" + Timestamp::iso8601TimeMs() + "] ";
-    buffer += message;
-    if (level >= LogLevel::Debug || level == LogLevel::Error)
+    buffer += logObject.message;
+    if (logObject.level >= LogLevel::Debug ||
+        logObject.level == LogLevel::Error)
     {
         buffer += " (";
-        buffer += file + ":" + std::to_string(line);
+        buffer += logObject.file + ":" + std::to_string(logObject.line);
         buffer += " in ";
-        buffer += function;
+        buffer += logObject.function;
         buffer += ")";
     }
 
     _ringFile.writeLine(buffer);
+
+    if (logObject.level == LogLevel::Error ||
+        logObject.level == LogLevel::Warning)
+        flush();
 }
 
 /**
@@ -193,9 +193,7 @@ std::string LogManager::_logLevelToString(const LogLevel& level) const
     constexpr auto additionalPadding = 3;
     const auto     size              = maxLength + additionalPadding;
 
-    const auto format = "{:*>" + std::to_string(size) + "}";
-
-    std::cout << format << std::endl;
+    const auto format = "{:>" + std::to_string(size) + "}";
 
     const auto levelStr      = std::string{LogLevelMeta::name(level)};
     const auto cleanLevelStr = "<" + levelStr + ">:";

@@ -12,30 +12,15 @@
  * @param file
  * @param line
  */
-LogEntryScope::LogEntryScope(
-    const LogLevel&    level,
-    const LogCategory& category,
-    const std::string& function,
-    const std::string& file,
-    const int          line
-)
-    : _level{level},
-      _category{category},
-      _function{function},
-      _file{file},
-      _line{line},
-      _enabled{LogManager::getInstance().isEnabled(category, level)}
+LogEntryScope::LogEntryScope(const LogObject& logObject)
+    : _logObject{logObject},
+      _enabled{LogManager::getInstance()
+                   .isEnabled(logObject.category, logObject.level)}
 {
     if (_enabled)
     {
-        LogManager::getInstance().log(
-            _level,
-            _category,
-            _file,
-            _line,
-            _function,
-            "→ enter " + std::string(_function)
-        );
+        _logObject.message = "→ enter " + std::string(_logObject.function);
+        LogManager::getInstance().log(_logObject);
     }
 }
 
@@ -47,14 +32,8 @@ LogEntryScope::~LogEntryScope()
 {
     if (_enabled)
     {
-        LogManager::getInstance().log(
-            _level,
-            _category,
-            _file,
-            _line,
-            _function,
-            "← exit  " + std::string(_function)
-        );
+        _logObject.message = "← exit  " + std::string(_logObject.function);
+        LogManager::getInstance().log(_logObject);
     }
 }
 
@@ -67,14 +46,8 @@ LogEntryScope::~LogEntryScope()
  * @param file
  * @param line
  */
-TimedLogEntryScope::TimedLogEntryScope(
-    const LogLevel&    level,
-    const LogCategory& category,
-    const std::string& function,
-    const std::string& file,
-    const int          line
-)
-    : LogEntryScope(level, category, function, file, line), _start{Clock::now()}
+TimedLogEntryScope::TimedLogEntryScope(const LogObject& logObject)
+    : LogEntryScope(logObject), _start{Clock::now()}
 {
 }
 
@@ -92,14 +65,9 @@ TimedLogEntryScope::~TimedLogEntryScope()
         const auto _ms            = duration_cast<milliseconds>(timeDifference);
         const auto ms             = _ms.count();
 
-        LogManager::getInstance().log(
-            _level,
-            _category,
-            _file,
-            _line,
-            _function,
-            "⧖ exit  " + std::string(_function) +
-                " (duration: " + std::to_string(ms) + " ms)"
-        );
+        _logObject.message = "⧖ exit  " + std::string(_logObject.function) +
+                             " (duration: " + std::to_string(ms) + " ms)";
+
+        LogManager::getInstance().log(_logObject);
     }
 }

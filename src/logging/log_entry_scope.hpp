@@ -4,6 +4,7 @@
 #include <chrono>
 #include <string>
 
+#include "log_object.hpp"
 #include "logging_base.hpp"
 
 /**
@@ -13,21 +14,11 @@
 class LogEntryScope
 {
    protected:
-    LogLevel    _level;
-    LogCategory _category;
-    std::string _function;
-    std::string _file;
-    int         _line;
-    bool        _enabled;
+    LogObject _logObject;
+    bool      _enabled;
 
    public:
-    LogEntryScope(
-        const LogLevel&    level,
-        const LogCategory& category,
-        const std::string& function,
-        const std::string& file,
-        const int          line
-    );
+    LogEntryScope(const LogObject& logObject);
 
     ~LogEntryScope();
 };
@@ -44,13 +35,7 @@ class TimedLogEntryScope final : public LogEntryScope
     Clock::time_point _start;
 
    public:
-    TimedLogEntryScope(
-        const LogLevel&    level,
-        const LogCategory& category,
-        const std::string& function,
-        const std::string& file,
-        const int          line
-    );
+    TimedLogEntryScope(const LogObject& logObject);
 
     ~TimedLogEntryScope();
 };

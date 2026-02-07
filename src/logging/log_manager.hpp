@@ -10,6 +10,8 @@
 enum class LogLevel : size_t;
 enum class LogCategory : size_t;
 
+struct LogObject;
+
 /**
  * @brief Singleton class managing logging categories and levels
  *
@@ -34,14 +36,7 @@ class LogManager
 
     std::filesystem::path getCurrentLogFilePath() const;
 
-    void log(
-        const LogLevel&    level,
-        const LogCategory& category,
-        const std::string& file,
-        const int          line,
-        const std::string& function,
-        const std::string& message
-    );
+    void log(const LogObject& logObject);
 
    private:
     LogManager();

@@ -14,6 +14,8 @@
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
+#include "ui/widgets/utils/infos.hpp"
+#include "ui/widgets/utils/warnings.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_ensureProfileController
 #include "logging/log_macros.hpp"
@@ -38,6 +40,15 @@ namespace ui
     {
     }
 
+    /**
+     * @brief Ensure that a profile exists. If a default profile is configured,
+     * it will check if it exists and load it. If it does not exist, it will
+     * show a warning message and prompt the user to select an existing profile
+     * or create a new one. If no default profile is configured, it will show a
+     * warning message and prompt the user to select an existing profile or
+     * create a new one.
+     *
+     */
     void EnsureProfileController::ensureProfileExists()
     {
         const auto& settings = _appContext.getSettings();
@@ -48,6 +59,12 @@ namespace ui
             _noDefaultProfile();
     }
 
+    /**
+     * @brief Check if the default profile exists and load it. If it does not
+     * exist, show a warning message and prompt the user to select an existing
+     * profile or create a new one.
+     *
+     */
     void EnsureProfileController::_defaultProfileExists()
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
@@ -64,12 +81,19 @@ namespace ui
             // load the non-existent default profile again.
             settings.unsetDefaultProfileName();
 
-            const auto msg =
-                "Default profile '" + name + "' not found in database.";
-
-            LOG_WARNING(msg);
-            if (statusBar)
-                statusBar->showMessage(QString::fromStdString(msg));
+            showWarningMessageBox(
+                "Default Profile Not Found",
+                LOG_WARNING_OBJECT(
+                    std::format(
+                        "Default Profile not Found The default profile '{}' "
+                        "could not be found. It might have been deleted or "
+                        "there there might be an issue with the profile store. "
+                        "You will need to select an existing profile or create "
+                        "a new one to continue.",
+                        name
+                    )
+                )
+            );
 
             if (profileStore.hasProfiles())
                 _showProfileSelectionDialog();
@@ -80,11 +104,12 @@ namespace ui
         {
             profileStore.setActiveProfile(name);
 
-            const auto msg = "Loaded default profile: " + name;
-            LOG_INFO(msg);
-
-            if (statusBar)
-                statusBar->showMessage(QString::fromStdString(msg));
+            showInfoStatusBar(
+                LOG_INFO_OBJECT(
+                    "Default profile '" + name + "' loaded successfully."
+                ),
+                statusBar
+            );
 
             // we relaunch to ensure all components are properly
             // initialized with the active profile. This is
@@ -96,13 +121,24 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Handle the case when no default profile is configured. Show a
+     * warning message and prompt the user to select an existing profile or
+     * create a new one.
+     *
+     */
     void EnsureProfileController::_noDefaultProfile()
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
-        auto* statusBar    = _mainWindow.statusBar();
 
-        if (statusBar)
-            statusBar->showMessage("No default profile configured.");
+        showWarningMessageBox(
+            "No Default Profile Configured",
+            LOG_WARNING_OBJECT(
+                "No Default Profile Configured No default profile is "
+                "configured. You will need to select an existing profile or "
+                "create a new one to continue."
+            )
+        );
 
         if (profileStore.hasProfiles())
             _showProfileSelectionDialog();
@@ -110,6 +146,14 @@ namespace ui
             _showAddProfileDialog();
     }
 
+    /**
+     * @brief Relaunch the application to ensure all components are properly
+     * initialized with the active profile. This is necessary because some
+     * components might have been initialized before the active profile was set,
+     * which can lead to issues if they try to access the active profile during
+     * their initialization.
+     *
+     */
     void EnsureProfileController::_relaunch()
     {
         const auto& profileStore = _appContext.getStore().getProfileStore();
@@ -140,19 +184,30 @@ namespace ui
                                                    // future attempts
             }
 
-            LOG_WARNING(
-                "No active profile found after ensuring profile existence. "
-                "This should not happen, as the ensureProfileExists method "
-                "should have set an active profile. If you are sure you did "
-                "everything right, please report this to the developers "
-                "under " +
-                Constants::getGithubIssuesUrl()
+            showWarningMessageBox(
+                "Failed to Ensure Profile Existence",
+                LOG_WARNING_OBJECT(
+                    "Failed to Ensure Profile Existence No active profile "
+                    "found "
+                    "after ensuring profile existence. This should not happen, "
+                    "as "
+                    "the ensureProfileExists method should have set an active "
+                    "profile. Trying to ensure profile existence again. If you "
+                    "keep seeing this message, please report it to the "
+                    "developers "
+                    "under " +
+                    Constants::getGithubIssuesUrl()
+                )
             );
 
             ensureProfileExists();
         }
     }
 
+    /**
+     * @brief Show the Add Profile Dialog to create a new profile.
+     *
+     */
     void EnsureProfileController::_showAddProfileDialog()
     {
         auto* statusBar = _mainWindow.statusBar();
@@ -184,6 +239,10 @@ namespace ui
         _addProfileDialog->activateWindow();
     }
 
+    /**
+     * @brief Show the Profile Selection Dialog to select an existing profile.
+     *
+     */
     void EnsureProfileController::_showProfileSelectionDialog()
     {
         auto* statusBar = _mainWindow.statusBar();
@@ -214,6 +273,16 @@ namespace ui
         _profileSelectionDialog->activateWindow();
     }
 
+    /**
+     * @brief Handle the profile selection result from the Profile Selection
+     * Dialog. If the user selected a profile, set it as the active profile and
+     * relaunch the application. If the user canceled the selection, show a
+     * warning message and try to ensure profile existence again.
+     *
+     * @param action The action performed by the user (Ok or Cancel).
+     * @param profileName The name of the selected profile (only valid if action
+     * is Ok).
+     */
     void EnsureProfileController::_onProfileSelectionRequested(
         const ProfileSelectionDialog::Action& action,
         const std::string&                    profileName
@@ -240,24 +309,18 @@ namespace ui
             {
                 _profileSelectionDialog->close();
 
-                LOG_WARNING(
-                    "No profile selected. Application cannot continue without "
-                    "an active profile. Trying to ensure profile existence "
-                    "again. If you keep seeing this message, please report it "
-                    "to the developers under " +
-                    Constants::getGithubIssuesUrl()
+                showWarningMessageBox(
+                    "No Profile Selected",
+                    LOG_WARNING_OBJECT(
+                        "No profile selected. Application cannot continue "
+                        "without "
+                        "an active profile. Trying to ensure profile existence "
+                        "again. If you keep seeing this message, please report "
+                        "it "
+                        "to the developers under " +
+                        Constants::getGithubIssuesUrl()
+                    )
                 );
-
-                QMessageBox msgBox;
-                msgBox.setIcon(QMessageBox::Warning);
-                msgBox.setWindowTitle("No Profile Selected");
-                msgBox.setText(
-                    "You must select a profile to continue. Please select a "
-                    "profile to proceed."
-                );
-                msgBox.setStandardButtons(QMessageBox::Ok);
-
-                msgBox.exec();
 
                 _relaunch();
                 break;
@@ -265,6 +328,35 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Handle the result from the Add Profile Dialog. If the user
+     * created a profile, set it as the active profile and relaunch the
+     * application. If the user canceled the creation, show a warning message
+     * and try to ensure profile existence again.
+     *
+     * @param action The action performed by the user (Ok or Cancel).
+     * @param profileDraft The draft of the created profile (only valid if
+     * action is Ok).
+     *
+     * Note: The actual profile creation is handled by the AddProfileCommand,
+     * which is executed when the user clicks Ok in the AddProfileDialog. The
+     * command will add the profile to the profile store and set it as active if
+     * the "Set as active" option is checked in the dialog. If the command fails
+     * for some reason (e.g., a profile with the same name already exists), it
+     * will show an error message in the dialog and not close it, allowing the
+     * user to fix the issue and try again. If the command succeeds, it will
+     * show a success message in the status bar and close the dialog. After
+     * that, it will call _relaunch() to ensure all components are properly
+     * initialized with the new active profile. If the user clicks Cancel in the
+     * AddProfileDialog, it will show a warning message and call _relaunch() to
+     * try to ensure profile existence again, which will likely show the
+     * AddProfileDialog again since there will still be no active profile. This
+     * is to prevent the application from being in a state where it cannot
+     * continue without an active profile. This flow ensures that the user is
+     * guided to create or select a profile if there is no active profile, and
+     * that the application can continue functioning properly once an active
+     * profile is set.
+     */
     void EnsureProfileController::_onAddProfileRequested(
         const AddProfileDialog::Action& action,
         const drafts::ProfileDraft&     profileDraft
@@ -313,11 +405,13 @@ namespace ui
                 }
                 else
                 {
-                    auto*      statusBar = _mainWindow.statusBar();
-                    const auto msg       = "Profile '" + profileDraft.name +
-                                     "' created successfully.";
-                    if (statusBar)
-                        statusBar->showMessage(QString::fromStdString(msg));
+                    showInfoStatusBar(
+                        LOG_INFO_OBJECT(
+                            "Profile '" + profileDraft.name +
+                            "' created successfully."
+                        ),
+                        _mainWindow.statusBar()
+                    );
 
                     _addProfileDialog->close();
                 }
