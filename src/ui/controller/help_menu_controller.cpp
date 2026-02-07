@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
+#include "config/constants.hpp"
 #include "ui/widgets/menu_bar/help_menu.hpp"
 
 namespace ui
@@ -34,12 +35,24 @@ namespace ui
      */
     void HelpMenuController::_onAboutRequested()
     {
-        // TODO(97gamjak): Update with real version and info
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-98
+        const auto version = QString::fromStdString(Constants::getVersion());
+        const auto githubRepoUrl =
+            QString::fromStdString(Constants::getGithubRepoUrl());
+
+        const auto aboutText =
+            QString(
+                "Molar Tracker %1\n\n"
+                "A simple application to track your molar intake and related "
+                "information.\n\n"
+                "GitHub: %2\n"
+            )
+                .arg(version)
+                .arg(githubRepoUrl);
+
         QMessageBox::information(
             &_mainWindow,
             "About Molar Tracker",
-            "Molar Tracker\nVersion 1.0.0\n© 2024 Molar Tracker Team"
+            aboutText
         );
     }
 
