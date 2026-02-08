@@ -31,25 +31,6 @@ MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
 
 MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL)
 
-/**
- * @brief Returns the index of the given LogLevel in LogLevelMeta::values
- *
- * @TODO: make this part of LogLevelMeta
- * https://97gamjak.atlassian.net/browse/MOLTRACK-82
- *
- * @param level LogLevel to find
- * @return std::optional<size_t> Index of the LogLevel, or std::nullopt if not
- * found
- */
-inline std::optional<size_t> indexOfLogLevel(LogLevel level)
-{
-    for (size_t i = 0; i < LogLevelMeta::size; ++i)
-        if (LogLevelMeta::values[i] == level)
-            return i;
-
-    return std::nullopt;
-}
-
 using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
 #endif   // __LOGGING__LOGGING_BASE_HPP__

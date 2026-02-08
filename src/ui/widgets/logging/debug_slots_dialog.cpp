@@ -199,7 +199,7 @@ namespace ui
             auto* combo = new QComboBox(_tree);
             combo->addItems(utils::toQStringList(LogLevelMeta::names));
 
-            const auto indexOpt = indexOfLogLevel(level);
+            const auto indexOpt = LogLevelMeta::index(level);
 
             if (!indexOpt.has_value())
                 LOG_ERROR(
