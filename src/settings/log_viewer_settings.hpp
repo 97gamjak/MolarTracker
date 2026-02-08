@@ -15,15 +15,31 @@ namespace settings
         // clang-format off
         static constexpr const char* _reloadIntervalSecKey         = "reloadIntervalSec";
         static constexpr double      _DEFAULT_RELOAD_INTERVAL_SEC  = 1.0;
+        static constexpr const char* _autoReloadKey                = "autoReload";
+        static constexpr bool        _DEFAULT_AUTO_RELOAD          = false;
         // clang-format on
 
         double _reloadIntervalSec = _DEFAULT_RELOAD_INTERVAL_SEC;
+        bool   _autoReload        = _DEFAULT_AUTO_RELOAD;
 
        public:
         LogViewerSettings() = default;
 
         nlohmann::json           toJson() const;
         static LogViewerSettings fromJson(const nlohmann::json& j);
+
+        [[nodiscard]] double getReloadIntervalSec() const;
+        [[nodiscard]] bool   isAutoReloadEnabled() const;
+
+       private:
+        static void _fromJsonReloadIntervalSec(
+            const nlohmann::json& jsonData,
+            LogViewerSettings&    settings
+        );
+        static void _fromJsonAutoReload(
+            const nlohmann::json& jsonData,
+            LogViewerSettings&    settings
+        );
     };
 
 }   // namespace settings

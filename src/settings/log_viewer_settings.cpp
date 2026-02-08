@@ -11,6 +11,7 @@ namespace settings
     {
         nlohmann::json jsonData;
         jsonData[_reloadIntervalSecKey] = _reloadIntervalSec;
+        jsonData[_autoReloadKey]        = _autoReload;
         return jsonData;
     }
 
@@ -24,11 +25,60 @@ namespace settings
     {
         LogViewerSettings settings;
 
+        _fromJsonReloadIntervalSec(j, settings);
+        _fromJsonAutoReload(j, settings);
+
+        return settings;
+    }
+
+    /**
+     * @brief Get the reload interval in seconds
+     *
+     * @return double
+     */
+    double LogViewerSettings::getReloadIntervalSec() const
+    {
+        return _reloadIntervalSec;
+    }
+
+    /**
+     * @brief Check if auto reload is enabled
+     *
+     * @return bool
+     */
+    bool LogViewerSettings::isAutoReloadEnabled() const { return _autoReload; }
+
+    /**
+     * @brief Deserialize the reload interval from JSON
+     *
+     * @param jsonData
+     * @param settings
+     */
+    void LogViewerSettings::_fromJsonReloadIntervalSec(
+        const nlohmann::json& jsonData,
+        LogViewerSettings&    settings
+    )
+    {
         const auto key          = _reloadIntervalSecKey;
         const auto defaultValue = _DEFAULT_RELOAD_INTERVAL_SEC;
 
-        settings._reloadIntervalSec = j.value(key, defaultValue);
+        settings._reloadIntervalSec = jsonData.value(key, defaultValue);
+    }
 
-        return settings;
+    /**
+     * @brief Deserialize the auto reload setting from JSON
+     *
+     * @param jsonData
+     * @param settings
+     */
+    void LogViewerSettings::_fromJsonAutoReload(
+        const nlohmann::json& jsonData,
+        LogViewerSettings&    settings
+    )
+    {
+        const auto key          = _autoReloadKey;
+        const auto defaultValue = _DEFAULT_AUTO_RELOAD;
+
+        settings._autoReload = jsonData.value(key, defaultValue);
     }
 }   // namespace settings
