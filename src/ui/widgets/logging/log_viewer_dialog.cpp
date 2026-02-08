@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <algorithm>
 #include <filesystem>
 
 #include "logging/log_manager.hpp"
