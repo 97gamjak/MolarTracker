@@ -2,11 +2,13 @@ add_library(molartracker_settings STATIC
     settings.cpp
     ui_settings.cpp
     log_viewer_settings.cpp
+    enum_param.hpp
 )
 
 target_include_directories(molartracker_settings
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../external/mstd/include
 )
 
 target_link_libraries(molartracker_settings
