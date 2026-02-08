@@ -1,8 +1,6 @@
 #ifndef __APP__APP_CONTEXT_HPP__
 #define __APP__APP_CONTEXT_HPP__
 
-#include <string>
-
 #include "app/repo_container.hpp"
 #include "app/service_container.hpp"
 #include "app/store_container.hpp"

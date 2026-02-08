@@ -13,7 +13,6 @@
 
 #include "logging/log_manager.hpp"
 #include "logging/logging_base.hpp"
-#include "ui/main_window.hpp"
 #include "ui/widgets/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
 
