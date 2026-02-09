@@ -43,6 +43,34 @@ namespace settings
     }
 
     /**
+     * @brief Commit the current value as the baseline for dirty checking
+     *
+     * @tparam T
+     */
+    template <typename T>
+    void ParamCore<T>::commit()
+    {
+        _baseLine    = _value;
+        _hasBaseLine = true;
+    }
+
+    /**
+     * @brief Check if the current value is different from the baseline value
+     *
+     * @tparam T
+     * @return true if the value has been changed since the last commit, false
+     * otherwise
+     */
+    template <typename T>
+    bool ParamCore<T>::isDirty() const
+    {
+        if (!_hasBaseLine)
+            return false;
+
+        return !_equals(_value, _baseLine);
+    }
+
+    /**
      * @brief Get the default value of the parameter
      *
      * @tparam T
@@ -112,6 +140,32 @@ namespace settings
     void ParamCore<T>::setDescription(const std::string& description)
     {
         _description = description;
+    }
+
+    /**
+     * @brief Check if two values are equal, this is used for dirty checking
+     *
+     * @tparam T
+     * @param a
+     * @param b
+     * @return true if the values are equal, false otherwise
+     */
+    template <typename T>
+    bool ParamCore<T>::_equals(const T& a, const T& b)
+    {
+        if constexpr (std::floating_point<T>)
+        {
+            // For floating-point types, consider them equal if they are within
+            // a small epsilon value of each other to account for precision
+            // issues
+            const auto epsilon = std::numeric_limits<T>::epsilon();
+            return std::abs(a - b) <= epsilon;
+        }
+        else
+        {
+            // For non-floating-point types, use regular equality
+            return a == b;
+        }
     }
 
 }   // namespace settings

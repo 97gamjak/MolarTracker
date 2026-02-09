@@ -17,11 +17,15 @@ namespace settings
     class ParamCore
     {
        private:
-        T                _value;
+        T    _value{};
+        T    _baseLine{};
+        bool _hasBaseLine = false;
+
         std::optional<T> _defaultValue = std::nullopt;
-        std::string      _key;
-        std::string      _title;
-        std::string      _description;
+
+        std::string _key;
+        std::string _title;
+        std::string _description;
 
        public:
         ParamCore() = delete;
@@ -29,6 +33,10 @@ namespace settings
 
         [[nodiscard]] const T& get() const;
         void                   set(const T& value);
+
+        void commit();
+
+        [[nodiscard]] bool isDirty() const;
 
         [[nodiscard]] const std::optional<T>& getDefault() const;
         void setDefault(const std::optional<T>& defaultValue);
@@ -38,6 +46,9 @@ namespace settings
 
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
+
+       private:
+        static bool _equals(const T& a, const T& b);
     };
 
 }   // namespace settings
