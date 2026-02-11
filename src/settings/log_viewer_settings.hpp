@@ -2,9 +2,23 @@
 #define __LOG_VIEWER_SETTINGS_HPP__
 
 #include "nlohmann/json.hpp"
+#include "numeric_param.hpp"
 
 namespace settings
 {
+    struct LogViewerSettingsSchema
+    {
+        static constexpr const char* RELOAD_INTERVAL_SEC_KEY =
+            "reloadIntervalSec";
+        static constexpr const char* RELOAD_INTERVAL_SEC_TITLE =
+            "Reload Interval (seconds)";
+        static constexpr const char* RELOAD_INTERVAL_SEC_DESC =
+            "Interval in seconds for reloading logs. A smaller value means "
+            "more frequent updates but may increase CPU usage.";
+        static constexpr double      RELOAD_INTERVAL_SEC_DEFAULT   = 1.0;
+        static constexpr double      RELOAD_INTERVAL_SEC_MIN       = 0.001;
+        static constexpr std::size_t RELOAD_INTERVAL_SEC_PRECISION = 3;
+    };
 
     /**
      * @brief Log viewer related settings management
@@ -12,18 +26,21 @@ namespace settings
     class LogViewerSettings
     {
        private:
-        // clang-format off
-        static constexpr const char* _reloadIntervalSecKey         = "reloadIntervalSec";
-        static constexpr double      _DEFAULT_RELOAD_INTERVAL_SEC  = 1.0;
-        // clang-format on
-
-        double _reloadIntervalSec = _DEFAULT_RELOAD_INTERVAL_SEC;
+        using Schema = LogViewerSettingsSchema;
+        NumericParam<double> _reloadIntervalSec{
+            Schema::RELOAD_INTERVAL_SEC_KEY,
+            Schema::RELOAD_INTERVAL_SEC_TITLE
+        };
 
        public:
-        LogViewerSettings() = default;
+        LogViewerSettings();
 
         nlohmann::json           toJson() const;
         static LogViewerSettings fromJson(const nlohmann::json& j);
+
+       private:
+        const auto& getParams() const;
+        auto&       getParams();
     };
 
 }   // namespace settings

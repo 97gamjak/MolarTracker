@@ -2,6 +2,24 @@
 
 namespace settings
 {
+    LogViewerSettings::LogViewerSettings()
+    {
+        _reloadIntervalSec.setDescription(Schema::RELOAD_INTERVAL_SEC_DESC);
+        _reloadIntervalSec.setDefault(Schema::RELOAD_INTERVAL_SEC_DEFAULT);
+        _reloadIntervalSec.setMinValue(Schema::RELOAD_INTERVAL_SEC_MIN);
+        _reloadIntervalSec.setPrecision(Schema::RELOAD_INTERVAL_SEC_PRECISION);
+    }
+
+    const auto& LogViewerSettings::getParams() const
+    {
+        return std::tie(_reloadIntervalSec);
+    }
+
+    auto& LogViewerSettings::getParams()
+    {
+        return std::tie(_reloadIntervalSec);
+    }
+
     /**
      * @brief Serialize LogViewerSettings to JSON
      *
@@ -10,7 +28,7 @@ namespace settings
     nlohmann::json LogViewerSettings::toJson() const
     {
         nlohmann::json jsonData;
-        jsonData[_reloadIntervalSecKey] = _reloadIntervalSec;
+        jsonData[_reloadIntervalSec.getKey()] = _reloadIntervalSec;
         return jsonData;
     }
 
@@ -25,9 +43,9 @@ namespace settings
         LogViewerSettings settings;
 
         const auto key          = _reloadIntervalSecKey;
-        const auto defaultValue = _DEFAULT_RELOAD_INTERVAL_SEC;
+        const auto defaultValue = Schema::RELOAD_INTERVAL_SEC_DEFAULT;
 
-        settings._reloadIntervalSec = j.value(key, defaultValue);
+        settings._reloadIntervalSec = j.value(, defaultValue);
 
         return settings;
     }
