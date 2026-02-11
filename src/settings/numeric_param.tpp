@@ -30,6 +30,28 @@ namespace settings
     /**
      * @brief Get the value of the numeric parameter
      *
+     * @note This function returns the ParamCore object which contains the value
+     * and other metadata about the parameter, to get the actual value, use the
+     * get() function of the ParamCore object returned by this function.
+     *
+     * It is private to prevent direct access to the core object from outside
+     * the class, and to enforce the use of the get() function for accessing the
+     * value, which may include additional logic such as validation or applying
+     * precision.
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return const ParamCore<T>&
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    NumericParam<T>::NumericParam(ParamCore<T> core) : _core(std::move(core))
+    {
+    }
+
+    /**
+     * @brief Get the value of the numeric parameter
+     *
      * @tparam Derived
      * @tparam T
      * @return const T&
@@ -203,6 +225,43 @@ namespace settings
     {
         if constexpr (std::floating_point<T>)
             _precision = decimalPlaces;
+    }
+
+    /**
+     * @brief Serialize NumericParam to JSON
+     *
+     * @tparam T
+     * @return nlohmann::json
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    nlohmann::json NumericParam<T>::toJson() const
+    {
+        auto jsonData                   = core().toJson();
+        jsonData[Schema::MIN_VALUE_KEY] = _minValue;
+        jsonData[Schema::MAX_VALUE_KEY] = _maxValue;
+        jsonData[Schema::PRECISION_KEY] = _precision;
+        return jsonData;
+    }
+
+    /**
+     * @brief Deserialize NumericParam from JSON
+     *
+     * @tparam T
+     * @param j
+     * @return settings::NumericParam<T>
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    NumericParam<T> NumericParam<T>::fromJson(const nlohmann::json& j)
+    {
+        NumericParam<T> param{ParamCore<T>::fromJson(j)};
+        param._minValue = j[Schema::MIN_VALUE_KEY].get<std::optional<T>>();
+        param._maxValue = j[Schema::MAX_VALUE_KEY].get<std::optional<T>>();
+        param._precision =
+            j[Schema::PRECISION_KEY].get<std::optional<size_t>>();
+
+        return param;
     }
 
 }   // namespace settings

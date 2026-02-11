@@ -143,6 +143,48 @@ namespace settings
     }
 
     /**
+     * @brief Serialize ParamCore to JSON
+     *
+     * @tparam T
+     * @return nlohmann::json
+     */
+    template <typename T>
+    nlohmann::json ParamCore<T>::toJson() const
+    {
+        nlohmann::json jsonData;
+
+        jsonData[Schema::KEY_KEY]         = _key;
+        jsonData[Schema::TITLE_KEY]       = _title;
+        jsonData[Schema::DESCRIPTION_KEY] = _description;
+        jsonData[Schema::VALUE_KEY]       = _value;
+        jsonData[Schema::DEFAULT_KEY]     = _defaultValue;
+
+        return jsonData;
+    }
+
+    /**
+     * @brief Deserialize ParamCore from JSON
+     *
+     * @tparam T
+     * @param j
+     * @return settings::ParamCore<T>
+     */
+    template <typename T>
+    ParamCore<T> ParamCore<T>::fromJson(const nlohmann::json& j)
+    {
+        const auto key   = j.at(Schema::KEY_KEY).get<std::string>();
+        const auto title = j.at(Schema::TITLE_KEY).get<std::string>();
+
+        ParamCore<T> param{key, title};
+
+        param._description  = j.at(Schema::DESCRIPTION_KEY).get<std::string>();
+        param._value        = j.at(Schema::VALUE_KEY).get<T>();
+        param._defaultValue = j.at(Schema::DEFAULT_KEY).get<std::optional<T>>();
+
+        return param;
+    }
+
+    /**
      * @brief Check if two values are equal, this is used for dirty checking
      *
      * @tparam T

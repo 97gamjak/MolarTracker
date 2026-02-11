@@ -28,7 +28,6 @@ namespace settings
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
 
-       protected:
         [[nodiscard]] ParamCore<T>&       _core();
         [[nodiscard]] const ParamCore<T>& _core() const;
 

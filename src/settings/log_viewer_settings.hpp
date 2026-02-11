@@ -27,6 +27,7 @@ namespace settings
     {
        private:
         using Schema = LogViewerSettingsSchema;
+
         NumericParam<double> _reloadIntervalSec{
             Schema::RELOAD_INTERVAL_SEC_KEY,
             Schema::RELOAD_INTERVAL_SEC_TITLE
@@ -39,8 +40,8 @@ namespace settings
         static LogViewerSettings fromJson(const nlohmann::json& j);
 
        private:
-        const auto& getParams() const;
-        auto&       getParams();
+        [[nodiscard]] auto getParams() const&;
+        [[nodiscard]] auto getParams() &;
     };
 
 }   // namespace settings

@@ -4,11 +4,20 @@
 #include <expected>
 #include <optional>
 
+#include "nlohmann/json.hpp"
 #include "params_mixin.hpp"
 
 namespace settings
 {
     class ParamError;   // Forward declaration
+
+    class NumericParamSchema
+    {
+       public:
+        static constexpr const char* MIN_VALUE_KEY = "minValue";
+        static constexpr const char* MAX_VALUE_KEY = "maxValue";
+        static constexpr const char* PRECISION_KEY = "precision";
+    };
 
     /**
      * @brief A setting parameter class for numeric types, this class
@@ -22,6 +31,8 @@ namespace settings
     class NumericParam : public ParamMixin<NumericParam<T>, T>
     {
        private:
+        using Schema = NumericParamSchema;
+
         ParamCore<T>     _core;
         std::optional<T> _minValue = std::nullopt;
         std::optional<T> _maxValue = std::nullopt;
@@ -42,12 +53,52 @@ namespace settings
         void setMaxValue(const T& maxValue);
         void setPrecision(size_t decimalPlaces);
 
+        nlohmann::json         toJson() const;
+        static NumericParam<T> fromJson(const nlohmann::json& j);
+
        private:
+        NumericParam(ParamCore<T> core);
+
         std::expected<void, ParamError> _isWithinRange(const T& v) const;
         T                               _applyPrecision(const T& v) const;
     };
 
 }   // namespace settings
+
+NLOHMANN_JSON_NAMESPACE_BEGIN
+/**
+ * @brief Serializer for utils::SemVer
+ *
+ */
+template <typename T>
+struct adl_serializer<settings::NumericParam<T>>
+{
+    /**
+     * @brief Serialize NumericParam<T> to JSON
+     *
+     * @param j
+     * @param settings
+     */
+    static void to_json(
+        nlohmann::json&                  j,
+        const settings::NumericParam<T>& settings
+    )
+    {
+        j = settings.toJson();
+    }
+
+    /**
+     * @brief Deserialize NumericParam<T> from JSON
+     *
+     * @param j
+     * @return settings::NumericParam<T>
+     */
+    static settings::NumericParam<T> from_json(const nlohmann::json& j)
+    {
+        return settings::NumericParam<T>::fromJson(j);
+    }
+};
+NLOHMANN_JSON_NAMESPACE_END
 
 #ifndef __SETTINGS__NUMERIC_PARAM_TPP__
 #include "numeric_param.tpp"

@@ -108,7 +108,7 @@ namespace settings
     template <typename Derived, typename T>
     ParamCore<T>& ParamMixin<Derived, T>::_core()
     {
-        return _self()._core;
+        return _self().core();
     }
 
     /**
@@ -121,7 +121,7 @@ namespace settings
     template <typename Derived, typename T>
     const ParamCore<T>& ParamMixin<Derived, T>::_core() const
     {
-        return _self()._core;
+        return _self().core();
     }
 
     /**
