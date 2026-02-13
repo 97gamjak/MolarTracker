@@ -1,8 +1,19 @@
 #include "log_viewer_settings.hpp"
 
+#include "param_utils.hpp"
+
 namespace settings
 {
+    /**
+     * @brief Construct a new LogViewerSettings::LogViewerSettings object
+     *
+     */
     LogViewerSettings::LogViewerSettings()
+        : ParamContainer(
+              Schema::LOG_VIEWER_SETTINGS_KEY,
+              Schema::LOG_VIEWER_SETTINGS_TITLE,
+              Schema::LOG_VIEWER_SETTINGS_DESC
+          )
     {
         _reloadIntervalSec.setDescription(Schema::RELOAD_INTERVAL_SEC_DESC);
         _reloadIntervalSec.setDefault(Schema::RELOAD_INTERVAL_SEC_DEFAULT);
@@ -10,12 +21,23 @@ namespace settings
         _reloadIntervalSec.setPrecision(Schema::RELOAD_INTERVAL_SEC_PRECISION);
     }
 
-    auto LogViewerSettings::getParams() const&
+    /**
+     * @brief Get the parameters of LogViewerSettings as a tuple (const version)
+     *
+     * @return auto
+     */
+    auto LogViewerSettings::_getParams() const&
     {
         return std::tie(_reloadIntervalSec);
     }
 
-    auto LogViewerSettings::getParams() &
+    /**
+     * @brief Get the parameters of LogViewerSettings as a tuple (non-const
+     * version)
+     *
+     * @return auto
+     */
+    auto LogViewerSettings::_getParams() &
     {
         return std::tie(_reloadIntervalSec);
     }
@@ -27,9 +49,7 @@ namespace settings
      */
     nlohmann::json LogViewerSettings::toJson() const
     {
-        nlohmann::json jsonData;
-        jsonData[Schema::RELOAD_INTERVAL_SEC_KEY] = _reloadIntervalSec;
-        return jsonData;
+        return paramsToJson(_getParams());
     }
 
     /**
@@ -38,12 +58,13 @@ namespace settings
      * @param j
      * @return settings::LogViewerSettings
      */
-    LogViewerSettings LogViewerSettings::fromJson(const nlohmann::json& j)
+    LogViewerSettings LogViewerSettings::fromJson(
+        const nlohmann::json& jsonData
+    )
     {
         LogViewerSettings settings;
 
-        const auto key              = Schema::RELOAD_INTERVAL_SEC_KEY;
-        settings._reloadIntervalSec = j[key].get<NumericParam<double>>();
+        paramsFromJson(settings._getParams(), jsonData);
 
         return settings;
     }

@@ -15,7 +15,7 @@ namespace settings
     template <typename Derived, typename T>
     const T& ParamMixin<Derived, T>::get() const
     {
-        return _core().get();
+        return core().get();
     }
 
     /**
@@ -28,7 +28,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::optional<T>& ParamMixin<Derived, T>::getDefault() const
     {
-        return _core().getDefault();
+        return core().getDefault();
     }
 
     /**
@@ -43,7 +43,7 @@ namespace settings
         const std::optional<T>& defaultValue
     )
     {
-        _core().setDefault(defaultValue);
+        core().setDefault(defaultValue);
     }
 
     /**
@@ -56,7 +56,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getKey() const
     {
-        return _core().getKey();
+        return core().getKey();
     }
 
     /**
@@ -69,7 +69,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getTitle() const
     {
-        return _core().getTitle();
+        return core().getTitle();
     }
 
     /**
@@ -82,7 +82,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getDescription() const
     {
-        return _core().getDescription();
+        return core().getDescription();
     }
 
     /**
@@ -95,7 +95,7 @@ namespace settings
     template <typename Derived, typename T>
     void ParamMixin<Derived, T>::setDescription(const std::string& description)
     {
-        _core().setDescription(description);
+        core().setDescription(description);
     }
 
     /**
@@ -106,7 +106,7 @@ namespace settings
      * @return ParamCore<T>&
      */
     template <typename Derived, typename T>
-    ParamCore<T>& ParamMixin<Derived, T>::_core()
+    ParamCore<T>& ParamMixin<Derived, T>::core()
     {
         return _self().core();
     }
@@ -119,7 +119,7 @@ namespace settings
      * @return const ParamCore<T>&
      */
     template <typename Derived, typename T>
-    const ParamCore<T>& ParamMixin<Derived, T>::_core() const
+    const ParamCore<T>& ParamMixin<Derived, T>::core() const
     {
         return _self().core();
     }

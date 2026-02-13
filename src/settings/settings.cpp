@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <tuple>
 
 #include "config/constants.hpp"
 #include "config/json.hpp"   // IWYU pragma: keep
@@ -18,7 +19,8 @@ namespace settings
      * @param configDir
      */
     Settings::Settings(const path& configDir)
-        : _settingsPath{absolute(configDir / _settingsFileName)},
+        : ParamContainer{Schema::SETTINGS_KEY, Schema::SETTINGS_TITLE, Schema::SETTINGS_DESC},
+          _settingsPath{absolute(configDir / _settingsFileName)},
           _version{utils::SemVer(Constants::getVersion())}
     {
         _fromJson();
@@ -87,7 +89,8 @@ namespace settings
 
         _toJsonProfileName(jsonData);
         _toJsonVersion(jsonData);
-        _toJsonUISettings(jsonData);
+
+        jsonData[_uiSettings.getKey()] = _uiSettings;
 
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
@@ -111,7 +114,8 @@ namespace settings
 
             _fromJsonProfileName(jsonData);
             _fromJsonOldVersion(jsonData);
-            _fromJsonUISettings(jsonData);
+
+            _uiSettings = jsonData.at(_uiSettings.getKey()).get<UISettings>();
 
             file.close();
         }
@@ -161,21 +165,6 @@ namespace settings
         const auto defaultValue = _oldVersion;
 
         _oldVersion = jsonData.value(key, defaultValue);
-    }
-
-    /**
-     * @brief Serialize UI settings to JSON
-     *
-     * @param jsonData
-     */
-    void Settings::_toJsonUISettings(nlohmann::json& jsonData) const
-    {
-        jsonData[_uiSettingsKey] = _uiSettings;
-    }
-
-    void Settings::_fromJsonUISettings(const nlohmann::json& jsonData)
-    {
-        _uiSettings = jsonData.value(_uiSettingsKey, _uiSettings);
     }
 
 }   // namespace settings

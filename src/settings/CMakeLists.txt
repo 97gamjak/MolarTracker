@@ -3,6 +3,7 @@ add_library(molartracker_settings STATIC
     ui_settings.cpp
     log_viewer_settings.cpp
     param_error.cpp
+    param_container.cpp
 )
 
 target_include_directories(molartracker_settings

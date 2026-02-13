@@ -6,18 +6,28 @@
 #include <string>
 
 #include "nlohmann/json.hpp"
+#include "param_container.hpp"
 #include "ui_settings.hpp"
 #include "utils/version.hpp"
 
 namespace settings
 {
+    class SettingsSchema
+    {
+       public:
+        static constexpr const char* SETTINGS_KEY   = "settings";
+        static constexpr const char* SETTINGS_TITLE = "Settings";
+        static constexpr const char* SETTINGS_DESC  = "Settings";
+    };
 
     /**
      * @brief Application settings management
      */
-    class Settings
+    class Settings : public ParamContainer
     {
        private:
+        using Schema = SettingsSchema;
+
         // clang-format off
         static constexpr const char* _settingsFileName = "settings.json";
         static constexpr const char* _defaultProfileNameKey = "defaultProfileName";
@@ -54,8 +64,6 @@ namespace settings
         void _fromJsonProfileName(const nlohmann::json& jsonData);
         void _toJsonVersion(nlohmann::json& jsonData) const;
         void _fromJsonOldVersion(const nlohmann::json& jsonData);
-        void _toJsonUISettings(nlohmann::json& jsonData) const;
-        void _fromJsonUISettings(const nlohmann::json& jsonData);
     };
 
 }   // namespace settings

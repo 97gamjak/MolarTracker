@@ -3,11 +3,28 @@
 
 #include "nlohmann/json.hpp"
 #include "numeric_param.hpp"
+#include "param_container.hpp"
 
 namespace settings
 {
+    /**
+     * @brief Schema for log viewer settings
+     *
+     * This struct defines the keys, titles, descriptions, default values, and
+     * validation constraints for the log viewer settings parameters. It serves
+     * as a centralized reference for all log viewer related settings.
+     */
     struct LogViewerSettingsSchema
     {
+        // general schema keys and metadata
+        static constexpr const char* LOG_VIEWER_SETTINGS_KEY =
+            "logViewerSettings";
+        static constexpr const char* LOG_VIEWER_SETTINGS_TITLE =
+            "Log Viewer Settings";
+        static constexpr const char* LOG_VIEWER_SETTINGS_DESC =
+            "Settings related to the log viewer component.";
+
+        // reload interval keys and metadata
         static constexpr const char* RELOAD_INTERVAL_SEC_KEY =
             "reloadIntervalSec";
         static constexpr const char* RELOAD_INTERVAL_SEC_TITLE =
@@ -23,7 +40,7 @@ namespace settings
     /**
      * @brief Log viewer related settings management
      */
-    class LogViewerSettings
+    class LogViewerSettings : public ParamContainer
     {
        private:
         using Schema = LogViewerSettingsSchema;
@@ -40,8 +57,8 @@ namespace settings
         static LogViewerSettings fromJson(const nlohmann::json& j);
 
        private:
-        [[nodiscard]] auto getParams() const&;
-        [[nodiscard]] auto getParams() &;
+        [[nodiscard]] auto _getParams() const&;
+        [[nodiscard]] auto _getParams() &;
     };
 
 }   // namespace settings

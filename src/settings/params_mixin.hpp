@@ -28,9 +28,10 @@ namespace settings
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
 
-        [[nodiscard]] ParamCore<T>&       _core();
-        [[nodiscard]] const ParamCore<T>& _core() const;
+        [[nodiscard]] ParamCore<T>&       core();
+        [[nodiscard]] const ParamCore<T>& core() const;
 
+       private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;
     };
