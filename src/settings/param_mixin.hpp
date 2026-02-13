@@ -1,7 +1,7 @@
-#ifndef __SETTINGS__PARAMS_MIXIN_HPP__
-#define __SETTINGS__PARAMS_MIXIN_HPP__
+#ifndef __SETTINGS__PARAM_MIXIN_HPP__
+#define __SETTINGS__PARAM_MIXIN_HPP__
 
-#include "params_core.hpp"
+#include "param_core.hpp"
 
 namespace settings
 {
@@ -17,8 +17,6 @@ namespace settings
     class ParamMixin
     {
        public:
-        [[nodiscard]] const T& get() const;
-
         [[nodiscard]] const std::optional<T>& getDefault() const;
         void setDefault(const std::optional<T>& defaultValue);
 
@@ -28,9 +26,6 @@ namespace settings
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
 
-        [[nodiscard]] ParamCore<T>&       core();
-        [[nodiscard]] const ParamCore<T>& core() const;
-
        private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;
@@ -38,8 +33,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAMS_MIXIN_TPP__
-#include "params_mixin.tpp"
-#endif   // __SETTINGS__PARAMS_MIXIN_TPP__
+#ifndef __SETTINGS__PARAM_MIXIN_TPP__
+#include "param_mixin.tpp"
+#endif   // __SETTINGS__PARAM_MIXIN_TPP__
 
-#endif   // __SETTINGS__PARAMS_MIXIN_HPP__
+#endif   // __SETTINGS__PARAM_MIXIN_HPP__

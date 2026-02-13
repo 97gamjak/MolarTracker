@@ -1,7 +1,7 @@
-#ifndef __SETTINGS__PARAMS_CORE_TPP__
-#define __SETTINGS__PARAMS_CORE_TPP__
+#ifndef __SETTINGS__PARAM_CORE_TPP__
+#define __SETTINGS__PARAM_CORE_TPP__
 
-#include "params_core.hpp"
+#include "param_core.hpp"
 
 namespace settings
 {
@@ -212,4 +212,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS_CORE_TPP__
+#endif   // __SETTINGS__PARAM_CORE_TPP__

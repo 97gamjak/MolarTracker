@@ -4,6 +4,7 @@
 #include "nlohmann/json.hpp"
 #include "numeric_param.hpp"
 #include "param_container.hpp"
+#include "param_container_mixin.hpp"
 
 namespace settings
 {
@@ -40,9 +41,10 @@ namespace settings
     /**
      * @brief Log viewer related settings management
      */
-    class LogViewerSettings : public ParamContainer
+    class LogViewerSettings : public ParamContainerMixin<LogViewerSettings>
     {
        private:
+        ParamContainer _core;
         using Schema = LogViewerSettingsSchema;
 
         NumericParam<double> _reloadIntervalSec{
@@ -53,8 +55,13 @@ namespace settings
        public:
         LogViewerSettings();
 
-        nlohmann::json           toJson() const;
-        static LogViewerSettings fromJson(const nlohmann::json& j);
+        [[nodiscard]] ParamContainer&       core();
+        [[nodiscard]] const ParamContainer& core() const;
+
+        [[nodiscard]] nlohmann::json           toJson() const;
+        [[nodiscard]] static LogViewerSettings fromJson(
+            const nlohmann::json& j
+        );
 
        private:
         [[nodiscard]] auto _getParams() const&;
@@ -62,40 +69,5 @@ namespace settings
     };
 
 }   // namespace settings
-
-NLOHMANN_JSON_NAMESPACE_BEGIN
-/**
- * @brief Serializer for settings::LogViewerSettings
- *
- */
-template <>
-struct adl_serializer<settings::LogViewerSettings>
-{
-    /**
-     * @brief Serialize LogViewerSettings to JSON
-     *
-     * @param j
-     * @param settings
-     */
-    static void to_json(
-        nlohmann::json&                    j,
-        const settings::LogViewerSettings& settings
-    )
-    {
-        j = settings.toJson();
-    }
-
-    /**
-     * @brief Deserialize LogViewerSettings from JSON
-     *
-     * @param j
-     * @return settings::LogViewerSettings
-     */
-    static settings::LogViewerSettings from_json(const nlohmann::json& j)
-    {
-        return settings::LogViewerSettings::fromJson(j);
-    }
-};
-NLOHMANN_JSON_NAMESPACE_END
 
 #endif   // __LOG_VIEWER_SETTINGS_HPP__

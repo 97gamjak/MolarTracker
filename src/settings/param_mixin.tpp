@@ -1,23 +1,10 @@
-#ifndef __SETTINGS__PARAMS_MIXIN_TPP__
-#define __SETTINGS__PARAMS_MIXIN_TPP__
+#ifndef __SETTINGS__PARAM_MIXIN_TPP__
+#define __SETTINGS__PARAM_MIXIN_TPP__
 
-#include "params_mixin.hpp"
+#include "param_mixin.hpp"
 
 namespace settings
 {
-    /**
-     * @brief Get the value of the parameter
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const T&
-     */
-    template <typename Derived, typename T>
-    const T& ParamMixin<Derived, T>::get() const
-    {
-        return core().get();
-    }
-
     /**
      * @brief Get the default value of the parameter
      *
@@ -28,7 +15,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::optional<T>& ParamMixin<Derived, T>::getDefault() const
     {
-        return core().getDefault();
+        return _self().core().getDefault();
     }
 
     /**
@@ -43,7 +30,7 @@ namespace settings
         const std::optional<T>& defaultValue
     )
     {
-        core().setDefault(defaultValue);
+        _self().core().setDefault(defaultValue);
     }
 
     /**
@@ -56,7 +43,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getKey() const
     {
-        return core().getKey();
+        return _self().core().getKey();
     }
 
     /**
@@ -69,7 +56,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getTitle() const
     {
-        return core().getTitle();
+        return _self().core().getTitle();
     }
 
     /**
@@ -82,7 +69,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getDescription() const
     {
-        return core().getDescription();
+        return _self().core().getDescription();
     }
 
     /**
@@ -95,33 +82,7 @@ namespace settings
     template <typename Derived, typename T>
     void ParamMixin<Derived, T>::setDescription(const std::string& description)
     {
-        core().setDescription(description);
-    }
-
-    /**
-     * @brief Get the core object
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return ParamCore<T>&
-     */
-    template <typename Derived, typename T>
-    ParamCore<T>& ParamMixin<Derived, T>::core()
-    {
-        return _self().core();
-    }
-
-    /**
-     * @brief Get the core object (const)
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const ParamCore<T>&
-     */
-    template <typename Derived, typename T>
-    const ParamCore<T>& ParamMixin<Derived, T>::core() const
-    {
-        return _self().core();
+        _self().core().setDescription(description);
     }
 
     /**
@@ -152,4 +113,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS_MIXIN_TPP__
+#endif   // __SETTINGS__PARAM_MIXIN_TPP__

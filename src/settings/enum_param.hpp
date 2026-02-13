@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "mstd/type_traits.hpp"
-#include "params_mixin.hpp"
+#include "param_mixin.hpp"
 
 namespace settings
 {

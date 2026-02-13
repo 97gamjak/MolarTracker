@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "nlohmann/json.hpp"
-#include "params_mixin.hpp"
+#include "param_mixin.hpp"
 
 namespace settings
 {
@@ -64,41 +64,6 @@ namespace settings
     };
 
 }   // namespace settings
-
-NLOHMANN_JSON_NAMESPACE_BEGIN
-/**
- * @brief Serializer for utils::SemVer
- *
- */
-template <typename T>
-struct adl_serializer<settings::NumericParam<T>>
-{
-    /**
-     * @brief Serialize NumericParam<T> to JSON
-     *
-     * @param j
-     * @param settings
-     */
-    static void to_json(
-        nlohmann::json&                  j,
-        const settings::NumericParam<T>& settings
-    )
-    {
-        j = settings.toJson();
-    }
-
-    /**
-     * @brief Deserialize NumericParam<T> from JSON
-     *
-     * @param j
-     * @return settings::NumericParam<T>
-     */
-    static settings::NumericParam<T> from_json(const nlohmann::json& j)
-    {
-        return settings::NumericParam<T>::fromJson(j);
-    }
-};
-NLOHMANN_JSON_NAMESPACE_END
 
 #ifndef __SETTINGS__NUMERIC_PARAM_TPP__
 #include "numeric_param.tpp"

@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS_CORE_HPP__
-#define __SETTINGS__PARAMS_CORE_HPP__
+#ifndef __SETTINGS__PARAM_CORE_HPP__
+#define __SETTINGS__PARAM_CORE_HPP__
 
 #include <optional>
 #include <string>
@@ -105,8 +105,8 @@ struct adl_serializer<settings::ParamCore<T>>
 };
 NLOHMANN_JSON_NAMESPACE_END
 
-#ifndef __SETTINGS__PARAMS_CORE_TPP__
-#include "params_core.tpp"
-#endif   // __SETTINGS__PARAMS_CORE_TPP__
+#ifndef __SETTINGS__PARAM_CORE_TPP__
+#include "param_core.tpp"
+#endif   // __SETTINGS__PARAM_CORE_TPP__
 
-#endif   // __SETTINGS__PARAMS_CORE_HPP__
+#endif   // __SETTINGS__PARAM_CORE_HPP__

@@ -4,7 +4,59 @@
 #include <utility>
 
 #include "nlohmann/json.hpp"
-#include "param_container.hpp"
+
+template <class Derived, class T>
+class ParamMixin;   // forward declaration
+
+template <class Derived>
+class ParamContainerMixin;   // forward declaration
+
+namespace settings::detail
+{
+    template <class D, class T>
+    std::true_type isParamMixinPtr(const ParamMixin<D, T>*);
+
+    template <class D>
+    std::true_type isParamContainerMixinPtr(const ParamContainerMixin<D>*);
+
+    std::false_type isParamMixinPtr(...);
+    std::false_type isParamContainerMixinPtr(...);
+
+    template <class U>
+    inline constexpr bool isParamMixin_v =
+        decltype(isParamMixinPtr(std::declval<const std::remove_cvref_t<U>*>())
+        )::value;
+
+    template <class U>
+    inline constexpr bool isParamContainerMixin_v =
+        decltype(isParamContainerMixinPtr(
+            std::declval<const std::remove_cvref_t<U>*>()
+        ))::value;
+}   // namespace settings::detail
+
+namespace settings
+{
+    template <class U>
+    concept ParamLike = settings::detail::isParamMixin_v<U> ||
+                        settings::detail::isParamContainerMixin_v<U>;
+}
+
+namespace settings
+{
+
+    template <settings::ParamLike P>
+    void to_json(nlohmann::json& j, const P& p)
+    {
+        j = p.toJson();
+    }
+
+    template <settings::ParamLike P>
+    void from_json(const nlohmann::json& j, P& p)
+    {
+        p = P::fromJson(j);   // whatever you implemented
+    }
+
+}   // namespace settings
 
 namespace settings
 {
@@ -68,8 +120,7 @@ namespace settings
             const auto& key = param.getKey();
 
             if (jsonData.contains(key))
-                param = jsonData.at(key)
-                            .template get<std::decay_t<decltype(param)>>();
+                jsonData.at(key).get_to(param);
         };
 
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);

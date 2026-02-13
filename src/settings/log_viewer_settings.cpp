@@ -9,7 +9,7 @@ namespace settings
      *
      */
     LogViewerSettings::LogViewerSettings()
-        : ParamContainer(
+        : _core(
               Schema::LOG_VIEWER_SETTINGS_KEY,
               Schema::LOG_VIEWER_SETTINGS_TITLE,
               Schema::LOG_VIEWER_SETTINGS_DESC
@@ -20,6 +20,10 @@ namespace settings
         _reloadIntervalSec.setMinValue(Schema::RELOAD_INTERVAL_SEC_MIN);
         _reloadIntervalSec.setPrecision(Schema::RELOAD_INTERVAL_SEC_PRECISION);
     }
+
+    ParamContainer& LogViewerSettings::core() { return _core; }
+
+    const ParamContainer& LogViewerSettings::core() const { return _core; }
 
     /**
      * @brief Get the parameters of LogViewerSettings as a tuple (const version)

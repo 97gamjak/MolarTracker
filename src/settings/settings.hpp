@@ -7,6 +7,7 @@
 
 #include "nlohmann/json.hpp"
 #include "param_container.hpp"
+#include "param_container_mixin.hpp"
 #include "ui_settings.hpp"
 #include "utils/version.hpp"
 
@@ -23,9 +24,10 @@ namespace settings
     /**
      * @brief Application settings management
      */
-    class Settings : public ParamContainer
+    class Settings : public ParamContainerMixin<Settings>
     {
        private:
+        ParamContainer _core;
         using Schema = SettingsSchema;
 
         // clang-format off
@@ -57,6 +59,9 @@ namespace settings
         [[nodiscard]] std::optional<std::string> getDefaultProfileName() const;
 
        private:
+        auto _getParams() &;
+        auto _getParams() const&;
+
         void _toJson() const;
         void _fromJson();
 
