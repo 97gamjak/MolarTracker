@@ -4,7 +4,7 @@
 #include <optional>
 #include <string>
 
-#include "config/json.hpp"   // IWYU pragma: keep for adl_serializer of std::optional<T>
+#include "nlohmann/json.hpp"   // IWYU pragma: keep for adl_serializer of std::optional<T>
 
 namespace settings
 {
@@ -61,49 +61,14 @@ namespace settings
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
 
-        nlohmann::json      toJson() const;
-        static ParamCore<T> fromJson(const nlohmann::json& j);
+        [[nodiscard]] nlohmann::json toJson() const;
+        static void fromJson(const nlohmann::json& j, ParamCore<T>& param);
 
        private:
-        static bool _equals(const T& a, const T& b);
+        [[nodiscard]] static bool _equals(const T& a, const T& b);
     };
 
 }   // namespace settings
-
-NLOHMANN_JSON_NAMESPACE_BEGIN
-/**
- * @brief Serializer for utils::SemVer
- *
- */
-template <typename T>
-struct adl_serializer<settings::ParamCore<T>>
-{
-    /**
-     * @brief Serialize ParamCore<T> to JSON
-     *
-     * @param j
-     * @param settings
-     */
-    static void to_json(
-        nlohmann::json&               j,
-        const settings::ParamCore<T>& settings
-    )
-    {
-        j = settings.toJson();
-    }
-
-    /**
-     * @brief Deserialize ParamCore<T> from JSON
-     *
-     * @param j
-     * @return settings::ParamCore<T>
-     */
-    static settings::ParamCore<T> from_json(const nlohmann::json& j)
-    {
-        return settings::ParamCore<T>::fromJson(j);
-    }
-};
-NLOHMANN_JSON_NAMESPACE_END
 
 #ifndef __SETTINGS__PARAM_CORE_TPP__
 #include "param_core.tpp"

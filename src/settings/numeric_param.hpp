@@ -4,8 +4,7 @@
 #include <expected>
 #include <optional>
 
-#include "nlohmann/json.hpp"
-#include "param_mixin.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
@@ -53,8 +52,8 @@ namespace settings
         void setMaxValue(const T& maxValue);
         void setPrecision(size_t decimalPlaces);
 
-        nlohmann::json         toJson() const;
-        static NumericParam<T> fromJson(const nlohmann::json& j);
+        nlohmann::json toJson() const;
+        static void fromJson(const nlohmann::json& j, NumericParam<T>& param);
 
        private:
         NumericParam(ParamCore<T> core);

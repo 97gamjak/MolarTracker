@@ -1,6 +1,6 @@
 #include "log_viewer_settings.hpp"
 
-#include "param_utils.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
@@ -59,17 +59,14 @@ namespace settings
     /**
      * @brief Deserialize LogViewerSettings from JSON
      *
-     * @param j
-     * @return settings::LogViewerSettings
+     * @param jsonData
+     * @param settings
      */
-    LogViewerSettings LogViewerSettings::fromJson(
-        const nlohmann::json& jsonData
+    void LogViewerSettings::fromJson(
+        const nlohmann::json& jsonData,
+        LogViewerSettings&    settings
     )
     {
-        LogViewerSettings settings;
-
         paramsFromJson(settings._getParams(), jsonData);
-
-        return settings;
     }
 }   // namespace settings

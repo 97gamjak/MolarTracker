@@ -1,10 +1,8 @@
 #ifndef __LOG_VIEWER_SETTINGS_HPP__
 #define __LOG_VIEWER_SETTINGS_HPP__
 
-#include "nlohmann/json.hpp"
 #include "numeric_param.hpp"
-#include "param_container.hpp"
-#include "param_container_mixin.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
@@ -58,9 +56,11 @@ namespace settings
         [[nodiscard]] ParamContainer&       core();
         [[nodiscard]] const ParamContainer& core() const;
 
-        [[nodiscard]] nlohmann::json           toJson() const;
-        [[nodiscard]] static LogViewerSettings fromJson(
-            const nlohmann::json& j
+        [[nodiscard]] nlohmann::json toJson() const;
+
+        static void fromJson(
+            const nlohmann::json& j,
+            LogViewerSettings&    settings
         );
 
        private:

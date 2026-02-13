@@ -53,7 +53,9 @@ namespace settings
     template <settings::ParamLike P>
     void from_json(const nlohmann::json& j, P& p)
     {
-        p = P::fromJson(j);   // whatever you implemented
+        // TODO: implement json concept for classes
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-139
+        p.fromJson(j);
     }
 
 }   // namespace settings
@@ -120,7 +122,7 @@ namespace settings
             const auto& key = param.getKey();
 
             if (jsonData.contains(key))
-                jsonData.at(key).get_to(param);
+                std::remove_cvref_t<decltype(param)>::fromJson(jsonData, param);
         };
 
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);

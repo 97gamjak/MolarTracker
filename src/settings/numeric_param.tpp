@@ -8,7 +8,7 @@
 #include <string>
 
 #include "numeric_param.hpp"
-#include "param_error.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
@@ -248,20 +248,24 @@ namespace settings
      * @brief Deserialize NumericParam from JSON
      *
      * @tparam T
-     * @param j
-     * @return settings::NumericParam<T>
+     * @param jsonData
+     * @param param
      */
     template <typename T>
     requires(std::integral<T> || std::floating_point<T>)
-    NumericParam<T> NumericParam<T>::fromJson(const nlohmann::json& j)
+    void NumericParam<T>::fromJson(
+        const nlohmann::json& jsonData,
+        NumericParam<T>&      param
+    )
     {
-        NumericParam<T> param{ParamCore<T>::fromJson(j)};
-        param._minValue = j[Schema::MIN_VALUE_KEY].get<std::optional<T>>();
-        param._maxValue = j[Schema::MAX_VALUE_KEY].get<std::optional<T>>();
-        param._precision =
-            j[Schema::PRECISION_KEY].get<std::optional<size_t>>();
+        ParamCore<T>::fromJson(jsonData, param.core());
 
-        return param;
+        param._minValue =
+            jsonData[Schema::MIN_VALUE_KEY].get<std::optional<T>>();
+        param._maxValue =
+            jsonData[Schema::MAX_VALUE_KEY].get<std::optional<T>>();
+        param._precision =
+            jsonData[Schema::PRECISION_KEY].get<std::optional<size_t>>();
     }
 
 }   // namespace settings

@@ -166,22 +166,23 @@ namespace settings
      * @brief Deserialize ParamCore from JSON
      *
      * @tparam T
-     * @param j
-     * @return settings::ParamCore<T>
+     * @param jsonData
+     * @param param
      */
     template <typename T>
-    ParamCore<T> ParamCore<T>::fromJson(const nlohmann::json& j)
+    void ParamCore<T>::fromJson(
+        const nlohmann::json& jsonData,
+        ParamCore<T>&         param
+    )
     {
-        const auto key   = j.at(Schema::KEY_KEY).get<std::string>();
-        const auto title = j.at(Schema::TITLE_KEY).get<std::string>();
+        param._key   = jsonData.at(Schema::KEY_KEY).get<std::string>();
+        param._title = jsonData.at(Schema::TITLE_KEY).get<std::string>();
+        param._description =
+            jsonData.at(Schema::DESCRIPTION_KEY).get<std::string>();
 
-        ParamCore<T> param{key, title};
-
-        param._description  = j.at(Schema::DESCRIPTION_KEY).get<std::string>();
-        param._value        = j.at(Schema::VALUE_KEY).get<T>();
-        param._defaultValue = j.at(Schema::DEFAULT_KEY).get<std::optional<T>>();
-
-        return param;
+        param._value = jsonData.at(Schema::VALUE_KEY).get<T>();
+        param._defaultValue =
+            jsonData.at(Schema::DEFAULT_KEY).get<std::optional<T>>();
     }
 
     /**

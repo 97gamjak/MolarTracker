@@ -5,9 +5,7 @@
 #include <optional>
 #include <string>
 
-#include "nlohmann/json.hpp"
-#include "param_container.hpp"
-#include "param_container_mixin.hpp"
+#include "params/params.hpp"
 #include "ui_settings.hpp"
 #include "utils/version.hpp"
 

@@ -2,9 +2,9 @@ add_library(molartracker_settings STATIC
     settings.cpp
     ui_settings.cpp
     log_viewer_settings.cpp
-    param_error.cpp
-    param_container.cpp
 )
+
+add_subdirectory(params)
 
 target_include_directories(molartracker_settings
     PUBLIC
@@ -15,4 +15,5 @@ target_include_directories(molartracker_settings
 target_link_libraries(molartracker_settings
     PUBLIC
     molartracker_config
+    molartracker_settings_params
 )

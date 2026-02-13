@@ -1,6 +1,6 @@
 #include "ui_settings.hpp"
 
-#include "param_utils.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
@@ -37,8 +37,6 @@ namespace settings
     /**
      * @brief Serialize UISettings to JSON
      *
-     * @param j
-     * @param settings
      */
     nlohmann::json UISettings::toJson() const
     {
@@ -48,15 +46,14 @@ namespace settings
     /**
      * @brief Deserialize UISettings from JSON
      *
-     * @param j
-     * @return settings::UISettings
+     * @param jsonData
+     * @param settings
      */
-    UISettings UISettings::fromJson(const nlohmann::json& jsonData)
+    void UISettings::fromJson(
+        const nlohmann::json& jsonData,
+        UISettings&           settings
+    )
     {
-        UISettings settings;
-
         paramsFromJson(settings._getParams(), jsonData);
-
-        return settings;
     }
 }   // namespace settings

@@ -2,8 +2,7 @@
 #define __SETTINGS__UI_SETTINGS_HPP__
 
 #include "log_viewer_settings.hpp"
-#include "nlohmann/json.hpp"
-#include "param_container.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
@@ -37,8 +36,8 @@ namespace settings
        public:
         UISettings();
 
-        nlohmann::json    toJson() const;
-        static UISettings fromJson(const nlohmann::json& j);
+        nlohmann::json toJson() const;
+        static void    fromJson(const nlohmann::json& j, UISettings& settings);
 
        private:
         UISettings(std::string key, std::string title, std::string description);
@@ -48,37 +47,5 @@ namespace settings
     };
 
 }   // namespace settings
-
-NLOHMANN_JSON_NAMESPACE_BEGIN
-/**
- * @brief Serializer for utils::SemVer
- *
- */
-template <>
-struct adl_serializer<settings::UISettings>
-{
-    /**
-     * @brief Serialize UISettings to JSON
-     *
-     * @param j
-     * @param settings
-     */
-    static void to_json(nlohmann::json& j, const settings::UISettings& settings)
-    {
-        j = settings.toJson();
-    }
-
-    /**
-     * @brief Deserialize UISettings from JSON
-     *
-     * @param j
-     * @return settings::UISettings
-     */
-    static settings::UISettings from_json(const nlohmann::json& j)
-    {
-        return settings::UISettings::fromJson(j);
-    }
-};
-NLOHMANN_JSON_NAMESPACE_END
 
 #endif   // __SETTINGS__UI_SETTINGS_HPP__
