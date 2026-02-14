@@ -8,7 +8,6 @@
 #include <string>
 
 #include "numeric_param.hpp"
-#include "params/params.hpp"
 
 namespace settings
 {

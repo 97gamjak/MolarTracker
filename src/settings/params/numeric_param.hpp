@@ -4,7 +4,8 @@
 #include <expected>
 #include <optional>
 
-#include "params/params.hpp"
+#include "param_core.hpp"
+#include "param_mixin.hpp"
 
 namespace settings
 {

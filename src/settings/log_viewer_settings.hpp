@@ -1,7 +1,6 @@
 #ifndef __LOG_VIEWER_SETTINGS_HPP__
 #define __LOG_VIEWER_SETTINGS_HPP__
 
-#include "numeric_param.hpp"
 #include "params/params.hpp"
 
 namespace settings
