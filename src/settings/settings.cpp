@@ -27,8 +27,25 @@ namespace settings
         _fromJson();
     }
 
-    auto Settings::_getParams() & { return std::tie(_uiSettings); }
-    auto Settings::_getParams() const& { return std::tie(_uiSettings); }
+    /**
+     * @brief Get the parameters of Settings as a tuple (non-const version)
+     *
+     * @return auto
+     */
+    auto Settings::_getParams() &
+    {
+        return std::tie(_uiSettings, _generalSettings);
+    }
+
+    /**
+     * @brief Get the parameters of Settings as a tuple (const version)
+     *
+     * @return auto
+     */
+    auto Settings::_getParams() const&
+    {
+        return std::tie(_uiSettings, _generalSettings);
+    }
 
     /**
      * @brief Save settings to the JSON file
@@ -92,7 +109,6 @@ namespace settings
         nlohmann::json jsonData = paramsToJson(_getParams());
 
         _toJsonProfileName(jsonData);
-        _toJsonVersion(jsonData);
 
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
@@ -115,7 +131,6 @@ namespace settings
             file >> jsonData;
 
             _fromJsonProfileName(jsonData);
-            _fromJsonOldVersion(jsonData);
 
             paramsFromJson(_getParams(), jsonData);
 
@@ -144,29 +159,6 @@ namespace settings
         const auto defaultValue = _defaultProfileName;
 
         _defaultProfileName = jsonData.value(key, defaultValue);
-    }
-
-    /**
-     * @brief Serialize the version to JSON
-     *
-     * @param jsonData
-     */
-    void Settings::_toJsonVersion(nlohmann::json& jsonData) const
-    {
-        jsonData[_versionKey] = _version;
-    }
-
-    /**
-     * @brief Deserialize the old version from JSON
-     *
-     * @param jsonData
-     */
-    void Settings::_fromJsonOldVersion(const nlohmann::json& jsonData)
-    {
-        const auto key          = _versionKey;
-        const auto defaultValue = _oldVersion;
-
-        _oldVersion = jsonData.value(key, defaultValue);
     }
 
 }   // namespace settings

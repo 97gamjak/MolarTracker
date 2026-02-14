@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 
+#include "general_settings.hpp"
 #include "params/params.hpp"
 #include "ui_settings.hpp"
 #include "utils/version.hpp"
@@ -31,9 +32,6 @@ namespace settings
         // clang-format off
         static constexpr const char* _settingsFileName = "settings.json";
         static constexpr const char* _defaultProfileNameKey = "defaultProfileName";
-        static constexpr const char* _versionKey = "version";
-
-        static constexpr const char* _uiSettingsKey = "uiSettings";
         // clang-format on
 
         std::filesystem::path      _settingsPath;
@@ -42,7 +40,8 @@ namespace settings
         utils::SemVer _version;
         utils::SemVer _oldVersion{utils::SemVer::getInvalidVersion()};
 
-        UISettings _uiSettings;
+        GeneralSettings _generalSettings;
+        UISettings      _uiSettings;
 
        public:
         Settings() = delete;
@@ -65,8 +64,6 @@ namespace settings
 
         void _toJsonProfileName(nlohmann::json& jsonData) const;
         void _fromJsonProfileName(const nlohmann::json& jsonData);
-        void _toJsonVersion(nlohmann::json& jsonData) const;
-        void _fromJsonOldVersion(const nlohmann::json& jsonData);
     };
 
 }   // namespace settings

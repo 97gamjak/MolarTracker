@@ -3,13 +3,17 @@
 
 #include <optional>
 
-#include "param_container.hpp"
-#include "param_container_mixin.hpp"
-#include "version_param.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {
 
+    /**
+     * @brief Schema for general settings
+     *
+     * This struct defines the keys, titles, and descriptions for the general
+     * settings. It serves as a centralized reference for all general settings.
+     */
     class GeneralSettingsSchema
     {
        public:
@@ -25,6 +29,9 @@ namespace settings
             "The current version of the application.";
     };
 
+    /**
+     * @brief General settings management
+     */
     class GeneralSettings : public ParamContainerMixin<GeneralSettings>
     {
        private:
@@ -38,6 +45,20 @@ namespace settings
 
        public:
         GeneralSettings();
+
+        [[nodiscard]] ParamContainer&       core();
+        [[nodiscard]] const ParamContainer& core() const;
+
+        [[nodiscard]] nlohmann::json toJson() const;
+
+        static void fromJson(
+            const nlohmann::json& j,
+            GeneralSettings&      settings
+        );
+
+       private:
+        [[nodiscard]] auto _getParams() const&;
+        [[nodiscard]] auto _getParams() &;
     };
 
 }   // namespace settings
