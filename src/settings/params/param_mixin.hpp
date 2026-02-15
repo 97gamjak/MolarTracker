@@ -1,7 +1,8 @@
 #ifndef __SETTINGS__PARAM_MIXIN_HPP__
 #define __SETTINGS__PARAM_MIXIN_HPP__
 
-#include "param_core.hpp"
+#include <optional>
+#include <string>
 
 namespace settings
 {
@@ -17,6 +18,8 @@ namespace settings
     class ParamMixin
     {
        public:
+        [[nodiscard]] const std::optional<T>& get() const;
+
         [[nodiscard]] const std::optional<T>& getDefault() const;
         void setDefault(const std::optional<T>& defaultValue);
 

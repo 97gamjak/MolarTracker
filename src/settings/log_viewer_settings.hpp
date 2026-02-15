@@ -1,6 +1,7 @@
 #ifndef __LOG_VIEWER_SETTINGS_HPP__
 #define __LOG_VIEWER_SETTINGS_HPP__
 
+#include "exceptions/base.hpp"
 #include "params/params.hpp"
 
 namespace settings
@@ -33,6 +34,17 @@ namespace settings
         static constexpr double      RELOAD_INTERVAL_SEC_DEFAULT   = 1.0;
         static constexpr double      RELOAD_INTERVAL_SEC_MIN       = 0.001;
         static constexpr std::size_t RELOAD_INTERVAL_SEC_PRECISION = 3;
+
+        // auto-reload keys and metadata
+        static constexpr const char* AUTO_RELOAD_KEY = "autoReload";
+        static constexpr const char* AUTO_RELOAD_TITLE =
+            "Automatic Reloading Log File";
+        static constexpr const char* AUTO_RELOAD_DESCRIPTION =
+            "Enable or disable automatic reloading of the log file. When "
+            "enabled, the log viewer will automatically reload the log file at "
+            "the specified interval. When disabled, the log viewer will only "
+            "reload the log file when the user manually triggers a reload.";
+        static constexpr bool AUTO_RELOAD_DEFAULT = false;
     };
 
     /**
@@ -44,14 +56,16 @@ namespace settings
         ParamContainer _core;
         using Schema = LogViewerSettingsSchema;
 
-        NumericParam<double> _reloadIntervalSec
-        {
+        NumericParam<double> _reloadIntervalSec{
             Schema::RELOAD_INTERVAL_SEC_KEY,
-                static constexpr const char* _autoReloadKey = "autoReload";
-            static constexpr bool            _DEFAULT_AUTO_RELOAD = false;
-            Schema::RELOAD_INTERVAL_SEC_TITLE
-        }
-        bool _autoReload = _DEFAULT_AUTO_RELOAD;
+            Schema::RELOAD_INTERVAL_SEC_TITLE,
+            Schema::RELOAD_INTERVAL_SEC_DESC
+        };
+        BoolParam _autoReload{
+            Schema::AUTO_RELOAD_KEY,
+            Schema::AUTO_RELOAD_TITLE,
+            Schema::AUTO_RELOAD_DESCRIPTION
+        };
 
        public:
         LogViewerSettings();
@@ -66,22 +80,24 @@ namespace settings
             LogViewerSettings&    settings
         );
 
-       private:
-        [[nodiscard]] auto _getParams() const&;
-        [[nodiscard]] auto _getParams() &;
-
         [[nodiscard]] double getReloadIntervalSec() const;
         [[nodiscard]] bool   isAutoReloadEnabled() const;
 
        private:
-        static void _fromJsonReloadIntervalSec(
-            const nlohmann::json& jsonData,
-            LogViewerSettings&    settings
-        );
-        static void _fromJsonAutoReload(
-            const nlohmann::json& jsonData,
-            LogViewerSettings&    settings
-        );
+        [[nodiscard]] auto _getParams() const&;
+        [[nodiscard]] auto _getParams() &;
+    };
+
+    /**
+     * @brief LogViewerSettings related exceptions
+     *
+     */
+    class LogViewerSettingsException : public MolarTrackerException
+    {
+       public:
+        explicit LogViewerSettingsException(std::string message);
+
+        const char* what() const noexcept override;
     };
 
 }   // namespace settings

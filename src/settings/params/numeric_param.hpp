@@ -46,6 +46,11 @@ namespace settings
 
        public:
         NumericParam(std::string key, std::string title);
+        NumericParam(
+            std::string key,
+            std::string title,
+            std::string description
+        );
 
         [[nodiscard]] ParamCore<T>&       core();
         [[nodiscard]] const ParamCore<T>& core() const;

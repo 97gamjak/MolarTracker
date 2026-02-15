@@ -5,6 +5,21 @@
 
 namespace settings
 {
+
+    /**
+     * @brief Get the value of the parameter
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return const std::optional<T>&
+     */
+
+    template <typename Derived, typename T>
+    const std::optional<T>& ParamMixin<Derived, T>::get() const
+    {
+        return _self().core().get();
+    }
+
     /**
      * @brief Get the default value of the parameter
      *

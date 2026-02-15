@@ -49,9 +49,6 @@ namespace settings
         [[nodiscard]] UISettings&       getUISettings();
         [[nodiscard]] const UISettings& getUISettings() const;
 
-        [[nodiscard]] UISettings&       getUISettings();
-        [[nodiscard]] const UISettings& getUISettings() const;
-
        private:
         auto _getParams() &;
         auto _getParams() const&;

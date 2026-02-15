@@ -39,14 +39,14 @@ namespace settings
         nlohmann::json toJson() const;
         static void    fromJson(const nlohmann::json& j, UISettings& settings);
 
+        [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
+        [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
+
        private:
         UISettings(std::string key, std::string title, std::string description);
 
         [[nodiscard]] auto _getParams() const&;
         [[nodiscard]] auto _getParams() &;
-
-        [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
-        [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
     };
 
 }   // namespace settings

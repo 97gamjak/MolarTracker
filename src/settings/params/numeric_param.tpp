@@ -28,6 +28,26 @@ namespace settings
     }
 
     /**
+     * @brief Construct a new NumericParam object with a description
+     *
+     * @tparam Derived
+     * @tparam T
+     * @param key
+     * @param title
+     * @param description
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    NumericParam<T>::NumericParam(
+        std::string key,
+        std::string title,
+        std::string description
+    )
+        : _core(std::move(key), std::move(title), std::move(description))
+    {
+    }
+
+    /**
      * @brief Get the value of the numeric parameter
      *
      * @note This function returns the ParamCore object which contains the value
