@@ -88,7 +88,7 @@ void to_json(nlohmann::json& j, const T& obj)
 template <JsonSerializable T>
 void from_json(const nlohmann::json& j, T& obj)
 {
-    obj.fromJson(j);
+    T::fromJson(j, obj);
 }
 
 #endif   // __JSON__TRAITS_HPP__
