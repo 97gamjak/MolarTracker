@@ -1,7 +1,48 @@
 #include "log_viewer_settings.hpp"
 
+#include "params/params.hpp"
+
 namespace settings
 {
+    /**
+     * @brief Construct a new LogViewerSettings::LogViewerSettings object
+     *
+     */
+    LogViewerSettings::LogViewerSettings()
+        : _core(
+              Schema::LOG_VIEWER_SETTINGS_KEY,
+              Schema::LOG_VIEWER_SETTINGS_TITLE,
+              Schema::LOG_VIEWER_SETTINGS_DESC
+          )
+    {
+        _reloadIntervalSec.setDefault(Schema::RELOAD_INTERVAL_SEC_DEFAULT);
+        _reloadIntervalSec.setMinValue(Schema::RELOAD_INTERVAL_SEC_MIN);
+        _reloadIntervalSec.setPrecision(Schema::RELOAD_INTERVAL_SEC_PRECISION);
+
+        _autoReload.setDefault(Schema::AUTO_RELOAD_DEFAULT);
+    }
+
+    /**
+     * @brief Get the parameters of LogViewerSettings as a tuple (const version)
+     *
+     * @return auto
+     */
+    auto LogViewerSettings::_getParams() const&
+    {
+        return std::tie(_reloadIntervalSec, _autoReload);
+    }
+
+    /**
+     * @brief Get the parameters of LogViewerSettings as a tuple (non-const
+     * version)
+     *
+     * @return auto
+     */
+    auto LogViewerSettings::_getParams() &
+    {
+        return std::tie(_reloadIntervalSec, _autoReload);
+    }
+
     /**
      * @brief Serialize LogViewerSettings to JSON
      *
@@ -9,26 +50,21 @@ namespace settings
      */
     nlohmann::json LogViewerSettings::toJson() const
     {
-        nlohmann::json jsonData;
-        jsonData[_reloadIntervalSecKey] = _reloadIntervalSec;
-        jsonData[_autoReloadKey]        = _autoReload;
-        return jsonData;
+        return paramsToJson(_getParams());
     }
 
     /**
      * @brief Deserialize LogViewerSettings from JSON
      *
-     * @param j
-     * @return settings::LogViewerSettings
+     * @param jsonData
+     * @param settings
      */
-    LogViewerSettings LogViewerSettings::fromJson(const nlohmann::json& j)
+    void LogViewerSettings::fromJson(
+        const nlohmann::json& jsonData,
+        LogViewerSettings&    settings
+    )
     {
-        LogViewerSettings settings;
-
-        _fromJsonReloadIntervalSec(j, settings);
-        _fromJsonAutoReload(j, settings);
-
-        return settings;
+        paramsFromJson(settings._getParams(), jsonData);
     }
 
     /**
@@ -38,47 +74,69 @@ namespace settings
      */
     double LogViewerSettings::getReloadIntervalSec() const
     {
-        return _reloadIntervalSec;
+        const auto interval = _reloadIntervalSec.get();
+        if (interval.has_value())
+            return interval.value();
+
+        // should not happen, but if it does, we should throw an exception to
+        // indicate that the value is not set, this is a critical error that
+        // should be handled by the caller
+        throw LogViewerSettingsException("Reload interval is not set");
     }
 
     /**
-     * @brief Check if auto reload is enabled
+     * @brief Get the auto-reload setting
      *
      * @return bool
      */
-    bool LogViewerSettings::isAutoReloadEnabled() const { return _autoReload; }
-
-    /**
-     * @brief Deserialize the reload interval from JSON
-     *
-     * @param jsonData
-     * @param settings
-     */
-    void LogViewerSettings::_fromJsonReloadIntervalSec(
-        const nlohmann::json& jsonData,
-        LogViewerSettings&    settings
-    )
+    bool LogViewerSettings::isAutoReloadEnabled() const
     {
-        const auto key          = _reloadIntervalSecKey;
-        const auto defaultValue = _DEFAULT_RELOAD_INTERVAL_SEC;
+        if (_autoReload.get().has_value())
+            return _autoReload.get().value();
 
-        settings._reloadIntervalSec = jsonData.value(key, defaultValue);
+        // should not happen, but if it does, we should throw an exception to
+        // indicate that the value is not set, this is a critical error that
+        // should be handled by the caller
+        throw LogViewerSettingsException("Auto-reload setting is not set");
     }
 
     /**
-     * @brief Deserialize the auto reload setting from JSON
+     * @brief Get the core parameter container of LogViewerSettings
      *
-     * @param jsonData
-     * @param settings
+     * @return ParamContainer&
      */
-    void LogViewerSettings::_fromJsonAutoReload(
-        const nlohmann::json& jsonData,
-        LogViewerSettings&    settings
-    )
-    {
-        const auto key          = _autoReloadKey;
-        const auto defaultValue = _DEFAULT_AUTO_RELOAD;
+    ParamContainer& LogViewerSettings::core() { return _core; }
 
-        settings._autoReload = jsonData.value(key, defaultValue);
+    /**
+     * @brief Get the core parameter container of LogViewerSettings (const
+     * version)
+     *
+     * @return const ParamContainer&
+     */
+    const ParamContainer& LogViewerSettings::core() const { return _core; }
+
+    /**
+     * @brief Construct a new
+     * LogViewerSettingsException::LogViewerSettingsException object
+     *
+     * @param message The exception message
+     */
+    LogViewerSettingsException::LogViewerSettingsException(std::string message)
+        : MolarTrackerException(std::move(message))
+    {
     }
+
+    /**
+     * @brief Get the exception message
+     *
+     * @return const char* The exception message
+     */
+    const char* LogViewerSettingsException::what() const noexcept
+    {
+        static const std::string prefix = "LogViewerSettingsException: ";
+        static std::string       fullMessage;
+        fullMessage = prefix + MolarTrackerException::what();
+        return fullMessage.c_str();
+    }
+
 }   // namespace settings

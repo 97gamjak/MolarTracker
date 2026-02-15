@@ -52,7 +52,7 @@ namespace ui
      */
     void EnsureProfileController::ensureProfileExists()
     {
-        const auto& settings = _appContext.getSettings();
+        const auto& settings = _appContext.getSettings().getGeneralSettings();
 
         if (settings.hasDefaultProfile())
             _defaultProfileExists();
@@ -69,10 +69,10 @@ namespace ui
     void EnsureProfileController::_defaultProfileExists()
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
-        auto& settings     = _appContext.getSettings();
+        auto& settings     = _appContext.getSettings().getGeneralSettings();
         auto* statusBar    = _mainWindow.statusBar();
 
-        const auto name = settings.getDefaultProfileName().value();
+        const auto name = settings.getDefaultProfile().value();
         if (!profileStore.profileExists(name))
         {
             // we unset the default profile name to prevent infinite loops in
@@ -80,7 +80,7 @@ namespace ui
             // reason. This way, the next time ensureProfileExists is called, it
             // will go through the _noDefaultProfile path instead of trying to
             // load the non-existent default profile again.
-            settings.unsetDefaultProfileName();
+            settings.unsetDefaultProfile();
 
             showWarningMessageBox(
                 "Default Profile Not Found",
@@ -157,7 +157,7 @@ namespace ui
     void EnsureProfileController::_relaunch()
     {
         const auto& profileStore = _appContext.getStore().getProfileStore();
-        const auto& settings     = _appContext.getSettings();
+        const auto& settings = _appContext.getSettings().getGeneralSettings();
 
         if (!settings.hasDefaultProfile() || !profileStore.hasActiveProfile() ||
             !profileStore.getActiveProfile().has_value())
@@ -284,7 +284,9 @@ namespace ui
                 _appContext.getStore().getProfileStore().setActiveProfile(
                     profileName
                 );
-                _appContext.getSettings().setDefaultProfileName(profileName);
+                _appContext.getSettings()
+                    .getGeneralSettings()
+                    .setDefaultProfile(profileName);
 
                 showInfoStatusBar(
                     LOG_INFO_OBJECT(

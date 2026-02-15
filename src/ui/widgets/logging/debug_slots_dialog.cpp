@@ -13,7 +13,6 @@
 
 #include "logging/log_manager.hpp"
 #include "logging/logging_base.hpp"
-#include "ui/main_window.hpp"
 #include "ui/widgets/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -199,7 +198,7 @@ namespace ui
             auto* combo = new QComboBox(_tree);
             combo->addItems(utils::toQStringList(LogLevelMeta::names));
 
-            const auto indexOpt = indexOfLogLevel(level);
+            const auto indexOpt = LogLevelMeta::index(level);
 
             if (!indexOpt.has_value())
                 LOG_ERROR(
