@@ -104,12 +104,19 @@ namespace ui
 
         if (_setAsDefault)
         {
-            _settings.setDefaultProfileName(_defaultProfileBeforeAdd);
+            auto& settings = _settings.getGeneralSettings();
 
-            const auto name =
-                _defaultProfileBeforeAdd.has_value()
-                    ? std::string{_defaultProfileBeforeAdd.value()}
-                    : "none";
+            std::string name;
+            if (_defaultProfileBeforeAdd.has_value())
+            {
+                settings.setDefaultProfile(_defaultProfileBeforeAdd.value());
+                name = _defaultProfileBeforeAdd.value();
+            }
+            else
+            {
+                settings.unsetDefaultProfile();
+                name = "none";
+            }
 
             const auto msg =
                 std::format("Default profile restored to '{}'", name);
@@ -174,8 +181,9 @@ namespace ui
 
         if (_setAsDefault)
         {
-            _defaultProfileBeforeAdd = _settings.getDefaultProfileName();
-            _settings.setDefaultProfileName(_profile.name);
+            auto& settings           = _settings.getGeneralSettings();
+            _defaultProfileBeforeAdd = settings.getDefaultProfile();
+            settings.setDefaultProfile(_profile.name);
             LOG_INFO(std::format("Default profile set to '{}'", _profile.name));
         }
 

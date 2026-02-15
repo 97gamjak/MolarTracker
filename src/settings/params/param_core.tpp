@@ -19,15 +19,36 @@ namespace settings
     }
 
     /**
+     * @brief Construct a new Param Core:: Param Core object
+     *
+     * @tparam T
+     * @param key
+     * @param title
+     * @param description
+     */
+    template <typename T>
+    ParamCore<T>::ParamCore(
+        const std::string& key,
+        const std::string& title,
+        const std::string& description
+    )
+        : _key(key), _title(title), _description(description)
+    {
+    }
+
+    /**
      * @brief Get the value of the parameter
      *
      * @tparam T
      * @return const T&
      */
     template <typename T>
-    const T& ParamCore<T>::get() const
+    const std::optional<T>& ParamCore<T>::get() const
     {
-        return _value;
+        if (_value.has_value())
+            return _value;
+
+        return _defaultValue;
     }
 
     /**
@@ -43,6 +64,18 @@ namespace settings
     }
 
     /**
+     * @brief Unset the value of the parameter, this will make get() return the
+     * default value if it exists
+     *
+     * @tparam T
+     */
+    template <typename T>
+    void ParamCore<T>::unset()
+    {
+        _value.reset();
+    }
+
+    /**
      * @brief Commit the current value as the baseline for dirty checking
      *
      * @tparam T
@@ -50,8 +83,7 @@ namespace settings
     template <typename T>
     void ParamCore<T>::commit()
     {
-        _baseLine    = _value;
-        _hasBaseLine = true;
+        _baseLine = _value;
     }
 
     /**
@@ -64,10 +96,10 @@ namespace settings
     template <typename T>
     bool ParamCore<T>::isDirty() const
     {
-        if (!_hasBaseLine)
+        if (!_baseLine.has_value() || !_value.has_value())
             return false;
 
-        return !_equals(_value, _baseLine);
+        return !_equals(_value.value(), _baseLine.value());
     }
 
     /**

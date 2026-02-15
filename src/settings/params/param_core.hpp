@@ -4,7 +4,7 @@
 #include <optional>
 #include <string>
 
-#include "nlohmann/json.hpp"   // IWYU pragma: keep for adl_serializer of std::optional<T>
+#include "nlohmann/json.hpp"
 
 namespace settings
 {
@@ -31,10 +31,8 @@ namespace settings
        private:
         using Schema = ParamCoreSchema;
 
-        T    _value{};
-        T    _baseLine{};
-        bool _hasBaseLine = false;
-
+        std::optional<T> _value        = std::nullopt;
+        std::optional<T> _baseLine     = std::nullopt;
         std::optional<T> _defaultValue = std::nullopt;
 
         std::string _key;
@@ -44,9 +42,15 @@ namespace settings
        public:
         ParamCore() = delete;
         ParamCore(const std::string& key, const std::string& title);
+        ParamCore(
+            const std::string& key,
+            const std::string& title,
+            const std::string& description
+        );
 
-        [[nodiscard]] const T& get() const;
-        void                   set(const T& value);
+        [[nodiscard]] const std::optional<T>& get() const;
+        void                                  set(const T& value);
+        void                                  unset();
 
         void commit();
 

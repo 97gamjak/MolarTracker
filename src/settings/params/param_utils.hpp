@@ -5,61 +5,6 @@
 
 #include "nlohmann/json.hpp"
 
-template <class Derived, class T>
-class ParamMixin;   // forward declaration
-
-template <class Derived>
-class ParamContainerMixin;   // forward declaration
-
-namespace settings::detail
-{
-    template <class D, class T>
-    std::true_type isParamMixinPtr(const ParamMixin<D, T>*);
-
-    template <class D>
-    std::true_type isParamContainerMixinPtr(const ParamContainerMixin<D>*);
-
-    std::false_type isParamMixinPtr(...);
-    std::false_type isParamContainerMixinPtr(...);
-
-    template <class U>
-    inline constexpr bool isParamMixin_v =
-        decltype(isParamMixinPtr(std::declval<const std::remove_cvref_t<U>*>())
-        )::value;
-
-    template <class U>
-    inline constexpr bool isParamContainerMixin_v =
-        decltype(isParamContainerMixinPtr(
-            std::declval<const std::remove_cvref_t<U>*>()
-        ))::value;
-}   // namespace settings::detail
-
-namespace settings
-{
-    template <class U>
-    concept ParamLike = settings::detail::isParamMixin_v<U> ||
-                        settings::detail::isParamContainerMixin_v<U>;
-}
-
-namespace settings
-{
-
-    template <settings::ParamLike P>
-    void to_json(nlohmann::json& j, const P& p)
-    {
-        j = p.toJson();
-    }
-
-    template <settings::ParamLike P>
-    void from_json(const nlohmann::json& j, P& p)
-    {
-        // TODO: implement json concept for classes
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-139
-        p.fromJson(j);
-    }
-
-}   // namespace settings
-
 namespace settings
 {
     /**

@@ -24,7 +24,10 @@ namespace settings
      *
      * @return auto
      */
-    auto GeneralSettings::_getParams() & { return std::tie(_version); }
+    auto GeneralSettings::_getParams() &
+    {
+        return std::tie(_version, _defaultProfile);
+    }
 
     /**
      * @brief Get the parameters of GeneralSettings as a tuple (non-const
@@ -32,7 +35,46 @@ namespace settings
      *
      * @return auto
      */
-    auto GeneralSettings::_getParams() const& { return std::tie(_version); }
+    auto GeneralSettings::_getParams() const&
+    {
+        return std::tie(_version, _defaultProfile);
+    }
+
+    /**
+     * @brief Set the default profile name
+     *
+     * @param profileName
+     */
+    void GeneralSettings::setDefaultProfile(const std::string& profileName)
+    {
+        _defaultProfile.set(profileName);
+    }
+
+    /**
+     * @brief Unset the default profile name
+     *
+     */
+    void GeneralSettings::unsetDefaultProfile() { _defaultProfile.unset(); }
+
+    /**
+     * @brief Get the default profile name
+     *
+     * @return std::optional<std::string>
+     */
+    std::optional<std::string> GeneralSettings::getDefaultProfile() const
+    {
+        return _defaultProfile.get();
+    }
+
+    /**
+     * @brief Check if a default profile name is set
+     *
+     * @return bool
+     */
+    bool GeneralSettings::hasDefaultProfile() const
+    {
+        return _defaultProfile.get().has_value();
+    }
 
     /**
      * @brief Get the core parameter container of GeneralSettings
@@ -71,6 +113,7 @@ namespace settings
     )
     {
         paramsFromJson(settings._getParams(), jsonData);
+        settings._savedVersion = settings._version.get();
     }
 
 }   // namespace settings

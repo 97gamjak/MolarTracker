@@ -26,19 +26,15 @@ namespace settings
     class Settings : public ParamContainerMixin<Settings>
     {
        private:
-        ParamContainer _core;
         using Schema = SettingsSchema;
+
+        ParamContainer _core;
 
         // clang-format off
         static constexpr const char* _settingsFileName = "settings.json";
-        static constexpr const char* _defaultProfileNameKey = "defaultProfileName";
         // clang-format on
 
-        std::filesystem::path      _settingsPath;
-        std::optional<std::string> _defaultProfileName = std::nullopt;
-
-        utils::SemVer _version;
-        utils::SemVer _oldVersion{utils::SemVer::getInvalidVersion()};
+        std::filesystem::path _settingsPath;
 
         GeneralSettings _generalSettings;
         UISettings      _uiSettings;
@@ -49,11 +45,11 @@ namespace settings
 
         void save() const;
 
-        void unsetDefaultProfileName();
-        void setDefaultProfileName(const std::optional<std::string>& name);
-        void setDefaultProfileName(const std::string& name);
-        [[nodiscard]] bool                       hasDefaultProfile() const;
-        [[nodiscard]] std::optional<std::string> getDefaultProfileName() const;
+        [[nodiscard]] GeneralSettings&       getGeneralSettings();
+        [[nodiscard]] const GeneralSettings& getGeneralSettings() const;
+
+        [[nodiscard]] UISettings&       getUISettings();
+        [[nodiscard]] const UISettings& getUISettings() const;
 
        private:
         auto _getParams() &;
@@ -61,9 +57,6 @@ namespace settings
 
         void _toJson() const;
         void _fromJson();
-
-        void _toJsonProfileName(nlohmann::json& jsonData) const;
-        void _fromJsonProfileName(const nlohmann::json& jsonData);
     };
 
 }   // namespace settings

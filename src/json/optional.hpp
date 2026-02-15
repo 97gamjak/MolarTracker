@@ -1,10 +1,11 @@
-#ifndef __CONFIG__JSON_HPP__
-#define __CONFIG__JSON_HPP__
+#ifndef __JSON__OPTIONAL_HPP__
+#define __JSON__OPTIONAL_HPP__
 
 #include <nlohmann/json.hpp>
 #include <optional>
 
 NLOHMANN_JSON_NAMESPACE_BEGIN
+
 /**
  * @brief Serializer for std::optional<T>
  *
@@ -43,4 +44,4 @@ struct adl_serializer<std::optional<T>>
 };
 NLOHMANN_JSON_NAMESPACE_END
 
-#endif   // __CONFIG__JSON_HPP__
+#endif   // __JSON__OPTIONAL_HPP__

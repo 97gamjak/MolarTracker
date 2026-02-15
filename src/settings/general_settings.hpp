@@ -17,16 +17,24 @@ namespace settings
     class GeneralSettingsSchema
     {
        public:
+        // General settings keys, titles, and descriptions
         static constexpr const char* GENERAL_SETTINGS_KEY = "generalSettings";
         static constexpr const char* GENERAL_SETTINGS_TITLE =
             "General Settings";
         static constexpr const char* GENERAL_SETTINGS_DESCRIPTION =
             "Settings related to the general behavior of the application.";
 
+        // Version setting keys, titles, and descriptions
         static constexpr const char* VERSION_KEY   = "version";
         static constexpr const char* VERSION_TITLE = "Version";
         static constexpr const char* VERSION_DESCRIPTION =
             "The current version of the application.";
+
+        // Default profile setting keys, titles, and descriptions
+        static constexpr const char* DEFAULT_PROFILE_KEY   = "defaultProfile";
+        static constexpr const char* DEFAULT_PROFILE_TITLE = "Default Profile";
+        static constexpr const char* DEFAULT_PROFILE_DESCRIPTION =
+            "The default profile to use when launching the application.";
     };
 
     /**
@@ -38,7 +46,16 @@ namespace settings
         using Schema = GeneralSettingsSchema;
         ParamContainer _core;
 
-        VersionParam _version{Schema::VERSION_KEY, Schema::VERSION_TITLE};
+        VersionParam _version{
+            Schema::VERSION_KEY,
+            Schema::VERSION_TITLE,
+            Schema::VERSION_DESCRIPTION
+        };
+        StringParam _defaultProfile{
+            Schema::DEFAULT_PROFILE_KEY,
+            Schema::DEFAULT_PROFILE_TITLE,
+            Schema::DEFAULT_PROFILE_DESCRIPTION
+        };
 
         std::optional<utils::SemVer> _currentVersion;
         std::optional<utils::SemVer> _savedVersion;
@@ -55,6 +72,11 @@ namespace settings
             const nlohmann::json& j,
             GeneralSettings&      settings
         );
+
+        void setDefaultProfile(const std::string& profileName);
+        void unsetDefaultProfile();
+        [[nodiscard]] std::optional<std::string> getDefaultProfile() const;
+        [[nodiscard]] bool                       hasDefaultProfile() const;
 
        private:
         [[nodiscard]] auto _getParams() const&;

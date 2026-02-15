@@ -9,6 +9,7 @@
 #include "param_error.hpp"             // IWYU pragma: export
 #include "param_mixin.hpp"             // IWYU pragma: export
 #include "param_utils.hpp"             // IWYU pragma: export
+#include "string_param.hpp"            // IWYU pragma: export
 #include "version_param.hpp"           // IWYU pragma: export
 
 #endif   // __SETTINGS__PARAMS__PARAMS_HPP__

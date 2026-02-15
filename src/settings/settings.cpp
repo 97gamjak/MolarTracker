@@ -21,8 +21,7 @@ namespace settings
      */
     Settings::Settings(const path& configDir)
         : _core{Schema::SETTINGS_KEY, Schema::SETTINGS_TITLE, Schema::SETTINGS_DESC},
-          _settingsPath{absolute(configDir / _settingsFileName)},
-          _version{utils::SemVer(Constants::getVersion())}
+          _settingsPath{absolute(configDir / _settingsFileName)}
     {
         _fromJson();
     }
@@ -54,51 +53,35 @@ namespace settings
     void Settings::save() const { _toJson(); }
 
     /**
-     * @brief Check if a default profile is set
+     * @brief Get the GeneralSettings object
      *
-     * @return true
-     * @return false
+     * @return GeneralSettings&
      */
-    bool Settings::hasDefaultProfile() const
+    GeneralSettings& Settings::getGeneralSettings() { return _generalSettings; }
+
+    /**
+     * @brief Get the GeneralSettings object (const version)
+     *
+     * @return const GeneralSettings&
+     */
+    const GeneralSettings& Settings::getGeneralSettings() const
     {
-        return _defaultProfileName.has_value();
+        return _generalSettings;
     }
 
     /**
-     * @brief Get the default profile name
+     * @brief Get the UISettings object
      *
-     * @return std::optional<std::string>
+     * @return UISettings&
      */
-    std::optional<std::string> Settings::getDefaultProfileName() const
-    {
-        return _defaultProfileName;
-    }
+    UISettings& Settings::getUISettings() { return _uiSettings; }
 
     /**
-     * @brief Unset the default profile name
+     * @brief Get the UISettings object (const version)
      *
+     * @return const UISettings&
      */
-    void Settings::unsetDefaultProfileName() { _defaultProfileName.reset(); }
-
-    /**
-     * @brief Set the default profile name
-     *
-     * @param name
-     */
-    void Settings::setDefaultProfileName(const std::optional<std::string>& name)
-    {
-        _defaultProfileName = name;
-    }
-
-    /**
-     * @brief Set the default profile name
-     *
-     * @param name
-     */
-    void Settings::setDefaultProfileName(const std::string& name)
-    {
-        _defaultProfileName = name;
-    }
+    const UISettings& Settings::getUISettings() const { return _uiSettings; }
 
     /**
      * @brief Serialize settings to JSON and save to file
@@ -106,13 +89,10 @@ namespace settings
      */
     void Settings::_toJson() const
     {
-        nlohmann::json jsonData = paramsToJson(_getParams());
-
-        _toJsonProfileName(jsonData);
-
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
         {
+            nlohmann::json jsonData = paramsToJson(_getParams());
             file << jsonData.dump(4);
             file.close();
         }
@@ -130,35 +110,10 @@ namespace settings
             nlohmann::json jsonData;
             file >> jsonData;
 
-            _fromJsonProfileName(jsonData);
-
             paramsFromJson(_getParams(), jsonData);
 
             file.close();
         }
-    }
-
-    /**
-     * @brief Serialize the default profile name to JSON
-     *
-     * @param jsonData
-     */
-    void Settings::_toJsonProfileName(nlohmann::json& jsonData) const
-    {
-        jsonData[_defaultProfileNameKey] = _defaultProfileName;
-    }
-
-    /**
-     * @brief Deserialize the default profile name from JSON
-     *
-     * @param jsonData
-     */
-    void Settings::_fromJsonProfileName(const nlohmann::json& jsonData)
-    {
-        const auto key          = _defaultProfileNameKey;
-        const auto defaultValue = _defaultProfileName;
-
-        _defaultProfileName = jsonData.value(key, defaultValue);
     }
 
 }   // namespace settings

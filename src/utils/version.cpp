@@ -7,12 +7,6 @@ namespace utils
     /**
      * @brief Construct a new Sem Ver:: Sem Ver object
      *
-     */
-    SemVer::SemVer() : _major(0), _minor(0), _patch(0), _isInvalid(true) {}
-
-    /**
-     * @brief Construct a new Sem Ver:: Sem Ver object
-     *
      * @param major
      * @param minor
      * @param patch

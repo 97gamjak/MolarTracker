@@ -22,7 +22,7 @@ namespace utils
         bool _isInvalid = false;
 
        public:
-        SemVer();
+        SemVer() = delete;
         explicit SemVer(
             std::size_t major,
             std::size_t minor,
