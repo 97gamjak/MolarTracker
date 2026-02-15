@@ -30,7 +30,7 @@ namespace settings
      */
     auto Settings::_getParams() &
     {
-        return std::tie(_uiSettings, _generalSettings);
+        return std::tie(_uiSettings, _generalSettings, _loggingSettings);
     }
 
     /**
@@ -40,7 +40,7 @@ namespace settings
      */
     auto Settings::_getParams() const&
     {
-        return std::tie(_uiSettings, _generalSettings);
+        return std::tie(_uiSettings, _generalSettings, _loggingSettings);
     }
 
     /**
@@ -79,6 +79,23 @@ namespace settings
      * @return const UISettings&
      */
     const UISettings& Settings::getUISettings() const { return _uiSettings; }
+
+    /**
+     * @brief Get the LoggingSettings object
+     *
+     * @return LoggingSettings&
+     */
+    LoggingSettings& Settings::getLoggingSettings() { return _loggingSettings; }
+
+    /**
+     * @brief Get the LoggingSettings object (const version)
+     *
+     * @return const LoggingSettings&
+     */
+    const LoggingSettings& Settings::getLoggingSettings() const
+    {
+        return _loggingSettings;
+    }
 
     /**
      * @brief Serialize settings to JSON and save to file

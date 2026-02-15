@@ -18,14 +18,14 @@ namespace app
     class AppContext
     {
        private:
-        settings::Settings _settings;
-        db::Database       _database;
-        RepoContainer      _repos;
-        ServiceContainer   _services;
-        StoreContainer     _store;
+        settings::Settings& _settings;
+        db::Database        _database;
+        RepoContainer       _repos;
+        ServiceContainer    _services;
+        StoreContainer      _store;
 
        public:
-        explicit AppContext();
+        explicit AppContext(settings::Settings& settings);
 
         AppContext(const AppContext&)            = delete;
         AppContext& operator=(const AppContext&) = delete;

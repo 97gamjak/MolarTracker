@@ -21,15 +21,13 @@ namespace settings
     class EnumParam : public ParamMixin<EnumParam<E>, E>
     {
        private:
+        friend ParamMixin<EnumParam<E>, E>;
         ParamCore<E> _core;
 
         using EnumMeta = mstd::enum_meta_t<E>;
         EnumParam(std::string key, std::string title);
 
        public:
-        [[nodiscard]] ParamCore<E>&       core();
-        [[nodiscard]] const ParamCore<E>& core() const;
-
         std::expected<void, ParamError> set(const E& value);
     };
 

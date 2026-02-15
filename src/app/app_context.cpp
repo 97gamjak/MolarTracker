@@ -10,8 +10,8 @@ namespace app
      * @brief Construct a new App Context:: App Context object
      *
      */
-    AppContext::AppContext()
-        : _settings{Constants::getInstance().getConfigPath()},
+    AppContext::AppContext(settings::Settings& settings)
+        : _settings{settings},
           _database{Constants::getInstance().getDatabasePath()},
           _repos{_database},
           _services{_repos},

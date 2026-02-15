@@ -7,34 +7,6 @@
 namespace settings
 {
     /**
-     * @brief Get the value of the enum parameter
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const T&
-     */
-    template <typename E>
-    requires std::is_enum_v<E>
-    const ParamCore<E>& EnumParam<E>::core() const
-    {
-        return _core;
-    }
-
-    /**
-     * @brief Get the value of the enum parameter
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return ParamCore<T>&
-     */
-    template <typename E>
-    requires std::is_enum_v<E>
-    ParamCore<E>& EnumParam<E>::core()
-    {
-        return _core;
-    }
-
-    /**
      * @brief Set the value of the enum parameter
      *
      * @tparam Derived

@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "nlohmann/json.hpp"
+
 namespace settings
 {
     /**

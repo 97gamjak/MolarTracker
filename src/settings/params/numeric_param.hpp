@@ -35,8 +35,9 @@ namespace settings
     {
        private:
         using Schema = NumericParamSchema;
+        friend ParamMixin<NumericParam<T>, T>;
+        ParamCore<T> _core;
 
-        ParamCore<T>     _core;
         std::optional<T> _minValue = std::nullopt;
         std::optional<T> _maxValue = std::nullopt;
 
@@ -51,9 +52,6 @@ namespace settings
             std::string title,
             std::string description
         );
-
-        [[nodiscard]] ParamCore<T>&       core();
-        [[nodiscard]] const ParamCore<T>& core() const;
 
         std::expected<void, ParamError> set(const T& value);
         void setLimits(const T& minValue, const T& maxValue);
