@@ -18,6 +18,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add generalized `Param...` handling for settings
 - Add `lineWrap` settings for log viewer dialog
 - Add variable to check if reboot is required to `ParamCore`
+- Add settings for ring file logging
 
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
