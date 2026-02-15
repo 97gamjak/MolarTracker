@@ -96,7 +96,7 @@ namespace settings
     template <typename T>
     bool ParamCore<T>::isDirty() const
     {
-        if (!_baseLine.has_value() || !_value.has_value())
+        if (!_baseLine.has_value() && !_value.has_value())
             return false;
 
         if (_value.has_value() && !_baseLine.has_value())
