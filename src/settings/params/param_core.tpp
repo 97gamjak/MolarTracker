@@ -1,6 +1,12 @@
 #ifndef __SETTINGS__PARAM_CORE_TPP__
 #define __SETTINGS__PARAM_CORE_TPP__
 
+#include <cmath>
+#include <concepts>
+#include <limits>
+#include <optional>
+#include <string>
+
 #include "param_core.hpp"
 
 namespace settings
