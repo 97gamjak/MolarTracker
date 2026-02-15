@@ -61,6 +61,7 @@ namespace ui
         void _resetDefaultDebugFlags();
         void _applyDebugFlagChanges(const LogCategoryMap& categories);
         void _applyDebugFlagChangesAndClose(const LogCategoryMap& categories);
+        void _applyLogViewerSettings();
     };
 
 }   // namespace ui

@@ -1,6 +1,12 @@
 #ifndef __SETTINGS__PARAM_CORE_TPP__
 #define __SETTINGS__PARAM_CORE_TPP__
 
+#include <cmath>
+#include <concepts>
+#include <limits>
+#include <optional>
+#include <string>
+
 #include "param_core.hpp"
 
 namespace settings
@@ -96,7 +102,7 @@ namespace settings
     template <typename T>
     bool ParamCore<T>::isDirty() const
     {
-        if (!_baseLine.has_value() || !_value.has_value())
+        if (!_baseLine.has_value() && !_value.has_value())
             return false;
 
         if (_value.has_value() && !_baseLine.has_value())
@@ -218,7 +224,7 @@ namespace settings
         param._description =
             jsonData.at(Schema::DESCRIPTION_KEY).get<std::string>();
 
-        param._value = jsonData.at(Schema::VALUE_KEY).get<T>();
+        param._value = jsonData.at(Schema::VALUE_KEY).get<std::optional<T>>();
         param._defaultValue =
             jsonData.at(Schema::DEFAULT_KEY).get<std::optional<T>>();
     }

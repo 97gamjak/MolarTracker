@@ -154,11 +154,7 @@ namespace ui
         if (_logViewerDialog != nullptr)
             return;
 
-        const auto& settings =
-            _appContext.getSettings().getUISettings().getLogViewerSettings();
-
-        _logViewerSettings.setAutoReload(settings.isAutoReloadEnabled());
-        _logViewerSettings.setIntervalSec(settings.getReloadIntervalSec());
+        _applyLogViewerSettings();
 
         _logViewerDialog =
             new LogViewerDialog{_logViewerSettings, &_mainWindow};
@@ -224,6 +220,16 @@ namespace ui
     {
         _applyDebugFlagChanges(categories);
         _debugSlotsDialog->accept();
+    }
+
+    void DebugMenuController::_applyLogViewerSettings()
+    {
+        const auto& settings =
+            _appContext.getSettings().getUISettings().getLogViewerSettings();
+
+        _logViewerSettings.setAutoReload(settings.isAutoReloadEnabled());
+        _logViewerSettings.setIntervalSec(settings.getReloadIntervalSec());
+        _logViewerSettings.setLineWrap(settings.isLineWrapEnabled());
     }
 
 }   // namespace ui
