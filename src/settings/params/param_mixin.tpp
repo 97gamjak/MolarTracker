@@ -101,6 +101,35 @@ namespace settings
     }
 
     /**
+     * @brief Check if changing this parameter requires a reboot
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return true if a reboot is required for changes to take effect, false
+     * otherwise
+     */
+    template <typename Derived, typename T>
+    bool ParamMixin<Derived, T>::isRebootRequired() const
+    {
+        return _self().core().isRebootRequired();
+    }
+
+    /**
+     * @brief Set whether changing this parameter requires a reboot, this can be
+     * used to inform the user that they need to restart the application for
+     * changes to take effect
+     *
+     * @tparam Derived
+     * @tparam T
+     * @param required
+     */
+    template <typename Derived, typename T>
+    void ParamMixin<Derived, T>::setRebootRequired(bool required)
+    {
+        _self().core().setRebootRequired(required);
+    }
+
+    /**
      * @brief Get the derived object
      *
      * @tparam Derived

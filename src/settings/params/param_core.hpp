@@ -43,6 +43,8 @@ namespace settings
         std::string _title;
         std::string _description;
 
+        bool _isRebootRequired = false;
+
        public:
         ParamCore() = delete;
         ParamCore(const std::string& key, const std::string& title);
@@ -68,6 +70,9 @@ namespace settings
 
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
+
+        void               setRebootRequired(bool required);
+        [[nodiscard]] bool isRebootRequired() const;
 
         [[nodiscard]] nlohmann::json toJson() const;
         static void fromJson(const nlohmann::json& j, ParamCore<T>& param);

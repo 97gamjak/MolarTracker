@@ -29,6 +29,9 @@ namespace settings
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
 
+        [[nodiscard]] bool isRebootRequired() const;
+        void               setRebootRequired(bool required);
+
        private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;
