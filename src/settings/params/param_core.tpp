@@ -99,6 +99,12 @@ namespace settings
         if (!_baseLine.has_value() || !_value.has_value())
             return false;
 
+        if (_value.has_value() && !_baseLine.has_value())
+            return true;
+
+        if (_baseLine.has_value() && !_value.has_value())
+            return true;
+
         return !_equals(_value.value(), _baseLine.value());
     }
 
