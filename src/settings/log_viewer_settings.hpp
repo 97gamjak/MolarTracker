@@ -63,8 +63,9 @@ namespace settings
     class LogViewerSettings : public ParamContainerMixin<LogViewerSettings>
     {
        private:
-        ParamContainer _core;
         using Schema = LogViewerSettingsSchema;
+        friend ParamContainerMixin<LogViewerSettings>;
+        ParamContainer _core;
 
         NumericParam<double> _reloadIntervalSec{
             Schema::RELOAD_INTERVAL_SEC_KEY,
@@ -84,9 +85,6 @@ namespace settings
 
        public:
         LogViewerSettings();
-
-        [[nodiscard]] ParamContainer&       core();
-        [[nodiscard]] const ParamContainer& core() const;
 
         [[nodiscard]] nlohmann::json toJson() const;
 

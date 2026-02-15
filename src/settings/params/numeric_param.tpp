@@ -70,34 +70,6 @@ namespace settings
     }
 
     /**
-     * @brief Get the value of the numeric parameter
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const T&
-     */
-    template <typename T>
-    requires(std::integral<T> || std::floating_point<T>)
-    const ParamCore<T>& NumericParam<T>::core() const
-    {
-        return _core;
-    }
-
-    /**
-     * @brief Get the value of the numeric parameter
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return ParamCore<T>&
-     */
-    template <typename T>
-    requires(std::integral<T> || std::floating_point<T>)
-    ParamCore<T>& NumericParam<T>::core()
-    {
-        return _core;
-    }
-
-    /**
      * @brief Set the value of the numeric parameter, this function checks if
      * the value is within the specified range before setting it, if the value
      * is out of range, an error is returned in the std::expected return type
@@ -257,7 +229,7 @@ namespace settings
     requires(std::integral<T> || std::floating_point<T>)
     nlohmann::json NumericParam<T>::toJson() const
     {
-        auto jsonData                   = core().toJson();
+        auto jsonData                   = _core.toJson();
         jsonData[Schema::MIN_VALUE_KEY] = _minValue;
         jsonData[Schema::MAX_VALUE_KEY] = _maxValue;
         jsonData[Schema::PRECISION_KEY] = _precision;
@@ -278,7 +250,7 @@ namespace settings
         NumericParam<T>&      param
     )
     {
-        ParamCore<T>::fromJson(jsonData, param.core());
+        ParamCore<T>::fromJson(jsonData, param._core);
 
         param._minValue =
             jsonData[Schema::MIN_VALUE_KEY].get<std::optional<T>>();

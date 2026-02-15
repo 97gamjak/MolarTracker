@@ -2,6 +2,7 @@
 #define __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
 
 #include "param_container_mixin.hpp"
+#include "param_utils.hpp"
 
 namespace settings
 {
@@ -14,7 +15,7 @@ namespace settings
     template <typename Derived>
     const std::string& ParamContainerMixin<Derived>::getKey() const
     {
-        return _self().core().getKey();
+        return _self()._core.getKey();
     }
 
     /**
@@ -26,7 +27,7 @@ namespace settings
     template <typename Derived>
     const std::string& ParamContainerMixin<Derived>::getTitle() const
     {
-        return _self().core().getTitle();
+        return _self()._core.getTitle();
     }
 
     /**
@@ -38,7 +39,7 @@ namespace settings
     template <typename Derived>
     const std::string& ParamContainerMixin<Derived>::getDescription() const
     {
-        return _self().core().getDescription();
+        return _self()._core.getDescription();
     }
 
     /**

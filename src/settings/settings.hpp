@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "general_settings.hpp"
+#include "logging_settings.hpp"
 #include "params/params.hpp"
 #include "ui_settings.hpp"
 
@@ -35,6 +36,7 @@ namespace settings
 
         GeneralSettings _generalSettings;
         UISettings      _uiSettings;
+        LoggingSettings _loggingSettings;
 
        public:
         Settings() = delete;
@@ -48,6 +50,9 @@ namespace settings
 
         [[nodiscard]] UISettings&       getUISettings();
         [[nodiscard]] const UISettings& getUISettings() const;
+
+        [[nodiscard]] LoggingSettings&       getLoggingSettings();
+        [[nodiscard]] const LoggingSettings& getLoggingSettings() const;
 
        private:
         auto _getParams() &;

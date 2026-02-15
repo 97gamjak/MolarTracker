@@ -4,6 +4,7 @@
 
 #include "log_object.hpp"
 #include "logging_base.hpp"
+#include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
 #include "utils/timestamp.hpp"
 
@@ -30,18 +31,18 @@ LogManager::LogManager() { _categories = getDefaultCategories(); }
  * @param directory Directory where the log files will be stored
  */
 void LogManager::initializeRingFileLogger(
-    const std::filesystem::path& directory
+    const settings::LoggingSettings& settings,
+    const std::filesystem::path&     directory
 )
 {
     RingFile::Config config;
-    _logDirectory    = directory / "logs";
-    config.directory = _logDirectory;
-    config.baseName  = "molar_tracker_" + Timestamp::fileSafe();
-    config.extension = ".log";
 
-    // TODO(97gamjak): add here all possible logging stuff including name of the
-    // file!
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-83
+    config.directory = directory / settings.getLogDirectory();
+    config.baseName  = settings.getLogFilePrefix() + Timestamp::fileSafe();
+    config.extension = settings.getLogFileSuffix();
+    config.maxFiles  = settings.getMaxLogFiles();
+    config.maxSizeMB = settings.getMaxLogFileSizeMB();
+
     _ringFile = RingFile(config);
 }
 

@@ -3,6 +3,7 @@ add_library(molartracker_settings STATIC
     ui_settings.cpp
     log_viewer_settings.cpp
     general_settings.cpp
+    logging_settings.cpp
 )
 
 add_subdirectory(params)

@@ -119,21 +119,6 @@ namespace settings
     }
 
     /**
-     * @brief Get the core parameter container of LogViewerSettings
-     *
-     * @return ParamContainer&
-     */
-    ParamContainer& LogViewerSettings::core() { return _core; }
-
-    /**
-     * @brief Get the core parameter container of LogViewerSettings (const
-     * version)
-     *
-     * @return const ParamContainer&
-     */
-    const ParamContainer& LogViewerSettings::core() const { return _core; }
-
-    /**
      * @brief Construct a new
      * LogViewerSettingsException::LogViewerSettingsException object
      *

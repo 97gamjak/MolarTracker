@@ -44,6 +44,7 @@ namespace settings
     {
        private:
         using Schema = GeneralSettingsSchema;
+        friend ParamContainerMixin<GeneralSettings>;
         ParamContainer _core;
 
         VersionParam _version{
@@ -62,9 +63,6 @@ namespace settings
 
        public:
         GeneralSettings();
-
-        [[nodiscard]] ParamContainer&       core();
-        [[nodiscard]] const ParamContainer& core() const;
 
         [[nodiscard]] nlohmann::json toJson() const;
 

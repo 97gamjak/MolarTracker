@@ -17,7 +17,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::optional<T>& ParamMixin<Derived, T>::get() const
     {
-        return _self().core().get();
+        return _self()._core.get();
     }
 
     /**
@@ -30,7 +30,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::optional<T>& ParamMixin<Derived, T>::getDefault() const
     {
-        return _self().core().getDefault();
+        return _self()._core.getDefault();
     }
 
     /**
@@ -45,7 +45,7 @@ namespace settings
         const std::optional<T>& defaultValue
     )
     {
-        _self().core().setDefault(defaultValue);
+        _self()._core.setDefault(defaultValue);
     }
 
     /**
@@ -58,7 +58,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getKey() const
     {
-        return _self().core().getKey();
+        return _self()._core.getKey();
     }
 
     /**
@@ -71,7 +71,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getTitle() const
     {
-        return _self().core().getTitle();
+        return _self()._core.getTitle();
     }
 
     /**
@@ -84,7 +84,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getDescription() const
     {
-        return _self().core().getDescription();
+        return _self()._core.getDescription();
     }
 
     /**
@@ -97,7 +97,7 @@ namespace settings
     template <typename Derived, typename T>
     void ParamMixin<Derived, T>::setDescription(const std::string& description)
     {
-        _self().core().setDescription(description);
+        _self()._core.setDescription(description);
     }
 
     /**
@@ -111,7 +111,7 @@ namespace settings
     template <typename Derived, typename T>
     bool ParamMixin<Derived, T>::isRebootRequired() const
     {
-        return _self().core().isRebootRequired();
+        return _self()._core.isRebootRequired();
     }
 
     /**
@@ -126,7 +126,7 @@ namespace settings
     template <typename Derived, typename T>
     void ParamMixin<Derived, T>::setRebootRequired(bool required)
     {
-        _self().core().setRebootRequired(required);
+        _self()._core.setRebootRequired(required);
     }
 
     /**

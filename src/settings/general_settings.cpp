@@ -78,21 +78,6 @@ namespace settings
     }
 
     /**
-     * @brief Get the core parameter container of GeneralSettings
-     *
-     * @return ParamContainer&
-     */
-    ParamContainer& GeneralSettings::core() { return _core; }
-
-    /**
-     * @brief Get the core parameter container of GeneralSettings (const
-     * version)
-     *
-     * @return const ParamContainer&
-     */
-    const ParamContainer& GeneralSettings::core() const { return _core; }
-
-    /**
      * @brief Serialize GeneralSettings to JSON
      *
      * @return nlohmann::json

@@ -7,10 +7,15 @@
 
 #include "utils/ring_file.hpp"
 
-enum class LogLevel : size_t;
-enum class LogCategory : size_t;
+enum class LogLevel : size_t;      // forward declaration
+enum class LogCategory : size_t;   // forward declaration
 
-struct LogObject;
+struct LogObject;   // forward declaration
+
+namespace settings
+{
+    class LoggingSettings;   // forward declaration
+}
 
 /**
  * @brief Singleton class managing logging categories and levels
@@ -26,7 +31,10 @@ class LogManager
    public:
     static LogManager& getInstance();
 
-    void initializeRingFileLogger(const std::filesystem::path& directory);
+    void initializeRingFileLogger(
+        const settings::LoggingSettings& settings,
+        const std::filesystem::path&     directory
+    );
     void changeLogLevel(const LogCategory& category, const LogLevel& level);
     bool isEnabled(const LogCategory& category, const LogLevel& level) const;
     void flush();
