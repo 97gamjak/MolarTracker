@@ -36,9 +36,8 @@ namespace ui
         resize(900, 600);
 
         _textEdit->setReadOnly(true);
-        // TODO(97gamjak): maybe this should be configurable
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-103
-        _textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+        _textEdit->setLineWrapMode(_settings.getLineWrapMode());
         _textEdit->setMaximumBlockCount(50000);
 
         _autoReloadCheckBox->setChecked(_settings.isAutoReloadEnabled());
@@ -211,6 +210,28 @@ namespace ui
     bool LogViewerDialog::Settings::isAutoReloadEnabled() const
     {
         return _autoReload;
+    }
+
+    /**
+     * @brief Enable or disable line wrap
+     *
+     * @param enabled
+     */
+    void LogViewerDialog::Settings::setLineWrap(bool enabled)
+    {
+        _lineWrap =
+            enabled ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap;
+    }
+
+    /**
+     * @brief Get the line wrap mode
+     *
+     * @return QPlainTextEdit::LineWrapMode
+     */
+    QPlainTextEdit::LineWrapMode LogViewerDialog::Settings::getLineWrapMode(
+    ) const
+    {
+        return _lineWrap;
     }
 
 }   // namespace ui

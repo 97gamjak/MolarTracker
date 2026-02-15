@@ -39,12 +39,22 @@ namespace settings
         static constexpr const char* AUTO_RELOAD_KEY = "autoReload";
         static constexpr const char* AUTO_RELOAD_TITLE =
             "Automatic Reloading Log File";
-        static constexpr const char* AUTO_RELOAD_DESCRIPTION =
+        static constexpr const char* AUTO_RELOAD_DESC =
             "Enable or disable automatic reloading of the log file. When "
             "enabled, the log viewer will automatically reload the log file at "
             "the specified interval. When disabled, the log viewer will only "
             "reload the log file when the user manually triggers a reload.";
         static constexpr bool AUTO_RELOAD_DEFAULT = false;
+
+        // line wrap keys and metadata
+        static constexpr const char* LINE_WRAP_KEY   = "lineWrap";
+        static constexpr const char* LINE_WRAP_TITLE = "Line Wrap";
+        static constexpr const char* LINE_WRAP_DESC =
+            "Enable or disable line wrapping in the log viewer. When enabled, "
+            "long lines will be wrapped to fit the width of the log viewer. "
+            "When disabled, long lines will be displayed on a single line and "
+            "may require horizontal scrolling to view the entire line.";
+        static constexpr bool LINE_WRAP_DEFAULT = false;
     };
 
     /**
@@ -64,7 +74,12 @@ namespace settings
         BoolParam _autoReload{
             Schema::AUTO_RELOAD_KEY,
             Schema::AUTO_RELOAD_TITLE,
-            Schema::AUTO_RELOAD_DESCRIPTION
+            Schema::AUTO_RELOAD_DESC
+        };
+        BoolParam _lineWrap{
+            Schema::LINE_WRAP_KEY,
+            Schema::LINE_WRAP_TITLE,
+            Schema::LINE_WRAP_DESC
         };
 
        public:
@@ -82,6 +97,7 @@ namespace settings
 
         [[nodiscard]] double getReloadIntervalSec() const;
         [[nodiscard]] bool   isAutoReloadEnabled() const;
+        [[nodiscard]] bool   isLineWrapEnabled() const;
 
        private:
         [[nodiscard]] auto _getParams() const&;

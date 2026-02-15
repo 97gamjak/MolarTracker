@@ -20,6 +20,8 @@ namespace settings
         _reloadIntervalSec.setPrecision(Schema::RELOAD_INTERVAL_SEC_PRECISION);
 
         _autoReload.setDefault(Schema::AUTO_RELOAD_DEFAULT);
+
+        _lineWrap.setDefault(Schema::LINE_WRAP_DEFAULT);
     }
 
     /**
@@ -29,7 +31,7 @@ namespace settings
      */
     auto LogViewerSettings::_getParams() const&
     {
-        return std::tie(_reloadIntervalSec, _autoReload);
+        return std::tie(_reloadIntervalSec, _autoReload, _lineWrap);
     }
 
     /**
@@ -40,7 +42,7 @@ namespace settings
      */
     auto LogViewerSettings::_getParams() &
     {
-        return std::tie(_reloadIntervalSec, _autoReload);
+        return std::tie(_reloadIntervalSec, _autoReload, _lineWrap);
     }
 
     /**
@@ -98,6 +100,22 @@ namespace settings
         // indicate that the value is not set, this is a critical error that
         // should be handled by the caller
         throw LogViewerSettingsException("Auto-reload setting is not set");
+    }
+
+    /**
+     * @brief Get the line wrap setting
+     *
+     * @return bool
+     */
+    bool LogViewerSettings::isLineWrapEnabled() const
+    {
+        if (_lineWrap.get().has_value())
+            return _lineWrap.get().value();
+
+        // should not happen, but if it does, we should throw an exception to
+        // indicate that the value is not set, this is a critical error that
+        // should be handled by the caller
+        throw LogViewerSettingsException("Line wrap setting is not set");
     }
 
     /**
