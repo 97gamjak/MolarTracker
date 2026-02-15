@@ -218,7 +218,7 @@ namespace settings
         param._description =
             jsonData.at(Schema::DESCRIPTION_KEY).get<std::string>();
 
-        param._value = jsonData.at(Schema::VALUE_KEY).get<T>();
+        param._value = jsonData.at(Schema::VALUE_KEY).get<std::optional<T>>();
         param._defaultValue =
             jsonData.at(Schema::DEFAULT_KEY).get<std::optional<T>>();
     }
