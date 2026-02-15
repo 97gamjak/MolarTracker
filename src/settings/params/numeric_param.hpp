@@ -5,12 +5,15 @@
 #include <optional>
 
 #include "param_core.hpp"
+#include "param_error.hpp"
 #include "param_mixin.hpp"
 
 namespace settings
 {
-    class ParamError;   // Forward declaration
-
+    /**
+     * @brief Schema for numeric parameters, this struct defines the keys for
+     * the JSON representation of numeric parameters
+     */
     class NumericParamSchema
     {
        public:

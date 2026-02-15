@@ -9,6 +9,10 @@
 namespace settings
 {
 
+    /**
+     * @brief Schema for a setting parameter, this struct defines the keys for
+     * the JSON representation of a setting parameter
+     */
     class ParamCoreSchema
     {
        public:

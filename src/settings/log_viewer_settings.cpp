@@ -21,10 +21,6 @@ namespace settings
         _reloadIntervalSec.setPrecision(Schema::RELOAD_INTERVAL_SEC_PRECISION);
     }
 
-    ParamContainer& LogViewerSettings::core() { return _core; }
-
-    const ParamContainer& LogViewerSettings::core() const { return _core; }
-
     /**
      * @brief Get the parameters of LogViewerSettings as a tuple (const version)
      *
@@ -69,4 +65,20 @@ namespace settings
     {
         paramsFromJson(settings._getParams(), jsonData);
     }
+
+    /**
+     * @brief Get the core parameter container of LogViewerSettings
+     *
+     * @return ParamContainer&
+     */
+    ParamContainer& LogViewerSettings::core() { return _core; }
+
+    /**
+     * @brief Get the core parameter container of LogViewerSettings (const
+     * version)
+     *
+     * @return const ParamContainer&
+     */
+    const ParamContainer& LogViewerSettings::core() const { return _core; }
+
 }   // namespace settings

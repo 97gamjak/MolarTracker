@@ -5,6 +5,15 @@
 
 namespace settings
 {
+    /**
+     * @brief Mixin class for parameter containers, this class provides common
+     * functionality for all parameter containers, such as getting the key,
+     * title, and description of the container. It is intended to be used as a
+     * base class for specific parameter container classes like GeneralSettings
+     * and UISettings.
+     *
+     * @tparam Derived The derived class that inherits from this mixin
+     */
     template <typename Derived>
     class ParamContainerMixin
     {

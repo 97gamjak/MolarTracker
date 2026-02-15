@@ -46,6 +46,13 @@ namespace settings
         );
     }
 
+    /**
+     * @brief Serialize a tuple of parameters to JSON
+     *
+     * @tparam Tuple
+     * @param tuple
+     * @return nlohmann::json
+     */
     template <typename Tuple>
     constexpr nlohmann::json paramsToJson(Tuple&& tuple)
     {
@@ -59,6 +66,13 @@ namespace settings
         return jsonData;
     }
 
+    /**
+     * @brief Deserialize a tuple of parameters from JSON
+     *
+     * @tparam Tuple
+     * @param tuple
+     * @param jsonData
+     */
     template <typename Tuple>
     constexpr void paramsFromJson(Tuple&& tuple, const nlohmann::json& jsonData)
     {

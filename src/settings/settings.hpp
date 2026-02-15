@@ -2,13 +2,10 @@
 #define __SETTINGS__SETTINGS_HPP__
 
 #include <filesystem>
-#include <optional>
-#include <string>
 
 #include "general_settings.hpp"
 #include "params/params.hpp"
 #include "ui_settings.hpp"
-#include "utils/version.hpp"
 
 namespace settings
 {
