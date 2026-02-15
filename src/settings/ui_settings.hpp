@@ -44,6 +44,9 @@ namespace settings
 
         [[nodiscard]] auto _getParams() const&;
         [[nodiscard]] auto _getParams() &;
+
+        [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
+        [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
     };
 
 }   // namespace settings

@@ -44,10 +44,14 @@ namespace settings
         ParamContainer _core;
         using Schema = LogViewerSettingsSchema;
 
-        NumericParam<double> _reloadIntervalSec{
+        NumericParam<double> _reloadIntervalSec
+        {
             Schema::RELOAD_INTERVAL_SEC_KEY,
+                static constexpr const char* _autoReloadKey = "autoReload";
+            static constexpr bool            _DEFAULT_AUTO_RELOAD = false;
             Schema::RELOAD_INTERVAL_SEC_TITLE
-        };
+        }
+        bool _autoReload = _DEFAULT_AUTO_RELOAD;
 
        public:
         LogViewerSettings();
@@ -65,6 +69,19 @@ namespace settings
        private:
         [[nodiscard]] auto _getParams() const&;
         [[nodiscard]] auto _getParams() &;
+
+        [[nodiscard]] double getReloadIntervalSec() const;
+        [[nodiscard]] bool   isAutoReloadEnabled() const;
+
+       private:
+        static void _fromJsonReloadIntervalSec(
+            const nlohmann::json& jsonData,
+            LogViewerSettings&    settings
+        );
+        static void _fromJsonAutoReload(
+            const nlohmann::json& jsonData,
+            LogViewerSettings&    settings
+        );
     };
 
 }   // namespace settings

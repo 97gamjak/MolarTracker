@@ -56,4 +56,25 @@ namespace settings
     {
         paramsFromJson(settings._getParams(), jsonData);
     }
+
+    /**
+     * @brief Get the LogViewerSettings object
+     *
+     * @return LogViewerSettings&
+     */
+    LogViewerSettings& UISettings::getLogViewerSettings()
+    {
+        return _logViewerSettings;
+    }
+
+    /**
+     * @brief Get the LogViewerSettings object (const version)
+     *
+     * @return const LogViewerSettings&
+     */
+    const LogViewerSettings& UISettings::getLogViewerSettings() const
+    {
+        return _logViewerSettings;
+    }
+
 }   // namespace settings

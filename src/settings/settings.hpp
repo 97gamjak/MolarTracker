@@ -42,8 +42,12 @@ namespace settings
 
         void save() const;
 
+       public:   // getters and setters
         [[nodiscard]] GeneralSettings&       getGeneralSettings();
         [[nodiscard]] const GeneralSettings& getGeneralSettings() const;
+
+        [[nodiscard]] UISettings&       getUISettings();
+        [[nodiscard]] const UISettings& getUISettings() const;
 
         [[nodiscard]] UISettings&       getUISettings();
         [[nodiscard]] const UISettings& getUISettings() const;

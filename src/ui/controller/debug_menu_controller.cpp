@@ -151,10 +151,18 @@ namespace ui
      */
     void DebugMenuController::_ensureLogViewerDialog()
     {
-        if (_logViewerDialog)
+        if (_logViewerDialog != nullptr)
             return;
 
-        _logViewerDialog = new LogViewerDialog{&_mainWindow};
+        const auto& settings =
+            _appContext.getSettings().getUISettings().getLogViewerSettings();
+
+        _logViewerSettings.setAutoReload(settings.isAutoReloadEnabled());
+        _logViewerSettings.setIntervalSec(settings.getReloadIntervalSec());
+
+        _logViewerDialog =
+            new LogViewerDialog{_logViewerSettings, &_mainWindow};
+
         _logViewerDialog->setModal(false);
     }
 

@@ -49,6 +49,7 @@ namespace settings
      */
     nlohmann::json LogViewerSettings::toJson() const
     {
+        jsonData[_autoReloadKey] = _autoReload;
         return paramsToJson(_getParams());
     }
 

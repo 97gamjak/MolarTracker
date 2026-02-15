@@ -20,14 +20,19 @@ namespace ui
     {
         Q_OBJECT
 
+       public:
+        class Settings;
+
        private:
+        Settings& _settings;
+
         QPlainTextEdit* _textEdit;
         QPushButton*    _reloadButton;
         QCheckBox*      _autoReloadCheckBox;
         QTimer*         _reloadTimer;
 
        public:
-        explicit LogViewerDialog(QWidget* parent = nullptr);
+        explicit LogViewerDialog(Settings& settings, QWidget* parent = nullptr);
 
        protected:
         void hideEvent(QHideEvent* event) override;
@@ -39,6 +44,24 @@ namespace ui
 
        private:
         void _loadLogFile();
+    };
+
+    /**
+     * @brief Settings for LogViewerDialog
+     *
+     */
+    class LogViewerDialog::Settings
+    {
+       private:
+        int  _reloadIntervalMs = 1000;
+        bool _autoReload       = false;
+
+       public:
+        void              setIntervalSec(double intervalSec);
+        [[nodiscard]] int getIntervalMs() const;
+
+        void               setAutoReload(bool enabled);
+        [[nodiscard]] bool isAutoReloadEnabled() const;
     };
 
 }   // namespace ui
