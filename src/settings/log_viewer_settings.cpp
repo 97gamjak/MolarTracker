@@ -134,8 +134,9 @@ namespace settings
     const char* LogViewerSettingsException::what() const noexcept
     {
         static const std::string prefix = "LogViewerSettingsException: ";
-        const auto fullMessage = prefix + MolarTrackerException::what();
-        return std::move(fullMessage.c_str());
+        static std::string       fullMessage;
+        fullMessage = prefix + MolarTrackerException::what();
+        return fullMessage.c_str();
     }
 
 }   // namespace settings
