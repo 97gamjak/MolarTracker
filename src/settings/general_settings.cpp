@@ -20,7 +20,8 @@ namespace settings
     }
 
     /**
-     * @brief Get the parameters of GeneralSettings as a tuple (const version)
+     * @brief Get the parameters of GeneralSettings as a tuple (non-const
+     * version)
      *
      * @return auto
      */
@@ -30,7 +31,7 @@ namespace settings
     }
 
     /**
-     * @brief Get the parameters of GeneralSettings as a tuple (non-const
+     * @brief Get the parameters of GeneralSettings as a tuple (const
      * version)
      *
      * @return auto
