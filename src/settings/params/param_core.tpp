@@ -367,9 +367,13 @@ namespace settings
     template <typename T>
     void ParamCore<T>::_notifySubscribers()
     {
-        // Note: if you want to allow callbacks to unsubscribe themselves
-        // safely, iterate over a copy of IDs or copy the map first.
-        for (auto& [_, sub] : _subscribers)
+        // Note: we use here a copy of the subscriber map to avoid issues when a
+        // subscriber is added or removed while we are notifying subscribers,
+        // this way we can safely iterate over the copy without worrying about
+        // concurrent modifications to the original map
+        std::unordered_map<size_t, Subscriber> copy = _subscribers;
+
+        for (auto& [_, sub] : copy)
             sub.fn(sub.user, _value);
     }
 
