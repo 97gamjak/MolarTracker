@@ -120,14 +120,6 @@ namespace settings
             throw ParamException("Subscriber ID counter has overflowed");
         }
 
-        if (_subscribers.find(id) != _subscribers.end())
-        {
-            // This should never happen since we are using a monotonically
-            // increasing counter for IDs, but we should still check to ensure
-            // that we don't accidentally overwrite an existing subscriber
-            throw ParamException("Subscriber ID collision detected");
-        }
-
         if (!user)
         {
             // user pointer can't be null because it is passed to the callback
