@@ -38,6 +38,8 @@ namespace utils
 
         static const SemVer getInvalidVersion() { return SemVer{"invalid"}; }
 
+        friend bool operator==(const SemVer& lhs, const SemVer& rhs);
+
        private:
         std::optional<SemVer> _parse(const std::string& versionStr);
     };

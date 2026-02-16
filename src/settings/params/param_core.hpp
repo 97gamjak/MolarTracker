@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 
+#include "connections/connection.hpp"
 #include "nlohmann/json.hpp"
 
 namespace settings
@@ -33,7 +34,23 @@ namespace settings
     class ParamCore
     {
        private:
+        using ChangedFn = void (*)(void*, const std::optional<T>&);
+
+        /**
+         * @brief Subscriber struct for a setting parameter, this struct
+         * contains the callback function and the user data for a subscriber,
+         * this is used to notify subscribers of changes in the parameter value
+         */
+        struct Subscriber
+        {
+            ChangedFn fn{};
+            void*     user{};
+        };
+
+       private:
         using Schema = ParamCoreSchema;
+
+        std::unordered_map<size_t, Subscriber> _subscribers;
 
         std::optional<T> _value        = std::nullopt;
         std::optional<T> _baseLine     = std::nullopt;
@@ -43,7 +60,8 @@ namespace settings
         std::string _title;
         std::string _description;
 
-        bool _isRebootRequired = false;
+        bool   _isRebootRequired = false;
+        size_t _idCounter        = 0;
 
        public:
         ParamCore() = delete;
@@ -57,6 +75,8 @@ namespace settings
         [[nodiscard]] const std::optional<T>& get() const;
         void                                  set(const T& value);
         void                                  unset();
+
+        Connection subscribe(ChangedFn fn, void* user);
 
         void commit();
 
@@ -79,6 +99,10 @@ namespace settings
 
        private:
         [[nodiscard]] static bool _equals(const T& a, const T& b);
+
+        static void _disconnect(void* owner, std::size_t id);
+
+        void _notifySubscribers();
     };
 
 }   // namespace settings

@@ -14,6 +14,7 @@ add_subdirectory(ui)
 add_subdirectory(exceptions)
 add_subdirectory(settings)
 add_subdirectory(json)
+add_subdirectory(connections)
 
 target_link_libraries(MolarTracker
     PRIVATE 
@@ -29,6 +30,7 @@ target_link_libraries(MolarTracker
     molartracker_exceptions
     molartracker_settings
     molartracker_json
+    molartracker_connections
 )
 
 set_target_properties(MolarTracker PROPERTIES
