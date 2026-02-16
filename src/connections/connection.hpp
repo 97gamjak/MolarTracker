@@ -13,7 +13,7 @@
 //  function).
 //
 // Requirements on the producer (e.g. Param<T>):
-//  - disconnect_fn(owner, id) must be valid, , and idempotent.
+//  - disconnect_fn(owner, id) must be valid, and idempotent.
 // ============================================================================
 
 /**
