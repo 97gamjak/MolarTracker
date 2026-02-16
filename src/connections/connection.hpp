@@ -2,8 +2,8 @@
 #define __CONNECTIONS__CONNECTION_HPP__
 
 #include <cstddef>
+#include <memory>
 #include <optional>
-#include <utility>
 
 // ============================================================================
 // Connection
@@ -25,11 +25,11 @@
  */
 struct ConnectionToken
 {
-    using DisconnectFn = void (*)(void*, std::size_t);
+    using DisconnectFn = void (*)(std::shared_ptr<void>, std::size_t);
 
-    void*        owner{};
-    std::size_t  id{};
-    DisconnectFn disconnect_fn{};
+    std::shared_ptr<void> owner{};
+    std::size_t           id{};
+    DisconnectFn          disconnect_fn{};
 
     void disconnect() const;
 };
@@ -69,7 +69,11 @@ class Connection
 
     void reset();
 
-    static Connection make(void* owner, std::size_t id, DisconnectFn fn);
+    static Connection make(
+        std::shared_ptr<void> owner,
+        std::size_t           id,
+        DisconnectFn          fn
+    );
 };
 
 #endif   // __CONNECTIONS__CONNECTION_HPP__

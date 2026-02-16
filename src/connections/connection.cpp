@@ -93,8 +93,14 @@ void ConnectionToken::disconnect() const { disconnect_fn(owner, id); }
  * call disconnect() in its destructor without worrying about whether the
  * subscription has already been disconnected or not
  *
- * @param owner A pointer representing the owner of the subscription, this can
- * be used to provide context for the disconnect function when it is called
+ * @param owner A shared pointer to the owner of the subscription, this is used
+ * by the disconnect function to identify which subscription to disconnect when
+ * it is called, this should be a shared pointer to ensure that the owner object
+ * is kept alive as long as there are active subscriptions, and to allow for
+ * safe disconnection when the owner object is destroyed, the disconnect
+ * function can use this pointer to check if the owner object is still alive
+ * before attempting to disconnect, and can safely do nothing if the owner
+ * object has already been destroyed.
  * @param id The subscription id, this is used by the disconnect function to
  * identify which subscription to disconnect when it is called
  * @param fn The disconnect function, this is a function pointer that takes the
@@ -105,7 +111,11 @@ void ConnectionToken::disconnect() const { disconnect_fn(owner, id); }
  * can be used to manage the subscription and will automatically disconnect when
  * it goes out of scope
  */
-Connection Connection::make(void* owner, std::size_t id, DisconnectFn fn)
+Connection Connection::make(
+    std::shared_ptr<void> owner,
+    std::size_t           id,
+    DisconnectFn          fn
+)
 {
     Connection c;
     c._token = Token{owner, id, fn};
