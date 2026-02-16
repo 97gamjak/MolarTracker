@@ -67,7 +67,8 @@ namespace settings
     template <typename T>
     void ParamCore<T>::set(const T& value)
     {
-        if (_value.has_value() && _equals(_value.value(), value))
+        const std::optional<T>& current = get();
+        if (current.has_value() && _equals(current.value(), value))
             return;
 
         _value = value;
