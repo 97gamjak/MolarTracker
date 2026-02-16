@@ -82,7 +82,11 @@ void Connection::reset()
  * is called on it, it calls the disconnect function stored in the token with
  * the owner pointer and subscription id to perform the disconnection
  */
-void ConnectionToken::disconnect() const { disconnect_fn(owner, id); }
+void ConnectionToken::disconnect() const
+{
+    if (owner)
+        disconnect_fn(owner, id);
+}
 
 /**
  * @brief Static factory method for creating a Connection object, this takes the
