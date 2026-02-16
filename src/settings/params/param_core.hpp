@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <string>
+#include <unordered_map>
 
 #include "connections/connection.hpp"
 #include "nlohmann/json.hpp"
