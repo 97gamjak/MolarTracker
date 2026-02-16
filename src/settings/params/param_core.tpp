@@ -8,6 +8,7 @@
 #include <string>
 
 #include "param_core.hpp"
+#include "param_error.hpp"
 
 namespace settings
 {
@@ -107,6 +108,33 @@ namespace settings
     Connection ParamCore<T>::subscribe(ChangedFn fn, void* user)
     {
         const auto id = _idCounter++;
+
+        if (!fn)
+            throw std::invalid_argument("Callback function cannot be null");
+
+        if (id == 0)
+        {
+            // Handle the case where the id counter overflows and wraps around
+            // to 0 This is a very unlikely scenario, but we should still handle
+            // it to prevent potential issues with subscriber management
+            throw ParamException("Subscriber ID counter has overflowed");
+        }
+
+        if (_subscribers.find(id) != _subscribers.end())
+        {
+            // This should never happen since we are using a monotonically
+            // increasing counter for IDs, but we should still check to ensure
+            // that we don't accidentally overwrite an existing subscriber
+            throw ParamException("Subscriber ID collision detected");
+        }
+
+        if (!user)
+        {
+            // user pointer can't be null because it is passed to the callback
+            // function when it is called, and the callback function may rely on
+            // it being a valid pointer to provide context for the callback
+            throw ParamException("User pointer cannot be null");
+        }
 
         _subscribers[id] = Subscriber{fn, user};
 

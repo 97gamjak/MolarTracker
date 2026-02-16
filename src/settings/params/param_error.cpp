@@ -17,4 +17,28 @@ namespace settings
      * @return const std::string&
      */
     const std::string& ParamError::getMessage() { return _message; }
+
+    /**
+     * @brief Construct a new Param Exception:: Param Exception object
+     *
+     * @param message The exception message
+     */
+    ParamException::ParamException(std::string message)
+        : MolarTrackerException(std::move(message))
+    {
+    }
+
+    /**
+     * @brief Get the exception message
+     *
+     * @return const char* The exception message
+     */
+    const char* ParamException::what() const noexcept
+    {
+        static const std::string prefix = "ParamException: ";
+        static std::string       fullMessage;
+        fullMessage = prefix + MolarTrackerException::what();
+        return fullMessage.c_str();
+    }
+
 }   // namespace settings
