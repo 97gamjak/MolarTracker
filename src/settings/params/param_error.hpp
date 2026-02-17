@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "exceptions/base.hpp"
+
 namespace settings
 {
 
@@ -20,6 +22,21 @@ namespace settings
         explicit ParamError(std::string message);
 
         [[nodiscard]] const std::string& getMessage();
+    };
+
+    /**
+     * @brief Exception class for setting parameters, this is used to represent
+     * an exception that occurs when setting a parameter value, this is used in
+     * the set function of the ParamMixin class when an error occurs that cannot
+     * be represented by the ParamError class, such as a critical error that
+     * should be handled by the caller
+     */
+    class ParamException : public MolarTrackerException
+    {
+       public:
+        explicit ParamException(std::string message);
+
+        const char* what() const noexcept override;
     };
 
 }   // namespace settings

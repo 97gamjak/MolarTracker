@@ -109,4 +109,25 @@ namespace utils
         return std::to_string(_major) + "." + std::to_string(_minor) + "." +
                std::to_string(_patch);
     }
+
+    /**
+     * @brief Equality operator for SemVer, two SemVer objects are considered
+     * equal if their major, minor, and patch numbers are all equal, if both
+     * SemVer objects are invalid, they are also considered equal
+     *
+     * @param lhs
+     * @param rhs
+     * @return true if the two SemVer objects are equal, false otherwise
+     */
+    bool operator==(const SemVer& lhs, const SemVer& rhs)
+    {
+        if (lhs._isInvalid != rhs._isInvalid)
+            return false;
+
+        if (lhs._isInvalid && rhs._isInvalid)
+            return true;
+
+        return lhs._major == rhs._major && lhs._minor == rhs._minor &&
+               lhs._patch == rhs._patch;
+    }
 }   // namespace utils
