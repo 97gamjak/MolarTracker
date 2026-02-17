@@ -2,10 +2,62 @@
 #define __SETTINGS__ENUM_PARAM_TPP__
 
 #include "enum_param.hpp"
+#include "nlohmann/json.hpp"
 #include "param_error.hpp"
 
 namespace settings
 {
+    /**
+     * @brief Construct a new Enum Param:: Enum Param object
+     *
+     * @tparam E
+     * @param key
+     * @param title
+     * @param description
+     */
+    template <typename E>
+    requires std::is_enum_v<E>
+    EnumParam<E>::EnumParam(
+        std::string key,
+        std::string title,
+        std::string description
+    )
+        : _core(key, title, description)
+    {
+    }
+
+    /**
+     * @brief Serialize EnumParam to JSON
+     *
+     * @tparam E
+     * @return nlohmann::json
+     */
+    template <typename E>
+    requires std::is_enum_v<E>
+    nlohmann::json EnumParam<E>::toJson() const
+    {
+        auto jsonData = _core.toJson();
+
+        return jsonData;
+    }
+
+    /**
+     * @brief Deserialize EnumParam from JSON
+     *
+     * @tparam E
+     * @param j
+     * @param param
+     */
+    template <typename E>
+    requires std::is_enum_v<E>
+    void EnumParam<E>::fromJson(
+        const nlohmann::json& jsonData,
+        EnumParam<E>&         param
+    )
+    {
+        ParamCore<E>::fromJson(jsonData, param._core);
+    }
+
     /**
      * @brief Set the value of the enum parameter
      *

@@ -23,6 +23,8 @@ namespace settings
         _maxLogFileSizeMB.setDefault(Schema::MAX_LOG_FILE_SIZE_MB_DEFAULT);
         _maxLogFileSizeMB.setMinValue(Schema::MAX_LOG_FILE_SIZE_MB_MIN);
 
+        _defaultLogLevel.setDefault(Schema::DEFAULT_LOG_LEVEL_DEFAULT);
+
         _logDirectory.setRebootRequired(true);
         _logFilePrefix.setRebootRequired(true);
         _logFileSuffix.setRebootRequired(true);
@@ -42,7 +44,8 @@ namespace settings
             _logFilePrefix,
             _logFileSuffix,
             _maxLogFiles,
-            _maxLogFileSizeMB
+            _maxLogFileSizeMB,
+            _defaultLogLevel
         );
     }
 
@@ -59,7 +62,8 @@ namespace settings
             _logFilePrefix,
             _logFileSuffix,
             _maxLogFiles,
-            _maxLogFileSizeMB
+            _maxLogFileSizeMB,
+            _defaultLogLevel
         );
     }
 

@@ -53,20 +53,22 @@ namespace settings
             std::string description
         );
 
-        std::expected<void, ParamError> set(const T& value);
+        [[nodiscard]] std::expected<void, ParamError> set(const T& value);
         void setLimits(const T& minValue, const T& maxValue);
         void setMinValue(const T& minValue);
         void setMaxValue(const T& maxValue);
         void setPrecision(size_t decimalPlaces);
 
-        nlohmann::json toJson() const;
+        [[nodiscard]] nlohmann::json toJson() const;
         static void fromJson(const nlohmann::json& j, NumericParam<T>& param);
 
        private:
         NumericParam(ParamCore<T> core);
 
-        std::expected<void, ParamError> _isWithinRange(const T& v) const;
-        T                               _applyPrecision(const T& v) const;
+        [[nodiscard]] std::expected<void, ParamError> _isWithinRange(
+            const T& v
+        ) const;
+        [[nodiscard]] T _applyPrecision(const T& v) const;
     };
 
 }   // namespace settings
