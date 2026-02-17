@@ -139,6 +139,10 @@ namespace settings
         [[nodiscard]] size_t      getMaxLogFiles() const;
         [[nodiscard]] size_t      getMaxLogFileSizeMB() const;
 
+        [[nodiscard]] EnumParam<LogLevel>&       getDefaultLogLevelParam();
+        [[nodiscard]] const EnumParam<LogLevel>& getDefaultLogLevelParam(
+        ) const;
+
         [[nodiscard]] nlohmann::json toJson() const;
 
         static void fromJson(

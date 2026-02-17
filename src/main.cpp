@@ -24,10 +24,12 @@ int main(int argc, char** argv)
 
         // initialize settings
         settings::Settings settings{Constants::getInstance().getConfigPath()};
+        auto&              loggingSettings = settings.getLoggingSettings();
 
         // initialize ring file buffered logger
+        LogManager::getInstance().subscribeToSettings(loggingSettings);
         LogManager::getInstance().initializeRingFileLogger(
-            settings.getLoggingSettings(),
+            loggingSettings,
             Constants::getInstance().getDataPath()
         );
 

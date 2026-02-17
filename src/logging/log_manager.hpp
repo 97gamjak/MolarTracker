@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "config/logging_base.hpp"
+#include "connections/connection.hpp"
 #include "utils/ring_file.hpp"
 
 enum class LogLevel : size_t;      // forward declaration
@@ -27,6 +29,8 @@ class LogManager
     std::unordered_map<LogCategory, LogLevel> _categories{};
     RingFile                                  _ringFile{};
     std::filesystem::path                     _logDirectory{};
+    LogLevel                                  _defaultLogLevel{LogLevel::Info};
+    Connection                                _defaultLogLevelConnection;
 
    public:
     static LogManager& getInstance();
@@ -35,6 +39,7 @@ class LogManager
         const settings::LoggingSettings& settings,
         const std::filesystem::path&     directory
     );
+    void subscribeToSettings(settings::LoggingSettings& settings);
     void changeLogLevel(const LogCategory& category, const LogLevel& level);
     bool isEnabled(const LogCategory& category, const LogLevel& level) const;
     void flush();
@@ -50,6 +55,7 @@ class LogManager
     LogManager();
 
     std::string _logLevelToString(const LogLevel& level) const;
+    void        setDefaultLogLevel(const LogLevel& level);
 };
 
 #endif   // __LOGGING__LOG_MANAGER_HPP__

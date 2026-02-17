@@ -76,14 +76,7 @@ namespace settings
      */
     double LogViewerSettings::getReloadIntervalSec() const
     {
-        const auto interval = _reloadIntervalSec.get();
-        if (interval.has_value())
-            return interval.value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LogViewerSettingsException("Reload interval is not set");
+        return _reloadIntervalSec.get();
     }
 
     /**
@@ -93,13 +86,7 @@ namespace settings
      */
     bool LogViewerSettings::isAutoReloadEnabled() const
     {
-        if (_autoReload.get().has_value())
-            return _autoReload.get().value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LogViewerSettingsException("Auto-reload setting is not set");
+        return _autoReload.get();
     }
 
     /**
@@ -109,13 +96,7 @@ namespace settings
      */
     bool LogViewerSettings::isLineWrapEnabled() const
     {
-        if (_lineWrap.get().has_value())
-            return _lineWrap.get().value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LogViewerSettingsException("Line wrap setting is not set");
+        return _lineWrap.get();
     }
 
     /**

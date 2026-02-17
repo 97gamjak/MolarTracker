@@ -47,6 +47,28 @@ void LogManager::initializeRingFileLogger(
 }
 
 /**
+ * @brief Subscribe to changes in the logging settings, currently only the
+ * default log level is subscribed to, but in the future, other settings can be
+ * subscribed to as well, such as log directory, file prefix/suffix, max files,
+ * and max file size
+ *
+ * @param settings
+ */
+void LogManager::subscribeToSettings(settings::LoggingSettings& settings)
+{
+    auto& param = settings.getDefaultLogLevelParam();
+
+    _defaultLogLevelConnection = param.subscribe(
+        [](void* user, const LogLevel& value)
+        {
+            auto* logManager = static_cast<LogManager*>(user);
+            logManager->setDefaultLogLevel(value);
+        },
+        this
+    );
+}
+
+/**
  * @brief Get the default logging categories with Info level
  *
  * @return std::unordered_map<LogCategory, LogLevel>
@@ -58,7 +80,7 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
     // https://97gamjak.atlassian.net/browse/MOLTRACK-84
     std::unordered_map<LogCategory, LogLevel> defaultCategories;
     for (const auto category : LogCategoryMeta::values)
-        defaultCategories[category] = LogLevel::Info;
+        defaultCategories[category] = _defaultLogLevel;
 
     return defaultCategories;
 }
@@ -200,4 +222,15 @@ std::string LogManager::_logLevelToString(const LogLevel& level) const
     const auto cleanLevelStr = "<" + levelStr + ">:";
 
     return std::vformat(format, std::make_format_args(cleanLevelStr));
+}
+
+/**
+ * @brief Set the default log level, this is used to update the default log
+ * level when the corresponding setting is changed
+ *
+ * @param level
+ */
+void LogManager::setDefaultLogLevel(const LogLevel& level)
+{
+    _defaultLogLevel = level;
 }

@@ -35,23 +35,29 @@ namespace settings
     class ParamCore
     {
        private:
-        using ChangedFn = void (*)(void*, const std::optional<T>&);
+        template <typename U>
+        using ChangedFnBase     = void (*)(void*, const U&);
+        using ChangedFn         = ChangedFnBase<T>;
+        using ChangedFnOptional = ChangedFnBase<std::optional<T>>;
 
         /**
          * @brief Subscriber struct for a setting parameter, this struct
          * contains the callback function and the user data for a subscriber,
          * this is used to notify subscribers of changes in the parameter value
          */
+        template <typename U>
         struct Subscriber
         {
-            ChangedFn fn{};
-            void*     user{};
+            ChangedFnBase<U> fn{};
+            void*            user{};
         };
 
        private:
         using Schema = ParamCoreSchema;
 
-        std::unordered_map<size_t, Subscriber> _subscribers;
+        std::unordered_map<size_t, Subscriber<T>> _subscribers;
+        std::unordered_map<size_t, Subscriber<std::optional<T>>>
+            _optionalSubscribers;
 
         std::optional<T> _value        = std::nullopt;
         std::optional<T> _baseLine     = std::nullopt;
@@ -73,10 +79,12 @@ namespace settings
             const std::string& description
         );
 
-        [[nodiscard]] const std::optional<T>& get() const;
+        [[nodiscard]] const std::optional<T>& getOptional() const;
+        [[nodiscard]] const T&                get() const;
         void                                  set(const T& value);
         void                                  unset();
 
+        Connection subscribeToOptional(ChangedFnOptional fn, void* user);
         Connection subscribe(ChangedFn fn, void* user);
 
         void commit();
@@ -101,9 +109,12 @@ namespace settings
        private:
         [[nodiscard]] static bool _equals(const T& a, const T& b);
 
+        template <typename U>
         static void _disconnect(void* owner, std::size_t id);
-
+        template <typename U>
         void _notifySubscribers();
+        template <typename U>
+        Connection _subscribe(ChangedFnBase<U> fn, void* user);
     };
 
 }   // namespace settings

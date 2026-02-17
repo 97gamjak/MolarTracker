@@ -4,6 +4,8 @@
 #include <optional>
 #include <string>
 
+#include "connections/connection.hpp"
+
 namespace settings
 {
 
@@ -17,8 +19,15 @@ namespace settings
     template <typename Derived, typename T>
     class ParamMixin
     {
+       private:
+        template <typename U>
+        using ChangedFnBase     = void (*)(void*, const U&);
+        using ChangedFn         = ChangedFnBase<T>;
+        using ChangedFnOptional = ChangedFnBase<std::optional<T>>;
+
        public:
-        [[nodiscard]] const std::optional<T>& get() const;
+        [[nodiscard]] const std::optional<T>& getOptional() const;
+        [[nodiscard]] const T&                get() const;
 
         [[nodiscard]] const std::optional<T>& getDefault() const;
         void setDefault(const std::optional<T>& defaultValue);
@@ -28,6 +37,9 @@ namespace settings
 
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
+
+        Connection subscribe(ChangedFn func, void* user);
+        Connection subscribeToOptional(ChangedFnOptional func, void* user);
 
         [[nodiscard]] bool isRebootRequired() const;
         void               setRebootRequired(bool required);
