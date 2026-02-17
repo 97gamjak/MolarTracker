@@ -115,11 +115,7 @@ void ConnectionToken::disconnect() const
  * can be used to manage the subscription and will automatically disconnect when
  * it goes out of scope
  */
-Connection Connection::make(
-    std::shared_ptr<void> owner,
-    std::size_t           id,
-    DisconnectFn          fn
-)
+Connection Connection::make(void* owner, std::size_t id, DisconnectFn fn)
 {
     Connection c;
     c._token = Token{owner, id, fn};
