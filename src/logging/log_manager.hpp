@@ -30,7 +30,6 @@ class LogManager
     RingFile                                  _ringFile{};
     std::filesystem::path                     _logDirectory{};
     LogLevel                                  _defaultLogLevel{LogLevel::Info};
-    Connection                                _defaultLogLevelConnection;
 
    public:
     static LogManager& getInstance();
@@ -39,7 +38,6 @@ class LogManager
         const settings::LoggingSettings& settings,
         const std::filesystem::path&     directory
     );
-    void subscribeToSettings(settings::LoggingSettings& settings);
     void changeLogLevel(const LogCategory& category, const LogLevel& level);
     bool isEnabled(const LogCategory& category, const LogLevel& level) const;
     void flush();
@@ -51,11 +49,15 @@ class LogManager
 
     void log(const LogObject& logObject);
 
+    // TODO(97gamjak): this should be done via a command and undo stack and
+    // should also be private
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-102
+    void setDefaultLogLevel(const LogLevel& level);
+
    private:
     LogManager();
 
     std::string _logLevelToString(const LogLevel& level) const;
-    void        setDefaultLogLevel(const LogLevel& level);
 };
 
 #endif   // __LOGGING__LOG_MANAGER_HPP__

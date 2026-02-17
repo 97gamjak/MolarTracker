@@ -109,10 +109,9 @@ namespace settings
        private:
         [[nodiscard]] static bool _equals(const T& a, const T& b);
 
+        void _notifySubscribers();
         template <typename U>
         static void _disconnect(void* owner, std::size_t id);
-        template <typename U>
-        void _notifySubscribers();
         template <typename U>
         Connection _subscribe(ChangedFnBase<U> fn, void* user);
     };

@@ -47,28 +47,6 @@ void LogManager::initializeRingFileLogger(
 }
 
 /**
- * @brief Subscribe to changes in the logging settings, currently only the
- * default log level is subscribed to, but in the future, other settings can be
- * subscribed to as well, such as log directory, file prefix/suffix, max files,
- * and max file size
- *
- * @param settings
- */
-void LogManager::subscribeToSettings(settings::LoggingSettings& settings)
-{
-    auto& param = settings.getDefaultLogLevelParam();
-
-    _defaultLogLevelConnection = param.subscribe(
-        [](void* user, const LogLevel& value)
-        {
-            auto* logManager = static_cast<LogManager*>(user);
-            logManager->setDefaultLogLevel(value);
-        },
-        this
-    );
-}
-
-/**
  * @brief Get the default logging categories with Info level
  *
  * @return std::unordered_map<LogCategory, LogLevel>

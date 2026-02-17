@@ -346,7 +346,6 @@ namespace settings
      * @tparam T
      */
     template <typename T>
-    template <typename U>
     void ParamCore<T>::_notifySubscribers()
     {
         // Note: we use here a copy of the subscriber map to avoid issues when a
@@ -355,11 +354,11 @@ namespace settings
         // concurrent modifications to the original map
         const auto copy = _subscribers;
         for (auto& [_, sub] : copy)
-            sub.fn(sub.user, _value);
+            sub.fn(sub.user, get());
 
-        const auto copy = _subscribers;
-        for (auto& [_, sub] : copy)
-            sub.fn(sub.user, _value);
+        const auto copyOptional = _optionalSubscribers;
+        for (auto& [_, sub] : copyOptional)
+            sub.fn(sub.user, getOptional());
     }
 
     template <typename T>
@@ -398,6 +397,12 @@ namespace settings
     template <typename U>
     Connection ParamCore<T>::_subscribe(ChangedFnBase<U> fn, void* user)
     {
+        if (_isRebootRequired)
+            throw ParamException(
+                "Cannot subscribe to changes for parameter '" + _key +
+                "' because it requires a reboot to take effect"
+            );
+
         const auto id = _idCounter++;
 
         if (!fn)
@@ -425,7 +430,7 @@ namespace settings
 
         _subscribers[id] = Subscriber{fn, user};
 
-        return Connection::make(this, id, &ParamCore<T>::_disconnect);
+        return Connection::make(this, id, &ParamCore<T>::_disconnect<U>);
     }
 
 }   // namespace settings

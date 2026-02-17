@@ -1,32 +1,12 @@
-#ifndef __SETTINGS__PARAM_MIXIN_TPP__
-#define __SETTINGS__PARAM_MIXIN_TPP__
+#ifndef __SETTINGS__PARAMS_MIXIN_TPP__
+#define __SETTINGS__PARAMS_MIXIN_TPP__
 
-#include "param_mixin.hpp"
+#include "params_mixin.hpp"
 
 namespace settings
 {
-
     /**
      * @brief Get the value of the parameter
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const std::optional<T>&
-     */
-
-    template <typename Derived, typename T>
-    const std::optional<T>& ParamMixin<Derived, T>::getOptional() const
-    {
-        return _self()._core.getOptional();
-    }
-
-    /**
-     * @brief Get the value of the parameter, if the value is not set, it will
-     * return the default value if it exists, otherwise it will throw an
-     * exception
-     *
-     * @throws ParamException if the value is not set and no default value is
-     * provided
      *
      * @tparam Derived
      * @tparam T
@@ -35,21 +15,8 @@ namespace settings
     template <typename Derived, typename T>
     const T& ParamMixin<Derived, T>::get() const
     {
-        return _self()._core.get();
+        return _core().get();
     }
-
-    /**
-     * @brief Get the value of the parameter, if the value is not set, it will
-     * return the default value if it exists, otherwise it will throw an
-     * exception
-     *
-     * @throws ParamException if the value is not set and no default value is
-     * provided
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const T&
-     */
 
     /**
      * @brief Get the default value of the parameter
@@ -61,7 +28,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::optional<T>& ParamMixin<Derived, T>::getDefault() const
     {
-        return _self()._core.getDefault();
+        return _core().getDefault();
     }
 
     /**
@@ -76,7 +43,7 @@ namespace settings
         const std::optional<T>& defaultValue
     )
     {
-        _self()._core.setDefault(defaultValue);
+        _core().setDefault(defaultValue);
     }
 
     /**
@@ -89,7 +56,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getKey() const
     {
-        return _self()._core.getKey();
+        return _core().getKey();
     }
 
     /**
@@ -102,7 +69,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getTitle() const
     {
-        return _self()._core.getTitle();
+        return _core().getTitle();
     }
 
     /**
@@ -115,7 +82,7 @@ namespace settings
     template <typename Derived, typename T>
     const std::string& ParamMixin<Derived, T>::getDescription() const
     {
-        return _self()._core.getDescription();
+        return _core().getDescription();
     }
 
     /**
@@ -128,68 +95,33 @@ namespace settings
     template <typename Derived, typename T>
     void ParamMixin<Derived, T>::setDescription(const std::string& description)
     {
-        _self()._core.setDescription(description);
+        _core().setDescription(description);
     }
 
     /**
-     * @brief Subscribe to changes of the parameter
+     * @brief Get the core object
      *
      * @tparam Derived
      * @tparam T
-     * @param func
-     * @param user
+     * @return ParamCore<T>&
      */
     template <typename Derived, typename T>
-    Connection ParamMixin<Derived, T>::subscribe(ChangedFn func, void* user)
+    ParamCore<T>& ParamMixin<Derived, T>::_core()
     {
-        return _self()._core.subscribe(func, user);
+        return _self().core();
     }
 
     /**
-     * @brief Subscribe to changes of the parameter with return type
-     * std::optional<T>
+     * @brief Get the core object (const)
      *
      * @tparam Derived
      * @tparam T
-     * @param func
-     * @param user
+     * @return const ParamCore<T>&
      */
     template <typename Derived, typename T>
-    Connection ParamMixin<Derived, T>::subscribeToOptional(
-        ChangedFnOptional func,
-        void*             user
-    )
+    const ParamCore<T>& ParamMixin<Derived, T>::_core() const
     {
-        return _self()._core.subscribeToOptional(func, user);
-    }
-
-    /**
-     * @brief Check if changing this parameter requires a reboot
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return true if a reboot is required for changes to take effect, false
-     * otherwise
-     */
-    template <typename Derived, typename T>
-    bool ParamMixin<Derived, T>::isRebootRequired() const
-    {
-        return _self()._core.isRebootRequired();
-    }
-
-    /**
-     * @brief Set whether changing this parameter requires a reboot, this can be
-     * used to inform the user that they need to restart the application for
-     * changes to take effect
-     *
-     * @tparam Derived
-     * @tparam T
-     * @param required
-     */
-    template <typename Derived, typename T>
-    void ParamMixin<Derived, T>::setRebootRequired(bool required)
-    {
-        _self()._core.setRebootRequired(required);
+        return _self().core();
     }
 
     /**
@@ -220,4 +152,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAM_MIXIN_TPP__
+#endif   // __SETTINGS__PARAMS_MIXIN_TPP__

@@ -7,6 +7,7 @@
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "ui/application.hpp"
+#include "ui/controller/controllers.hpp"
 #include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 
@@ -27,14 +28,14 @@ int main(int argc, char** argv)
         auto&              loggingSettings = settings.getLoggingSettings();
 
         // initialize ring file buffered logger
-        LogManager::getInstance().subscribeToSettings(loggingSettings);
         LogManager::getInstance().initializeRingFileLogger(
             loggingSettings,
             Constants::getInstance().getDataPath()
         );
 
         app::AppContext appContext{settings};
-        ui::MainWindow  mainWindow{appContext};
+        ui::Controllers controllers{settings};
+        ui::MainWindow  mainWindow{appContext, controllers};
 
         mainWindow.show();
 

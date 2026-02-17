@@ -8,8 +8,6 @@
 #include <QVBoxLayout>
 
 #include "app/app_context.hpp"
-#include "domain/profile.hpp"
-#include "drafts/profile_draft.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
@@ -19,8 +17,21 @@
 namespace ui
 {
 
-    MainWindow::MainWindow(app::AppContext& appContext, QWidget* parent)
-        : QMainWindow{parent}, _appContext{appContext}
+    /**
+     * @brief Construct a new Main Window:: Main Window object
+     *
+     * @param appContext
+     * @param controllers
+     * @param parent
+     */
+    MainWindow::MainWindow(
+        app::AppContext& appContext,
+        Controllers&     controllers,
+        QWidget*         parent
+    )
+        : QMainWindow{parent},
+          _appContext{appContext},
+          _controllers{controllers}
     {
         setWindowTitle("Molar Tracker");
         resize(5000, 3000);
@@ -29,12 +40,20 @@ namespace ui
         _ensureProfileExists();
     }
 
+    /**
+     * @brief Build the UI of the main window
+     *
+     */
     void MainWindow::_buildUI()
     {
         _buildMenuBar();
         _buildCentral();
     }
 
+    /**
+     * @brief Build the menu bar and its controllers
+     *
+     */
     void MainWindow::_buildMenuBar()
     {
         _menuBar = new MenuBar{this};
@@ -70,6 +89,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Build the central widget of the main window
+     *
+     */
     void MainWindow::_buildCentral()
     {
         auto* root = new QWidget{this};
@@ -87,6 +110,11 @@ namespace ui
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
     }
 
+    /**
+     * @brief Ensure that a profile exists, and if not, prompt the user to
+     * create one
+     *
+     */
     void MainWindow::_ensureProfileExists()
     {
         _ensureProfileController = std::make_unique<EnsureProfileController>(
