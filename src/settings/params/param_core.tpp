@@ -113,7 +113,7 @@ namespace settings
         if (!fn)
             throw std::invalid_argument("Callback function cannot be null");
 
-        if (id == 0)
+        if (_idCounter == 0)
         {
             // Handle the case where the id counter overflows and wraps around
             // to 0 This is a very unlikely scenario, but we should still handle
