@@ -121,14 +121,6 @@ namespace settings
             throw ParamException("Subscriber ID counter has overflowed");
         }
 
-        if (!user)
-        {
-            // user pointer can't be null because it is passed to the callback
-            // function when it is called, and the callback function may rely on
-            // it being a valid pointer to provide context for the callback
-            throw ParamException("User pointer cannot be null");
-        }
-
         _subscribers[id] = Subscriber{fn, user};
 
         return Connection::make(this, id, &ParamCore<T>::_disconnect);

@@ -121,6 +121,9 @@ namespace utils
      */
     bool operator==(const SemVer& lhs, const SemVer& rhs)
     {
+        if (lhs._isInvalid != rhs._isInvalid)
+            return false;
+
         if (lhs._isInvalid && rhs._isInvalid)
             return true;
 
