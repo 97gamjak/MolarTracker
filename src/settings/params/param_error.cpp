@@ -36,7 +36,7 @@ namespace settings
     const char* ParamException::what() const noexcept
     {
         static const std::string prefix = "ParamException: ";
-        static std::string       fullMessage;
+        static thread_local std::string fullMessage;
         fullMessage = prefix + MolarTrackerException::what();
         return fullMessage.c_str();
     }
