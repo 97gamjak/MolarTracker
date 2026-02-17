@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "logging_base.hpp"
+#include "config/logging_base.hpp"
 
 /**
  * @brief Struct representing a log message and its metadata

@@ -1,7 +1,6 @@
 #include "log_entry_scope.hpp"
 
 #include "log_manager.hpp"
-#include "logging_base.hpp"
 
 /**
  * @brief Construct a new Log Entry Scope:: Log Entry Scope object

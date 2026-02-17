@@ -11,8 +11,7 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
-#include "logging/log_manager.hpp"
-#include "logging/logging_base.hpp"
+#include "config/logging_base.hpp"
 #include "ui/widgets/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
 

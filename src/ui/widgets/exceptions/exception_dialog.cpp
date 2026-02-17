@@ -7,8 +7,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "config/logging_base.hpp"
 #include "logging/log_manager.hpp"
-#include "logging/logging_base.hpp"
 
 namespace ui
 {

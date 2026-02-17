@@ -12,4 +12,5 @@ target_include_directories(molartracker_logging
 target_link_libraries(molartracker_logging
     PUBLIC
         molartracker_utils
+        molartracker_config
 )

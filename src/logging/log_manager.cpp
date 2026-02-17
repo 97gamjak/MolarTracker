@@ -2,8 +2,8 @@
 
 #include <format>
 
+#include "config/logging_base.hpp"
 #include "log_object.hpp"
-#include "logging_base.hpp"
 #include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
 #include "utils/timestamp.hpp"
