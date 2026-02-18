@@ -39,19 +39,6 @@ namespace settings
     }
 
     /**
-     * @brief Get the value of the parameter, if the value is not set, it will
-     * return the default value if it exists, otherwise it will throw an
-     * exception
-     *
-     * @throws ParamException if the value is not set and no default value is
-     * provided
-     *
-     * @tparam Derived
-     * @tparam T
-     * @return const T&
-     */
-
-    /**
      * @brief Get the default value of the parameter
      *
      * @tparam Derived
