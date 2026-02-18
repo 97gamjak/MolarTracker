@@ -38,6 +38,7 @@ int main(int argc, char** argv)
         ui::MainWindow  mainWindow{appContext, controllers};
 
         mainWindow.show();
+        mainWindow.start();
 
         return app.exec();
     }

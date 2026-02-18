@@ -246,10 +246,6 @@ namespace ui
      *
      * @param event
      */
-    void AddProfileDialog::closeEvent(QCloseEvent* event)
-    {
-        QDialog::closeEvent(event);
-        _emitCancel();
-    }
+    void AddProfileDialog::closeEvent(QCloseEvent* /*event*/) { _emitCancel(); }
 
 }   // namespace ui
