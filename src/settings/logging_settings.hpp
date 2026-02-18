@@ -79,8 +79,8 @@ namespace settings
         static constexpr const char* DEFAULT_LOG_LEVEL_TITLE =
             "Default Log Level";
         static constexpr const char* DEFAULT_LOG_LEVEL_DESC =
-            "Default log level for all categories. Changing this setting will "
-            "require a restart of the application to take effect.";
+            "Default log level for all categories. This setting determines the "
+            "minimum severity of log messages that will be recorded.";
         static constexpr LogLevel DEFAULT_LOG_LEVEL_DEFAULT = LogLevel::Info;
     };
 

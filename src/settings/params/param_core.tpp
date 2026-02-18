@@ -428,8 +428,6 @@ namespace settings
                 "std::optional<T>& newValue)"
             );
 
-        _subscribers[id] = Subscriber{fn, user};
-
         return Connection::make(this, id, &ParamCore<T>::_disconnect<U>);
     }
 
