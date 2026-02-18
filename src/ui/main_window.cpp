@@ -36,9 +36,13 @@ namespace ui
         setWindowTitle("Molar Tracker");
         resize(5000, 3000);
         _buildUI();
-
-        _ensureProfileExists();
     }
+
+    /**
+     * @brief Start the main window (show it)
+     *
+     */
+    void MainWindow::start() { _ensureProfileExists(); }
 
     /**
      * @brief Build the UI of the main window

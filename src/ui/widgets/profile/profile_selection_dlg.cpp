@@ -135,6 +135,7 @@ namespace ui
         const auto profileName = selectedItems.first()->text().toStdString();
 
         _emit(Action::Ok, profileName);
+        accept();
     }
 
     /**
@@ -148,10 +149,9 @@ namespace ui
      *
      * @param event
      */
-    void ProfileSelectionDialog::closeEvent(QCloseEvent* event)
+    void ProfileSelectionDialog::closeEvent(QCloseEvent* /*event*/)
     {
-        QDialog::closeEvent(event);
-        _emit(Action::Cancel);
+        _emitCancel();
     }
 
 }   // namespace ui

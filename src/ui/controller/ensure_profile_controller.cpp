@@ -133,7 +133,7 @@ namespace ui
         showWarningMessageBox(
             "No Default Profile Configured",
             LOG_WARNING_OBJECT(
-                "No Default Profile Configured No default profile is "
+                "No Default Profile Configured - No default profile is "
                 "configured. You will need to select an existing profile or "
                 "create a new one to continue."
             )
@@ -181,22 +181,6 @@ namespace ui
                 _callCount = MAX_PROFILE_CHECKS;   // reset call count for
                                                    // future attempts
             }
-
-            showWarningMessageBox(
-                "Failed to Ensure Profile Existence",
-                LOG_WARNING_OBJECT(
-                    "Failed to Ensure Profile Existence No active profile "
-                    "found "
-                    "after ensuring profile existence. This should not happen, "
-                    "as "
-                    "the ensureProfileExists method should have set an active "
-                    "profile. Trying to ensure profile existence again. If you "
-                    "keep seeing this message, please report it to the "
-                    "developers "
-                    "under " +
-                    Constants::getGithubIssuesUrl()
-                )
-            );
 
             ensureProfileExists();
         }
@@ -302,21 +286,7 @@ namespace ui
 
             case ProfileSelectionDialog::Action::Cancel:
             {
-                _profileSelectionDialog->close();
-
-                showWarningMessageBox(
-                    "No Profile Selected",
-                    LOG_WARNING_OBJECT(
-                        "No profile selected. Application cannot continue "
-                        "without "
-                        "an active profile. Trying to ensure profile existence "
-                        "again. If you keep seeing this message, please report "
-                        "it "
-                        "to the developers under " +
-                        Constants::getGithubIssuesUrl()
-                    )
-                );
-
+                _profileSelectionDialog->reject();
                 _relaunch();
                 break;
             }
@@ -406,7 +376,7 @@ namespace ui
                         _mainWindow.statusBar()
                     );
 
-                    _addProfileDialog->close();
+                    _addProfileDialog->accept();
                 }
 
                 _relaunch();
@@ -415,14 +385,7 @@ namespace ui
 
             case AddProfileDialog::Action::Cancel:
             {
-                LOG_WARNING(
-                    "No profile created. Application cannot continue without "
-                    "an active profile. Trying to ensure profile existence "
-                    "again. If you keep seeing this message, please report it "
-                    "to the developers under " +
-                    Constants::getGithubIssuesUrl()
-                );
-                _addProfileDialog->close();
+                _addProfileDialog->reject();
                 _relaunch();
                 break;
             }

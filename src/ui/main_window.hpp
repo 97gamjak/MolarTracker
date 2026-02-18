@@ -48,6 +48,8 @@ namespace ui
             QWidget*         parent = nullptr
         );
 
+        void start();
+
        private:
         void _buildUI();
         void _buildMenuBar();
