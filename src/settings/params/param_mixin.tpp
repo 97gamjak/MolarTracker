@@ -15,7 +15,25 @@ namespace settings
      */
 
     template <typename Derived, typename T>
-    const std::optional<T>& ParamMixin<Derived, T>::get() const
+    const std::optional<T>& ParamMixin<Derived, T>::getOptional() const
+    {
+        return _self()._core.getOptional();
+    }
+
+    /**
+     * @brief Get the value of the parameter, if the value is not set, it will
+     * return the default value if it exists, otherwise it will throw an
+     * exception
+     *
+     * @throws ParamException if the value is not set and no default value is
+     * provided
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return const T&
+     */
+    template <typename Derived, typename T>
+    const T& ParamMixin<Derived, T>::get() const
     {
         return _self()._core.get();
     }
@@ -98,6 +116,38 @@ namespace settings
     void ParamMixin<Derived, T>::setDescription(const std::string& description)
     {
         _self()._core.setDescription(description);
+    }
+
+    /**
+     * @brief Subscribe to changes of the parameter
+     *
+     * @tparam Derived
+     * @tparam T
+     * @param func
+     * @param user
+     */
+    template <typename Derived, typename T>
+    Connection ParamMixin<Derived, T>::subscribe(ChangedFn func, void* user)
+    {
+        return _self()._core.subscribe(func, user);
+    }
+
+    /**
+     * @brief Subscribe to changes of the parameter with return type
+     * std::optional<T>
+     *
+     * @tparam Derived
+     * @tparam T
+     * @param func
+     * @param user
+     */
+    template <typename Derived, typename T>
+    Connection ParamMixin<Derived, T>::subscribeToOptional(
+        ChangedFnOptional func,
+        void*             user
+    )
+    {
+        return _self()._core.subscribeToOptional(func, user);
     }
 
     /**

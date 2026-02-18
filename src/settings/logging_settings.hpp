@@ -1,6 +1,7 @@
 #ifndef __SETTINGS__LOGGING_SETTINGS_HPP__
 #define __SETTINGS__LOGGING_SETTINGS_HPP__
 
+#include "config/logging_base.hpp"
 #include "exceptions/base.hpp"
 #include "params/params.hpp"
 
@@ -72,6 +73,15 @@ namespace settings
             "will require a restart of the application to take effect.";
         static constexpr size_t MAX_LOG_FILE_SIZE_MB_DEFAULT = 50;
         static constexpr size_t MAX_LOG_FILE_SIZE_MB_MIN     = 1;
+
+        // default loglevel for categories
+        static constexpr const char* DEFAULT_LOG_LEVEL_KEY = "defaultLogLevel";
+        static constexpr const char* DEFAULT_LOG_LEVEL_TITLE =
+            "Default Log Level";
+        static constexpr const char* DEFAULT_LOG_LEVEL_DESC =
+            "Default log level for all categories. This setting determines the "
+            "minimum severity of log messages that will be recorded.";
+        static constexpr LogLevel DEFAULT_LOG_LEVEL_DEFAULT = LogLevel::Info;
     };
 
     /**
@@ -114,6 +124,11 @@ namespace settings
             Schema::MAX_LOG_FILE_SIZE_MB_TITLE,
             Schema::MAX_LOG_FILE_SIZE_MB_DESC
         };
+        EnumParam<LogLevel> _defaultLogLevel{
+            Schema::DEFAULT_LOG_LEVEL_KEY,
+            Schema::DEFAULT_LOG_LEVEL_TITLE,
+            Schema::DEFAULT_LOG_LEVEL_DESC
+        };
 
        public:
         LoggingSettings();
@@ -123,6 +138,10 @@ namespace settings
         [[nodiscard]] std::string getLogFileSuffix() const;
         [[nodiscard]] size_t      getMaxLogFiles() const;
         [[nodiscard]] size_t      getMaxLogFileSizeMB() const;
+
+        [[nodiscard]] EnumParam<LogLevel>&       getDefaultLogLevelParam();
+        [[nodiscard]] const EnumParam<LogLevel>& getDefaultLogLevelParam(
+        ) const;
 
         [[nodiscard]] nlohmann::json toJson() const;
 

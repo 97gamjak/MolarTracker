@@ -23,6 +23,8 @@ namespace settings
         _maxLogFileSizeMB.setDefault(Schema::MAX_LOG_FILE_SIZE_MB_DEFAULT);
         _maxLogFileSizeMB.setMinValue(Schema::MAX_LOG_FILE_SIZE_MB_MIN);
 
+        _defaultLogLevel.setDefault(Schema::DEFAULT_LOG_LEVEL_DEFAULT);
+
         _logDirectory.setRebootRequired(true);
         _logFilePrefix.setRebootRequired(true);
         _logFileSuffix.setRebootRequired(true);
@@ -42,7 +44,8 @@ namespace settings
             _logFilePrefix,
             _logFileSuffix,
             _maxLogFiles,
-            _maxLogFileSizeMB
+            _maxLogFileSizeMB,
+            _defaultLogLevel
         );
     }
 
@@ -59,7 +62,8 @@ namespace settings
             _logFilePrefix,
             _logFileSuffix,
             _maxLogFiles,
-            _maxLogFileSizeMB
+            _maxLogFileSizeMB,
+            _defaultLogLevel
         );
     }
 
@@ -70,13 +74,7 @@ namespace settings
      */
     std::string LoggingSettings::getLogDirectory() const
     {
-        if (_logDirectory.get().has_value())
-            return _logDirectory.get().value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LoggingSettingsException("Log directory is not set");
+        return _logDirectory.get();
     }
 
     /**
@@ -86,13 +84,7 @@ namespace settings
      */
     std::string LoggingSettings::getLogFileSuffix() const
     {
-        if (_logFileSuffix.get().has_value())
-            return _logFileSuffix.get().value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LoggingSettingsException("Log file suffix is not set");
+        return _logFileSuffix.get();
     }
 
     /**
@@ -102,13 +94,7 @@ namespace settings
      */
     std::string LoggingSettings::getLogFilePrefix() const
     {
-        if (_logFilePrefix.get().has_value())
-            return _logFilePrefix.get().value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LoggingSettingsException("Log file prefix is not set");
+        return _logFilePrefix.get();
     }
 
     /**
@@ -118,13 +104,7 @@ namespace settings
      */
     size_t LoggingSettings::getMaxLogFiles() const
     {
-        if (_maxLogFiles.get().has_value())
-            return _maxLogFiles.get().value();
-
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LoggingSettingsException("Max log files is not set");
+        return _maxLogFiles.get();
     }
 
     /**
@@ -134,13 +114,31 @@ namespace settings
      */
     size_t LoggingSettings::getMaxLogFileSizeMB() const
     {
-        if (_maxLogFileSizeMB.get().has_value())
-            return _maxLogFileSizeMB.get().value();
+        return _maxLogFileSizeMB.get();
+    }
 
-        // should not happen, but if it does, we should throw an exception to
-        // indicate that the value is not set, this is a critical error that
-        // should be handled by the caller
-        throw LoggingSettingsException("Max log file size (MB) is not set");
+    /**
+     * @brief Get the default log level parameter, this returns the EnumParam
+     * object itself to allow for setting the value and other properties of the
+     * parameter, such as the default value and whether it requires a reboot.
+     *
+     * @return EnumParam<LogLevel>&
+     */
+    [[nodiscard]] EnumParam<LogLevel>& LoggingSettings::getDefaultLogLevelParam(
+    )
+    {
+        return _defaultLogLevel;
+    }
+
+    /**
+     * @brief Get the default log level parameter (const version)
+     *
+     * @return const EnumParam<LogLevel>&
+     */
+    [[nodiscard]] const EnumParam<LogLevel>& LoggingSettings::
+        getDefaultLogLevelParam() const
+    {
+        return _defaultLogLevel;
     }
 
     /**

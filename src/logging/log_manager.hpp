@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "config/logging_base.hpp"
+#include "connections/connection.hpp"
 #include "utils/ring_file.hpp"
 
 enum class LogLevel : size_t;      // forward declaration
@@ -27,6 +29,7 @@ class LogManager
     std::unordered_map<LogCategory, LogLevel> _categories{};
     RingFile                                  _ringFile{};
     std::filesystem::path                     _logDirectory{};
+    LogLevel                                  _defaultLogLevel{LogLevel::Info};
 
    public:
     static LogManager& getInstance();
@@ -45,6 +48,11 @@ class LogManager
     std::filesystem::path getCurrentLogFilePath() const;
 
     void log(const LogObject& logObject);
+
+    // TODO(97gamjak): this should be done via a command and undo stack and
+    // should also be private
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-102
+    void setDefaultLogLevel(const LogLevel& level);
 
    private:
     LogManager();

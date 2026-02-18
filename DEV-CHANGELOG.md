@@ -10,6 +10,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 - implement `SemVer` class for versioning
 
+#### Controllers
+
+- implement container like `Controllers` type to separate controller handling from main window
+
 #### Settings
 
 - Add `version` and `oldVersion` to `Settings`
@@ -19,6 +23,8 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `lineWrap` settings for log viewer dialog
 - Add variable to check if reboot is required to `ParamCore`
 - Add settings for ring file logging
+- Add subscription for default log level settings
+- Add runtime check if a subscription is for a `ParamCore` that needs restart -> throw `ParamException`
 
 #### Connections
 

@@ -2,9 +2,8 @@
 #define __UI__LOGGING__DEBUG_SLOTS_DIALOG_HPP__
 
 #include <QDialog>
-#include <unordered_map>
 
-#include "logging/logging_base.hpp"
+#include "config/logging_base.hpp"
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration

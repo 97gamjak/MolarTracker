@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "command.hpp"
-#include "logging/logging_base.hpp"
+#include "config/logging_base.hpp"
 
 namespace ui
 {

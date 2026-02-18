@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QPointer>
 
-#include "logging/logging_base.hpp"
 #include "ui/widgets/logging/debug_slots_dialog.hpp"
 #include "ui/widgets/logging/log_viewer_dialog.hpp"
 
@@ -17,9 +16,8 @@ class QMainWindow;   // Forward declaration
 
 namespace ui
 {
-    class DebugMenu;          // Forward declaration
-    class DebugSlotsDialog;   // Forward declaration
-    class UndoStack;          // Forward declaration
+    class DebugMenu;   // Forward declaration
+    class UndoStack;   // Forward declaration
 
     /**
      * @brief Controller for the debug menu actions

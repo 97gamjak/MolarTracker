@@ -16,7 +16,7 @@ namespace settings
           }
     {
         _version.set(utils::SemVer(Constants::getVersion()));
-        _currentVersion = _version.get();
+        _currentVersion = _version.getOptional();
     }
 
     /**
@@ -64,7 +64,7 @@ namespace settings
      */
     std::optional<std::string> GeneralSettings::getDefaultProfile() const
     {
-        return _defaultProfile.get();
+        return _defaultProfile.getOptional();
     }
 
     /**
@@ -74,7 +74,7 @@ namespace settings
      */
     bool GeneralSettings::hasDefaultProfile() const
     {
-        return _defaultProfile.get().has_value();
+        return _defaultProfile.getOptional().has_value();
     }
 
     /**
@@ -99,7 +99,7 @@ namespace settings
     )
     {
         paramsFromJson(settings._getParams(), jsonData);
-        settings._savedVersion = settings._version.get();
+        settings._savedVersion = settings._version.getOptional();
     }
 
 }   // namespace settings

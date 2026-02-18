@@ -4,6 +4,8 @@
 #include <expected>
 
 #include "mstd/type_traits.hpp"
+#include "nlohmann/json.hpp"
+#include "param_core.hpp"
 #include "param_mixin.hpp"
 
 namespace settings
@@ -25,9 +27,13 @@ namespace settings
         ParamCore<E> _core;
 
         using EnumMeta = mstd::enum_meta_t<E>;
-        EnumParam(std::string key, std::string title);
 
        public:
+        EnumParam(std::string key, std::string title, std::string description);
+
+        [[nodiscard]] nlohmann::json toJson() const;
+        static void fromJson(const nlohmann::json& j, EnumParam<E>& param);
+
         std::expected<void, ParamError> set(const E& value);
     };
 

@@ -2,8 +2,8 @@
 
 #include <format>
 
+#include "config/logging_base.hpp"
 #include "log_object.hpp"
-#include "logging_base.hpp"
 #include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
 #include "utils/timestamp.hpp"
@@ -58,7 +58,7 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
     // https://97gamjak.atlassian.net/browse/MOLTRACK-84
     std::unordered_map<LogCategory, LogLevel> defaultCategories;
     for (const auto category : LogCategoryMeta::values)
-        defaultCategories[category] = LogLevel::Info;
+        defaultCategories[category] = _defaultLogLevel;
 
     return defaultCategories;
 }
@@ -200,4 +200,15 @@ std::string LogManager::_logLevelToString(const LogLevel& level) const
     const auto cleanLevelStr = "<" + levelStr + ">:";
 
     return std::vformat(format, std::make_format_args(cleanLevelStr));
+}
+
+/**
+ * @brief Set the default log level, this is used to update the default log
+ * level when the corresponding setting is changed
+ *
+ * @param level
+ */
+void LogManager::setDefaultLogLevel(const LogLevel& level)
+{
+    _defaultLogLevel = level;
 }

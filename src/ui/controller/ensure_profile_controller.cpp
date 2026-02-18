@@ -8,7 +8,6 @@
 
 #include "app/app_context.hpp"
 #include "config/constants.hpp"
-#include "logging/logging_base.hpp"
 #include "ui/commands/add_profile_command.hpp"
 #include "ui/commands/add_profile_command_error.hpp"
 #include "ui/commands/undo_stack.hpp"
