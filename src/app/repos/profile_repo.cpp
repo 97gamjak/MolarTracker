@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include "app/factories/profile_factory.hpp"
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud.hpp"
@@ -24,55 +25,6 @@ namespace app
      */
     void ProfileRepo::ensureSchema() { orm::create_table<ProfileRow>(_db); }
 
-    // TODO(97gamjak): create a static factory class to handle these conversions
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-86
-    /**
-     * @brief Convert a ProfileRow to a Profile domain object
-     *
-     * @param row
-     * @return Profile
-     */
-    Profile toDomain(const ProfileRow& row)
-    {
-        return Profile{row.id.value(), row.name.value(), row.email.value()};
-    }
-
-    // TODO(97gamjak): create a static factory class to handle these conversions
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-86
-    /**
-     * @brief Convert a vector of ProfileRow to a vector of Profile domain
-     * objects
-     *
-     * @param rows
-     * @return std::vector<Profile>
-     */
-    std::vector<Profile> toDomains(const std::vector<ProfileRow>& rows)
-    {
-        std::vector<Profile> profiles;
-
-        for (const auto& row : rows)
-            profiles.push_back(toDomain(row));
-
-        return profiles;
-    }
-
-    // TODO(97gamjak): create a static factory class to handle these conversions
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-86
-    /**
-     * @brief Convert a Profile domain object to a ProfileRow
-     *
-     * @param profile
-     * @return ProfileRow
-     */
-    ProfileRow toRow(const Profile& profile)
-    {
-        ProfileRow row;
-        row.id    = profile.getId();
-        row.name  = profile.getName();
-        row.email = profile.getEmail();
-        return row;
-    }
-
     /**
      * @brief Get all profiles from the database
      *
@@ -80,7 +32,7 @@ namespace app
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return toDomains(orm::get_all<ProfileRow>(_db));
+        return ProfileFactory::toDomains(orm::get_all<ProfileRow>(_db));
     }
 
     /**
@@ -94,7 +46,7 @@ namespace app
         const auto profile = orm::get_by_pk<ProfileRow>(_db, id);
 
         if (profile.has_value())
-            return toDomain(profile.value());
+            return ProfileFactory::toDomain(profile.value());
 
         return std::nullopt;
     }
@@ -115,7 +67,7 @@ namespace app
         );
 
         if (profile.has_value())
-            return toDomain(profile.value());
+            return ProfileFactory::toDomain(profile.value());
 
         return std::nullopt;
     }
@@ -133,7 +85,7 @@ namespace app
     )
     {
         const auto profile = Profile{ProfileId::from(0), name, email};
-        const auto rowId   = orm::insert(_db, toRow(profile));
+        const auto rowId   = orm::insert(_db, ProfileFactory::toRow(profile));
 
         if (rowId <= 0)
         {
@@ -186,7 +138,7 @@ namespace app
         const auto& existingProfile = existingProfileOpt.value();
         Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
-        orm::update(_db, toRow(updatedProfile));
+        orm::update(_db, ProfileFactory::toRow(updatedProfile));
     }
 
     /**

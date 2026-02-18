@@ -8,6 +8,7 @@ target_link_libraries(molartracker_app_repos
     PRIVATE
     molartracker_db
     molartracker_app_domain
+    molartracker_app_factories
 )
 
 target_include_directories(molartracker_app_repos

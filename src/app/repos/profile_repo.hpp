@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "repos_api/i_profile_repo.hpp"
-#include "sql_models/profile_row.hpp"
 
 namespace db
 {

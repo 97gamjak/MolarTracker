@@ -11,6 +11,7 @@ add_subdirectory(domain)
 add_subdirectory(services_api)
 add_subdirectory(repos_api)
 add_subdirectory(store)
+add_subdirectory(factories)
 
 target_include_directories(molartracker_app
     PUBLIC
@@ -24,5 +25,6 @@ target_link_libraries(molartracker_app
     molartracker_app_services
     molartracker_app_domain
     molartracker_app_store
+    molartracker_app_factories
     molartracker_logging
 )
