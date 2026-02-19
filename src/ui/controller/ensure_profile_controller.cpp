@@ -278,8 +278,8 @@ namespace ui
                     _mainWindow.statusBar()
                 );
 
-                if (_profileSelectionDialog)
-                    _profileSelectionDialog->accept();
+                if (auto* dialog = _profileSelectionDialog.data())
+                    dialog->accept();
 
                 _relaunch();
                 break;
@@ -287,8 +287,8 @@ namespace ui
 
             case ProfileSelectionDialog::Action::Cancel:
             {
-                if (_profileSelectionDialog)
-                    _profileSelectionDialog->reject();
+                if (auto* dialog = _profileSelectionDialog.data())
+                    dialog->reject();
 
                 _relaunch();
                 break;
@@ -379,8 +379,8 @@ namespace ui
                         _mainWindow.statusBar()
                     );
 
-                    if (_addProfileDialog)
-                        _addProfileDialog->accept();
+                    if (auto* dialog = _addProfileDialog.data())
+                        dialog->accept();
                 }
 
                 _relaunch();
@@ -389,8 +389,9 @@ namespace ui
 
             case AddProfileDialog::Action::Cancel:
             {
-                if (_addProfileDialog)
-                    _addProfileDialog->reject();
+                if (auto* dialog = _addProfileDialog.data())
+                    dialog->reject();
+
                 _relaunch();
                 break;
             }
