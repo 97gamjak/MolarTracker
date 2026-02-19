@@ -4,6 +4,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Bug Fixes
+
+- Fix CI check for changes in CHANGELOG files
+
 ### Features
 
 #### Utils
