@@ -8,10 +8,6 @@ All changes and updates, that are relevant for a user will be documented here
 
 - if no default profile is set or exists at startup the error cases are now fixed and everything should behave as expected
 
-### Test
-
-- test
-
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 
