@@ -6,7 +6,8 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Bug Fixes
 
-- if no default profile is set or exists at startup the error cases are now fixed and everything should behave as expected
+- If no default profile is set or exists at startup the error cases are now fixed and everything should behave as expected
+- Fix CI building issue for Linux releases 
 
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
