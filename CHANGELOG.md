@@ -7,6 +7,9 @@ All changes and updates, that are relevant for a user will be documented here
 ### Bug Fixes
 
 - if no default profile is set or exists at startup the error cases are now fixed and everything should behave as expected
+
+### Test
+
 - test
 
 <!-- insertion marker -->
