@@ -72,7 +72,6 @@ namespace ui
        private:
         void _defaultProfileExists();
         void _noDefaultProfile();
-        void _relaunch();
         void _showAddProfileDialog();
         void _showProfileSelectionDialog();
     };

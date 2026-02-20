@@ -20,6 +20,8 @@ namespace ui
      *
      * @param parent Parent widget
      * @param profiles List of profile names to display
+     * @param canBeClosed Whether the dialog can be closed without selecting a
+     * profile
      */
     ProfileSelectionDialog::ProfileSelectionDialog(
         QWidget*                        parent,
@@ -103,7 +105,6 @@ namespace ui
      * @brief Handle the close event of the dialog. If the dialog is closed
      * without selecting a profile, emit the cancel action.
      *
-     * @param event The close event
      */
     void ProfileSelectionDialog::reject()
     {

@@ -170,7 +170,8 @@ namespace ui
         _addProfileDialog->setAttribute(Qt::WA_DeleteOnClose);
         _addProfileDialog->setEnforceDefaultProfile(true);
 
-        _addProfileDialog->exec();
+        if (auto* dialog = _addProfileDialog.data())
+            dialog->exec();
     }
 
     /**
@@ -199,7 +200,8 @@ namespace ui
         _profileSelectionDialog->setModal(true);
         _profileSelectionDialog->setAttribute(Qt::WA_DeleteOnClose);
 
-        _profileSelectionDialog->exec();
+        if (auto* dialog = _profileSelectionDialog.data())
+            dialog->exec();
     }
 
     /**
@@ -319,8 +321,8 @@ namespace ui
                     _mainWindow.statusBar()
                 );
 
-                if (auto dlg = _addProfileDialog)
-                    dlg->accept();
+                if (auto* dialog = _addProfileDialog.data())
+                    dialog->accept();
             }
         }
     }

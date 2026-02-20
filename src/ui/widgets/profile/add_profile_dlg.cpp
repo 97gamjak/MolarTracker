@@ -25,6 +25,8 @@ namespace ui
      * @param profileStore Reference to the Profile Store
      * @param settings Reference to the Settings
      * @param undoStack Reference to the Undo Stack
+     * @param canBeClosed Whether the dialog can be closed without adding a
+     * profile
      * @param parent Parent widget
      */
     AddProfileDialog::AddProfileDialog(
@@ -254,7 +256,6 @@ namespace ui
      * @brief Handle the close event of the dialog. If the dialog is closed
      * without adding a profile, emit the cancel action.
      *
-     * @param event The close event
      */
     void AddProfileDialog::reject()
     {
