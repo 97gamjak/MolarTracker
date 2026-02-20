@@ -10,9 +10,16 @@ namespace settings
 
 namespace ui
 {
+    /**
+     * @brief A container for all controllers in the application. This class is
+     * responsible for initializing and managing the lifecycle of all
+     * controllers.
+     *
+     */
     class Controllers
     {
        private:
+        /// Controller for handling logging related functionality
         LoggingController _loggingController;
 
        public:

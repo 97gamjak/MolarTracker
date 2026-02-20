@@ -28,6 +28,8 @@ LogManager::LogManager() { _categories = getDefaultCategories(); }
 /**
  * @brief Initializes the ring file logger
  *
+ * @param settings Logging settings containing the configuration for the ring
+ * file logger
  * @param directory Directory where the log files will be stored
  */
 void LogManager::initializeRingFileLogger(
@@ -35,7 +37,7 @@ void LogManager::initializeRingFileLogger(
     const std::filesystem::path&     directory
 )
 {
-    RingFile::Config config;
+    RingFileConfig config;
 
     config.directory = directory / settings.getLogDirectory();
     config.baseName  = settings.getLogFilePrefix() + Timestamp::fileSafe();
@@ -141,12 +143,7 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getCategories() const
 /**
  * @brief Log a message
  *
- * @param level
- * @param category
- * @param file
- * @param line
- * @param function
- * @param message
+ * @param logObject The log object containing the log message and metadata
  */
 void LogManager::log(const LogObject& logObject)
 {

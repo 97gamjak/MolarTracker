@@ -5,11 +5,8 @@
 /**
  * @brief Construct a new Log Entry Scope:: Log Entry Scope object
  *
- * @param level
- * @param category
- * @param function
- * @param file
- * @param line
+ * @param logObject The log object to use for logging entry and exit of the
+ * scope
  */
 LogEntryScope::LogEntryScope(const LogObject& logObject)
     : _logObject{logObject},
@@ -39,14 +36,16 @@ LogEntryScope::~LogEntryScope()
 /**
  * @brief Construct a new Timed Log Entry Scope:: Timed Log Entry Scope object
  *
- * @param level
- * @param category
- * @param function
- * @param file
- * @param line
+ * This class extends LogEntryScope to also log the duration of the scope in
+ * milliseconds when exiting the scope. It uses a steady clock to measure the
+ * time difference between the construction and destruction of the object.
+ *
+ * @param logObject The log object to use for logging entry and exit of the
+ * scope, the exit log will also include the duration of the scope in
+ * milliseconds
  */
 TimedLogEntryScope::TimedLogEntryScope(const LogObject& logObject)
-    : LogEntryScope(logObject), _start{Clock::now()}
+    : LogEntryScope(logObject), _start{std::chrono::steady_clock::now()}
 {
 }
 
@@ -60,7 +59,7 @@ TimedLogEntryScope::~TimedLogEntryScope()
     {
         using namespace std::chrono;
 
-        const auto timeDifference = Clock::now() - _start;
+        const auto timeDifference = steady_clock::now() - _start;
         const auto _ms            = duration_cast<milliseconds>(timeDifference);
         const auto ms             = _ms.count();
 

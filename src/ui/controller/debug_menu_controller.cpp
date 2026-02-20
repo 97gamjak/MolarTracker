@@ -25,6 +25,7 @@ namespace ui
      * @param mainWindow
      * @param debugMenu
      * @param appContext
+     * @param undoStack
      */
     DebugMenuController::DebugMenuController(
         QMainWindow&     mainWindow,
@@ -178,6 +179,12 @@ namespace ui
     /**
      * @brief Discard debug flag changes and reset to current values
      *
+     * This is used when there was an error while applying the changes, to reset
+     * the dialog to the current values and avoid leaving it in an inconsistent
+     * state.
+     *
+     * @param categories The current debug flag categories to reset to
+     *
      */
     void DebugMenuController::_applyDebugFlagChanges(
         const LogCategoryMap& categories
@@ -222,6 +229,10 @@ namespace ui
         _debugSlotsDialog->accept();
     }
 
+    /**
+     * @brief Apply log viewer settings to the dialog
+     *
+     */
     void DebugMenuController::_applyLogViewerSettings()
     {
         const auto& settings =

@@ -218,7 +218,6 @@ namespace ui
      * @brief emit the requested signal with the given action and profile draft
      *
      * @param action
-     * @param profileDraft
      */
     void AddProfileDialog::_emit(const Action& action)
     {
@@ -228,16 +227,12 @@ namespace ui
     /**
      * @brief emit the requested signal with the Ok action and profile draft
      *
-     * @param action
-     * @param profileDraft
      */
     void AddProfileDialog::_emitOk() { _emit(Action::Ok); }
 
     /**
      * @brief emit the requested signal with the Cancel action
      *
-     * @param action
-     * @param profileDraft
      */
     void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
 

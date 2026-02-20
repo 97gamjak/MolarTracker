@@ -10,12 +10,22 @@
 
 namespace settings
 {
+    /**
+     * @brief Schema for the application settings. This defines the keys and
+     * descriptions for the settings parameters.
+     *
+     */
     class SettingsSchema
     {
        public:
-        static constexpr const char* SETTINGS_KEY   = "settings";
+        /// The key for the settings container
+        static constexpr const char* SETTINGS_KEY = "settings";
+
+        /// The title for the settings container
         static constexpr const char* SETTINGS_TITLE = "Settings";
-        static constexpr const char* SETTINGS_DESC  = "Settings";
+
+        /// The description for the settings container
+        static constexpr const char* SETTINGS_DESC = "Settings";
     };
 
     /**
@@ -24,18 +34,23 @@ namespace settings
     class Settings : public ParamContainerMixin<Settings>
     {
        private:
-        using Schema = SettingsSchema;
-
+        /// The core container for the settings parameters
         ParamContainer _core;
 
-        // clang-format off
+        // TODO: maybe move this somewhere else
+        /// The name of the settings file
         static constexpr const char* _settingsFileName = "settings.json";
-        // clang-format on
 
+        /// The path to the settings file
         std::filesystem::path _settingsPath;
 
+        /// The general settings parameters
         GeneralSettings _generalSettings;
-        UISettings      _uiSettings;
+
+        /// The UI settings parameters
+        UISettings _uiSettings;
+
+        /// The logging settings parameters
         LoggingSettings _loggingSettings;
 
        public:

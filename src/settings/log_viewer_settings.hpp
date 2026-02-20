@@ -15,45 +15,74 @@ namespace settings
      */
     struct LogViewerSettingsSchema
     {
-        // general schema keys and metadata
+        /***********************
+         * Log Viewer Settings *
+         ***********************/
+
+        /// log viewer settings key
         static constexpr const char* LOG_VIEWER_SETTINGS_KEY =
             "logViewerSettings";
+        /// log viewer settings title
         static constexpr const char* LOG_VIEWER_SETTINGS_TITLE =
             "Log Viewer Settings";
+        /// log viewer settings description
         static constexpr const char* LOG_VIEWER_SETTINGS_DESC =
             "Settings related to the log viewer component.";
 
-        // reload interval keys and metadata
+        /*******************
+         * Reload Interval *
+         *******************/
+
+        /// reload interval key
         static constexpr const char* RELOAD_INTERVAL_SEC_KEY =
             "reloadIntervalSec";
+        /// reload interval title
         static constexpr const char* RELOAD_INTERVAL_SEC_TITLE =
             "Reload Interval (seconds)";
+        /// reload interval description
         static constexpr const char* RELOAD_INTERVAL_SEC_DESC =
             "Interval in seconds for reloading logs. A smaller value means "
             "more frequent updates but may increase CPU usage.";
-        static constexpr double      RELOAD_INTERVAL_SEC_DEFAULT   = 1.0;
-        static constexpr double      RELOAD_INTERVAL_SEC_MIN       = 0.001;
+        /// reload interval default value
+        static constexpr double RELOAD_INTERVAL_SEC_DEFAULT = 1.0;
+        /// reload interval minimum value
+        static constexpr double RELOAD_INTERVAL_SEC_MIN = 0.001;
+        /// reload interval precision (number of decimal places)
         static constexpr std::size_t RELOAD_INTERVAL_SEC_PRECISION = 3;
 
-        // auto-reload keys and metadata
+        /***********************
+         * Automatic Reloading *
+         ***********************/
+
+        /// auto reload key
         static constexpr const char* AUTO_RELOAD_KEY = "autoReload";
+        /// auto reload title
         static constexpr const char* AUTO_RELOAD_TITLE =
             "Automatic Reloading Log File";
+        /// auto reload description
         static constexpr const char* AUTO_RELOAD_DESC =
             "Enable or disable automatic reloading of the log file. When "
             "enabled, the log viewer will automatically reload the log file at "
             "the specified interval. When disabled, the log viewer will only "
             "reload the log file when the user manually triggers a reload.";
+        /// auto reload default value
         static constexpr bool AUTO_RELOAD_DEFAULT = false;
 
-        // line wrap keys and metadata
-        static constexpr const char* LINE_WRAP_KEY   = "lineWrap";
+        /*****************
+         * Line Wrapping *
+         *****************/
+
+        /// line wrap key
+        static constexpr const char* LINE_WRAP_KEY = "lineWrap";
+        /// line wrap title
         static constexpr const char* LINE_WRAP_TITLE = "Line Wrap";
+        /// line wrap description
         static constexpr const char* LINE_WRAP_DESC =
             "Enable or disable line wrapping in the log viewer. When enabled, "
             "long lines will be wrapped to fit the width of the log viewer. "
             "When disabled, long lines will be displayed on a single line and "
             "may require horizontal scrolling to view the entire line.";
+        /// line wrap default value
         static constexpr bool LINE_WRAP_DEFAULT = false;
     };
 
@@ -63,20 +92,33 @@ namespace settings
     class LogViewerSettings : public ParamContainerMixin<LogViewerSettings>
     {
        private:
+        /// type alias for LogViewerSettingsSchema
         using Schema = LogViewerSettingsSchema;
+        /// friend declaration to allow ParamContainerMixin to access private
+        /// members of LogViewerSettings, this is necessary because
+        /// ParamContainerMixin needs to access the _core member of
+        /// LogViewerSettings to implement the functionality for log viewer
+        /// settings
         friend ParamContainerMixin<LogViewerSettings>;
+
+        /// The core container for the log viewer settings parameters
         ParamContainer _core;
 
+        /// The interval in seconds for reloading logs
         NumericParam<double> _reloadIntervalSec{
             Schema::RELOAD_INTERVAL_SEC_KEY,
             Schema::RELOAD_INTERVAL_SEC_TITLE,
             Schema::RELOAD_INTERVAL_SEC_DESC
         };
+
+        /// Whether to enable automatic reloading of the log file
         BoolParam _autoReload{
             Schema::AUTO_RELOAD_KEY,
             Schema::AUTO_RELOAD_TITLE,
             Schema::AUTO_RELOAD_DESC
         };
+
+        /// Whether to enable line wrapping in the log viewer
         BoolParam _lineWrap{
             Schema::LINE_WRAP_KEY,
             Schema::LINE_WRAP_TITLE,

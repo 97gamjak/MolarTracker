@@ -18,11 +18,14 @@ namespace ui
         Q_OBJECT
 
        signals:
+        /// Signal emitted when the user requests to see the about dialog
         void requestAbout();
 
        private:
+        /// Pointer to the help menu widget
         QMenu* _helpMenu = nullptr;
 
+        /// The about action in the help menu
         QAction* _aboutAction = nullptr;
 
        public:

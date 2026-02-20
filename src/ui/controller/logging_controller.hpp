@@ -10,9 +10,21 @@ namespace settings
 
 namespace ui
 {
+    /**
+     * @brief Controller for managing logging settings and behavior in the UI.
+     *
+     * This controller is responsible for subscribing to changes in the logging
+     * settings and updating the logging behavior accordingly. It manages a
+     * connection to the logging settings to ensure that any changes are
+     * reflected in the application's logging system.
+     *
+     */
     class LoggingController
     {
        private:
+        /// Connection object for the logging settings change subscription. This
+        /// is used to manage the subscription and ensure that it can be
+        /// properly disconnected when the controller is destroyed.
         Connection _logLevelConnection;
 
        public:

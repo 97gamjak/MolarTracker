@@ -1,12 +1,11 @@
 #ifndef __UTILS__RING_FILE_HPP__
 #define __UTILS__RING_FILE_HPP__
 
-#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include <system_error>
-#include <vector>
+
+#include "ring_file_config.hpp"
 
 // TODO: migrate this RingFile to mstd
 // https://97gamjak.atlassian.net/browse/MSTD-90
@@ -22,22 +21,21 @@
  */
 class RingFile
 {
-   public:
-    struct Config
-    {
-        std::filesystem::path directory{};
-        std::string           baseName{"log"};
-        std::string           extension{".txt"};
-        std::size_t           maxFiles{10};
-        bool                  append{true};
-        bool                  ignoreZeroIndex{true};
-        std::uintmax_t        maxSizeMB{50};
-    };
+   private:
+    /// type alias for the configuration struct
+    using Config = RingFileConfig;
 
    private:
-    Config         _config{};
-    std::ofstream  _file{};
+    /// The configuration for the RingFile
+    Config _config{};
+
+    /// The currently open file stream for writing log entries
+    std::ofstream _file{};
+
+    /// The index of the current file in the ring
     std::uintmax_t _initialFileSize{0};
+
+    /// The total number of bytes written to the current file
     std::uintmax_t _bytesWritten{0};
 
    public:

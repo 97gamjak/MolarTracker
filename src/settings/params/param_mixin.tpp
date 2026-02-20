@@ -125,6 +125,7 @@ namespace settings
      * @tparam T
      * @param func
      * @param user
+     * @return Connection
      */
     template <typename Derived, typename T>
     Connection ParamMixin<Derived, T>::subscribe(ChangedFn func, void* user)
@@ -140,6 +141,7 @@ namespace settings
      * @tparam T
      * @param func
      * @param user
+     * @return Connection
      */
     template <typename Derived, typename T>
     Connection ParamMixin<Derived, T>::subscribeToOptional(

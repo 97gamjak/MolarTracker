@@ -20,8 +20,10 @@ namespace ui
         Q_OBJECT
 
        private:
-        QListWidget*      _profileListWidget = nullptr;
-        QDialogButtonBox* _buttonBox         = nullptr;
+        /// List widget for displaying available profiles
+        QListWidget* _profileListWidget = nullptr;
+        /// Button box for dialog actions
+        QDialogButtonBox* _buttonBox = nullptr;
 
        public:
         explicit ProfileSelectionDialog(
@@ -29,6 +31,10 @@ namespace ui
             std::vector<std::string> profiles
         );
 
+        /**
+         * @brief enum for the actions that can be emitted by the dialog
+         *
+         */
         enum class Action
         {
             Ok,
@@ -36,6 +42,7 @@ namespace ui
         };
 
        signals:
+        /// Signal emitted when the user performs an action in the dialog
         void requested(const Action& action, const std::string& profileName);
 
        protected:

@@ -30,4 +30,21 @@ namespace app
             store->commit();
     }
 
+    /**
+     * @brief Get the ProfileStore
+     *
+     * @return ProfileStore&
+     */
+    ProfileStore& StoreContainer::getProfileStore() { return _profileStore; }
+
+    /**
+     * @brief Get the ProfileStore (const version)
+     *
+     * @return const ProfileStore&
+     */
+    const ProfileStore& StoreContainer::getProfileStore() const
+    {
+        return _profileStore;
+    }
+
 }   // namespace app

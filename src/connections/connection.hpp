@@ -2,7 +2,6 @@
 #define __CONNECTIONS__CONNECTION_HPP__
 
 #include <cstddef>
-#include <memory>
 #include <optional>
 
 // ============================================================================
@@ -22,15 +21,26 @@
  * this is used by the Connection class to manage the subscription and to
  * disconnect when the Connection object is destroyed or when disconnect() is
  * called on it
+ *
  */
 struct ConnectionToken
 {
+   public:
+    /// Function pointer type for the disconnect function
     using DisconnectFn = void (*)(void*, std::size_t);
 
-    void*        owner{};
-    std::size_t  id{};
+    /// Pointer to the owner of the subscription
+    void* owner{};
+
+    /// Subscription id
+    std::size_t id{};
+
+    /// Disconnect function for the subscription, this is a function pointer
+    /// that takes the owner pointer and subscription id as arguments and is
+    /// responsible for disconnecting the subscription when called
     DisconnectFn disconnect_fn{};
 
+   public:
     void disconnect() const;
 };
 
@@ -45,14 +55,10 @@ struct ConnectionToken
 class Connection
 {
    private:
-    using Token = ConnectionToken;
-
-   private:
-    std::optional<Token> _token;
+    /// Optional token representing the subscription connection
+    std::optional<ConnectionToken> _token;
 
    public:
-    using DisconnectFn = Token::DisconnectFn;
-
     Connection() = default;
 
     Connection(const Connection&)            = delete;
@@ -69,7 +75,11 @@ class Connection
 
     void reset();
 
-    static Connection make(void* owner, std::size_t id, DisconnectFn fn);
+    static Connection make(
+        void*                         owner,
+        std::size_t                   id,
+        ConnectionToken::DisconnectFn fn
+    );
 };
 
 #endif   // __CONNECTIONS__CONNECTION_HPP__

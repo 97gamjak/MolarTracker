@@ -18,11 +18,20 @@ namespace settings
     class ParamCoreSchema
     {
        public:
-        static constexpr const char* KEY_KEY         = "key";
-        static constexpr const char* TITLE_KEY       = "title";
+        /// key for the parameter key in JSON
+        static constexpr const char* KEY_KEY = "key";
+
+        /// key for the parameter title in JSON
+        static constexpr const char* TITLE_KEY = "title";
+
+        /// key for the parameter description in JSON
         static constexpr const char* DESCRIPTION_KEY = "description";
-        static constexpr const char* VALUE_KEY       = "value";
-        static constexpr const char* DEFAULT_KEY     = "default";
+
+        /// key for the parameter value in JSON
+        static constexpr const char* VALUE_KEY = "value";
+
+        /// key for the parameter default value in JSON
+        static constexpr const char* DEFAULT_KEY = "default";
     };
 
     /**
@@ -35,9 +44,24 @@ namespace settings
     class ParamCore
     {
        private:
+        /// Type alias for the templated change callback function, this is a
+        /// function pointer that takes a pointer to the user data and the new
+        /// value of the parameter, this is used to notify subscribers when the
+        /// parameter value changes
         template <typename U>
-        using ChangedFnBase     = void (*)(void*, const U&);
-        using ChangedFn         = ChangedFnBase<T>;
+        using ChangedFnBase = void (*)(void*, const U&);
+
+        /// Type alias for the change callback function for the parameter value,
+        /// this is a function pointer that takes a pointer to the user data and
+        /// the new value of the parameter, this is used to notify subscribers
+        /// when the parameter value changes
+        using ChangedFn = ChangedFnBase<T>;
+
+        /// Type alias for the change callback function for the optional
+        /// parameter value, this is a function pointer that takes a pointer to
+        /// the user data and the new optional value of the parameter, this is
+        /// used to notify subscribers when the parameter value changes, this is
+        /// useful for parameters that can be unset (optional)
         using ChangedFnOptional = ChangedFnBase<std::optional<T>>;
 
         /**
@@ -48,27 +72,52 @@ namespace settings
         template <typename U>
         struct Subscriber
         {
+            /// The callback function to call when the parameter value changes
             ChangedFnBase<U> fn{};
-            void*            user{};
+            /// A user-defined pointer that will be passed to the callback
+            void* user{};
         };
 
        private:
+        /// type alias for ParamCoreSchema
         using Schema = ParamCoreSchema;
 
-        std::unordered_map<size_t, Subscriber<T>> _subscribers;
-        std::unordered_map<size_t, Subscriber<std::optional<T>>>
-            _optionalSubscribers;
-
-        std::optional<T> _value        = std::nullopt;
-        std::optional<T> _baseLine     = std::nullopt;
+        /// The current value of the parameter
+        std::optional<T> _value = std::nullopt;
+        /// The baseline value of the parameter, used for dirty checking
+        std::optional<T> _baseLine = std::nullopt;
+        /// The default value of the parameter
         std::optional<T> _defaultValue = std::nullopt;
 
+        /// The key for the parameter
         std::string _key;
+        /// The title for the parameter
         std::string _title;
+        /// The description for the parameter
         std::string _description;
 
-        bool   _isRebootRequired = false;
-        size_t _idCounter        = 0;
+        /// Whether changing this parameter requires a reboot, this can be used
+        /// to inform the user that they need to restart the application for
+        /// changes to take effect
+        bool _isRebootRequired = false;
+
+        /// A counter for generating unique subscriber IDs, this is used to
+        /// assign IDs to subscribers when they subscribe to changes in the
+        /// parameter value, this allows for subscribers to be uniquely
+        /// identified and unsubscribed when needed
+        size_t _idCounter = 0;
+
+        /// The subscribers for changes in the parameter value, this is a map of
+        /// subscriber IDs to Subscriber structs, this allows for multiple
+        /// subscribers to be notified of changes in the parameter value
+        std::unordered_map<size_t, Subscriber<T>> _subscribers;
+
+        /// The subscribers for changes in the optional parameter value, this is
+        /// a map of subscriber IDs to Subscriber structs, this allows for
+        /// multiple subscribers to be notified of changes in the parameter
+        /// value, this is useful for parameters that can be unset (optional)
+        std::unordered_map<size_t, Subscriber<std::optional<T>>>
+            _optionalSubscribers;
 
        public:
         ParamCore() = delete;

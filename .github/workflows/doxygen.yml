@@ -1,0 +1,44 @@
+name: Doxygen
+
+on:
+  pull_request:
+    branches: ["*"]
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+jobs:
+  doxygen:
+    name: Build docs (strict)
+    runs-on: ubuntu-latest
+
+    env:
+      QT_VERSION: "6.8.3"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen + Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz ninja-build pkg-config libcurl4-openssl-dev
+
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+
+      - name: Configure (docs)
+        run: |
+          cmake -S . -B build-docs \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DMOLARTRACKER_ENABLE_DOCS=ON
+
+      - name: Build docs (strict)
+        run: |
+          cmake --build build-docs --target docs --config Release

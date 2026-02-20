@@ -15,7 +15,9 @@ namespace ui
     class UpdateDebugFlagsCommand : public ICommand
     {
        private:
+        /// The old categories before the update
         LogCategoryMap _oldCategories;
+        /// The new categories after the update
         LogCategoryMap _categories;
 
        public:

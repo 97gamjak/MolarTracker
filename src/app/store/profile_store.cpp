@@ -76,7 +76,6 @@ namespace app
      * @brief Set the active profile by name
      *
      * @param name
-     * @return ProfileStoreResult
      */
     void ProfileStore::setActiveProfile(std::optional<std::string_view> name)
     {

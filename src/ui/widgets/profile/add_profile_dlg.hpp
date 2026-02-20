@@ -36,18 +36,29 @@ namespace ui
         Q_OBJECT
 
        private:
-        app::ProfileStore&  _profileStore;
+        /// Reference to the profile store
+        app::ProfileStore& _profileStore;
+        /// Reference to the settings
         settings::Settings& _settings;
-        UndoStack&          _undoStack;
-        bool                _enforceDefaultProfile = false;
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
+        /// Whether to enforce a default profile
+        bool _enforceDefaultProfile = false;
 
-        QVBoxLayout* _mainLayout           = nullptr;
-        QLineEdit*   _nameLineEdit         = nullptr;
-        QLineEdit*   _emailLineEdit        = nullptr;
-        QPushButton* _addButton            = nullptr;
-        QPushButton* _cancelButton         = nullptr;
-        QCheckBox*   _setActiveCheckBox    = nullptr;
-        QCheckBox*   _setAsDefaultCheckBox = nullptr;
+        /// ptr to the main layout of the dialog
+        QVBoxLayout* _mainLayout = nullptr;
+        /// Line edit for the profile name
+        QLineEdit* _nameLineEdit = nullptr;
+        /// Line edit for the profile email
+        QLineEdit* _emailLineEdit = nullptr;
+        /// Button to add the profile
+        QPushButton* _addButton = nullptr;
+        /// Button to cancel the operation
+        QPushButton* _cancelButton = nullptr;
+        /// Checkbox to set the profile as active
+        QCheckBox* _setActiveCheckBox = nullptr;
+        /// Checkbox to set the profile as default
+        QCheckBox* _setAsDefaultCheckBox = nullptr;
 
        public:
         explicit AddProfileDialog(
@@ -64,6 +75,10 @@ namespace ui
 
         void showNameAlreadyExistsError();
 
+        /**
+         * @brief Enum class for actions in the add profile dialog
+         *
+         */
         enum class Action
         {
             Ok,
@@ -71,6 +86,13 @@ namespace ui
         };
 
        signals:
+        /**
+         * @brief QT signal for when an action is performed in the add profile
+         * dialog
+         *
+         * @param action
+         * @param profile
+         */
         void requested(
             const Action&               action,
             const drafts::ProfileDraft& profile

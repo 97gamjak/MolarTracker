@@ -21,10 +21,17 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// Vector of unique pointers to commands in the stack
         std::vector<std::unique_ptr<ICommand>> _commands;
-        std::size_t                            _cursor = 0;
+
+        /// Cursor pointing to the current position in the stack, this is used
+        /// to determine which commands can be undone or redone, and to manage
+        /// the state of the stack when new commands are added after undoing
+        /// some commands
+        std::size_t _cursor = 0;
 
        signals:
+        /// Signal emitted when the undo stack changes
         void changed();
 
        public:

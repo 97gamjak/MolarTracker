@@ -10,9 +10,9 @@ namespace settings
      */
     UISettings::UISettings()
         : ParamContainer(
-              Schema::UI_SETTINGS_KEY,
-              Schema::UI_SETTINGS_TITLE,
-              Schema::UI_SETTINGS_DESC
+              UISettingsSchema::UI_SETTINGS_KEY,
+              UISettingsSchema::UI_SETTINGS_TITLE,
+              UISettingsSchema::UI_SETTINGS_DESC
           )
     {
     }
@@ -37,6 +37,7 @@ namespace settings
     /**
      * @brief Serialize UISettings to JSON
      *
+     * @return nlohmann::json
      */
     nlohmann::json UISettings::toJson() const
     {

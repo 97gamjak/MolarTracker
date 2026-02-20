@@ -16,6 +16,7 @@ namespace settings
     class ParamError
     {
        private:
+        /// The error message describing the parameter error
         std::string _message;
 
        public:

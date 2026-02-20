@@ -15,8 +15,11 @@ namespace settings
     class ParamContainer
     {
        private:
+        /// The key for the parameter container
         std::string _key;
+        /// The title for the parameter container
         std::string _title;
+        /// The description for the parameter container
         std::string _description;
 
        public:

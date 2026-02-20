@@ -21,6 +21,7 @@ namespace app
     class ProfileRepo : public IProfileRepo
     {
        private:
+        /// reference to the database instance
         db::Database& _db;
 
        public:

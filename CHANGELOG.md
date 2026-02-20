@@ -4,6 +4,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Documentation
+
+- Adding developer and API docs via doxygen
+
 ### Bug Fixes
 
 - If no default profile is set or exists at startup the error cases are now fixed and everything should behave as expected

@@ -45,7 +45,7 @@ namespace settings
      * @brief Deserialize EnumParam from JSON
      *
      * @tparam E
-     * @param j
+     * @param jsonData
      * @param param
      */
     template <typename E>

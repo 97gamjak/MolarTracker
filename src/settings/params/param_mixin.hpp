@@ -20,9 +20,24 @@ namespace settings
     class ParamMixin
     {
        private:
+        /// Type alias for the templated change callback function, this is a
+        /// function pointer that takes a pointer to the user data and the new
+        /// value of the parameter, this is used to notify subscribers when the
+        /// parameter value changes
         template <typename U>
-        using ChangedFnBase     = void (*)(void*, const U&);
-        using ChangedFn         = ChangedFnBase<T>;
+        using ChangedFnBase = void (*)(void*, const U&);
+
+        /// Type alias for the change callback function for the parameter value,
+        /// this is a function pointer that takes a pointer to the user data and
+        /// the new value of the parameter, this is used to notify subscribers
+        /// when the parameter value changes
+        using ChangedFn = ChangedFnBase<T>;
+
+        /// Type alias for the change callback function for the optional
+        /// parameter value, this is a function pointer that takes a pointer to
+        /// the user data and the new optional value of the parameter, this is
+        /// used to notify subscribers when the parameter value changes, this is
+        /// useful for parameters that can be unset (optional)
         using ChangedFnOptional = ChangedFnBase<std::optional<T>>;
 
        public:

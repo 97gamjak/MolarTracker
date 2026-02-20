@@ -9,15 +9,14 @@
 namespace settings
 {
     using std::filesystem::absolute;
-    using std::filesystem::path;
 
     /**
      * @brief Construct a new Settings:: Settings object
      *
      * @param configDir
      */
-    Settings::Settings(const path& configDir)
-        : _core{Schema::SETTINGS_KEY, Schema::SETTINGS_TITLE, Schema::SETTINGS_DESC},
+    Settings::Settings(const std::filesystem::path& configDir)
+        : _core{SettingsSchema::SETTINGS_KEY, SettingsSchema::SETTINGS_TITLE, SettingsSchema::SETTINGS_DESC},
           _settingsPath{absolute(configDir / _settingsFileName)}
     {
         _fromJson();

@@ -18,11 +18,14 @@ namespace ui
         Q_OBJECT
 
        signals:
+        /// Signal emitted when the user requests to open the preferences dialog
         void requestPreferences();
 
        private:
+        /// Pointer to the settings menu widget
         QMenu* _settingsMenu = nullptr;
 
+        /// The preferences action in the settings menu
         QAction* _preferencesAction = nullptr;
 
        public:

@@ -19,7 +19,10 @@ namespace db
     class Database
     {
        private:
-        sqlite3*    _db{nullptr};
+        /// The native SQLite database handle
+        sqlite3* _db{nullptr};
+
+        /// The path to the database file
         std::string _dbPath{};
 
        public:

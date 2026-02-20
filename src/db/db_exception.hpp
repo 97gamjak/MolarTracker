@@ -3,7 +3,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <utility>
 
 namespace db
 {
@@ -14,10 +13,7 @@ namespace db
     class SqliteError : public std::runtime_error
     {
        public:
-        explicit SqliteError(const std::string message)
-            : std::runtime_error(message)
-        {
-        }
+        explicit SqliteError(const std::string message);
     };
 
 }   // namespace db

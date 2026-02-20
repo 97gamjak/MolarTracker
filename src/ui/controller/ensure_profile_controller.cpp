@@ -27,6 +27,8 @@ namespace ui
      * Controller object
      *
      * @param mainWindow
+     * @param appContext
+     * @param undoStack
      */
     EnsureProfileController::EnsureProfileController(
         QMainWindow&     mainWindow,
