@@ -12,6 +12,10 @@ permissions:
 jobs:
   cppcheck:
     runs-on: ubuntu-24.04
+
+    env:
+      QT_VERSION: "6.8.3"
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,9 +26,24 @@ jobs:
           sudo apt update
           sudo apt install -y cppcheck
 
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+
+      - name: Configure (docs)
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+
       - name: Run cppcheck
         run: |
-          cppcheck --enable=all \
+          cppcheck \
+              --project=build/compile_commands.json \
+              --enable=all \
               --enable=performance \
               --enable=style \
               --enable=information \
@@ -34,8 +53,7 @@ jobs:
               --suppress=missingIncludeSystem \
               --inline-suppr \
               --inconclusive \
-              -I include \
-              src
+              -I src
 
   clang-tidy:
     runs-on: ubuntu-24.04
