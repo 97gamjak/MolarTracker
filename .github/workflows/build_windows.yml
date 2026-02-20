@@ -108,7 +108,8 @@ jobs:
             -DMOLARTRACKER_IS_TAG="$isTag" `
             -DMOLARTRACKER_GIT_TAG="${{ github.ref_name }}" `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_TRIPLET }}
+            -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_TRIPLET }} `
+            -DMOLARTRACKER_ENABLE_TESTING=ON
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
