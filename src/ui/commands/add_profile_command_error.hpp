@@ -23,6 +23,7 @@
  */
 enum class AddProfileCommandErrorCode : std::size_t;   // only for doxygen
 
+// cppcheck-suppress syntaxError
 MSTD_ENUM(
     AddProfileCommandErrorCode,
     std::size_t,

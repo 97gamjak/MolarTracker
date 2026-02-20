@@ -60,7 +60,9 @@ namespace ui
         std::string getRedoLabel() const;
 
        private:
-        std::expected<void, CommandErrorPtr> _do(std::unique_ptr<ICommand> cmd);
+        std::expected<void, CommandErrorPtr> _do(
+            std::unique_ptr<ICommand> command
+        );
     };
 
 }   // namespace ui

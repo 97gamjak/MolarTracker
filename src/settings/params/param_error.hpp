@@ -22,7 +22,7 @@ namespace settings
        public:
         explicit ParamError(std::string message);
 
-        [[nodiscard]] const std::string& getMessage();
+        [[nodiscard]] const std::string& getMessage() const;
     };
 
     /**

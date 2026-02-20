@@ -45,6 +45,9 @@ namespace app
         ) override;
 
         void remove(ProfileId id) override;
+
+       private:
+        void _ensureSchema();
     };
 
 }   // namespace app

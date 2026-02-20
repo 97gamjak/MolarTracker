@@ -7,7 +7,7 @@ namespace orm
      *
      * @param message The error message describing the ORM error
      */
-    ORMError::ORMError(const std::string message) : std::runtime_error(message)
+    ORMError::ORMError(const std::string& message) : std::runtime_error(message)
     {
     }
 

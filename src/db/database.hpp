@@ -34,8 +34,8 @@ namespace db
         Database(Database const&)            = delete;
         Database& operator=(Database const&) = delete;
 
-        Database(Database&& other);
-        Database& operator=(Database&& other);
+        Database(Database&& other) noexcept;
+        Database& operator=(Database&& other) noexcept;
 
         void open(const std::string& db_path);
         void close();

@@ -40,7 +40,10 @@ namespace db
      *
      * @param other
      */
-    Database::Database(Database&& other) { _moveFrom(std::move(other)); }
+    Database::Database(Database&& other) noexcept
+    {
+        _moveFrom(std::move(other));
+    }
 
     /**
      * @brief Move assignment operator
@@ -48,7 +51,7 @@ namespace db
      * @param other
      * @return Database&
      */
-    Database& Database::operator=(Database&& other)
+    Database& Database::operator=(Database&& other) noexcept
     {
         if (this != &other)
         {
@@ -66,10 +69,9 @@ namespace db
      */
     void Database::_moveFrom(Database&& other)
     {
-        _db     = other._db;
+        _db     = std::exchange(other._db, nullptr);
         _dbPath = std::move(other._dbPath);
 
-        other._db = nullptr;
         other._dbPath.clear();
     }
 

@@ -57,7 +57,7 @@ namespace ui
         Type _type;
 
        public:
-        CommandError(Type type);
+        explicit CommandError(Type type);
 
         std::string getMessage() const override;
 

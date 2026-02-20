@@ -10,10 +10,7 @@ namespace app
      *
      * @param database
      */
-    RepoContainer::RepoContainer(db::Database& database)
-        : _profileRepo{database}
-    {
-    }
+    RepoContainer::RepoContainer(db::Database& db) : _profileRepo{db} {}
 
     /**
      * @brief Get the Profile Repo

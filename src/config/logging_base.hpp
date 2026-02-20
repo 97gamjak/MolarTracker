@@ -19,6 +19,7 @@
     X(logging_manager)            \
     X(application)
 
+// cppcheck-suppress syntaxError
 MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
 
 #define LOG_LEVEL(X) \
@@ -29,6 +30,7 @@ MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
     X(Debug)         \
     X(Trace)
 
+// cppcheck-suppress syntaxError
 MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL);
 
 using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
