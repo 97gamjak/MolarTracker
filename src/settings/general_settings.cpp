@@ -9,14 +9,10 @@ namespace settings
      *
      */
     GeneralSettings::GeneralSettings()
-        : _core{
-              Schema::GENERAL_SETTINGS_KEY,
-              Schema::GENERAL_SETTINGS_TITLE,
-              Schema::GENERAL_SETTINGS_DESCRIPTION
-          }
+        : _core{Schema::GENERAL_SETTINGS_KEY, Schema::GENERAL_SETTINGS_TITLE, Schema::GENERAL_SETTINGS_DESCRIPTION},
+          _currentVersion(utils::SemVer(Constants::getVersion()))
     {
         _version.set(utils::SemVer(Constants::getVersion()));
-        _currentVersion = _version.getOptional();
     }
 
     /**
@@ -62,7 +58,7 @@ namespace settings
      *
      * @return std::optional<std::string>
      */
-    std::optional<std::string> GeneralSettings::getDefaultProfile() const
+    const std::optional<std::string>& GeneralSettings::getDefaultProfile() const
     {
         return _defaultProfile.getOptional();
     }

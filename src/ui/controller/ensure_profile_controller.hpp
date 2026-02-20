@@ -19,10 +19,6 @@ namespace drafts
     struct ProfileDraft;   // Forward declaration
 }
 
-// TODO: implement this via a settings value that has a max number of checks
-// predefined
-constexpr std::size_t MAX_PROFILE_CHECKS = 10;
-
 namespace ui
 {
     class UndoStack;   // Forward declaration
@@ -34,6 +30,11 @@ namespace ui
     class EnsureProfileController : public QObject
     {
         Q_OBJECT
+       private:
+        /// Maximum number of times to check for a valid profile before giving
+        /// up and showing an error message, this is to prevent infinite loops
+        /// in case of unexpected issues with profile creation or selection
+        static constexpr std::size_t MAX_PROFILE_CHECKS = 10;
 
        private:
         /// Reference to the main window
@@ -43,8 +44,6 @@ namespace ui
         /// Reference to the undo stack
         UndoStack& _undoStack;
 
-        /// Counter for the number of profile checks
-        std::size_t _callCount = MAX_PROFILE_CHECKS;
         /// Pointer to the profile selection dialog
         QPointer<ProfileSelectionDialog> _profileSelectionDialog;
         /// Pointer to the add profile dialog
@@ -72,7 +71,6 @@ namespace ui
        private:
         void _defaultProfileExists();
         void _noDefaultProfile();
-        void _relaunch();
         void _showAddProfileDialog();
         void _showProfileSelectionDialog();
     };

@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "connections/connection.hpp"
-#include "nlohmann/json.hpp"
+#include "json/optional.hpp"   // IWYU pragma: keep
 
 namespace settings
 {
@@ -167,8 +167,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAM_CORE_TPP__
+#ifndef __SETTINGS__PARAMS__PARAM_CORE_TPP__
 #include "param_core.tpp"
-#endif   // __SETTINGS__PARAM_CORE_TPP__
+#endif   // __SETTINGS__PARAMS__PARAM_CORE_TPP__
 
 #endif   // __SETTINGS__PARAMS__PARAM_CORE_HPP__

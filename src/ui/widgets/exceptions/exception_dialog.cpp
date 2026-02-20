@@ -95,7 +95,7 @@ namespace ui
 
         ExceptionDialog dlg(title, QString::fromStdString(logObject.message));
         dlg.exec();
-        QCoreApplication::quit();
+        ::exit(0);
     }
 
 }   // namespace ui

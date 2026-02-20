@@ -103,10 +103,11 @@ namespace settings
             GeneralSettings&      settings
         );
 
-        void setDefaultProfile(const std::string& profileName);
-        void unsetDefaultProfile();
-        [[nodiscard]] std::optional<std::string> getDefaultProfile() const;
-        [[nodiscard]] bool                       hasDefaultProfile() const;
+        void               setDefaultProfile(const std::string& profileName);
+        void               unsetDefaultProfile();
+        [[nodiscard]] bool hasDefaultProfile() const;
+        [[nodiscard]] const std::optional<std::string>& getDefaultProfile(
+        ) const;
 
        private:
         [[nodiscard]] auto _getParams() const&;

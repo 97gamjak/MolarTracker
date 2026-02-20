@@ -11,6 +11,7 @@ All changes and updates, that are relevant for a user will be documented here
 ### Bug Fixes
 
 - If no default profile is set or exists at startup the error cases are now fixed and everything should behave as expected
+- Fix startup profile existence to remain inside dialogs if no user was added or selected
 - Fix CI building issue for Linux releases 
 
 <!-- insertion marker -->

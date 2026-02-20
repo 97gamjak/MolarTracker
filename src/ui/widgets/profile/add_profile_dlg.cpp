@@ -25,18 +25,22 @@ namespace ui
      * @param profileStore Reference to the Profile Store
      * @param settings Reference to the Settings
      * @param undoStack Reference to the Undo Stack
+     * @param canBeClosed Whether the dialog can be closed without adding a
+     * profile
      * @param parent Parent widget
      */
     AddProfileDialog::AddProfileDialog(
         app::ProfileStore&  profileStore,
         settings::Settings& settings,
         UndoStack&          undoStack,
+        bool                canBeClosed,
         QWidget*            parent
     )
         : QDialog{parent},
           _profileStore{profileStore},
           _settings{settings},
-          _undoStack{undoStack}
+          _undoStack{undoStack},
+          _canBeClosed{canBeClosed}
     {
         setWindowTitle("Add New Profile");
         resize(400, 200);
@@ -53,6 +57,7 @@ namespace ui
     {
         QDialog::setModal(true);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _mainLayout = new QVBoxLayout{this};
 
         _buildFormSection();
@@ -68,12 +73,14 @@ namespace ui
      */
     void AddProfileDialog::_buildFormSection()
     {
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         auto* formLayout = new QFormLayout{};
         _nameLineEdit    = new QLineEdit{this};
         formLayout->addRow(new QLabel{"Name:"}, _nameLineEdit);
 
         _emailLineEdit = new QLineEdit{this};
         formLayout->addRow(new QLabel{"Email:"}, _emailLineEdit);
+        // NOLINTEND(cppcoreguidelines-owning-memory)
 
         _mainLayout->addLayout(formLayout);
     }
@@ -84,11 +91,14 @@ namespace ui
      */
     void AddProfileDialog::_buildToggleSection()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* toggleLayout = new QHBoxLayout{};
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _setActiveCheckBox = new QCheckBox{"Set as Active Profile", this};
         toggleLayout->addWidget(_setActiveCheckBox);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _setAsDefaultCheckBox = new QCheckBox{"Set as Default Profile", this};
         toggleLayout->addWidget(_setAsDefaultCheckBox);
 
@@ -106,8 +116,10 @@ namespace ui
      */
     void AddProfileDialog::_buildButtonSection()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout{};
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _addButton = new QPushButton{"Add Profile", this};
         buttonLayout->addWidget(_addButton);
         connect(
@@ -117,14 +129,18 @@ namespace ui
             &AddProfileDialog::_emitOk
         );
 
-        _cancelButton = new QPushButton{"Cancel", this};
-        buttonLayout->addWidget(_cancelButton);
-        connect(
-            _cancelButton,
-            &QPushButton::clicked,
-            this,
-            &AddProfileDialog::_emitCancel
-        );
+        if (_canBeClosed)
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+            _cancelButton = new QPushButton{"Cancel", this};
+            buttonLayout->addWidget(_cancelButton);
+            connect(
+                _cancelButton,
+                &QPushButton::clicked,
+                this,
+                &AddProfileDialog::_emitCancel
+            );
+        }
 
         _mainLayout->addLayout(buttonLayout);
     }
@@ -188,8 +204,8 @@ namespace ui
     drafts::ProfileDraft AddProfileDialog::_getProfile() const
     {
         return drafts::ProfileDraft{
-            _nameLineEdit->text().toStdString(),
-            _emailLineEdit->text().toStdString()
+            .name  = _nameLineEdit->text().toStdString(),
+            .email = _emailLineEdit->text().toStdString()
         };
     }
 
@@ -237,10 +253,17 @@ namespace ui
     void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
 
     /**
-     * @brief handle the close event, emit the cancel action
+     * @brief Handle the close event of the dialog. If the dialog is closed
+     * without adding a profile, emit the cancel action.
      *
-     * @param event
      */
-    void AddProfileDialog::closeEvent(QCloseEvent* /*event*/) { _emitCancel(); }
+    void AddProfileDialog::reject()
+    {
+        if (_canBeClosed)
+        {
+            _emitCancel();
+            QDialog::reject();
+        }
+    }
 
 }   // namespace ui

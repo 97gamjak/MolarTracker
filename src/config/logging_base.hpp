@@ -5,6 +5,8 @@
 #include <mstd/enum.hpp>
 #include <unordered_map>
 
+// NOLINTBEGIN
+
 #define LOG_CATEGORY(X)           \
     X(app_service_profileService) \
     X(app_storeContainer)         \
@@ -17,6 +19,7 @@
     X(ui_profileSelectionDialog)  \
     X(database)                   \
     X(logging_manager)            \
+    X(settings)                   \
     X(application)
 
 // cppcheck-suppress syntaxError
@@ -32,6 +35,8 @@ MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
 
 // cppcheck-suppress syntaxError
 MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL);
+
+// NOLINTEND
 
 using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
