@@ -10,22 +10,90 @@
 
 namespace orm
 {
+    /**
+     * @brief A template struct to map C++ types to their corresponding SQL
+     * types.
+     *
+     * This struct is specialized for fundamental types and strong_id types to
+     * provide the appropriate SQL type name as a string view. The name member
+     * can be used in SQL queries to specify the type of a column or parameter.
+     *
+     * @tparam T The C++ type to map to an SQL type.
+     */
     template <typename T>
     struct sql_type;
 
-    // clang-format off
-    template <> struct sql_type<std::int64_t>{static constexpr std::string_view name = "INTEGER";};
-    template <> struct sql_type<int>         {static constexpr std::string_view name = "INTEGER";};
-    template <> struct sql_type<bool>        {static constexpr std::string_view name = "INTEGER";};
-    template <> struct sql_type<double>      {static constexpr std::string_view name = "REAL";};
-    template <> struct sql_type<std::string> {static constexpr std::string_view name = "TEXT";};
-    // clang-format on
+    /**
+     * @brief Specialization of sql_type for std::int64_t
+     *
+     * @tparam std::int64_t The C++ type to specialize for, which is
+     * std::int64_t in this case.
+     */
+    template <>
+    struct sql_type<std::int64_t>
+    {
+        static constexpr std::string_view name = "INTEGER";
+    };
 
+    /**
+     * @brief Specialization of sql_type for int.
+     *
+     * @tparam int The C++ type to specialize for, which is int in this case.
+     */
+    template <>
+    struct sql_type<int>
+    {
+        static constexpr std::string_view name = "INTEGER";
+    };
+
+    /**
+     * @brief Specialization of sql_type for bool.
+     *
+     * @tparam bool The C++ type to specialize for, which is bool in this case.
+     */
+    template <>
+    struct sql_type<bool>
+    {
+        static constexpr std::string_view name = "INTEGER";
+    };
+
+    /**
+     * @brief Specialization of sql_type for double.
+     *
+     * @tparam double The C++ type to specialize for, which is double in this
+     * case.
+     */
+    template <>
+    struct sql_type<double>
+    {
+        static constexpr std::string_view name = "REAL";
+    };
+
+    /**
+     * @brief Specialization of sql_type for std::string.
+     *
+     * @tparam std::string The C++ type to specialize for, which is
+     * std::string in this case.
+     */
+    template <>
+    struct sql_type<std::string>
+    {
+        static constexpr std::string_view name = "TEXT";
+    };
+
+    /**
+     * @brief Specialization of sql_type for strong_id types. Strong IDs are
+     * typically represented as integers in the database, so we map them to
+     * INTEGER.
+     *
+     * @tparam T The strong_id type to specialize for.
+     */
     template <strong_id T>
     struct sql_type<T>
     {
         static constexpr std::string_view name = "INTEGER";
     };
+
 }   // namespace orm
 
 #endif   // __ORM__SQL_TYPE_HPP__

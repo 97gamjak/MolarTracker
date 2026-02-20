@@ -10,6 +10,11 @@
 
 namespace settings
 {
+    /**
+     * @brief Schema for the application settings. This defines the keys and
+     * descriptions for the settings parameters.
+     *
+     */
     class SettingsSchema
     {
        public:

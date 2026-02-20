@@ -22,6 +22,8 @@
  * this is used by the Connection class to manage the subscription and to
  * disconnect when the Connection object is destroyed or when disconnect() is
  * called on it
+ *
+ * @member owner The pointer to the owner of the subscription, this is typically
  */
 struct ConnectionToken
 {
@@ -51,6 +53,11 @@ class Connection
     std::optional<Token> _token;
 
    public:
+    /**
+     * @brief Type alias for the disconnect function used in the Connection
+     * class.
+     *
+     */
     using DisconnectFn = Token::DisconnectFn;
 
     Connection() = default;

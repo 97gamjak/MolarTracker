@@ -97,3 +97,9 @@ if(NOT DEFINED WIN32)
     VERBATIM
     )
 endif()
+
+option(MOLARTRACKER_ENABLE_DOCS OFF)
+
+if(MOLARTRACKER_ENABLE_DOCS)
+  include(cmake/doxygen.cmake)
+endif()

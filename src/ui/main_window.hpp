@@ -22,6 +22,11 @@ namespace ui
     class MenuBar;       // Forward declaration
     class Controllers;   // Forward declaration
 
+    /**
+     * @brief The main window of the application. This is the central widget
+     * that contains the menu bar and the central widget.
+     *
+     */
     class MainWindow final : public QMainWindow
     {
         Q_OBJECT

@@ -23,6 +23,10 @@
 class RingFile
 {
    public:
+    /**
+     * @brief Configuration for the RingFile
+     *
+     */
     struct Config
     {
         std::filesystem::path directory{};
