@@ -62,3 +62,40 @@ set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
     ${CMAKE_BINARY_DIR}/bin
 )
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(MolarTracker PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+
+        # correctness
+        -Wshadow
+        -Wconversion
+        -Wsign-conversion
+        -Wcast-align
+        -Wformat=2
+        -Wnull-dereference
+        -Wdouble-promotion
+        -Wimplicit-fallthrough
+        -Woverloaded-virtual
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Wuseless-cast
+        -Wduplicated-cond
+        -Wduplicated-branches
+        -Wlogical-op
+        -Wmisleading-indentation
+
+        # lifetime / safety
+        -Wuninitialized
+        -Wmaybe-uninitialized
+        -Winit-self
+
+        # switch needs to check all enum values
+        -Wswitch-enum
+
+        -Wno-error=deprecated-declarations
+    )
+endif()

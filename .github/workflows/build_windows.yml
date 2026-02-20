@@ -116,6 +116,13 @@ jobs:
           cmake --build build --verbose
 
       # -------------------------
+      # Run tests (on the built binaries)
+      # -------------------------
+      - name: Run tests (Ubuntu)
+        run: |
+          ctest --test-dir build --output-on-failure
+
+      # -------------------------
       # Windows: deploy with windeployqt (ONLY on tags/dev)
       # -------------------------
       - name: Deploy Qt runtime (Windows)
