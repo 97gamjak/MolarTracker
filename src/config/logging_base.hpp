@@ -19,7 +19,7 @@
     X(logging_manager)            \
     X(application)
 
-MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
+MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
 
 #define LOG_LEVEL(X) \
     X(Off, 0)        \
@@ -29,7 +29,7 @@ MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
     X(Debug)         \
     X(Trace)
 
-MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL)
+MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL);
 
 using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
