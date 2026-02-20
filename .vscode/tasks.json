@@ -19,6 +19,7 @@
                 "--inline-suppr",
                 "--inconclusive",
                 "--library=qt",
+                "-I ${workspaceFolder}/external/mstd/include",
                 "-I ${workspaceFolder}/src"
             ],
             "options": {

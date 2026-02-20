@@ -11,4 +11,5 @@ target_link_libraries(molartracker_app_store
     PUBLIC
         molartracker_config
         molartracker_logging
+        molartracker_app_domain
 )

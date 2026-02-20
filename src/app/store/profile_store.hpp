@@ -1,8 +1,6 @@
 #ifndef __APP__STORE__PROFILE_STORE_HPP__
 #define __APP__STORE__PROFILE_STORE_HPP__
 
-#include <cstddef>
-#include <functional>
 #include <optional>
 #include <set>
 #include <string>

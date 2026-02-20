@@ -21,8 +21,8 @@ namespace ui
      * @param profiles List of profile names to display
      */
     ProfileSelectionDialog::ProfileSelectionDialog(
-        QWidget*                 parent,
-        std::vector<std::string> profiles
+        QWidget*                        parent,
+        const std::vector<std::string>& profiles
     )
         : QDialog{parent}
     {
@@ -38,7 +38,9 @@ namespace ui
      *
      * @param profiles List of profile names to display
      */
-    void ProfileSelectionDialog::_buildUI(std::vector<std::string> profiles)
+    void ProfileSelectionDialog::_buildUI(
+        const std::vector<std::string>& profiles
+    )
     {
         auto* mainLayout   = new QVBoxLayout{this};
         _profileListWidget = new QListWidget{this};

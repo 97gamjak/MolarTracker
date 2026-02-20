@@ -5,14 +5,14 @@ qt_add_executable(MolarTracker
 add_library(json INTERFACE)
 
 target_include_directories(json
-    SYSTEM INTERFACE
+    INTERFACE
         ${CMAKE_SOURCE_DIR}/external/json/single_include
 )
 
 add_library(mstd INTERFACE)
 
 target_include_directories(mstd
-    SYSTEM INTERFACE
+    INTERFACE
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
 

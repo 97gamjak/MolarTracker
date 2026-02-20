@@ -24,7 +24,7 @@ namespace app
         };
 
        public:
-        StoreContainer(ServiceContainer& services);
+        explicit StoreContainer(ServiceContainer& services);
 
         void commit();
 

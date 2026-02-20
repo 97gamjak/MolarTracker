@@ -18,7 +18,7 @@ class LogEntryScope
     bool _enabled;
 
    public:
-    LogEntryScope(const LogObject& logObject);
+    explicit LogEntryScope(const LogObject& logObject);
 
     ~LogEntryScope();
 };
@@ -34,7 +34,7 @@ class TimedLogEntryScope final : public LogEntryScope
     std::chrono::steady_clock::time_point _start;
 
    public:
-    TimedLogEntryScope(const LogObject& logObject);
+    explicit TimedLogEntryScope(const LogObject& logObject);
 
     ~TimedLogEntryScope();
 };

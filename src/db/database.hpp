@@ -27,7 +27,7 @@ namespace db
 
        public:
         Database() = delete;
-        explicit Database(const std::filesystem::path& db_path);
+        explicit Database(const std::filesystem::path& dbPath);
 
         ~Database();
 
@@ -37,7 +37,7 @@ namespace db
         Database(Database&& other) noexcept;
         Database& operator=(Database&& other) noexcept;
 
-        void open(const std::string& db_path);
+        void open(const std::string& dbPath);
         void close();
 
         [[nodiscard]] bool     isOpen() const;

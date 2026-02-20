@@ -27,8 +27,8 @@ namespace ui
 
        public:
         explicit ProfileSelectionDialog(
-            QWidget*                 parent,
-            std::vector<std::string> profiles
+            QWidget*                        parent,
+            const std::vector<std::string>& profiles
         );
 
         /**
@@ -49,7 +49,7 @@ namespace ui
         void closeEvent(QCloseEvent* event) override;
 
        private:
-        void _buildUI(std::vector<std::string> profiles);
+        void _buildUI(const std::vector<std::string>& profiles);
 
         void _emit(const Action& action, const std::string& profileName);
         void _emit(const Action& action);

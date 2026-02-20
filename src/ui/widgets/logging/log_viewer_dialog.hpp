@@ -73,7 +73,7 @@ namespace ui
         void              setIntervalSec(double intervalSec);
         [[nodiscard]] int getIntervalMs() const;
 
-        void               setAutoReload(bool enabled);
+        void               setAutoReload(bool autoReload);
         [[nodiscard]] bool isAutoReloadEnabled() const;
 
         void                                       setLineWrap(bool enabled);
