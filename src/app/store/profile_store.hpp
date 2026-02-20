@@ -63,6 +63,12 @@ namespace app
 
        public:
         explicit ProfileStore(IProfileService& getProfileService);
+        ~ProfileStore() override = default;
+
+        ProfileStore(ProfileStore const&)                = delete;
+        ProfileStore& operator=(ProfileStore const&)     = delete;
+        ProfileStore(ProfileStore&&) noexcept            = delete;
+        ProfileStore& operator=(ProfileStore&&) noexcept = delete;
 
         void reload();
 
