@@ -20,11 +20,13 @@
 #endif
 // clang-format on
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-do-while)
 #define LOG(logObject)                              \
     do                                              \
     {                                               \
         LogManager::getInstance().log((logObject)); \
     } while (0)
+// NOLINTEND(cppcoreguidelines-avoid-do-while)
 
 #define LOG_TRACE_OBJECT(message)   LOG_OBJECT(LogLevel::Trace, message)
 #define LOG_DEBUG_OBJECT(message)   LOG_OBJECT(LogLevel::Debug, message)

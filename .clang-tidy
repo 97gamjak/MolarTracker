@@ -30,3 +30,5 @@ CheckOptions:
     value:           llvm
   - key:             modernize-use-nullptr.NullMacros
     value:           'NULL'
+  - key:             cppcoreguidelines-rvalue-reference-param-not-moved.AllowPartialMove
+    value:           '1'
