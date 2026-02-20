@@ -55,6 +55,8 @@ namespace ui
         const auto& settings = _appContext.getSettings().getGeneralSettings();
         auto&       profileStore = _appContext.getStore().getProfileStore();
 
+        std::size_t counter = 0;
+
         while (!settings.hasDefaultProfile() || !profileStore.hasActiveProfile()
         )
         {
@@ -77,6 +79,27 @@ namespace ui
                 _defaultProfileExists();
             else
                 _noDefaultProfile();
+
+            // if we reach this point, it means that the profile selection or
+            // creation process was completed, but we still don't have a valid
+            // profile loaded. This could happen if there are unexpected issues
+            // with the profile store or if the user somehow manages to delete
+            // the default profile during the selection/creation process. To
+            // prevent infinite loops in such cases, we keep track of how many
+            // times we've checked for a valid profile and if it exceeds a
+            // certain threshold, we show a fatal error message and stop trying
+            // to ensure profile existence.
+            if (++counter >= MAX_PROFILE_CHECKS)
+            {
+                ExceptionDialog::showFatal(
+                    "Profile Load Failed",
+                    LOG_ERROR_OBJECT(
+                        "Failed to load a valid profile after " +
+                        std::to_string(MAX_PROFILE_CHECKS) +
+                        " attempts. Please check the profile store for issues."
+                    )
+                );
+            }
         }
     }
 
