@@ -24,7 +24,7 @@ jobs:
       - name: Install cppcheck
         run: |
           sudo apt update
-          sudo apt install -y cppcheck
+          sudo apt install -y cppcheck ninja-build pkg-config libcurl4-openssl-dev
 
       - name: Install Qt (Ubuntu)
         if: runner.os == 'Linux'
