@@ -18,6 +18,7 @@ namespace orm
         /// The characters of the string, stored in a std::array for fixed size
         std::array<char, Size> _data{};
 
+        // cppcheck-suppress noExplicitConstructor
         constexpr fixed_string(char const (&text)[Size]);
 
         [[nodiscard]] constexpr std::string_view view() const;

@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__STORE_CONTAINER_HPP__
-#define __APP__STORE__STORE_CONTAINER_HPP__
+#ifndef __APP__STORE_CONTAINER_HPP__
+#define __APP__STORE_CONTAINER_HPP__
 
 #include "store/profile_store.hpp"
 
@@ -24,7 +24,7 @@ namespace app
         };
 
        public:
-        StoreContainer(ServiceContainer& services);
+        explicit StoreContainer(ServiceContainer& services);
 
         void commit();
 
@@ -34,4 +34,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__STORE__STORE_CONTAINER_HPP__
+#endif   // __APP__STORE_CONTAINER_HPP__

@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__NUMERIC_PARAM_HPP__
-#define __SETTINGS__NUMERIC_PARAM_HPP__
+#ifndef __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
+#define __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
 
 #include <expected>
 #include <optional>
@@ -94,4 +94,4 @@ namespace settings
 #include "numeric_param.tpp"
 #endif   // __SETTINGS__NUMERIC_PARAM_TPP__
 
-#endif   // __SETTINGS__NUMERIC_PARAM_HPP__
+#endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__

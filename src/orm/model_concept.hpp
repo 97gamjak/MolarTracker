@@ -1,5 +1,5 @@
-#ifndef __ORM__MODEL_CONCEPTS_HPP__
-#define __ORM__MODEL_CONCEPTS_HPP__
+#ifndef __ORM__MODEL_CONCEPT_HPP__
+#define __ORM__MODEL_CONCEPT_HPP__
 
 #include <concepts>
 #include <string_view>
@@ -31,4 +31,4 @@ namespace orm
     };
 }   // namespace orm
 
-#endif   // __ORM__MODEL_CONCEPTS_HPP__
+#endif   // __ORM__MODEL_CONCEPT_HPP__

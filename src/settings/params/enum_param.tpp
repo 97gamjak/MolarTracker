@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__ENUM_PARAM_TPP__
-#define __SETTINGS__ENUM_PARAM_TPP__
+#ifndef __SETTINGS__PARAMS__ENUM_PARAM_TPP__
+#define __SETTINGS__PARAMS__ENUM_PARAM_TPP__
 
 #include "enum_param.hpp"
 #include "nlohmann/json.hpp"
@@ -88,4 +88,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__ENUM_PARAM_TPP__
+#endif   // __SETTINGS__PARAMS__ENUM_PARAM_TPP__

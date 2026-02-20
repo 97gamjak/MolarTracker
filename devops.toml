@@ -15,13 +15,12 @@
 
 [cpp]
 #style_checks = true
-#license_header_check = true
+license_header_check = false
 #license_header = <some file path>
 #check_only_staged_files = false
-#header_guards_according_to_filepath = false
+header_guards_according_to_filepath = true
 
 [file]
 #encoding = "utf-8"
 changelog_paths = ["CHANGELOG.md", "DEV-CHANGELOG.md"]
 #default_changelog_path = "CHANGELOG.md"
-

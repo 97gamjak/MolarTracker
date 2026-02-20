@@ -51,8 +51,8 @@ namespace db
        public:
         Statement() = default;
         Statement(
-            sqlite3*      database_handle,
-            sqlite3_stmt* statement_handle,
+            sqlite3*      db,
+            sqlite3_stmt* statement,
             std::string   sqlForErrors
         );
 

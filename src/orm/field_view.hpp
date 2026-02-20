@@ -3,7 +3,6 @@
 
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #include "db/statement.hpp"
 
@@ -93,6 +92,8 @@ namespace orm
     };
 }   // namespace orm
 
+#ifndef __ORM__FIELD_VIEW_TPP__
 #include "field_view.tpp"
+#endif   // __ORM__FIELD_VIEW_TPP__
 
 #endif   // __ORM__FIELD_VIEW_HPP__

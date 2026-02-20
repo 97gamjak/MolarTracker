@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__ENUM_PARAM_HPP__
-#define __SETTINGS__ENUM_PARAM_HPP__
+#ifndef __SETTINGS__PARAMS__ENUM_PARAM_HPP__
+#define __SETTINGS__PARAMS__ENUM_PARAM_HPP__
 
 #include <expected>
 
@@ -50,4 +50,4 @@ namespace settings
 #include "enum_param.tpp"
 #endif   // __SETTINGS__ENUM_PARAM_TPP__
 
-#endif   // __SETTINGS__ENUM_PARAM_HPP__
+#endif   // __SETTINGS__PARAMS__ENUM_PARAM_HPP__

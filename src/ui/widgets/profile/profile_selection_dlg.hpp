@@ -1,5 +1,5 @@
-#ifndef __UI__PROFILE__PROFILE_SELECTION_DLG_HPP__
-#define __UI__PROFILE__PROFILE_SELECTION_DLG_HPP__
+#ifndef __UI__WIDGETS__PROFILE__PROFILE_SELECTION_DLG_HPP__
+#define __UI__WIDGETS__PROFILE__PROFILE_SELECTION_DLG_HPP__
 
 #include <QDialog>
 #include <string>
@@ -27,8 +27,8 @@ namespace ui
 
        public:
         explicit ProfileSelectionDialog(
-            QWidget*                 parent,
-            std::vector<std::string> profiles
+            QWidget*                        parent,
+            const std::vector<std::string>& profiles
         );
 
         /**
@@ -49,7 +49,7 @@ namespace ui
         void closeEvent(QCloseEvent* event) override;
 
        private:
-        void _buildUI(std::vector<std::string> profiles);
+        void _buildUI(const std::vector<std::string>& profiles);
 
         void _emit(const Action& action, const std::string& profileName);
         void _emit(const Action& action);
@@ -59,4 +59,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__PROFILE__PROFILE_SELECTION_DLG_HPP__
+#endif   // __UI__WIDGETS__PROFILE__PROFILE_SELECTION_DLG_HPP__

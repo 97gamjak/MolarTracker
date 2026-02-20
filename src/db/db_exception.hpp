@@ -6,6 +6,8 @@
 
 namespace db
 {
+    // TODO: use here MolarTracker's own exception hierarchy, e.g. by deriving
+    // from a base MolarTrackerException class
     /**
      * @brief Exception type for SQLite-related errors
      *
@@ -13,7 +15,7 @@ namespace db
     class SqliteError : public std::runtime_error
     {
        public:
-        explicit SqliteError(const std::string message);
+        explicit SqliteError(const std::string& message);
     };
 
 }   // namespace db

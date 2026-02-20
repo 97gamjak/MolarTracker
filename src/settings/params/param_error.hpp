@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAM_ERROR_HPP__
-#define __SETTINGS__PARAM_ERROR_HPP__
+#ifndef __SETTINGS__PARAMS__PARAM_ERROR_HPP__
+#define __SETTINGS__PARAMS__PARAM_ERROR_HPP__
 
 #include <string>
 
@@ -22,7 +22,7 @@ namespace settings
        public:
         explicit ParamError(std::string message);
 
-        [[nodiscard]] const std::string& getMessage();
+        [[nodiscard]] const std::string& getMessage() const;
     };
 
     /**
@@ -42,4 +42,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAM_ERROR_HPP__
+#endif   // __SETTINGS__PARAMS__PARAM_ERROR_HPP__

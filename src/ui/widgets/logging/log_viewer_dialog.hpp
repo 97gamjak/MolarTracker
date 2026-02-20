@@ -1,5 +1,5 @@
-#ifndef __UI__LOGGING__LOG_VIEWER_DIALOG_HPP__
-#define __UI__LOGGING__LOG_VIEWER_DIALOG_HPP__
+#ifndef __UI__WIDGETS__LOGGING__LOG_VIEWER_DIALOG_HPP__
+#define __UI__WIDGETS__LOGGING__LOG_VIEWER_DIALOG_HPP__
 
 #include <QDialog>
 #include <QPlainTextEdit>
@@ -73,7 +73,7 @@ namespace ui
         void              setIntervalSec(double intervalSec);
         [[nodiscard]] int getIntervalMs() const;
 
-        void               setAutoReload(bool enabled);
+        void               setAutoReload(bool autoReload);
         [[nodiscard]] bool isAutoReloadEnabled() const;
 
         void                                       setLineWrap(bool enabled);
@@ -82,4 +82,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__LOGGING__LOG_VIEWER_DIALOG_HPP__
+#endif   // __UI__WIDGETS__LOGGING__LOG_VIEWER_DIALOG_HPP__

@@ -8,12 +8,9 @@ namespace app
     /**
      * @brief Construct a new Repo Container object
      *
-     * @param database
+     * @param db
      */
-    RepoContainer::RepoContainer(db::Database& database)
-        : _profileRepo{database}
-    {
-    }
+    RepoContainer::RepoContainer(db::Database& db) : _profileRepo{db} {}
 
     /**
      * @brief Get the Profile Repo

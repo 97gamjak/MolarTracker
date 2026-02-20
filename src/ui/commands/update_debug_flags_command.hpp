@@ -21,7 +21,7 @@ namespace ui
         LogCategoryMap _categories;
 
        public:
-        UpdateDebugFlagsCommand(const LogCategoryMap& categories);
+        explicit UpdateDebugFlagsCommand(const LogCategoryMap& categories);
         ~UpdateDebugFlagsCommand() override = default;
 
         std::expected<void, CommandErrorPtr> undo() override;

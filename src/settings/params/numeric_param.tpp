@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__NUMERIC_PARAM_TPP__
-#define __SETTINGS__NUMERIC_PARAM_TPP__
+#ifndef __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
+#define __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
 
 #include <cmath>
 #include <expected>
@@ -253,4 +253,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__NUMERIC_PARAM_TPP__
+#endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__

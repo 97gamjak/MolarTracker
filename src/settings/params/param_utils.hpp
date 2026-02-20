@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS_UTILS_HPP__
-#define __SETTINGS__PARAMS_UTILS_HPP__
+#ifndef __SETTINGS__PARAMS__PARAM_UTILS_HPP__
+#define __SETTINGS__PARAMS__PARAM_UTILS_HPP__
 
 #include <utility>
 
@@ -89,4 +89,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS_UTILS_HPP__
+#endif   // __SETTINGS__PARAMS__PARAM_UTILS_HPP__

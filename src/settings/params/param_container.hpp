@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAM_CONTAINER_HPP__
-#define __SETTINGS__PARAM_CONTAINER_HPP__
+#ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_HPP__
+#define __SETTINGS__PARAMS__PARAM_CONTAINER_HPP__
 
 #include <string>
 
@@ -37,4 +37,4 @@ namespace settings
     };
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAM_CONTAINER_HPP__
+#endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_HPP__

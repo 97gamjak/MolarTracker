@@ -8,6 +8,7 @@
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud.hpp"
+#include "sql_models/profile_row.hpp"
 
 namespace app
 {
@@ -17,13 +18,21 @@ namespace app
      *
      * @param db
      */
-    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} { ensureSchema(); }
+    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} { _ensureSchema(); }
 
     /**
      * @brief Ensure the database schema for profiles exists
      *
      */
-    void ProfileRepo::ensureSchema() { orm::create_table<ProfileRow>(_db); }
+    void ProfileRepo::ensureSchema() { _ensureSchema(); }
+
+    /**
+     * @brief Ensure the database schema for profiles exists, this is a private
+     * helper method that is called by the virtual overriding method
+     * ensureSchema() to not use virtual dispatch in constructor
+     *
+     */
+    void ProfileRepo::_ensureSchema() { orm::create_table<ProfileRow>(_db); }
 
     /**
      * @brief Get all profiles from the database

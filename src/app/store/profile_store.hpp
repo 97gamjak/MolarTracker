@@ -1,8 +1,6 @@
 #ifndef __APP__STORE__PROFILE_STORE_HPP__
 #define __APP__STORE__PROFILE_STORE_HPP__
 
-#include <cstddef>
-#include <functional>
 #include <optional>
 #include <set>
 #include <string>
@@ -65,6 +63,12 @@ namespace app
 
        public:
         explicit ProfileStore(IProfileService& getProfileService);
+        ~ProfileStore() override = default;
+
+        ProfileStore(ProfileStore const&)                = delete;
+        ProfileStore& operator=(ProfileStore const&)     = delete;
+        ProfileStore(ProfileStore&&) noexcept            = delete;
+        ProfileStore& operator=(ProfileStore&&) noexcept = delete;
 
         void reload();
 

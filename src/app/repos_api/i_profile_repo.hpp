@@ -1,5 +1,5 @@
-#ifndef __APP__REPOS__PROFILE_REPO_HPP__
-#define __APP__REPOS__PROFILE_REPO_HPP__
+#ifndef __APP__REPOS_API__I_PROFILE_REPO_HPP__
+#define __APP__REPOS_API__I_PROFILE_REPO_HPP__
 
 #include <optional>
 #include <string>
@@ -7,7 +7,6 @@
 
 #include "config/id_types.hpp"
 #include "domain/profile.hpp"
-#include "sql_models/profile_row.hpp"
 
 namespace app
 {
@@ -100,4 +99,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__REPOS__PROFILE_REPO_HPP__
+#endif   // __APP__REPOS_API__I_PROFILE_REPO_HPP__
