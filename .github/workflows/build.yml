@@ -1,4 +1,4 @@
-name: CI
+name: BUILD LINUX
 
 on:
   pull_request:
@@ -14,18 +14,11 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     env:
       QT_VERSION: "6.8.3"
       BUILD_TYPE: "Release"
-      # Use static vcpkg triplet on Windows so we don't ship sqlite3.dll/curl DLLs
-      VCPKG_TRIPLET: "x64-windows-static"
 
     steps:
       - name: Checkout
@@ -59,11 +52,9 @@ jobs:
           echo "ARTIFACT_VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "IS_TAG=${IS_TAG}" >> "$GITHUB_ENV"
 
-          echo "WINDOWS_NAME=MolarTracker-windows-${VERSION}" >> "$GITHUB_ENV"
           echo "LINUX_NAME=MolarTracker-linux-${VERSION}" >> "$GITHUB_ENV"
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "WINDOWS_LATEST=MolarTracker-windows-latest" >> "$GITHUB_ENV"
             echo "LINUX_LATEST=MolarTracker-linux-latest" >> "$GITHUB_ENV"
           fi
 
@@ -71,54 +62,28 @@ jobs:
       # Build tools
       # -------------------------
       - name: Install build tools (Ubuntu)
-        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build pkg-config libcurl4-openssl-dev
-
-      - name: Install build tools (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          choco install -y ninja
+          sudo apt-get install -y     \
+              ninja-build             \
+              pkg-config              \
+              libcurl4-openssl-dev    \
+              cppcheck                \
+              clang-tidy
 
       # -------------------------
       # Install Qt
       # -------------------------
       - name: Install Qt (Ubuntu)
-        if: runner.os == 'Linux'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
           target: desktop
-
-      - name: Install Qt (Windows, MSVC 2022)
-        if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: ${{ env.QT_VERSION }}
-          target: desktop
-          arch: win64_msvc2022_64
-
-      # -------------------------
-      # Windows: MSVC env + vcpkg deps
-      # -------------------------
-      - name: Setup MSVC dev cmd
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Setup vcpkg (Windows, manifest mode)
-        if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: "**/vcpkg.json"
-          runVcpkgInstall: true
-          vcpkgTriplet: ${{ env.VCPKG_TRIPLET }}
 
       # -------------------------
       # Configure + build
       # -------------------------
       - name: Configure (Ubuntu)
-        if: runner.os == 'Linux'
         shell: bash
         run: |
           set -euo pipefail
@@ -132,61 +97,44 @@ jobs:
             -DMOLARTRACKER_GIT_TAG="${GITHUB_REF_NAME}"
 
       - name: Build (Ubuntu)
-        if: runner.os == 'Linux'
         run: |
           cmake --build build --verbose
 
-      - name: Configure (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $isTag = if ("${{ startsWith(github.ref, 'refs/tags/') }}" -eq "True") { "ON" } else { "OFF" }
-          cmake -S . -B build -G Ninja `
-            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
-            -DMOLARTRACKER_IS_TAG="$isTag" `
-            -DMOLARTRACKER_GIT_TAG="${{ github.ref_name }}" `
-            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_TRIPLET }}
-
-      - name: Build (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          cmake --build build --verbose
 
       # -------------------------
-      # Windows: deploy with windeployqt (ONLY on tags/dev)
+      # Run cppcheck (on the compile_commands.json from the build, so it has all the correct include paths)
       # -------------------------
-      - name: Deploy Qt runtime (Windows)
-        if: runner.os == 'Windows' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
-        shell: pwsh
+      - name: Run cppcheck
         run: |
-          $exe = "build/bin/MolarTracker.exe"
-          if (-not (Test-Path $exe)) {
-            throw "Expected executable not found: $exe. Check your RUNTIME_OUTPUT_DIRECTORY and target name."
-          }
+          cppcheck \
+              --project=build/compile_commands.json \
+              --enable=all \
+              --enable=performance \
+              --enable=style \
+              --enable=information \
+              --enable=portability \
+              --error-exitcode=1 \
+              --suppressions-list=.cppcheck.suppress \
+              --suppress=missingIncludeSystem \
+              --inline-suppr \
+              --inconclusive \
+              -I src
 
-          New-Item -ItemType Directory -Force deploy | Out-Null
-
-          $windeployqt = (Get-Command windeployqt.exe -ErrorAction SilentlyContinue)?.Source
-          if (-not $windeployqt) { throw "windeployqt.exe not found on PATH." }
-
-          & $windeployqt --release --compiler-runtime --dir deploy $exe
-          Copy-Item $exe deploy\
+      # -------------------------
+      # Run clang-tidy (also using the compile_commands.json from the build)
+      # -------------------------
+      - name: Run clang-tidy
+        run: |
+          clang-tidy \
+              --warnings-as-errors=* \
+              --compile-commands=build/compile_commands.json \
+              $(find src -name '*.cpp')
 
       # -------------------------
       # Package for Release assets (ONLY on tags)
       # -------------------------
-      - name: Package (Windows, tag)
-        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
-        shell: pwsh
-        run: |
-          $zip = "MolarTracker-windows-${{ github.ref_name }}.zip"
-          if (Test-Path $zip) { Remove-Item $zip -Force }
-          Compress-Archive -Path deploy\* -DestinationPath $zip -Force
-
       - name: Package (Linux, tag)
-        if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
           set -euo pipefail
@@ -198,18 +146,8 @@ jobs:
       # Upload to GitHub Release (ONLY on tags)
       # Requires the Release to already exist for that tag (your other workflow creates it)
       # -------------------------
-      - name: Upload release assets (Windows)
-        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: |
-            MolarTracker-windows-${{ github.ref_name }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload release assets (Linux)
-        if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -222,16 +160,8 @@ jobs:
       # -------------------------
       # Upload Actions artifacts (ONLY on tags/dev; convenient for quick download)
       # -------------------------
-      - name: Upload Windows artifact (Actions, versioned)
-        if: runner.os == 'Windows' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.WINDOWS_NAME }}
-          path: deploy/**
-          if-no-files-found: error
-
       - name: Upload Linux artifact (Actions, versioned)
-        if: runner.os == 'Linux' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
+        if: (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.LINUX_NAME }}
@@ -243,16 +173,8 @@ jobs:
       # -------------------------
       # Tag pushes: also upload "latest" Actions artifacts
       # -------------------------
-      - name: Upload Windows artifact (Actions, latest)
-        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.WINDOWS_LATEST }}
-          path: deploy/**
-          if-no-files-found: error
-
       - name: Upload Linux artifact (Actions, latest)
-        if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.LINUX_LATEST }}

@@ -10,52 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  cppcheck:
-    runs-on: ubuntu-24.04
-
-    env:
-      QT_VERSION: "6.8.3"
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install cppcheck
-        run: |
-          sudo apt update
-          sudo apt install -y cppcheck ninja-build pkg-config libcurl4-openssl-dev
-
-      - name: Install Qt (Ubuntu)
-        if: runner.os == 'Linux'
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: ${{ env.QT_VERSION }}
-          target: desktop
-
-      - name: Configure (docs)
-        run: |
-          cmake -S . -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-
-      - name: Run cppcheck
-        run: |
-          cppcheck \
-              --project=build/compile_commands.json \
-              --enable=all \
-              --enable=performance \
-              --enable=style \
-              --enable=information \
-              --enable=portability \
-              --error-exitcode=1 \
-              --suppressions-list=.cppcheck.suppress \
-              --suppress=missingIncludeSystem \
-              --inline-suppr \
-              --inconclusive \
-              -I src
-
-  clang-tidy:
+  devops:
+    name: DevOps checks
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -73,6 +29,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e external/devops
 
-      - name: Install clang-tidy and dependencies
+      - name: Run DevOps checks
         run: |
           cpp_checks --dirs src
