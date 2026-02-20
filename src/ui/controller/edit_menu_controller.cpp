@@ -86,6 +86,12 @@ namespace ui
             statusBar->showMessage(QString::fromStdString(msg));
     }
 
+    /**
+     * @brief Refresh the state of the edit menu actions based on the undo stack
+     * state, this should be called whenever the undo stack changes to update
+     * the enabled state and text of the undo/redo actions in the edit menu.
+     *
+     */
     void EditMenuController::refresh()
     {
         const bool canUndo = _undoStack.canUndo();

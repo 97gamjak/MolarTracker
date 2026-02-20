@@ -38,9 +38,15 @@ namespace db
     class Statement
     {
        private:
-        sqlite3*      _db{nullptr};
+        /// Pointer to the SQLite database connection (not owned by this class)
+        sqlite3* _db{nullptr};
+
+        /// Pointer to the prepared statement handle (owned by this class)
         sqlite3_stmt* _statement{nullptr};
-        std::string   _sqlForErrors{};
+
+        /// The SQL string used to prepare this statement, stored for error
+        /// reporting purposes
+        std::string _sqlForErrors{};
 
        public:
         Statement() = default;

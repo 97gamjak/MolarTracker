@@ -1,5 +1,6 @@
 add_library(molartracker_db STATIC
     database.cpp
+    db_exception.cpp
     statement.cpp
     transaction.cpp
 )

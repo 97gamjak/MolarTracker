@@ -12,8 +12,10 @@
 class LogEntryScope
 {
    protected:
+    /// The LogObject associated with this scope
     LogObject _logObject;
-    bool      _enabled;
+    /// Flag indicating whether the scope is enabled
+    bool _enabled;
 
    public:
     LogEntryScope(const LogObject& logObject);
@@ -28,9 +30,8 @@ class LogEntryScope
 class TimedLogEntryScope final : public LogEntryScope
 {
    private:
-    using Clock = std::chrono::steady_clock;
-
-    Clock::time_point _start;
+    /// The start time of the scope
+    std::chrono::steady_clock::time_point _start;
 
    public:
     TimedLogEntryScope(const LogObject& logObject);

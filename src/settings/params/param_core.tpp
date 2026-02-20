@@ -361,12 +361,44 @@ namespace settings
             sub.fn(sub.user, getOptional());
     }
 
+    /**
+     * @brief Subscribe to changes in the parameter value, the provided callback
+     * function will be called whenever the value is changed, the user pointer
+     * can be used to pass additional data to the callback function, the
+     * returned Connection object can be used to unsubscribe from changes
+     *
+     * @tparam T
+     * @param func The callback function to call when the parameter value
+     * changes, it should have the signature void(void* user, const T& newValue)
+     * @param user A user-defined pointer that will be passed to the callback
+     * function when it is called, this can be used to provide additional
+     * context for the callback function
+     * @return Connection An object representing the subscription, this can be
+     * used to unsubscribe from changes by calling disconnect() on it or by
+     * letting it go out of scope
+     */
     template <typename T>
     Connection ParamCore<T>::subscribe(ChangedFn func, void* user)
     {
         return _subscribe<T>(func, user);
     }
 
+    /**
+     * @brief Subscribe to changes in the parameter value, the provided callback
+     * function will be called whenever the value is changed, the user pointer
+     * can be used to pass additional data to the callback function, the
+     * returned Connection object can be used to unsubscribe from changes
+     *
+     * @tparam T
+     * @param func The callback function to call when the parameter value
+     * changes, it should have the signature void(void* user, const T& newValue)
+     * @param user A user-defined pointer that will be passed to the callback
+     * function when it is called, this can be used to provide additional
+     * context for the callback function
+     * @return Connection An object representing the subscription, this can be
+     * used to unsubscribe from changes by calling disconnect() on it or by
+     * letting it go out of scope
+     */
     template <typename T>
     Connection ParamCore<T>::subscribeToOptional(
         ChangedFnOptional func,

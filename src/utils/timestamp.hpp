@@ -18,15 +18,11 @@
 class Timestamp final
 {
    public:
-    using Clock     = std::chrono::system_clock;
-    using Duration  = Clock::duration;
-    using TimePoint = std::chrono::local_time<Duration>;
-
     // Delete default constructor to prevent instantiation
     Timestamp() = delete;
 
-    [[nodiscard]] static TimePoint now();
-
+    [[nodiscard]] static std::chrono::local_time<std::chrono::system_clock::duration> now(
+    );
     // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] static std::string iso8601();
 

@@ -6,7 +6,6 @@
 #include <unordered_map>
 
 #include "config/logging_base.hpp"
-#include "connections/connection.hpp"
 #include "utils/ring_file.hpp"
 
 enum class LogLevel : size_t;      // forward declaration
@@ -26,10 +25,17 @@ namespace settings
 class LogManager
 {
    private:
+    /// Mapping of log categories to their current log levels.
     std::unordered_map<LogCategory, LogLevel> _categories{};
-    RingFile                                  _ringFile{};
-    std::filesystem::path                     _logDirectory{};
-    LogLevel                                  _defaultLogLevel{LogLevel::Info};
+
+    /// The ring file logger instance used for logging to files.
+    RingFile _ringFile{};
+
+    /// The directory where log files are stored.
+    std::filesystem::path _logDirectory{};
+
+    /// The default log level for categories that are not explicitly set.
+    LogLevel _defaultLogLevel{LogLevel::Info};
 
    public:
     static LogManager& getInstance();

@@ -15,7 +15,10 @@ namespace app
     class StoreContainer
     {
        private:
-        ProfileStore         _profileStore;
+        /// The Profile store
+        ProfileStore _profileStore;
+
+        /// list of all stores TODO: maybe introduce a std::tie
         std::vector<IStore*> _allStores{
             &_profileStore,
         };
@@ -25,10 +28,8 @@ namespace app
 
         void commit();
 
-        // clang-format off
-        ProfileStore&       getProfileStore() { return _profileStore; }
-        const ProfileStore& getProfileStore() const { return _profileStore; }
-        // clang-format on
+        ProfileStore&       getProfileStore();
+        const ProfileStore& getProfileStore() const;
     };
 
 }   // namespace app

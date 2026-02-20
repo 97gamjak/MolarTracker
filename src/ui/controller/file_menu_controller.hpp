@@ -23,8 +23,11 @@ namespace ui
         Q_OBJECT
 
        private:
-        QMainWindow&     _mainWindow;
-        FileMenu&        _fileMenu;
+        /// Reference to the main window
+        QMainWindow& _mainWindow;
+        /// Reference to the file menu
+        FileMenu& _fileMenu;
+        /// Reference to the application context
         app::AppContext& _appContext;
 
        private slots:

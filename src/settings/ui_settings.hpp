@@ -17,8 +17,13 @@ namespace settings
     class UISettingsSchema
     {
        public:
-        static constexpr const char* UI_SETTINGS_KEY   = "uiSettings";
+        /// The key for the UI settings container
+        static constexpr const char* UI_SETTINGS_KEY = "uiSettings";
+
+        /// The title for the UI settings container
         static constexpr const char* UI_SETTINGS_TITLE = "UI Settings";
+
+        /// The description for the UI settings container
         static constexpr const char* UI_SETTINGS_DESC =
             "Settings related to the user interface.";
     };
@@ -29,8 +34,7 @@ namespace settings
     class UISettings : public ParamContainer
     {
        private:
-        using Schema = UISettingsSchema;
-
+        /// The UI settings parameters
         LogViewerSettings _logViewerSettings;
 
        public:
@@ -43,8 +47,6 @@ namespace settings
         [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
 
        private:
-        UISettings(std::string key, std::string title, std::string description);
-
         [[nodiscard]] auto _getParams() const&;
         [[nodiscard]] auto _getParams() &;
     };

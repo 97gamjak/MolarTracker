@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <string>
-#include <tuple>
 
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
@@ -16,16 +15,27 @@
  */
 struct ProfileRow final
 {
+   public:   // fields
+    /// The name of the database table this struct represents
     static inline constexpr std::string table_name = "profile";
 
-    orm::IdField<ProfileId>                                         id{};
-    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name{};
-    orm::Field<"email", std::optional<std::string>>                 email{};
+    /// The id field, this is the primary key of the table and is
+    /// auto-incremented
+    orm::IdField<ProfileId> id{};
 
-    // clang-format off
-    [[nodiscard]] constexpr auto fields() { return std::tie(id, name, email); }
-    [[nodiscard]] constexpr auto fields() const { return std::tie(id, name, email); }
-    // clang-format on
+    /// The name field, this is a required and unique field
+    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name{};
+
+    /// The email field, this is an optional field
+    orm::Field<"email", std::optional<std::string>> email{};
+
+   public:   // methods
+    [[nodiscard]] constexpr auto fields();
+    [[nodiscard]] constexpr auto fields() const;
 };
+
+#ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
+#include "profile_row.impl.hpp"
+#endif   // __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
 
 #endif   // __SQL_MODELS__PROFILE_ROW_HPP__

@@ -18,7 +18,9 @@ namespace ui
         Q_OBJECT
 
        private:
-        QMainWindow&  _mainWindow;
+        /// Reference to the main window
+        QMainWindow& _mainWindow;
+        /// Reference to the settings menu
         SettingsMenu& _settingsMenu;
 
        private slots:

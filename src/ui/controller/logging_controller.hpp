@@ -22,6 +22,9 @@ namespace ui
     class LoggingController
     {
        private:
+        /// Connection object for the logging settings change subscription. This
+        /// is used to manage the subscription and ensure that it can be
+        /// properly disconnected when the controller is destroyed.
         Connection _logLevelConnection;
 
        public:

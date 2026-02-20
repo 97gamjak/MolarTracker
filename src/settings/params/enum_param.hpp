@@ -23,9 +23,16 @@ namespace settings
     class EnumParam : public ParamMixin<EnumParam<E>, E>
     {
        private:
+        /// friend declaration to allow ParamMixin to access private members of
+        /// EnumParam, this is necessary because ParamMixin needs to access the
+        /// _core member of EnumParam to implement the functionality for enum
+        /// parameters
         friend ParamMixin<EnumParam<E>, E>;
+
+        /// The core implementation of the parameter
         ParamCore<E> _core;
 
+        /// type alias for the enum metadata
         using EnumMeta = mstd::enum_meta_t<E>;
 
        public:

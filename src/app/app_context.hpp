@@ -18,11 +18,23 @@ namespace app
     class AppContext
     {
        private:
+        /// The settings object for the application, which can be used to
+        /// subscribe to settings changes
         settings::Settings& _settings;
-        db::Database        _database;
-        RepoContainer       _repos;
-        ServiceContainer    _services;
-        StoreContainer      _store;
+
+        /// The database instance for the application
+        db::Database _database;
+
+        /// The repository container for the application
+        RepoContainer _repos;
+
+        /// The service container for the application
+        ServiceContainer _services;
+
+        /// The store container for the application, this is where the global
+        /// state of the application is stored and can be accessed and modified
+        /// by the controllers and other parts of the application
+        StoreContainer _store;
 
        public:
         explicit AppContext(settings::Settings& settings);
@@ -30,11 +42,11 @@ namespace app
         AppContext(const AppContext&)            = delete;
         AppContext& operator=(const AppContext&) = delete;
 
-        StoreContainer&       getStore() { return _store; }
-        const StoreContainer& getStore() const { return _store; }
+        StoreContainer&       getStore();
+        const StoreContainer& getStore() const;
 
-        settings::Settings&       getSettings() { return _settings; }
-        const settings::Settings& getSettings() const { return _settings; }
+        settings::Settings&       getSettings();
+        const settings::Settings& getSettings() const;
     };
 
 }   // namespace app

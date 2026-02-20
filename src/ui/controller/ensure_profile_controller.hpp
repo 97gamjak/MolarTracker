@@ -36,12 +36,19 @@ namespace ui
         Q_OBJECT
 
        private:
-        QMainWindow&                     _mainWindow;
-        app::AppContext&                 _appContext;
-        UndoStack&                       _undoStack;
-        std::size_t                      _callCount = MAX_PROFILE_CHECKS;
+        /// Reference to the main window
+        QMainWindow& _mainWindow;
+        /// Reference to the application context
+        app::AppContext& _appContext;
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
+
+        /// Counter for the number of profile checks
+        std::size_t _callCount = MAX_PROFILE_CHECKS;
+        /// Pointer to the profile selection dialog
         QPointer<ProfileSelectionDialog> _profileSelectionDialog;
-        QPointer<AddProfileDialog>       _addProfileDialog;
+        /// Pointer to the add profile dialog
+        QPointer<AddProfileDialog> _addProfileDialog;
 
        public:
         explicit EnsureProfileController(

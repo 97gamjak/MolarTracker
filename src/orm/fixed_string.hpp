@@ -15,6 +15,7 @@ namespace orm
     template <std::size_t Size>
     struct fixed_string
     {
+        /// The characters of the string, stored in a std::array for fixed size
         std::array<char, Size> _data{};
 
         constexpr fixed_string(char const (&text)[Size]);

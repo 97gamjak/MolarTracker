@@ -3,7 +3,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <utility>
 
 namespace orm
 {
@@ -14,10 +13,7 @@ namespace orm
     class ORMError : public std::runtime_error
     {
        public:
-        explicit ORMError(const std::string message)
-            : std::runtime_error(message)
-        {
-        }
+        explicit ORMError(const std::string message);
     };
 
 }   // namespace orm

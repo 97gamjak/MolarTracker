@@ -111,6 +111,14 @@ namespace utils
     }
 
     /**
+     * @brief Get an invalid SemVer object, this can be used to represent an
+     * invalid version when parsing fails, this is useful for error handling
+     *
+     * @return SemVer
+     */
+    const SemVer SemVer::getInvalidVersion() { return SemVer{"invalid"}; }
+
+    /**
      * @brief Equality operator for SemVer, two SemVer objects are considered
      * equal if their major, minor, and patch numbers are all equal, if both
      * SemVer objects are invalid, they are also considered equal

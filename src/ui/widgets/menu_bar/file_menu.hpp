@@ -18,13 +18,18 @@ namespace ui
         Q_OBJECT
 
        signals:
+        /// Signal emitted when the user requests to save
         void requestSave();
+        /// Signal emitted when the user requests to quit
         void requestQuit();
 
        private:
+        /// Pointer to the file menu widget
         QMenu* _fileMenu = nullptr;
 
+        /// The save action in the file menu
         QAction* _saveAction = nullptr;
+        /// The quit action in the file menu
         QAction* _quitAction = nullptr;
 
        public:

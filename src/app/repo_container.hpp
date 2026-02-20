@@ -18,6 +18,7 @@ namespace app
     class RepoContainer
     {
        private:
+        /// The Profile repository
         ProfileRepo _profileRepo;
 
        public:

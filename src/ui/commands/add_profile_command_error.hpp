@@ -34,13 +34,15 @@ namespace ui
     /**
      * @brief A class for representing errors when adding a profile
      *
-     * @notes inherits from ICommandError interface
-     *
      */
     class AddProfileCommandError final : public ICommandError
     {
        private:
-        std::string                _message;
+        /// The error message describing the error that occurred when adding a
+        /// profile
+        std::string _message;
+        /// The error code representing the type of error that occurred when
+        /// adding a profile
         AddProfileCommandErrorCode _code;
 
        public:

@@ -1,6 +1,12 @@
 #ifndef __ORM__CONCEPTS_HPP__
 #define __ORM__CONCEPTS_HPP__
 
+#include <concepts>
+#include <cstdint>
+#include <optional>
+
+#include "orm/constraints.hpp"
+
 namespace orm
 {
     /**
@@ -66,6 +72,8 @@ namespace orm
     template <typename T>
     struct optional_inner
     {
+        /// Type alias for the inner type, which is just T for non-optional
+        /// types
         using type = T;
     };
 
@@ -77,6 +85,7 @@ namespace orm
     template <typename U>
     struct optional_inner<std::optional<U>>
     {
+        /// Type alias for the inner type, which is U for std::optional<U>
         using type = U;
     };
 

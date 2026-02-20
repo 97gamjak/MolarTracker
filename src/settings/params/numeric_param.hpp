@@ -17,8 +17,13 @@ namespace settings
     class NumericParamSchema
     {
        public:
+        /// key for the minimum value of the numeric parameter
         static constexpr const char* MIN_VALUE_KEY = "minValue";
+
+        /// key for the maximum value of the numeric parameter
         static constexpr const char* MAX_VALUE_KEY = "maxValue";
+
+        /// key for the precision of the numeric parameter
         static constexpr const char* PRECISION_KEY = "precision";
     };
 
@@ -34,15 +39,27 @@ namespace settings
     class NumericParam : public ParamMixin<NumericParam<T>, T>
     {
        private:
+        /// type alias for NumericParamSchema
         using Schema = NumericParamSchema;
+        /// friend declaration to allow ParamMixin to access private members of
+        /// NumericParam, this is necessary because ParamMixin needs to access
+        /// the _core member of NumericParam to implement the functionality for
+        /// numeric parameters
         friend ParamMixin<NumericParam<T>, T>;
+
+        /// The core container for the numeric parameter
         ParamCore<T> _core;
 
+        /// The minimum value for the numeric parameter, if set, the parameter
+        /// value must be greater than or equal to this value
         std::optional<T> _minValue = std::nullopt;
+
+        /// The maximum value for the numeric parameter, if set, the parameter
+        /// value must be less than or equal to this value
         std::optional<T> _maxValue = std::nullopt;
 
-        // For floating-point types, this represents the number of decimal
-        // places to consider for validation
+        /// For floating-point types, this represents the number of decimal
+        /// places to consider for validation
         std::optional<size_t> _precision;
 
        public:

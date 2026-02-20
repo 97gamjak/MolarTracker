@@ -17,18 +17,23 @@ namespace ui
     {
         Q_OBJECT
 
-       signals:
-        void requestDebugSlots();
-        void requestLogViewer();
-
        private:
+        /// Pointer to the debug menu in the menu bar
         QMenu* _debugMenu = nullptr;
 
+        /// Pointer to the action for opening the debug slots dialog
         QAction* _debugSlotsAction = nullptr;
-        QAction* _logViewerAction  = nullptr;
+        /// Pointer to the action for opening the log viewer dialog
+        QAction* _logViewerAction = nullptr;
 
        public:
         explicit DebugMenu(QMenuBar& menuBar);
+
+       signals:
+        /// QT signal for when the debug slots action is triggered
+        void requestDebugSlots();
+        /// QT signal for when the log viewer action is triggered
+        void requestLogViewer();
     };
 
 }   // namespace ui

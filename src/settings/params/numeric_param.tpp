@@ -48,20 +48,11 @@ namespace settings
     }
 
     /**
-     * @brief Get the value of the numeric parameter
-     *
-     * @note This function returns the ParamCore object which contains the value
-     * and other metadata about the parameter, to get the actual value, use the
-     * get() function of the ParamCore object returned by this function.
-     *
-     * It is private to prevent direct access to the core object from outside
-     * the class, and to enforce the use of the get() function for accessing the
-     * value, which may include additional logic such as validation or applying
-     * precision.
+     * @brief Construct a new NumericParam object with a core container
      *
      * @tparam Derived
      * @tparam T
-     * @return const ParamCore<T>&
+     * @param core The core container for the numeric parameter
      */
     template <typename T>
     requires(std::integral<T> || std::floating_point<T>)

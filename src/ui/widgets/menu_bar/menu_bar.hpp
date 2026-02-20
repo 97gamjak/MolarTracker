@@ -24,11 +24,16 @@ namespace ui
         Q_OBJECT
 
        private:
-        FileMenu     _fileMenu;
-        EditMenu     _editMenu;
-        DebugMenu    _debugMenu;
+        /// File menu
+        FileMenu _fileMenu;
+        /// Edit menu
+        EditMenu _editMenu;
+        /// Debug menu
+        DebugMenu _debugMenu;
+        /// Settings menu
         SettingsMenu _settingsMenu;
-        HelpMenu     _helpMenu;
+        /// Help menu
+        HelpMenu _helpMenu;
 
        public:
         explicit MenuBar(QWidget* parent = nullptr);

@@ -12,7 +12,10 @@ namespace drafts
      */
     struct ProfileDraft
     {
-        std::string                name;
+        /// The name of the profile (required)
+        std::string name;
+
+        /// The email associated with the profile (optional)
         std::optional<std::string> email = std::nullopt;
     };
 }   // namespace drafts

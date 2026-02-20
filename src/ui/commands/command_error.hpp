@@ -13,8 +13,20 @@ namespace ui
     class ICommandError
     {
        public:
-        virtual ~ICommandError()               = default;
+        virtual ~ICommandError() = default;
+
+        /**
+         * @brief Get the Message object
+         *
+         * @return std::string
+         */
         virtual std::string getMessage() const = 0;
+
+        /**
+         * @brief Get the Code Str object
+         *
+         * @return std::string
+         */
         virtual std::string getCodeStr() const = 0;
     };
 
@@ -29,6 +41,10 @@ namespace ui
        public:
         // TODO(97gamjak): implement this via mstd::enum
         // https://97gamjak.atlassian.net/browse/MOLTRACK-110
+        /**
+         * @brief Enum class for command error types
+         *
+         */
         enum class Type
         {
             InvalidCommand,
@@ -36,6 +52,11 @@ namespace ui
             NothingToUndo
         };
 
+       private:
+        /// The type of the command error
+        Type _type;
+
+       public:
         CommandError(Type type);
 
         std::string getMessage() const override;
@@ -45,9 +66,6 @@ namespace ui
         static std::unique_ptr<CommandError> makeNothingToUndoErrorPtr();
         static std::unique_ptr<CommandError> makeNothingToRedoErrorPtr();
         static std::unique_ptr<CommandError> makeInvalidCommandErrorPtr();
-
-       private:
-        Type _type;
     };
 
 }   // namespace ui

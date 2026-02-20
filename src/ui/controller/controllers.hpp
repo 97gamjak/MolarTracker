@@ -19,6 +19,7 @@ namespace ui
     class Controllers
     {
        private:
+        /// Controller for handling logging related functionality
         LoggingController _loggingController;
 
        public:

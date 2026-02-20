@@ -32,18 +32,28 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// Reference to the application context
         app::AppContext& _appContext;
-        Controllers&     _controllers;
-        MenuBar*         _menuBar = nullptr;
+        /// Reference to the controllers
+        Controllers& _controllers;
+        /// Pointer to the menu bar widget
+        MenuBar* _menuBar = nullptr;
 
-        std::unique_ptr<FileMenuController>     _fileMenuController;
-        std::unique_ptr<EditMenuController>     _editMenuController;
-        std::unique_ptr<DebugMenuController>    _debugMenuController;
+        /// File menu controller
+        std::unique_ptr<FileMenuController> _fileMenuController;
+        /// Edit menu controller
+        std::unique_ptr<EditMenuController> _editMenuController;
+        /// Debug menu controller
+        std::unique_ptr<DebugMenuController> _debugMenuController;
+        /// Settings menu controller
         std::unique_ptr<SettingsMenuController> _settingsMenuController;
-        std::unique_ptr<HelpMenuController>     _helpMenuController;
+        /// Help menu controller
+        std::unique_ptr<HelpMenuController> _helpMenuController;
 
+        /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;
 
+        /// Undo stack for managing undoable commands in the application
         UndoStack _undoStack;
 
        public:

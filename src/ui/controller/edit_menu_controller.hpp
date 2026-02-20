@@ -19,9 +19,12 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// Reference to the main window
         QMainWindow& _mainWindow;
-        EditMenu&    _editMenu;
-        UndoStack&   _undoStack;
+        /// Reference to the edit menu
+        EditMenu& _editMenu;
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
 
        private slots:
         void _onUndoRequested();

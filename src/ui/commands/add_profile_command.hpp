@@ -26,14 +26,21 @@ namespace ui
     class AddProfileCommand : public ICommand
     {
        private:
-        app::ProfileStore&   _profileStore;
-        settings::Settings&  _settings;
+        /// Reference to the profile store
+        app::ProfileStore& _profileStore;
+        /// Reference to the settings
+        settings::Settings& _settings;
+        /// The profile draft
         drafts::ProfileDraft _profile;
 
-        bool _setAsActive  = false;
+        /// Whether to set the new profile as active
+        bool _setAsActive = false;
+        /// Whether to set the new profile as default
         bool _setAsDefault = false;
 
-        std::optional<std::string> _activeProfileBeforeAdd  = std::nullopt;
+        /// The active profile before adding the new profile
+        std::optional<std::string> _activeProfileBeforeAdd = std::nullopt;
+        /// The default profile before adding the new profile
         std::optional<std::string> _defaultProfileBeforeAdd = std::nullopt;
 
        public:

@@ -18,6 +18,7 @@ namespace app
     class ProfileService : public IProfileService
     {
        private:
+        /// reference to the Profile repository
         IProfileRepo& _profileRepo;
 
        public:

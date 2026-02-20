@@ -15,10 +15,14 @@ namespace utils
     class SemVer
     {
        private:
+        /// The major version number
         std::size_t _major;
+        /// The minor version number
         std::size_t _minor;
+        /// The patch version number
         std::size_t _patch;
 
+        /// Flag indicating whether the version is invalid
         bool _isInvalid = false;
 
        public:
@@ -36,7 +40,7 @@ namespace utils
 
         [[nodiscard]] std::string toString() const;
 
-        static const SemVer getInvalidVersion() { return SemVer{"invalid"}; }
+        static const SemVer getInvalidVersion();
 
         friend bool operator==(const SemVer& lhs, const SemVer& rhs);
 

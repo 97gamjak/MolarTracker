@@ -16,8 +16,13 @@ namespace app
     class Profile
     {
        private:
-        ProfileId                  _id;
-        std::string                _name;
+        /// The unique identifier for the profile
+        ProfileId _id;
+
+        /// The name of the profile
+        std::string _name;
+
+        /// The email associated with the profile (optional)
         std::optional<std::string> _email;
 
        public:
@@ -27,19 +32,13 @@ namespace app
             const std::optional<std::string>& email
         );
 
-        //
-        // getter and setter methods
-        //
+        ProfileId                        getId() const noexcept;
+        const std::string                getName() const noexcept;
+        const std::optional<std::string> getEmail() const noexcept;
 
-        // clang-format off
-        ProfileId                        getId() const noexcept { return _id; }
-        const std::string                getName() const noexcept { return _name; }
-        const std::optional<std::string> getEmail() const noexcept { return _email; }
-
-        void setId(ProfileId newId) { _id = newId; }
-        void setName(const std::string& newName) { _name = newName; }
-        void setEmail(const std::optional<std::string>& newEmail) { _email = newEmail; }
-        // clang-format on
+        void setId(ProfileId newId);
+        void setName(const std::string& newName);
+        void setEmail(const std::optional<std::string>& newEmail);
     };
 
 }   // namespace app

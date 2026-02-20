@@ -82,7 +82,8 @@ namespace ui
      * @brief Show a fatal exception dialog
      *
      * @param title The title of the dialog
-     * @param details The details of the exception
+     * @param logObject The log object containing the details of the exception,
+     * this will be logged as an error and shown in the details of the dialog
      */
     void ExceptionDialog::showFatal(const QString& title, LogObject logObject)
     {

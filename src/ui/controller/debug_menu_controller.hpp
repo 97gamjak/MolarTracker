@@ -28,14 +28,26 @@ namespace ui
         Q_OBJECT
 
        private:
-        QMainWindow&     _mainWindow;
-        DebugMenu&       _debugMenu;
+        /// References to the main window
+        QMainWindow& _mainWindow;
+        /// Reference to the debug menu
+        DebugMenu& _debugMenu;
+        /// Reference to the application context
         app::AppContext& _appContext;
-        UndoStack&       _undoStack;
+        /// Reference to the undo stack for executing commands
+        UndoStack& _undoStack;
+        /// Settings for the log viewer dialog
+        LogViewerDialog::Settings _logViewerSettings;
 
+        /// Pointer to the debug slots dialog, this is a QPointer to ensure that
+        /// we do not have a dangling pointer if the dialog is closed outside of
+        /// this controller
         QPointer<DebugSlotsDialog> _debugSlotsDialog;
-        QPointer<LogViewerDialog>  _logViewerDialog;
-        LogViewerDialog::Settings  _logViewerSettings;
+
+        /// Pointer to the log viewer dialog, this is a QPointer to ensure that
+        /// we do not have a dangling pointer if the dialog is closed outside of
+        /// this controller
+        QPointer<LogViewerDialog> _logViewerDialog;
 
        private slots:
         void _onRequestDebugSlots();
