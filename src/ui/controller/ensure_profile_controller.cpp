@@ -60,7 +60,7 @@ namespace ui
         while (!settings.hasDefaultProfile() || !profileStore.hasActiveProfile()
         )
         {
-            std::optional<std::string_view> name = settings.getDefaultProfile();
+            const auto& name = settings.getDefaultProfile();
 
             if (name.has_value() && profileStore.profileExists(name.value()))
             {

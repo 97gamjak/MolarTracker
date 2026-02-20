@@ -34,7 +34,7 @@ namespace ui
         /// Maximum number of times to check for a valid profile before giving
         /// up and showing an error message, this is to prevent infinite loops
         /// in case of unexpected issues with profile creation or selection
-        static constexpr std::size_t MAX_PROFILE_CHECKS = 10;
+        static constexpr std::size_t MAX_PROFILE_CHECKS = 0;
 
        private:
         /// Reference to the main window
