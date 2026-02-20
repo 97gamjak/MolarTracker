@@ -25,10 +25,15 @@ namespace ui
         /// Button box for dialog actions
         QDialogButtonBox* _buttonBox = nullptr;
 
+        /// Flag to prevent emitting cancel action multiple times when the
+        /// dialog is closed without selecting a profile
+        bool _canBeClosed = true;
+
        public:
         explicit ProfileSelectionDialog(
             QWidget*                        parent,
-            const std::vector<std::string>& profiles
+            const std::vector<std::string>& profiles,
+            bool                            canBeClosed = true
         );
 
         /**
@@ -46,7 +51,7 @@ namespace ui
         void requested(const Action& action, const std::string& profileName);
 
        protected:
-        void closeEvent(QCloseEvent* event) override;
+        void reject() override;
 
        private:
         void _buildUI(const std::vector<std::string>& profiles);

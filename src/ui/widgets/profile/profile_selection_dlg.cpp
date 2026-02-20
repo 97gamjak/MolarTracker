@@ -1,5 +1,6 @@
 #include "profile_selection_dlg.hpp"
 
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QListWidget>
 #include <QPushButton>
@@ -22,12 +23,12 @@ namespace ui
      */
     ProfileSelectionDialog::ProfileSelectionDialog(
         QWidget*                        parent,
-        const std::vector<std::string>& profiles
+        const std::vector<std::string>& profiles,
+        bool                            canBeClosed
     )
-        : QDialog{parent}
+        : QDialog{parent}, _canBeClosed{canBeClosed}
     {
         setWindowTitle("Select Profile");
-        resize(400, 300);
         utils::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI(profiles);
@@ -42,16 +43,22 @@ namespace ui
         const std::vector<std::string>& profiles
     )
     {
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         auto* mainLayout   = new QVBoxLayout{this};
         _profileListWidget = new QListWidget{this};
+        // NOLINTEND(cppcoreguidelines-owning-memory)
 
         for (const auto& profileName : profiles)
             _profileListWidget->addItem(QString::fromStdString(profileName));
 
         mainLayout->addWidget(_profileListWidget);
 
-        using enum QDialogButtonBox::StandardButton;
-        _buttonBox = new QDialogButtonBox{Ok | Cancel, this};
+        auto buttons = _canBeClosed
+                           ? QDialogButtonBox::Ok | QDialogButtonBox::Cancel
+                           : QDialogButtonBox::Ok;
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _buttonBox = new QDialogButtonBox(buttons, Qt::Horizontal, this);
 
         connect(
             _buttonBox,
@@ -59,12 +66,19 @@ namespace ui
             this,
             &ProfileSelectionDialog::_emitOk
         );
-        connect(
-            _buttonBox,
-            &QDialogButtonBox::rejected,
-            this,
-            &ProfileSelectionDialog::_emitCancel
-        );
+
+        // If the dialog can be closed, connect the rejected signal to emit the
+        // cancel action. Otherwise, we ignore the rejected signal to prevent
+        // the user from closing the dialog without selecting a profile.
+        if (_canBeClosed)
+        {
+            connect(
+                _buttonBox,
+                &QDialogButtonBox::rejected,
+                this,
+                &ProfileSelectionDialog::_emitCancel
+            );
+        }
 
         // disable buttons until a profile is selected
         _buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
@@ -83,6 +97,21 @@ namespace ui
         );
 
         mainLayout->addWidget(_buttonBox);
+    }
+
+    /**
+     * @brief Handle the close event of the dialog. If the dialog is closed
+     * without selecting a profile, emit the cancel action.
+     *
+     * @param event The close event
+     */
+    void ProfileSelectionDialog::reject()
+    {
+        if (_canBeClosed)
+        {
+            _emitCancel();
+            QDialog::reject();
+        }
     }
 
     /**
@@ -145,15 +174,5 @@ namespace ui
      *
      */
     void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
-
-    /**
-     * @brief Handle the close event, emit the cancel action
-     *
-     * @param event
-     */
-    void ProfileSelectionDialog::closeEvent(QCloseEvent* /*event*/)
-    {
-        _emitCancel();
-    }
 
 }   // namespace ui

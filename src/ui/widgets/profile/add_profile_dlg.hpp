@@ -42,8 +42,13 @@ namespace ui
         settings::Settings& _settings;
         /// Reference to the undo stack
         UndoStack& _undoStack;
+
         /// Whether to enforce a default profile
         bool _enforceDefaultProfile = false;
+
+        /// Flag to prevent emitting cancel action multiple times when the
+        /// dialog is closed without adding a profile
+        bool _canBeClosed = true;
 
         /// ptr to the main layout of the dialog
         QVBoxLayout* _mainLayout = nullptr;
@@ -65,7 +70,8 @@ namespace ui
             app::ProfileStore&  profileStore,
             settings::Settings& settings,
             UndoStack&          undoStack,
-            QWidget*            parent = nullptr
+            bool                canBeClosed = true,
+            QWidget*            parent      = nullptr
         );
 
         void setEnforceDefaultProfile(bool value);
@@ -99,7 +105,7 @@ namespace ui
         );
 
        protected:
-        void closeEvent(QCloseEvent* event) override;
+        void reject() override;
 
        private:
         void _buildUI();

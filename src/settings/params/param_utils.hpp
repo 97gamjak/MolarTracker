@@ -23,7 +23,8 @@ namespace settings
         std::index_sequence<Is...>
     )
     {
-        (func(std::get<Is>(std::forward<Tuple>(tuple))), ...);
+        (std::forward<Func>(func)(std::get<Is>(std::forward<Tuple>(tuple))),
+         ...);
     }
 
     /**
@@ -81,12 +82,19 @@ namespace settings
             const auto& key = param.getKey();
 
             if (jsonData.contains(key))
-                std::remove_cvref_t<decltype(param)>::fromJson(jsonData, param);
+            {
+                std::remove_cvref_t<decltype(param)>::fromJson(
+                    jsonData[key],
+                    param
+                );
+            }
         };
 
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);
     }
 
 }   // namespace settings
+
+#undef __LOG_CATEGORY__
 
 #endif   // __SETTINGS__PARAMS__PARAM_UTILS_HPP__

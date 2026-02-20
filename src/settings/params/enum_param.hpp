@@ -46,8 +46,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__ENUM_PARAM_TPP__
+#ifndef __SETTINGS__PARAMS__ENUM_PARAM_TPP__
 #include "enum_param.tpp"
-#endif   // __SETTINGS__ENUM_PARAM_TPP__
+#endif   // __SETTINGS__PARAMS__ENUM_PARAM_TPP__
 
 #endif   // __SETTINGS__PARAMS__ENUM_PARAM_HPP__
