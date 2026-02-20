@@ -38,9 +38,12 @@ namespace app
 
        public:
         explicit AppContext(settings::Settings& settings);
+        ~AppContext() = default;
 
         AppContext(const AppContext&)            = delete;
         AppContext& operator=(const AppContext&) = delete;
+        AppContext(AppContext&&)                 = delete;
+        AppContext& operator=(AppContext&&)      = delete;
 
         StoreContainer&       getStore();
         const StoreContainer& getStore() const;
