@@ -1,5 +1,5 @@
-#ifndef __APP__REPOS__DB_PROFILE_REPO_HPP__
-#define __APP__REPOS__DB_PROFILE_REPO_HPP__
+#ifndef __APP__REPOS__PROFILE_REPO_HPP__
+#define __APP__REPOS__PROFILE_REPO_HPP__
 
 #include <optional>
 #include <vector>
@@ -49,4 +49,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__REPOS__DB_PROFILE_REPO_HPP__
+#endif   // __APP__REPOS__PROFILE_REPO_HPP__

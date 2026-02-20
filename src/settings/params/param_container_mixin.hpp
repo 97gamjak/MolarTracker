@@ -1,9 +1,7 @@
-#ifndef __SETTINGS__PARAM_CONTAINER_MIXIN_HPP__
-#define __SETTINGS__PARAM_CONTAINER_MIXIN_HPP__
+#ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__
+#define __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__
 
 #include <string>
-
-#include "nlohmann/json.hpp"
 
 namespace settings
 {
@@ -35,4 +33,4 @@ namespace settings
 #include "param_container_mixin.tpp"
 #endif   // __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
 
-#endif   // __SETTINGS__PARAM_CONTAINER_MIXIN_HPP__
+#endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__

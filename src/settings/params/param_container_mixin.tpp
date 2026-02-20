@@ -1,8 +1,7 @@
-#ifndef __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
-#define __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
+#ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
+#define __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
 
 #include "param_container_mixin.hpp"
-#include "param_utils.hpp"
 
 namespace settings
 {
@@ -70,4 +69,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
+#endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__

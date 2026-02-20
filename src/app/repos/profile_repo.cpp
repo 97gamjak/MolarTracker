@@ -8,6 +8,7 @@
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud.hpp"
+#include "sql_models/profile_row.hpp"
 
 namespace app
 {

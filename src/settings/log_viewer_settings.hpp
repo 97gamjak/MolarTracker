@@ -1,5 +1,5 @@
-#ifndef __LOG_VIEWER_SETTINGS_HPP__
-#define __LOG_VIEWER_SETTINGS_HPP__
+#ifndef __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
+#define __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
 
 #include "exceptions/base.hpp"
 #include "params/params.hpp"
@@ -158,4 +158,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __LOG_VIEWER_SETTINGS_HPP__
+#endif   // __SETTINGS__LOG_VIEWER_SETTINGS_HPP__

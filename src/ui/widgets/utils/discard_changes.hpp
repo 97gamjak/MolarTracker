@@ -1,5 +1,5 @@
-#ifndef __UI__UTILS__DISCARD_CHANGES_HPP__
-#define __UI__UTILS__DISCARD_CHANGES_HPP__
+#ifndef __UI__WIDGETS__UTILS__DISCARD_CHANGES_HPP__
+#define __UI__WIDGETS__UTILS__DISCARD_CHANGES_HPP__
 
 #include <QMessageBox>
 
@@ -17,4 +17,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__UTILS__DISCARD_CHANGES_HPP__
+#endif   // __UI__WIDGETS__UTILS__DISCARD_CHANGES_HPP__

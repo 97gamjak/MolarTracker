@@ -1,5 +1,5 @@
-#ifndef __UI__PROFILE__ADD_PROFILE_DLG_HPP__
-#define __UI__PROFILE__ADD_PROFILE_DLG_HPP__
+#ifndef __UI__WIDGETS__PROFILE__ADD_PROFILE_DLG_HPP__
+#define __UI__WIDGETS__PROFILE__ADD_PROFILE_DLG_HPP__
 
 #include <QDialog>
 
@@ -118,4 +118,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__PROFILE__ADD_PROFILE_DLG_HPP__
+#endif   // __UI__WIDGETS__PROFILE__ADD_PROFILE_DLG_HPP__

@@ -1,5 +1,5 @@
-#ifndef __UI__MENU_BAR__EDIT_MENU_HPP__
-#define __UI__MENU_BAR__EDIT_MENU_HPP__
+#ifndef __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__
+#define __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__
 
 #include <QObject>
 
@@ -43,4 +43,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__MENU_BAR__EDIT_MENU_HPP__
+#endif   // __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__

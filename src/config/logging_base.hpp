@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOGGING_BASE_HPP__
-#define __LOGGING__LOGGING_BASE_HPP__
+#ifndef __CONFIG__LOGGING_BASE_HPP__
+#define __CONFIG__LOGGING_BASE_HPP__
 
 #include <cstddef>
 #include <mstd/enum.hpp>
@@ -33,4 +33,4 @@ MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL)
 
 using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
-#endif   // __LOGGING__LOGGING_BASE_HPP__
+#endif   // __CONFIG__LOGGING_BASE_HPP__

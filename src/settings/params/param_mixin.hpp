@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAM_MIXIN_HPP__
-#define __SETTINGS__PARAM_MIXIN_HPP__
+#ifndef __SETTINGS__PARAMS__PARAM_MIXIN_HPP__
+#define __SETTINGS__PARAMS__PARAM_MIXIN_HPP__
 
 #include <optional>
 #include <string>
@@ -70,4 +70,4 @@ namespace settings
 #include "param_mixin.tpp"
 #endif   // __SETTINGS__PARAM_MIXIN_TPP__
 
-#endif   // __SETTINGS__PARAM_MIXIN_HPP__
+#endif   // __SETTINGS__PARAMS__PARAM_MIXIN_HPP__

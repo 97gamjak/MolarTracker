@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__GENERAL_SETTINGS__
-#define __SETTINGS__GENERAL_SETTINGS__
+#ifndef __SETTINGS__GENERAL_SETTINGS_HPP__
+#define __SETTINGS__GENERAL_SETTINGS_HPP__
 
 #include <optional>
 
@@ -115,4 +115,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__GENERAL_SETTINGS__
+#endif   // __SETTINGS__GENERAL_SETTINGS_HPP__
