@@ -1,5 +1,6 @@
 #include "undo_stack.hpp"
 
+#include <cassert>
 #include <format>
 
 #define __LOG_CATEGORY__ LogCategory::undoStack
