@@ -24,8 +24,8 @@ namespace ui
         /// The name of the profile to set as active
         std::string _profileName;
 
-        /// The previous active profile name, used for undoing the command
-        std::optional<app::Profile> _previousProfileName;
+        /// The previous active profile, used for undoing the command
+        std::optional<app::Profile> _previousProfile;
 
         /// Reference to the profile store
         app::ProfileStore& _profileStore;
