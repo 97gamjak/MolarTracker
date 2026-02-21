@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
+#include "ui/commands/commands.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
 
@@ -48,6 +49,8 @@ namespace ui
         QPointer<ProfileSelectionDialog> _profileSelectionDialog;
         /// Pointer to the add profile dialog
         QPointer<AddProfileDialog> _addProfileDialog;
+
+        Commands _ensureProfileExistsCommand{"Ensure Profile Exists Command"};
 
        public:
         explicit EnsureProfileController(

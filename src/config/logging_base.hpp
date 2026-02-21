@@ -20,6 +20,7 @@
     X(database)                   \
     X(logging_manager)            \
     X(settings)                   \
+    X(undoStack)                  \
     X(application)
 
 // cppcheck-suppress syntaxError

@@ -15,6 +15,7 @@ namespace ui
        public:
         virtual ~ICommandError() = default;
 
+       public:
         /**
          * @brief Get the Message object
          *

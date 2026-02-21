@@ -1,26 +1,13 @@
 #include "undo_stack.hpp"
 
+#define __LOG_CATEGORY__ LogCategory::undoStack
+#include "logging/log_macros.hpp"
+
 namespace ui
 {
 
-    /**
-     * @brief Execute a command and add it to the undo stack
-     *
-     * @param command The command to execute
-     * @return std::expected<void, CommandErrorPtr> Result of the operation
-     */
-    std::expected<void, CommandErrorPtr> UndoStack::_do(
-        std::unique_ptr<ICommand> command
-    )
+    void UndoStack::push(Commands command)
     {
-        if (!command)
-            return std::unexpected(CommandError::makeInvalidCommandErrorPtr());
-
-        auto result = command->redo();
-
-        if (!result)
-            return std::unexpected(std::move(result).error());
-
         if (_cursor < _commands.size())
         {
             _commands.erase(
@@ -33,7 +20,6 @@ namespace ui
         _cursor = _commands.size();
 
         emit changed();
-        return {};
     }
 
     /**
@@ -60,11 +46,14 @@ namespace ui
         if (!canUndo())
             return std::unexpected(CommandError::makeNothingToUndoErrorPtr());
 
-        --_cursor;
-        auto result = _commands[_cursor]->undo();
+        if (!_commands[_cursor - 1].isUndoRedoDisabled())
+        {
+            --_cursor;
+            auto result = _commands[_cursor - 1].undo();
 
-        if (!result)
-            return std::unexpected(std::move(result).error());
+            if (!result)
+                return std::unexpected(std::move(result).error());
+        }
 
         emit changed();
 
@@ -81,12 +70,15 @@ namespace ui
         if (!canRedo())
             return std::unexpected(CommandError::makeNothingToRedoErrorPtr());
 
-        // Policy: if redo fails, keep cursor unchanged and do not advance.
-        auto result = _commands[_cursor]->redo();
-        if (!result)
-            return std::unexpected(std::move(result).error());
+        if (!_commands[_cursor].isUndoRedoDisabled())
+        {
+            // Policy: if redo fails, keep cursor unchanged and do not advance.
+            auto result = _commands[_cursor].redo();
+            if (!result)
+                return std::unexpected(std::move(result).error());
 
-        ++_cursor;
+            ++_cursor;
+        }
 
         emit changed();
 
@@ -104,7 +96,30 @@ namespace ui
         if (!canUndo())
             return "";
 
-        return _commands[_cursor - 1]->getLabel();
+        const auto& combinedLabels = _commands[_cursor - 1].getCombinedLabels();
+        const auto& label          = _commands[_cursor - 1].getLabel();
+
+        if (_commands[_cursor - 1].isUndoRedoDisabled())
+        {
+            LOG_WARNING(
+                std::format(
+                    "Command '{}' cannot be undone because undo/redo is "
+                    "disabled for this command.",
+                    label
+                )
+            );
+            return "Undo (Disabled)";
+        }
+
+        LOG_INFO(
+            std::format(
+                "Undoing: {} with the following subcommands {}",
+                label,
+                combinedLabels
+            )
+        );
+
+        return label;
     }
 
     /**
@@ -118,7 +133,30 @@ namespace ui
         if (!canRedo())
             return "";
 
-        return _commands[_cursor]->getLabel();
+        const auto& combinedLabels = _commands[_cursor].getCombinedLabels();
+        const auto& label          = _commands[_cursor].getLabel();
+
+        if (_commands[_cursor].isUndoRedoDisabled())
+        {
+            LOG_WARNING(
+                std::format(
+                    "Command '{}' cannot be redone because undo/redo is "
+                    "disabled for this command.",
+                    label
+                )
+            );
+            return "Redo (Disabled)";
+        }
+
+        LOG_INFO(
+            std::format(
+                "Redoing: {} with the following subcommands {}",
+                label,
+                combinedLabels
+            )
+        );
+
+        return combinedLabels;
     }
 
 }   // namespace ui

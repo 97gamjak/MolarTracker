@@ -39,6 +39,7 @@ namespace ui
           _appContext(appContext),
           _undoStack(undoStack)
     {
+        _ensureProfileExistsCommand.disableUndoRedo();
     }
 
     /**
@@ -301,7 +302,7 @@ namespace ui
         {
             // we don't need to do anything here, as the AddProfileCommand
             // already adds the profile and sets it as active if needed.
-            const auto result = _undoStack.makeAndDo<AddProfileCommand>(
+            auto result = Commands::makeAndDo<AddProfileCommand>(
                 _appContext.getStore().getProfileStore(),
                 _appContext.getSettings(),
                 profileDraft,
@@ -336,6 +337,7 @@ namespace ui
             }
             else
             {
+                _ensureProfileExistsCommand << std::move(result);
                 showInfoStatusBar(
                     LOG_INFO_OBJECT(
                         "Profile '" + profileDraft.name +

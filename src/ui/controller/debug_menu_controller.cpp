@@ -190,8 +190,7 @@ namespace ui
         const LogCategoryMap& categories
     )
     {
-        const auto result =
-            _undoStack.makeAndDo<UpdateDebugFlagsCommand>(categories);
+        auto result = Commands::makeAndDo<UpdateDebugFlagsCommand>(categories);
 
         if (!result)
         {
@@ -212,6 +211,8 @@ namespace ui
 
             return;
         }
+
+        _undoStack.push(std::move(result).value());
 
         _debugSlotsDialog->setCategories(categories);
     }
