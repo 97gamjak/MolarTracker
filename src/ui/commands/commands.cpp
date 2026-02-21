@@ -183,14 +183,14 @@ namespace ui
      */
     std::expected<void, CommandErrorPtr> Commands::redo()
     {
-        for (auto& command : _commands)
+        for (std::size_t i = 0; i < _commands.size(); ++i)
         {
-            auto result = command->redo();
+            auto result = _commands[i]->redo();
             if (!result)
             {
-                for (auto& _command : _commands)
+                for (std::size_t j = i; j > 0; --j)
                 {
-                    auto _undo = _command->undo();
+                    auto _undo = _commands[j - 1]->undo();
                     if (!_undo)
                     {
                         return std::unexpected(std::move(_undo).error());
