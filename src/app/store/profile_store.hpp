@@ -99,9 +99,8 @@ namespace app
         void commit() override;
 
        private:
-        [[nodiscard]] static std::string _normalizeName(std::string_view name);
-        [[nodiscard]] ProfileId          _generateNewId();
-        [[nodiscard]] bool               _isDeleted(ProfileId id) const;
+        [[nodiscard]] ProfileId _generateNewId();
+        [[nodiscard]] bool      _isDeleted(ProfileId id) const;
 
         [[nodiscard]] std::optional<Profile> _findProfile(ProfileId id) const;
         [[nodiscard]] std::optional<Profile> _findProfile(

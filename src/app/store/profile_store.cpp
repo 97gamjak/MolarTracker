@@ -370,46 +370,6 @@ namespace app
     }
 
     /**
-     * @brief Normalize a profile name for comparison
-     *
-     * @note Trims whitespace and converts to lowercase for case-insensitive
-     * comparison
-     *
-     * @param name
-     * @return std::string
-     */
-    std::string ProfileStore::_normalizeName(std::string_view name)
-    {
-        // TODO: clean this up
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-89
-        //  Policy: trim + case-insensitive
-        //  If you want case-sensitive, remove the tolower part.
-        std::size_t start = 0;
-        while (start < name.size() &&
-               std::isspace(static_cast<unsigned char>(name[start])))
-            ++start;
-
-        std::size_t end = name.size();
-        while (end > start &&
-               std::isspace(static_cast<unsigned char>(name[end - 1])))
-            --end;
-
-        std::string result;
-        result.reserve(end - start);
-
-        for (std::size_t i = start; i < end; ++i)
-        {
-            result.push_back(
-                static_cast<char>(
-                    std::tolower(static_cast<unsigned char>(name[i]))
-                )
-            );
-        }
-
-        return result;
-    }
-
-    /**
      * @brief generate a new unique ProfileId and mark it as used
      *
      * @return ProfileId
@@ -469,12 +429,9 @@ namespace app
         std::string_view name
     ) const
     {
-        const std::string normalized = _normalizeName(name);
-
         const auto it = std::ranges::find_if(
             _profiles,
-            [&normalized](const Profile& p)
-            { return _normalizeName(p.getName()) == normalized; }
+            [&name](const Profile& p) { return p.getName() == name; }
         );
 
         if (it == _profiles.end())
@@ -490,14 +447,12 @@ namespace app
      */
     void ProfileStore::_removeInternal(ProfileId id)
     {
-        _profiles.erase(
-            std::remove_if(
-                _profiles.begin(),
-                _profiles.end(),
-                [id](const Profile& p) { return p.getId() == id; }
-            ),
-            _profiles.end()
+        auto [beg, end] = std::ranges::remove_if(
+            _profiles,
+            [id](const Profile& p) { return p.getId() == id; }
         );
+
+        _profiles.erase(beg, end);
     }
 
     /**
@@ -507,17 +462,12 @@ namespace app
      */
     void ProfileStore::_removeInternal(std::string_view name)
     {
-        const std::string normalized = _normalizeName(name);
-
-        _profiles.erase(
-            std::remove_if(
-                _profiles.begin(),
-                _profiles.end(),
-                [&normalized, this](const Profile& p)
-                { return _normalizeName(p.getName()) == normalized; }
-            ),
-            _profiles.end()
+        auto [beg, end] = std::ranges::remove_if(
+            _profiles,
+            [&name, this](const Profile& p) { return p.getName() == name; }
         );
+
+        _profiles.erase(beg, end);
     }
 
     /**
