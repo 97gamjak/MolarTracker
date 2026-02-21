@@ -50,6 +50,8 @@ namespace ui
         return *this;
     }
 
+    void Commands::clearSubCommands() { _commands.clear(); }
+
     std::expected<void, CommandErrorPtr> Commands::undo()
     {
         for (std::size_t i = _commands.size(); i > 0; --i)

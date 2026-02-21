@@ -42,6 +42,8 @@ namespace ui
         Commands& operator<<(Commands&& commands);
         Commands& operator<<(Commands& commands) = delete;
 
+        void clearSubCommands();
+
         [[nodiscard]] std::expected<void, CommandErrorPtr> undo();
         [[nodiscard]] std::expected<void, CommandErrorPtr> redo();
 

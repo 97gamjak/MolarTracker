@@ -72,10 +72,12 @@ namespace ui
         );
 
        private:
-        void _defaultProfileExists();
+        void _defaultProfileExists(const std::string& defaultProfile);
         void _noDefaultProfile();
         void _showAddProfileDialog();
         void _showProfileSelectionDialog();
+        void _fatalError(const std::string& message);
+        bool _activateProfile(const std::string& name);
     };
 
 }   // namespace ui

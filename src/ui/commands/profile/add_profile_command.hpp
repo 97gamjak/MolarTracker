@@ -1,5 +1,5 @@
-#ifndef __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
-#define __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
+#ifndef __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__
+#define __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__
 
 #include <expected>
 
@@ -48,4 +48,4 @@ namespace ui
     };
 }   // namespace ui
 
-#endif   // __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
+#endif   // __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__

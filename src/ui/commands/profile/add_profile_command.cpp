@@ -6,7 +6,6 @@
 #include "add_profile_command_error.hpp"
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
-#include "settings/settings.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_AddProfileCommand
 #include "logging/log_macros.hpp"
@@ -26,7 +25,7 @@ namespace ui
         app::ProfileStore&   profileStore,
         drafts::ProfileDraft profile
     )
-        : _profileStore{profileStore}, _profile{profile}
+        : _profileStore{profileStore}, _profile{std::move(profile)}
     {
     }
 

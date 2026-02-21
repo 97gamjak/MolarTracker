@@ -98,6 +98,8 @@ namespace app
         _activeProfileId = profile->getId();
     }
 
+    void ProfileStore::unsetActiveProfile() { _activeProfileId.reset(); }
+
     /**
      * @brief Check if there is an active profile set
      *
@@ -195,6 +197,11 @@ namespace app
     bool ProfileStore::profileExists(std::string_view name) const
     {
         return getProfile(name).has_value();
+    }
+
+    bool ProfileStore::profileExists(const Profile& profile) const
+    {
+        return profileExists(profile.getName());
     }
 
     /**
