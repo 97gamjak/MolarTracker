@@ -75,11 +75,29 @@ namespace ui
     {
         // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         auto* formLayout = new QFormLayout{};
-        _nameLineEdit    = new QLineEdit{this};
-        formLayout->addRow(new QLabel{"Name:"}, _nameLineEdit);
 
-        _emailLineEdit = new QLineEdit{this};
-        formLayout->addRow(new QLabel{"Email:"}, _emailLineEdit);
+        auto* nameErrorLabel = new QLabel{this};
+        _nameLineEdit        = new NameLineEdit{this};
+        _nameLineEdit->setRequired(true);
+        _nameLineEdit->attachErrorLabel(nameErrorLabel);
+        auto* nameContainer = new QWidget{this};
+        auto* nameLayout    = new QVBoxLayout{nameContainer};
+        nameLayout->setContentsMargins(0, 0, 0, 0);
+        nameLayout->setSpacing(2);
+        nameLayout->addWidget(_nameLineEdit);
+        nameLayout->addWidget(nameErrorLabel);
+        formLayout->addRow(new QLabel{"Name*:"}, nameContainer);
+
+        auto* emailErrorLabel = new QLabel{this};
+        _emailLineEdit        = new EmailLineEdit{this};
+        _emailLineEdit->attachErrorLabel(emailErrorLabel);
+        auto* emailContainer = new QWidget{this};
+        auto* emailLayout    = new QVBoxLayout{emailContainer};
+        emailLayout->setContentsMargins(0, 0, 0, 0);
+        emailLayout->setSpacing(2);
+        emailLayout->addWidget(_emailLineEdit);
+        emailLayout->addWidget(emailErrorLabel);
+        formLayout->addRow(new QLabel{"Email:"}, emailContainer);
         // NOLINTEND(cppcoreguidelines-owning-memory)
 
         _mainLayout->addLayout(formLayout);
@@ -185,15 +203,9 @@ namespace ui
      */
     void AddProfileDialog::showNameAlreadyExistsError()
     {
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setWindowTitle("Profile Name Already Exists");
-        msgBox.setText(
-            "A profile with the same name already exists. Please choose a "
-            "different name."
+        _nameLineEdit->setExternalError(
+            "A profile with the same name already exists."
         );
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
     }
 
     /**
