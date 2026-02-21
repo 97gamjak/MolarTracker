@@ -9,9 +9,9 @@ namespace ui
 {
     /**
      * @brief A LineValidator for validating names, this class implements the
-     * _validate function to provide specific validation logic for names, such
-     * as checking for invalid characters or reserved words. This class can be
-     * used for validating profile names, service names, etc.
+     * _validateNonEmpty function to provide specific validation logic for
+     * names, such as checking for invalid characters or reserved words. This
+     * class can be used for validating profile names, service names, etc.
      */
     class NameLineEdit : public LineValidator
     {
