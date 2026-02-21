@@ -32,10 +32,10 @@ namespace ui
         // application, and it is better than having an error state because of a
         // missing profile.
 
-        if (!_previousProfileName.has_value())
+        if (!_previousProfile.has_value())
             _profileStore.unsetActiveProfile();
         else
-            _profileStore.setActiveProfile(_previousProfileName->getName());
+            _profileStore.setActiveProfile(_previousProfile->getName());
 
         return {};
     }
@@ -58,7 +58,7 @@ namespace ui
             return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
-        _previousProfileName = _profileStore.getActiveProfile();
+        _previousProfile = _profileStore.getActiveProfile();
 
         _profileStore.setActiveProfile(_profileName);
         return {};
