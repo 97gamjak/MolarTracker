@@ -1,4 +1,5 @@
 #include "undo_stack.hpp"
+#include <format>
 
 #define __LOG_CATEGORY__ LogCategory::undoStack
 #include "logging/log_macros.hpp"
