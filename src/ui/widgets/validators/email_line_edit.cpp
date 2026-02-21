@@ -46,7 +46,7 @@ namespace ui
 
         // Simple regex for basic email validation, this can be improved for
         // more strict validation if needed
-        const QRegularExpression emailRegex(
+        static const QRegularExpression emailRegex(
             R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$)"
         );
 
