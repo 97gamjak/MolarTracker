@@ -349,8 +349,8 @@ namespace ui
     {
         if (action == AddProfileDialog::Action::Ok)
         {
-            // we don't need to do anything here, as the AddProfileCommand
-            // already adds the profile and sets it as active if needed.
+            // We only need to invoke AddProfileCommand here to add the profile;
+            // default/active status is managed by separate commands below.
             auto result = Commands::makeAndDo<AddProfileCommand>(
                 _appContext.getStore().getProfileStore(),
                 profileDraft
