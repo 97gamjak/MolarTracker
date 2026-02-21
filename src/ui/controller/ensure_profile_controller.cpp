@@ -9,6 +9,7 @@
 #include "app/app_context.hpp"
 #include "ui/commands/add_profile_command.hpp"
 #include "ui/commands/add_profile_command_error.hpp"
+#include "ui/commands/set_default_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
@@ -304,10 +305,7 @@ namespace ui
             // already adds the profile and sets it as active if needed.
             auto result = Commands::makeAndDo<AddProfileCommand>(
                 _appContext.getStore().getProfileStore(),
-                _appContext.getSettings(),
-                profileDraft,
-                _addProfileDialog->isActiveChecked(),
-                _addProfileDialog->isDefaultChecked()
+                profileDraft
             );
 
             if (!result)
@@ -318,37 +316,44 @@ namespace ui
                 if (auto* addError =
                         dynamic_cast<AddProfileCommandError*>(errorPtr))
                 {
-                    if (addError->getCode() ==
-                        AddProfileCommandErrorCode::NameAlreadyExists)
-                    {
+                    using enum AddProfileCommandErrorCode;
+                    if (addError->getCode() == NameAlreadyExists)
                         _addProfileDialog->showNameAlreadyExistsError();
-                    }
-                    else
-                    {
-                        const auto errorMsg =
-                            "Failed to add profile: " + addError->getMessage();
-
-                        ExceptionDialog::showFatal(
-                            "Add Profile Error",
-                            LOG_ERROR_OBJECT(errorMsg)
-                        );
-                    }
                 }
+
+                auto msg       = addProfileError->getMessage();
+                msg            = "Failed to add profile: " + msg;
+                const auto log = LOG_ERROR_OBJECT(msg);
+                ExceptionDialog::showFatal("Add Profile Error", log);
+
+                return;
             }
-            else
-            {
-                _ensureProfileExistsCommand << std::move(result);
-                showInfoStatusBar(
-                    LOG_INFO_OBJECT(
-                        "Profile '" + profileDraft.name +
-                        "' created successfully."
-                    ),
-                    _mainWindow.statusBar()
+
+            auto setDefaultCommand =
+                Commands::makeAndDo<SetDefaultProfileCommand>(
+                    profileDraft.name,
+                    _appContext.getSettings().getGeneralSettings()
                 );
 
-                if (auto* dialog = _addProfileDialog.data())
-                    dialog->accept();
-            }
+            assert(
+                setDefaultCommand &&
+                "Setting default profile should not fail here, if it does, it "
+                "means there is a critical issue with the settings management "
+                "that needs to be addressed."
+            );
+
+            _ensureProfileExistsCommand << std::move(result)
+                                        << std::move(setDefaultCommand);
+
+            showInfoStatusBar(
+                LOG_INFO_OBJECT(
+                    "Profile '" + profileDraft.name + "' created successfully."
+                ),
+                _mainWindow.statusBar()
+            );
+
+            if (auto* dialog = _addProfileDialog.data())
+                dialog->accept();
         }
     }
 

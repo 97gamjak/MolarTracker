@@ -52,9 +52,9 @@ namespace ui
             AddProfileCommandErrorCode code
         );
 
-        std::string                getMessage() const override;
-        std::string                getCodeStr() const override;
-        AddProfileCommandErrorCode getCode() const;
+        std::string                              getMessage() const override;
+        std::string                              getCodeStr() const override;
+        [[nodiscard]] AddProfileCommandErrorCode getCode() const;
     };
 
 }   // namespace ui
