@@ -3,6 +3,9 @@
 
 #include <QDialog>
 
+#include "ui/widgets/validators/email_line_edit.hpp"
+#include "ui/widgets/validators/name_line_edit.hpp"
+
 namespace drafts
 {
     struct ProfileDraft;   // Forward declaration
@@ -53,9 +56,9 @@ namespace ui
         /// ptr to the main layout of the dialog
         QVBoxLayout* _mainLayout = nullptr;
         /// Line edit for the profile name
-        QLineEdit* _nameLineEdit = nullptr;
+        NameLineEdit* _nameLineEdit = nullptr;
         /// Line edit for the profile email
-        QLineEdit* _emailLineEdit = nullptr;
+        EmailLineEdit* _emailLineEdit = nullptr;
         /// Button to add the profile
         QPushButton* _addButton = nullptr;
         /// Button to cancel the operation

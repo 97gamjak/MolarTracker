@@ -14,6 +14,12 @@ All changes and updates, that are relevant for a user will be documented here
 - Fix startup profile existence to remain inside dialogs if no user was added or selected
 - Fix CI building issue for Linux releases 
 
+### Features
+
+#### Startup Profile Selection/Adding
+
+- Added input validators for startup profile fields and improved the first `quick sign in` dialog with inline error messages and visual feedback for invalid inputs
+
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 
