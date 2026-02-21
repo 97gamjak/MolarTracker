@@ -47,6 +47,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Testing
 
 - Adding unit tests for `Database` class
+- Adding unit tests for `Statement` class
 
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
