@@ -1,4 +1,5 @@
 #include "undo_stack.hpp"
+
 #include <format>
 
 #define __LOG_CATEGORY__ LogCategory::undoStack
@@ -52,10 +53,12 @@ namespace ui
         if (!canUndo())
             return std::unexpected(CommandError::makeNothingToUndoErrorPtr());
 
+        assert(_cursor > 0 && _cursor <= _commands.size());
+
         if (!_commands[_cursor - 1].isUndoRedoDisabled())
         {
             --_cursor;
-            auto result = _commands[_cursor - 1].undo();
+            auto result = _commands[_cursor].undo();
 
             if (!result)
                 return std::unexpected(std::move(result).error());
