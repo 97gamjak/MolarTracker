@@ -98,6 +98,10 @@ namespace app
         _activeProfileId = profile->getId();
     }
 
+    /**
+     * @brief Unset the active profile, leaving no profile active
+     *
+     */
     void ProfileStore::unsetActiveProfile() { _activeProfileId.reset(); }
 
     /**
@@ -199,6 +203,15 @@ namespace app
         return getProfile(name).has_value();
     }
 
+    /**
+     * @brief Check if a profile with the same name as the given profile exists
+     *
+     * @note Ignores profiles marked as deleted
+     *
+     * @param profile
+     * @return true
+     * @return false
+     */
     bool ProfileStore::profileExists(const Profile& profile) const
     {
         return profileExists(profile.getName());

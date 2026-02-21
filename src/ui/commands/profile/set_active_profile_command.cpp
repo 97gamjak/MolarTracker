@@ -10,6 +10,12 @@
 
 namespace ui
 {
+    /**
+     * @brief Set the Active Profile Command:: Set Active Profile Command object
+     *
+     * @param profileName
+     * @param profileStore
+     */
     SetActiveProfileCommand::SetActiveProfileCommand(
         std::string        profileName,
         app::ProfileStore& profileStore

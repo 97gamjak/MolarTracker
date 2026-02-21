@@ -42,22 +42,19 @@ namespace ui
          */
         [[nodiscard]] virtual std::string getLabel() const = 0;
 
+       protected:
+        friend class Commands;
+
         template <typename CommandType, typename... Args>
         static std::expected<std::unique_ptr<ICommand>, CommandErrorPtr> makeAndDo(
             Args&&... args
-        )
-        {
-            auto command =
-                std::make_unique<CommandType>(std::forward<Args>(args)...);
-
-            auto result = command->redo();
-            if (!result)
-                return std::unexpected(std::move(result).error());
-
-            return std::move(command);
-        }
+        );
     };
 
 }   // namespace ui
+
+#ifndef __UI__COMMANDS__COMMAND_TPP__
+#include "command.tpp"
+#endif   // __UI__COMMANDS__COMMAND_TPP__
 
 #endif   // __UI__COMMANDS__COMMAND_HPP__

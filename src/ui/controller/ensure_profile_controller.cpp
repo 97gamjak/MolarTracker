@@ -97,6 +97,23 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Try to activate the profile with the given name. If the profile
+     * exists and is activated successfully, it returns true. If the profile
+     * does not exist or if there is an error during activation, it returns
+     * false. This method does not show any error messages, it is the caller's
+     * responsibility to handle the error cases and show appropriate messages to
+     * the user, this is a design choice that allows us to keep this method
+     * focused on the logic of activating a profile, and it allows us to handle
+     * errors in a more appropriate place in the code where the profile
+     * activation is being attempted, rather than handling those errors in this
+     * method, which is a lower-level method that is called from multiple
+     * places.
+     *
+     * @param name The name of the profile to activate
+     * @return true If the profile exists and is activated successfully.
+     * @return false If the profile does not exist or if there is an error
+     */
     bool EnsureProfileController::_activateProfile(const std::string& name)
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
@@ -139,6 +156,7 @@ namespace ui
      * exist, show a warning message and prompt the user to select an existing
      * profile or create a new one.
      *
+     * @param defaultProfile The name of the default profile to check and load
      */
     void EnsureProfileController::_defaultProfileExists(
         const std::string& defaultProfile

@@ -16,10 +16,7 @@ namespace ui
      * @brief Construct a new Add Profile Command:: Add Profile Command object
      *
      * @param profileStore
-     * @param settings
      * @param profile
-     * @param setAsActive
-     * @param setAsDefault
      */
     AddProfileCommand::AddProfileCommand(
         app::ProfileStore&   profileStore,

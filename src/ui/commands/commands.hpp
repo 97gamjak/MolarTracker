@@ -8,6 +8,18 @@
 
 namespace ui
 {
+    /**
+     * @brief A class for grouping multiple ICommand objects together as a
+     * single command in the undo stack, this allows us to perform multiple
+     * operations as a single undoable/redoable action, for example when adding
+     * a profile we might want to add the profile to the profile store, set it
+     * as the active profile, and set it as the default profile, all of these
+     * operations can be grouped together as a single command in the undo stack,
+     * so that when the user undoes the action, all of these operations are
+     * undone together, and when the user redoes the action, all of these
+     * operations are redone together.
+     *
+     */
     class Commands
     {
        private:
@@ -16,8 +28,10 @@ namespace ui
         /// single command in the undo stack.
         std::vector<std::unique_ptr<ICommand>> _commands;
 
+        /// A label for this command
         std::string _label{};
 
+        /// Flag to indicate whether undo/redo should be disabled
         bool _disableUndoRedo = false;
 
        public:
@@ -27,16 +41,7 @@ namespace ui
         template <typename ICommandType, typename... Args>
         static std::expected<Commands, CommandErrorPtr> makeAndDo(
             Args&&... args
-        )
-        {
-            auto result =
-                ICommand::makeAndDo<ICommandType>(std::forward<Args>(args)...);
-
-            if (!result)
-                return std::unexpected(std::move(result).error());
-
-            return Commands::_fromCommand(std::move(result).value());
-        }
+        );
 
         Commands& operator<<(std::expected<Commands, CommandErrorPtr>&& result);
         Commands& operator<<(Commands&& commands);
@@ -62,5 +67,9 @@ namespace ui
     };
 
 }   // namespace ui
+
+#ifndef __UI__COMMANDS__COMMANDS_TPP__
+#include "commands.tpp"
+#endif   // __UI__COMMANDS__COMMANDS_TPP__
 
 #endif   // __UI__COMMANDS__COMMANDS_HPP__

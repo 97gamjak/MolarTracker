@@ -50,6 +50,9 @@ namespace ui
         /// Pointer to the add profile dialog
         QPointer<AddProfileDialog> _addProfileDialog;
 
+        /// Command for ensuring profile existence, this command will contain
+        /// the sub-commands for setting the default profile, setting the active
+        /// profile and adding a new profile if needed
         Commands _ensureProfileExistsCommand{"Ensure Profile Exists Command"};
 
        public:
