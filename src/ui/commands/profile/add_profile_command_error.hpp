@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "command_error.hpp"
 #include "mstd/enum.hpp"
+#include "ui/commands/command_error.hpp"
 
 #define ADD_PROFILE_COMMAND_ERROR_CODE(X) \
     X(NameAlreadyExists)                  \

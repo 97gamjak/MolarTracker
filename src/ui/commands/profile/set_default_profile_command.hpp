@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-#include "command.hpp"
+#include "ui/commands/command.hpp"
 
 namespace settings
 {

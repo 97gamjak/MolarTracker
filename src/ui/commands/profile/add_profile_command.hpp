@@ -2,10 +2,9 @@
 #define __UI__COMMANDS__ADD_PROFILE_COMMAND_HPP__
 
 #include <expected>
-#include <optional>
 
-#include "command.hpp"
 #include "drafts/profile_draft.hpp"
+#include "ui/commands/command.hpp"
 
 namespace app
 {

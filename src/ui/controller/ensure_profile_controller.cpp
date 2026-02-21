@@ -7,9 +7,9 @@
 #include <format>
 
 #include "app/app_context.hpp"
-#include "ui/commands/add_profile_command.hpp"
-#include "ui/commands/add_profile_command_error.hpp"
-#include "ui/commands/set_default_profile_command.hpp"
+#include "ui/commands/profile/add_profile_command.hpp"
+#include "ui/commands/profile/add_profile_command_error.hpp"
+#include "ui/commands/profile/set_default_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
