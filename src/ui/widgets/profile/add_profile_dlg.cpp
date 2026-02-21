@@ -139,13 +139,25 @@ namespace ui
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _addButton = new QPushButton{"Add Profile", this};
-        buttonLayout->addWidget(_addButton);
+
+        // check the validity of the input to enable or disable the add button
+        _addButton->setEnabled(false);
+        connect(
+            _nameLineEdit,
+            &NameLineEdit::validityChanged,
+            _addButton,
+            &QPushButton::setEnabled
+        );
+
+        // connect the add button to emit the Ok action with the profile draft
         connect(
             _addButton,
             &QPushButton::clicked,
             this,
             &AddProfileDialog::_emitOk
         );
+
+        buttonLayout->addWidget(_addButton);
 
         if (_canBeClosed)
         {
