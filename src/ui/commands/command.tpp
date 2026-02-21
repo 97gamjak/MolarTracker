@@ -1,6 +1,9 @@
 #ifndef __UI__COMMANDS__COMMAND_TPP__
 #define __UI__COMMANDS__COMMAND_TPP__
 
+#include <expected>
+#include <utility>
+
 #include "command.hpp"
 
 namespace ui

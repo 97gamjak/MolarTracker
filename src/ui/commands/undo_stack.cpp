@@ -161,7 +161,7 @@ namespace ui
             )
         );
 
-        return combinedLabels;
+        return label;
     }
 
 }   // namespace ui
