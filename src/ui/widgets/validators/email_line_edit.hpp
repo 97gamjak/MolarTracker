@@ -7,7 +7,7 @@ namespace ui
 {
     /**
      * @brief A LineValidator for validating email addresses, this class
-     * implements the _validate function to provide specific validation logic
+     * implements the _validateNonEmpty function to provide specific validation logic
      * for email addresses, such as checking for the presence of an "@" symbol
      * and ensuring that the email address is in a valid format. This class can
      * be used for validating email input fields in the application.
