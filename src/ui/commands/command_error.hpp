@@ -15,6 +15,7 @@ namespace ui
        public:
         virtual ~ICommandError() = default;
 
+       public:
         /**
          * @brief Get the Message object
          *
@@ -30,7 +31,7 @@ namespace ui
         virtual std::string getCodeStr() const = 0;
     };
 
-    using CommandErrorPtr = std::unique_ptr<ICommandError>;
+    using CommandErrorPtr = std::shared_ptr<ICommandError>;
 
     /**
      * @brief Concrete implementation of ICommandError
@@ -63,9 +64,9 @@ namespace ui
 
         std::string getCodeStr() const override;
 
-        static std::unique_ptr<CommandError> makeNothingToUndoErrorPtr();
-        static std::unique_ptr<CommandError> makeNothingToRedoErrorPtr();
-        static std::unique_ptr<CommandError> makeInvalidCommandErrorPtr();
+        static CommandErrorPtr makeNothingToUndoErrorPtr();
+        static CommandErrorPtr makeNothingToRedoErrorPtr();
+        static CommandErrorPtr makeInvalidCommandErrorPtr();
     };
 
 }   // namespace ui

@@ -40,9 +40,21 @@ namespace ui
          *
          * @return std::string
          */
-        virtual std::string getLabel() const = 0;
+        [[nodiscard]] virtual std::string getLabel() const = 0;
+
+       protected:
+        friend class Commands;
+
+        template <typename CommandType, typename... Args>
+        static std::expected<std::unique_ptr<ICommand>, CommandErrorPtr> makeAndDo(
+            Args&&... args
+        );
     };
 
 }   // namespace ui
+
+#ifndef __UI__COMMANDS__COMMAND_TPP__
+#include "command.tpp"
+#endif   // __UI__COMMANDS__COMMAND_TPP__
 
 #endif   // __UI__COMMANDS__COMMAND_HPP__

@@ -1,10 +1,10 @@
-#ifndef __UI__COMMANDS__ADD_PROFILE_COMMAND_ERROR_HPP__
-#define __UI__COMMANDS__ADD_PROFILE_COMMAND_ERROR_HPP__
+#ifndef __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__
+#define __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__
 
 #include <string>
 
-#include "command_error.hpp"
 #include "mstd/enum.hpp"
+#include "ui/commands/command_error.hpp"
 
 #define ADD_PROFILE_COMMAND_ERROR_CODE(X) \
     X(NameAlreadyExists)                  \
@@ -52,11 +52,11 @@ namespace ui
             AddProfileCommandErrorCode code
         );
 
-        std::string                getMessage() const override;
-        std::string                getCodeStr() const override;
-        AddProfileCommandErrorCode getCode() const;
+        std::string                              getMessage() const override;
+        std::string                              getCodeStr() const override;
+        [[nodiscard]] AddProfileCommandErrorCode getCode() const;
     };
 
 }   // namespace ui
 
-#endif   // __UI__COMMANDS__ADD_PROFILE_COMMAND_ERROR_HPP__
+#endif   // __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__

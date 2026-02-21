@@ -6,7 +6,6 @@
 #include "add_profile_command_error.hpp"
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
-#include "settings/settings.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::ui_AddProfileCommand
 #include "logging/log_macros.hpp"
@@ -17,23 +16,13 @@ namespace ui
      * @brief Construct a new Add Profile Command:: Add Profile Command object
      *
      * @param profileStore
-     * @param settings
      * @param profile
-     * @param setAsActive
-     * @param setAsDefault
      */
     AddProfileCommand::AddProfileCommand(
         app::ProfileStore&   profileStore,
-        settings::Settings&  settings,
-        drafts::ProfileDraft profile,
-        bool                 setAsActive,
-        bool                 setAsDefault
+        drafts::ProfileDraft profile
     )
-        : _profileStore{profileStore},
-          _settings{settings},
-          _profile{profile},
-          _setAsActive{setAsActive},
-          _setAsDefault{setAsDefault}
+        : _profileStore{profileStore}, _profile{std::move(profile)}
     {
     }
 
@@ -86,44 +75,6 @@ namespace ui
             return std::unexpected<CommandErrorPtr>(std::move(error));
         }
 
-        if (_setAsActive)
-        {
-            // here no check is done if old profile exists... we will let this
-            // fail with an exception as this should really really never happen
-            _profileStore.setActiveProfile(_activeProfileBeforeAdd);
-
-            const auto name = _activeProfileBeforeAdd.has_value()
-                                  ? std::string{_activeProfileBeforeAdd.value()}
-                                  : "none";
-
-            const auto msg =
-                std::format("Active profile restored to '{}'", name);
-
-            LOG_INFO(msg);
-        }
-
-        if (_setAsDefault)
-        {
-            auto& settings = _settings.getGeneralSettings();
-
-            std::string name;
-            if (_defaultProfileBeforeAdd.has_value())
-            {
-                settings.setDefaultProfile(_defaultProfileBeforeAdd.value());
-                name = _defaultProfileBeforeAdd.value();
-            }
-            else
-            {
-                settings.unsetDefaultProfile();
-                name = "none";
-            }
-
-            const auto msg =
-                std::format("Default profile restored to '{}'", name);
-
-            LOG_INFO(msg);
-        }
-
         return {};
     }
 
@@ -138,7 +89,7 @@ namespace ui
 
         if (result == app::ProfileStoreResult::Ok)
         {
-            LOG_INFO(std::format("Profile added: '{}'", _profile.name));
+            LOG_INFO(std::format("Profile created: '{}'", _profile.name));
         }
         else if (result == app::ProfileStoreResult::NameAlreadyExists)
         {
@@ -157,8 +108,10 @@ namespace ui
         }
         else
         {
-            const auto errorMessage =
-                std::format("Unknown error adding profile '{}'", _profile.name);
+            const auto errorMessage = std::format(
+                "Unknown error creating profile '{}'",
+                _profile.name
+            );
 
             LOG_ERROR(errorMessage);
 
@@ -171,22 +124,6 @@ namespace ui
             return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
-        if (_setAsActive)
-        {
-            _activeProfileBeforeAdd = _profileStore.getActiveProfileName();
-            _profileStore.setActiveProfile(_profile.name);
-
-            LOG_INFO(std::format("Active profile set to '{}'", _profile.name));
-        }
-
-        if (_setAsDefault)
-        {
-            auto& settings           = _settings.getGeneralSettings();
-            _defaultProfileBeforeAdd = settings.getDefaultProfile();
-            settings.setDefaultProfile(_profile.name);
-            LOG_INFO(std::format("Default profile set to '{}'", _profile.name));
-        }
-
         return std::expected<void, CommandErrorPtr>{};
     }
 
@@ -197,7 +134,7 @@ namespace ui
      */
     std::string AddProfileCommand::getLabel() const
     {
-        return "Add Profile '" + _profile.name + "'";
+        return "Create Profile '" + _profile.name + "'";
     }
 
 }   // namespace ui
