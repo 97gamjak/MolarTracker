@@ -94,12 +94,19 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DMOLARTRACKER_IS_TAG="${IS_TAG_FLAG}" \
-            -DMOLARTRACKER_GIT_TAG="${GITHUB_REF_NAME}"
+            -DMOLARTRACKER_GIT_TAG="${GITHUB_REF_NAME}" \
+            -DMOLARTRACKER_ENABLE_TESTING=ON
 
       - name: Build (Ubuntu)
         run: |
           cmake --build build --verbose
 
+      # -------------------------
+      # Run tests (on the built binaries)
+      # -------------------------
+      - name: Run tests (Ubuntu)
+        run: |
+          ctest --test-dir build --output-on-failure
 
       # -------------------------
       # Run cppcheck (on the compile_commands.json from the build, so it has all the correct include paths)
