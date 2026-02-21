@@ -39,11 +39,6 @@ namespace ui
     {
         const auto text = trimmedText.toString();
 
-        if (!text.contains('@'))
-        {
-            return {false, "Email addresses must contain an '@' symbol."};
-        }
-
         // Simple regex for basic email validation, this can be improved for
         // more strict validation if needed
         static const QRegularExpression emailRegex(
