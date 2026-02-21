@@ -348,7 +348,10 @@ namespace ui
                 {
                     using enum AddProfileCommandErrorCode;
                     if (addError->getCode() == NameAlreadyExists)
+                    {
                         _addProfileDialog->showNameAlreadyExistsError();
+                        return;
+                    }
                 }
 
                 auto msg       = addProfileError->getMessage();
