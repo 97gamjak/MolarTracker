@@ -154,12 +154,12 @@ namespace ui
     }
 
     /**
-     * @brief validate the given non-empty text, returns a pair of (isValid,
+     * @brief validate the given text, returns a pair of (isValid,
      * errorMessage). If isValid is true, errorMessage will be ignored. If
      * isValid is false, errorMessage will be shown in the tooltip.
      *
-     * @param rawText the text to validate, guaranteed to be non-empty and
-     * trimmed of whitespace
+     * @param rawText the text to validate; it may be empty or contain
+     * surrounding whitespace and will be trimmed before validation
      * @return std::pair<bool, QString>
      */
     std::pair<bool, QString> LineValidator::_validate(QStringView rawText) const
