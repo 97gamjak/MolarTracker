@@ -94,7 +94,13 @@ namespace ui
         return {};
     }
 
-    std::string Commands::getLabel() const { return _label; }
+    std::string Commands::getLabel() const
+    {
+        if (_label.empty() && size() == 1)
+            return _commands[0]->getLabel();
+
+        return _label;
+    }
 
     std::vector<std::string> Commands::getLabels() const
     {

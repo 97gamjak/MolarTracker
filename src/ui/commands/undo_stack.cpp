@@ -6,6 +6,11 @@
 namespace ui
 {
 
+    /**
+     * @brief Push a new command onto the undo stack
+     *
+     * @param command The command to be pushed onto the stack
+     */
     void UndoStack::push(Commands command)
     {
         if (_cursor < _commands.size())
