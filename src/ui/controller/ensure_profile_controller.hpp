@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
+#include "ui/commands/commands.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
 
@@ -49,6 +50,8 @@ namespace ui
         /// Pointer to the add profile dialog
         QPointer<AddProfileDialog> _addProfileDialog;
 
+        Commands _ensureProfileExistsCommand{"Ensure Profile Exists Command"};
+
        public:
         explicit EnsureProfileController(
             QMainWindow&     mainWindow,
@@ -69,10 +72,12 @@ namespace ui
         );
 
        private:
-        void _defaultProfileExists();
+        void _defaultProfileExists(const std::string& defaultProfile);
         void _noDefaultProfile();
         void _showAddProfileDialog();
         void _showProfileSelectionDialog();
+        void _fatalError(const std::string& message);
+        bool _activateProfile(const std::string& name);
     };
 
 }   // namespace ui

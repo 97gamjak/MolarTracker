@@ -10,6 +10,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Features
 
+#### Commands
+
+- Introduce `Commands` class as a batch container for better serialization of sub-commands
+
 #### Utils
 
 - implement `SemVer` class for versioning

@@ -77,6 +77,7 @@ namespace app
         [[nodiscard]] std::vector<std::string> getAllProfileNames() const;
 
         void setActiveProfile(std::optional<std::string_view> name);
+        void unsetActiveProfile();
         [[nodiscard]] bool                       hasActiveProfile() const;
         [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
         [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
@@ -87,6 +88,7 @@ namespace app
         [[nodiscard]] std::optional<Profile> getProfile(std::string_view) const;
 
         [[nodiscard]] bool profileExists(std::string_view name) const;
+        [[nodiscard]] bool profileExists(const Profile& profile) const;
 
         [[nodiscard]] ProfileStoreResult addProfile(
             const drafts::ProfileDraft& draft

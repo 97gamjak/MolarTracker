@@ -12,7 +12,7 @@
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "settings/settings.hpp"
-#include "ui/commands/add_profile_command.hpp"
+#include "ui/commands/profile/add_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "utils/qt_helpers.hpp"
 
