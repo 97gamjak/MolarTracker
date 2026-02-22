@@ -322,10 +322,10 @@ namespace app
      */
     void ProfileStore::_commitNewProfile(const Profile& profile)
     {
-        const auto name  = profile.getName();
-        const auto email = profile.getEmail();
-        const auto newId = _profileService.create(name, email);
-        const auto oldId = profile.getId();
+        const auto& name  = profile.getName();
+        const auto& email = profile.getEmail();
+        const auto  newId = _profileService.create(name, email);
+        const auto  oldId = profile.getId();
 
         if (newId != oldId)
         {
@@ -358,9 +358,9 @@ namespace app
      */
     void ProfileStore::_commitModifiedProfile(const Profile& profile)
     {
-        const auto name  = profile.getName();
-        const auto email = profile.getEmail();
-        const auto id    = profile.getId();
+        const auto& name  = profile.getName();
+        const auto& email = profile.getEmail();
+        const auto  id    = profile.getId();
 
         _profileService.update(id, name, email);
         _profileStates[id] = StoreState::Clean;
@@ -465,10 +465,7 @@ namespace app
      */
     std::optional<Profile> ProfileStore::_findProfile(ProfileId id) const
     {
-        const auto it = std::ranges::find_if(
-            _profiles,
-            [id](const Profile& profile) { return profile.getId() == id; }
-        );
+        const auto it = std::ranges::find_if(_profiles, HasProfileId{id});
 
         if (it == _profiles.end())
             return std::nullopt;
@@ -486,10 +483,7 @@ namespace app
         std::string_view name
     ) const
     {
-        auto hasName = [&name](const Profile& profile)
-        { return profile.getName() == name; };
-
-        const auto it = std::ranges::find_if(_profiles, hasName);
+        const auto it = std::ranges::find_if(_profiles, HasProfileName{name});
 
         if (it == _profiles.end())
             return std::nullopt;
@@ -504,10 +498,7 @@ namespace app
      */
     void ProfileStore::_removeInternal(ProfileId id)
     {
-        auto hasId = [id](const Profile& profile)
-        { return profile.getId() == id; };
-
-        auto [beg, end] = std::ranges::remove_if(_profiles, hasId);
+        auto [beg, end] = std::ranges::remove_if(_profiles, HasProfileId{id});
 
         _profiles.erase(beg, end);
     }
@@ -519,10 +510,9 @@ namespace app
      */
     void ProfileStore::_removeInternal(std::string_view name)
     {
-        auto hasName = [&name](const Profile& profile)
-        { return profile.getName() == name; };
+        using std::ranges::remove_if;
 
-        auto [beg, end] = std::ranges::remove_if(_profiles, hasName);
+        auto [beg, end] = remove_if(_profiles, HasProfileName{name});
 
         _profiles.erase(beg, end);
     }

@@ -32,13 +32,35 @@ namespace app
             const std::optional<std::string>& email
         );
 
-        ProfileId                        getId() const noexcept;
-        const std::string                getName() const noexcept;
-        const std::optional<std::string> getEmail() const noexcept;
+        [[nodiscard]] ProfileId                         getId() const;
+        [[nodiscard]] const std::string&                getName() const;
+        [[nodiscard]] const std::optional<std::string>& getEmail() const;
 
         void setId(ProfileId newId);
         void setName(const std::string& newName);
         void setEmail(const std::optional<std::string>& newEmail);
+    };
+
+    /**
+     * @brief Predicate for finding a profile by its ID
+     *
+     */
+    struct HasProfileId
+    {
+        ProfileId id;
+
+        [[nodiscard]] bool operator()(const Profile& profile) const;
+    };
+
+    /**
+     * @brief Predicate for finding a profile by its name
+     *
+     */
+    struct HasProfileName
+    {
+        std::string_view name;
+
+        [[nodiscard]] bool operator()(const Profile& profile) const;
     };
 
 }   // namespace app
