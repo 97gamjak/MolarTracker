@@ -11,7 +11,7 @@
  *
  * @param other
  */
-Connection::Connection(Connection&& other)
+Connection::Connection(Connection&& other) noexcept
     : _token(std::exchange(other._token, std::nullopt))
 {
 }
@@ -26,7 +26,7 @@ Connection::Connection(Connection&& other)
  * @param other
  * @return Connection&
  */
-Connection& Connection::operator=(Connection&& other)
+Connection& Connection::operator=(Connection&& other) noexcept
 {
     if (this != &other)
     {
@@ -84,8 +84,8 @@ void Connection::reset()
  */
 void ConnectionToken::disconnect() const
 {
-    if (owner)
-        disconnect_fn(owner, id);
+    if (owner != nullptr && disconnectFunc != nullptr)
+        disconnectFunc(owner, id);
 }
 
 /**
@@ -107,8 +107,8 @@ void ConnectionToken::disconnect() const
  * object has already been destroyed.
  * @param id The subscription id, this is used by the disconnect function to
  * identify which subscription to disconnect when it is called
- * @param fn The disconnect function, this is a function pointer that takes the
- * owner pointer and subscription id as parameters and performs the
+ * @param func The disconnect function, this is a function pointer that takes
+ * the owner pointer and subscription id as parameters and performs the
  * disconnection of the subscription when called, it must be valid and
  * idempotent
  * @return Connection An object representing the subscription connection, this
@@ -116,12 +116,15 @@ void ConnectionToken::disconnect() const
  * it goes out of scope
  */
 Connection Connection::make(
-    void*                         owner,
-    std::size_t                   id,
-    ConnectionToken::DisconnectFn fn
+    void*                                owner,
+    std::size_t                          id,
+    const ConnectionToken::DisconnectFn& func
 )
 {
-    Connection c;
-    c._token = ConnectionToken{owner, id, fn};
-    return c;
+    Connection connection;
+
+    connection._token =
+        ConnectionToken{.owner = owner, .id = id, .disconnectFunc = func};
+
+    return connection;
 }

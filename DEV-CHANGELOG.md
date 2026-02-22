@@ -37,6 +37,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Connections
 
 - Add first implementation for connecting subscribers to custom classes
+- Generalize subscription model by introducing `Observable` and `Signal` classes
 
 #### Factories
 
