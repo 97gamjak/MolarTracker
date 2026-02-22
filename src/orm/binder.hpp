@@ -3,10 +3,10 @@
 
 #include <cstdint>
 #include <string>
-#include <string_view>
 
 #include "finance/currency.hpp"
 #include "orm/concepts.hpp"
+#include "orm/orm_exception.hpp"
 
 namespace orm
 {
@@ -257,7 +257,18 @@ namespace orm
          */
         static finance::Currency read(Statement const& statement, int col)
         {
-            return CurrencyMeta::from_string(statement.columnText(col));
+            const auto value =
+                CurrencyMeta::from_string(statement.columnText(col));
+
+            if (!value.has_value())
+            {
+                throw ORMError(
+                    "Invalid currency value in database: " +
+                    statement.columnText(col)
+                );
+            }
+
+            return value.value();
         }
     };
 }   // namespace orm
