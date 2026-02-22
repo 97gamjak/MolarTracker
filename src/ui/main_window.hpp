@@ -6,6 +6,7 @@
 
 #include "commands/undo_stack.hpp"
 #include "ui/controller/debug_menu_controller.hpp"
+#include "ui/controller/dirty_controller.hpp"
 #include "ui/controller/edit_menu_controller.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/controller/file_menu_controller.hpp"
@@ -53,6 +54,9 @@ namespace ui
         /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;
 
+        /// Controller for managing the dirty state of the application
+        std::unique_ptr<DirtyStateController> _dirtyStateController;
+
         /// Undo stack for managing undoable commands in the application
         UndoStack _undoStack;
 
@@ -64,6 +68,7 @@ namespace ui
         );
 
         void start();
+        void setWindowTitle(const bool& isDirty);
 
        private:
         void _buildUI();

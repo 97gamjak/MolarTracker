@@ -47,7 +47,7 @@ Connection Signal<Tag>::connect(CallbackFn func, void* user)
  * @param arg
  */
 template <typename Tag>
-void Signal<Tag>::notify(const TagType& arg)
+void Signal<Tag>::notify(const TagType& arg) const
 {
     const auto copy = _subscribers;
     for (auto const& [_, sub] : copy)

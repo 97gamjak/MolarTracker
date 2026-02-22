@@ -2,6 +2,12 @@
 #define __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__
 
 #include <string>
+#include <vector>
+
+#include "config/signal_tags.hpp"
+#include "param_utils.hpp"
+
+class Connection;   // Forward declaration
 
 namespace settings
 {
@@ -22,6 +28,14 @@ namespace settings
         [[nodiscard]] const std::string& getTitle() const;
         [[nodiscard]] const std::string& getDescription() const;
 
+        [[nodiscard]] std::vector<Connection> subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        );
+
+        [[nodiscard]] nlohmann::json toJson() const;
+        static void fromJson(const nlohmann::json& jsonData, Derived& settings);
+
        private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;
@@ -29,8 +43,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
+#ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
 #include "param_container_mixin.tpp"
-#endif   // __SETTINGS__PARAM_CONTAINER_MIXIN_TPP__
+#endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
 
 #endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__

@@ -20,6 +20,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Added input validators for startup profile fields and improved the first `quick sign in` dialog with inline error messages and visual feedback for invalid inputs
 
+#### UI
+
+- The App title shows now if there are some unsaved changes or not
+
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 

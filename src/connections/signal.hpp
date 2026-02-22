@@ -51,7 +51,7 @@ class Signal
    public:
     Connection connect(CallbackFn func, void* user);
 
-    void notify(const TagType& arg);
+    void notify(const TagType& arg) const;
 
    private:
     static void _disconnect(void* owner, std::size_t id);

@@ -232,6 +232,8 @@ namespace app
         const drafts::ProfileDraft& draft
     )
     {
+        _markPotentiallyDirty();
+
         const auto profileOpt = _findProfile(draft.name);
 
         if (profileOpt.has_value() && !_isDeleted(profileOpt->getId()))
@@ -268,6 +270,8 @@ namespace app
         const drafts::ProfileDraft& draft
     )
     {
+        _markPotentiallyDirty();
+
         const auto profile = _findProfile(draft.name);
 
         if (!profile.has_value())

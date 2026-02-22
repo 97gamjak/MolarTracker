@@ -29,7 +29,7 @@ namespace ui
 
        public:
         LoggingController() = delete;
-        LoggingController(settings::LoggingSettings& loggingSettings);
+        explicit LoggingController(settings::LoggingSettings& loggingSettings);
 
        private:
         void subscribe(settings::LoggingSettings& loggingSettings);

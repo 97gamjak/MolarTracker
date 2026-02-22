@@ -2,7 +2,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <tuple>
 
 #include "params/params.hpp"
 
@@ -20,26 +19,6 @@ namespace settings
           _settingsPath{absolute(configDir / _settingsFileName)}
     {
         _fromJson();
-    }
-
-    /**
-     * @brief Get the parameters of Settings as a tuple (non-const version)
-     *
-     * @return auto
-     */
-    auto Settings::_getParams() &
-    {
-        return std::tie(_uiSettings, _generalSettings, _loggingSettings);
-    }
-
-    /**
-     * @brief Get the parameters of Settings as a tuple (const version)
-     *
-     * @return auto
-     */
-    auto Settings::_getParams() const&
-    {
-        return std::tie(_uiSettings, _generalSettings, _loggingSettings);
     }
 
     /**
@@ -105,7 +84,13 @@ namespace settings
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
         {
-            nlohmann::json jsonData = paramsToJson(_getParams());
+            nlohmann::json jsonData;
+
+            auto toJsonFunc = [&](const auto& param)
+            { jsonData[param.getKey()] = param.toJson(); };
+
+            _forEachParam(toJsonFunc);
+
             file << jsonData.dump(4);
             file.close();
         }
@@ -123,7 +108,19 @@ namespace settings
             nlohmann::json jsonData;
             file >> jsonData;
 
-            paramsFromJson(_getParams(), jsonData);
+            auto fromJsonFunc = [&](auto& param)
+            {
+                const auto& key = param.getKey();
+                if (jsonData.contains(key))
+                {
+                    std::remove_cvref_t<decltype(param)>::fromJson(
+                        jsonData[key],
+                        param
+                    );
+                }
+            };
+
+            _forEachParam(fromJsonFunc);
 
             file.close();
         }

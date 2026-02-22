@@ -128,20 +128,15 @@ namespace settings
        public:
         LogViewerSettings();
 
-        [[nodiscard]] nlohmann::json toJson() const;
-
-        static void fromJson(
-            const nlohmann::json& j,
-            LogViewerSettings&    settings
-        );
-
         [[nodiscard]] double getReloadIntervalSec() const;
         [[nodiscard]] bool   isAutoReloadEnabled() const;
         [[nodiscard]] bool   isLineWrapEnabled() const;
 
        private:
-        [[nodiscard]] auto _getParams() const&;
-        [[nodiscard]] auto _getParams() &;
+        template <typename Func>
+        void _forEachParam(Func&& func) const;
+        template <typename Func>
+        void _forEachParam(Func&& func);
     };
 
     /**
@@ -151,11 +146,15 @@ namespace settings
     class LogViewerSettingsException : public MolarTrackerException
     {
        public:
-        explicit LogViewerSettingsException(std::string message);
+        explicit LogViewerSettingsException(const std::string& message);
 
         [[nodiscard]] const char* what() const noexcept override;
     };
 
 }   // namespace settings
+
+#ifndef __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
+#include "log_viewer_settings.tpp"
+#endif   // __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
 
 #endif   // __SETTINGS__LOG_VIEWER_SETTINGS_HPP__

@@ -47,6 +47,7 @@ namespace app
      */
     struct HasProfileId
     {
+        /// The ID to compare against
         ProfileId id;
 
         [[nodiscard]] bool operator()(const Profile& profile) const;
@@ -58,6 +59,7 @@ namespace app
      */
     struct HasProfileName
     {
+        /// The name to compare against
         std::string_view name;
 
         [[nodiscard]] bool operator()(const Profile& profile) const;

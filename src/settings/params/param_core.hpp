@@ -3,8 +3,8 @@
 
 #include <optional>
 #include <string>
-#include <unordered_map>
 
+#include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
 #include "json/optional.hpp"   // IWYU pragma: keep
 
@@ -32,19 +32,6 @@ namespace settings
 
         /// key for the parameter default value in JSON
         static constexpr const char* DEFAULT_KEY = "default";
-    };
-
-    /**
-     * @brief Tag struct for indicating that the dirty state of a parameter has
-     * changed, this is used for notifying subscribers when the dirty state of a
-     * parameter changes, the TagType is a boolean indicating whether the
-     * parameter is dirty (has unsaved changes) or not
-     *
-     */
-    struct DirtyChanged
-    {
-        /// Type alias for the type of data
-        using TagType = bool;
     };
 
     /**
@@ -84,14 +71,14 @@ namespace settings
      */
     template <typename T>
     class ParamCore : Observable<
-                          DirtyChanged,
+                          OnDirtyChanged,
                           ParamValueChanged<T>,
                           ParamOptionalChanged<T>>
     {
        private:
         /// Type alias for the base class
         using Base = Observable<
-            DirtyChanged,
+            OnDirtyChanged,
             ParamValueChanged<T>,
             ParamOptionalChanged<T>>;
 
@@ -108,13 +95,6 @@ namespace settings
         /// useful for parameters that can be unset (optional)
         using ChangedFnOptional =
             void (*)(void*, const std::optional<T>& newValue);
-
-        /// Type alias for the change callback function for the dirty state of
-        /// the parameter, this is a function pointer that takes a pointer to
-        /// the user data and a boolean indicating whether the parameter is
-        /// dirty (has unsaved changes) or not, this is used to notify
-        /// subscribers when the dirty state of the parameter changes
-        using DirtyChangedFn = void (*)(void*, bool isDirty);
 
        private:
         /// type alias for ParamCoreSchema
@@ -151,7 +131,7 @@ namespace settings
 
         Connection subscribe(ChangedFn func, void* user);
         Connection subscribeToOptional(ChangedFnOptional func, void* user);
-        Connection subscribeToDirty(DirtyChangedFn func, void* user);
+        Connection subscribeToDirty(OnDirtyChanged::func func, void* user);
 
         void commit();
 

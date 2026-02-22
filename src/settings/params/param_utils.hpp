@@ -48,6 +48,28 @@ namespace settings
     }
 
     /**
+     * @brief Concept for types that have a forEachParam function, this is used
+     * to constrain the types that can be used with the paramsToJson and
+     * paramsFromJson functions, this ensures that only types that have a
+     * forEachParam function can be serialized and deserialized using these
+     * functions
+     *
+     * @tparam T
+     */
+    template <class T>
+    concept HasForEachParam =
+        (requires(T& param) { param._forEachParam([](auto&&) {}); }) &&
+        requires(const T& param) { param._forEachParam([](auto&&) {}); };
+
+    /**
+     * @brief Concept for parameter containers
+     *
+     * @tparam T
+     */
+    template <typename T>
+    concept IsParamContainer = HasForEachParam<T>;
+
+    /**
      * @brief Serialize a tuple of parameters to JSON
      *
      * @tparam Tuple

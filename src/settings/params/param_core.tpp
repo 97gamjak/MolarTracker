@@ -325,7 +325,7 @@ namespace settings
     template <typename T>
     void ParamCore<T>::_notifySubscribers()
     {
-        Base::template _emit<DirtyChanged>(isDirty());
+        Base::template _emit<OnDirtyChanged>(isDirty());
         Base::template _emit<ParamValueChanged<T>>(get());
         Base::template _emit<ParamOptionalChanged<T>>(getOptional());
     }
@@ -412,9 +412,12 @@ namespace settings
      * letting it go out of scope
      */
     template <typename T>
-    Connection ParamCore<T>::subscribeToDirty(DirtyChangedFn func, void* user)
+    Connection ParamCore<T>::subscribeToDirty(
+        OnDirtyChanged::func func,
+        void*                user
+    )
     {
-        return Base::template on<DirtyChanged>(func, user);
+        return Base::template on<OnDirtyChanged>(func, user);
     }
 
 }   // namespace settings

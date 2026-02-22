@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include "config/constants.hpp"
 #include "general_settings.hpp"
 #include "logging_settings.hpp"
 #include "params/params.hpp"
@@ -34,6 +35,12 @@ namespace settings
     class Settings : public ParamContainerMixin<Settings>
     {
        private:
+        /// friend declaration to allow ParamContainerMixin to access private
+        /// members of Settings, this is necessary because ParamContainerMixin
+        /// needs to access the _core member of Settings to implement the
+        /// functionality for settings
+        friend ParamContainerMixin<Settings>;
+
         /// The core container for the settings parameters
         ParamContainer _core;
 
@@ -70,13 +77,19 @@ namespace settings
         [[nodiscard]] const LoggingSettings& getLoggingSettings() const;
 
        private:
-        auto _getParams() &;
-        auto _getParams() const&;
+        template <typename Func>
+        void _forEachParam(Func&& func) const;
+        template <typename Func>
+        void _forEachParam(Func&& func);
 
         void _toJson() const;
         void _fromJson();
     };
 
 }   // namespace settings
+
+#ifndef __SETTINGS__SETTINGS_TPP__
+#include "settings.tpp"
+#endif   // __SETTINGS__SETTINGS_TPP__
 
 #endif   // __SETTINGS__SETTINGS_HPP__

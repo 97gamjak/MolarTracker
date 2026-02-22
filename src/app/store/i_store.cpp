@@ -8,29 +8,59 @@ namespace app
      * making any changes to the store to indicate that there may be dirty data
      * that needs to be committed.
      */
-    void IStore::_markPotentiallyDirty() { _isPotentiallyDirty = true; }
+    void IStore::_markPotentiallyDirty()
+    {
+        _isPotentiallyDirty = true;
+        _notifySubscribers(true);
+    }
 
     /**
      * @brief Mark the store as clean, this should be called after committing
      * changes to the store to indicate that there is no longer any dirty data
      * that needs to be committed.
      */
-    void IStore::_clearPotentiallyDirty() { _isPotentiallyDirty = false; }
+    void IStore::_clearPotentiallyDirty()
+    {
+        _isPotentiallyDirty = false;
+        _notifySubscribers(false);
+    }
 
     /**
-     * @brief Check if the store has any potentially dirty data that needs to be
-     * committed
+     * @brief Subscribe to changes in the dirty state of the store, the
+     * provided callback function will be called whenever the dirty state
+     * changes, the user pointer can be used to pass additional data to the
+     * callback function, the returned Connection object can be used to
+     * unsubscribe from changes
      *
-     * This method is used to have a quick check to see if the store has any
-     * potentially dirty data that needs to be committed, without having to do a
-     * more expensive check of the actual dirty data.
-     *
-     * @return true
-     * @return false
+     * @param func The callback function to call when the dirty state of the
+     * store changes, it should have the signature void(void* user, bool
+     * isDirty)
+     * @param user A user-defined pointer that will be passed to the callback
+     * function when it is called, this can be used to provide additional
+     * context for the callback function
+     * @return Connection An object representing the subscription, this can be
+     * used to unsubscribe from changes by calling disconnect() on it or by
+     * letting it go out of scope
      */
-    [[nodiscard]] bool IStore::isPotentiallyDirty() const
+    Connection IStore::subscribeToDirty(DirtyChangedFn func, void* user)
     {
-        return _isPotentiallyDirty;
+        return Base::template on<DirtyChanged>(func, user);
+    }
+
+    /**
+     * @brief Notify subscribers of a change in the dirty state of the store,
+     * this should be called whenever the dirty state of the store changes to
+     * notify any subscribers of the change, it takes a boolean indicating
+     * whether the store is dirty (has unsaved changes) or not, and passes this
+     * to the subscribers when notifying them of the change
+     *
+     * @param isDirty A boolean indicating whether the store is dirty (has
+     * unsaved changes) or not, this will be passed to the subscribers when
+     * notifying them of the change
+     */
+    void IStore::_notifySubscribers(const bool& isDirty)
+    {
+        Base::template _emit<DirtyChanged>(isDirty);
     }
 
 }   // namespace app

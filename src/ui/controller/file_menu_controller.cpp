@@ -6,6 +6,7 @@
 #include <QStatusBar>
 
 #include "app/app_context.hpp"
+#include "ui/main_window.hpp"
 #include "ui/widgets/menu_bar/file_menu.hpp"
 
 namespace ui
@@ -18,7 +19,7 @@ namespace ui
      * @param appContext The application context
      */
     FileMenuController::FileMenuController(
-        QMainWindow&     mainWindow,
+        MainWindow&      mainWindow,
         FileMenu&        fileMenu,
         app::AppContext& appContext
     )
@@ -50,6 +51,8 @@ namespace ui
     {
         _appContext.getStore().commit();
         _appContext.getSettings().save();
+
+        _mainWindow.setWindowTitle(false);
 
         auto* statusBar = _mainWindow.statusBar();
 

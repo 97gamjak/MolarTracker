@@ -75,6 +75,18 @@ std::filesystem::path Constants::getDatabasePath() const
 const std::string Constants::getAppName() { return ConstantsSchema::_appName; }
 
 /**
+ * @brief Get the application display name, this is the name that is shown in
+ * the title bar of the application, it includes the application name and
+ * version
+ *
+ * @return const std::string
+ */
+const std::string Constants::getAppDisplayName()
+{
+    return getAppName() + " " + getVersion();
+}
+
+/**
  * @brief Get the directory prefix used for config and data directories
  *
  * @return const std::string
