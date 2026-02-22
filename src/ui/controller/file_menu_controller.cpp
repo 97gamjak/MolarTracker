@@ -49,8 +49,9 @@ namespace ui
      */
     void FileMenuController::_onRequestSave()
     {
-        _appContext.getStore().commit();
         _appContext.getSettings().save();
+        _appContext.getStore().commit();
+        _appContext.getStore().clearPotentiallyDirty();
 
         _mainWindow.setWindowTitle(false);
 
