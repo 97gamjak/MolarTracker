@@ -69,7 +69,7 @@ namespace finance
      * @param rhs
      * @return Cash the result of adding two Cash objects
      */
-    constexpr Cash operator+(const Cash& lhs, const Cash& rhs)
+    Cash operator+(const Cash& lhs, const Cash& rhs)
     {
         if (lhs._currency != rhs._currency)
         {
@@ -88,7 +88,7 @@ namespace finance
      * @param rhs
      * @return Cash the result of subtracting two Cash objects
      */
-    constexpr Cash operator-(const Cash& lhs, const Cash& rhs)
+    Cash operator-(const Cash& lhs, const Cash& rhs)
     {
         if (lhs._currency != rhs._currency)
         {
@@ -106,7 +106,7 @@ namespace finance
      * @param cash
      * @return Cash the result of negating a Cash object
      */
-    constexpr Cash operator-(const Cash& cash)
+    Cash operator-(const Cash& cash)
     {
         return Cash(cash._currency, -cash._amount);
     }

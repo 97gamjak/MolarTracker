@@ -34,9 +34,9 @@ namespace finance
             const Cash& rhs
         );
 
-        friend constexpr Cash operator+(const Cash& lhs, const Cash& rhs);
-        friend constexpr Cash operator-(const Cash& lhs, const Cash& rhs);
-        friend constexpr Cash operator-(const Cash& cash);
+        friend Cash operator+(const Cash& lhs, const Cash& rhs);
+        friend Cash operator-(const Cash& lhs, const Cash& rhs);
+        friend Cash operator-(const Cash& cash);
     };
 
 }   // namespace finance
