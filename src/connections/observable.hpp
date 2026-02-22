@@ -2,8 +2,7 @@
 #define __CONNECTIONS__OBSERVABLE_HPP__
 
 #include "signal.hpp"
-
-/**
+#include <tuple>
  * @brief Base class for observable objects that can emit signals for multiple
  * event tags, this class uses a tuple of signals to manage the different
  * events that can be emitted by the observable object. It provides a method
