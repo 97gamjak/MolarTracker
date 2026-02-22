@@ -211,6 +211,23 @@ namespace settings
     }
 
     /**
+     * @brief Commit the changes to the parameter, this should be called after
+     * making any changes to the parameter to ensure that the changes are saved
+     * and can be accessed by other parts of the application. The exact behavior
+     * of this method will depend on the implementation of the parameter, but it
+     * may involve saving the changes to a database, writing them to a file, or
+     * simply marking them as committed in memory.
+     *
+     * @tparam Derived
+     * @tparam T
+     */
+    template <typename Derived, typename T>
+    void ParamMixin<Derived, T>::commit()
+    {
+        _self()._core.commit();
+    }
+
+    /**
      * @brief Get the derived object
      *
      * @tparam Derived

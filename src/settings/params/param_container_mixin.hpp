@@ -36,6 +36,8 @@ namespace settings
         [[nodiscard]] nlohmann::json toJson() const;
         static void fromJson(const nlohmann::json& jsonData, Derived& settings);
 
+        void commit();
+
        private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;

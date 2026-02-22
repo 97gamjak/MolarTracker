@@ -25,7 +25,11 @@ namespace settings
      * @brief Save settings to the JSON file
      *
      */
-    void Settings::save() const { _toJson(); }
+    void Settings::save()
+    {
+        _toJson();
+        commit();
+    }
 
     /**
      * @brief Get the GeneralSettings object
@@ -84,12 +88,7 @@ namespace settings
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
         {
-            nlohmann::json jsonData;
-
-            auto toJsonFunc = [&](const auto& param)
-            { jsonData[param.getKey()] = param.toJson(); };
-
-            _forEachParam(toJsonFunc);
+            nlohmann::json jsonData = toJson();
 
             file << jsonData.dump(4);
             file.close();
@@ -108,19 +107,7 @@ namespace settings
             nlohmann::json jsonData;
             file >> jsonData;
 
-            auto fromJsonFunc = [&](auto& param)
-            {
-                const auto& key = param.getKey();
-                if (jsonData.contains(key))
-                {
-                    std::remove_cvref_t<decltype(param)>::fromJson(
-                        jsonData[key],
-                        param
-                    );
-                }
-            };
-
-            _forEachParam(fromJsonFunc);
+            fromJson(jsonData, *this);
 
             file.close();
         }

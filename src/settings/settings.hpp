@@ -64,7 +64,7 @@ namespace settings
         Settings() = delete;
         explicit Settings(const std::filesystem::path& configDir);
 
-        void save() const;
+        void save();
 
        public:   // getters and setters
         [[nodiscard]] GeneralSettings&       getGeneralSettings();

@@ -67,6 +67,8 @@ namespace settings
         [[nodiscard]] bool isRebootRequired() const;
         void               setRebootRequired(bool required);
 
+        void commit();
+
        private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;

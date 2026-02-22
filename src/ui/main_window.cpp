@@ -42,6 +42,7 @@ namespace ui
               )
           )
     {
+        setWindowTitle(false);
         resize(5000, 3000);
         _buildUI();
     }

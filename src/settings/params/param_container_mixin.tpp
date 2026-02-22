@@ -154,6 +154,24 @@ namespace settings
     }
 
     /**
+     * @brief Commit the changes to all parameters in the container, this should
+     * be called after making any changes to the parameters to ensure that the
+     * changes are saved and can be accessed by other parts of the application,
+     * the exact behavior of this method will depend on the implementation of
+     * the parameters, but it may involve saving the changes to a database,
+     * writing them to a file, or simply marking them as committed in memory
+     *
+     * @tparam Derived
+     */
+    template <typename Derived>
+    void ParamContainerMixin<Derived>::commit()
+    {
+        auto commitParam = [&](auto& param) { param.commit(); };
+
+        _self()._forEachParam(commitParam);
+    }
+
+    /**
      * @brief Get a reference to the derived class, this is used for CRTP to
      * call functions of the derived class from the mixin
      *

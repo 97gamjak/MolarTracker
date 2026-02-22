@@ -1,5 +1,7 @@
 #include "i_store.hpp"
 
+#include "config/signal_tags.hpp"
+
 namespace app
 {
 
@@ -42,9 +44,9 @@ namespace app
      * used to unsubscribe from changes by calling disconnect() on it or by
      * letting it go out of scope
      */
-    Connection IStore::subscribeToDirty(DirtyChangedFn func, void* user)
+    Connection IStore::subscribeToDirty(OnDirtyChanged::func func, void* user)
     {
-        return Base::template on<DirtyChanged>(func, user);
+        return Base::template on<OnDirtyChanged>(func, user);
     }
 
     /**
@@ -60,7 +62,7 @@ namespace app
      */
     void IStore::_notifySubscribers(const bool& isDirty)
     {
-        Base::template _emit<DirtyChanged>(isDirty);
+        Base::template _emit<OnDirtyChanged>(isDirty);
     }
 
 }   // namespace app
