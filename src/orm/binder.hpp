@@ -3,9 +3,10 @@
 
 #include <cstdint>
 #include <string>
-#include <string_view>
 
+#include "finance/currency.hpp"
 #include "orm/concepts.hpp"
+#include "orm/orm_exception.hpp"
 
 namespace orm
 {
@@ -216,6 +217,58 @@ namespace orm
         static T read(Statement const& statement, int col)
         {
             return T::from(statement.columnInt64(col));
+        }
+    };
+
+    /**
+     * @brief Binder for finance::Currency enum
+     *
+     * @tparam Statement
+     */
+    template <typename Statement>
+    struct binder<Statement, finance::Currency>
+    {
+        /// alias for finance::CurrencyMeta
+        using CurrencyMeta = finance::CurrencyMeta;
+
+        /**
+         * @brief Bind a finance::Currency value to the specified parameter
+         * index
+         *
+         * @param statement
+         * @param index
+         * @param value
+         */
+        static void bind(
+            Statement&               statement,
+            int                      index,
+            finance::Currency const& value
+        )
+        {
+            statement.bindText(index, CurrencyMeta::name(value));
+        }
+
+        /**
+         * @brief Read a finance::Currency value from the specified column
+         *
+         * @param statement
+         * @param col
+         * @return finance::Currency
+         */
+        static finance::Currency read(Statement const& statement, int col)
+        {
+            const auto value =
+                CurrencyMeta::from_string(statement.columnText(col));
+
+            if (!value.has_value())
+            {
+                throw ORMError(
+                    "Invalid currency value in database: " +
+                    statement.columnText(col)
+                );
+            }
+
+            return value.value();
         }
     };
 }   // namespace orm

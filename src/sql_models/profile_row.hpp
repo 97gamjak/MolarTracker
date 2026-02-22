@@ -17,17 +17,17 @@ struct ProfileRow final
 {
    public:   // fields
     /// The name of the database table this struct represents
-    static inline constexpr std::string table_name = "profile";
+    static constexpr std::string table_name = "profile";
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<ProfileId> id{};
+    orm::IdField<ProfileId> id;
 
     /// The name field, this is a required and unique field
-    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name{};
+    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name;
 
     /// The email field, this is an optional field
-    orm::Field<"email", std::optional<std::string>> email{};
+    orm::Field<"email", std::optional<std::string>> email;
 
    public:   // methods
     [[nodiscard]] constexpr auto fields();
@@ -35,7 +35,7 @@ struct ProfileRow final
 };
 
 #ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
-#include "profile_row.impl.hpp"
-#endif   // __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
+#include "profile_row.impl.hpp"   // IWYU pragma: keep
+#endif
 
 #endif   // __SQL_MODELS__PROFILE_ROW_HPP__
