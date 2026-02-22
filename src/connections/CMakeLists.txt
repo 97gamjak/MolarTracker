@@ -1,6 +1,6 @@
 add_library(molartracker_connections STATIC
     connection.cpp
-    connection.hpp
+    signal_exception.cpp
 )
 
 target_include_directories(molartracker_connections

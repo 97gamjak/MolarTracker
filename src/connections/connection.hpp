@@ -12,7 +12,7 @@
 //
 //
 // Requirements on the producer (e.g. Param<T>):
-//  - disconnect_fn(owner, id) must be valid, and idempotent.
+//  - disconnectFunc(owner, id) must be valid, and idempotent.
 // ============================================================================
 
 /**
@@ -38,7 +38,7 @@ struct ConnectionToken
     /// Disconnect function for the subscription, this is a function pointer
     /// that takes the owner pointer and subscription id as arguments and is
     /// responsible for disconnecting the subscription when called
-    DisconnectFn disconnect_fn{};
+    DisconnectFn disconnectFunc{};
 
    public:
     void disconnect() const;
@@ -64,9 +64,8 @@ class Connection
     Connection(const Connection&)            = delete;
     Connection& operator=(const Connection&) = delete;
 
-    Connection(Connection&& other);
-
-    Connection& operator=(Connection&& other);
+    Connection(Connection&& other) noexcept;
+    Connection& operator=(Connection&& other) noexcept;
 
     ~Connection();
 
@@ -76,9 +75,9 @@ class Connection
     void reset();
 
     static Connection make(
-        void*                         owner,
-        std::size_t                   id,
-        ConnectionToken::DisconnectFn fn
+        void*                                owner,
+        std::size_t                          id,
+        const ConnectionToken::DisconnectFn& func
     );
 };
 

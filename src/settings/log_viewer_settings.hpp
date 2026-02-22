@@ -153,7 +153,7 @@ namespace settings
        public:
         explicit LogViewerSettingsException(std::string message);
 
-        const char* what() const noexcept override;
+        [[nodiscard]] const char* what() const noexcept override;
     };
 
 }   // namespace settings

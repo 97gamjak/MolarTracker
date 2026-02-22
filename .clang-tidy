@@ -27,7 +27,7 @@ ImplementationFileExtensions:
   - cc
   - cpp
   - cxx
-HeaderFilterRegex: '*.hpp,*.tpp'
+HeaderFilterRegex: '.*\.(hpp|tpp)$'
 FormatStyle:     google
 User:            jag
 CheckOptions:
