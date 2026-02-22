@@ -48,10 +48,10 @@ namespace app
         [[nodiscard]] virtual bool isDirty() const = 0;
 
         Connection subscribeToDirty(OnDirtyChanged::func func, void* user);
+        void       clearPotentiallyDirty();
 
        protected:
         void _markPotentiallyDirty();
-        void _clearPotentiallyDirty();
 
        private:
         void _notifySubscribers(const bool& isDirty);

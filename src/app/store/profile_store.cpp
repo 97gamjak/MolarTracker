@@ -399,8 +399,6 @@ namespace app
      */
     void ProfileStore::commit()
     {
-        _clearPotentiallyDirty();
-
         if (!isDirty())
         {
             LOG_DEBUG("No changes to save in ProfileStore");
@@ -411,9 +409,6 @@ namespace app
         {
             switch (_profileStates[profile.getId()])
             {
-                case StoreState::Clean:
-                    _profileStates[profile.getId()] = StoreState::Clean;
-                    continue;
                 case StoreState::New:
                     _commitNewProfile(profile);
                     break;
@@ -422,6 +417,8 @@ namespace app
                     break;
                 case StoreState::Deleted:
                     _commitDeletedProfile(profile);
+                    break;
+                case StoreState::Clean:
                     break;
             }
         }

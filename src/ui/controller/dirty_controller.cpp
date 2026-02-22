@@ -23,8 +23,14 @@ namespace ui
     {
         auto setTitleDirty = [](void* user, const bool& isDirty)
         {
-            if (auto* mainWindow = static_cast<ui::MainWindow*>(user))
-                mainWindow->setWindowTitle(isDirty);
+            // we only want to send a signal in case something is dirty
+            // In case we save settings and the store, we handle the dirty state
+            // there
+            if (isDirty)
+            {
+                if (auto* mainWindow = static_cast<ui::MainWindow*>(user))
+                    mainWindow->setWindowTitle(isDirty);
+            }
         };
 
         _dirtyStoreConnections =

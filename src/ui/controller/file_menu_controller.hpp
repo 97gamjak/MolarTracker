@@ -10,12 +10,8 @@ namespace app
 
 namespace ui
 {
+    class FileMenu;     // Forward declaration
     class MainWindow;   // Forward declaration
-}
-
-namespace ui
-{
-    class FileMenu;   // Forward declaration
 
     /**
      * @brief Binds the file menu actions to their respective functionalities.

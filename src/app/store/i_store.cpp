@@ -21,7 +21,7 @@ namespace app
      * changes to the store to indicate that there is no longer any dirty data
      * that needs to be committed.
      */
-    void IStore::_clearPotentiallyDirty()
+    void IStore::clearPotentiallyDirty()
     {
         _isPotentiallyDirty = false;
         _notifySubscribers(false);

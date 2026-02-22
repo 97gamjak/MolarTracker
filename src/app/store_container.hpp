@@ -26,6 +26,7 @@ namespace app
         explicit StoreContainer(ServiceContainer& services);
 
         void commit();
+        void clearPotentiallyDirty();
 
         std::vector<Connection> subscribeToDirty(
             OnDirtyChanged::func func,
