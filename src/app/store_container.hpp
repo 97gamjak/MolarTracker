@@ -1,6 +1,7 @@
 #ifndef __APP__STORE_CONTAINER_HPP__
 #define __APP__STORE_CONTAINER_HPP__
 
+#include "config/signal_tags.hpp"
 #include "store/profile_store.hpp"
 
 namespace app
@@ -18,15 +19,19 @@ namespace app
         /// The Profile store
         ProfileStore _profileStore;
 
-        /// list of all stores TODO: maybe introduce a std::tie
-        std::vector<IStore*> _allStores{
-            &_profileStore,
-        };
+        /// list of all stores
+        std::vector<IStore*> _allStores;
 
        public:
         explicit StoreContainer(ServiceContainer& services);
 
         void commit();
+        void clearPotentiallyDirty();
+
+        std::vector<Connection> subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        );
 
         ProfileStore&       getProfileStore();
         const ProfileStore& getProfileStore() const;

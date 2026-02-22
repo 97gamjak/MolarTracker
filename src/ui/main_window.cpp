@@ -1,5 +1,6 @@
 #include "main_window.hpp"
 
+#include <QApplication>
 #include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
@@ -8,6 +9,7 @@
 #include <QVBoxLayout>
 
 #include "app/app_context.hpp"
+#include "config/constants.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
@@ -31,9 +33,16 @@ namespace ui
     )
         : QMainWindow{parent},
           _appContext{appContext},
-          _controllers{controllers}
+          _controllers{controllers},
+          _dirtyStateController(
+              std::make_unique<DirtyStateController>(
+                  _appContext.getStore(),
+                  _appContext.getSettings(),
+                  this
+              )
+          )
     {
-        setWindowTitle("Molar Tracker");
+        setWindowTitle(false);
         resize(5000, 3000);
         _buildUI();
     }
@@ -128,6 +137,24 @@ namespace ui
         );
 
         _ensureProfileController->ensureProfileExists();
+    }
+
+    /**
+     * @brief Set the window title of the main window, this will append a
+     * warning to the title if there are unsaved changes in the application
+     *
+     * @param isDirty Whether there are unsaved changes
+     */
+    void MainWindow::setWindowTitle(const bool& isDirty)
+    {
+        QApplication::setApplicationDisplayName("");
+        auto baseTitle = Constants::getAppDisplayName();
+
+        if (isDirty)
+            baseTitle += " *** unsaved changes ***";
+
+        const auto name = QString::fromStdString(baseTitle);
+        QMainWindow::setWindowTitle(name);
     }
 
 }   // namespace ui

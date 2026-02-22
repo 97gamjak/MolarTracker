@@ -31,26 +31,37 @@ namespace settings
     /**
      * @brief UI-related settings management
      */
-    class UISettings : public ParamContainer
+    class UISettings : public ParamContainerMixin<UISettings>
     {
        private:
+        /// friend declaration to allow ParamContainerMixin to access private
+        /// members of UISettings, this is necessary because ParamContainerMixin
+        /// needs to access the _core member of UISettings to implement the
+        /// functionality for UI settings
+        friend ParamContainerMixin<UISettings>;
+        /// The core container for the UI settings parameters
+        ParamContainer _core;
+
         /// The UI settings parameters
         LogViewerSettings _logViewerSettings;
 
        public:
         UISettings();
 
-        nlohmann::json toJson() const;
-        static void    fromJson(const nlohmann::json& j, UISettings& settings);
-
         [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
         [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
 
        private:
-        [[nodiscard]] auto _getParams() const&;
-        [[nodiscard]] auto _getParams() &;
+        template <typename Func>
+        void _forEachParam(Func&& func) const;
+        template <typename Func>
+        void _forEachParam(Func&& func);
     };
 
 }   // namespace settings
+
+#ifndef __SETTINGS__UI_SETTINGS_TPP__
+#include "ui_settings.tpp"
+#endif   // __SETTINGS__UI_SETTINGS_TPP__
 
 #endif   // __SETTINGS__UI_SETTINGS_HPP__

@@ -33,41 +33,6 @@ namespace settings
     }
 
     /**
-     * @brief Get the parameters of LoggingSettings as a tuple (const version)
-     *
-     * @return auto
-     */
-    auto LoggingSettings::_getParams() const&
-    {
-        return std::tie(
-            _logDirectory,
-            _logFilePrefix,
-            _logFileSuffix,
-            _maxLogFiles,
-            _maxLogFileSizeMB,
-            _defaultLogLevel
-        );
-    }
-
-    /**
-     * @brief Get the parameters of LoggingSettings as a tuple (non-const
-     * version)
-     *
-     * @return auto
-     */
-    auto LoggingSettings::_getParams() &
-    {
-        return std::tie(
-            _logDirectory,
-            _logFilePrefix,
-            _logFileSuffix,
-            _maxLogFiles,
-            _maxLogFileSizeMB,
-            _defaultLogLevel
-        );
-    }
-
-    /**
      * @brief Get the log directory setting
      *
      * @return std::string
@@ -142,37 +107,15 @@ namespace settings
     }
 
     /**
-     * @brief Get the JSON representation of the LoggingSettings
-     *
-     * @return nlohmann::json
-     */
-    nlohmann::json LoggingSettings::toJson() const
-    {
-        return paramsToJson(_getParams());
-    }
-
-    /**
-     * @brief Deserialize LoggingSettings from JSON
-     *
-     * @param jsonData
-     * @param settings
-     */
-    void LoggingSettings::fromJson(
-        const nlohmann::json& jsonData,
-        LoggingSettings&      settings
-    )
-    {
-        paramsFromJson(settings._getParams(), jsonData);
-    }
-
-    /**
      * @brief Construct a new LoggingSettingsException::LoggingSettingsException
      * object
      *
      * @param message The exception message
      */
-    LoggingSettingsException::LoggingSettingsException(std::string message)
-        : MolarTrackerException(std::move(message))
+    LoggingSettingsException::LoggingSettingsException(
+        const std::string& message
+    )
+        : MolarTrackerException(message)
     {
     }
 

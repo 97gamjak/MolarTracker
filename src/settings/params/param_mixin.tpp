@@ -153,6 +153,35 @@ namespace settings
     }
 
     /**
+     * @brief Subscribe to changes in the dirty state of the parameter, the
+     * provided callback function will be called whenever the dirty state
+     * changes, the user pointer can be used to pass additional data to the
+     * callback function, the returned Connection object can be used to
+     * unsubscribe from changes by calling disconnect() on it or by letting it
+     * go out of scope
+     *
+     * @tparam Derived
+     * @tparam T
+     * @param func The callback function to call when the dirty state of the
+     * parameter changes, it should have the signature void(void* user, bool
+     * isDirty)
+     * @param user A user-defined pointer that will be passed to the callback
+     * function when it is called, this can be used to provide additional
+     * context for the callback function
+     * @return Connection An object representing the subscription, this can be
+     * used to unsubscribe from changes by calling disconnect() on it or by
+     * letting it go out of scope
+     */
+    template <typename Derived, typename T>
+    Connection ParamMixin<Derived, T>::subscribeToDirty(
+        OnDirtyChanged::func func,
+        void*                user
+    )
+    {
+        return _self()._core.subscribeToDirty(func, user);
+    }
+
+    /**
      * @brief Check if changing this parameter requires a reboot
      *
      * @tparam Derived
@@ -179,6 +208,23 @@ namespace settings
     void ParamMixin<Derived, T>::setRebootRequired(bool required)
     {
         _self()._core.setRebootRequired(required);
+    }
+
+    /**
+     * @brief Commit the changes to the parameter, this should be called after
+     * making any changes to the parameter to ensure that the changes are saved
+     * and can be accessed by other parts of the application. The exact behavior
+     * of this method will depend on the implementation of the parameter, but it
+     * may involve saving the changes to a database, writing them to a file, or
+     * simply marking them as committed in memory.
+     *
+     * @tparam Derived
+     * @tparam T
+     */
+    template <typename Derived, typename T>
+    void ParamMixin<Derived, T>::commit()
+    {
+        _self()._core.commit();
     }
 
     /**

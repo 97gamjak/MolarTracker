@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 
+#include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
 
 namespace settings
@@ -53,11 +54,20 @@ namespace settings
         [[nodiscard]] const std::string& getDescription() const;
         void setDescription(const std::string& description);
 
-        Connection subscribe(ChangedFn func, void* user);
-        Connection subscribeToOptional(ChangedFnOptional func, void* user);
+        [[nodiscard]] Connection subscribe(ChangedFn func, void* user);
+        [[nodiscard]] Connection subscribeToOptional(
+            ChangedFnOptional func,
+            void*             user
+        );
+        [[nodiscard]] Connection subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        );
 
         [[nodiscard]] bool isRebootRequired() const;
         void               setRebootRequired(bool required);
+
+        void commit();
 
        private:
         [[nodiscard]] Derived&       _self();

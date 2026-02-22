@@ -2,7 +2,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <tuple>
 
 #include "params/params.hpp"
 
@@ -23,30 +22,14 @@ namespace settings
     }
 
     /**
-     * @brief Get the parameters of Settings as a tuple (non-const version)
-     *
-     * @return auto
-     */
-    auto Settings::_getParams() &
-    {
-        return std::tie(_uiSettings, _generalSettings, _loggingSettings);
-    }
-
-    /**
-     * @brief Get the parameters of Settings as a tuple (const version)
-     *
-     * @return auto
-     */
-    auto Settings::_getParams() const&
-    {
-        return std::tie(_uiSettings, _generalSettings, _loggingSettings);
-    }
-
-    /**
      * @brief Save settings to the JSON file
      *
      */
-    void Settings::save() const { _toJson(); }
+    void Settings::save()
+    {
+        _toJson();
+        commit();
+    }
 
     /**
      * @brief Get the GeneralSettings object
@@ -105,7 +88,8 @@ namespace settings
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
         {
-            nlohmann::json jsonData = paramsToJson(_getParams());
+            nlohmann::json jsonData = toJson();
+
             file << jsonData.dump(4);
             file.close();
         }
@@ -123,7 +107,7 @@ namespace settings
             nlohmann::json jsonData;
             file >> jsonData;
 
-            paramsFromJson(_getParams(), jsonData);
+            fromJson(jsonData, *this);
 
             file.close();
         }

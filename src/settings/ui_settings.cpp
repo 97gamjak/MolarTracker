@@ -9,53 +9,12 @@ namespace settings
      *
      */
     UISettings::UISettings()
-        : ParamContainer(
+        : _core{
               UISettingsSchema::UI_SETTINGS_KEY,
               UISettingsSchema::UI_SETTINGS_TITLE,
               UISettingsSchema::UI_SETTINGS_DESC
-          )
+          }
     {
-    }
-
-    /**
-     * @brief Get the parameters of UISettings as a tuple (const version)
-     *
-     * @return auto
-     */
-    auto UISettings::_getParams() const&
-    {
-        return std::tie(_logViewerSettings);
-    }
-
-    /**
-     * @brief Get the parameters of UISettings as a tuple (non-const version)
-     *
-     * @return auto
-     */
-    auto UISettings::_getParams() & { return std::tie(_logViewerSettings); }
-
-    /**
-     * @brief Serialize UISettings to JSON
-     *
-     * @return nlohmann::json
-     */
-    nlohmann::json UISettings::toJson() const
-    {
-        return paramsToJson(_getParams());
-    }
-
-    /**
-     * @brief Deserialize UISettings from JSON
-     *
-     * @param jsonData
-     * @param settings
-     */
-    void UISettings::fromJson(
-        const nlohmann::json& jsonData,
-        UISettings&           settings
-    )
-    {
-        paramsFromJson(settings._getParams(), jsonData);
     }
 
     /**

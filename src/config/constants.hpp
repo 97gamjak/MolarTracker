@@ -59,6 +59,7 @@ class Constants
     [[nodiscard]] std::filesystem::path getDatabasePath() const;
 
     [[nodiscard]] static const std::string getAppName();
+    [[nodiscard]] static const std::string getAppDisplayName();
     [[nodiscard]] static const std::string getDirPrefix();
     [[nodiscard]] static const std::string getDesktopAppName();
     [[nodiscard]] static const std::string getGithubRepoUrl();

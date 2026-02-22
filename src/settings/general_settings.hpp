@@ -96,13 +96,6 @@ namespace settings
        public:
         GeneralSettings();
 
-        [[nodiscard]] nlohmann::json toJson() const;
-
-        static void fromJson(
-            const nlohmann::json& j,
-            GeneralSettings&      settings
-        );
-
         void               setDefaultProfile(const std::string& profileName);
         void               unsetDefaultProfile();
         [[nodiscard]] bool hasDefaultProfile() const;
@@ -110,10 +103,16 @@ namespace settings
         ) const;
 
        private:
-        [[nodiscard]] auto _getParams() const&;
-        [[nodiscard]] auto _getParams() &;
+        template <typename Func>
+        void _forEachParam(Func&& func) const;
+        template <typename Func>
+        void _forEachParam(Func&& func);
     };
 
 }   // namespace settings
+
+#ifndef __SETTINGS__GENERAL_SETTINGS_TPP__
+#include "general_settings.tpp"
+#endif   // __SETTINGS__GENERAL_SETTINGS_TPP__
 
 #endif   // __SETTINGS__GENERAL_SETTINGS_HPP__

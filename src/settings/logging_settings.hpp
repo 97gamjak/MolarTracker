@@ -210,16 +210,11 @@ namespace settings
         [[nodiscard]] const EnumParam<LogLevel>& getDefaultLogLevelParam(
         ) const;
 
-        [[nodiscard]] nlohmann::json toJson() const;
-
-        static void fromJson(
-            const nlohmann::json& j,
-            LoggingSettings&      settings
-        );
-
        private:
-        [[nodiscard]] auto _getParams() const&;
-        [[nodiscard]] auto _getParams() &;
+        template <typename Func>
+        void _forEachParam(Func&& func) const;
+        template <typename Func>
+        void _forEachParam(Func&& func);
     };
 
     /**
@@ -233,11 +228,15 @@ namespace settings
     class LoggingSettingsException : public MolarTrackerException
     {
        public:
-        explicit LoggingSettingsException(std::string message);
+        explicit LoggingSettingsException(const std::string& message);
 
-        const char* what() const noexcept override;
+        [[nodiscard]] const char* what() const noexcept override;
     };
 
 }   // namespace settings
+
+#ifndef __SETTINGS__LOGGING_SETTINGS_TPP__
+#include "logging_settings.tpp"
+#endif   // __SETTINGS__LOGGING_SETTINGS_TPP__
 
 #endif   // __SETTINGS__LOGGING_SETTINGS_HPP__
