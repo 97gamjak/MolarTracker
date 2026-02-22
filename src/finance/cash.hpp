@@ -1,6 +1,8 @@
 #ifndef __FINANCE__CASH_HPP__
 #define __FINANCE__CASH_HPP__
 
+#include <compare>
+
 #include "currency.hpp"
 
 namespace finance
