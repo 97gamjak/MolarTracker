@@ -4,6 +4,9 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
+
 ### Bug Fixes
 
 - Fix CI check for changes in CHANGELOG files
@@ -55,7 +58,6 @@ All changes and updates, that are relevant for developers will be documented her
 - Adding unit tests for `Statement` class
 - Adding unit tests for `Transaction` class
 
-<!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 
 ## [0.0.1](https://github.com/repo/owner/releases/tag/0.0.1) - 2026-02-07
@@ -118,6 +120,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 
