@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "connections/connection.hpp"
+#include "connections/observable.hpp"
 #include "json/optional.hpp"   // IWYU pragma: keep
 
 namespace settings
@@ -35,48 +35,86 @@ namespace settings
     };
 
     /**
+     * @brief Tag struct for indicating that the dirty state of a parameter has
+     * changed, this is used for notifying subscribers when the dirty state of a
+     * parameter changes, the TagType is a boolean indicating whether the
+     * parameter is dirty (has unsaved changes) or not
+     *
+     */
+    struct DirtyChanged
+    {
+        /// Type alias for the type of data
+        using TagType = bool;
+    };
+
+    /**
+     * @brief Tag struct for indicating that the value of a parameter has
+     * changed, this is used for notifying subscribers when the value of a
+     * parameter changes, the TagType is the new value of the parameter
+     *
+     * @tparam T
+     */
+    template <typename T>
+    struct ParamValueChanged
+    {
+        /// Type alias for the type of data
+        using TagType = T;
+    };
+
+    /**
+     * @brief Tag struct for indicating that the optional value of a parameter
+     * has changed, this is used for notifying subscribers when the value of a
+     * parameter changes, the TagType is the new optional value of the
+     * parameter, this is useful for parameters that can be unset (optional)
+     *
+     * @tparam T
+     */
+    template <typename T>
+    struct ParamOptionalChanged
+    {
+        /// Type alias for the type of data
+        using TagType = std::optional<T>;
+    };
+
+    /**
      * @brief Core class for a setting parameter, this is a template class that
      * can be used for any type of setting parameter
      *
      * @tparam T
      */
     template <typename T>
-    class ParamCore
+    class ParamCore : Observable<
+                          DirtyChanged,
+                          ParamValueChanged<T>,
+                          ParamOptionalChanged<T>>
     {
        private:
-        /// Type alias for the templated change callback function, this is a
-        /// function pointer that takes a pointer to the user data and the new
-        /// value of the parameter, this is used to notify subscribers when the
-        /// parameter value changes
-        template <typename U>
-        using ChangedFnBase = void (*)(void*, const U&);
+        /// Type alias for the base class
+        using Base = Observable<
+            DirtyChanged,
+            ParamValueChanged<T>,
+            ParamOptionalChanged<T>>;
 
         /// Type alias for the change callback function for the parameter value,
         /// this is a function pointer that takes a pointer to the user data and
         /// the new value of the parameter, this is used to notify subscribers
         /// when the parameter value changes
-        using ChangedFn = ChangedFnBase<T>;
+        using ChangedFn = void (*)(void*, const T& newValue);
 
         /// Type alias for the change callback function for the optional
         /// parameter value, this is a function pointer that takes a pointer to
         /// the user data and the new optional value of the parameter, this is
         /// used to notify subscribers when the parameter value changes, this is
         /// useful for parameters that can be unset (optional)
-        using ChangedFnOptional = ChangedFnBase<std::optional<T>>;
+        using ChangedFnOptional =
+            void (*)(void*, const std::optional<T>& newValue);
 
-        /**
-         * @brief Subscriber struct for a setting parameter, this struct
-         * contains the callback function and the user data for a subscriber,
-         * this is used to notify subscribers of changes in the parameter value
-         */
-        template <typename U>
-        struct Subscriber
-        {
-            /// The callback function to call when the parameter value changes
-            ChangedFnBase<U> fn{};
-            /// A user-defined pointer that will be passed to the callback
-            void* user{};
-        };
+        /// Type alias for the change callback function for the dirty state of
+        /// the parameter, this is a function pointer that takes a pointer to
+        /// the user data and a boolean indicating whether the parameter is
+        /// dirty (has unsaved changes) or not, this is used to notify
+        /// subscribers when the dirty state of the parameter changes
+        using DirtyChangedFn = void (*)(void*, bool isDirty);
 
        private:
         /// type alias for ParamCoreSchema
@@ -107,34 +145,19 @@ namespace settings
         /// identified and unsubscribed when needed
         size_t _idCounter = 0;
 
-        /// The subscribers for changes in the parameter value, this is a map of
-        /// subscriber IDs to Subscriber structs, this allows for multiple
-        /// subscribers to be notified of changes in the parameter value
-        std::unordered_map<size_t, Subscriber<T>> _subscribers;
-
-        /// The subscribers for changes in the optional parameter value, this is
-        /// a map of subscriber IDs to Subscriber structs, this allows for
-        /// multiple subscribers to be notified of changes in the parameter
-        /// value, this is useful for parameters that can be unset (optional)
-        std::unordered_map<size_t, Subscriber<std::optional<T>>>
-            _optionalSubscribers;
-
        public:
         ParamCore() = delete;
-        ParamCore(const std::string& key, const std::string& title);
-        ParamCore(
-            const std::string& key,
-            const std::string& title,
-            const std::string& description
-        );
+        ParamCore(std::string key, std::string title);
+        ParamCore(std::string key, std::string title, std::string description);
 
         [[nodiscard]] const std::optional<T>& getOptional() const;
         [[nodiscard]] const T&                get() const;
         void                                  set(const T& value);
         void                                  unset();
 
-        Connection subscribeToOptional(ChangedFnOptional fn, void* user);
-        Connection subscribe(ChangedFn fn, void* user);
+        Connection subscribe(ChangedFn func, void* user);
+        Connection subscribeToOptional(ChangedFnOptional func, void* user);
+        Connection subscribeToDirty(DirtyChangedFn func, void* user);
 
         void commit();
 
@@ -152,17 +175,16 @@ namespace settings
         void               setRebootRequired(bool required);
         [[nodiscard]] bool isRebootRequired() const;
 
+        static void fromJson(
+            const nlohmann::json& jsonData,
+            ParamCore<T>&         param
+        );
         [[nodiscard]] nlohmann::json toJson() const;
-        static void fromJson(const nlohmann::json& j, ParamCore<T>& param);
 
        private:
-        [[nodiscard]] static bool _equals(const T& a, const T& b);
+        [[nodiscard]] static bool _equals(const T& lhs, const T& rhs);
 
         void _notifySubscribers();
-        template <typename U>
-        static void _disconnect(void* owner, std::size_t id);
-        template <typename U>
-        Connection _subscribe(ChangedFnBase<U> fn, void* user);
     };
 
 }   // namespace settings

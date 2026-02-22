@@ -20,8 +20,8 @@ namespace settings
      * @param title
      */
     template <typename T>
-    ParamCore<T>::ParamCore(const std::string& key, const std::string& title)
-        : _key(key), _title(title)
+    ParamCore<T>::ParamCore(std::string key, std::string title)
+        : _key(std::move(key)), _title(std::move(title))
     {
     }
 
@@ -35,11 +35,13 @@ namespace settings
      */
     template <typename T>
     ParamCore<T>::ParamCore(
-        const std::string& key,
-        const std::string& title,
-        const std::string& description
+        std::string key,
+        std::string title,
+        std::string description
     )
-        : _key(key), _title(title), _description(description)
+        : _key(std::move(key)),
+          _title(std::move(title)),
+          _description(std::move(description))
     {
     }
 
@@ -292,12 +294,12 @@ namespace settings
      * @brief Check if two values are equal, this is used for dirty checking
      *
      * @tparam T
-     * @param a
-     * @param b
+     * @param lhs
+     * @param rhs
      * @return true if the values are equal, false otherwise
      */
     template <typename T>
-    bool ParamCore<T>::_equals(const T& a, const T& b)
+    bool ParamCore<T>::_equals(const T& lhs, const T& rhs)
     {
         if constexpr (std::floating_point<T>)
         {
@@ -305,38 +307,13 @@ namespace settings
             // a small epsilon value of each other to account for precision
             // issues
             const auto epsilon = std::numeric_limits<T>::epsilon();
-            return std::abs(a - b) <= epsilon;
+            return std::abs(lhs - rhs) <= epsilon;
         }
         else
         {
             // For non-floating-point types, use regular equality
-            return a == b;
+            return lhs == rhs;
         }
-    }
-
-    /**
-     * @brief Disconnect a subscriber from the parameter, this is called by the
-     * Connection object when it is destroyed or when disconnect() is called on
-     * it
-     *
-     * @tparam T
-     * @param owner
-     * @param id
-     */
-    template <typename T>
-    template <typename U>
-    void ParamCore<T>::_disconnect(void* owner, std::size_t id)
-    {
-        auto* self = static_cast<ParamCore<T>*>(owner);
-
-        if constexpr (std::same_as<U, T>)
-            self->_subscribers.erase(id);
-        else if constexpr (std::same_as<U, std::optional<T>>)
-            self->_optionalSubscribers.erase(id);
-        else
-            static_assert(
-                std::same_as<U, T> || std::same_as<U, std::optional<T>>
-            );
     }
 
     /**
@@ -348,17 +325,9 @@ namespace settings
     template <typename T>
     void ParamCore<T>::_notifySubscribers()
     {
-        // Note: we use here a copy of the subscriber map to avoid issues when a
-        // subscriber is added or removed while we are notifying subscribers,
-        // this way we can safely iterate over the copy without worrying about
-        // concurrent modifications to the original map
-        const auto copy = _subscribers;
-        for (auto& [_, sub] : copy)
-            sub.fn(sub.user, get());
-
-        const auto copyOptional = _optionalSubscribers;
-        for (auto& [_, sub] : copyOptional)
-            sub.fn(sub.user, getOptional());
+        Base::template _emit<DirtyChanged>(isDirty());
+        Base::template _emit<ParamValueChanged<T>>(get());
+        Base::template _emit<ParamOptionalChanged<T>>(getOptional());
     }
 
     /**
@@ -380,7 +349,15 @@ namespace settings
     template <typename T>
     Connection ParamCore<T>::subscribe(ChangedFn func, void* user)
     {
-        return _subscribe<T>(func, user);
+        if (_isRebootRequired)
+        {
+            throw ParamException(
+                "Cannot subscribe to changes for parameter '" + _key +
+                "' because it requires a reboot to take effect"
+            );
+        }
+
+        return Base::template on<ParamValueChanged<T>>(func, user);
     }
 
     /**
@@ -405,19 +382,28 @@ namespace settings
         void*             user
     )
     {
-        return _subscribe<std::optional<T>>(func, user);
+        if (_isRebootRequired)
+        {
+            throw ParamException(
+                "Cannot subscribe to changes for parameter '" + _key +
+                "' because it requires a reboot to take effect"
+            );
+        }
+
+        return Base::template on<ParamOptionalChanged<T>>(func, user);
     }
 
     /**
-     * @brief Subscribe to changes in the parameter value, the provided callback
-     * function will be called whenever the value is changed or unset, the user
-     * pointer can be used to pass additional data to the callback function, the
-     * returned Connection object can be used to unsubscribe from changes
+     * @brief Subscribe to changes in the dirty state of the parameter, the
+     * provided callback function will be called whenever the dirty state
+     * changes, the user pointer can be used to pass additional data to the
+     * callback function, the returned Connection object can be used to
+     * unsubscribe from changes
      *
      * @tparam T
-     * @param fn The callback function to call when the parameter value changes,
-     * it should have the signature void(void* user, const std::optional<T>&
-     * newValue)
+     * @param func The callback function to call when the dirty state of the
+     * parameter changes, it should have the signature void(void* user, bool
+     * isDirty)
      * @param user A user-defined pointer that will be passed to the callback
      * function when it is called, this can be used to provide additional
      * context for the callback function
@@ -426,41 +412,9 @@ namespace settings
      * letting it go out of scope
      */
     template <typename T>
-    template <typename U>
-    Connection ParamCore<T>::_subscribe(ChangedFnBase<U> fn, void* user)
+    Connection ParamCore<T>::subscribeToDirty(DirtyChangedFn func, void* user)
     {
-        if (_isRebootRequired)
-            throw ParamException(
-                "Cannot subscribe to changes for parameter '" + _key +
-                "' because it requires a reboot to take effect"
-            );
-
-        const auto id = _idCounter++;
-
-        if (!fn)
-            throw std::invalid_argument("Callback function cannot be null");
-
-        if (_idCounter == 0)
-        {
-            // Handle the case where the id counter overflows and wraps around
-            // to 0 This is a very unlikely scenario, but we should still handle
-            // it to prevent potential issues with subscriber management
-            throw ParamException("Subscriber ID counter has overflowed");
-        }
-
-        if constexpr (std::same_as<U, T>)
-            _subscribers[id] = Subscriber{fn, user};
-        else if constexpr (std::same_as<U, std::optional<T>>)
-            _optionalSubscribers[id] = Subscriber{fn, user};
-        else
-            static_assert(
-                std::same_as<U, T> || std::same_as<U, std::optional<T>>,
-                "Callback function must have the signature void(void* user, "
-                "const T& newValue) or void(void* user, const "
-                "std::optional<T>& newValue)"
-            );
-
-        return Connection::make(this, id, &ParamCore<T>::_disconnect<U>);
+        return Base::template on<DirtyChanged>(func, user);
     }
 
 }   // namespace settings
