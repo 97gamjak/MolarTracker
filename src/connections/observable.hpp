@@ -3,6 +3,8 @@
 
 #include "signal.hpp"
 
+class Connection;   // Forward declaration
+
 /**
  * @brief Base class for observable objects that can emit signals for multiple
  * event tags, this class uses a tuple of signals to manage the different
