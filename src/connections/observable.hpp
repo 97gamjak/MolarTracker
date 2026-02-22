@@ -13,7 +13,7 @@
  *
  * @tparam Tags A variadic template parameter pack representing the different
  * event tags that the observable object can emit, each tag should have an
- * associated argument type defined as `arg_type` that will be passed to the
+ * associated argument type defined as `TagType` that will be passed to the
  * subscribers when the event is emitted.
  */
 template <typename... Tags>
