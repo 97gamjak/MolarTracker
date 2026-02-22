@@ -1,0 +1,34 @@
+PROJECT_NAME                         = "@PROJECT_NAME@"
+PROJECT_NUMBER                       = "@PROJECT_VERSION@"
+OUTPUT_DIRECTORY                     = "@DOXYGEN_OUTPUT_DIR@"
+GENERATE_HTML                        = YES
+GENERATE_LATEX                       = NO
+QUIET                                = YES
+WARNINGS                             = YES
+WARN_IF_UNDOCUMENTED                 = YES
+WARN_IF_DOC_ERROR                    = YES
+WARN_NO_PARAMDOC                     = YES
+WARN_AS_ERROR                        = YES
+EXTRACT_ALL                          = NO
+EXTRACT_PRIVATE                      = YES
+EXTRACT_STATIC                       = YES
+INTERNAL_DOCS                        = NO
+JAVADOC_AUTOBRIEF                    = YES
+QT_AUTOBRIEF                         = YES
+MULTILINE_CPP_IS_BRIEF               = YES
+INLINE_INHERITED_MEMB                = YES
+
+# Make missing @param, @return, etc. visible and fatal
+STRICT_PROTO_MATCHING                = YES
+
+# Input
+INPUT                                = "@DOXYGEN_INPUT@"
+FILE_PATTERNS                        = *.hpp *.h *.cpp *.tpp
+EXTENSION_MAPPING 					 = .tpp=C++
+RECURSIVE                            = YES
+
+# Typically exclude build + vcpkg + generated
+EXCLUDE_PATTERNS                     = */build/* */out/* */_deps/* */vcpkg_installed/* */.git/*
+
+# If you use markdown pages:
+MARKDOWN_SUPPORT                     = YES

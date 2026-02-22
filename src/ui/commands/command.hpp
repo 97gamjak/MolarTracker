@@ -18,12 +18,43 @@ namespace ui
        public:
         virtual ~ICommand() = default;
 
+        /**
+         * @brief Undo the command
+         *
+         * @return std::expected<void, CommandErrorPtr>
+         */
         virtual std::expected<void, CommandErrorPtr> undo() = 0;
+
+        /**
+         * @brief Redo the command
+         *
+         * @return std::expected<void, CommandErrorPtr>
+         */
         virtual std::expected<void, CommandErrorPtr> redo() = 0;
 
-        virtual std::string getLabel() const = 0;
+        /**
+         * @brief Get the label of the command, this is used to display the
+         * command in the undo/redo stack, this should be a user-friendly
+         * string that describes the command, for example "Add Profile" or
+         * "Delete Profile"
+         *
+         * @return std::string
+         */
+        [[nodiscard]] virtual std::string getLabel() const = 0;
+
+       protected:
+        friend class Commands;
+
+        template <typename CommandType, typename... Args>
+        static std::expected<std::unique_ptr<ICommand>, CommandErrorPtr> makeAndDo(
+            Args&&... args
+        );
     };
 
 }   // namespace ui
+
+#ifndef __UI__COMMANDS__COMMAND_TPP__
+#include "command.tpp"
+#endif   // __UI__COMMANDS__COMMAND_TPP__
 
 #endif   // __UI__COMMANDS__COMMAND_HPP__

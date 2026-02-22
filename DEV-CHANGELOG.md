@@ -4,6 +4,57 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Bug Fixes
+
+- Fix CI check for changes in CHANGELOG files
+
+### Features
+
+#### Commands
+
+- Introduce `Commands` class as a batch container for better serialization of sub-commands
+
+#### Utils
+
+- implement `SemVer` class for versioning
+
+#### Controllers
+
+- implement container like `Controllers` type to separate controller handling from main window
+
+#### Settings
+
+- Add `version` and `oldVersion` to `Settings`
+- Add `UISettings` including `LogViewerSettings`
+- Add `reloadIntervalSec` and `autoReload` to `LogViewerSettings`
+- Add generalized `Param...` handling for settings
+- Add `lineWrap` settings for log viewer dialog
+- Add variable to check if reboot is required to `ParamCore`
+- Add settings for ring file logging
+- Add subscription for default log level settings
+- Add runtime check if a subscription is for a `ParamCore` that needs restart -> throw `ParamException`
+
+#### Connections
+
+- Add first implementation for connecting subscribers to custom classes
+- Generalize subscription model by introducing `Observable` and `Signal` classes
+
+#### Factories
+
+- Introduce `ProfileFactory` for converting between Domain and Row
+
+#### CI
+
+- Add doxygen checks
+- Add cpp-checks and devops cpp checks
+- Add first ctest via googletest
+
+#### Testing
+
+- Adding unit tests for `Database` class
+- Adding unit tests for `Statement` class
+- Adding unit tests for `Transaction` class
+
 <!-- insertion marker -->
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 

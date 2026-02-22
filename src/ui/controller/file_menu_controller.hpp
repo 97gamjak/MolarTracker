@@ -8,11 +8,10 @@ namespace app
     class AppContext;   // Forward declaration
 }   // namespace app
 
-class QMainWindow;   // Forward declaration
-
 namespace ui
 {
-    class FileMenu;   // Forward declaration
+    class FileMenu;     // Forward declaration
+    class MainWindow;   // Forward declaration
 
     /**
      * @brief Binds the file menu actions to their respective functionalities.
@@ -23,8 +22,11 @@ namespace ui
         Q_OBJECT
 
        private:
-        QMainWindow&     _mainWindow;
-        FileMenu&        _fileMenu;
+        /// Reference to the main window
+        MainWindow& _mainWindow;
+        /// Reference to the file menu
+        FileMenu& _fileMenu;
+        /// Reference to the application context
         app::AppContext& _appContext;
 
        private slots:
@@ -33,7 +35,7 @@ namespace ui
 
        public:
         explicit FileMenuController(
-            QMainWindow&     mainWindow,
+            MainWindow&      mainWindow,
             FileMenu&        fileMenu,
             app::AppContext& appContext
         );

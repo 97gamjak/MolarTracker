@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QPointer>
 
-#include "logging/logging_base.hpp"
 #include "ui/widgets/logging/debug_slots_dialog.hpp"
+#include "ui/widgets/logging/log_viewer_dialog.hpp"
 
 namespace app
 {
@@ -16,10 +16,8 @@ class QMainWindow;   // Forward declaration
 
 namespace ui
 {
-    class DebugMenu;          // Forward declaration
-    class DebugSlotsDialog;   // Forward declaration
-    class LogViewerDialog;    // Forward declaration
-    class UndoStack;          // Forward declaration
+    class DebugMenu;   // Forward declaration
+    class UndoStack;   // Forward declaration
 
     /**
      * @brief Controller for the debug menu actions
@@ -30,13 +28,26 @@ namespace ui
         Q_OBJECT
 
        private:
-        QMainWindow&     _mainWindow;
-        DebugMenu&       _debugMenu;
+        /// References to the main window
+        QMainWindow& _mainWindow;
+        /// Reference to the debug menu
+        DebugMenu& _debugMenu;
+        /// Reference to the application context
         app::AppContext& _appContext;
-        UndoStack&       _undoStack;
+        /// Reference to the undo stack for executing commands
+        UndoStack& _undoStack;
+        /// Settings for the log viewer dialog
+        LogViewerDialog::Settings _logViewerSettings;
 
+        /// Pointer to the debug slots dialog, this is a QPointer to ensure that
+        /// we do not have a dangling pointer if the dialog is closed outside of
+        /// this controller
         QPointer<DebugSlotsDialog> _debugSlotsDialog;
-        QPointer<LogViewerDialog>  _logViewerDialog;
+
+        /// Pointer to the log viewer dialog, this is a QPointer to ensure that
+        /// we do not have a dangling pointer if the dialog is closed outside of
+        /// this controller
+        QPointer<LogViewerDialog> _logViewerDialog;
 
        private slots:
         void _onRequestDebugSlots();
@@ -60,6 +71,7 @@ namespace ui
         void _resetDefaultDebugFlags();
         void _applyDebugFlagChanges(const LogCategoryMap& categories);
         void _applyDebugFlagChangesAndClose(const LogCategoryMap& categories);
+        void _applyLogViewerSettings();
     };
 
 }   // namespace ui

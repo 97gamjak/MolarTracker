@@ -1,5 +1,5 @@
-#ifndef __UI__MENU_BAR__SETTINGS_MENU_HPP__
-#define __UI__MENU_BAR__SETTINGS_MENU_HPP__
+#ifndef __UI__WIDGETS__MENU_BAR__SETTINGS_MENU_HPP__
+#define __UI__WIDGETS__MENU_BAR__SETTINGS_MENU_HPP__
 
 #include <QObject>
 
@@ -18,11 +18,14 @@ namespace ui
         Q_OBJECT
 
        signals:
+        /// Signal emitted when the user requests to open the preferences dialog
         void requestPreferences();
 
        private:
+        /// Pointer to the settings menu widget
         QMenu* _settingsMenu = nullptr;
 
+        /// The preferences action in the settings menu
         QAction* _preferencesAction = nullptr;
 
        public:
@@ -31,4 +34,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__MENU_BAR__SETTINGS_MENU_HPP__
+#endif   // __UI__WIDGETS__MENU_BAR__SETTINGS_MENU_HPP__

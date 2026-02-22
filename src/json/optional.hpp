@@ -1,10 +1,11 @@
-#ifndef __CONFIG__JSON_HPP__
-#define __CONFIG__JSON_HPP__
+#ifndef __JSON__OPTIONAL_HPP__
+#define __JSON__OPTIONAL_HPP__
 
 #include <nlohmann/json.hpp>
 #include <optional>
 
 NLOHMANN_JSON_NAMESPACE_BEGIN
+
 /**
  * @brief Serializer for std::optional<T>
  *
@@ -13,6 +14,12 @@ NLOHMANN_JSON_NAMESPACE_BEGIN
 template <typename T>
 struct adl_serializer<std::optional<T>>
 {
+    /**
+     * @brief Serialize std::optional<T> to JSON
+     *
+     * @param j
+     * @param opt
+     */
     static void to_json(json& j, const std::optional<T>& opt)
     {
         if (opt.has_value())
@@ -21,6 +28,12 @@ struct adl_serializer<std::optional<T>>
             j = nullptr;
     }
 
+    /**
+     * @brief Deserialize std::optional<T> from JSON
+     *
+     * @param j
+     * @param opt
+     */
     static void from_json(const json& j, std::optional<T>& opt)
     {
         if (j.is_null())
@@ -31,4 +44,4 @@ struct adl_serializer<std::optional<T>>
 };
 NLOHMANN_JSON_NAMESPACE_END
 
-#endif   // __CONFIG__JSON_HPP__
+#endif   // __JSON__OPTIONAL_HPP__

@@ -1,5 +1,5 @@
-#ifndef __UI__MENU_BAR__MENU_BAR_HPP__
-#define __UI__MENU_BAR__MENU_BAR_HPP__
+#ifndef __UI__WIDGETS__MENU_BAR__MENU_BAR_HPP__
+#define __UI__WIDGETS__MENU_BAR__MENU_BAR_HPP__
 
 #include <QMenuBar>
 #include <QObject>
@@ -24,11 +24,16 @@ namespace ui
         Q_OBJECT
 
        private:
-        FileMenu     _fileMenu;
-        EditMenu     _editMenu;
-        DebugMenu    _debugMenu;
+        /// File menu
+        FileMenu _fileMenu;
+        /// Edit menu
+        EditMenu _editMenu;
+        /// Debug menu
+        DebugMenu _debugMenu;
+        /// Settings menu
         SettingsMenu _settingsMenu;
-        HelpMenu     _helpMenu;
+        /// Help menu
+        HelpMenu _helpMenu;
 
        public:
         explicit MenuBar(QWidget* parent = nullptr);
@@ -42,4 +47,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__MENU_BAR__MENU_BAR_HPP__
+#endif   // __UI__WIDGETS__MENU_BAR__MENU_BAR_HPP__

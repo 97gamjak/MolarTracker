@@ -50,31 +50,31 @@ namespace ui
     /**
      * @brief Create a CommandErrorPtr for NothingToUndo error
      *
-     * @return std::unique_ptr<CommandError>
+     * @return CommandErrorPtr
      */
-    std::unique_ptr<CommandError> CommandError::makeNothingToUndoErrorPtr()
+    CommandErrorPtr CommandError::makeNothingToUndoErrorPtr()
     {
-        return std::make_unique<CommandError>(Type::NothingToUndo);
+        return std::make_shared<CommandError>(Type::NothingToUndo);
     }
 
     /**
      * @brief Create a CommandErrorPtr for NothingToRedo error
      *
-     * @return std::unique_ptr<CommandError>
+     * @return CommandErrorPtr
      */
-    std::unique_ptr<CommandError> CommandError::makeNothingToRedoErrorPtr()
+    CommandErrorPtr CommandError::makeNothingToRedoErrorPtr()
     {
-        return std::make_unique<CommandError>(Type::NothingToRedo);
+        return std::make_shared<CommandError>(Type::NothingToRedo);
     }
 
     /**
      * @brief Create a CommandErrorPtr for InvalidCommand error
      *
-     * @return std::unique_ptr<CommandError>
+     * @return CommandErrorPtr
      */
-    std::unique_ptr<CommandError> CommandError::makeInvalidCommandErrorPtr()
+    CommandErrorPtr CommandError::makeInvalidCommandErrorPtr()
     {
-        return std::make_unique<CommandError>(Type::InvalidCommand);
+        return std::make_shared<CommandError>(Type::InvalidCommand);
     }
 
 }   // namespace ui

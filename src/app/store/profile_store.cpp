@@ -1,4 +1,4 @@
-#include "store/profile_store.hpp"
+#include "profile_store.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -7,7 +7,6 @@
 
 #include "drafts/profile_draft.hpp"
 #include "services_api/i_profile_service.hpp"
-#include "store/profile_store.hpp"
 
 #define __LOG_CATEGORY__ LogCategory::app_store_ProfileStore
 #include "logging/log_macros.hpp"
@@ -47,11 +46,10 @@ namespace app
      */
     bool ProfileStore::hasProfiles() const
     {
-        for (const auto& profile : _profiles)
-            if (!_isDeleted(profile.getId()))
-                return true;
+        auto isNotDeleted = [this](const auto& pair)
+        { return pair.second != StoreState::Deleted; };
 
-        return false;
+        return std::ranges::any_of(_profileStates, isNotDeleted);
     }
 
     /**
@@ -66,8 +64,10 @@ namespace app
         std::vector<std::string> names;
 
         for (const auto& profile : _profiles)
+        {
             if (!_isDeleted(profile.getId()))
                 names.push_back(profile.getName());
+        }
 
         return names;
     }
@@ -76,7 +76,6 @@ namespace app
      * @brief Set the active profile by name
      *
      * @param name
-     * @return ProfileStoreResult
      */
     void ProfileStore::setActiveProfile(std::optional<std::string_view> name)
     {
@@ -89,7 +88,7 @@ namespace app
         const auto profile = getProfile(name.value());
         if (!profile)
         {
-            // TODO: make here MT specific error handling for stores
+            // TODO(97gamjak): make here MT specific error handling for stores
             // https://97gamjak.atlassian.net/browse/MOLTRACK-88
             throw std::runtime_error(
                 std::format("Profile '{}' not found", name.value())
@@ -98,6 +97,12 @@ namespace app
 
         _activeProfileId = profile->getId();
     }
+
+    /**
+     * @brief Unset the active profile, leaving no profile active
+     *
+     */
+    void ProfileStore::unsetActiveProfile() { _activeProfileId.reset(); }
 
     /**
      * @brief Check if there is an active profile set
@@ -142,7 +147,7 @@ namespace app
      * @return true
      * @return false
      */
-    bool ProfileStore::hasPendingChanges() const
+    bool ProfileStore::isDirty() const
     {
         return std::ranges::any_of(
             _profileStates,
@@ -176,7 +181,7 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
     {
-        const auto profile = _findProfile(name);
+        auto profile = _findProfile(name);
 
         if (profile.has_value() && _isDeleted(profile->getId()))
             return std::nullopt;
@@ -199,11 +204,26 @@ namespace app
     }
 
     /**
+     * @brief Check if a profile with the same name as the given profile
+     * exists
+     *
+     * @note Ignores profiles marked as deleted
+     *
+     * @param profile
+     * @return true
+     * @return false
+     */
+    bool ProfileStore::profileExists(const Profile& profile) const
+    {
+        return profileExists(profile.getName());
+    }
+
+    /**
      * @brief Add a new profile to the store
      *
-     * @note If a profile with the same name exists and is marked as deleted,
-     * it will be restored and updated with the new draft information.
-     * Otherwise, a new profile will be created.
+     * @note If a profile with the same name exists and is marked as
+     * deleted, it will be restored and updated with the new draft
+     * information. Otherwise, a new profile will be created.
      *
      * @param draft
      * @return ProfileStoreResult
@@ -212,6 +232,8 @@ namespace app
         const drafts::ProfileDraft& draft
     )
     {
+        _markPotentiallyDirty();
+
         const auto profileOpt = _findProfile(draft.name);
 
         if (profileOpt.has_value() && !_isDeleted(profileOpt->getId()))
@@ -238,7 +260,8 @@ namespace app
     /**
      * @brief Remove a profile from the store
      *
-     * @note Marks the profile as deleted; actual removal occurs during commit
+     * @note Marks the profile as deleted; actual removal occurs during
+     * commit
      *
      * @param draft
      * @return ProfileStoreResult
@@ -247,6 +270,8 @@ namespace app
         const drafts::ProfileDraft& draft
     )
     {
+        _markPotentiallyDirty();
+
         const auto profile = _findProfile(draft.name);
 
         if (!profile.has_value())
@@ -258,7 +283,8 @@ namespace app
             _activeProfileId.reset();
         }
 
-        // if the profile is new and not yet committed, just remove it entirely
+        // if the profile is new and not yet committed, just remove it
+        // entirely
         if (_profileStates[profile->getId()] == StoreState::New)
         {
             _removeInternal(profile->getId());
@@ -294,120 +320,110 @@ namespace app
     }
 
     /**
+     * @brief Commit a new profile to the underlying service
+     *
+     * @param profile
+     */
+    void ProfileStore::_commitNewProfile(const Profile& profile)
+    {
+        const auto& name  = profile.getName();
+        const auto& email = profile.getEmail();
+        const auto  newId = _profileService.create(name, email);
+        const auto  oldId = profile.getId();
+
+        if (newId != oldId)
+        {
+            _profileStates.erase(oldId);
+            _usedIds.erase(oldId);
+            _profileStates.emplace(newId, StoreState::Clean);
+            _usedIds.insert(newId);
+
+            // Update the active profile ID if it was pointing to the old ID
+            if (_activeProfileId.has_value() &&
+                _activeProfileId.value() == oldId)
+            {
+                _activeProfileId = newId;
+            }
+        }
+        else
+        {
+            _profileStates[profile.getId()] = StoreState::Clean;
+        }
+
+        LOG_INFO(
+            std::format("Profile '{}' saved to database", profile.getName())
+        );
+    }
+
+    /**
+     * @brief Commit a modified profile to the underlying service
+     *
+     * @param profile
+     */
+    void ProfileStore::_commitModifiedProfile(const Profile& profile)
+    {
+        const auto& name  = profile.getName();
+        const auto& email = profile.getEmail();
+        const auto  id    = profile.getId();
+
+        _profileService.update(id, name, email);
+        _profileStates[id] = StoreState::Clean;
+
+        LOG_INFO(
+            std::format("Profile '{}' updated in database", profile.getName())
+        );
+    }
+
+    /**
+     * @brief Commit a deleted profile to the underlying service
+     *
+     * @param profile
+     */
+    void ProfileStore::_commitDeletedProfile(const Profile& profile)
+    {
+        const auto id = profile.getId();
+
+        _profileService.remove(id);
+        _usedIds.erase(id);
+        _profileStates.erase(id);
+        _removeInternal(id);
+
+        LOG_INFO(
+            std::format("Profile '{}' removed from database", profile.getName())
+        );
+    }
+
+    /**
      * @brief Commit all pending changes to the underlying service
      *
      */
     void ProfileStore::commit()
     {
-        if (!hasPendingChanges())
+        if (!isDirty())
         {
             LOG_DEBUG("No changes to save in ProfileStore");
             return;
         }
 
-        for (auto& p : _profiles)
+        for (auto& profile : _profiles)
         {
-            if (_profileStates[p.getId()] == StoreState::New)
+            switch (_profileStates[profile.getId()])
             {
-                const auto name  = p.getName();
-                const auto email = p.getEmail();
-                const auto newId = _profileService.create(name, email);
-
-                if (newId != p.getId())
-                {
-                    _profileStates.erase(p.getId());
-                    _usedIds.erase(p.getId());
-                    _profileStates.emplace(newId, StoreState::Clean);
-                    _usedIds.insert(newId);
-                    p.setId(newId);
-                    if (_activeProfileId.has_value() &&
-                        _activeProfileId.value() == p.getId())
-                    {
-                        _activeProfileId = newId;
-                    }
-                }
-                else
-                    _profileStates[p.getId()] = StoreState::Clean;
-
-                LOG_INFO(
-                    std::format("Profile '{}' saved to database", p.getName())
-                );
-
-                continue;
+                case StoreState::New:
+                    _commitNewProfile(profile);
+                    break;
+                case StoreState::Modified:
+                    _commitModifiedProfile(profile);
+                    break;
+                case StoreState::Deleted:
+                    _commitDeletedProfile(profile);
+                    break;
+                case StoreState::Clean:
+                    break;
             }
-
-            if (_profileStates[p.getId()] == StoreState::Modified)
-            {
-                const auto name  = p.getName();
-                const auto email = p.getEmail();
-
-                _profileService.update(p.getId(), name, email);
-                _profileStates[p.getId()] = StoreState::Clean;
-
-                LOG_INFO(
-                    std::format("Profile '{}' updated in database", p.getName())
-                );
-                continue;
-            }
-
-            if (_profileStates[p.getId()] == StoreState::Deleted)
-            {
-                _profileService.remove(p.getId());
-                _usedIds.erase(p.getId());
-                _profileStates.erase(p.getId());
-
-                LOG_INFO(
-                    std::format(
-                        "Profile '{}' removed from database",
-                        p.getName()
-                    )
-                );
-                continue;
-            }
-            _profileStates[p.getId()] = StoreState::Clean;
         }
 
         reload();
-    }
-
-    /**
-     * @brief Normalize a profile name for comparison
-     *
-     * @note Trims whitespace and converts to lowercase for case-insensitive
-     * comparison
-     *
-     * @param name
-     * @return std::string
-     */
-    std::string ProfileStore::_normalizeName(std::string_view name)
-    {
-        // TODO: clean this up
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-89
-        //  Policy: trim + case-insensitive
-        //  If you want case-sensitive, remove the tolower part.
-        std::size_t start = 0;
-        while (start < name.size() &&
-               std::isspace(static_cast<unsigned char>(name[start])))
-            ++start;
-
-        std::size_t end = name.size();
-        while (end > start &&
-               std::isspace(static_cast<unsigned char>(name[end - 1])))
-            --end;
-
-        std::string result;
-        result.reserve(end - start);
-
-        for (std::size_t i = start; i < end; ++i)
-        {
-            result.push_back(
-                static_cast<char>(
-                    std::tolower(static_cast<unsigned char>(name[i]))
-                )
-            );
-        }
-
-        return result;
     }
 
     /**
@@ -435,6 +451,7 @@ namespace app
     bool ProfileStore::_isDeleted(ProfileId id) const
     {
         const auto it = _profileStates.find(id);
+
         if (it == _profileStates.end())
             return false;
 
@@ -449,10 +466,7 @@ namespace app
      */
     std::optional<Profile> ProfileStore::_findProfile(ProfileId id) const
     {
-        const auto it = std::ranges::find_if(
-            _profiles,
-            [id](const Profile& p) { return p.getId() == id; }
-        );
+        const auto it = std::ranges::find_if(_profiles, HasProfileId{id});
 
         if (it == _profiles.end())
             return std::nullopt;
@@ -470,13 +484,7 @@ namespace app
         std::string_view name
     ) const
     {
-        const std::string normalized = _normalizeName(name);
-
-        const auto it = std::ranges::find_if(
-            _profiles,
-            [&normalized](const Profile& p)
-            { return _normalizeName(p.getName()) == normalized; }
-        );
+        const auto it = std::ranges::find_if(_profiles, HasProfileName{name});
 
         if (it == _profiles.end())
             return std::nullopt;
@@ -491,14 +499,9 @@ namespace app
      */
     void ProfileStore::_removeInternal(ProfileId id)
     {
-        _profiles.erase(
-            std::remove_if(
-                _profiles.begin(),
-                _profiles.end(),
-                [id](const Profile& p) { return p.getId() == id; }
-            ),
-            _profiles.end()
-        );
+        auto [beg, end] = std::ranges::remove_if(_profiles, HasProfileId{id});
+
+        _profiles.erase(beg, end);
     }
 
     /**
@@ -508,17 +511,11 @@ namespace app
      */
     void ProfileStore::_removeInternal(std::string_view name)
     {
-        const std::string normalized = _normalizeName(name);
+        using std::ranges::remove_if;
 
-        _profiles.erase(
-            std::remove_if(
-                _profiles.begin(),
-                _profiles.end(),
-                [&normalized, this](const Profile& p)
-                { return _normalizeName(p.getName()) == normalized; }
-            ),
-            _profiles.end()
-        );
+        auto [beg, end] = remove_if(_profiles, HasProfileName{name});
+
+        _profiles.erase(beg, end);
     }
 
     /**
@@ -529,9 +526,9 @@ namespace app
      * @param newEmail
      */
     void ProfileStore::_updateInternal(
-        ProfileId                  id,
-        std::string_view           newName,
-        std::optional<std::string> newEmail
+        ProfileId                         id,
+        std::string_view                  newName,
+        const std::optional<std::string>& newEmail
     )
     {
         for (auto& profile : _profiles)

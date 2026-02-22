@@ -1,5 +1,6 @@
 #include "main_window.hpp"
 
+#include <QApplication>
 #include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
@@ -8,8 +9,7 @@
 #include <QVBoxLayout>
 
 #include "app/app_context.hpp"
-#include "domain/profile.hpp"
-#include "drafts/profile_draft.hpp"
+#include "config/constants.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
@@ -19,22 +19,54 @@
 namespace ui
 {
 
-    MainWindow::MainWindow(app::AppContext& appContext, QWidget* parent)
-        : QMainWindow{parent}, _appContext{appContext}
+    /**
+     * @brief Construct a new Main Window:: Main Window object
+     *
+     * @param appContext
+     * @param controllers
+     * @param parent
+     */
+    MainWindow::MainWindow(
+        app::AppContext& appContext,
+        Controllers&     controllers,
+        QWidget*         parent
+    )
+        : QMainWindow{parent},
+          _appContext{appContext},
+          _controllers{controllers},
+          _dirtyStateController(
+              std::make_unique<DirtyStateController>(
+                  _appContext.getStore(),
+                  _appContext.getSettings(),
+                  this
+              )
+          )
     {
-        setWindowTitle("Molar Tracker");
+        setWindowTitle(false);
         resize(5000, 3000);
         _buildUI();
-
-        _ensureProfileExists();
     }
 
+    /**
+     * @brief Start the main window (show it)
+     *
+     */
+    void MainWindow::start() { _ensureProfileExists(); }
+
+    /**
+     * @brief Build the UI of the main window
+     *
+     */
     void MainWindow::_buildUI()
     {
         _buildMenuBar();
         _buildCentral();
     }
 
+    /**
+     * @brief Build the menu bar and its controllers
+     *
+     */
     void MainWindow::_buildMenuBar()
     {
         _menuBar = new MenuBar{this};
@@ -70,6 +102,10 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Build the central widget of the main window
+     *
+     */
     void MainWindow::_buildCentral()
     {
         auto* root = new QWidget{this};
@@ -87,6 +123,11 @@ namespace ui
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
     }
 
+    /**
+     * @brief Ensure that a profile exists, and if not, prompt the user to
+     * create one
+     *
+     */
     void MainWindow::_ensureProfileExists()
     {
         _ensureProfileController = std::make_unique<EnsureProfileController>(
@@ -96,6 +137,24 @@ namespace ui
         );
 
         _ensureProfileController->ensureProfileExists();
+    }
+
+    /**
+     * @brief Set the window title of the main window, this will append a
+     * warning to the title if there are unsaved changes in the application
+     *
+     * @param isDirty Whether there are unsaved changes
+     */
+    void MainWindow::setWindowTitle(const bool& isDirty)
+    {
+        QApplication::setApplicationDisplayName("");
+        auto baseTitle = Constants::getAppDisplayName();
+
+        if (isDirty)
+            baseTitle += " *** unsaved changes ***";
+
+        const auto name = QString::fromStdString(baseTitle);
+        QMainWindow::setWindowTitle(name);
     }
 
 }   // namespace ui

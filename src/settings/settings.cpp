@@ -3,20 +3,20 @@
 #include <filesystem>
 #include <fstream>
 
-#include "config/json.hpp"   // IWYU pragma: keep
+#include "params/params.hpp"
 
 namespace settings
 {
     using std::filesystem::absolute;
-    using std::filesystem::path;
 
     /**
      * @brief Construct a new Settings:: Settings object
      *
      * @param configDir
      */
-    Settings::Settings(const path& configDir)
-        : _settingsPath{absolute(configDir / _settingsFileName)}
+    Settings::Settings(const std::filesystem::path& configDir)
+        : _core{SettingsSchema::SETTINGS_KEY, SettingsSchema::SETTINGS_TITLE, SettingsSchema::SETTINGS_DESC},
+          _settingsPath{absolute(configDir / _settingsFileName)}
     {
         _fromJson();
     }
@@ -25,53 +25,58 @@ namespace settings
      * @brief Save settings to the JSON file
      *
      */
-    void Settings::save() const { _toJson(); }
-
-    /**
-     * @brief Check if a default profile is set
-     *
-     * @return true
-     * @return false
-     */
-    bool Settings::hasDefaultProfile() const
+    void Settings::save()
     {
-        return _defaultProfileName.has_value();
+        _toJson();
+        commit();
     }
 
     /**
-     * @brief Get the default profile name
+     * @brief Get the GeneralSettings object
      *
-     * @return std::optional<std::string>
+     * @return GeneralSettings&
      */
-    std::optional<std::string> Settings::getDefaultProfileName() const
+    GeneralSettings& Settings::getGeneralSettings() { return _generalSettings; }
+
+    /**
+     * @brief Get the GeneralSettings object (const version)
+     *
+     * @return const GeneralSettings&
+     */
+    const GeneralSettings& Settings::getGeneralSettings() const
     {
-        return _defaultProfileName;
+        return _generalSettings;
     }
 
     /**
-     * @brief Unset the default profile name
+     * @brief Get the UISettings object
      *
+     * @return UISettings&
      */
-    void Settings::unsetDefaultProfileName() { _defaultProfileName.reset(); }
+    UISettings& Settings::getUISettings() { return _uiSettings; }
 
     /**
-     * @brief Set the default profile name
+     * @brief Get the UISettings object (const version)
      *
-     * @param name
+     * @return const UISettings&
      */
-    void Settings::setDefaultProfileName(const std::optional<std::string>& name)
-    {
-        _defaultProfileName = name;
-    }
+    const UISettings& Settings::getUISettings() const { return _uiSettings; }
 
     /**
-     * @brief Set the default profile name
+     * @brief Get the LoggingSettings object
      *
-     * @param name
+     * @return LoggingSettings&
      */
-    void Settings::setDefaultProfileName(const std::string& name)
+    LoggingSettings& Settings::getLoggingSettings() { return _loggingSettings; }
+
+    /**
+     * @brief Get the LoggingSettings object (const version)
+     *
+     * @return const LoggingSettings&
+     */
+    const LoggingSettings& Settings::getLoggingSettings() const
     {
-        _defaultProfileName = name;
+        return _loggingSettings;
     }
 
     /**
@@ -80,12 +85,11 @@ namespace settings
      */
     void Settings::_toJson() const
     {
-        nlohmann::json jsonData;
-        jsonData[_defaultProfileNameKey] = _defaultProfileName;
-
         std::ofstream file{_settingsPath.string()};
         if (file.is_open())
         {
+            nlohmann::json jsonData = toJson();
+
             file << jsonData.dump(4);
             file.close();
         }
@@ -103,8 +107,7 @@ namespace settings
             nlohmann::json jsonData;
             file >> jsonData;
 
-            _defaultProfileName =
-                jsonData.value(_defaultProfileNameKey, _defaultProfileName);
+            fromJson(jsonData, *this);
 
             file.close();
         }

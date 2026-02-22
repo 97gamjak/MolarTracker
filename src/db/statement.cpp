@@ -251,7 +251,7 @@ namespace db
     {
         _ensureValid();
 
-        auto const* bytes      = sqlite3_column_text(_statement, col);
+        auto const* bytes     = sqlite3_column_text(_statement, col);
         const auto  byteCount = sqlite3_column_bytes(_statement, col);
 
         if (bytes == nullptr || byteCount <= 0)
@@ -263,6 +263,11 @@ namespace db
         };
     }
 
+    /**
+     * @brief get the native sqlite3_stmt handle (for advanced use cases)
+     *
+     * @return sqlite3_stmt*
+     */
     sqlite3_stmt* Statement::nativeHandle() const { return _statement; }
 
     //
@@ -271,12 +276,26 @@ namespace db
     //
     //
 
+    /**
+     * @brief ensure that the statement is valid (i.e., statement handle is not
+     * null) and throw an exception if it is not
+     *
+     */
     void Statement::_ensureValid() const
     {
         if (_statement == nullptr)
             throw SqliteError("Statement is not valid");
     }
 
+    /**
+     * @brief generate a SqliteError with a detailed error message based on the
+     * given operation and result code
+     *
+     * @param operation The name of the SQLite operation that failed (e.g.,
+     * "step", "reset", etc.)
+     * @param result The SQLite result code returned by the failed operation
+     * @return SqliteError with a detailed error message
+     */
     SqliteError Statement::_generateError(
         const std::string_view operation,
         const int              result
@@ -300,6 +319,11 @@ namespace db
         return SqliteError(msg);
     }
 
+    /**
+     * @brief move the resources from another Statement object to this one
+     *
+     * @param other The other Statement object to move from
+     */
     void Statement::_moveFrom(Statement&& other)
     {
         _db           = other._db;
@@ -311,6 +335,11 @@ namespace db
         other._sqlForErrors.clear();
     }
 
+    /**
+     * @brief finalize the statement by resetting and finalizing the native
+     * sqlite3_stmt handle, and clearing the SQL string for errors
+     *
+     */
     void Statement::_finalize()
     {
         if (_statement != nullptr)

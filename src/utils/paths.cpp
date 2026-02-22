@@ -6,6 +6,8 @@
 #include <string>
 #endif
 
+#include <algorithm>
+
 namespace utils
 {
 
@@ -95,23 +97,26 @@ namespace utils
         if (s.front() == ' ' || s.back() == ' ')
             return false;
 
-        for (const auto& ch : s)
+        auto isCharInvalid = [](unsigned char c)
         {
-            const auto uch = static_cast<unsigned char>(ch);
+            // Control chars
+            if (c < 0x20 || c == 0x7F)
+                return true;
 
-            // control chars
-            if (uch < 0x20 || uch == 0x7F)
-                return false;
-
-            // path separators / traversal enablers
-            if (uch == '/' || uch == '\\')
-                return false;
+            // Path separators / traversal enablers
+            if (c == '/' || c == '\\')
+                return true;
 
             // Windows reserved characters (also safe to ban on Linux)
-            if (uch == '<' || uch == '>' || uch == ':' || uch == '"' ||
-                uch == '|' || uch == '?' || uch == '*')
-                return false;
-        }
+            if (c == '<' || c == '>' || c == ':' || c == '"' || c == '|' ||
+                c == '?' || c == '*')
+                return true;
+
+            return false;
+        };
+
+        if (std::ranges::any_of(s, isCharInvalid))
+            return false;
 
         // Disallow "." or ".." exactly
         if (s == "." || s == "..")

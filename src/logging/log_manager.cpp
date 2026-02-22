@@ -2,8 +2,9 @@
 
 #include <format>
 
+#include "config/logging_base.hpp"
 #include "log_object.hpp"
-#include "logging_base.hpp"
+#include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
 #include "utils/timestamp.hpp"
 
@@ -27,21 +28,23 @@ LogManager::LogManager() { _categories = getDefaultCategories(); }
 /**
  * @brief Initializes the ring file logger
  *
+ * @param settings Logging settings containing the configuration for the ring
+ * file logger
  * @param directory Directory where the log files will be stored
  */
 void LogManager::initializeRingFileLogger(
-    const std::filesystem::path& directory
+    const settings::LoggingSettings& settings,
+    const std::filesystem::path&     directory
 )
 {
-    RingFile::Config config;
-    _logDirectory    = directory / "logs";
-    config.directory = _logDirectory;
-    config.baseName  = "molar_tracker_" + Timestamp::fileSafe();
-    config.extension = ".log";
+    RingFileConfig config;
 
-    // TODO(97gamjak): add here all possible logging stuff including name of the
-    // file!
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-83
+    config.directory = directory / settings.getLogDirectory();
+    config.baseName  = settings.getLogFilePrefix() + Timestamp::fileSafe();
+    config.extension = settings.getLogFileSuffix();
+    config.maxFiles  = settings.getMaxLogFiles();
+    config.maxSizeMB = settings.getMaxLogFileSizeMB();
+
     _ringFile = RingFile(config);
 }
 
@@ -57,7 +60,7 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
     // https://97gamjak.atlassian.net/browse/MOLTRACK-84
     std::unordered_map<LogCategory, LogLevel> defaultCategories;
     for (const auto category : LogCategoryMeta::values)
-        defaultCategories[category] = LogLevel::Info;
+        defaultCategories[category] = _defaultLogLevel;
 
     return defaultCategories;
 }
@@ -140,12 +143,7 @@ std::unordered_map<LogCategory, LogLevel> LogManager::getCategories() const
 /**
  * @brief Log a message
  *
- * @param level
- * @param category
- * @param file
- * @param line
- * @param function
- * @param message
+ * @param logObject The log object containing the log message and metadata
  */
 void LogManager::log(const LogObject& logObject)
 {
@@ -199,4 +197,15 @@ std::string LogManager::_logLevelToString(const LogLevel& level) const
     const auto cleanLevelStr = "<" + levelStr + ">:";
 
     return std::vformat(format, std::make_format_args(cleanLevelStr));
+}
+
+/**
+ * @brief Set the default log level, this is used to update the default log
+ * level when the corresponding setting is changed
+ *
+ * @param level
+ */
+void LogManager::setDefaultLogLevel(const LogLevel& level)
+{
+    _defaultLogLevel = level;
 }

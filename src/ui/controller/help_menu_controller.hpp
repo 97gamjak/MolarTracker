@@ -18,8 +18,10 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// Reference to the main window
         QMainWindow& _mainWindow;
-        HelpMenu&    _helpMenu;
+        /// Reference to the help menu
+        HelpMenu& _helpMenu;
 
        private slots:
         void _onAboutRequested();

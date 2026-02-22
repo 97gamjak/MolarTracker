@@ -6,25 +6,23 @@
 
 /**
  * @brief Base class for all application exceptions
+ *
+ * This class serves as the base for all exceptions thrown within the Molar
+ * Tracker application. It inherits from std::exception and provides a
+ * constructor that accepts a message string, which can be retrieved using the
+ * what() method. This allows for consistent exception handling and messaging
+ * throughout the application.
+ *
  */
 class MolarTrackerException : public std::exception
 {
    private:
+    /// The error message associated with the exception
     std::string _message;
 
    public:
-    /**
-     * @brief Constructs a new Molar Tracker Exception object
-     *
-     * @param message The exception message
-     */
     explicit MolarTrackerException(const std::string& message);
 
-    /**
-     * @brief Returns the exception message
-     *
-     * @return const char* The exception message
-     */
     const char* what() const noexcept override;
 };
 

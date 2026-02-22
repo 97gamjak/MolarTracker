@@ -1,5 +1,5 @@
-#ifndef __APP__SERVICES__PROFILE_SERVICE_IMPL_HPP__
-#define __APP__SERVICES__PROFILE_SERVICE_IMPL_HPP__
+#ifndef __APP__SERVICES__PROFILE_SERVICE_HPP__
+#define __APP__SERVICES__PROFILE_SERVICE_HPP__
 
 #include <optional>
 #include <vector>
@@ -18,6 +18,7 @@ namespace app
     class ProfileService : public IProfileService
     {
        private:
+        /// reference to the Profile repository
         IProfileRepo& _profileRepo;
 
        public:
@@ -42,4 +43,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__SERVICES__PROFILE_SERVICE_IMPL_HPP__
+#endif   // __APP__SERVICES__PROFILE_SERVICE_HPP__

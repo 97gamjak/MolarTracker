@@ -24,20 +24,33 @@ namespace orm
     class Field
     {
        private:
+        /// The value of the field
         Value _value{};
 
        public:
-        using value_type                   = Value;
+        /// Type alias for the field's value type
+        using value_type = Value;
+
+        /// The name of the field as a fixed string
         static constexpr fixed_string name = Name;
 
-        // clang-format off
-        static constexpr bool isPk                = has_option_v<primary_key_t, Options...>;
-        static constexpr bool isAutoIncrement    = has_option_v<auto_increment_t, Options...>;
-        static constexpr bool isAutoIncrementPk = isPk && isAutoIncrement;
-        static constexpr bool isUnique            = has_option_v<unique_t, Options...>;
-        static constexpr bool isNullable          = is_nullable_v<Value, Options...>;
-        // clang-format on
+        /// Compile-time flag indicating whether this field is a primary key
+        static constexpr bool isPk = has_option_v<primary_key_t, Options...>;
 
+        /// Compile-time flag indicating whether this field is auto-incremented
+        static constexpr bool isAutoIncrement =
+            has_option_v<auto_increment_t, Options...>;
+
+        /// Compile-time flag indicating whether this field is a unique key
+        static constexpr bool isAutoIncrementPk = isPk && isAutoIncrement;
+
+        /// Compile-time flag indicating whether this field is unique
+        static constexpr bool isUnique = has_option_v<unique_t, Options...>;
+
+        /// Compile-time flag indicating whether this field is nullable
+        static constexpr bool isNullable = is_nullable_v<Value, Options...>;
+
+       public:
         Field() = default;
         explicit Field(Value value);
 

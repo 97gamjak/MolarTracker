@@ -22,43 +22,6 @@ message(STATUS "WIN32                   = ${WIN32}")
 
 qt_standard_project_setup()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Werror
-
-        # correctness
-        -Wshadow
-        -Wconversion
-        -Wsign-conversion
-        -Wcast-align
-        -Wformat=2
-        -Wnull-dereference
-        -Wdouble-promotion
-        -Wimplicit-fallthrough
-        -Woverloaded-virtual
-        -Wnon-virtual-dtor
-        -Wold-style-cast
-        -Wuseless-cast
-        -Wduplicated-cond
-        -Wduplicated-branches
-        -Wlogical-op
-        -Wmisleading-indentation
-
-        # lifetime / safety
-        -Wuninitialized
-        -Wmaybe-uninitialized
-        -Winit-self
-
-        # switch needs to check all enum values
-        -Wswitch-enum
-
-        -Wno-error=deprecated-declarations
-    )
-endif()
-
 if (MSVC)
     message(STATUS "Adding MSVC specific compile options")
     add_compile_options(/Zc:preprocessor)
@@ -75,6 +38,9 @@ add_compile_definitions(
     MOLARTRACKER_DESKTOP_APP_NAME=\"${PROJECT_NAME}\"
     MOLARTRACKER_GIT_TAG=\"${MOLARTRACKER_GIT_TAG}\"
 )
+
+include(CTest)          # enables BUILD_TESTING option + testing infrastructure
+enable_testing()
 
 add_subdirectory(src)
 
@@ -96,4 +62,16 @@ if(NOT DEFINED WIN32)
             "$ENV{HOME}/.local/share/applications/${PROJECT_NAME}.desktop"
     VERBATIM
     )
+endif()
+
+option(MOLARTRACKER_ENABLE_DOCS OFF)
+
+if(MOLARTRACKER_ENABLE_DOCS)
+  include(cmake/doxygen.cmake)
+endif()
+
+option(MOLARTRACKER_ENABLE_TESTING ON)
+
+if(MOLARTRACKER_ENABLE_TESTING)
+  add_subdirectory(tests)
 endif()

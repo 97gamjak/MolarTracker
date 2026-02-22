@@ -64,7 +64,7 @@ std::filesystem::path Constants::getDataPath() const { return _dataPath; }
  */
 std::filesystem::path Constants::getDatabasePath() const
 {
-    return _dataPath / _databaseFile;
+    return _dataPath / ConstantsSchema::_databaseFile;
 }
 
 /**
@@ -72,28 +72,49 @@ std::filesystem::path Constants::getDatabasePath() const
  *
  * @return const std::string
  */
-const std::string Constants::getAppName() { return _appName; }
+const std::string Constants::getAppName() { return ConstantsSchema::_appName; }
+
+/**
+ * @brief Get the application display name, this is the name that is shown in
+ * the title bar of the application, it includes the application name and
+ * version
+ *
+ * @return const std::string
+ */
+const std::string Constants::getAppDisplayName()
+{
+    return getAppName() + " " + getVersion();
+}
 
 /**
  * @brief Get the directory prefix used for config and data directories
  *
  * @return const std::string
  */
-const std::string Constants::getDirPrefix() { return _dirPrefix; }
+const std::string Constants::getDirPrefix()
+{
+    return ConstantsSchema::_dirPrefix;
+}
 
 /**
  * @brief Get the desktop application name
  *
  * @return const std::string
  */
-const std::string Constants::getDesktopAppName() { return _desktopAppName; }
+const std::string Constants::getDesktopAppName()
+{
+    return ConstantsSchema::_desktopAppName;
+}
 
 /**
  * @brief Get the GitHub repository URL
  *
  * @return const std::string
  */
-const std::string Constants::getGithubRepoUrl() { return _githubRepoUrl; }
+const std::string Constants::getGithubRepoUrl()
+{
+    return ConstantsSchema::_githubRepoUrl;
+}
 
 /**
  * @brief Get the GitHub issues URL
@@ -102,7 +123,7 @@ const std::string Constants::getGithubRepoUrl() { return _githubRepoUrl; }
  */
 const std::string Constants::getGithubIssuesUrl()
 {
-    return std::string(_githubRepoUrl) + "/issues";
+    return std::string(ConstantsSchema::_githubRepoUrl) + "/issues";
 }
 
 /**
@@ -110,4 +131,11 @@ const std::string Constants::getGithubIssuesUrl()
  *
  * @return const std::string
  */
-const std::string Constants::getVersion() { return _version; }
+const std::string Constants::getVersion() { return ConstantsSchema::_version; }
+
+/**
+ * @brief Get the Git tag corresponding to the current version
+ *
+ * @return const std::string
+ */
+const std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }

@@ -12,8 +12,11 @@ namespace db
     class Transaction
     {
        private:
+        /// Pointer to the Database instance (not owned by this class)
         Database* _db{nullptr};
-        bool      _isActive{false};
+
+        /// Flag to indicate whether the transaction is currently active
+        bool _isActive{false};
 
        public:
         explicit Transaction(Database& db, bool immediate = true);

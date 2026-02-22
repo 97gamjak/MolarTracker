@@ -3,10 +3,11 @@
 
 #include <stdexcept>
 #include <string>
-#include <utility>
 
 namespace orm
 {
+    // TODO: use here MolarTracker's own exception hierarchy, e.g. by deriving
+    // from a base MolarTrackerException class
     /**
      * @brief Exception type for ORM-related errors
      *
@@ -14,10 +15,7 @@ namespace orm
     class ORMError : public std::runtime_error
     {
        public:
-        explicit ORMError(const std::string message)
-            : std::runtime_error(message)
-        {
-        }
+        explicit ORMError(const std::string& message);
     };
 
 }   // namespace orm

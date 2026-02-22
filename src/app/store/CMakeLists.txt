@@ -1,4 +1,5 @@
 add_library(molartracker_app_store STATIC
+    i_store.cpp
     profile_store.cpp
 )
 
@@ -11,4 +12,5 @@ target_link_libraries(molartracker_app_store
     PUBLIC
         molartracker_config
         molartracker_logging
+        molartracker_app_domain
 )

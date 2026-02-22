@@ -1,7 +1,10 @@
-#ifndef __UI__PROFILE__ADD_PROFILE_DLG_HPP__
-#define __UI__PROFILE__ADD_PROFILE_DLG_HPP__
+#ifndef __UI__WIDGETS__PROFILE__ADD_PROFILE_DLG_HPP__
+#define __UI__WIDGETS__PROFILE__ADD_PROFILE_DLG_HPP__
 
 #include <QDialog>
+
+#include "ui/widgets/validators/email_line_edit.hpp"
+#include "ui/widgets/validators/name_line_edit.hpp"
 
 namespace drafts
 {
@@ -36,25 +39,42 @@ namespace ui
         Q_OBJECT
 
        private:
-        app::ProfileStore&  _profileStore;
+        /// Reference to the profile store
+        app::ProfileStore& _profileStore;
+        /// Reference to the settings
         settings::Settings& _settings;
-        UndoStack&          _undoStack;
-        bool                _enforceDefaultProfile = false;
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
 
-        QVBoxLayout* _mainLayout           = nullptr;
-        QLineEdit*   _nameLineEdit         = nullptr;
-        QLineEdit*   _emailLineEdit        = nullptr;
-        QPushButton* _addButton            = nullptr;
-        QPushButton* _cancelButton         = nullptr;
-        QCheckBox*   _setActiveCheckBox    = nullptr;
-        QCheckBox*   _setAsDefaultCheckBox = nullptr;
+        /// Whether to enforce a default profile
+        bool _enforceDefaultProfile = false;
+
+        /// Flag to prevent emitting cancel action multiple times when the
+        /// dialog is closed without adding a profile
+        bool _canBeClosed = true;
+
+        /// ptr to the main layout of the dialog
+        QVBoxLayout* _mainLayout = nullptr;
+        /// Line edit for the profile name
+        NameLineEdit* _nameLineEdit = nullptr;
+        /// Line edit for the profile email
+        EmailLineEdit* _emailLineEdit = nullptr;
+        /// Button to add the profile
+        QPushButton* _addButton = nullptr;
+        /// Button to cancel the operation
+        QPushButton* _cancelButton = nullptr;
+        /// Checkbox to set the profile as active
+        QCheckBox* _setActiveCheckBox = nullptr;
+        /// Checkbox to set the profile as default
+        QCheckBox* _setAsDefaultCheckBox = nullptr;
 
        public:
         explicit AddProfileDialog(
             app::ProfileStore&  profileStore,
             settings::Settings& settings,
             UndoStack&          undoStack,
-            QWidget*            parent = nullptr
+            bool                canBeClosed = true,
+            QWidget*            parent      = nullptr
         );
 
         void setEnforceDefaultProfile(bool value);
@@ -64,6 +84,10 @@ namespace ui
 
         void showNameAlreadyExistsError();
 
+        /**
+         * @brief Enum class for actions in the add profile dialog
+         *
+         */
         enum class Action
         {
             Ok,
@@ -71,13 +95,20 @@ namespace ui
         };
 
        signals:
+        /**
+         * @brief QT signal for when an action is performed in the add profile
+         * dialog
+         *
+         * @param action
+         * @param profile
+         */
         void requested(
             const Action&               action,
             const drafts::ProfileDraft& profile
         );
 
        protected:
-        void closeEvent(QCloseEvent* event) override;
+        void reject() override;
 
        private:
         void _buildUI();
@@ -96,4 +127,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__PROFILE__ADD_PROFILE_DLG_HPP__
+#endif   // __UI__WIDGETS__PROFILE__ADD_PROFILE_DLG_HPP__

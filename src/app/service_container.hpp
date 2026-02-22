@@ -17,6 +17,7 @@ namespace app
     class ServiceContainer
     {
        private:
+        /// The Profile service
         ProfileService _profileService;
 
        public:

@@ -2,6 +2,20 @@ qt_add_executable(MolarTracker
     main.cpp
 )
 
+add_library(json INTERFACE)
+
+target_include_directories(json
+    INTERFACE
+        ${CMAKE_SOURCE_DIR}/external/json/single_include
+)
+
+add_library(mstd INTERFACE)
+
+target_include_directories(mstd
+    INTERFACE
+        ${CMAKE_SOURCE_DIR}/external/mstd/include
+)
+
 add_subdirectory(config)
 add_subdirectory(logging)
 add_subdirectory(utils)
@@ -13,6 +27,8 @@ add_subdirectory(app)
 add_subdirectory(ui)
 add_subdirectory(exceptions)
 add_subdirectory(settings)
+add_subdirectory(json)
+add_subdirectory(connections)
 
 target_link_libraries(MolarTracker
     PRIVATE 
@@ -27,6 +43,8 @@ target_link_libraries(MolarTracker
     molartracker_utils
     molartracker_exceptions
     molartracker_settings
+    molartracker_json
+    molartracker_connections
 )
 
 set_target_properties(MolarTracker PROPERTIES
@@ -44,3 +62,40 @@ set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
     ${CMAKE_BINARY_DIR}/bin
 )
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(MolarTracker PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+
+        # correctness
+        -Wshadow
+        -Wconversion
+        -Wsign-conversion
+        -Wcast-align
+        -Wformat=2
+        -Wnull-dereference
+        -Wdouble-promotion
+        -Wimplicit-fallthrough
+        -Woverloaded-virtual
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Wuseless-cast
+        -Wduplicated-cond
+        -Wduplicated-branches
+        -Wlogical-op
+        -Wmisleading-indentation
+
+        # lifetime / safety
+        -Wuninitialized
+        -Wmaybe-uninitialized
+        -Winit-self
+
+        # switch needs to check all enum values
+        -Wswitch-enum
+
+        -Wno-error=deprecated-declarations
+    )
+endif()

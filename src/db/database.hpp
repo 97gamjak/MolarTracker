@@ -19,22 +19,25 @@ namespace db
     class Database
     {
        private:
-        sqlite3*    _db{nullptr};
+        /// The native SQLite database handle
+        sqlite3* _db{nullptr};
+
+        /// The path to the database file
         std::string _dbPath{};
 
        public:
         Database() = delete;
-        explicit Database(const std::filesystem::path& db_path);
+        explicit Database(const std::filesystem::path& dbPath);
 
         ~Database();
 
         Database(Database const&)            = delete;
         Database& operator=(Database const&) = delete;
 
-        Database(Database&& other);
-        Database& operator=(Database&& other);
+        Database(Database&& other) noexcept;
+        Database& operator=(Database&& other) noexcept;
 
-        void open(const std::string& db_path);
+        void open(const std::string& dbPath);
         void close();
 
         [[nodiscard]] bool     isOpen() const;

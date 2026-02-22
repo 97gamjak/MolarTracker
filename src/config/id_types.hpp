@@ -1,5 +1,5 @@
-#ifndef __APP__CONFIG__ID_TYPES_HPP__
-#define __APP__CONFIG__ID_TYPES_HPP__
+#ifndef __CONFIG__ID_TYPES_HPP__
+#define __CONFIG__ID_TYPES_HPP__
 
 #include "config/strong_id.hpp"
 
@@ -8,4 +8,4 @@ struct ProfileTag {};
 using ProfileId = StrongId<ProfileTag>;
 // clang-format on
 
-#endif   // __APP__CONFIG__ID_TYPES_HPP__
+#endif   // __CONFIG__ID_TYPES_HPP__

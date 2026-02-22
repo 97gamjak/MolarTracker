@@ -12,7 +12,6 @@ NamespaceIndentation: All
 AllowShortFunctionsOnASingleLine: All
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortCaseExpressionOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortEnumsOnASingleLine: true

@@ -1,5 +1,5 @@
-#ifndef __UI__MENU_BAR__FILE_MENU_HPP__
-#define __UI__MENU_BAR__FILE_MENU_HPP__
+#ifndef __UI__WIDGETS__MENU_BAR__FILE_MENU_HPP__
+#define __UI__WIDGETS__MENU_BAR__FILE_MENU_HPP__
 
 #include <QObject>
 
@@ -18,13 +18,18 @@ namespace ui
         Q_OBJECT
 
        signals:
+        /// Signal emitted when the user requests to save
         void requestSave();
+        /// Signal emitted when the user requests to quit
         void requestQuit();
 
        private:
+        /// Pointer to the file menu widget
         QMenu* _fileMenu = nullptr;
 
+        /// The save action in the file menu
         QAction* _saveAction = nullptr;
+        /// The quit action in the file menu
         QAction* _quitAction = nullptr;
 
        public:
@@ -33,4 +38,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__MENU_BAR__FILE_MENU_HPP__
+#endif   // __UI__WIDGETS__MENU_BAR__FILE_MENU_HPP__

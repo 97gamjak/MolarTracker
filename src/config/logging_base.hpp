@@ -1,9 +1,11 @@
-#ifndef __LOGGING__LOGGING_BASE_HPP__
-#define __LOGGING__LOGGING_BASE_HPP__
+#ifndef __CONFIG__LOGGING_BASE_HPP__
+#define __CONFIG__LOGGING_BASE_HPP__
 
 #include <cstddef>
 #include <mstd/enum.hpp>
 #include <unordered_map>
+
+// NOLINTBEGIN
 
 #define LOG_CATEGORY(X)           \
     X(app_service_profileService) \
@@ -17,9 +19,12 @@
     X(ui_profileSelectionDialog)  \
     X(database)                   \
     X(logging_manager)            \
+    X(settings)                   \
+    X(undoStack)                  \
     X(application)
 
-MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
+// cppcheck-suppress syntaxError
+MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
 
 #define LOG_LEVEL(X) \
     X(Off, 0)        \
@@ -29,27 +34,11 @@ MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY)
     X(Debug)         \
     X(Trace)
 
-MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL)
+// cppcheck-suppress syntaxError
+MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL);
 
-/**
- * @brief Returns the index of the given LogLevel in LogLevelMeta::values
- *
- * @TODO: make this part of LogLevelMeta
- * https://97gamjak.atlassian.net/browse/MOLTRACK-82
- *
- * @param level LogLevel to find
- * @return std::optional<size_t> Index of the LogLevel, or std::nullopt if not
- * found
- */
-inline std::optional<size_t> indexOfLogLevel(LogLevel level)
-{
-    for (size_t i = 0; i < LogLevelMeta::size; ++i)
-        if (LogLevelMeta::values[i] == level)
-            return i;
-
-    return std::nullopt;
-}
+// NOLINTEND
 
 using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
-#endif   // __LOGGING__LOGGING_BASE_HPP__
+#endif   // __CONFIG__LOGGING_BASE_HPP__

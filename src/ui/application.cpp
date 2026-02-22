@@ -14,12 +14,14 @@ namespace ui
         : QApplication(argc, argv)
     {
         const auto appName = QString::fromStdString(Constants::getAppName());
+        const auto version = QString::fromStdString(Constants::getVersion());
         const auto desktopAppName =
             QString::fromStdString(Constants::getDesktopAppName());
-        const auto version = QString::fromStdString(Constants::getVersion());
+        const auto appDisplayName =
+            QString::fromStdString(Constants::getAppDisplayName());
 
         setApplicationName(appName);
-        setApplicationDisplayName(appName + " " + version);
+        setApplicationDisplayName(appDisplayName);
         setApplicationVersion(version);
 
         setDesktopFileName(desktopAppName);

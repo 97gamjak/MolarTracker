@@ -1,5 +1,5 @@
-#ifndef __UI__MENU_BAR__EDIT_MENU_HPP__
-#define __UI__MENU_BAR__EDIT_MENU_HPP__
+#ifndef __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__
+#define __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__
 
 #include <QObject>
 
@@ -18,13 +18,18 @@ namespace ui
         Q_OBJECT
 
        signals:
+        /// Signal emitted when the user requests to undo an action
         void requestUndo();
+        /// Signal emitted when the user requests to redo an action
         void requestRedo();
 
        private:
+        /// The edit menu widget
         QMenu* _editMenu = nullptr;
 
+        /// The undo action in the edit menu
         QAction* _undoAction = nullptr;
+        /// The redo action in the edit menu
         QAction* _redoAction = nullptr;
 
        public:
@@ -38,4 +43,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__MENU_BAR__EDIT_MENU_HPP__
+#endif   // __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__

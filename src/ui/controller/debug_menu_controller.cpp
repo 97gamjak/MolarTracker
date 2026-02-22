@@ -25,6 +25,7 @@ namespace ui
      * @param mainWindow
      * @param debugMenu
      * @param appContext
+     * @param undoStack
      */
     DebugMenuController::DebugMenuController(
         QMainWindow&     mainWindow,
@@ -151,10 +152,14 @@ namespace ui
      */
     void DebugMenuController::_ensureLogViewerDialog()
     {
-        if (_logViewerDialog)
+        if (_logViewerDialog != nullptr)
             return;
 
-        _logViewerDialog = new LogViewerDialog{&_mainWindow};
+        _applyLogViewerSettings();
+
+        _logViewerDialog =
+            new LogViewerDialog{_logViewerSettings, &_mainWindow};
+
         _logViewerDialog->setModal(false);
     }
 
@@ -174,13 +179,18 @@ namespace ui
     /**
      * @brief Discard debug flag changes and reset to current values
      *
+     * This is used when there was an error while applying the changes, to reset
+     * the dialog to the current values and avoid leaving it in an inconsistent
+     * state.
+     *
+     * @param categories The current debug flag categories to reset to
+     *
      */
     void DebugMenuController::_applyDebugFlagChanges(
         const LogCategoryMap& categories
     )
     {
-        const auto result =
-            _undoStack.makeAndDo<UpdateDebugFlagsCommand>(categories);
+        auto result = Commands::makeAndDo<UpdateDebugFlagsCommand>(categories);
 
         if (!result)
         {
@@ -202,6 +212,8 @@ namespace ui
             return;
         }
 
+        _undoStack.push(std::move(result).value());
+
         _debugSlotsDialog->setCategories(categories);
     }
 
@@ -216,6 +228,20 @@ namespace ui
     {
         _applyDebugFlagChanges(categories);
         _debugSlotsDialog->accept();
+    }
+
+    /**
+     * @brief Apply log viewer settings to the dialog
+     *
+     */
+    void DebugMenuController::_applyLogViewerSettings()
+    {
+        const auto& settings =
+            _appContext.getSettings().getUISettings().getLogViewerSettings();
+
+        _logViewerSettings.setAutoReload(settings.isAutoReloadEnabled());
+        _logViewerSettings.setIntervalSec(settings.getReloadIntervalSec());
+        _logViewerSettings.setLineWrap(settings.isLineWrapEnabled());
     }
 
 }   // namespace ui

@@ -12,7 +12,7 @@
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "settings/settings.hpp"
-#include "ui/commands/add_profile_command.hpp"
+#include "ui/commands/profile/add_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -25,18 +25,22 @@ namespace ui
      * @param profileStore Reference to the Profile Store
      * @param settings Reference to the Settings
      * @param undoStack Reference to the Undo Stack
+     * @param canBeClosed Whether the dialog can be closed without adding a
+     * profile
      * @param parent Parent widget
      */
     AddProfileDialog::AddProfileDialog(
         app::ProfileStore&  profileStore,
         settings::Settings& settings,
         UndoStack&          undoStack,
+        bool                canBeClosed,
         QWidget*            parent
     )
         : QDialog{parent},
           _profileStore{profileStore},
           _settings{settings},
-          _undoStack{undoStack}
+          _undoStack{undoStack},
+          _canBeClosed{canBeClosed}
     {
         setWindowTitle("Add New Profile");
         resize(400, 200);
@@ -53,6 +57,7 @@ namespace ui
     {
         QDialog::setModal(true);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _mainLayout = new QVBoxLayout{this};
 
         _buildFormSection();
@@ -68,12 +73,32 @@ namespace ui
      */
     void AddProfileDialog::_buildFormSection()
     {
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         auto* formLayout = new QFormLayout{};
-        _nameLineEdit    = new QLineEdit{this};
-        formLayout->addRow(new QLabel{"Name:"}, _nameLineEdit);
 
-        _emailLineEdit = new QLineEdit{this};
-        formLayout->addRow(new QLabel{"Email:"}, _emailLineEdit);
+        auto* nameErrorLabel = new QLabel{this};
+        _nameLineEdit        = new NameLineEdit{this};
+        _nameLineEdit->setRequired(true);
+        _nameLineEdit->attachErrorLabel(nameErrorLabel);
+        auto* nameContainer = new QWidget{this};
+        auto* nameLayout    = new QVBoxLayout{nameContainer};
+        nameLayout->setContentsMargins(0, 0, 0, 0);
+        nameLayout->setSpacing(2);
+        nameLayout->addWidget(_nameLineEdit);
+        nameLayout->addWidget(nameErrorLabel);
+        formLayout->addRow(new QLabel{"Name*:"}, nameContainer);
+
+        auto* emailErrorLabel = new QLabel{this};
+        _emailLineEdit        = new EmailLineEdit{this};
+        _emailLineEdit->attachErrorLabel(emailErrorLabel);
+        auto* emailContainer = new QWidget{this};
+        auto* emailLayout    = new QVBoxLayout{emailContainer};
+        emailLayout->setContentsMargins(0, 0, 0, 0);
+        emailLayout->setSpacing(2);
+        emailLayout->addWidget(_emailLineEdit);
+        emailLayout->addWidget(emailErrorLabel);
+        formLayout->addRow(new QLabel{"Email:"}, emailContainer);
+        // NOLINTEND(cppcoreguidelines-owning-memory)
 
         _mainLayout->addLayout(formLayout);
     }
@@ -84,11 +109,14 @@ namespace ui
      */
     void AddProfileDialog::_buildToggleSection()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* toggleLayout = new QHBoxLayout{};
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _setActiveCheckBox = new QCheckBox{"Set as Active Profile", this};
         toggleLayout->addWidget(_setActiveCheckBox);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _setAsDefaultCheckBox = new QCheckBox{"Set as Default Profile", this};
         toggleLayout->addWidget(_setAsDefaultCheckBox);
 
@@ -106,10 +134,22 @@ namespace ui
      */
     void AddProfileDialog::_buildButtonSection()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout{};
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _addButton = new QPushButton{"Add Profile", this};
-        buttonLayout->addWidget(_addButton);
+
+        // check the validity of the input to enable or disable the add button
+        _addButton->setEnabled(false);
+        connect(
+            _nameLineEdit,
+            &NameLineEdit::validityChanged,
+            _addButton,
+            &QPushButton::setEnabled
+        );
+
+        // connect the add button to emit the Ok action with the profile draft
         connect(
             _addButton,
             &QPushButton::clicked,
@@ -117,14 +157,20 @@ namespace ui
             &AddProfileDialog::_emitOk
         );
 
-        _cancelButton = new QPushButton{"Cancel", this};
-        buttonLayout->addWidget(_cancelButton);
-        connect(
-            _cancelButton,
-            &QPushButton::clicked,
-            this,
-            &AddProfileDialog::_emitCancel
-        );
+        buttonLayout->addWidget(_addButton);
+
+        if (_canBeClosed)
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+            _cancelButton = new QPushButton{"Cancel", this};
+            buttonLayout->addWidget(_cancelButton);
+            connect(
+                _cancelButton,
+                &QPushButton::clicked,
+                this,
+                &AddProfileDialog::_emitCancel
+            );
+        }
 
         _mainLayout->addLayout(buttonLayout);
     }
@@ -169,15 +215,9 @@ namespace ui
      */
     void AddProfileDialog::showNameAlreadyExistsError()
     {
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setWindowTitle("Profile Name Already Exists");
-        msgBox.setText(
-            "A profile with the same name already exists. Please choose a "
-            "different name."
+        _nameLineEdit->setExternalError(
+            "A profile with the same name already exists."
         );
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
     }
 
     /**
@@ -188,8 +228,8 @@ namespace ui
     drafts::ProfileDraft AddProfileDialog::_getProfile() const
     {
         return drafts::ProfileDraft{
-            _nameLineEdit->text().toStdString(),
-            _emailLineEdit->text().toStdString()
+            .name  = _nameLineEdit->text().toStdString(),
+            .email = _emailLineEdit->text().toStdString()
         };
     }
 
@@ -218,7 +258,6 @@ namespace ui
      * @brief emit the requested signal with the given action and profile draft
      *
      * @param action
-     * @param profileDraft
      */
     void AddProfileDialog::_emit(const Action& action)
     {
@@ -228,28 +267,27 @@ namespace ui
     /**
      * @brief emit the requested signal with the Ok action and profile draft
      *
-     * @param action
-     * @param profileDraft
      */
     void AddProfileDialog::_emitOk() { _emit(Action::Ok); }
 
     /**
      * @brief emit the requested signal with the Cancel action
      *
-     * @param action
-     * @param profileDraft
      */
     void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
 
     /**
-     * @brief handle the close event, emit the cancel action
+     * @brief Handle the close event of the dialog. If the dialog is closed
+     * without adding a profile, emit the cancel action.
      *
-     * @param event
      */
-    void AddProfileDialog::closeEvent(QCloseEvent* event)
+    void AddProfileDialog::reject()
     {
-        QDialog::closeEvent(event);
-        _emitCancel();
+        if (_canBeClosed)
+        {
+            _emitCancel();
+            QDialog::reject();
+        }
     }
 
 }   // namespace ui

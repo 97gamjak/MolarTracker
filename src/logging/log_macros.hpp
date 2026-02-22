@@ -1,6 +1,8 @@
 #ifndef __LOGGING__LOG_MACROS_HPP__
 #define __LOGGING__LOG_MACROS_HPP__
 
+#include <iostream>   // IWYU pragma: keep
+
 #include "log_entry_scope.hpp"   // IWYU pragma: keep
 #include "log_manager.hpp"       // IWYU pragma: keep
 #include "log_object.hpp"        // IWYU pragma: keep
@@ -20,11 +22,13 @@
 #endif
 // clang-format on
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-do-while)
 #define LOG(logObject)                              \
     do                                              \
     {                                               \
         LogManager::getInstance().log((logObject)); \
     } while (0)
+// NOLINTEND(cppcoreguidelines-avoid-do-while)
 
 #define LOG_TRACE_OBJECT(message)   LOG_OBJECT(LogLevel::Trace, message)
 #define LOG_DEBUG_OBJECT(message)   LOG_OBJECT(LogLevel::Debug, message)
@@ -41,5 +45,7 @@
 #define LOG_ENTRY LogEntryScope __logEntryScope__(LOG_TRACE_OBJECT(""))
 #define LOG_TIMED_ENTRY \
     TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
+
+#define MT_DEBUG std::cerr
 
 #endif   // __LOGGING__LOG_MACROS_HPP__

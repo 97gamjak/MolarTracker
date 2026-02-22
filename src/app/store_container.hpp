@@ -1,6 +1,7 @@
-#ifndef __APP__STORE__STORE_CONTAINER_HPP__
-#define __APP__STORE__STORE_CONTAINER_HPP__
+#ifndef __APP__STORE_CONTAINER_HPP__
+#define __APP__STORE_CONTAINER_HPP__
 
+#include "config/signal_tags.hpp"
 #include "store/profile_store.hpp"
 
 namespace app
@@ -15,22 +16,27 @@ namespace app
     class StoreContainer
     {
        private:
-        ProfileStore         _profileStore;
-        std::vector<IStore*> _allStores{
-            &_profileStore,
-        };
+        /// The Profile store
+        ProfileStore _profileStore;
+
+        /// list of all stores
+        std::vector<IStore*> _allStores;
 
        public:
-        StoreContainer(ServiceContainer& services);
+        explicit StoreContainer(ServiceContainer& services);
 
         void commit();
+        void clearPotentiallyDirty();
 
-        // clang-format off
-        ProfileStore&       getProfileStore() { return _profileStore; }
-        const ProfileStore& getProfileStore() const { return _profileStore; }
-        // clang-format on
+        std::vector<Connection> subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        );
+
+        ProfileStore&       getProfileStore();
+        const ProfileStore& getProfileStore() const;
     };
 
 }   // namespace app
 
-#endif   // __APP__STORE__STORE_CONTAINER_HPP__
+#endif   // __APP__STORE_CONTAINER_HPP__

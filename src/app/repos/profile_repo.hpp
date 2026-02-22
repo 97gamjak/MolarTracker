@@ -1,11 +1,10 @@
-#ifndef __APP__REPOS__DB_PROFILE_REPO_HPP__
-#define __APP__REPOS__DB_PROFILE_REPO_HPP__
+#ifndef __APP__REPOS__PROFILE_REPO_HPP__
+#define __APP__REPOS__PROFILE_REPO_HPP__
 
 #include <optional>
 #include <vector>
 
 #include "repos_api/i_profile_repo.hpp"
-#include "sql_models/profile_row.hpp"
 
 namespace db
 {
@@ -22,6 +21,7 @@ namespace app
     class ProfileRepo : public IProfileRepo
     {
        private:
+        /// reference to the database instance
         db::Database& _db;
 
        public:
@@ -45,8 +45,11 @@ namespace app
         ) override;
 
         void remove(ProfileId id) override;
+
+       private:
+        void _ensureSchema();
     };
 
 }   // namespace app
 
-#endif   // __APP__REPOS__DB_PROFILE_REPO_HPP__
+#endif   // __APP__REPOS__PROFILE_REPO_HPP__

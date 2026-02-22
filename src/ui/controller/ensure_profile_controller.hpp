@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
+#include "ui/commands/commands.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
 
@@ -19,10 +20,6 @@ namespace drafts
     struct ProfileDraft;   // Forward declaration
 }
 
-// TODO: implement this via a settings value that has a max number of checks
-// predefined
-constexpr std::size_t MAX_PROFILE_CHECKS = 10;
-
 namespace ui
 {
     class UndoStack;   // Forward declaration
@@ -34,14 +31,29 @@ namespace ui
     class EnsureProfileController : public QObject
     {
         Q_OBJECT
+       private:
+        /// Maximum number of times to check for a valid profile before giving
+        /// up and showing an error message, this is to prevent infinite loops
+        /// in case of unexpected issues with profile creation or selection
+        static constexpr std::size_t MAX_PROFILE_CHECKS = 10;
 
        private:
-        QMainWindow&                     _mainWindow;
-        app::AppContext&                 _appContext;
-        UndoStack&                       _undoStack;
-        std::size_t                      _callCount = MAX_PROFILE_CHECKS;
+        /// Reference to the main window
+        QMainWindow& _mainWindow;
+        /// Reference to the application context
+        app::AppContext& _appContext;
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
+
+        /// Pointer to the profile selection dialog
         QPointer<ProfileSelectionDialog> _profileSelectionDialog;
-        QPointer<AddProfileDialog>       _addProfileDialog;
+        /// Pointer to the add profile dialog
+        QPointer<AddProfileDialog> _addProfileDialog;
+
+        /// Command for ensuring profile existence, this command will contain
+        /// the sub-commands for setting the default profile, setting the active
+        /// profile and adding a new profile if needed
+        Commands _ensureProfileExistsCommand{"Ensure Profile Exists Command"};
 
        public:
         explicit EnsureProfileController(
@@ -63,11 +75,12 @@ namespace ui
         );
 
        private:
-        void _defaultProfileExists();
+        void _defaultProfileExists(const std::string& defaultProfile);
         void _noDefaultProfile();
-        void _relaunch();
         void _showAddProfileDialog();
         void _showProfileSelectionDialog();
+        void _fatalError(const std::string& message);
+        bool _activateProfile(const std::string& name);
     };
 
 }   // namespace ui

@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "command.hpp"
-#include "logging/logging_base.hpp"
+#include "config/logging_base.hpp"
 
 namespace ui
 {
@@ -15,11 +15,13 @@ namespace ui
     class UpdateDebugFlagsCommand : public ICommand
     {
        private:
+        /// The old categories before the update
         LogCategoryMap _oldCategories;
+        /// The new categories after the update
         LogCategoryMap _categories;
 
        public:
-        UpdateDebugFlagsCommand(const LogCategoryMap& categories);
+        explicit UpdateDebugFlagsCommand(const LogCategoryMap& categories);
         ~UpdateDebugFlagsCommand() override = default;
 
         std::expected<void, CommandErrorPtr> undo() override;

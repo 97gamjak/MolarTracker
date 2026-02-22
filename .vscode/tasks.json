@@ -1,0 +1,74 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cppcheck",
+            "type": "process",
+            "command": "cppcheck",
+            "args": [
+                "--project=${workspaceFolder}/.build/compile_commands.json",
+                "--file-filter=${workspaceFolder}/src/*",
+                "--quiet",
+                "--enable=all",
+                "--enable=performance",
+                "--enable=style",
+                "--enable=information",
+                "--enable=portability",
+                "--error-exitcode=1",
+                "--suppressions-list=${workspaceFolder}/.cppcheck",
+                "--inline-suppr",
+                "--inconclusive",
+                "--library=qt",
+                "-I${workspaceFolder}/external/mstd/include",
+                "-I${workspaceFolder}/src"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": {
+                "owner": "cppcheck",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s*(error|warning|style|performance|portability):\\s*(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            },
+            "group": "build"
+        },
+        {
+            "label": "clang-tidy",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "set -euo pipefail; find \"${workspaceFolder}/src\" -type f -name '*.cpp' -print0 | xargs -0 clang-tidy --config-file=\"${workspaceFolder}/.clang-tidy\" -checks='*' --warnings-as-errors='*' --header-filter=\"^${workspaceFolder}/(src|include)/\" -p \"${workspaceFolder}/.build\""
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "clang-tidy",
+                    "fileLocation": [
+                        "absolute"
+                    ],
+                    "pattern": {
+                        "regexp": "^(.*?):(\\d+):(\\d+):\\s*(warning|error|note):\\s*(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": "build"
+        }
+    ]
+}

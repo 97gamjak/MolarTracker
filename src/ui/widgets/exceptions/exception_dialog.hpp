@@ -1,5 +1,5 @@
-#ifndef __UI__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
-#define __UI__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
+#ifndef __UI__WIDGETS__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
+#define __UI__WIDGETS__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
 
 #include <QDialog>
 #include <QString>
@@ -28,4 +28,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
+#endif   // __UI__WIDGETS__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
