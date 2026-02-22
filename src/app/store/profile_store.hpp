@@ -15,7 +15,7 @@
 namespace drafts
 {
     struct ProfileDraft;   // forward declaration
-}
+}   // namespace drafts
 
 namespace app
 {
@@ -23,7 +23,7 @@ namespace app
      * @brief Result of profile store operations
      *
      */
-    enum class ProfileStoreResult
+    enum class ProfileStoreResult : std::uint8_t
     {
         Ok,
         Error,
@@ -82,7 +82,7 @@ namespace app
         [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
         [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 
-        [[nodiscard]] bool hasPendingChanges() const;
+        [[nodiscard]] bool isDirty() const override;
 
         [[nodiscard]] std::optional<Profile> getProfile(ProfileId id) const;
         [[nodiscard]] std::optional<Profile> getProfile(std::string_view) const;
@@ -113,10 +113,14 @@ namespace app
         void _removeInternal(std::string_view name);
 
         void _updateInternal(
-            ProfileId                  id,
-            std::string_view           newName,
-            std::optional<std::string> newEmail
+            ProfileId                         id,
+            std::string_view                  newName,
+            const std::optional<std::string>& newEmail
         );
+
+        void _commitNewProfile(const Profile& profile);
+        void _commitModifiedProfile(const Profile& profile);
+        void _commitDeletedProfile(const Profile& profile);
     };
 
 }   // namespace app

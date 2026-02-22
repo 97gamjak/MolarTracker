@@ -1,6 +1,8 @@
 #ifndef __APP__STORE__I_STORE_HPP__
 #define __APP__STORE__I_STORE_HPP__
 
+#include <cstdint>
+
 namespace app
 {
 
@@ -10,6 +12,15 @@ namespace app
      */
     class IStore
     {
+       private:
+        /// Flag to indicate if the store has potentially dirty data that needs
+        /// to be committed
+        bool _isPotentiallyDirty = false;
+
+       protected:
+        void _markPotentiallyDirty();
+        void _clearPotentiallyDirty();
+
        public:
         virtual ~IStore() = default;
 
@@ -23,13 +34,23 @@ namespace app
          *
          */
         virtual void commit() = 0;
+
+        /**
+         * @brief Check if the store has any dirty data that needs to be
+         * committed
+         *
+         * @return true if the store has dirty data, false otherwise
+         */
+        [[nodiscard]] virtual bool isDirty() const = 0;
+
+        [[nodiscard]] bool isPotentiallyDirty() const;
     };
 
     /**
      * @brief State of an item in the store
      *
      */
-    enum class StoreState
+    enum class StoreState : std::uint8_t
     {
         Clean,
         New,
