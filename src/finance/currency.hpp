@@ -9,13 +9,17 @@
 namespace finance
 {
 
-#define CURRENCY_LIST(X) \
-    X(USD)               \
-    X(EUR)               \
-    X(GBP)               \
-    X(CHF)
+    // clang-format off
+    // NOLINTBEGIN
+    #define CURRENCY_LIST(X) \
+        X(USD)               \
+        X(EUR)               \
+        X(GBP)               \
+        X(CHF)
+    // clang-format on
 
     MSTD_ENUM(Currency, std::uint8_t, CURRENCY_LIST);
+    // NOLINTEND
 
     /**
      * @brief Traits for each currency, providing information such as symbol,
