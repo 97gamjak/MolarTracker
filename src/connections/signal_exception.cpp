@@ -17,8 +17,8 @@ SignalException::SignalException(const std::string& message)
  */
 const char* SignalException::what() const noexcept
 {
-    static const std::string prefix = "SignalException: ";
-    static std::string       fullMessage;
+    static const std::string        prefix = "SignalException: ";
+    static thread_local std::string fullMessage;
     fullMessage = prefix + MolarTrackerException::what();
     return fullMessage.c_str();
 }

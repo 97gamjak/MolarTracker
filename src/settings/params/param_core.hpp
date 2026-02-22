@@ -139,12 +139,6 @@ namespace settings
         /// changes to take effect
         bool _isRebootRequired = false;
 
-        /// A counter for generating unique subscriber IDs, this is used to
-        /// assign IDs to subscribers when they subscribe to changes in the
-        /// parameter value, this allows for subscribers to be uniquely
-        /// identified and unsubscribed when needed
-        size_t _idCounter = 0;
-
        public:
         ParamCore() = delete;
         ParamCore(std::string key, std::string title);
