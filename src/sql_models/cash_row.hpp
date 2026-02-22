@@ -1,6 +1,9 @@
 #ifndef __SQL_MODELS__CASH_ROW_HPP__
 #define __SQL_MODELS__CASH_ROW_HPP__
 
+#include <cstdint>
+#include <string>
+
 #include "config/id_types.hpp"
 #include "finance/currency.hpp"
 #include "orm/field.hpp"
