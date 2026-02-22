@@ -72,7 +72,7 @@ void Observable<Tags...>::_emit(const typename Tag::TagType& arg)
  * one of the tags specified in the template parameter pack of the Observable
  * class
  * @param func The callback function to call when the event is emitted, it
- * should have the signature void(void* user, const typename Tag::arg_type& arg)
+ * should have the signature void(void* user, const typename Tag::TagType& arg)
  * @param user A user-defined pointer that will be passed to the callback
  * function when it is called, this can be used to provide additional context
  * for the callback function
