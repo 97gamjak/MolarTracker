@@ -1,6 +1,8 @@
 #ifndef __SQL_MODELS__CASH_ROW_IMPL_HPP__
 #define __SQL_MODELS__CASH_ROW_IMPL_HPP__
 
+#include <tuple>
+
 #include "cash_row.hpp"
 
 /**
