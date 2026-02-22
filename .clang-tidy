@@ -7,6 +7,7 @@ Checks:
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
+  -fuchsia-statically-constructed-objects,
   -llvmlibc-callee-namespace,
   -llvmlibc-implementation-in-namespace,
   -llvmlibc-inline-function-decl,

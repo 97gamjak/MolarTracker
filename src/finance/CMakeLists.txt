@@ -1,4 +1,6 @@
 add_library(molartracker_finance STATIC
+    cash.cpp
+    currency_exception.cpp
 )
 
 target_include_directories(molartracker_finance

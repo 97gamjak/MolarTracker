@@ -1,5 +1,5 @@
-#ifndef __FINANCE_CURRENCY_HPP__
-#define __FINANCE_CURRENCY_HPP__
+#ifndef __FINANCE__CURRENCY_HPP__
+#define __FINANCE__CURRENCY_HPP__
 
 #include <cstdint>
 
@@ -102,4 +102,4 @@ namespace finance
 
 }   // namespace finance
 
-#endif   // __FINANCE_CURRENCY_HPP__
+#endif   // __FINANCE__CURRENCY_HPP__
