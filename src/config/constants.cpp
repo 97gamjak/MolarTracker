@@ -72,7 +72,7 @@ std::filesystem::path Constants::getDatabasePath() const
  *
  * @return const std::string
  */
-const std::string Constants::getAppName() { return ConstantsSchema::_appName; }
+std::string Constants::getAppName() { return ConstantsSchema::_appName; }
 
 /**
  * @brief Get the application display name, this is the name that is shown in
@@ -81,7 +81,7 @@ const std::string Constants::getAppName() { return ConstantsSchema::_appName; }
  *
  * @return const std::string
  */
-const std::string Constants::getAppDisplayName()
+std::string Constants::getAppDisplayName()
 {
     return getAppName() + " " + getVersion();
 }
@@ -91,17 +91,14 @@ const std::string Constants::getAppDisplayName()
  *
  * @return const std::string
  */
-const std::string Constants::getDirPrefix()
-{
-    return ConstantsSchema::_dirPrefix;
-}
+std::string Constants::getDirPrefix() { return ConstantsSchema::_dirPrefix; }
 
 /**
  * @brief Get the desktop application name
  *
  * @return const std::string
  */
-const std::string Constants::getDesktopAppName()
+std::string Constants::getDesktopAppName()
 {
     return ConstantsSchema::_desktopAppName;
 }
@@ -111,7 +108,7 @@ const std::string Constants::getDesktopAppName()
  *
  * @return const std::string
  */
-const std::string Constants::getGithubRepoUrl()
+std::string Constants::getGithubRepoUrl()
 {
     return ConstantsSchema::_githubRepoUrl;
 }
@@ -121,7 +118,7 @@ const std::string Constants::getGithubRepoUrl()
  *
  * @return const std::string
  */
-const std::string Constants::getGithubIssuesUrl()
+std::string Constants::getGithubIssuesUrl()
 {
     return std::string(ConstantsSchema::_githubRepoUrl) + "/issues";
 }
@@ -131,11 +128,11 @@ const std::string Constants::getGithubIssuesUrl()
  *
  * @return const std::string
  */
-const std::string Constants::getVersion() { return ConstantsSchema::_version; }
+std::string Constants::getVersion() { return ConstantsSchema::_version; }
 
 /**
  * @brief Get the Git tag corresponding to the current version
  *
  * @return const std::string
  */
-const std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }
+std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }

@@ -67,15 +67,15 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator-() const
 /**
  * @brief Output stream operator for StrongId
  *
- * @param os
+ * @param output
  * @param id
  * @return std::ostream&
  */
 template <class Tag, class Rep>
-std::ostream& operator<<(std::ostream& os, StrongId<Tag, Rep> id)
+std::ostream& operator<<(std::ostream& output, StrongId<Tag, Rep> id)
 {
-    os << std::string(typeid(Tag).name()) << "(" << id.value() << ")";
-    return os;
+    output << std::string(typeid(Tag).name()) << "(" << id.value() << ")";
+    return output;
 }
 
 #endif   // __CONFIG__STRONG_ID_TPP__

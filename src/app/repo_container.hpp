@@ -24,8 +24,8 @@ namespace app
        public:
         explicit RepoContainer(db::Database& db);
 
-        IProfileRepo&       getProfileRepo();
-        const IProfileRepo& getProfileRepo() const;
+        [[nodiscard]] IProfileRepo&       getProfileRepo();
+        [[nodiscard]] const IProfileRepo& getProfileRepo() const;
     };
 
 }   // namespace app

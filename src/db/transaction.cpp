@@ -21,6 +21,14 @@ namespace db
     }
 
     /**
+     * @brief Construct a new Transaction:: Transaction object with immediate
+     * mode by default
+     *
+     * @param db
+     */
+    Transaction::Transaction(Database& db) : Transaction(db, true) {}
+
+    /**
      * @brief Destroy the Transaction:: Transaction object
      *
      */
@@ -43,7 +51,7 @@ namespace db
      *
      * @param other
      */
-    Transaction::Transaction(Transaction&& other)
+    Transaction::Transaction(Transaction&& other) noexcept
     {
         _moveFrom(std::move(other));
     }
@@ -54,7 +62,7 @@ namespace db
      * @param other
      * @return Transaction&
      */
-    Transaction& Transaction::operator=(Transaction&& other)
+    Transaction& Transaction::operator=(Transaction&& other) noexcept
     {
         if (this != &other)
             _moveFrom(std::move(other));

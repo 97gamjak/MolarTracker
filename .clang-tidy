@@ -38,9 +38,9 @@ CheckOptions:
 
   ### allow short variable names
   - key:             readability-identifier-length.IgnoredParameterNames
-    value:           '^(id|it)$'
+    value:           '^(id|it|db)$'
   - key:             readability-identifier-length.IgnoredVariableNames
-    value:           '^(id|it)$'
+    value:           '^(id|it|db)$'
   
   ### special member functions
   - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor

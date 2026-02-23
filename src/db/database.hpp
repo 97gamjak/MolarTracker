@@ -23,7 +23,7 @@ namespace db
         sqlite3* _db{nullptr};
 
         /// The path to the database file
-        std::string _dbPath{};
+        std::string _dbPath;
 
        public:
         Database() = delete;

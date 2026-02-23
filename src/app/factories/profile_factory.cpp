@@ -28,6 +28,7 @@ namespace app
     )
     {
         std::vector<Profile> profiles;
+        profiles.reserve(rows.size());
 
         for (const auto& row : rows)
             profiles.push_back(toDomain(row));
