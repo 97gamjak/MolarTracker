@@ -39,7 +39,7 @@ namespace ui
         QTimer* _reloadTimer;
 
        public:
-        explicit LogViewerDialog(Settings& settings, QWidget* parent = nullptr);
+        explicit LogViewerDialog(Settings& settings, QWidget* parent);
 
        protected:
         void hideEvent(QHideEvent* event) override;
