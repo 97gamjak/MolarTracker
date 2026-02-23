@@ -61,11 +61,7 @@ namespace ui
         UndoStack _undoStack;
 
        public:
-        explicit MainWindow(
-            app::AppContext& app,
-            Controllers&     controllers,
-            QWidget*         parent = nullptr
-        );
+        explicit MainWindow(app::AppContext& app, Controllers& controllers);
 
         void start();
         void setWindowTitle(const bool& isDirty);

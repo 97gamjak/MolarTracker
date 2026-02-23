@@ -28,11 +28,9 @@ namespace ui
      */
     MainWindow::MainWindow(
         app::AppContext& appContext,
-        Controllers&     controllers,
-        QWidget*         parent
+        Controllers&     controllers
     )
-        : QMainWindow{parent},
-          _appContext{appContext},
+        : _appContext{appContext},
           _controllers{controllers},
           _dirtyStateController(
               std::make_unique<DirtyStateController>(
@@ -69,6 +67,7 @@ namespace ui
      */
     void MainWindow::_buildMenuBar()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _menuBar = new MenuBar{this};
         setMenuBar(_menuBar);
 
@@ -108,19 +107,24 @@ namespace ui
      */
     void MainWindow::_buildCentral()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* root = new QWidget{this};
         setCentralWidget(root);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout{root};
         layout->setContentsMargins(8, 8, 8, 8);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* tabs = new QTabWidget{root};
         layout->addWidget(tabs);
 
         // Placeholder pages
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
         tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
+        // NOLINTEND(cppcoreguidelines-owning-memory)
     }
 
     /**
