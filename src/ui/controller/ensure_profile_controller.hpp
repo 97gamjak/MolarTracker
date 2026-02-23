@@ -18,7 +18,7 @@ namespace app
 namespace drafts
 {
     struct ProfileDraft;   // Forward declaration
-}
+}   // namespace drafts
 
 namespace ui
 {
@@ -79,8 +79,9 @@ namespace ui
         void _noDefaultProfile();
         void _showAddProfileDialog();
         void _showProfileSelectionDialog();
-        void _fatalError(const std::string& message);
         bool _activateProfile(const std::string& name);
+
+        static void _fatalError(const std::string& message);
     };
 
 }   // namespace ui

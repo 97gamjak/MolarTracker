@@ -11,6 +11,7 @@
 #include "app/app_context.hpp"
 #include "config/constants.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
+#include "ui/handlers/handlers.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
@@ -26,20 +27,11 @@ namespace ui
      * @param controllers
      * @param parent
      */
-    MainWindow::MainWindow(
-        app::AppContext& appContext,
-        Controllers&     controllers
-    )
-        : _appContext{appContext},
-          _controllers{controllers},
-          _dirtyStateController(
-              std::make_unique<DirtyStateController>(
-                  _appContext.getStore(),
-                  _appContext.getSettings(),
-                  this
-              )
-          )
+    MainWindow::MainWindow(app::AppContext& appContext, Handlers& handlers)
+        : _appContext{appContext}, _handlers{handlers}
     {
+        _handlers.getDirtyStateHandler().subscribe(appContext, this);
+
         setWindowTitle(false);
         resize(5000, 3000);
         _buildUI();

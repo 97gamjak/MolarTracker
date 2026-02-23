@@ -52,19 +52,19 @@ namespace ui
          * @brief Action enum for the debug slots dialog
          *
          */
-        enum class Action
+        enum class Action : std::uint8_t
         {
             Apply,
             ApplyAndClose,
             ResetDefault
         };
 
-        explicit DebugSlotsDialog(QWidget* parent = nullptr);
+        explicit DebugSlotsDialog(QWidget* parent);
 
         void setCategories(const LogCategoryMap& categories);
         void setCategories(
             const LogCategoryMap& categories,
-            const bool            overrideReference
+            bool                  overrideReference
         );
         void populateTree();
 

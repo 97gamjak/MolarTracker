@@ -307,12 +307,7 @@ namespace ui
             const auto msg =
                 "Profile '" + profileName + "' selected successfully.";
 
-            showInfoStatusBar(
-                LOG_INFO_OBJECT(
-                    "Profile '" + profileName + "' selected successfully."
-                ),
-                _mainWindow.statusBar()
-            );
+            showInfoStatusBar(LOG_INFO_OBJECT(msg), _mainWindow.statusBar());
         }
     }
 
