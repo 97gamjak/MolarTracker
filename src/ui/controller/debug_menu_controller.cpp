@@ -37,7 +37,8 @@ namespace ui
           _mainWindow(mainWindow),
           _debugMenu(debugMenu),
           _appContext(appContext),
-          _undoStack(undoStack)
+          _undoStack(undoStack),
+          _logViewerSettings{}
     {
         connect(
             &debugMenu,
@@ -77,7 +78,7 @@ namespace ui
 
         auto* statusBar = _mainWindow.statusBar();
 
-        if (statusBar)
+        if (statusBar != nullptr)
             statusBar->showMessage("Debug slots opened");
     }
 
@@ -122,7 +123,7 @@ namespace ui
 
         auto* statusBar = _mainWindow.statusBar();
 
-        if (statusBar)
+        if (statusBar != nullptr)
             statusBar->showMessage("Log File opened");
     }
 
@@ -135,6 +136,7 @@ namespace ui
         if (_debugSlotsDialog != nullptr)
             return;
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
         _debugSlotsDialog->setModal(false);
 
@@ -157,8 +159,10 @@ namespace ui
 
         _applyLogViewerSettings();
 
-        _logViewerDialog =
-            new LogViewerDialog{_logViewerSettings, &_mainWindow};
+        // clang-format off
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _logViewerDialog = new LogViewerDialog{_logViewerSettings, &_mainWindow};
+        // clang-format on
 
         _logViewerDialog->setModal(false);
     }
@@ -194,7 +198,8 @@ namespace ui
 
         if (!result)
         {
-            // TODO: create general exception message for unexpected errors
+            // TODO(97gamjak): create general exception message for unexpected
+            // errors
             // https://97gamjak.atlassian.net/browse/MOLTRACK-112
             LOG_ERROR(
                 "There happened an unexpected error while updating the debug "
