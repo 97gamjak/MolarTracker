@@ -13,16 +13,16 @@
 LogObject::LogObject(
     const LogLevel&    _level,
     const LogCategory& _category,
-    const std::string& _message,
-    const std::string& _file,
+    std::string        _message,
+    std::string        _file,
     int                _line,
-    const std::string& _function
+    std::string        _function
 )
     : level{_level},
       category{_category},
-      file{_file},
+      file{std::move(_file)},
       line{_line},
-      function{_function},
-      message{_message}
+      function{std::move(_function)},
+      message{std::move(_message)}
 {
 }
