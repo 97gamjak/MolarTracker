@@ -1,9 +1,6 @@
 #ifndef __ORM__FIELDS_DETAIL_HPP__
 #define __ORM__FIELDS_DETAIL_HPP__
 
-#include <array>
-#include <tuple>
-#include <type_traits>
 #include <utility>
 
 namespace orm::detail
@@ -20,7 +17,7 @@ namespace orm::detail
     template <typename Tuple, std::size_t... Indices>
     constexpr auto tuple_to_field_array(
         Tuple&& tuple,
-        std::index_sequence<Indices...>
+        std::index_sequence<Indices...> /*dummy*/
     );
 
 }   // namespace orm::detail

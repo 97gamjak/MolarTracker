@@ -16,6 +16,7 @@ namespace orm
      * @param text
      */
     template <std::size_t Size>
+    // NOLINTNEXTLINE
     constexpr fixed_string<Size>::fixed_string(char const (&text)[Size])
     {
         for (std::size_t index = 0; index < Size; ++index)

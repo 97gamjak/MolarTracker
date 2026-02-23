@@ -46,7 +46,7 @@ namespace orm
         void const* _constFieldAddress{nullptr};
 
         /// The name of the database column corresponding to this field
-        std::string_view _columnName{};
+        std::string_view _columnName;
 
         /// flag indicating whether this field is a primary key
         bool _isPk{false};

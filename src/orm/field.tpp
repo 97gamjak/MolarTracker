@@ -8,7 +8,6 @@
 
 #include "orm/binder.hpp"
 #include "orm/concepts.hpp"
-#include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
 #include "orm/sql_type.hpp"

@@ -1,12 +1,10 @@
 #ifndef __ORM__FIELDS_TPP__
 #define __ORM__FIELDS_TPP__
 
-#include <array>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
-#include "field_view.hpp"
 #include "fields.hpp"
 #include "fields_detail.hpp"
 

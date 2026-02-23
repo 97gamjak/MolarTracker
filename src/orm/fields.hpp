@@ -1,13 +1,6 @@
 #ifndef __ORM__FIELDS_HPP__
 #define __ORM__FIELDS_HPP__
 
-#include <array>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-
-#include "field_view.hpp"
-
 namespace orm
 {
     template <typename Model>
