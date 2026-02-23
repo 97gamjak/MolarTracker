@@ -10,7 +10,7 @@
 namespace settings
 {
     class GeneralSettings;   // Forward declaration
-}
+}   // namespace settings
 
 namespace ui
 {

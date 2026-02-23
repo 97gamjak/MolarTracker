@@ -9,12 +9,12 @@
 namespace app
 {
     class ProfileStore;   // Forward declaration
-}
+}   // namespace app
 
 namespace settings
 {
     class Settings;   // Forward declaration
-}
+}   // namespace settings
 
 namespace ui
 {
