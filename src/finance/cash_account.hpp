@@ -16,6 +16,7 @@ namespace finance
         X(Active)                  \
         X(Closed)
 
+    // cppcheck-suppress syntaxError
     MSTD_ENUM(AccountStatus, uint8_t, ACCOUNT_STATUS_LIST);
 
     #define ACCOUNT_TYPE_LIST(X) \
@@ -23,6 +24,7 @@ namespace finance
         X(Securities)            \
         X(External)
 
+    // cppcheck-suppress syntaxError
     MSTD_ENUM(AccountType, uint8_t, ACCOUNT_TYPE_LIST);
     // NOLINTEND
     // clang-format on

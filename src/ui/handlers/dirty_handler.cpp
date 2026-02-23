@@ -12,9 +12,9 @@ namespace ui
      * @brief Subscribe to dirty state changes in the stores and settings, this
      * will update the window title to indicate that there are unsaved changes
      *
-     * @param storeContainer
-     * @param settings
-     * @param mainWindow
+     * @param appContext The application context to subscribe to for dirty state
+     * changes
+     * @param mainWindow The main window to update the title for
      */
     void DirtyStateHandler::subscribe(
         app::AppContext& appContext,

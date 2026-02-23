@@ -23,9 +23,8 @@ namespace ui
     /**
      * @brief Construct a new Main Window:: Main Window object
      *
-     * @param appContext
-     * @param controllers
-     * @param parent
+     * @param appContext The application context
+     * @param handlers The handlers
      */
     MainWindow::MainWindow(app::AppContext& appContext, Handlers& handlers)
         : _appContext{appContext}, _handlers{handlers}

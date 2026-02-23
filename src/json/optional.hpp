@@ -17,7 +17,7 @@ struct adl_serializer<std::optional<T>>
     /**
      * @brief Serialize std::optional<T> to JSON
      *
-     * @param j
+     * @param jsonData
      * @param opt
      */
     static void to_json(json& jsonData, const std::optional<T>& opt)
@@ -31,7 +31,7 @@ struct adl_serializer<std::optional<T>>
     /**
      * @brief Deserialize std::optional<T> from JSON
      *
-     * @param j
+     * @param jsonData
      * @param opt
      */
     static void from_json(const json& jsonData, std::optional<T>& opt)

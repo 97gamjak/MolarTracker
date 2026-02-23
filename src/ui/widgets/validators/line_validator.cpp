@@ -195,24 +195,24 @@ namespace ui
      */
     void LineValidator::_recompute()
     {
-        bool isValid = false;
+        bool valid = false;
 
         if (_hasExternalError)
         {
-            isValid    = false;
+            valid      = false;
             _errorText = _externalError;
         }
         else
         {
             const auto result = _validate(text());
-            isValid           = result.first;
+            valid             = result.first;
             _errorText        = result.second;
         }
 
-        const bool changed = (isValid != _isValid);
-        _isValid           = isValid;
+        const bool changed = (valid != _isValid);
+        _isValid           = valid;
 
-        _applyFeedback(isValid, _errorText);
+        _applyFeedback(valid, _errorText);
 
         if (changed)
             emit validityChanged(_isValid);
