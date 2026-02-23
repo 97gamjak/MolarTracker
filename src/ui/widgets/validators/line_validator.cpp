@@ -108,12 +108,17 @@ namespace ui
      */
     void LineValidator::attachErrorLabel(QLabel* label)
     {
-        const auto visible = (_errorLabel && _errorLabel->isVisible());
-        const auto msg     = (_errorLabel) ? _errorLabel->text() : QString{};
+        bool    visible = false;
+        QString msg;
+        if (_errorLabel != nullptr)
+        {
+            visible = _errorLabel->isVisible();
+            msg     = _errorLabel->text();
+        }
 
         _errorLabel = label;
 
-        if (_errorLabel)
+        if (_errorLabel != nullptr)
         {
             _errorLabel->setStyleSheet(
                 "QLabel { color: #c00; font-size: 11px; }"
@@ -130,7 +135,7 @@ namespace ui
      * the text.
      *
      */
-    void LineValidator::onTextChanged(const QString&)
+    void LineValidator::onTextChanged(const QString& /*_dummy*/)
     {
         if (_hasExternalError)
         {
@@ -164,9 +169,9 @@ namespace ui
      */
     std::pair<bool, QString> LineValidator::_validate(QStringView rawText) const
     {
-        const auto t = rawText.trimmed();
+        const auto trimmed = rawText.trimmed();
 
-        if (t.isEmpty())
+        if (trimmed.isEmpty())
         {
             if (_required)
                 return {false, _getRequiredErrorMessage()};
@@ -175,7 +180,7 @@ namespace ui
             return {true, {}};
         }
 
-        return _validateNonEmpty(QStringView{t});
+        return _validateNonEmpty(QStringView{trimmed});
     }
 
     /**
@@ -190,24 +195,24 @@ namespace ui
      */
     void LineValidator::_recompute()
     {
-        bool ok = false;
+        bool isValid = false;
 
         if (_hasExternalError)
         {
-            ok         = false;
+            isValid    = false;
             _errorText = _externalError;
         }
         else
         {
-            const auto local = _validate(text());
-            ok               = local.first;
-            _errorText       = local.second;
+            const auto result = _validate(text());
+            isValid           = result.first;
+            _errorText        = result.second;
         }
 
-        const bool changed = (ok != _isValid);
-        _isValid           = ok;
+        const bool changed = (isValid != _isValid);
+        _isValid           = isValid;
 
-        _applyFeedback(ok, _errorText);
+        _applyFeedback(isValid, _errorText);
 
         if (changed)
             emit validityChanged(_isValid);
@@ -230,7 +235,7 @@ namespace ui
         {
             setStyleSheet({});
             setToolTip({});
-            if (_errorLabel)
+            if (_errorLabel != nullptr)
             {
                 _errorLabel->clear();
                 _errorLabel->setVisible(false);
@@ -241,7 +246,7 @@ namespace ui
         setStyleSheet("QLineEdit { border: 1px solid #c00; }");
         setToolTip(errorMessage);
 
-        if (_errorLabel)
+        if (_errorLabel != nullptr)
         {
             _errorLabel->setText(errorMessage);
             _errorLabel->setVisible(true);
