@@ -76,22 +76,25 @@ namespace settings
         void setMaxValue(const T& maxValue);
         void setPrecision(size_t decimalPlaces);
 
+        static void fromJson(
+            const nlohmann::json& jsonData,
+            NumericParam<T>&      param
+        );
         [[nodiscard]] nlohmann::json toJson() const;
-        static void fromJson(const nlohmann::json& j, NumericParam<T>& param);
 
        private:
-        NumericParam(ParamCore<T> core);
+        explicit NumericParam(ParamCore<T> core);
 
         [[nodiscard]] std::expected<void, ParamError> _isWithinRange(
-            const T& v
+            const T& value
         ) const;
-        [[nodiscard]] T _applyPrecision(const T& v) const;
+        [[nodiscard]] T _applyPrecision(const T& value) const;
     };
 
 }   // namespace settings
 
-#ifndef __SETTINGS__NUMERIC_PARAM_TPP__
+#ifndef __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
 #include "numeric_param.tpp"
-#endif   // __SETTINGS__NUMERIC_PARAM_TPP__
+#endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
 
 #endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__

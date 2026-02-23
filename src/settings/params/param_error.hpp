@@ -35,9 +35,9 @@ namespace settings
     class ParamException : public MolarTrackerException
     {
        public:
-        explicit ParamException(std::string message);
+        explicit ParamException(const std::string& message);
 
-        const char* what() const noexcept override;
+        [[nodiscard]] const char* what() const noexcept override;
     };
 
 }   // namespace settings
