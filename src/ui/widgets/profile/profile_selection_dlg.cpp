@@ -37,6 +37,21 @@ namespace ui
     }
 
     /**
+     * @brief Construct a new Profile Selection Dialog:: Profile Selection
+     * Dialog object
+     *
+     * @param parent
+     * @param profiles
+     */
+    ProfileSelectionDialog::ProfileSelectionDialog(
+        QWidget*                        parent,
+        const std::vector<std::string>& profiles
+    )
+        : ProfileSelectionDialog(parent, profiles, true)
+    {
+    }
+
+    /**
      * @brief Builds the UI for the Profile Selection Dialog
      *
      * @param profiles List of profile names to display

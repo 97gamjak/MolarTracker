@@ -9,17 +9,17 @@
 namespace drafts
 {
     struct ProfileDraft;   // Forward declaration
-}
+}   // namespace drafts
 
 namespace app
 {
     class ProfileStore;   // Forward declaration
-}
+}   // namespace app
 
 namespace settings
 {
     class Settings;   // Forward declaration
-}
+}   // namespace settings
 
 class QLineEdit;     // Forward declaration
 class QPushButton;   // Forward declaration
@@ -73,8 +73,14 @@ namespace ui
             app::ProfileStore&  profileStore,
             settings::Settings& settings,
             UndoStack&          undoStack,
-            bool                canBeClosed = true,
-            QWidget*            parent      = nullptr
+            bool                canBeClosed,
+            QWidget*            parent
+        );
+        explicit AddProfileDialog(
+            app::ProfileStore&  profileStore,
+            settings::Settings& settings,
+            UndoStack&          undoStack,
+            QWidget*            parent
         );
 
         void setEnforceDefaultProfile(bool value);
@@ -88,7 +94,7 @@ namespace ui
          * @brief Enum class for actions in the add profile dialog
          *
          */
-        enum class Action
+        enum class Action : std::uint8_t
         {
             Ok,
             Cancel

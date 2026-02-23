@@ -50,6 +50,31 @@ namespace ui
     }
 
     /**
+     * @brief Construct a new Add Profile Dialog:: Add Profile Dialog object
+     *
+     * @param profileStore
+     * @param settings
+     * @param undoStack
+     * @param parent
+     */
+    AddProfileDialog::AddProfileDialog(
+        app::ProfileStore&  profileStore,
+        settings::Settings& settings,
+        UndoStack&          undoStack,
+        QWidget*            parent
+    )
+        : AddProfileDialog(
+              profileStore,
+              settings,
+              undoStack,
+              true,   // canBeClosed = true to allow closing without adding a
+                      // profile
+              parent
+          )
+    {
+    }
+
+    /**
      * @brief build the UI
      *
      */
