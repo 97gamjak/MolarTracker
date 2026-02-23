@@ -36,7 +36,7 @@ namespace ui
         HelpMenu _helpMenu;
 
        public:
-        explicit MenuBar(QWidget* parent = nullptr);
+        explicit MenuBar(QWidget* parent);
 
         FileMenu&     getFileMenu();
         EditMenu&     getEditMenu();
