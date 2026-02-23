@@ -8,6 +8,7 @@
 namespace ui
 {
     void showInfoStatusBar(LogObject logObject, QStatusBar* statusBar);
-}
+
+}   // namespace ui
 
 #endif   // __UI__WIDGETS__UTILS__INFOS_HPP__

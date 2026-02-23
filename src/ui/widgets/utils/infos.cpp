@@ -19,7 +19,7 @@ namespace ui
 
         LogManager::getInstance().log(logObject);
 
-        if (statusBar)
+        if (statusBar != nullptr)
             statusBar->showMessage(QString::fromStdString(logObject.message));
     }
 }   // namespace ui
