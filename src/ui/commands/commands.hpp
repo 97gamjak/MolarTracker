@@ -29,7 +29,7 @@ namespace ui
         std::vector<std::unique_ptr<ICommand>> _commands;
 
         /// A label for this command
-        std::string _label{};
+        std::string _label;
 
         /// Flag to indicate whether undo/redo should be disabled
         bool _disableUndoRedo = false;
@@ -60,7 +60,8 @@ namespace ui
         [[nodiscard]] std::size_t size() const;
 
         [[nodiscard]] bool isUndoRedoDisabled() const;
-        void               disableUndoRedo(bool disable = true);
+        void               disableUndoRedo();
+        void               disableUndoRedo(bool disable);
 
        private:
         static Commands _fromCommand(std::unique_ptr<ICommand>&& command);
