@@ -20,7 +20,7 @@ namespace settings
     constexpr void forEachParamImpl(
         Tuple&& tuple,
         Func&&  func,
-        std::index_sequence<Is...>
+        std::index_sequence<Is...> /*dummy*/
     )
     {
         (std::forward<Func>(func)(std::get<Is>(std::forward<Tuple>(tuple))),

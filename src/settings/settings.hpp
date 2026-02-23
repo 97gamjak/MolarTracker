@@ -3,7 +3,6 @@
 
 #include <filesystem>
 
-#include "config/constants.hpp"
 #include "general_settings.hpp"
 #include "logging_settings.hpp"
 #include "params/params.hpp"

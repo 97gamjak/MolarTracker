@@ -10,6 +10,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Add `Currency` enum and `CurrencyTraits` for handling different current
 - Add `Cash` class for representing a cash amount together with a currency
+- Add `CashAccount` class
 
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22

@@ -33,14 +33,18 @@ namespace ui
         explicit ProfileSelectionDialog(
             QWidget*                        parent,
             const std::vector<std::string>& profiles,
-            bool                            canBeClosed = true
+            bool                            canBeClosed
+        );
+        explicit ProfileSelectionDialog(
+            QWidget*                        parent,
+            const std::vector<std::string>& profiles
         );
 
         /**
          * @brief enum for the actions that can be emitted by the dialog
          *
          */
-        enum class Action
+        enum class Action : std::uint8_t
         {
             Ok,
             Cancel

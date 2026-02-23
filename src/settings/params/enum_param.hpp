@@ -38,8 +38,11 @@ namespace settings
        public:
         EnumParam(std::string key, std::string title, std::string description);
 
+        static void fromJson(
+            const nlohmann::json& jsonData,
+            EnumParam<E>&         param
+        );
         [[nodiscard]] nlohmann::json toJson() const;
-        static void fromJson(const nlohmann::json& j, EnumParam<E>& param);
 
         std::expected<void, ParamError> set(const E& value);
     };

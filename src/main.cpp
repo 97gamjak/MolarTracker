@@ -7,7 +7,7 @@
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "ui/application.hpp"
-#include "ui/controller/controllers.hpp"
+#include "ui/handlers/handlers.hpp"
 #include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 
@@ -34,8 +34,8 @@ int main(int argc, char** argv)
         );
 
         app::AppContext appContext{settings};
-        ui::Controllers controllers{settings};
-        ui::MainWindow  mainWindow{appContext, controllers};
+        ui::Handlers    handlers{settings};
+        ui::MainWindow  mainWindow{appContext, handlers};
 
         mainWindow.show();
         mainWindow.start();

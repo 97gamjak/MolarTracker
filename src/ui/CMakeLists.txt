@@ -6,6 +6,7 @@ qt_add_library(molartracker_ui STATIC
 add_subdirectory(commands)
 add_subdirectory(controller)
 add_subdirectory(widgets)
+add_subdirectory(handlers)
 
 target_link_libraries(molartracker_ui
     PUBLIC
@@ -14,6 +15,7 @@ target_link_libraries(molartracker_ui
         molartracker_ui_commands
         molartracker_ui_widgets
         molartracker_ui_controller
+        molartracker_ui_handlers
         molartracker_app
 )
 

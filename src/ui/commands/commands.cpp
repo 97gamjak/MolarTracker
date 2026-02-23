@@ -239,6 +239,7 @@ namespace ui
     std::vector<std::string> Commands::getLabels() const
     {
         std::vector<std::string> labels;
+        labels.reserve(_commands.size());
 
         for (const auto& command : _commands)
             labels.push_back(command->getLabel());
@@ -328,5 +329,16 @@ namespace ui
      * object, if false, undo/redo will be enabled for this Commands object.
      */
     void Commands::disableUndoRedo(bool disable) { _disableUndoRedo = disable; }
+
+    /**
+     * @brief Disable undo/redo for this Commands object, this is a convenience
+     * method that allows us to disable undo/redo for this Commands object with
+     * a single method call, without having to pass a boolean argument, as this
+     * is a common use case where we want to disable undo/redo for a Commands
+     * object, and having a separate method for this makes the code more
+     * readable and concise.
+     *
+     */
+    void Commands::disableUndoRedo() { disableUndoRedo(true); }
 
 }   // namespace ui

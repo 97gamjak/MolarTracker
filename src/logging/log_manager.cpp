@@ -178,9 +178,9 @@ void LogManager::log(const LogObject& logObject)
  * @param level
  * @return std::string
  */
-std::string LogManager::_logLevelToString(const LogLevel& level) const
+std::string LogManager::_logLevelToString(const LogLevel& level)
 {
-    // TODO: move this length determination logic to utils
+    // TODO(97gamjak): move this length determination logic to utils
     // https://97gamjak.atlassian.net/browse/MOLTRACK-113
     const auto maxLength = std::ranges::max_element(
                                LogLevelMeta::names,

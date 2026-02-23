@@ -98,7 +98,7 @@ namespace app
 
         if (rowId <= 0)
         {
-            // TODO: introduce MT specific error handling for repos
+            // TODO(97gamjak): introduce MT specific error handling for repos
             // https://97gamjak.atlassian.net/browse/MOLTRACK-87
             throw std::runtime_error(
                 std::format("Failed to insert new profile with name '{}'", name)
@@ -108,7 +108,7 @@ namespace app
         const auto createdProfile = get(name);
         if (!createdProfile.has_value())
         {
-            // TODO: introduce MT specific error handling for repos
+            // TODO(97gamjak): introduce MT specific error handling for repos
             // https://97gamjak.atlassian.net/browse/MOLTRACK-87
             throw std::runtime_error(
                 std::format(
@@ -137,7 +137,7 @@ namespace app
         const auto existingProfileOpt = get(id);
         if (!existingProfileOpt.has_value())
         {
-            // TODO: introduce MT specific error handling for repos
+            // TODO(97gamjak): introduce MT specific error handling for repos
             // https://97gamjak.atlassian.net/browse/MOLTRACK-87
             throw std::runtime_error(
                 std::format("Profile with ID {} not found", id.value())

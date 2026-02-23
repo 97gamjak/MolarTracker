@@ -2,7 +2,6 @@
 
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #include "db/statement.hpp"
 #include "orm/orm_exception.hpp"

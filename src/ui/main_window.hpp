@@ -6,7 +6,6 @@
 
 #include "commands/undo_stack.hpp"
 #include "ui/controller/debug_menu_controller.hpp"
-#include "ui/controller/dirty_controller.hpp"
 #include "ui/controller/edit_menu_controller.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/controller/file_menu_controller.hpp"
@@ -20,8 +19,8 @@ namespace app
 
 namespace ui
 {
-    class MenuBar;       // Forward declaration
-    class Controllers;   // Forward declaration
+    class MenuBar;    // Forward declaration
+    class Handlers;   // Forward declaration
 
     /**
      * @brief The main window of the application. This is the central widget
@@ -35,8 +34,8 @@ namespace ui
        private:
         /// Reference to the application context
         app::AppContext& _appContext;
-        /// Reference to the controllers
-        Controllers& _controllers;
+        /// Reference to the handlers container
+        Handlers& _handlers;
         /// Pointer to the menu bar widget
         MenuBar* _menuBar = nullptr;
 
@@ -54,18 +53,11 @@ namespace ui
         /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;
 
-        /// Controller for managing the dirty state of the application
-        std::unique_ptr<DirtyStateController> _dirtyStateController;
-
         /// Undo stack for managing undoable commands in the application
         UndoStack _undoStack;
 
        public:
-        explicit MainWindow(
-            app::AppContext& app,
-            Controllers&     controllers,
-            QWidget*         parent = nullptr
-        );
+        explicit MainWindow(app::AppContext& app, Handlers& handlers);
 
         void start();
         void setWindowTitle(const bool& isDirty);

@@ -46,7 +46,7 @@ namespace ui
          * @brief Enum class for command error types
          *
          */
-        enum class Type
+        enum class Type : std::uint8_t
         {
             InvalidCommand,
             NothingToRedo,

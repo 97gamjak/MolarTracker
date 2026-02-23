@@ -58,15 +58,15 @@ class Constants
     [[nodiscard]] std::filesystem::path getDataPath() const;
     [[nodiscard]] std::filesystem::path getDatabasePath() const;
 
-    [[nodiscard]] static const std::string getAppName();
-    [[nodiscard]] static const std::string getAppDisplayName();
-    [[nodiscard]] static const std::string getDirPrefix();
-    [[nodiscard]] static const std::string getDesktopAppName();
-    [[nodiscard]] static const std::string getGithubRepoUrl();
-    [[nodiscard]] static const std::string getGithubIssuesUrl();
+    [[nodiscard]] static std::string getAppName();
+    [[nodiscard]] static std::string getAppDisplayName();
+    [[nodiscard]] static std::string getDirPrefix();
+    [[nodiscard]] static std::string getDesktopAppName();
+    [[nodiscard]] static std::string getGithubRepoUrl();
+    [[nodiscard]] static std::string getGithubIssuesUrl();
 
-    [[nodiscard]] static const std::string getVersion();
-    [[nodiscard]] static const std::string getGitTag();
+    [[nodiscard]] static std::string getVersion();
+    [[nodiscard]] static std::string getGitTag();
 
    private:
     Constants();

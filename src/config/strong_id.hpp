@@ -55,9 +55,14 @@ class StrongId final
     /// @endcond
 
     template <class T, class U>
-    friend std::ostream& operator<<(std::ostream& os, StrongId<Tag, Rep> id);
+    friend std::ostream& operator<<(
+        std::ostream&      output,
+        StrongId<Tag, Rep> id
+    );
 };
 
+#ifndef __CONFIG__STRONG_ID_TPP__
 #include "strong_id.tpp"
+#endif   // __CONFIG__STRONG_ID_TPP__
 
 #endif   // __CONFIG__STRONG_ID_HPP__

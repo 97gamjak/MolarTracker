@@ -43,11 +43,13 @@ namespace ui
         _autoReloadCheckBox->setChecked(_settings.isAutoReloadEnabled());
         _reloadTimer->setInterval(_settings.getIntervalMs());
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout();
         buttonLayout->addWidget(_reloadButton);
         buttonLayout->addStretch(1);
         buttonLayout->addWidget(_autoReloadCheckBox);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout(this);
         layout->addWidget(_textEdit);
         layout->addLayout(buttonLayout);

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "domain/profile.hpp"
-#include "repos/profile_repo.hpp"
+#include "repos_api/i_profile_repo.hpp"
 
 namespace app
 {

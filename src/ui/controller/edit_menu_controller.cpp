@@ -63,7 +63,7 @@ namespace ui
 
         auto* statusBar = _mainWindow.statusBar();
 
-        if (statusBar)
+        if (statusBar != nullptr)
             statusBar->showMessage(QString::fromStdString(msg));
     }
 
@@ -82,7 +82,7 @@ namespace ui
 
         auto* statusBar = _mainWindow.statusBar();
 
-        if (statusBar)
+        if (statusBar != nullptr)
             statusBar->showMessage(QString::fromStdString(msg));
     }
 

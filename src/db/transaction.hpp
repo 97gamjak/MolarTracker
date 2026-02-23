@@ -19,14 +19,15 @@ namespace db
         bool _isActive{false};
 
        public:
-        explicit Transaction(Database& db, bool immediate = true);
+        explicit Transaction(Database& db, bool immediate);
+        explicit Transaction(Database& db);
         ~Transaction();
 
         Transaction(Transaction const&)            = delete;
         Transaction& operator=(Transaction const&) = delete;
 
-        Transaction(Transaction&& other);
-        Transaction& operator=(Transaction&& other);
+        Transaction(Transaction&& other) noexcept;
+        Transaction& operator=(Transaction&& other) noexcept;
 
         [[nodiscard]] bool isActive() const;
 

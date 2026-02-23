@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "config/signal_tags.hpp"
-#include "param_utils.hpp"
+#include "nlohmann/json.hpp"
 
 class Connection;   // Forward declaration
 

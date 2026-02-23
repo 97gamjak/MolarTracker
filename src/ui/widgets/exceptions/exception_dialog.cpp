@@ -30,6 +30,7 @@ namespace ui
         setModal(true);
         setMinimumWidth(600);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout(this);
 
         auto* summary = new QLabel(
@@ -37,6 +38,7 @@ namespace ui
         );
         summary->setWordWrap(true);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* detailBox = new QPlainTextEdit(details);
         detailBox->setReadOnly(true);
         detailBox->setVisible(false);
@@ -84,8 +86,13 @@ namespace ui
      * @param title The title of the dialog
      * @param logObject The log object containing the details of the exception,
      * this will be logged as an error and shown in the details of the dialog
+     * @param parent The parent widget of the dialog
      */
-    void ExceptionDialog::showFatal(const QString& title, LogObject logObject)
+    void ExceptionDialog::showFatal(
+        const QString& title,
+        LogObject      logObject,
+        QWidget*       parent
+    )
     {
         // we set the log level to error to make sure it is visible in the log
         // viewer and stands out from other log messages
@@ -93,9 +100,26 @@ namespace ui
 
         LogManager::getInstance().log(logObject);
 
-        ExceptionDialog dlg(title, QString::fromStdString(logObject.message));
+        ExceptionDialog dlg(
+            title,
+            QString::fromStdString(logObject.message),
+            parent
+        );
         dlg.exec();
+        // NOLINTNEXTLINE(concurrency-mt-unsafe)
         ::exit(0);
+    }
+
+    /**
+     * @brief Show a fatal exception dialog without a parent widget
+     *
+     * @param title The title of the dialog
+     * @param logObject The log object containing the details of the exception,
+     * this will be logged as an error and shown in the details of the dialog
+     */
+    void ExceptionDialog::showFatal(const QString& title, LogObject logObject)
+    {
+        showFatal(title, std::move(logObject), nullptr);
     }
 
 }   // namespace ui

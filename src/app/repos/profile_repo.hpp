@@ -31,7 +31,7 @@ namespace app
 
         std::vector<Profile>   getAll() const override;
         std::optional<Profile> get(ProfileId id) const override;
-        std::optional<Profile> get(const std::string&) const override;
+        std::optional<Profile> get(const std::string& name) const override;
 
         ProfileId create(
             const std::string&         name,

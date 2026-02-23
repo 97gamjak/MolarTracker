@@ -15,7 +15,7 @@ namespace db
      * @brief Result of stepping a prepared statement
      *
      */
-    enum class StepResult
+    enum class StepResult : std::uint8_t
     {
         RowAvailable = SQLITE_ROW,
         Done         = SQLITE_DONE
@@ -46,7 +46,7 @@ namespace db
 
         /// The SQL string used to prepare this statement, stored for error
         /// reporting purposes
-        std::string _sqlForErrors{};
+        std::string _sqlForErrors;
 
        public:
         Statement() = default;
@@ -61,8 +61,8 @@ namespace db
         Statement(Statement const&)            = delete;
         Statement& operator=(Statement const&) = delete;
 
-        Statement(Statement&& other);
-        Statement& operator=(Statement&& other);
+        Statement(Statement&& other) noexcept;
+        Statement& operator=(Statement&& other) noexcept;
 
         [[nodiscard]] bool is_valid() const;
 
@@ -70,23 +70,23 @@ namespace db
         void                     executeToCompletion();
         void                     reset();
 
-        void bindNull(const int index);
-        void bindInt64(const int index, std::int64_t value);
-        void bindDouble(const int index, double value);
-        void bindText(const int index, std::string_view value);
+        void bindNull(int index);
+        void bindInt64(int index, std::int64_t value);
+        void bindDouble(int index, double value);
+        void bindText(int index, std::string_view value);
 
-        [[nodiscard]] bool         columnIsNull(const int col) const;
-        [[nodiscard]] std::int64_t columnInt64(const int col) const;
-        [[nodiscard]] double       columnDouble(const int col) const;
-        [[nodiscard]] std::string  columnText(const int col) const;
+        [[nodiscard]] bool         columnIsNull(int col) const;
+        [[nodiscard]] std::int64_t columnInt64(int col) const;
+        [[nodiscard]] double       columnDouble(int col) const;
+        [[nodiscard]] std::string  columnText(int col) const;
 
         [[nodiscard]] sqlite3_stmt* nativeHandle() const;
 
        private:   // PRIVATE HELPER METHODS
-        void        _ensureValid() const;
-        SqliteError _generateError(
+        void                      _ensureValid() const;
+        [[nodiscard]] SqliteError _generateError(
             std::string_view operation,
-            const int        result
+            int              result
         ) const;
 
         void _finalize();

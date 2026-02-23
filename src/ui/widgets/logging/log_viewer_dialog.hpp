@@ -39,7 +39,7 @@ namespace ui
         QTimer* _reloadTimer;
 
        public:
-        explicit LogViewerDialog(Settings& settings, QWidget* parent = nullptr);
+        explicit LogViewerDialog(Settings& settings, QWidget* parent);
 
        protected:
         void hideEvent(QHideEvent* event) override;
@@ -61,13 +61,13 @@ namespace ui
     {
        private:
         /// The interval for auto-reloading the log file, in milliseconds
-        int _reloadIntervalMs = 1000;
+        int _reloadIntervalMs;
 
         /// Whether auto-reload is enabled
-        bool _autoReload = false;
+        bool _autoReload;
 
         /// The line wrap mode for the text edit widget
-        QPlainTextEdit::LineWrapMode _lineWrap = QPlainTextEdit::NoWrap;
+        QPlainTextEdit::LineWrapMode _lineWrap;
 
        public:
         void              setIntervalSec(double intervalSec);

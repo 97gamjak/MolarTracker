@@ -10,7 +10,7 @@
 namespace app
 {
     class AppContext;   // Forward declaration
-}
+}   // namespace app
 
 class QMainWindow;   // Forward declaration
 

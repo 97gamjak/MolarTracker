@@ -35,14 +35,14 @@ namespace ui
 
         /// The error message to be shown in the tooltip when the input is
         /// invalid, this can be set by local validation or by an external error
-        QString _errorText{};
+        QString _errorText;
 
         /// Flag indicating whether there is an external error that should be
         /// shown
         bool _hasExternalError{false};
         /// The external error message to be shown in the tooltip if
         /// _hasExternalError is true
-        QString _externalError{};
+        QString _externalError;
 
         /// Optional label to show error messages below the line edit, this can
         /// be used if we want to show error messages persistently instead of
@@ -51,7 +51,7 @@ namespace ui
         QLabel* _errorLabel = nullptr;
 
        public:
-        explicit LineValidator(QWidget* parent = nullptr);
+        explicit LineValidator(QWidget* parent);
 
         [[nodiscard]] bool    isValid() const;
         [[nodiscard]] QString getErrorText() const;

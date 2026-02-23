@@ -57,7 +57,10 @@ namespace db
      *
      * @param other
      */
-    Statement::Statement(Statement&& other) { _moveFrom(std::move(other)); }
+    Statement::Statement(Statement&& other) noexcept
+    {
+        _moveFrom(std::move(other));
+    }
 
     /**
      * @brief Move assignment operator
@@ -65,7 +68,7 @@ namespace db
      * @param other
      * @return Statement&
      */
-    Statement& Statement::operator=(Statement&& other)
+    Statement& Statement::operator=(Statement&& other) noexcept
     {
         if (this != &other)
         {

@@ -16,7 +16,7 @@ struct LogObject;   // forward declaration
 namespace settings
 {
     class LoggingSettings;   // forward declaration
-}
+}   // namespace settings
 
 /**
  * @brief Singleton class managing logging categories and levels
@@ -26,13 +26,13 @@ class LogManager
 {
    private:
     /// Mapping of log categories to their current log levels.
-    std::unordered_map<LogCategory, LogLevel> _categories{};
+    std::unordered_map<LogCategory, LogLevel> _categories;
 
     /// The ring file logger instance used for logging to files.
-    RingFile _ringFile{};
+    RingFile _ringFile;
 
     /// The directory where log files are stored.
-    std::filesystem::path _logDirectory{};
+    std::filesystem::path _logDirectory;
 
     /// The default log level for categories that are not explicitly set.
     LogLevel _defaultLogLevel{LogLevel::Info};
@@ -63,7 +63,7 @@ class LogManager
    private:
     LogManager();
 
-    std::string _logLevelToString(const LogLevel& level) const;
+    static std::string _logLevelToString(const LogLevel& level);
 };
 
 #endif   // __LOGGING__LOG_MANAGER_HPP__

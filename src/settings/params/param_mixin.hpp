@@ -76,8 +76,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAM_MIXIN_TPP__
+#ifndef __SETTINGS__PARAMS__PARAM_MIXIN_TPP__
 #include "param_mixin.tpp"
-#endif   // __SETTINGS__PARAM_MIXIN_TPP__
+#endif   // __SETTINGS__PARAMS__PARAM_MIXIN_TPP__
 
 #endif   // __SETTINGS__PARAMS__PARAM_MIXIN_HPP__

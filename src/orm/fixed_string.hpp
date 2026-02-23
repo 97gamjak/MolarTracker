@@ -19,6 +19,7 @@ namespace orm
         std::array<char, Size> _data{};
 
         // cppcheck-suppress noExplicitConstructor
+        // NOLINTNEXTLINE
         constexpr fixed_string(char const (&text)[Size]);
 
         [[nodiscard]] constexpr std::string_view view() const;
@@ -30,6 +31,7 @@ namespace orm
      * @tparam Size
      */
     template <std::size_t Size>
+    // NOLINTNEXTLINE
     fixed_string(char const (&)[Size]) -> fixed_string<Size>;
 }   // namespace orm
 

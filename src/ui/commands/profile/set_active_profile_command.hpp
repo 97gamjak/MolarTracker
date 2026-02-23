@@ -10,7 +10,7 @@
 namespace app
 {
     class ProfileStore;   // Forward declaration
-}
+}   // namespace app
 
 namespace ui
 {

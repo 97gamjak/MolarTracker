@@ -2,7 +2,7 @@
 #define __ORM__MODEL_CONCEPT_HPP__
 
 #include <concepts>
-#include <string_view>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>

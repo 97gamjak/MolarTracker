@@ -11,8 +11,9 @@ namespace ui
     void showWarningMessageBox(
         const std::string& title,
         LogObject          logObject,
-        QWidget*           parent = nullptr
+        QWidget*           parent
     );
-}
+
+}   // namespace ui
 
 #endif   // __UI__WIDGETS__UTILS__WARNINGS_HPP__

@@ -16,13 +16,18 @@ namespace ui
         Q_OBJECT
 
        public:
+        static void showFatal(
+            const QString& title,
+            LogObject      logObject,
+            QWidget*       parent
+        );
         static void showFatal(const QString& title, LogObject logObject);
 
        private:
         explicit ExceptionDialog(
             const QString& title,
             const QString& details,
-            QWidget*       parent = nullptr
+            QWidget*       parent
         );
     };
 

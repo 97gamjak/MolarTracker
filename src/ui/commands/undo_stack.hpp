@@ -2,7 +2,6 @@
 #define __UI__COMMANDS__UNDO_STACK_HPP__
 
 #include <QObject>
-#include <memory>
 #include <vector>
 
 #include "command_error.hpp"

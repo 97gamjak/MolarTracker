@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-#include "finance/currency.hpp"
+#include "mstd/type_traits.hpp"
 #include "orm/concepts.hpp"
 #include "orm/orm_exception.hpp"
 
@@ -28,11 +28,7 @@ namespace orm
          * @param index
          * @param value
          */
-        static inline void bind(
-            Statement&   statement,
-            int          index,
-            std::int64_t value
-        )
+        static void bind(Statement& statement, int index, std::int64_t value)
         {
             statement.bindInt64(index, value);
         }
@@ -225,27 +221,24 @@ namespace orm
      *
      * @tparam Statement
      */
-    template <typename Statement>
-    struct binder<Statement, finance::Currency>
+    template <typename Statement, typename T>
+    requires mstd::has_enum_meta<T>
+    struct binder<Statement, T>
     {
-        /// alias for finance::CurrencyMeta
-        using CurrencyMeta = finance::CurrencyMeta;
+        /// alias for enum_meta_t<T>
+        using EnumMeta = mstd::enum_meta_t<T>;
 
         /**
-         * @brief Bind a finance::Currency value to the specified parameter
-         * index
+         * @brief Bind a T value to the specified parameter index
          *
          * @param statement
          * @param index
          * @param value
          */
-        static void bind(
-            Statement&               statement,
-            int                      index,
-            finance::Currency const& value
-        )
+        static void bind(Statement& statement, int index, T const& value)
         {
-            statement.bindText(index, CurrencyMeta::name(value));
+            const auto name = EnumMeta::name(value);
+            statement.bindText(index, std::string{name});
         }
 
         /**
@@ -253,12 +246,11 @@ namespace orm
          *
          * @param statement
          * @param col
-         * @return finance::Currency
+         * @return T
          */
-        static finance::Currency read(Statement const& statement, int col)
+        static T read(Statement const& statement, int col)
         {
-            const auto value =
-                CurrencyMeta::from_string(statement.columnText(col));
+            const auto value = EnumMeta::from_string(statement.columnText(col));
 
             if (!value.has_value())
             {

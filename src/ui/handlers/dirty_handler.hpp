@@ -1,5 +1,5 @@
-#ifndef __UI__CONTROLLER__DIRTY_CONTROLLER_HPP__
-#define __UI__CONTROLLER__DIRTY_CONTROLLER_HPP__
+#ifndef __UI__HANDLERS__DIRTY_HANDLER_HPP__
+#define __UI__HANDLERS__DIRTY_HANDLER_HPP__
 
 #include <vector>
 
@@ -7,13 +7,8 @@
 
 namespace app
 {
-    class StoreContainer;   // Forward declaration
+    class AppContext;   // Forward declaration
 }   // namespace app
-
-namespace settings
-{
-    class Settings;   // Forward declaration
-}   // namespace settings
 
 namespace ui
 {
@@ -23,14 +18,14 @@ namespace ui
 namespace ui
 {
     /**
-     * @brief Controller for managing the dirty state of the application, this
-     * controller is responsible for tracking the dirty state of the application
+     * @brief Handler for managing the dirty state of the application, this
+     * handler is responsible for tracking the dirty state of the application
      * and providing methods for marking the application as dirty or clean, it
      * can also be used to subscribe to changes in the dirty state and to notify
      * subscribers when the dirty state changes.
      *
      */
-    class DirtyStateController
+    class DirtyStateHandler
     {
        private:
         /// Connections for tracking dirty state changes in stores
@@ -40,13 +35,9 @@ namespace ui
         std::vector<Connection> _dirtySettingsConnections;
 
        public:
-        explicit DirtyStateController(
-            app::StoreContainer& storeContainer,
-            settings::Settings&  settings,
-            ui::MainWindow*      mainWindow
-        );
+        void subscribe(app::AppContext& appContext, ui::MainWindow* mainWindow);
     };
 
 }   // namespace ui
 
-#endif   // __UI__CONTROLLER__DIRTY_CONTROLLER_HPP__
+#endif   // __UI__HANDLERS__DIRTY_HANDLER_HPP__

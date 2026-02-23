@@ -2,8 +2,8 @@
 #define __ORM__CRUD_HPP__
 
 #include <cstdint>
-#include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "db/database.hpp"
 #include "db/statement.hpp"
@@ -26,9 +26,7 @@ namespace orm
          * @param table_name
          * @return constexpr std::string
          */
-        static inline constexpr std::string create_table(
-            const std::string& table_name
-        )
+        static constexpr std::string create_table(const std::string& table_name)
         {
             return "CREATE TABLE IF NOT EXISTS " + table_name;
         }
@@ -39,9 +37,7 @@ namespace orm
          * @param table_name
          * @return constexpr std::string
          */
-        static inline constexpr std::string insert_into(
-            const std::string& table_name
-        )
+        static constexpr std::string insert_into(const std::string& table_name)
         {
             return "INSERT INTO " + table_name;
         }

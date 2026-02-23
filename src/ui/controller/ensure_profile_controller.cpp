@@ -175,7 +175,8 @@ namespace ui
                     "profile or create a new one to continue.",
                     defaultProfile
                 )
-            )
+            ),
+            &_mainWindow
         );
 
         if (profileStore.hasProfiles())
@@ -198,7 +199,8 @@ namespace ui
                 "No Default Profile Configured - No default profile is "
                 "configured. You will need to select an existing profile or "
                 "create a new one to continue."
-            )
+            ),
+            &_mainWindow
         );
 
         auto& profileStore = _appContext.getStore().getProfileStore();
@@ -305,12 +307,7 @@ namespace ui
             const auto msg =
                 "Profile '" + profileName + "' selected successfully.";
 
-            showInfoStatusBar(
-                LOG_INFO_OBJECT(
-                    "Profile '" + profileName + "' selected successfully."
-                ),
-                _mainWindow.statusBar()
-            );
+            showInfoStatusBar(LOG_INFO_OBJECT(msg), _mainWindow.statusBar());
         }
     }
 

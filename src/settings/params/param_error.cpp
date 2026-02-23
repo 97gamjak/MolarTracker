@@ -23,8 +23,8 @@ namespace settings
      *
      * @param message The exception message
      */
-    ParamException::ParamException(std::string message)
-        : MolarTrackerException(std::move(message))
+    ParamException::ParamException(const std::string& message)
+        : MolarTrackerException(message)
     {
     }
 

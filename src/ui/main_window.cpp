@@ -11,6 +11,7 @@
 #include "app/app_context.hpp"
 #include "config/constants.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
+#include "ui/handlers/handlers.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/profile/add_profile_dlg.hpp"
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
@@ -22,26 +23,14 @@ namespace ui
     /**
      * @brief Construct a new Main Window:: Main Window object
      *
-     * @param appContext
-     * @param controllers
-     * @param parent
+     * @param appContext The application context
+     * @param handlers The handlers
      */
-    MainWindow::MainWindow(
-        app::AppContext& appContext,
-        Controllers&     controllers,
-        QWidget*         parent
-    )
-        : QMainWindow{parent},
-          _appContext{appContext},
-          _controllers{controllers},
-          _dirtyStateController(
-              std::make_unique<DirtyStateController>(
-                  _appContext.getStore(),
-                  _appContext.getSettings(),
-                  this
-              )
-          )
+    MainWindow::MainWindow(app::AppContext& appContext, Handlers& handlers)
+        : _appContext{appContext}, _handlers{handlers}
     {
+        _handlers.getDirtyStateHandler().subscribe(appContext, this);
+
         setWindowTitle(false);
         resize(5000, 3000);
         _buildUI();
@@ -69,6 +58,7 @@ namespace ui
      */
     void MainWindow::_buildMenuBar()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _menuBar = new MenuBar{this};
         setMenuBar(_menuBar);
 
@@ -108,19 +98,24 @@ namespace ui
      */
     void MainWindow::_buildCentral()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* root = new QWidget{this};
         setCentralWidget(root);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout{root};
         layout->setContentsMargins(8, 8, 8, 8);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* tabs = new QTabWidget{root};
         layout->addWidget(tabs);
 
         // Placeholder pages
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
         tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
         tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
+        // NOLINTEND(cppcoreguidelines-owning-memory)
     }
 
     /**

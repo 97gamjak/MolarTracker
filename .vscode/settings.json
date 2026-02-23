@@ -116,6 +116,7 @@
         "qvboxlayout": "cpp"
     },
     "cSpell.words": [
+        "googletest",
         "MSTD"
     ],
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"

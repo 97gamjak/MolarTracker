@@ -71,9 +71,9 @@ concept JsonSerializable = is_json_serializable_v<T>;
  * @param obj
  */
 template <JsonSerializable T>
-void to_json(nlohmann::json& j, const T& obj)
+void to_json(nlohmann::json& jsonData, const T& obj)
 {
-    j = obj.toJson();
+    jsonData = obj.toJson();
 }
 
 /**
@@ -86,9 +86,9 @@ void to_json(nlohmann::json& j, const T& obj)
  * @param obj
  */
 template <JsonSerializable T>
-void from_json(const nlohmann::json& j, T& obj)
+void from_json(const nlohmann::json& jsonData, T& obj)
 {
-    T::fromJson(j, obj);
+    T::fromJson(jsonData, obj);
 }
 
 #endif   // __JSON__TRAITS_HPP__

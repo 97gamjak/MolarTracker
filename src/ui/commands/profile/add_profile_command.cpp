@@ -53,7 +53,8 @@ namespace ui
 
             return std::unexpected<CommandErrorPtr>(std::move(error));
         }
-        else if (result == app::ProfileStoreResult::Ok)
+
+        if (result == app::ProfileStoreResult::Ok)
         {
             LOG_INFO(std::format("Profile removed: '{}'", _profile.name));
         }

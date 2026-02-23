@@ -1,8 +1,6 @@
 #ifndef __APP__SERVICE_CONTAINER_HPP__
 #define __APP__SERVICE_CONTAINER_HPP__
 
-#include <memory>
-
 #include "services/profile_service.hpp"
 
 namespace app
@@ -23,8 +21,8 @@ namespace app
        public:
         explicit ServiceContainer(RepoContainer& repos);
 
-        IProfileService&       getProfileService();
-        const IProfileService& getProfileService() const;
+        IProfileService&                     getProfileService();
+        [[nodiscard]] const IProfileService& getProfileService() const;
     };
 
 }   // namespace app

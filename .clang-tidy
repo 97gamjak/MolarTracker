@@ -4,6 +4,7 @@ Checks:
   *,
   -altera-unroll-loops,
   -altera-struct-pack-align,
+  -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
@@ -37,9 +38,9 @@ CheckOptions:
 
   ### allow short variable names
   - key:             readability-identifier-length.IgnoredParameterNames
-    value:           '^(id|it)$'
+    value:           '^(id|it|db)$'
   - key:             readability-identifier-length.IgnoredVariableNames
-    value:           '^(id|it)$'
+    value:           '^(id|it|db)$'
   
   ### special member functions
   - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
@@ -49,11 +50,11 @@ CheckOptions:
 
   ### short line statements
   - key:             readability-braces-around-statements.ShortStatementLines
-    value:           2
+    value:           4
   - key:             google-readability-braces-around-statements.ShortStatementLines
-    value:           2
+    value:           4
   - key:             hicpp-braces-around-statements.ShortStatementLines
-    value:           2
+    value:           4
 
   ### allow std::ranges
   - key:             misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic

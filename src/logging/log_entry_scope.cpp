@@ -57,14 +57,16 @@ TimedLogEntryScope::~TimedLogEntryScope()
 {
     if (_enabled)
     {
-        using namespace std::chrono;
+        using std::chrono::duration_cast;
+        using std::chrono::milliseconds;
+        using std::chrono::steady_clock;
 
         const auto timeDifference = steady_clock::now() - _start;
         const auto _ms            = duration_cast<milliseconds>(timeDifference);
-        const auto ms             = _ms.count();
+        const auto time_ms        = _ms.count();
 
         _logObject.message = "⧖ exit  " + std::string(_logObject.function) +
-                             " (duration: " + std::to_string(ms) + " ms)";
+                             " (duration: " + std::to_string(time_ms) + " ms)";
 
         LogManager::getInstance().log(_logObject);
     }

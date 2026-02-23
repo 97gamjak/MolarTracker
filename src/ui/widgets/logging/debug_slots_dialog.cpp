@@ -51,7 +51,7 @@ namespace ui
      */
     void DebugSlotsDialog::setCategories(
         const LogCategoryMap& categories,
-        const bool            overrideReference
+        bool                  overrideReference
     )
     {
         if (overrideReference)
@@ -69,6 +69,7 @@ namespace ui
         setWindowTitle("Logging Debug Flags");
         resize(820, 560);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _tree = new QTreeWidget(this);
         _tree->setColumnCount(2);
         _tree->setHeaderLabels({"Debug Flag", "Value"});
@@ -78,29 +79,35 @@ namespace ui
         header->setSectionResizeMode(QHeaderView::Stretch);
         _tree->setAlternatingRowColors(true);
 
-        _defaultsButton       = new QPushButton("Use default flags", this);
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _defaultsButton = new QPushButton("Use default flags", this);
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _discardChangesButton = new QPushButton("Discard Changes", this);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _showOnlyModifiedCheckBox = new QCheckBox("Show only modified", this);
         _showOnlyModifiedCheckBox->setChecked(false);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _buttonBox = new QDialogButtonBox(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
                 QDialogButtonBox::Apply,
             this
         );
 
-        // bottom row
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* upperBottomRow = new QHBoxLayout();
         upperBottomRow->addWidget(_showOnlyModifiedCheckBox);
         upperBottomRow->addStretch(1);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* bottomRow = new QHBoxLayout();
         bottomRow->addWidget(_defaultsButton);
         bottomRow->addWidget(_discardChangesButton);
         bottomRow->addStretch(1);
         bottomRow->addWidget(_buttonBox);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* root = new QVBoxLayout();
         root->addWidget(_tree, 1);
         root->addLayout(upperBottomRow);
@@ -159,9 +166,9 @@ namespace ui
             _showOnlyModifiedCheckBox,
             &QCheckBox::toggled,
             this,
-            [this](bool on)
+            [this](bool checked)
             {
-                _modifiedOnly = on;
+                _modifiedOnly = checked;
                 populateTree();
             }
         );
@@ -189,21 +196,25 @@ namespace ui
             const auto categoryStr  = std::string(categoryName);
             const auto categoryQStr = QString::fromStdString(categoryStr);
 
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
             auto* treeItem = new QTreeWidgetItem(_tree);
             treeItem->setText(CAT_COL, categoryQStr);
             treeItem->setFirstColumnSpanned(false);
             treeItem->setFlags(treeItem->flags() & ~Qt::ItemIsUserCheckable);
 
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
             auto* combo = new QComboBox(_tree);
             combo->addItems(utils::toQStringList(LogLevelMeta::names));
 
             const auto indexOpt = LogLevelMeta::index(level);
 
             if (!indexOpt.has_value())
+            {
                 LOG_ERROR(
                     "LogLevel for category " + categoryStr +
                     " is invalid, defaulting to Off"
                 );
+            }
 
             combo->setCurrentIndex(static_cast<int>(indexOpt.value_or(0)));
             _tree->setItemWidget(treeItem, LEVEL_COL, combo);
@@ -216,7 +227,7 @@ namespace ui
                 {
                     // column 2 of this row changed
                     const auto levelText =
-                        static_cast<QComboBox*>(QObject::sender())
+                        dynamic_cast<QComboBox*>(QObject::sender())
                             ->currentText()
                             .toStdString();
 

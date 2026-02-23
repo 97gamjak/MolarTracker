@@ -17,29 +17,29 @@ struct adl_serializer<std::optional<T>>
     /**
      * @brief Serialize std::optional<T> to JSON
      *
-     * @param j
+     * @param jsonData
      * @param opt
      */
-    static void to_json(json& j, const std::optional<T>& opt)
+    static void to_json(json& jsonData, const std::optional<T>& opt)
     {
         if (opt.has_value())
-            j = *opt;
+            jsonData = *opt;
         else
-            j = nullptr;
+            jsonData = nullptr;
     }
 
     /**
      * @brief Deserialize std::optional<T> from JSON
      *
-     * @param j
+     * @param jsonData
      * @param opt
      */
-    static void from_json(const json& j, std::optional<T>& opt)
+    static void from_json(const json& jsonData, std::optional<T>& opt)
     {
-        if (j.is_null())
+        if (jsonData.is_null())
             opt = std::nullopt;
         else
-            opt = j.get<T>();
+            opt = jsonData.get<T>();
     }
 };
 NLOHMANN_JSON_NAMESPACE_END

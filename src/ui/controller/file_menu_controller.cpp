@@ -57,7 +57,7 @@ namespace ui
 
         auto* statusBar = _mainWindow.statusBar();
 
-        if (statusBar)
+        if (statusBar != nullptr)
             statusBar->showMessage("Save requested");
     }
 
