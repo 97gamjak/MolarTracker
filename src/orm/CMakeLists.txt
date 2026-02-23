@@ -11,4 +11,5 @@ target_include_directories(molartracker_orm
 target_link_libraries(molartracker_orm
     PUBLIC
     molartracker_db
+    mstd
 )
