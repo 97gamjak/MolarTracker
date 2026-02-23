@@ -4,6 +4,7 @@ Checks:
   *,
   -altera-unroll-loops,
   -altera-struct-pack-align,
+  -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
