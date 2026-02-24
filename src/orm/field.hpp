@@ -62,6 +62,10 @@ namespace orm
 
         template <typename Statement>
         void readFrom(Statement const& statement, int col);
+
+        /// Get the column name for this field TODO: @return fixed_string
+        /// instead of std::string
+        static constexpr auto getColumnName() { return name; }
     };
 
     template <typename Value>

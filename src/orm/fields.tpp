@@ -54,6 +54,16 @@ namespace orm
         return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
     }
 
+    template <typename Model>
+    constexpr auto fields()
+    {
+        auto tuple                     = Model{}.fields();
+        using tuple_type               = rm_ref_t<decltype(tuple)>;
+        constexpr std::size_t n_fields = std::tuple_size_v<tuple_type>;
+
+        return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__FIELDS_TPP__
