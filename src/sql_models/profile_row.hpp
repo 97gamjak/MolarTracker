@@ -8,6 +8,7 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "orm/model_concept.hpp"
 
 /**
  * @brief Represents a row in the "profile" database table
@@ -33,9 +34,16 @@ struct ProfileRow final
     [[nodiscard]] constexpr auto fields();
     [[nodiscard]] constexpr auto fields() const;
 
+    /**
+     * @brief Get the Unique Groups object
+     *
+     * @return constexpr auto
+     */
     static constexpr auto getUniqueGroups()
     {
-        return std::tuple{std::tuple{&ProfileRow::name, &ProfileRow::email}};
+        return orm::unique_set(
+            orm::unique<(&ProfileRow::name), (&ProfileRow::email)>()
+        );
     }
 };
 

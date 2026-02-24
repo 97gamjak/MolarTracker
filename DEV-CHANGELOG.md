@@ -13,6 +13,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `CashAccount` class
 - Add `Transaction` class
 
+#### ORM
+
+- Introduce `unique_group` to make it possible to have multiple fields as a single unique group
+
 #### Testing
 
 - Add test cases for `binder` struct

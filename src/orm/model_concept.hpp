@@ -40,6 +40,42 @@ namespace orm
         requires db_model<T>;
         { instance.getUniqueGroups() } -> tuple_like;
     };
+
+    /**
+     * @brief Represents a unique constraint group for a model
+     *
+     * @tparam Members
+     */
+    template <auto... Members>
+    struct unique_group
+    {
+        /// A tuple of pointers to the fields that are part of this unique group
+        static constexpr auto members = std::tuple{Members...};
+    };
+
+    /**
+     * @brief Helper function to create a unique group
+     *
+     * @tparam Members
+     * @return constexpr unique_group<Members...>
+     */
+    template <auto... Members>
+    constexpr unique_group<Members...> unique()
+    {
+        return {};
+    }
+
+    /**
+     * @brief Helper function to create a set of unique groups
+     *
+     * @tparam Groups
+     * @return constexpr auto
+     */
+    template <typename... Groups>
+    constexpr auto unique_set(Groups... groups)
+    {
+        return std::tuple{groups...};
+    }
 }   // namespace orm
 
 #endif   // __ORM__MODEL_CONCEPT_HPP__
