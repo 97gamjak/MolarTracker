@@ -17,6 +17,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Introduce `unique_group` to make it possible to have multiple fields as a single unique group
 - Introduce bit-wise `FieldConstraints`
+- Add `foreign_key_t` constraint
 
 #### Testing
 
