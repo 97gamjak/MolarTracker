@@ -8,7 +8,7 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
-#include "orm/model_concept.hpp"
+#include "orm/type_traits.hpp"
 
 /**
  * @brief Represents a row in the "profile" database table

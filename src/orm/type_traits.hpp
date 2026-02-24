@@ -16,7 +16,7 @@ namespace orm
      */
     template <typename T>
     concept tuple_like =
-        requires { std::tuple_size<std::remove_reference_t<T>>::value; };
+        requires { std::tuple_size_v<std::remove_reference_t<T>>; };
 
     /**
      * @brief Concept for database models

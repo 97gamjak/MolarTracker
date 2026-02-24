@@ -3,15 +3,14 @@
 
 #include <cstdint>
 #include <string>
-#include <tuple>
 #include <vector>
 
+#include "crud/create.hpp"   // IWYU pragma: export
 #include "db/database.hpp"
 #include "db/statement.hpp"
-#include "logging/log_macros.hpp"
 #include "orm/binder.hpp"
 #include "orm/fields.hpp"
-#include "orm/model_concept.hpp"
+#include "orm/type_traits.hpp"
 #include "orm_exception.hpp"
 
 namespace orm
@@ -23,17 +22,6 @@ namespace orm
     struct SQL
     {
         /**
-         * @brief Create table SQL statement
-         *
-         * @param table_name
-         * @return constexpr std::string
-         */
-        static constexpr std::string create_table(const std::string& table_name)
-        {
-            return "CREATE TABLE IF NOT EXISTS " + table_name;
-        }
-
-        /**
          * @brief Insert into SQL statement
          *
          * @param table_name
@@ -44,114 +32,6 @@ namespace orm
             return "INSERT INTO " + table_name;
         }
     };
-
-    /**
-     * @brief Create a table for the specified model if it doesn't exist
-     *
-     * @tparam Model
-     * @param database
-     */
-    template <typename Model, typename Group, std::size_t... I>
-    void append_unique_group_sql_impl(
-        std::string& sql,
-        std::index_sequence<I...>
-    )
-    {
-        auto const& members = Group::members;
-
-        sql        += ", UNIQUE (";
-        bool first  = true;
-
-        auto append_column = [&](auto member)
-        {
-            if (!first)
-                sql += ", ";
-            first = false;
-
-            sql += std::string((Model{}.*member).getColumnName().view());
-        };
-
-        (std::apply([&](auto... m) { (append_column(m), ...); }, members));
-        sql += ")";
-    }
-
-    /**
-     * @brief Append SQL for a unique group to the provided SQL string
-     *
-     * @tparam Model
-     * @tparam Group
-     * @param sql
-     */
-    template <typename Model, typename Group>
-    void append_unique_group_sql(std::string& sql)
-    {
-        constexpr std::size_t n = std::tuple_size_v<
-            std::remove_reference_t<decltype(Group::members)>>;
-
-        append_unique_group_sql_impl<Model, Group>(
-            sql,
-            std::make_index_sequence<n>{}
-        );
-    }
-
-    /**
-     * @brief Append SQL for all unique groups of a model
-     *
-     * @tparam Model
-     * @tparam Groups
-     * @tparam I
-     * @param sql
-     * @param groups
-     * @param index_sequence
-     */
-    template <typename Model, typename Groups, std::size_t... I>
-    void append_all_unique_groups_sql(
-        std::string& sql,
-        Groups,
-        std::index_sequence<I...>
-    )
-    {
-        (append_unique_group_sql<Model, std::tuple_element_t<I, Groups>>(sql),
-         ...);
-    }
-
-    /**
-     * @brief Create a table for the specified model in the database
-     *
-     * @tparam Model
-     * @param database
-     */
-    template <db_model Model>
-    void create_table(db::Database& database)
-    {
-        const auto fieldViews = orm::fields<Model>();
-        auto       sqlText    = SQL::create_table(Model::table_name) + " (";
-        auto       firstCol   = true;
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (!firstCol)
-                sqlText += ", ";
-
-            firstCol  = false;
-            sqlText  += field.ddl();
-        }
-
-        if constexpr (has_unique_groups<Model>)
-        {
-            auto const            groups = Model::getUniqueGroups();
-            constexpr std::size_t m      = std::tuple_size_v<decltype(groups)>;
-            append_all_unique_groups_sql<Model>(
-                sqlText,
-                groups,
-                std::make_index_sequence<m>{}
-            );
-        }
-
-        sqlText += ");";
-
-        database.execute(sqlText);
-    }
 
     /**
      * @brief Insert a row into the database
