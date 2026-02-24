@@ -18,10 +18,15 @@ struct CashInstrumentRow
 {
     static constexpr std::string table_name = "cash_instrument";
 
-    orm::IdField<InstrumentId> id;
+    orm::Field < "id", InstrumentId, orm::primary_key_t,
+        orm::foreign_key_t < orm::
 
-    orm::Field<"currency", finance::Currency, orm::not_null_t, orm::unique_t>
-        currency;
+                                 orm::Field<
+                                     "currency",
+                                     finance::Currency,
+                                     orm::not_null_t,
+                                     orm::unique_t>
+                                     currency;
 };
 
 #endif   // __SQL_MODELS__INSTRUMENT_ROW_HPP__
