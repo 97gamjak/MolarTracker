@@ -6,6 +6,7 @@
 
 #include "config/id_types.hpp"
 #include "mstd/enum.hpp"
+#include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
@@ -40,6 +41,11 @@ namespace finance
 
         /// An optional comment or description for the transaction
         std::optional<std::string> _comment;
+
+        /// A list of entries associated with the transaction, each entry
+        /// represents a specific cash movement or account change related to the
+        /// transaction
+        std::vector<TransactionEntry> _entries;
 
        public:
         explicit Transaction(
