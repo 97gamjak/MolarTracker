@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "db/database.hpp"
@@ -43,6 +44,50 @@ namespace orm
         }
     };
 
+    template <typename Model, typename Group, std::size_t... I>
+    void append_unique_group_sql(
+        std::string& sql,
+        Group const& group,
+        std::index_sequence<I...>
+    )
+    {
+        // Optional constraint name (stable & readable)
+        sql += ", CONSTRAINT uq_";
+        sql += std::string(Model::table_name);
+
+        ((sql += "_", sql += std::string(std::get<I>(group).getColumnName())),
+         ...);
+
+        sql        += " UNIQUE (";
+        bool first  = true;
+        ((sql += (first ? (first = false, "") : ", "),
+          sql += std::string(std::get<I>(group).getColumnName())),
+         ...);
+        sql += ")";
+    }
+
+    template <typename Model, typename Group>
+    void append_unique_group_sql(std::string& sql, Group const& group)
+    {
+        constexpr std::size_t n =
+            std::tuple_size_v<std::remove_reference_t<Group>>;
+        append_unique_group_sql<Model>(
+            sql,
+            group,
+            std::make_index_sequence<n>{}
+        );
+    }
+
+    template <typename Model, typename Groups, std::size_t... I>
+    void append_all_unique_groups_sql(
+        std::string&  sql,
+        Groups const& groups,
+        std::index_sequence<I...>
+    )
+    {
+        (append_unique_group_sql<Model>(sql, std::get<I>(groups)), ...);
+    }
+
     /**
      * @brief Create a table for the specified model in the database
      *
@@ -63,6 +108,17 @@ namespace orm
 
             firstCol  = false;
             sqlText  += field.ddl();
+        }
+
+        if constexpr (has_unique_groups<Model>)
+        {
+            auto const            groups = Model::getUniqueGroups();
+            constexpr std::size_t m      = std::tuple_size_v<decltype(groups)>;
+            append_all_unique_groups_sql<Model>(
+                sqlText,
+                groups,
+                std::make_index_sequence<m>{}
+            );
         }
 
         sqlText += ");";

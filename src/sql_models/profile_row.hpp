@@ -32,6 +32,11 @@ struct ProfileRow final
    public:   // methods
     [[nodiscard]] constexpr auto fields();
     [[nodiscard]] constexpr auto fields() const;
+
+    static constexpr auto getUniqueGroups()
+    {
+        return std::tuple{std::tuple{&ProfileRow::name, &ProfileRow::email}};
+    }
 };
 
 #ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__

@@ -29,6 +29,17 @@ namespace orm
         { instance.fields() } -> tuple_like;
         { std::as_const(instance).fields() } -> tuple_like;
     };
+
+    /**
+     * @brief Concept for checking if a model has unique groups
+     *
+     * @tparam T
+     */
+    template <typename T>
+    concept has_unique_groups = requires(T instance) {
+        requires db_model<T>;
+        { instance.getUniqueGroups() } -> tuple_like;
+    };
 }   // namespace orm
 
 #endif   // __ORM__MODEL_CONCEPT_HPP__
