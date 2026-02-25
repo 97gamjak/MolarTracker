@@ -2,10 +2,10 @@
 #define __ORM__CRUD_HPP__
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
-#include "crud/create.hpp"   // IWYU pragma: export
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "orm/binder.hpp"
@@ -15,167 +15,18 @@
 
 namespace orm
 {
-    /**
-     * @brief SQL statement helpers
-     *
-     */
-    struct SQL
-    {
-        /**
-         * @brief Insert into SQL statement
-         *
-         * @param table_name
-         * @return constexpr std::string
-         */
-        static constexpr std::string insert_into(const std::string& table_name)
-        {
-            return "INSERT INTO " + table_name;
-        }
-    };
 
-    /**
-     * @brief Insert a row into the database
-     *
-     * @tparam Model
-     * @param database
-     * @param row
-     * @return std::int64_t The last inserted row ID
-     */
     template <db_model Model>
-    [[nodiscard]] std::int64_t insert(db::Database& database, Model const& row)
-    {
-        auto const fieldViews = orm::fields(row);
-        auto       sqlText    = SQL::insert_into(Model::table_name) + " (";
-        auto       firstCol   = true;
+    void create_table(db::Database& database);
 
-        for (FieldView const& field : fieldViews)
-        {
-            if (field.isAutoIncrementPk())
-                continue;
-
-            if (!firstCol)
-                sqlText += ", ";
-
-            firstCol  = false;
-            sqlText  += std::string{field.getColumnName()};
-        }
-
-        sqlText += ") VALUES (";
-
-        firstCol = true;
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (field.isAutoIncrementPk())
-                continue;
-
-            if (!firstCol)
-                sqlText += ", ";
-
-            firstCol  = false;
-            sqlText  += "?";
-        }
-
-        sqlText += ");";
-
-        db::Statement statement = database.prepare(sqlText);
-
-        int index = 1;
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (field.isAutoIncrementPk())
-                continue;
-
-            field.bind(statement, index);
-            ++index;
-        }
-
-        statement.executeToCompletion();
-        return database.lastInsertRowid();
-    }
-
-    /**
-     * @brief Update a row in the database
-     *
-     * @tparam Model
-     * @param database
-     * @param row
-     */
     template <db_model Model>
-    void update(db::Database& database, Model const& row)
-    {
-        auto const fieldViews = orm::fields(row);
+    [[nodiscard]] std::optional<std::int64_t> insert(
+        db::Database& database,
+        const Model&  row
+    );
 
-        std::string sqlText;
-        sqlText += "UPDATE ";
-        sqlText += Model::table_name;
-        sqlText += " SET ";
-
-        bool firstAssignment = true;
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (field.isPk())
-                continue;
-
-            if (!firstAssignment)
-                sqlText += ", ";
-
-            firstAssignment  = false;
-            sqlText         += std::string{field.getColumnName()};
-            sqlText         += "=?";
-        }
-
-        sqlText += " WHERE ";
-
-        bool whereIsPresent = false;
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (!field.isPk())
-                continue;
-
-            if (!whereIsPresent)
-            {
-                whereIsPresent  = true;
-                sqlText        += std::string{field.getColumnName()};
-                sqlText        += "=?";
-            }
-        }
-
-        if (!whereIsPresent)
-        {
-            throw ORMError(
-                "orm::update requires at least one primary key field"
-            );
-        }
-
-        sqlText += ";";
-
-        db::Statement statement = database.prepare(sqlText);
-
-        int index = 1;
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (field.isPk())
-                continue;
-
-            field.bind(statement, index);
-            ++index;
-        }
-
-        for (FieldView const& field : fieldViews)
-        {
-            if (!field.isPk())
-                continue;
-
-            field.bind(statement, index);
-        }
-
-        statement.executeToCompletion();
-    }
+    template <db_model Model>
+    void update(db::Database& database, const Model& row);
 
     /**
      * @brief Get rows by matching field value
@@ -482,5 +333,8 @@ namespace orm
     }
 
 }   // namespace orm
+
+#include "crud/create.hpp"   // IWYU pragma: keep
+#include "crud/insert.hpp"   // IWYU pragma: keep
 
 #endif   // __ORM__CRUD_HPP__

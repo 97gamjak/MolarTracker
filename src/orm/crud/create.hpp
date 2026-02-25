@@ -31,7 +31,11 @@ namespace orm
 
         auto const& members = Group::members;
 
-        (std::apply([&](auto... m) { (append_column(m), ...); }, members));
+        (std::apply(
+            [&](auto... member) { (append_column(member), ...); },
+            members
+        ));
+
         sql += ")";
     }
 
@@ -47,10 +51,7 @@ namespace orm
     {
         constexpr auto size = std::tuple_size_v<decltype(Group::members)>;
 
-        append_unique_group_sql_impl<Model, Group>(
-            sql,
-            std::make_index_sequence<size>{}
-        );
+        append_unique_group_sql_impl<Model, Group>(sql, index_seq<size>{});
     }
 
     /**
@@ -89,7 +90,7 @@ namespace orm
 
         auto firstCol = true;
 
-        for (FieldView const& field : orm::fields<Model>())
+        for (const auto& field : orm::fields<Model>())
         {
             if (!firstCol)
                 sqlText += ", ";
@@ -105,7 +106,7 @@ namespace orm
             append_all_unique_groups_sql<Model>(
                 sqlText,
                 groups,
-                std::make_index_sequence<size>{}
+                index_seq<size>{}
             );
         }
 

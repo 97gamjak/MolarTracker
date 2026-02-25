@@ -231,21 +231,27 @@ namespace db
      *
      * @return std::int64_t
      */
-    std::int64_t Database::lastInsertRowid() const
+    std::optional<std::int64_t> Database::getLastInsertRowid() const
     {
         _ensureOpen();
-        return static_cast<std::int64_t>(sqlite3_last_insert_rowid(_db));
+        const auto lastRowId = sqlite3_last_insert_rowid(_db);
+
+        if (lastRowId == 0)
+            return std::nullopt;
+
+        return static_cast<int64_t>(lastRowId);
     }
 
     /**
      * @brief get the number of rows changed by the last executed statement
      *
-     * @return int
+     * @return int64_t
      */
-    int Database::changes() const
+    std::int64_t Database::getNumberOfLastChanges() const
     {
         _ensureOpen();
-        return sqlite3_changes(_db);
+
+        return static_cast<int64_t>(sqlite3_changes64(_db));
     }
 
     /**

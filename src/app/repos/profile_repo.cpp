@@ -96,7 +96,7 @@ namespace app
         const auto profile = Profile{ProfileId::from(0), name, email};
         const auto rowId   = orm::insert(_db, ProfileFactory::toRow(profile));
 
-        if (rowId <= 0)
+        if (!rowId.has_value())
         {
             // TODO(97gamjak): introduce MT specific error handling for repos
             // https://97gamjak.atlassian.net/browse/MOLTRACK-87
@@ -105,20 +105,7 @@ namespace app
             );
         }
 
-        const auto createdProfile = get(name);
-        if (!createdProfile.has_value())
-        {
-            // TODO(97gamjak): introduce MT specific error handling for repos
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-87
-            throw std::runtime_error(
-                std::format(
-                    "Failed to retrieve newly created profile with name '{}'",
-                    name
-                )
-            );
-        }
-
-        return createdProfile->getId();
+        return ProfileId{rowId.value()};
     }
 
     /**
