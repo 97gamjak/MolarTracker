@@ -1,31 +1,63 @@
 #ifndef __ORM__CRUD__UPDATE_HPP__
 #define __ORM__CRUD__UPDATE_HPP__
 
-#include <ranges>
 #include <string>
 #include <vector>
 
 #include "db/database.hpp"
+#include "mstd/enum.hpp"
+#include "orm/constraints.hpp"
 #include "orm/fields.hpp"
 #include "orm/orm_exception.hpp"
 #include "orm/type_traits.hpp"
+#include "utils/string.hpp"
 
 namespace orm
 {
+
+    // NOLINTBEGIN
+#define ORM_CONSTRAINT_MODE(X) \
+    X(All)                     \
+    X(Not)                     \
+    X(Only)
+
+    MSTD_ENUM(ORMConstraintMode, uint8_t, ORM_CONSTRAINT_MODE);
+    // NOLINTEND
+
     template <typename FieldRange>
-    std::vector<std::string> getColumnNamesBinder(
+    std::vector<std::string> getColumnNames(
         const FieldRange& fields,
-        bool              usePrimaryKey
+        ORMConstraint     constraint,
+        ORMConstraintMode mode
+    )
+    {
+        return getColumnNames(fields, constraint, mode, "");
+    }
+
+    template <typename FieldRange>
+    std::vector<std::string> getColumnNames(
+        const FieldRange&  fields,
+        ORMConstraint      constraint,
+        ORMConstraintMode  mode,
+        const std::string& suffix
     )
     {
         std::vector<std::string> sqlTexts;
 
         for (const auto& field : fields)
         {
-            if (usePrimaryKey != field.isPk())
-                continue;
+            if (mode == ORMConstraintMode::Only)
+            {
+                if ((field.getConstraints() & constraint) == constraint)
+                    continue;
+            }
+            else if (mode == ORMConstraintMode::Not)
+            {
+                if ((field.getConstraints() & constraint) != constraint)
+                    continue;
+            }
 
-            sqlTexts.push_back(std::string{field.getColumnName()} + "=?");
+            sqlTexts.push_back(std::string{field.getColumnName()} + suffix);
         }
 
         return sqlTexts;
@@ -35,28 +67,28 @@ namespace orm
     void bindFieldsToStatement(
         db::Statement&    statement,
         const FieldRange& fields,
-        bool              bindPrimaryKey
+        ORMConstraint     constraint,
+        ORMConstraintMode mode
     )
     {
         int index = 1;
 
         for (const auto& field : fields)
         {
-            if (bindPrimaryKey != field.isPk())
-                continue;
+            if (mode == ORMConstraintMode::Only)
+            {
+                if ((field.getConstraints() & constraint) == constraint)
+                    continue;
+            }
+            else if (mode == ORMConstraintMode::Not)
+            {
+                if ((field.getConstraints() & constraint) != constraint)
+                    continue;
+            }
 
             field.bind(statement, index);
             ++index;
         }
-    }
-
-    std::string concat(
-        const std::vector<std::string>& vector,
-        const std::string&              delimiter
-    )
-    {
-        auto joined = std::ranges::views::join_with(vector, delimiter);
-        return {joined.begin(), joined.end()};
     }
 
     /**
@@ -78,10 +110,21 @@ namespace orm
 
         auto firstAssignment = true;
 
-        sqlText += concat(getColumnNamesBinder(fieldViews, false), ", ");
+        const auto columnNames = getColumnNamesBinder(
+            fieldViews,
+            ORMConstraint::PrimaryKey,
+            ORMConstraintMode::Not
+        );
+
+        sqlText += utils::join(columnNames, ", ");
         sqlText += " WHERE ";
 
-        const auto whereClauses = getColumnNamesBinder(fieldViews, true);
+        const auto whereClauses = getColumnNamesBinder(
+            fieldViews,
+            ORMConstraint::PrimaryKey,
+            ORMConstraintMode::Only,
+            " = ?"
+        );
 
         if (whereClauses.empty())
         {
@@ -90,7 +133,7 @@ namespace orm
             );
         }
 
-        sqlText += concat(whereClauses, " AND ");
+        sqlText += utils::join(whereClauses, " AND ");
         sqlText += ";";
 
         db::Statement statement = database.prepare(sqlText);

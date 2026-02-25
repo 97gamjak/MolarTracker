@@ -174,6 +174,18 @@ namespace orm
         }
     }
 
+    template <fixed_string Name, typename Value, typename... Options>
+    constexpr auto Field<Name, Value, Options...>::getColumnName()
+    {
+        return name;
+    }
+
+    template <fixed_string Name, typename Value, typename... Options>
+    consteval ORMConstraint Field<Name, Value, Options...>::getConstraints()
+    {
+        return (ORMConstraint{} | ... | Options::value);
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__FIELD_TPP__

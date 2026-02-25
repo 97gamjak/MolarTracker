@@ -336,5 +336,6 @@ namespace orm
 
 #include "crud/create.hpp"   // IWYU pragma: keep
 #include "crud/insert.hpp"   // IWYU pragma: keep
+#include "crud/update.hpp"   // IWYU pragma: keep
 
 #endif   // __ORM__CRUD_HPP__

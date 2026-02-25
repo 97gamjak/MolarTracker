@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "db/statement.hpp"
+#include "orm/constraints.hpp"
 
 namespace orm
 {
@@ -15,6 +16,7 @@ namespace orm
     class FieldView
     {
        private:
+        using _field = void*;
         /// Type alias for the bind function pointer type, which takes a pointer
         /// to the field's value, a reference to a db::Statement, and an index,
         /// and returns void
@@ -84,6 +86,8 @@ namespace orm
 
         template <typename Field>
         static FieldView from(Field const& field);
+
+        static consteval ORMConstraint getConstraints();
 
        private:
         void _ensureBindable() const;
