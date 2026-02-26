@@ -63,9 +63,8 @@ namespace orm
         template <typename Statement>
         void readFrom(Statement const& statement, int col);
 
-        static constexpr auto getColumnName();
-
-        static consteval ORMConstraint getConstraints();
+        [[nodiscard]] static constexpr auto          getColumnName();
+        [[nodiscard]] static constexpr ORMConstraint getConstraints();
     };
 
     template <typename Value>

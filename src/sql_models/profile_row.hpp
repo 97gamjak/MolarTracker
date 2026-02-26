@@ -34,17 +34,7 @@ struct ProfileRow final
     [[nodiscard]] constexpr auto fields();
     [[nodiscard]] constexpr auto fields() const;
 
-    /**
-     * @brief Get the Unique Groups object
-     *
-     * @return constexpr auto
-     */
-    static constexpr auto getUniqueGroups()
-    {
-        return orm::unique_set(
-            orm::unique<(&ProfileRow::name), (&ProfileRow::email)>()
-        );
-    }
+    [[nodiscard]] static constexpr auto getUniqueGroups();
 };
 
 #ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__

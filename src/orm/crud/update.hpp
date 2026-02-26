@@ -110,7 +110,7 @@ namespace orm
 
         auto firstAssignment = true;
 
-        const auto columnNames = getColumnNamesBinder(
+        const auto columnNames = getColumnNames(
             fieldViews,
             ORMConstraint::PrimaryKey,
             ORMConstraintMode::Not
@@ -119,7 +119,7 @@ namespace orm
         sqlText += utils::join(columnNames, ", ");
         sqlText += " WHERE ";
 
-        const auto whereClauses = getColumnNamesBinder(
+        const auto whereClauses = getColumnNames(
             fieldViews,
             ORMConstraint::PrimaryKey,
             ORMConstraintMode::Only,
@@ -138,8 +138,18 @@ namespace orm
 
         db::Statement statement = database.prepare(sqlText);
 
-        bindFieldsToStatement(statement, fieldViews, false);
-        bindFieldsToStatement(statement, fieldViews, true);
+        bindFieldsToStatement(
+            statement,
+            fieldViews,
+            ORMConstraint::PrimaryKey,
+            ORMConstraintMode::Not
+        );
+        bindFieldsToStatement(
+            statement,
+            fieldViews,
+            ORMConstraint::PrimaryKey,
+            ORMConstraintMode::Only
+        );
 
         statement.executeToCompletion();
 

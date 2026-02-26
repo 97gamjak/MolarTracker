@@ -181,7 +181,7 @@ namespace orm
     }
 
     template <fixed_string Name, typename Value, typename... Options>
-    consteval ORMConstraint Field<Name, Value, Options...>::getConstraints()
+    constexpr ORMConstraint Field<Name, Value, Options...>::getConstraints()
     {
         return (ORMConstraint{} | ... | Options::value);
     }
