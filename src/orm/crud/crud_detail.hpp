@@ -3,7 +3,11 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 
+#include "db/database.hpp"
+#include "db/statement.hpp"
+#include "orm/constraints.hpp"
 #include "orm/fields.hpp"
 
 namespace orm
@@ -77,6 +81,116 @@ namespace orm
     {
         (appendUniqueGroup<Model, std::tuple_element_t<I, Groups>>(sql), ...);
     }
+
+    // NOLINTBEGIN
+#define ORM_CONSTRAINT_MODE(X) \
+    X(All)                     \
+    X(Not)                     \
+    X(Only)
+
+    MSTD_ENUM(ORMConstraintMode, uint8_t, ORM_CONSTRAINT_MODE);
+    // NOLINTEND
+
+    /**
+     * @brief Get column names from a range of FieldView based on constraints
+     *
+     * @tparam FieldRange
+     * @param fields
+     * @param constraint
+     * @param mode
+     * @return std::vector<std::string>
+     */
+    template <typename FieldRange>
+    std::vector<std::string> getColumnNames(
+        const FieldRange& fields,
+        ORMConstraint     constraint,
+        ORMConstraintMode mode
+    )
+    {
+        return getColumnNames(fields, constraint, mode, "");
+    }
+
+    /**
+     * @brief Get column names with suffix from a range of FieldView based on
+     * constraints
+     *
+     * @tparam FieldRange
+     * @param fields
+     * @param constraint
+     * @param mode
+     * @param suffix
+     * @return std::vector<std::string>
+     */
+    template <typename FieldRange>
+    std::vector<std::string> getColumnNames(
+        const FieldRange&  fields,
+        ORMConstraint      constraint,
+        ORMConstraintMode  mode,
+        const std::string& suffix
+    )
+    {
+        std::vector<std::string> sqlTexts;
+
+        for (const auto& field : fields)
+        {
+            if (mode == ORMConstraintMode::Only)
+            {
+                if ((field.getConstraints() & constraint) == constraint)
+                    continue;
+            }
+            else if (mode == ORMConstraintMode::Not)
+            {
+                if ((field.getConstraints() & constraint) != constraint)
+                    continue;
+            }
+
+            sqlTexts.push_back(std::string{field.getColumnName()} + suffix);
+        }
+
+        return sqlTexts;
+    }
+
+    /**
+     * @brief Bind field values to a statement based on constraints
+     *
+     * @tparam FieldRange
+     * @param statement
+     * @param fields
+     * @param constraint
+     * @param mode
+     */
+    template <typename FieldRange>
+    void bindFieldsToStatement(
+        db::Statement&    statement,
+        const FieldRange& fields,
+        ORMConstraint     constraint,
+        ORMConstraintMode mode
+    )
+    {
+        int index = 1;
+
+        for (const auto& field : fields)
+        {
+            if (mode == ORMConstraintMode::Only)
+            {
+                if ((field.getConstraints() & constraint) == constraint)
+                    continue;
+            }
+            else if (mode == ORMConstraintMode::Not)
+            {
+                if ((field.getConstraints() & constraint) != constraint)
+                    continue;
+            }
+
+            field.bind(statement, index);
+            ++index;
+        }
+    }
+
 }   // namespace orm
+
+#ifndef __ORM__CRUD__CRUD_DETAIL_TPP__
+#include "crud_detail.tpp"
+#endif   // __ORM__CRUD__CRUD_DETAIL_TPP__
 
 #endif   // __ORM__CRUD__CRUD_DETAIL_HPP__

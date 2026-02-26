@@ -18,7 +18,8 @@ namespace orm
      * @tparam Model
      * @param database
      * @param row
-     * @return std::int64_t The last inserted row ID
+     * @return std::expected<std::int64_t, CrudError> The ID of the inserted row
+     * or an error
      */
     template <db_model Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
