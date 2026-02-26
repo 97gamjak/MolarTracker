@@ -69,10 +69,13 @@ namespace orm
         /// Function pointer for getting the DDL definition of the field
         ddl_function_type _ddlFunction{nullptr};
 
+        ORMConstraint _constraints{};
+
        public:
         FieldView() = default;
 
         [[nodiscard]] std::string_view getColumnName() const;
+        [[nodiscard]] ORMConstraint    getConstraints() const;
         [[nodiscard]] bool             isPk() const;
         [[nodiscard]] bool             isAutoIncrement() const;
         [[nodiscard]] bool             isAutoIncrementPk() const;
@@ -86,8 +89,6 @@ namespace orm
 
         template <typename Field>
         static FieldView from(Field const& field);
-
-        static consteval ORMConstraint getConstraints();
 
        private:
         void _ensureBindable() const;

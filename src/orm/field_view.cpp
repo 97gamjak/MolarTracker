@@ -16,6 +16,13 @@ namespace orm
     std::string_view FieldView::getColumnName() const { return _columnName; }
 
     /**
+     * @brief Get the field constraints
+     *
+     * @return ORMConstraint
+     */
+    ORMConstraint FieldView::getConstraints() const { return _constraints; }
+
+    /**
      * @brief Check if the field is a primary key
      *
      * @return true

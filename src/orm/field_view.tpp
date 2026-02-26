@@ -15,11 +15,18 @@ namespace orm
     template <typename Field>
     FieldView FieldView::from(Field& field)
     {
+        static_assert(
+            Field::isAutoIncrement && !Field::isPk,
+            "Auto-incrementing fields that are not primary keys are not "
+            "supported!"
+        );
         FieldView view{};
         view._mutableFieldAddress = static_cast<void*>(&field);
         view._constFieldAddress   = static_cast<void const*>(&field);
 
-        view._columnName        = Field::name.view();
+        view._columnName  = Field::name.view();
+        view._constraints = Field::getConstraints();
+
         view._isPk              = Field::isPk;
         view._isAutoIncrement   = Field::isAutoIncrement;
         view._isAutoIncrementPk = Field::isAutoIncrementPk;
@@ -54,11 +61,17 @@ namespace orm
     template <typename Field>
     FieldView FieldView::from(Field const& field)
     {
+        static_assert(
+            Field::isAutoIncrement && !Field::isPk,
+            "Auto-incrementing fields that are not primary keys are not "
+            "supported!"
+        );
         FieldView view{};
         view._mutableFieldAddress = nullptr;
         view._constFieldAddress   = static_cast<void const*>(&field);
 
         view._columnName        = Field::name.view();
+        view._constraints       = Field::getConstraints();
         view._isPk              = Field::isPk;
         view._isAutoIncrement   = Field::isAutoIncrement;
         view._isAutoIncrementPk = Field::isAutoIncrementPk;
