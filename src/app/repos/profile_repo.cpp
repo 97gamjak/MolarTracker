@@ -5,10 +5,14 @@
 #include <vector>
 
 #include "app/factories/profile_factory.hpp"
+#include "config/logging_base.hpp"
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud.hpp"
 #include "sql_models/profile_row.hpp"
+
+#define __LOG_CATEGORY__ LogCategory::repo_profile
+#include "logging/log_macros.hpp"
 
 namespace app
 {
@@ -96,16 +100,16 @@ namespace app
         const auto profile = Profile{ProfileId::from(0), name, email};
         const auto rowId   = orm::insert(_db, ProfileFactory::toRow(profile));
 
-        if (!rowId.has_value())
-        {
-            // TODO(97gamjak): introduce MT specific error handling for repos
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-87
-            throw std::runtime_error(
-                std::format("Failed to insert new profile with name '{}'", name)
-            );
-        }
+        if (rowId.has_value())
+            return ProfileId::from(rowId.value());
 
-        return ProfileId{rowId.value()};
+        const auto msg =
+            "Inserting profile with name '" + name +
+            "' failed: " + rowId.error().getMessage() + " (type: " +
+            orm::CrudErrorTypeMeta::toString(rowId.error().getType()) + ")";
+
+        LOG_ERROR(msg);
+        throw orm::CrudException(msg);
     }
 
     /**

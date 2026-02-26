@@ -13,10 +13,23 @@ namespace orm
 #define CRUD_ERROR_LIST(X) \
     X(NoRowsUpdated)       \
     X(NoPrimaryKey)        \
-    X(MultipleRowsUpdated)
+    X(MultipleRowsUpdated) \
+    X(InsertFailed)
 
     MSTD_ENUM(CrudErrorType, uint8_t, CRUD_ERROR_LIST);
     // NOLINTEND
+
+    /**
+     * @brief Exception class for CRUD operation errors
+     *
+     */
+    class CrudException : public MolarTrackerException
+    {
+       public:
+        explicit CrudException(const std::string& message);
+
+        [[nodiscard]] const char* what() const noexcept override;
+    };
 
     /**
      * @brief Error class for CRUD operation return values
@@ -29,25 +42,10 @@ namespace orm
         std::string   _message;
 
        public:
-        CrudError(CrudErrorType type, std::string message)
-            : _type(type), _message(std::move(message))
-        {
-        }
+        CrudError(CrudErrorType type, std::string message);
 
         [[nodiscard]] CrudErrorType      getType() const;
         [[nodiscard]] const std::string& getMessage() const;
-    };
-
-    /**
-     * @brief Exception class for CRUD operation errors
-     *
-     */
-    class CrudException : public MolarTrackerException
-    {
-       public:
-        explicit CrudException(const std::string& message);
-
-        [[nodiscard]] const char* what() const noexcept override;
     };
 
 }   // namespace orm

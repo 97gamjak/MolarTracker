@@ -2,8 +2,10 @@
 #define __ORM__CRUD__INSERT_HPP__
 
 #include <cstdint>
+#include <expected>
 #include <optional>
 
+#include "crud_error.hpp"
 #include "db/database.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
@@ -19,7 +21,7 @@ namespace orm
      * @return std::int64_t The last inserted row ID
      */
     template <db_model Model>
-    [[nodiscard]] std::optional<std::int64_t> insert(
+    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
         db::Database& database,
         const Model&  row
     )
@@ -72,7 +74,17 @@ namespace orm
         }
 
         statement.executeToCompletion();
-        return database.getLastInsertRowid();
+
+        const auto lastInsertId = database.getLastInsertRowid();
+        if (lastInsertId.has_value())
+            return lastInsertId.value();
+
+        const auto error = CrudError{
+            CrudErrorType::InsertFailed,
+            "Failed to retrieve last insert ID after insert operation"
+        };
+
+        return std::unexpected(error);
     }
 
 }   // namespace orm

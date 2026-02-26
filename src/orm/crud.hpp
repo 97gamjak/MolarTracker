@@ -2,6 +2,7 @@
 #define __ORM__CRUD_HPP__
 
 #include <cstdint>
+#include <expected>
 #include <optional>
 #include <string>
 #include <vector>
@@ -9,6 +10,7 @@
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "orm/binder.hpp"
+#include "orm/crud/crud_error.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
 #include "orm_exception.hpp"
@@ -20,7 +22,7 @@ namespace orm
     void create_table(db::Database& database);
 
     template <db_model Model>
-    [[nodiscard]] std::optional<std::int64_t> insert(
+    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
         db::Database& database,
         const Model&  row
     );

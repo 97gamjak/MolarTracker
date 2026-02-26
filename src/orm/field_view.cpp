@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "db/statement.hpp"
+#include "orm/constraints.hpp"
 #include "orm/orm_exception.hpp"
 
 namespace orm
