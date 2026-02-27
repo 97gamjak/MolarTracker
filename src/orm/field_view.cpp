@@ -32,6 +32,14 @@ namespace orm
     bool FieldView::isPk() const { return _isPk; }
 
     /**
+     * @brief Check if the field is a foreign key
+     *
+     * @return true
+     * @return false
+     */
+    bool FieldView::isFk() const { return _isFk; }
+
+    /**
      * @brief Check if the field is auto-incrementing
      *
      * @return true

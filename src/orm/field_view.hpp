@@ -52,6 +52,9 @@ namespace orm
         /// flag indicating whether this field is a primary key
         bool _isPk{false};
 
+        /// flag indicating whether this field is a foreign key
+        bool _isFk{false};
+
         /// flag indicating whether this field is auto-incremented
         bool _isAutoIncrement{false};
 
@@ -78,6 +81,7 @@ namespace orm
         [[nodiscard]] std::string_view getColumnName() const;
         [[nodiscard]] ORMConstraint    getConstraints() const;
         [[nodiscard]] bool             isPk() const;
+        [[nodiscard]] bool             isFk() const;
         [[nodiscard]] bool             isAutoIncrement() const;
         [[nodiscard]] bool             isAutoIncrementPk() const;
 
