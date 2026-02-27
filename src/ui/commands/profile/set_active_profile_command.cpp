@@ -3,10 +3,10 @@
 #include <format>
 
 #include "app/store/profile_store.hpp"
+#include "logging/log_macros.hpp"
 #include "ui/commands/profile/add_profile_command_error.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_AddProfileCommand
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("ui.commands.profile");
 
 namespace ui
 {

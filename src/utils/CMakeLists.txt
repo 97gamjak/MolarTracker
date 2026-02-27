@@ -18,4 +18,5 @@ target_link_libraries(molartracker_utils
 
     PRIVATE
         json
+        molartracker_log_categories_generated
 )

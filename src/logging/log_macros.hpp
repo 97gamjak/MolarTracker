@@ -3,32 +3,33 @@
 
 #include <iostream>   // IWYU pragma: keep
 
+#include "log_category.hpp"      // IWYU pragma: keep
 #include "log_entry_scope.hpp"   // IWYU pragma: keep
 #include "log_manager.hpp"       // IWYU pragma: keep
 #include "log_object.hpp"        // IWYU pragma: keep
-#include "mstd/error.hpp"
+
+#define REGISTER_LOG_CATEGORY(name_literal)                       \
+    namespace                                                     \
+    {                                                             \
+                                                                  \
+        [[maybe_unused]] const logging::LogCategory _logCategory{ \
+            name_literal                                          \
+        };                                                        \
+    }
 
 #define LOG_OBJECT_INTERNAL(level, category, message) \
-    (LogObject{level, category, message, __FILE__, __LINE__, __func__})
+    (logging::LogObject{level, category, message, __FILE__, __LINE__, __func__})
 
-// clang-format off
-#ifndef __LOG_CATEGORY__
-    #define LOG_OBJECT(level, message)                                          \
-        MSTD_COMPILE_FAIL(                                                      \
-            "LOG_CATEGORY must be defined before including log_macros.hpp"      \
-        );
-#else
-    #define LOG_OBJECT(level, message) LOG_OBJECT_INTERNAL(level, __LOG_CATEGORY__, message)
-#endif
-// clang-format on
+#define LOG_OBJECT(level, message) \
+    LOG_OBJECT_INTERNAL(level, _logCategory, message)
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-do-while)
-#define LOG(logObject)                              \
-    do                                              \
-    {                                               \
-        LogManager::getInstance().log((logObject)); \
+// NOLINTBEGIN(cppcoreguidelines-avoid-do-while, cppcoreguidelines-macro-usage)
+#define LOG(logObject)                                       \
+    do                                                       \
+    {                                                        \
+        logging::LogManager::getInstance().log((logObject)); \
     } while (0)
-// NOLINTEND(cppcoreguidelines-avoid-do-while)
+// NOLINTEND(cppcoreguidelines-avoid-do-while, cppcoreguidelines-macro-usage)
 
 #define LOG_TRACE_OBJECT(message)   LOG_OBJECT(LogLevel::Trace, message)
 #define LOG_DEBUG_OBJECT(message)   LOG_OBJECT(LogLevel::Debug, message)

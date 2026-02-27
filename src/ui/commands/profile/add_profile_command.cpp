@@ -6,9 +6,9 @@
 #include "add_profile_command_error.hpp"
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
-
-#define __LOG_CATEGORY__ LogCategory::ui_AddProfileCommand
 #include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("ui.commands.profile");
 
 namespace ui
 {

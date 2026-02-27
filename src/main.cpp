@@ -4,6 +4,7 @@
 #include "app/app_context.hpp"
 #include "config/constants.hpp"
 #include "exceptions/base.hpp"
+#include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "ui/application.hpp"
@@ -11,8 +12,7 @@
 #include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::application
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("application");
 
 int main(int argc, char** argv)
 {

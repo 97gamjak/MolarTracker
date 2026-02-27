@@ -4,41 +4,50 @@
 #include <string>
 
 #include "config/logging_base.hpp"
+#include "log_category.hpp"
 
-/**
- * @brief Struct representing a log message and its metadata
- *
- */
-struct LogObject
+namespace logging
 {
-   public:   // members
-    /// The log level of the message (e.g., Debug, Info, Warning, Error)
-    LogLevel level;
+    class LogCategory;
 
-    /// The log category of the message (e.g., application, ui, database, etc.)
-    LogCategory category;
+    /**
+     * @brief Struct representing a log message and its metadata
+     *
+     */
+    struct LogObject
+    {
+       public:   // members
+        /// The log level of the message (e.g., Debug, Info, Warning, Error)
+        LogLevel level;
 
-    /// The source file where the log message was generated
-    std::string file;
+        /// The log category of the message (e.g., application, ui, database,
+        /// etc.)
+        LogCategory category;
 
-    /// The line number in the source file where the log message was generated
-    int line;
+        /// The source file where the log message was generated
+        std::string file;
 
-    /// The function name where the log message was generated
-    std::string function;
+        /// The line number in the source file where the log message was
+        /// generated
+        int line;
 
-    /// The actual log message content
-    std::string message;
+        /// The function name where the log message was generated
+        std::string function;
 
-   public:   // methods
-    LogObject(
-        const LogLevel&    _level,
-        const LogCategory& _category,
-        std::string        _message,
-        std::string        _file,
-        int                _line,
-        std::string        _function
-    );
-};
+        /// The actual log message content
+        std::string message;
+
+       public:   // methods
+        LogObject(
+            const LogLevel&    _level,
+            const LogCategory& _category,
+            std::string        _message,
+            std::string        _file,
+            int                _line,
+            std::string        _function
+        );
+    };
+
+}   // namespace logging
 
 #endif   // __LOGGING__LOG_OBJECT_HPP__

@@ -1,30 +1,10 @@
 #ifndef __CONFIG__LOGGING_BASE_HPP__
 #define __CONFIG__LOGGING_BASE_HPP__
 
-#include <cstddef>
+#include <cstdint>
 #include <mstd/enum.hpp>
-#include <unordered_map>
 
-// NOLINTBEGIN
-
-#define LOG_CATEGORY(X)           \
-    X(app_service_profileService) \
-    X(app_storeContainer)         \
-    X(app_store_ProfileStore)     \
-    X(ui_AddProfileCommand)       \
-    X(ui_mainWindow)              \
-    X(ui_logging)                 \
-    X(ui_debugMenuController)     \
-    X(ui_ensureProfileController) \
-    X(ui_profileSelectionDialog)  \
-    X(database)                   \
-    X(logging_manager)            \
-    X(settings)                   \
-    X(undoStack)                  \
-    X(application)
-
-// cppcheck-suppress syntaxError
-MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
 #define LOG_LEVEL(X) \
     X(Off, 0)        \
@@ -35,10 +15,8 @@ MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);
     X(Trace)
 
 // cppcheck-suppress syntaxError
-MSTD_ENUM(LogLevel, std::size_t, LOG_LEVEL);
+MSTD_ENUM(LogLevel, std::int8_t, LOG_LEVEL);
 
 // NOLINTEND
-
-using LogCategoryMap = std::unordered_map<LogCategory, LogLevel>;
 
 #endif   // __CONFIG__LOGGING_BASE_HPP__
