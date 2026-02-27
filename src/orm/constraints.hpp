@@ -17,6 +17,7 @@ namespace orm
     X(Nullable, 0x10)          \
     X(ForeignKey, 0x20)
 
+    // cppcheck-suppress syntaxError
     MSTD_ENUM_BITFLAG(ORMConstraint, uint64_t, ORM_CONSTRAINT_LIST);
     // NOLINTEND
 

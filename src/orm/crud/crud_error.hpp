@@ -17,6 +17,7 @@ namespace orm
     X(InsertFailed)        \
     X(NotFound)
 
+    // cppcheck-suppress syntaxError
     MSTD_ENUM(CrudErrorType, uint8_t, CRUD_ERROR_LIST);
     // NOLINTEND
 
