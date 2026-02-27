@@ -28,7 +28,10 @@ namespace orm
     );
 
     template <db_model Model>
-    void update(db::Database& database, const Model& row);
+    [[nodiscard]] std::expected<void, CrudError> update(
+        db::Database& database,
+        const Model&  row
+    );
 
     /**
      * @brief Get rows by matching field value

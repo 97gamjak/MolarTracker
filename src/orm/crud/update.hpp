@@ -1,13 +1,14 @@
 #ifndef __ORM__CRUD__UPDATE_HPP__
 #define __ORM__CRUD__UPDATE_HPP__
 
+#include <expected>
 #include <string>
 
 #include "crud_detail.hpp"
+#include "crud_error.hpp"
 #include "db/database.hpp"
 #include "orm/constraints.hpp"
 #include "orm/fields.hpp"
-#include "orm/orm_exception.hpp"
 #include "orm/type_traits.hpp"
 #include "utils/string.hpp"
 
@@ -20,9 +21,14 @@ namespace orm
      * @tparam Model
      * @param database
      * @param row
+     * @return std::expected<void, CrudError> An empty expected on success, or
+     * an error on failure
      */
     template <db_model Model>
-    void update(db::Database& database, const Model& row)
+    std::expected<void, CrudError> update(
+        db::Database& database,
+        const Model&  row
+    )
     {
         auto const fieldViews = orm::fields(row);
 
@@ -51,9 +57,10 @@ namespace orm
 
         if (whereClauses.empty())
         {
-            throw ORMError(
+            return std::unexpected(CrudError(
+                CrudErrorType::NoPrimaryKey,
                 "orm::update requires at least one primary key field"
-            );
+            ));
         }
 
         sqlText += utils::join(whereClauses, " AND ");
@@ -80,19 +87,23 @@ namespace orm
 
         if (changes == 0)
         {
-            throw ORMError(
+            return std::unexpected(CrudError(
+                CrudErrorType::NoRowsUpdated,
                 "orm::update did not update any rows. This may be because the "
                 "primary key value(s) did not match any existing row."
-            );
+            ));
         }
 
         if (changes > 1)
         {
-            throw ORMError(
+            return std::unexpected(CrudError(
+                CrudErrorType::MultipleRowsUpdated,
                 "orm::update updated multiple rows. This should never happen, "
                 "as updates are performed by matching primary key values."
-            );
+            ));
         }
+
+        return {};
     }
 }   // namespace orm
 

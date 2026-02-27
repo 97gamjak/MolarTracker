@@ -138,7 +138,20 @@ namespace app
         const auto& existingProfile = existingProfileOpt.value();
         Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
-        orm::update(_db, ProfileFactory::toRow(updatedProfile));
+        const auto result =
+            orm::update(_db, ProfileFactory::toRow(updatedProfile));
+
+        if (!result)
+        {
+            const auto msg =
+                "Updating profile with ID '" + std::to_string(id.value()) +
+                "' failed: " + result.error().getMessage() + " (type: " +
+                orm::CrudErrorTypeMeta::toString(result.error().getType()) +
+                ")";
+
+            LOG_ERROR(msg);
+            throw orm::CrudException(msg);
+        }
     }
 
     /**
