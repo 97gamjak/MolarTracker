@@ -28,7 +28,7 @@ namespace db
     class StepResultMeta
     {
        public:
-        static bool is_valid(int result);
+        static bool isValid(int result);
     };
 
     /**
@@ -64,7 +64,7 @@ namespace db
         Statement(Statement&& other) noexcept;
         Statement& operator=(Statement&& other) noexcept;
 
-        [[nodiscard]] bool is_valid() const;
+        [[nodiscard]] bool isValid() const;
 
         [[nodiscard]] StepResult step();
         void                     executeToCompletion();

@@ -12,7 +12,7 @@ namespace orm
      * @param database
      */
     template <db_model Model>
-    void create_table(db::Database& database)
+    void createTable(db::Database& database)
     {
         std::string sqlText  = "CREATE TABLE IF NOT EXISTS ";
         sqlText             += Model::table_name;

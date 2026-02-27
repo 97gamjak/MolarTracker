@@ -36,7 +36,7 @@ namespace app
      * ensureSchema() to not use virtual dispatch in constructor
      *
      */
-    void ProfileRepo::_ensureSchema() { orm::create_table<ProfileRow>(_db); }
+    void ProfileRepo::_ensureSchema() { orm::createTable<ProfileRow>(_db); }
 
     /**
      * @brief Get all profiles from the database
@@ -45,7 +45,7 @@ namespace app
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return ProfileFactory::toDomains(orm::get_all<ProfileRow>(_db));
+        return ProfileFactory::toDomains(orm::getAll<ProfileRow>(_db));
     }
 
     /**
@@ -56,7 +56,7 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
-        const auto profile = orm::get_by_pk<ProfileRow>(_db, id);
+        const auto profile = orm::getByPk<ProfileRow>(_db, id);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -74,7 +74,7 @@ namespace app
     {
         using name_field = decltype(ProfileRow::name);
 
-        const auto profile = orm::get_by_unique_field<ProfileRow, name_field>(
+        const auto profile = orm::getByUniqueField<ProfileRow, name_field>(
             _db,
             name_field{name}
         );
@@ -161,7 +161,7 @@ namespace app
      */
     void ProfileRepo::remove(ProfileId id)
     {
-        orm::delete_by_pk<ProfileRow>(_db, id);
+        orm::deleteByPk<ProfileRow>(_db, id);
     }
 
 }   // namespace app

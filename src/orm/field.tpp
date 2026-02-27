@@ -174,12 +174,28 @@ namespace orm
         }
     }
 
+    /**
+     * @brief Get the column name for the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return std::string_view
+     */
     template <fixed_string Name, typename Value, typename... Options>
     constexpr auto Field<Name, Value, Options...>::getColumnName()
     {
         return name;
     }
 
+    /**
+     * @brief Get the combined constraints for the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return ORMConstraint
+     */
     template <fixed_string Name, typename Value, typename... Options>
     constexpr ORMConstraint Field<Name, Value, Options...>::getConstraints()
     {

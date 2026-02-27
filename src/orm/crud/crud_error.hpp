@@ -14,7 +14,8 @@ namespace orm
     X(NoRowsUpdated)       \
     X(NoPrimaryKey)        \
     X(MultipleRowsUpdated) \
-    X(InsertFailed)
+    X(InsertFailed)        \
+    X(NotFound)
 
     MSTD_ENUM(CrudErrorType, uint8_t, CRUD_ERROR_LIST);
     // NOLINTEND
@@ -38,8 +39,11 @@ namespace orm
     class CrudError
     {
        private:
+        /// The type of the CRUD error
         CrudErrorType _type;
-        std::string   _message;
+
+        /// The error message describing the CRUD error
+        std::string _message;
 
        public:
         CrudError(CrudErrorType type, std::string message);

@@ -16,7 +16,6 @@ namespace orm
     class FieldView
     {
        private:
-        using _field = void*;
         /// Type alias for the bind function pointer type, which takes a pointer
         /// to the field's value, a reference to a db::Statement, and an index,
         /// and returns void
@@ -69,6 +68,8 @@ namespace orm
         /// Function pointer for getting the DDL definition of the field
         ddl_function_type _ddlFunction{nullptr};
 
+        /// The combined constraints for the field (e.g., primary key, unique,
+        /// not null, etc.)
         ORMConstraint _constraints{};
 
        public:
