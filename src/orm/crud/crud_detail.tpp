@@ -139,12 +139,12 @@ namespace orm
         {
             if (mode == ORMConstraintMode::Only)
             {
-                if ((field.getConstraints() & constraint) == constraint)
+                if ((field.getConstraints() & constraint) != constraint)
                     continue;
             }
             else if (mode == ORMConstraintMode::Not)
             {
-                if ((field.getConstraints() & constraint) != constraint)
+                if ((field.getConstraints() & constraint) == constraint)
                     continue;
             }
 

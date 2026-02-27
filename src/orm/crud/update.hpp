@@ -37,12 +37,11 @@ namespace orm
         sqlText += Model::table_name;
         sqlText += " SET ";
 
-        auto firstAssignment = true;
-
         const auto columnNames = getColumnNames(
             fieldViews,
             ORMConstraint::PrimaryKey,
-            ORMConstraintMode::Not
+            ORMConstraintMode::Not,
+            "=?"
         );
 
         sqlText += mstd::join(columnNames, ", ");
@@ -52,7 +51,7 @@ namespace orm
             fieldViews,
             ORMConstraint::PrimaryKey,
             ORMConstraintMode::Only,
-            " = ?"
+            "=?"
         );
 
         if (whereClauses.empty())

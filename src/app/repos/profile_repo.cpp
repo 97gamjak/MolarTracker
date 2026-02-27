@@ -82,6 +82,16 @@ namespace app
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
 
+        LOG_INFO(
+            std::format(
+                "Profile with name '{}' not found in database due to: {} "
+                "(type: {})",
+                name,
+                profile.error().getMessage(),
+                orm::CrudErrorTypeMeta::toString(profile.error().getType())
+            )
+        );
+
         return std::nullopt;
     }
 

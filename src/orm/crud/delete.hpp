@@ -39,8 +39,6 @@ namespace orm
         sqlText += Model::table_name;
         sqlText += " WHERE ";
 
-        bool whereIsPresent = false;
-
         const auto whereClauses = getColumnNames(
             emptyFieldViews,
             ORMConstraint::PrimaryKey,
@@ -48,13 +46,15 @@ namespace orm
             "=?"
         );
 
-        if (!whereIsPresent)
+        if (whereClauses.empty())
         {
             throw CrudException("orm::deleteByPk requires a primary key field");
         }
 
-        sqlText                 += ";";
-        db::Statement statement  = database.prepare(sqlText);
+        sqlText += whereClauses[0];
+        sqlText += ";";
+
+        db::Statement statement = database.prepare(sqlText);
         orm::binder<db::Statement, PrimaryKeyValue>::bind(
             statement,
             1,

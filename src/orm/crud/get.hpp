@@ -145,8 +145,6 @@ namespace orm
         sqlText += Model::table_name;
         sqlText += " WHERE ";
 
-        bool whereIsPresent = false;
-
         const auto whereClauses = getColumnNames(
             emptyFieldViews,
             ORMConstraint::PrimaryKey,
@@ -161,6 +159,7 @@ namespace orm
             );
         }
 
+        sqlText += whereClauses[0];
         sqlText += ";";
 
         db::Statement statement = database.prepare(sqlText);
