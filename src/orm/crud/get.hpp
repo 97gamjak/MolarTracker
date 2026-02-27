@@ -8,11 +8,11 @@
 #include "crud_detail.hpp"
 #include "crud_error.hpp"
 #include "db/database.hpp"
+#include "mstd/string.hpp"
 #include "orm/binder.hpp"
 #include "orm/field_view.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
-#include "utils/string.hpp"
 
 namespace orm
 {
@@ -38,7 +38,7 @@ namespace orm
         sqlText += "SELECT ";
 
         const auto columnNames  = getColumnNames(emptyFieldViews);
-        sqlText                += utils::join(columnNames, ", ");
+        sqlText                += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
         sqlText += Model::table_name;
@@ -84,7 +84,7 @@ namespace orm
         sqlText += "SELECT ";
 
         const auto columnNames  = getColumnNames(emptyFieldViews);
-        sqlText                += utils::join(columnNames, ", ");
+        sqlText                += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
         sqlText += Model::table_name;
@@ -139,7 +139,7 @@ namespace orm
 
         const auto columnNames = getColumnNames(emptyFieldViews);
 
-        sqlText += utils::join(columnNames, ", ");
+        sqlText += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
         sqlText += Model::table_name;
@@ -189,7 +189,7 @@ namespace orm
         sqlText += "SELECT ";
 
         const auto columnNames  = getColumnNames(emptyFieldViews);
-        sqlText                += utils::join(columnNames, ", ");
+        sqlText                += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
         sqlText += Model::table_name;

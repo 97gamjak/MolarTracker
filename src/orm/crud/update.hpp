@@ -7,10 +7,10 @@
 #include "crud_detail.hpp"
 #include "crud_error.hpp"
 #include "db/database.hpp"
+#include "mstd/string.hpp"
 #include "orm/constraints.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
-#include "utils/string.hpp"
 
 namespace orm
 {
@@ -45,7 +45,7 @@ namespace orm
             ORMConstraintMode::Not
         );
 
-        sqlText += utils::join(columnNames, ", ");
+        sqlText += mstd::join(columnNames, ", ");
         sqlText += " WHERE ";
 
         const auto whereClauses = getColumnNames(
@@ -63,7 +63,7 @@ namespace orm
             ));
         }
 
-        sqlText += utils::join(whereClauses, " AND ");
+        sqlText += mstd::join(whereClauses, " AND ");
         sqlText += ";";
 
         db::Statement statement = database.prepare(sqlText);

@@ -4,7 +4,6 @@ add_library(molartracker_utils STATIC
     paths.cpp
     qt_helpers.cpp
     version.cpp
-    string.cpp
 )
 
 target_include_directories(molartracker_utils
