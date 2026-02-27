@@ -21,7 +21,8 @@
     X(logging_manager)            \
     X(settings)                   \
     X(undoStack)                  \
-    X(application)
+    X(application)                \
+    X(repo_profile)
 
 // cppcheck-suppress syntaxError
 MSTD_ENUM(LogCategory, std::size_t, LOG_CATEGORY);

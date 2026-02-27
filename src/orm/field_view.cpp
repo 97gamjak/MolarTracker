@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "db/statement.hpp"
+#include "orm/constraints.hpp"
 #include "orm/orm_exception.hpp"
 
 namespace orm
@@ -16,12 +17,27 @@ namespace orm
     std::string_view FieldView::getColumnName() const { return _columnName; }
 
     /**
+     * @brief Get the field constraints
+     *
+     * @return ORMConstraint
+     */
+    ORMConstraint FieldView::getConstraints() const { return _constraints; }
+
+    /**
      * @brief Check if the field is a primary key
      *
      * @return true
      * @return false
      */
     bool FieldView::isPk() const { return _isPk; }
+
+    /**
+     * @brief Check if the field is a foreign key
+     *
+     * @return true
+     * @return false
+     */
+    bool FieldView::isFk() const { return _isFk; }
 
     /**
      * @brief Check if the field is auto-incrementing

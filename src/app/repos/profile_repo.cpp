@@ -5,10 +5,14 @@
 #include <vector>
 
 #include "app/factories/profile_factory.hpp"
+#include "config/logging_base.hpp"
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud.hpp"
 #include "sql_models/profile_row.hpp"
+
+#define __LOG_CATEGORY__ LogCategory::repo_profile
+#include "logging/log_macros.hpp"
 
 namespace app
 {
@@ -32,7 +36,7 @@ namespace app
      * ensureSchema() to not use virtual dispatch in constructor
      *
      */
-    void ProfileRepo::_ensureSchema() { orm::create_table<ProfileRow>(_db); }
+    void ProfileRepo::_ensureSchema() { orm::createTable<ProfileRow>(_db); }
 
     /**
      * @brief Get all profiles from the database
@@ -41,7 +45,7 @@ namespace app
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return ProfileFactory::toDomains(orm::get_all<ProfileRow>(_db));
+        return ProfileFactory::toDomains(orm::getAll<ProfileRow>(_db));
     }
 
     /**
@@ -52,7 +56,7 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
-        const auto profile = orm::get_by_pk<ProfileRow>(_db, id);
+        const auto profile = orm::getByPk<ProfileRow>(_db, id);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -70,13 +74,23 @@ namespace app
     {
         using name_field = decltype(ProfileRow::name);
 
-        const auto profile = orm::get_by_unique_field<ProfileRow, name_field>(
+        const auto profile = orm::getByUniqueField<ProfileRow, name_field>(
             _db,
             name_field{name}
         );
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
+
+        LOG_INFO(
+            std::format(
+                "Profile with name '{}' not found in database due to: {} "
+                "(type: {})",
+                name,
+                profile.error().getMessage(),
+                orm::CrudErrorTypeMeta::toString(profile.error().getType())
+            )
+        );
 
         return std::nullopt;
     }
@@ -96,29 +110,16 @@ namespace app
         const auto profile = Profile{ProfileId::from(0), name, email};
         const auto rowId   = orm::insert(_db, ProfileFactory::toRow(profile));
 
-        if (rowId <= 0)
-        {
-            // TODO(97gamjak): introduce MT specific error handling for repos
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-87
-            throw std::runtime_error(
-                std::format("Failed to insert new profile with name '{}'", name)
-            );
-        }
+        if (rowId.has_value())
+            return ProfileId::from(rowId.value());
 
-        const auto createdProfile = get(name);
-        if (!createdProfile.has_value())
-        {
-            // TODO(97gamjak): introduce MT specific error handling for repos
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-87
-            throw std::runtime_error(
-                std::format(
-                    "Failed to retrieve newly created profile with name '{}'",
-                    name
-                )
-            );
-        }
+        const auto msg =
+            "Inserting profile with name '" + name +
+            "' failed: " + rowId.error().getMessage() + " (type: " +
+            orm::CrudErrorTypeMeta::toString(rowId.error().getType()) + ")";
 
-        return createdProfile->getId();
+        LOG_ERROR(msg);
+        throw orm::CrudException(msg);
     }
 
     /**
@@ -147,7 +148,20 @@ namespace app
         const auto& existingProfile = existingProfileOpt.value();
         Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
-        orm::update(_db, ProfileFactory::toRow(updatedProfile));
+        const auto result =
+            orm::update(_db, ProfileFactory::toRow(updatedProfile));
+
+        if (!result)
+        {
+            const auto msg =
+                "Updating profile with ID '" + std::to_string(id.value()) +
+                "' failed: " + result.error().getMessage() + " (type: " +
+                orm::CrudErrorTypeMeta::toString(result.error().getType()) +
+                ")";
+
+            LOG_ERROR(msg);
+            throw orm::CrudException(msg);
+        }
     }
 
     /**
@@ -157,7 +171,7 @@ namespace app
      */
     void ProfileRepo::remove(ProfileId id)
     {
-        orm::delete_by_pk<ProfileRow>(_db, id);
+        orm::deleteByPk<ProfileRow>(_db, id);
     }
 
 }   // namespace app
