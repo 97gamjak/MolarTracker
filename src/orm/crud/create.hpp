@@ -1,3 +1,6 @@
+#ifndef __ORM__CRUD__CREATE_HPP__
+#define __ORM__CRUD__CREATE_HPP__
+
 #include "crud_detail.hpp"
 #include "db/database.hpp"
 #include "orm/fields.hpp"
@@ -41,3 +44,5 @@ namespace orm
         database.execute(sqlText);
     }
 }   // namespace orm
+
+#endif   // __ORM__CRUD__CREATE_HPP__
