@@ -51,16 +51,26 @@ int main(int argc, char** argv)
 
     std::ofstream out(output);
 
-    out << "#pragma once\n";
-    out << "#include <array>\n";
+    out << "#ifndef __LOG_CATEGORIES_GEN_HPP__\n";
+    out << "#define __LOG_CATEGORIES_GEN_HPP__\n";
+    out << "#include <set>\n";
     out << "#include <string_view>\n\n";
-    out << "namespace logcat_gen {\n";
-    out << "inline constexpr std::array<std::string_view, " << categories.size()
-        << "> leaf_categories = {{\n";
+    out << "namespace logging\n";
+    out << "{\n";
+    out << "    class CategoryRegistry{\n";
+    out << "      public:\n";
+    out << "        static CategoryRegistry& getInstance()\n";
+    out << "        {\n";
+    out << "            static CategoryRegistry registry;\n";
+    out << "            return registry;\n";
+    out << "        }\n\n";
+    out << "        std::set<std::string_view> categories = {\n";
 
     for (auto const& category : categories)
-        out << "    \"" << category << "\",\n";
+        out << "            \"" << category << "\",\n";
 
-    out << "}};\n";
-    out << "}\n";
+    out << "        };\n";
+    out << "    };\n\n";
+    out << "}\n\n";
+    out << "#endif // __LOG_CATEGORIES_GEN_HPP__\n";
 }
