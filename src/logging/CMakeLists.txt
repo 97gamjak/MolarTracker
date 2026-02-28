@@ -17,3 +17,7 @@ target_link_libraries(molartracker_logging
         molartracker_settings
         molartracker_log_categories_generated
 )
+
+set_property(TARGET molartracker_logging APPEND PROPERTY
+    AUTOGEN_TARGET_DEPENDS generate_log_categories
+)

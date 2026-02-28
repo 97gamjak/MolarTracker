@@ -15,8 +15,10 @@ target_link_libraries(molartracker_utils
     PUBLIC
         Qt6::Core
         Qt6::Widgets
-
-    PRIVATE
         json
-        molartracker_log_categories_generated
+        molartracker_logging
+)
+
+set_property(TARGET molartracker_utils APPEND PROPERTY
+    AUTOGEN_TARGET_DEPENDS generate_log_categories
 )

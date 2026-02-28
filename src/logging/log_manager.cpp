@@ -3,6 +3,7 @@
 #include <format>
 
 #include "config/logging_base.hpp"
+#include "log_categories.gen.hpp"
 #include "log_category.hpp"
 #include "log_object.hpp"
 #include "settings/logging_settings.hpp"
@@ -27,7 +28,7 @@ namespace logging
      * @brief Construct a new Log Manager:: Log Manager object
      *
      */
-    LogManager::LogManager() : _categories(getDefaultCategories()) {}
+    LogManager::LogManager() { _categories = getDefaultCategories(); }
 
     /**
      * @brief Initializes the ring file logger
@@ -55,15 +56,14 @@ namespace logging
     /**
      * @brief Get the default logging categories with Info level
      *
-     * @return std::unordered_map<LogCategory, LogLevel>
+     * @return LogCategoryMap
      */
-    std::unordered_map<LogCategory, LogLevel> LogManager::getDefaultCategories(
-    ) const
+    LogManager::LogCategoryMap LogManager::getDefaultCategories() const
     {
         // TODO(97gamjak): make the default levels configurable
         // https://97gamjak.atlassian.net/browse/MOLTRACK-84
-        std::unordered_map<LogCategory, LogLevel> defaultCategories;
-        for (const auto category : LogCategoryMeta::values)
+        LogCategoryMap defaultCategories;
+        for (const auto category : CategoryRegistry::instance().getValues())
             defaultCategories[category] = _defaultLogLevel;
 
         return defaultCategories;

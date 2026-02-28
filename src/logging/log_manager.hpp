@@ -5,7 +5,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "config/logging_base.hpp"
 #include "log_category.hpp"
 #include "utils/ring_file.hpp"
 
@@ -27,9 +26,13 @@ namespace logging
     class LogManager
     {
        private:
+        /// Type alias for the log category map, which maps log categories to
+        /// their current log levels
+        using LogCategoryMap =
+            std::unordered_map<LogCategory, LogLevel, LogCategory::Hash>;
+
         /// Mapping of log categories to their current log levels.
-        std::unordered_map<LogCategory, LogLevel, LogCategory::Hash>
-            _categories;
+        LogCategoryMap _categories;
 
         /// The ring file logger instance used for logging to files.
         RingFile _ringFile;
@@ -38,7 +41,7 @@ namespace logging
         std::filesystem::path _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
-        LogLevel _defaultLogLevel{LogLevel::Info};
+        LogLevel _defaultLogLevel;
 
        public:
         static LogManager& getInstance();
@@ -54,8 +57,8 @@ namespace logging
         ) const;
         void flush();
 
-        std::unordered_map<LogCategory, LogLevel> getCategories() const;
-        std::unordered_map<LogCategory, LogLevel> getDefaultCategories() const;
+        LogCategoryMap getCategories() const;
+        LogCategoryMap getDefaultCategories() const;
 
         std::filesystem::path getCurrentLogFilePath() const;
 

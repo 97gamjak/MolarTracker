@@ -16,35 +16,29 @@ target_include_directories(mstd
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
 
-# 1) Build the generator tool
-add_executable(logcat_generator
-    ${CMAKE_SOURCE_DIR}/tools/generate_log_categories.cpp
-)
+add_executable(logcat_generator ${CMAKE_SOURCE_DIR}/tools/generate_log_categories.cpp)
 
-# 2) Where to write the generated header
-set(GEN_DIR  ${CMAKE_SOURCE_DIR}/logging/generated)
-set(GEN_HDR  ${GEN_DIR}/log_categories.gen.hpp)
+set(GEN_DIR ${PROJECT_BINARY_DIR}/src/generated)
+set(GEN_HDR ${GEN_DIR}/log_categories.gen.hpp)
 
-# 3) Collect inputs (so it reruns when sources change)
 file(GLOB_RECURSE LOGCAT_INPUTS CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.cpp
     ${CMAKE_SOURCE_DIR}/src/*.hpp
     ${CMAKE_SOURCE_DIR}/src/*.tpp
 )
 
-# 4) Generate header
 add_custom_command(
-    OUTPUT ${GEN_HDR}
+    OUTPUT  ${GEN_HDR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}
     COMMAND $<TARGET_FILE:logcat_generator> ${GEN_HDR} ${CMAKE_SOURCE_DIR}/src
     DEPENDS logcat_generator ${LOGCAT_INPUTS}
     VERBATIM
-    COMMENT "Generating log categories: ${GEN_HDR}"
+    COMMENT "Generating log category header: ${GEN_HDR}"
 )
 
-# 5) Wrapper target (OPTIONAL: add ALL if you want it on every build)
-add_custom_target(generate_log_categories
-    DEPENDS ${GEN_HDR}    
+add_custom_target(
+    generate_log_categories
+    DEPENDS ${GEN_HDR}
 )
 
 add_library(molartracker_log_categories_generated INTERFACE)
@@ -82,7 +76,6 @@ target_link_libraries(MolarTracker
     molartracker_json
     molartracker_connections
     molartracker_finance
-    molartracker_log_categories_generated
 )
 
 set_target_properties(MolarTracker PROPERTIES
