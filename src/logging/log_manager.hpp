@@ -46,6 +46,7 @@ namespace logging
        public:
         static LogManager& getInstance();
 
+        void initializeLoggingCategories();
         void initializeRingFileLogger(
             const settings::LoggingSettings& settings,
             const std::filesystem::path&     directory

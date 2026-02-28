@@ -9,16 +9,15 @@ namespace logging
      *
      * @param name
      */
-    LogCategory::LogCategory(const char* name)
-        : _name{name} {CategoryRegistry::getInstance().categories.}
-
-          /**
-           * @brief Get the name of the log category
-           *
-           * @return std::string
-           */
-          std::string LogCategory::getName() const
+    LogCategory::LogCategory(std::string name) : _name(std::move(name))
     {
-        return _name;
+        CategoryRegistry::getInstance().categories.insert(name);
     }
+
+    /**
+     * @brief Get the name of the log category
+     *
+     * @return std::string
+     */
+    std::string LogCategory::getName() const { return _name; }
 }   // namespace logging

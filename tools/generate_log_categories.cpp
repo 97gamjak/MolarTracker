@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     out << "#ifndef __LOG_CATEGORIES_GEN_HPP__\n";
     out << "#define __LOG_CATEGORIES_GEN_HPP__\n";
     out << "#include <set>\n";
-    out << "#include <string_view>\n\n";
+    out << "#include <string>\n\n";
     out << "namespace logging\n";
     out << "{\n";
     out << "    class CategoryRegistry{\n";
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
     out << "            static CategoryRegistry registry;\n";
     out << "            return registry;\n";
     out << "        }\n\n";
-    out << "        std::set<std::string_view> categories = {\n";
+    out << "        std::set<std::string> categories = {\n";
 
     for (auto const& category : categories)
         out << "            \"" << category << "\",\n";

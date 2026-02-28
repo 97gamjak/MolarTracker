@@ -15,9 +15,14 @@ namespace logging
         std::string _name;
 
        public:
-        explicit LogCategory(const char* name);
+        explicit LogCategory(std::string name);
 
         [[nodiscard]] std::string getName() const;
+
+        bool operator==(const LogCategory& other) const
+        {
+            return _name == other._name;
+        }
 
         struct Hash
         {

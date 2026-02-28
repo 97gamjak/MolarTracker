@@ -63,8 +63,8 @@ namespace logging
         // TODO(97gamjak): make the default levels configurable
         // https://97gamjak.atlassian.net/browse/MOLTRACK-84
         LogCategoryMap defaultCategories;
-        for (const auto category : CategoryRegistry::instance().getValues())
-            defaultCategories[category] = _defaultLogLevel;
+        for (const auto category : CategoryRegistry::getInstance().categories)
+            defaultCategories[LogCategory{category}] = _defaultLogLevel;
 
         return defaultCategories;
     }
@@ -119,10 +119,10 @@ namespace logging
             _categories[category] = level;
             const auto logObject  = LogObject{
                 LogLevel::Info,
-                LogCategory::logging_manager,
+                LogCategory{"logging_manager"},
                 std::format(
                     "Log level for category '{}' changed from '{}' to '{}'",
-                    std::string{LogCategoryMeta::name(category)},
+                    std::string{category.getName()},
                     std::string{LogLevelMeta::name(previousLevel)},
                     std::string{LogLevelMeta::name(level)}
                 ),
@@ -137,9 +137,9 @@ namespace logging
     /**
      * @brief Get the current logging categories and their levels
      *
-     * @return std::unordered_map<LogCategory, LogLevel>
+     * @return LogManager::LogCategoryMap
      */
-    std::unordered_map<LogCategory, LogLevel> LogManager::getCategories() const
+    LogManager::LogCategoryMap LogManager::getCategories() const
     {
         return _categories;
     }
