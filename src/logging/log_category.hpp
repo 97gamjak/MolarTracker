@@ -15,7 +15,7 @@ namespace logging
         std::string _name;
 
        public:
-        explicit LogCategory(std::string name);
+        explicit LogCategory(std::string name) noexcept;
 
         [[nodiscard]] std::string getName() const;
 

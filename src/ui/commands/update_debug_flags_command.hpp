@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "command.hpp"
-#include "config/logging_base.hpp"
+#include "logging/log_manager.hpp"
 
 namespace ui
 {
@@ -15,6 +15,10 @@ namespace ui
     class UpdateDebugFlagsCommand : public ICommand
     {
        private:
+        using LogCategoryMap = std::unordered_map<
+            logging::LogCategory,
+            LogLevel,
+            logging::LogCategory::Hash>;
         /// The old categories before the update
         LogCategoryMap _oldCategories;
         /// The new categories after the update

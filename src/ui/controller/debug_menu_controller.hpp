@@ -53,7 +53,10 @@ namespace ui
         void _onRequestDebugSlots();
         void _onDebugSlotsChangeRequested(
             const DebugSlotsDialog::Action& action,
-            const LogCategoryMap&           categories
+            const std::unordered_map<
+                logging::LogCategory,
+                LogLevel,
+                logging::LogCategory::Hash>& categories
         );
         void _onRequestLogViewer();
 
@@ -69,8 +72,18 @@ namespace ui
         void _ensureDebugSlotsDialog();
         void _ensureLogViewerDialog();
         void _resetDefaultDebugFlags();
-        void _applyDebugFlagChanges(const LogCategoryMap& categories);
-        void _applyDebugFlagChangesAndClose(const LogCategoryMap& categories);
+        void _applyDebugFlagChanges(
+            const std::unordered_map<
+                logging::LogCategory,
+                LogLevel,
+                logging::LogCategory::Hash>& categories
+        );
+        void _applyDebugFlagChangesAndClose(
+            const std::unordered_map<
+                logging::LogCategory,
+                LogLevel,
+                logging::LogCategory::Hash>& categories
+        );
         void _applyLogViewerSettings();
     };
 

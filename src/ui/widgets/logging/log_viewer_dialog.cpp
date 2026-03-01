@@ -10,10 +10,10 @@
 #include <algorithm>
 #include <filesystem>
 
+#include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_logging
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("LogViewerDialog");
 
 namespace ui
 {
@@ -96,7 +96,7 @@ namespace ui
      */
     void LogViewerDialog::_loadLogFile()
     {
-        auto&       logManager  = LogManager::getInstance();
+        auto&       logManager  = logging::LogManager::getInstance();
         const auto& logFilePath = logManager.getCurrentLogFilePath();
         const auto  absPath     = std::filesystem::absolute(logFilePath);
         const auto  qStrPath    = QString::fromStdString(absPath.string());

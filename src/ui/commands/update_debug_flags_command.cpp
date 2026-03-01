@@ -13,7 +13,7 @@ namespace ui
     UpdateDebugFlagsCommand::UpdateDebugFlagsCommand(
         const LogCategoryMap& categories
     )
-        : _oldCategories(LogManager::getInstance().getCategories()),
+        : _oldCategories(logging::LogManager::getInstance().getCategories()),
           _categories(categories)
     {
     }
@@ -26,7 +26,7 @@ namespace ui
     std::expected<void, CommandErrorPtr> UpdateDebugFlagsCommand::undo()
     {
         for (const auto& [category, level] : _oldCategories)
-            LogManager::getInstance().changeLogLevel(category, level);
+            logging::LogManager::getInstance().changeLogLevel(category, level);
 
         return {};
     }
@@ -39,7 +39,7 @@ namespace ui
     std::expected<void, CommandErrorPtr> UpdateDebugFlagsCommand::redo()
     {
         for (const auto& [category, level] : _categories)
-            LogManager::getInstance().changeLogLevel(category, level);
+            logging::LogManager::getInstance().changeLogLevel(category, level);
 
         return {};
     }

@@ -12,11 +12,11 @@
 #include <QVBoxLayout>
 
 #include "config/logging_base.hpp"
+#include "logging/log_macros.hpp"
 #include "ui/widgets/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_logging
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("DebugSlotsDialog");
 
 namespace ui
 {
@@ -192,7 +192,7 @@ namespace ui
             if (_modifiedOnly && level == _categories.at(category))
                 continue;
 
-            const auto categoryName = LogCategoryMeta::name(category);
+            const auto categoryName = category.getName();
             const auto categoryStr  = std::string(categoryName);
             const auto categoryQStr = QString::fromStdString(categoryStr);
 

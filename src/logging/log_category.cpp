@@ -1,7 +1,5 @@
 #include "log_category.hpp"
 
-#include "log_categories.gen.hpp"
-
 namespace logging
 {
     /**
@@ -9,9 +7,8 @@ namespace logging
      *
      * @param name
      */
-    LogCategory::LogCategory(std::string name) : _name(std::move(name))
+    LogCategory::LogCategory(std::string name) noexcept : _name{std::move(name)}
     {
-        CategoryRegistry::getInstance().categories.insert(name);
     }
 
     /**

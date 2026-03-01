@@ -3,7 +3,8 @@
 
 #include <QDialog>
 
-#include "config/logging_base.hpp"
+#include "logging/log_category.hpp"
+#include "logging/log_manager.hpp"
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration
@@ -23,6 +24,11 @@ namespace ui
         Q_OBJECT
 
        private:
+        using LogCategoryMap = std::unordered_map<
+            logging::LogCategory,
+            LogLevel,
+            logging::LogCategory::Hash>;
+
         /// The reference map of log categories
         LogCategoryMap _categories;
         /// The current map of log categories

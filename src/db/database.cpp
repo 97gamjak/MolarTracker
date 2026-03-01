@@ -3,15 +3,14 @@
 #include <sqlite3.h>
 
 #include <filesystem>
-#include <format>
 #include <string>
 #include <utility>
 
 #include "db_exception.hpp"
+#include "logging/log_macros.hpp"
 #include "statement.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::database
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("Database");
 
 namespace db
 {

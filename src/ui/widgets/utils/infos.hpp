@@ -1,13 +1,16 @@
 #ifndef __UI__WIDGETS__UTILS__INFOS_HPP__
 #define __UI__WIDGETS__UTILS__INFOS_HPP__
 
-#include <QStatusBar>
+class QStatusBar;   // forward declaration
 
-#include "logging/log_object.hpp"
+namespace logging
+{
+    class LogObject;   // forward declaration
+}   // namespace logging
 
 namespace ui
 {
-    void showInfoStatusBar(LogObject logObject, QStatusBar* statusBar);
+    void showInfoStatusBar(logging::LogObject logObject, QStatusBar* statusBar);
 
 }   // namespace ui
 

@@ -8,6 +8,7 @@
 #include <format>
 
 #include "app/app_context.hpp"
+#include "logging/log_macros.hpp"
 #include "ui/commands/profile/add_profile_command.hpp"
 #include "ui/commands/profile/add_profile_command_error.hpp"
 #include "ui/commands/profile/set_active_profile_command.hpp"
@@ -19,8 +20,7 @@
 #include "ui/widgets/utils/infos.hpp"
 #include "ui/widgets/utils/warnings.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_ensureProfileController
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("EnsureProfileController");
 
 namespace ui
 {

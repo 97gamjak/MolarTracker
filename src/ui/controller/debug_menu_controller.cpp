@@ -6,6 +6,7 @@
 #include <QStatusBar>
 
 #include "app/app_context.hpp"
+#include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "ui/commands/update_debug_flags_command.hpp"
@@ -13,8 +14,7 @@
 #include "ui/widgets/logging/log_viewer_dialog.hpp"
 #include "ui/widgets/menu_bar/debug_menu.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_debugMenuController
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("DebugMenuController");
 
 namespace ui
 {
@@ -66,7 +66,7 @@ namespace ui
         // we need to update here the logging categories as
         // an undo can always happen outside of the dialog
         // and hence it could be out of sync
-        const auto& logManager = LogManager::getInstance();
+        const auto& logManager = logging::LogManager::getInstance();
         const auto  categories = logManager.getCategories();
 
         _debugSlotsDialog->setCategories(categories);
@@ -90,7 +90,10 @@ namespace ui
      */
     void DebugMenuController::_onDebugSlotsChangeRequested(
         const DebugSlotsDialog::Action& action,
-        const LogCategoryMap&           categories
+        const std::unordered_map<
+            logging::LogCategory,
+            LogLevel,
+            logging::LogCategory::Hash>& categories
     )
     {
         using enum DebugSlotsDialog::Action;
@@ -173,7 +176,7 @@ namespace ui
      */
     void DebugMenuController::_resetDefaultDebugFlags()
     {
-        const auto& logManager = LogManager::getInstance();
+        const auto& logManager = logging::LogManager::getInstance();
         const auto  categories = logManager.getDefaultCategories();
 
         _debugSlotsDialog->setCategories(categories, false);
@@ -191,7 +194,10 @@ namespace ui
      *
      */
     void DebugMenuController::_applyDebugFlagChanges(
-        const LogCategoryMap& categories
+        const std::unordered_map<
+            logging::LogCategory,
+            LogLevel,
+            logging::LogCategory::Hash>& categories
     )
     {
         auto result = Commands::makeAndDo<UpdateDebugFlagsCommand>(categories);
@@ -209,7 +215,7 @@ namespace ui
             // this should not happen, but if it does, we should not leave the
             // dialog in an inconsistent state, so we will just reset the
             // categories to the current values and repopulate the tree
-            const auto& logManager        = LogManager::getInstance();
+            const auto& logManager        = logging::LogManager::getInstance();
             const auto  currentCategories = logManager.getCategories();
             _debugSlotsDialog->setCategories(currentCategories, false);
             _debugSlotsDialog->populateTree();
@@ -228,7 +234,10 @@ namespace ui
      * @param categories The new debug flag categories to set
      */
     void DebugMenuController::_applyDebugFlagChangesAndClose(
-        const LogCategoryMap& categories
+        const std::unordered_map<
+            logging::LogCategory,
+            LogLevel,
+            logging::LogCategory::Hash>& categories
     )
     {
         _applyDebugFlagChanges(categories);
