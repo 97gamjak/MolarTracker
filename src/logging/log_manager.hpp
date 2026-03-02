@@ -26,13 +26,9 @@ namespace logging
     class LogManager
     {
        private:
-        /// Type alias for the log category map, which maps log categories to
-        /// their current log levels
-        using LogCategoryMap =
-            std::unordered_map<LogCategory, LogLevel, LogCategory::Hash>;
-
-        /// Mapping of log categories to their current log levels.
-        LogCategoryMap _categories;
+        std::vector<LogCategory>                       _categories;
+        std::vector<LogCategory>                       _startupCategories;
+        std::unordered_map<std::string, LogCategoryId> _categoryNameToIdMap;
 
         /// The ring file logger instance used for logging to files.
         RingFile _ringFile;
@@ -41,12 +37,12 @@ namespace logging
         std::filesystem::path _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
-        LogLevel _defaultLogLevel;
+        LogLevel _defaultLogLevel = LogLevel::Info;
 
        public:
         static LogManager& getInstance();
 
-        void initializeLoggingCategories();
+        void initializeCategories();
         void initializeRingFileLogger(
             const settings::LoggingSettings& settings,
             const std::filesystem::path&     directory
@@ -58,8 +54,8 @@ namespace logging
         ) const;
         void flush();
 
-        LogCategoryMap getCategories() const;
-        LogCategoryMap getDefaultCategories() const;
+        std::vector<LogCategory> getCategories() const;
+        std::vector<LogCategory> getDefaultCategories() const;
 
         std::filesystem::path getCurrentLogFilePath() const;
 
@@ -71,9 +67,55 @@ namespace logging
         void setDefaultLogLevel(const LogLevel& level);
 
        private:
-        LogManager();
+        LogManager() = default;
 
-        static std::string _logLevelToString(const LogLevel& level);
+        [[nodiscard]] static std::string _logLevelToString(
+            const LogLevel& level
+        );
+
+        [[nodiscard]] LogCategoryId _findLogCategory(
+            const std::string& categoryName
+        ) const;
+
+        [[nodiscard]] LogCategoryId _getOrCreateLogCategory(
+            LogCategoryId      parentCategoryId,
+            const std::string& segment,
+            const std::string& fullName,
+            const LogLevel&    logLevel
+        );
+
+        static void _appendSegmentToFullName(
+            std::string&       parentFullName,
+            const std::string& segment
+        );
+
+        [[nodiscard]] LogCategoryId _addLogCategory(
+            const std::string& fullName,
+            const LogLevel&    logLevel
+        );
+
+        [[nodiscard]] LogCategoryId _addLogCategory(
+            const LogCategoryId& parentCategoryId,
+            const std::string&   segment,
+            const std::string&   fullName,
+            const LogLevel&      logLevel
+        );
+
+        template <typename Fn>
+        void _forEachSegment(const std::string& fullName, Fn&& fn) const
+        {
+            std::size_t pos = 0;
+            while (pos < fullName.size())
+            {
+                const auto dot = fullName.find('.', pos);
+                const auto end =
+                    (dot == std::string::npos) ? fullName.size() : dot;
+
+                fn(fullName.substr(pos, end - pos));
+
+                pos = end + 1;
+            }
+        }
     };
 
 }   // namespace logging

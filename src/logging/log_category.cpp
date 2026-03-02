@@ -2,19 +2,40 @@
 
 namespace logging
 {
-    /**
-     * @brief Construct a new Log Category:: Log Category object
-     *
-     * @param name
-     */
-    LogCategory::LogCategory(std::string name) noexcept : _name{std::move(name)}
+    LogCategory LogCategory::createRootCategory(LogLevel logLevel)
+    {
+        return LogCategory(
+            RootLogCategoryId,
+            InvalidLogCategoryId,
+            "",
+            "",
+            logLevel
+        );
+    }
+
+    LogCategory::LogCategory(
+        LogCategoryId id,
+        LogCategoryId parentId,
+        std::string   segment,
+        std::string   fullName,
+        LogLevel      logLevel
+    )
+        : _id(id),
+          _parentId(parentId),
+          _segment(std::move(segment)),
+          _fullName(std::move(fullName)),
+          _logLevel(logLevel)
     {
     }
 
-    /**
-     * @brief Get the name of the log category
-     *
-     * @return std::string
-     */
-    std::string LogCategory::getName() const { return _name; }
+    void LogCategory::addSubCategory(LogCategoryId subCategoryId)
+    {
+        _subCategoryIds.push_back(subCategoryId);
+    }
+
+    void LogCategory::setLogLevel(const LogLevel& logLevel)
+    {
+        _logLevel = logLevel;
+    }
+
 }   // namespace logging
