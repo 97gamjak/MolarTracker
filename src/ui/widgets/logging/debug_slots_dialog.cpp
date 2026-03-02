@@ -37,7 +37,9 @@ namespace ui
      *
      * @param categories The debug flag categories to set
      */
-    void DebugSlotsDialog::setCategories(const LogCategoryMap& categories)
+    void DebugSlotsDialog::setCategories(
+        const std::vector<logging::LogCategory>& categories
+    )
     {
         setCategories(categories, true);
     }
@@ -50,8 +52,8 @@ namespace ui
      * with the new ones
      */
     void DebugSlotsDialog::setCategories(
-        const LogCategoryMap& categories,
-        bool                  overrideReference
+        const std::vector<logging::LogCategory>& categories,
+        bool                                     overrideReference
     )
     {
         if (overrideReference)
@@ -187,9 +189,11 @@ namespace ui
         static constexpr int CAT_COL   = 0;
         static constexpr int LEVEL_COL = 1;
 
-        for (const auto& [category, level] : _currentCategories)
+        for (const auto& category : _currentCategories)
         {
-            if (_modifiedOnly && level == _categories.at(category))
+            const auto level = category.getLogLevel();
+            if (_modifiedOnly &&
+                level == _categories.at(category.getId()).getLogLevel())
                 continue;
 
             const auto categoryName = category.getName();
@@ -234,7 +238,9 @@ namespace ui
                     const auto levelOpt = LogLevelMeta::from_string(levelText);
 
                     if (levelOpt.has_value())
-                        _currentCategories[category] = levelOpt.value();
+                        _currentCategories[category.getId()].setLogLevel(
+                            levelOpt.value()
+                        );
                 }
             );
         }
@@ -307,7 +313,18 @@ namespace ui
     void DebugSlotsDialog::_rejectChanges()
     {
         // if something changed ask for confirmation
-        if (_currentCategories != _categories)
+        auto isModified = false;
+        for (const auto& category : _currentCategories)
+        {
+            if (category.getLogLevel() !=
+                _categories.at(category.getId()).getLogLevel())
+            {
+                isModified = true;
+                break;
+            }
+        }
+
+        if (isModified)
         {
             const auto res = askDiscardChanges(this);
 

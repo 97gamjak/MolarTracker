@@ -15,17 +15,15 @@ namespace ui
     class UpdateDebugFlagsCommand : public ICommand
     {
        private:
-        using LogCategoryMap = std::unordered_map<
-            logging::LogCategory,
-            LogLevel,
-            logging::LogCategory::Hash>;
         /// The old categories before the update
-        LogCategoryMap _oldCategories;
+        std::vector<logging::LogCategory> _oldCategories;
         /// The new categories after the update
-        LogCategoryMap _categories;
+        std::vector<logging::LogCategory> _categories;
 
        public:
-        explicit UpdateDebugFlagsCommand(const LogCategoryMap& categories);
+        explicit UpdateDebugFlagsCommand(
+            const std::vector<logging::LogCategory>& categories
+        );
         ~UpdateDebugFlagsCommand() override = default;
 
         std::expected<void, CommandErrorPtr> undo() override;

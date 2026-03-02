@@ -11,7 +11,7 @@ namespace ui
      * @param categories The new debug flag categories to set
      */
     UpdateDebugFlagsCommand::UpdateDebugFlagsCommand(
-        const LogCategoryMap& categories
+        const std::vector<logging::LogCategory>& categories
     )
         : _oldCategories(logging::LogManager::getInstance().getCategories()),
           _categories(categories)
@@ -25,8 +25,13 @@ namespace ui
      */
     std::expected<void, CommandErrorPtr> UpdateDebugFlagsCommand::undo()
     {
-        for (const auto& [category, level] : _oldCategories)
-            logging::LogManager::getInstance().changeLogLevel(category, level);
+        for (const auto& category : _oldCategories)
+        {
+            logging::LogManager::getInstance().changeLogLevel(
+                category,
+                category.getLogLevel()
+            );
+        }
 
         return {};
     }
@@ -38,8 +43,13 @@ namespace ui
      */
     std::expected<void, CommandErrorPtr> UpdateDebugFlagsCommand::redo()
     {
-        for (const auto& [category, level] : _categories)
-            logging::LogManager::getInstance().changeLogLevel(category, level);
+        for (const auto& category : _categories)
+        {
+            logging::LogManager::getInstance().changeLogLevel(
+                category,
+                category.getLogLevel()
+            );
+        }
 
         return {};
     }

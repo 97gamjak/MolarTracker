@@ -38,4 +38,10 @@ namespace logging
         _logLevel = logLevel;
     }
 
+    LogLevel LogCategory::getLogLevel() const { return _logLevel; }
+
+    std::string LogCategory::getName() const { return _fullName; }
+
+    LogCategoryId LogCategory::getId() const { return _id; }
+
 }   // namespace logging

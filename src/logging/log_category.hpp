@@ -39,7 +39,13 @@ namespace logging
         );
 
         void addSubCategory(LogCategoryId subCategoryId);
-        void setLogLevel(const LogLevel& logLevel);
+
+        void                   setLogLevel(const LogLevel& logLevel);
+        [[nodiscard]] LogLevel getLogLevel() const;
+
+        [[nodiscard]] std::string getName() const;
+
+        [[nodiscard]] LogCategoryId getId() const;
     };
 }   // namespace logging
 

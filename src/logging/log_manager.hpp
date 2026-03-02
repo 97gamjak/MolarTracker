@@ -3,8 +3,8 @@
 
 #include <filesystem>
 #include <string>
-#include <unordered_map>
 
+#include "log_categories.hpp"
 #include "log_category.hpp"
 #include "utils/ring_file.hpp"
 
@@ -26,9 +26,8 @@ namespace logging
     class LogManager
     {
        private:
-        std::vector<LogCategory>                       _categories;
-        std::vector<LogCategory>                       _startupCategories;
-        std::unordered_map<std::string, LogCategoryId> _categoryNameToIdMap;
+        LogCategories _categories;
+        LogCategories _startupCategories;
 
         /// The ring file logger instance used for logging to files.
         RingFile _ringFile;
@@ -66,56 +65,14 @@ namespace logging
         // https://97gamjak.atlassian.net/browse/MOLTRACK-102
         void setDefaultLogLevel(const LogLevel& level);
 
+        LogCategory getCategory(const std::string& name) const;
+
        private:
         LogManager() = default;
 
         [[nodiscard]] static std::string _logLevelToString(
             const LogLevel& level
         );
-
-        [[nodiscard]] LogCategoryId _findLogCategory(
-            const std::string& categoryName
-        ) const;
-
-        [[nodiscard]] LogCategoryId _getOrCreateLogCategory(
-            LogCategoryId      parentCategoryId,
-            const std::string& segment,
-            const std::string& fullName,
-            const LogLevel&    logLevel
-        );
-
-        static void _appendSegmentToFullName(
-            std::string&       parentFullName,
-            const std::string& segment
-        );
-
-        [[nodiscard]] LogCategoryId _addLogCategory(
-            const std::string& fullName,
-            const LogLevel&    logLevel
-        );
-
-        [[nodiscard]] LogCategoryId _addLogCategory(
-            const LogCategoryId& parentCategoryId,
-            const std::string&   segment,
-            const std::string&   fullName,
-            const LogLevel&      logLevel
-        );
-
-        template <typename Fn>
-        void _forEachSegment(const std::string& fullName, Fn&& fn) const
-        {
-            std::size_t pos = 0;
-            while (pos < fullName.size())
-            {
-                const auto dot = fullName.find('.', pos);
-                const auto end =
-                    (dot == std::string::npos) ? fullName.size() : dot;
-
-                fn(fullName.substr(pos, end - pos));
-
-                pos = end + 1;
-            }
-        }
     };
 
 }   // namespace logging

@@ -24,15 +24,10 @@ namespace ui
         Q_OBJECT
 
        private:
-        using LogCategoryMap = std::unordered_map<
-            logging::LogCategory,
-            LogLevel,
-            logging::LogCategory::Hash>;
-
         /// The reference map of log categories
-        LogCategoryMap _categories;
+        std::vector<logging::LogCategory> _categories;
         /// The current map of log categories
-        LogCategoryMap _currentCategories;
+        std::vector<logging::LogCategory> _currentCategories;
 
         /// Flag to indicate if only modified categories should be shown in the
         /// tree
@@ -67,16 +62,19 @@ namespace ui
 
         explicit DebugSlotsDialog(QWidget* parent);
 
-        void setCategories(const LogCategoryMap& categories);
+        void setCategories(const std::vector<logging::LogCategory>& categories);
         void setCategories(
-            const LogCategoryMap& categories,
-            bool                  overrideReference
+            const std::vector<logging::LogCategory>& categories,
+            bool                                     overrideReference
         );
         void populateTree();
 
        signals:
         /// Signal emitted when the user requests to apply changes
-        void requested(const Action& action, const LogCategoryMap& categories);
+        void requested(
+            const Action&                            action,
+            const std::vector<logging::LogCategory>& categories
+        );
 
        private:
         void _buildUi();

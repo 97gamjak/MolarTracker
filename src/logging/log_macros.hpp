@@ -10,13 +10,11 @@
 
 namespace logging::detail
 {
-    inline LogCategory internNoexcept(const char* name) noexcept
+    inline std::string internNoexcept(const char* name) noexcept
     {
-        // Best: make intern() itself noexcept.
-        // If it can throw today, do not let it escape:
         try
         {
-            return LogCategory{name};
+            return {name};
         }
         catch (...)
         {
