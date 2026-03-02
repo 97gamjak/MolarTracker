@@ -8,13 +8,29 @@
 #include "log_manager.hpp"       // IWYU pragma: keep
 #include "log_object.hpp"        // IWYU pragma: keep
 
-#define REGISTER_LOG_CATEGORY(name_literal)                       \
-    namespace                                                     \
-    {                                                             \
-                                                                  \
-        [[maybe_unused]] const logging::LogCategory _logCategory{ \
-            name_literal                                          \
-        };                                                        \
+namespace logging::detail
+{
+    inline LogCategory internNoexcept(const char* name) noexcept
+    {
+        // Best: make intern() itself noexcept.
+        // If it can throw today, do not let it escape:
+        try
+        {
+            return LogCategory{name};
+        }
+        catch (...)
+        {
+            std::abort();
+        }
+    }
+}   // namespace logging::detail
+
+#define REGISTER_LOG_CATEGORY(name_literal)                        \
+    namespace                                                      \
+    {                                                              \
+                                                                   \
+        [[maybe_unused]] const logging::LogCategory _logCategory = \
+            logging::detail::internNoexcept(name_literal);         \
     }
 
 #define LOG_OBJECT_INTERNAL(level, category, message) \
