@@ -48,6 +48,19 @@ namespace logging
         return _categories[id];
     }
 
+    void LogCategories::setLogLevel(
+        const std::string& categoryName,
+        const LogLevel&    logLevel
+    )
+    {
+        const auto id = findLogCategory(categoryName);
+
+        if (id == InvalidLogCategoryId)
+            return;
+
+        _categories[id].setLogLevel(logLevel);
+    }
+
     LogCategoryId LogCategories::_getOrCreateLogCategory(
         LogCategoryId      parentCategoryId,
         const std::string& segment,

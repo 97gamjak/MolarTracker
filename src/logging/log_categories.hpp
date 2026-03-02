@@ -35,6 +35,11 @@ namespace logging
             const std::string& categoryName
         ) const;
 
+        void setLogLevel(
+            const std::string& categoryName,
+            const LogLevel&    logLevel
+        );
+
        private:
         [[nodiscard]] LogCategoryId _addLogCategory(
             const std::string& fullName,

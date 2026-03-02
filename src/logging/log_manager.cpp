@@ -133,14 +133,16 @@ namespace logging
         if (previousLevel == level)
             return;
 
-        _categories.getCategory(category.getName())->setLogLevel(level);
+        _categories.setLogLevel(category.getName(), level);
 
         const auto logObject = LogObject{
             LogLevel::Info,
-            _categories[id],
+            _categories.getCategory(category.getName()).value(),
             std::format(
                 "Log level for category '{}' changed from '{}' to '{}'",
-                std::string{_categories[id].getName()},
+                std::string{_categories.getCategory(category.getName())
+                                .value()
+                                .getName()},
                 std::string{LogLevelMeta::name(previousLevel)},
                 std::string{LogLevelMeta::name(level)}
             ),
@@ -158,7 +160,7 @@ namespace logging
      */
     std::vector<LogCategory> LogManager::getCategories() const
     {
-        return _categories;
+        return _categories.getCategories();
     }
 
     /**
@@ -195,12 +197,12 @@ namespace logging
 
     LogCategory LogManager::getCategory(const std::string& name) const
     {
-        const auto id = _findLogCategory(name);
+        const auto categoryOpt = _categories.getCategory(name);
 
-        if (id == InvalidLogCategoryId)
-            throw std::runtime_error("Log category '" + name + "' not found");
+        if (!categoryOpt.has_value())
+            return LogCategory::createRootCategory(_defaultLogLevel);
 
-        return _categories[id];
+        return categoryOpt.value();
     }
 
 }   // namespace logging
