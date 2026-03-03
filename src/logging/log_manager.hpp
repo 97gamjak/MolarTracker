@@ -48,7 +48,7 @@ namespace logging
         );
         void changeLogLevel(const LogCategory& category, const LogLevel& level);
         bool isEnabled(
-            const LogCategory& category,
+            const std::string& categoryName,
             const LogLevel&    level
         ) const;
         void flush();

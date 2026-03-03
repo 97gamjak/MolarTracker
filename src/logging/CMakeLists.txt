@@ -1,9 +1,9 @@
 add_library(molartracker_logging STATIC
     log_manager.cpp
-    log_manager_private.cpp
     log_entry_scope.cpp
     log_object.cpp
     log_category.cpp
+    log_categories.cpp
 )
 
 target_include_directories(molartracker_logging

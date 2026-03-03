@@ -22,7 +22,7 @@ namespace logging
 
         /// The log category of the message (e.g., application, ui, database,
         /// etc.)
-        LogCategory category;
+        std::string category;
 
         /// The source file where the log message was generated
         std::string file;
@@ -39,12 +39,12 @@ namespace logging
 
        public:   // methods
         LogObject(
-            const LogLevel&    _level,
-            const LogCategory& _category,
-            std::string        _message,
-            std::string        _file,
-            int                _line,
-            std::string        _function
+            const LogLevel& _level,
+            std::string     _category,
+            std::string     _message,
+            std::string     _file,
+            int             _line,
+            std::string     _function
         );
     };
 

@@ -23,12 +23,12 @@ namespace logging::detail
     }
 }   // namespace logging::detail
 
-#define REGISTER_LOG_CATEGORY(name_literal)                        \
-    namespace                                                      \
-    {                                                              \
-                                                                   \
-        [[maybe_unused]] const logging::LogCategory _logCategory = \
-            logging::detail::internNoexcept(name_literal);         \
+#define REGISTER_LOG_CATEGORY(name_literal)                \
+    namespace                                              \
+    {                                                      \
+                                                           \
+        [[maybe_unused]] const auto _logCategory =         \
+            logging::detail::internNoexcept(name_literal); \
     }
 
 #define LOG_OBJECT_INTERNAL(level, category, message) \

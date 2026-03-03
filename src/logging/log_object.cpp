@@ -13,15 +13,15 @@ namespace logging
      * @param _function
      */
     LogObject::LogObject(
-        const LogLevel&    _level,
-        const LogCategory& _category,
-        std::string        _message,
-        std::string        _file,
-        int                _line,
-        std::string        _function
+        const LogLevel& _level,
+        std::string     _category,
+        std::string     _message,
+        std::string     _file,
+        int             _line,
+        std::string     _function
     )
         : level{_level},
-          category{_category},
+          category{std::move(_category)},
           file{std::move(_file)},
           line{_line},
           function{std::move(_function)},
