@@ -16,14 +16,12 @@ namespace ui
     {
        private:
         /// The old categories before the update
-        std::vector<logging::LogCategory> _oldCategories;
+        logging::LogCategories _oldCategories;
         /// The new categories after the update
-        std::vector<logging::LogCategory> _categories;
+        logging::LogCategories _categories;
 
        public:
-        explicit UpdateDebugFlagsCommand(
-            const std::vector<logging::LogCategory>& categories
-        );
+        explicit UpdateDebugFlagsCommand(logging::LogCategories categories);
         ~UpdateDebugFlagsCommand() override = default;
 
         std::expected<void, CommandErrorPtr> undo() override;

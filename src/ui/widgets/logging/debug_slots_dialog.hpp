@@ -8,7 +8,7 @@
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration
-class QTreeWidget;        // Forward declaration
+class QTreeView;          // Forward declaration
 class QDialogButtonBox;   // Forward declaration
 class QMainWindow;        // Forward declaration
 
@@ -25,16 +25,16 @@ namespace ui
 
        private:
         /// The reference map of log categories
-        std::vector<logging::LogCategory> _categories;
+        logging::LogCategories _categories;
         /// The current map of log categories
-        std::vector<logging::LogCategory> _currentCategories;
+        logging::LogCategories _currentCategories;
 
         /// Flag to indicate if only modified categories should be shown in the
         /// tree
         bool _modifiedOnly = false;
 
         /// UI elements
-        QTreeWidget* _tree{};
+        QTreeView* _tree{};
 
         /// Buttons
         QPushButton* _defaultsButton{};
@@ -62,18 +62,18 @@ namespace ui
 
         explicit DebugSlotsDialog(QWidget* parent);
 
-        void setCategories(const std::vector<logging::LogCategory>& categories);
+        void setCategories(const logging::LogCategories& categories);
         void setCategories(
-            const std::vector<logging::LogCategory>& categories,
-            bool                                     overrideReference
+            const logging::LogCategories& categories,
+            bool                          overrideReference
         );
         void populateTree();
 
        signals:
         /// Signal emitted when the user requests to apply changes
         void requested(
-            const Action&                            action,
-            const std::vector<logging::LogCategory>& categories
+            const Action&                 action,
+            const logging::LogCategories& categories
         );
 
        private:

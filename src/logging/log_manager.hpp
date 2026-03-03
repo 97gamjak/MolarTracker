@@ -53,8 +53,8 @@ namespace logging
         ) const;
         void flush();
 
-        std::vector<LogCategory> getCategories() const;
-        std::vector<LogCategory> getDefaultCategories() const;
+        [[nodiscard]] LogCategories getCategories() const;
+        [[nodiscard]] LogCategories getDefaultCategories() const;
 
         std::filesystem::path getCurrentLogFilePath() const;
 

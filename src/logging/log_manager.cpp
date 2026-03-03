@@ -60,16 +60,15 @@ namespace logging
     /**
      * @brief Get the default logging categories with Info level
      *
-     * @return LogCategoryMap
+     * @return LogCategories
      */
-    std::vector<LogCategory> LogManager::getDefaultCategories() const
+    LogCategories LogManager::getDefaultCategories() const
     {
-        std::vector<LogCategory> defaultCategories;
+        LogCategories defaultCategories;
 
-        for (auto& category : _startupCategories.getCategories())
+        for (const auto& category : _startupCategories.getCategories())
         {
-            category.setLogLevel(_defaultLogLevel);
-            defaultCategories.push_back(category);
+            defaultCategories.setLogLevel(category.getName(), _defaultLogLevel);
         }
 
         return defaultCategories;
@@ -156,12 +155,9 @@ namespace logging
     /**
      * @brief Get the current logging categories
      *
-     * @return LogCategory
+     * @return LogCategories
      */
-    std::vector<LogCategory> LogManager::getCategories() const
-    {
-        return _categories.getCategories();
-    }
+    LogCategories LogManager::getCategories() const { return _categories; }
 
     /**
      * @brief Log a message

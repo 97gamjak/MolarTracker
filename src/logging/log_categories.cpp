@@ -1,6 +1,7 @@
 #include "log_categories.hpp"
 
 #include <cassert>
+#include <iostream>
 
 namespace logging
 {
@@ -37,6 +38,17 @@ namespace logging
     }
 
     std::optional<LogCategory> LogCategories::getCategory(
+        const LogCategoryId& categoryId
+    ) const
+    {
+        if (categoryId == InvalidLogCategoryId ||
+            categoryId >= _categories.size())
+            return std::nullopt;
+
+        return _categories[categoryId];
+    }
+
+    std::optional<LogCategory> LogCategories::getCategory(
         const std::string& categoryName
     ) const
     {
@@ -46,6 +58,16 @@ namespace logging
             return std::nullopt;
 
         return _categories[id];
+    }
+
+    std::vector<LogCategoryId> LogCategories::getChildrenOf(
+        LogCategoryId parentId
+    ) const
+    {
+        if (parentId == InvalidLogCategoryId || parentId >= _categories.size())
+            return {};
+
+        return _categories[parentId].getSubCategoryIds();
     }
 
     void LogCategories::setLogLevel(

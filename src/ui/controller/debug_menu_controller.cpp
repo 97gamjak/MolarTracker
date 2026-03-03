@@ -89,8 +89,8 @@ namespace ui
      * @param categories The new debug flag categories to set
      */
     void DebugMenuController::_onDebugSlotsChangeRequested(
-        const DebugSlotsDialog::Action&          action,
-        const std::vector<logging::LogCategory>& categories
+        const DebugSlotsDialog::Action& action,
+        const logging::LogCategories&   categories
     )
     {
         using enum DebugSlotsDialog::Action;
@@ -191,7 +191,7 @@ namespace ui
      *
      */
     void DebugMenuController::_applyDebugFlagChanges(
-        const std::vector<logging::LogCategory>& categories
+        const logging::LogCategories& categories
     )
     {
         auto result = Commands::makeAndDo<UpdateDebugFlagsCommand>(categories);
@@ -228,7 +228,7 @@ namespace ui
      * @param categories The new debug flag categories to set
      */
     void DebugMenuController::_applyDebugFlagChangesAndClose(
-        const std::vector<logging::LogCategory>& categories
+        const logging::LogCategories& categories
     )
     {
         _applyDebugFlagChanges(categories);

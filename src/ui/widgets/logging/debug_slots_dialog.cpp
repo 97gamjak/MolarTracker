@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 
 #include "config/logging_base.hpp"
+#include "debug_slots_tree_view.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/widgets/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
@@ -38,7 +39,7 @@ namespace ui
      * @param categories The debug flag categories to set
      */
     void DebugSlotsDialog::setCategories(
-        const std::vector<logging::LogCategory>& categories
+        const logging::LogCategories& categories
     )
     {
         setCategories(categories, true);
@@ -52,8 +53,8 @@ namespace ui
      * with the new ones
      */
     void DebugSlotsDialog::setCategories(
-        const std::vector<logging::LogCategory>& categories,
-        bool                                     overrideReference
+        const logging::LogCategories& categories,
+        bool                          overrideReference
     )
     {
         if (overrideReference)
@@ -73,8 +74,6 @@ namespace ui
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _tree = new QTreeWidget(this);
-        _tree->setColumnCount(2);
-        _tree->setHeaderLabels({"Debug Flag", "Value"});
         _tree->setRootIsDecorated(true);
         _tree->setUniformRowHeights(true);
         auto* header = _tree->header();
@@ -183,70 +182,79 @@ namespace ui
      */
     void DebugSlotsDialog::populateTree()
     {
-        _tree->blockSignals(true);
-        _tree->clear();
+        // _tree->blockSignals(true);
+        // _tree->clear();
 
-        static constexpr int CAT_COL   = 0;
-        static constexpr int LEVEL_COL = 1;
+        // static constexpr int CAT_COL   = 0;
+        // static constexpr int LEVEL_COL = 1;
 
-        for (const auto& category : _currentCategories)
-        {
-            const auto level = category.getLogLevel();
-            if (_modifiedOnly &&
-                level == _categories.at(category.getId()).getLogLevel())
-                continue;
+        auto* model = new LogCategoryTreeModel(_currentCategories, this);
 
-            const auto categoryName = category.getName();
-            const auto categoryStr  = std::string(categoryName);
-            const auto categoryQStr = QString::fromStdString(categoryStr);
+        _tree = new QTreeView(this);
+        _tree->setModel(model);
+        _tree->setUniformRowHeights(true);
+        _tree->setHeaderHidden(false);
+        _tree->expandToDepth(1);   // optional
 
-            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-            auto* treeItem = new QTreeWidgetItem(_tree);
-            treeItem->setText(CAT_COL, categoryQStr);
-            treeItem->setFirstColumnSpanned(false);
-            treeItem->setFlags(treeItem->flags() & ~Qt::ItemIsUserCheckable);
+        // for (const auto& category : _currentCategories)
+        // {
+        //     const auto level = category.getLogLevel();
+        //     if (_modifiedOnly &&
+        //         level == _categories.at(category.getId()).getLogLevel())
+        //         continue;
 
-            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-            auto* combo = new QComboBox(_tree);
-            combo->addItems(utils::toQStringList(LogLevelMeta::names));
+        //     const auto categoryName = category.getName();
+        //     const auto categoryStr  = std::string(categoryName);
+        //     const auto categoryQStr = QString::fromStdString(categoryStr);
 
-            const auto indexOpt = LogLevelMeta::index(level);
+        //     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        //     auto* treeItem = new QTreeWidgetItem(_tree);
+        //     treeItem->setText(CAT_COL, categoryQStr);
+        //     treeItem->setFirstColumnSpanned(false);
+        //     treeItem->setFlags(treeItem->flags() & ~Qt::ItemIsUserCheckable);
 
-            if (!indexOpt.has_value())
-            {
-                LOG_ERROR(
-                    "LogLevel for category " + categoryStr +
-                    " is invalid, defaulting to Off"
-                );
-            }
+        //     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        //     auto* combo = new QComboBox(_tree);
+        //     combo->addItems(utils::toQStringList(LogLevelMeta::names));
 
-            combo->setCurrentIndex(static_cast<int>(indexOpt.value_or(0)));
-            _tree->setItemWidget(treeItem, LEVEL_COL, combo);
+        //     const auto indexOpt = LogLevelMeta::index(level);
 
-            connect(
-                combo,
-                &QComboBox::currentIndexChanged,
-                this,
-                [category, this]()
-                {
-                    // column 2 of this row changed
-                    const auto levelText =
-                        dynamic_cast<QComboBox*>(QObject::sender())
-                            ->currentText()
-                            .toStdString();
+        //     if (!indexOpt.has_value())
+        //     {
+        //         LOG_ERROR(
+        //             "LogLevel for category " + categoryStr +
+        //             " is invalid, defaulting to Off"
+        //         );
+        //     }
 
-                    const auto levelOpt = LogLevelMeta::from_string(levelText);
+        //     combo->setCurrentIndex(static_cast<int>(indexOpt.value_or(0)));
+        //     _tree->setItemWidget(treeItem, LEVEL_COL, combo);
 
-                    if (levelOpt.has_value())
-                        _currentCategories[category.getId()].setLogLevel(
-                            levelOpt.value()
-                        );
-                }
-            );
-        }
+        //     connect(
+        //         combo,
+        //         &QComboBox::currentIndexChanged,
+        //         this,
+        //         [category, this]()
+        //         {
+        //             // column 2 of this row changed
+        //             const auto levelText =
+        //                 dynamic_cast<QComboBox*>(QObject::sender())
+        //                     ->currentText()
+        //                     .toStdString();
 
-        _tree->expandAll();
-        _tree->blockSignals(false);
+        //             const auto levelOpt =
+        //             LogLevelMeta::from_string(levelText);
+
+        //             if (levelOpt.has_value())
+        //                 _currentCategories[category.getId()].setLogLevel(
+        //                     levelOpt.value()
+        //                 );
+        //         }
+        //     );
+        // }
+
+        // _tree->expandAll();
+        // _tree->blockSignals(false);
     }
 
     /**
@@ -314,10 +322,10 @@ namespace ui
     {
         // if something changed ask for confirmation
         auto isModified = false;
-        for (const auto& category : _currentCategories)
+        for (const auto& category : _currentCategories.getCategories())
         {
             if (category.getLogLevel() !=
-                _categories.at(category.getId()).getLogLevel())
+                _categories.getCategory(category.getName())->getLogLevel())
             {
                 isModified = true;
                 break;

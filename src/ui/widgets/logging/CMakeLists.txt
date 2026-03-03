@@ -1,5 +1,6 @@
 add_library(molartracker_ui_logging STATIC
     debug_slots_dialog.cpp
+    debug_slots_tree_view.cpp
     log_viewer_dialog.cpp
 )
 

@@ -28,6 +28,7 @@ int main(int argc, char** argv)
         auto&              loggingSettings = settings.getLoggingSettings();
 
         // initialize ring file buffered logger
+        logging::LogManager::getInstance().initializeCategories();
         logging::LogManager::getInstance().initializeRingFileLogger(
             loggingSettings,
             Constants::getInstance().getDataPath()

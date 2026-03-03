@@ -46,6 +46,8 @@ namespace logging
         [[nodiscard]] std::string getName() const;
 
         [[nodiscard]] LogCategoryId getId() const;
+
+        [[nodiscard]] std::vector<LogCategoryId> getSubCategoryIds() const;
     };
 }   // namespace logging
 

@@ -11,13 +11,13 @@
 namespace logging
 {
     /**
-     * @brief Struct representing a collection of log categories, organized in a
+     * @brief Class representing a collection of log categories, organized in a
      * hierarchical structure.
      *
      */
-    struct LogCategories
+    class LogCategories
     {
-       public:
+       private:
         std::vector<LogCategory>                       _categories;
         std::unordered_map<std::string, LogCategoryId> _categoryNameToIdMap;
 
@@ -30,10 +30,16 @@ namespace logging
         );
 
         LogCategoryId findLogCategory(const std::string& categoryName) const;
+
         std::vector<LogCategory>   getCategories() const;
+        std::optional<LogCategory> getCategory(
+            const LogCategoryId& categoryId
+        ) const;
         std::optional<LogCategory> getCategory(
             const std::string& categoryName
         ) const;
+
+        std::vector<LogCategoryId> getChildrenOf(LogCategoryId parentId) const;
 
         void setLogLevel(
             const std::string& categoryName,

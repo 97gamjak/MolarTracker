@@ -52,8 +52,8 @@ namespace ui
        private slots:
         void _onRequestDebugSlots();
         void _onDebugSlotsChangeRequested(
-            const DebugSlotsDialog::Action&          action,
-            const std::vector<logging::LogCategory>& categories
+            const DebugSlotsDialog::Action& action,
+            const logging::LogCategories&   categories
         );
         void _onRequestLogViewer();
 
@@ -69,11 +69,9 @@ namespace ui
         void _ensureDebugSlotsDialog();
         void _ensureLogViewerDialog();
         void _resetDefaultDebugFlags();
-        void _applyDebugFlagChanges(
-            const std::vector<logging::LogCategory>& categories
-        );
+        void _applyDebugFlagChanges(const logging::LogCategories& categories);
         void _applyDebugFlagChangesAndClose(
-            const std::vector<logging::LogCategory>& categories
+            const logging::LogCategories& categories
         );
         void _applyLogViewerSettings();
     };
