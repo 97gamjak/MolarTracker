@@ -73,7 +73,7 @@ namespace ui
         resize(820, 560);
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _tree = new QTreeWidget(this);
+        _tree = new QTreeView(this);
         _tree->setRootIsDecorated(true);
         _tree->setUniformRowHeights(true);
         auto* header = _tree->header();
@@ -188,13 +188,9 @@ namespace ui
         // static constexpr int CAT_COL   = 0;
         // static constexpr int LEVEL_COL = 1;
 
-        auto* model = new LogCategoryTreeModel(_currentCategories, this);
+        auto* model = new LogCategoryTreeModel(_currentCategories, _tree);
 
-        _tree = new QTreeView(this);
         _tree->setModel(model);
-        _tree->setUniformRowHeights(true);
-        _tree->setHeaderHidden(false);
-        _tree->expandToDepth(1);   // optional
 
         // for (const auto& category : _currentCategories)
         // {

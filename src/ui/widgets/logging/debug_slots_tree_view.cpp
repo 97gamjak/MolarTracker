@@ -5,15 +5,16 @@
 
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
+#include "logging/log_macros.hpp"
 
 namespace ui
 {
 
     LogCategoryTreeModel::LogCategoryTreeModel(
-        logging::LogCategories& reg,
+        logging::LogCategories& categories,
         QObject*                parent
     )
-        : QAbstractItemModel(parent), _categories(reg)
+        : QAbstractItemModel(parent), _categories(categories)
     {
     }
 
@@ -26,8 +27,8 @@ namespace ui
         if (row < 0 || column < 0 || column >= ColumnCount)
             return {};
 
-        const auto parentId = id_from_index_(parent);
-        const auto childId  = child_at_(parentId, row);
+        const auto parentId = _getIdFromIndex(parent);
+        const auto childId  = _getChildAt(parentId, row);
 
         if (childId == logging::InvalidLogCategoryId)
             return {};
@@ -40,16 +41,16 @@ namespace ui
         if (!child.isValid())
             return {};
 
-        logging::LogCategoryId childId  = id_from_index_(child);
-        logging::LogCategoryId parentId = parent_id_(childId);
+        logging::LogCategoryId childId  = _getIdFromIndex(child);
+        logging::LogCategoryId parentId = _getParentId(childId);
 
         if (parentId == logging::RootLogCategoryId ||
             parentId == logging::InvalidLogCategoryId)
             return {};
 
         // Find the row of the parent category among its siblings
-        logging::LogCategoryId grandParentId = parent_id_(parentId);
-        int                    row           = row_of_child_(
+        logging::LogCategoryId grandParentId = _getParentId(parentId);
+        int                    row           = _getRowOfChild(
             grandParentId == logging::InvalidLogCategoryId
                 ? logging::RootLogCategoryId
                 : grandParentId,
@@ -64,7 +65,7 @@ namespace ui
 
     int LogCategoryTreeModel::rowCount(const QModelIndex& parent) const
     {
-        const auto parentId = id_from_index_(parent);
+        const auto parentId = _getIdFromIndex(parent);
 
         if (parent.isValid() && parent.column() != 0)
             return 0;
@@ -77,7 +78,7 @@ namespace ui
         if (!idx.isValid())
             return {};
 
-        const auto categoryId = id_from_index_(idx);
+        const auto categoryId = _getIdFromIndex(idx);
         const auto category   = _categories.getCategory(categoryId);
 
         if (role == Qt::DisplayRole)
@@ -122,6 +123,55 @@ namespace ui
             flags |= Qt::ItemIsEditable;
 
         return flags;
+    }
+
+    logging::LogCategoryId LogCategoryTreeModel::_getIdFromIndex(
+        const QModelIndex& idx
+    )
+    {
+        if (!idx.isValid())
+            return logging::RootLogCategoryId;
+
+        return static_cast<logging::LogCategoryId>(idx.internalId());
+    }
+
+    logging::LogCategoryId LogCategoryTreeModel::_getParentId(
+        logging::LogCategoryId id
+    ) const
+    {
+        const auto categoryOpt = _categories.getCategory(id);
+
+        if (!categoryOpt.has_value())
+            return logging::InvalidLogCategoryId;
+
+        return categoryOpt->getParentId();
+    }
+
+    logging::LogCategoryId LogCategoryTreeModel::_getChildAt(
+        logging::LogCategoryId parentId,
+        int                    row
+    ) const
+    {
+        const auto children = _categories.getChildrenOf(parentId);
+        if (row < 0 || row >= static_cast<int>(children.size()))
+            return logging::InvalidLogCategoryId;
+
+        return children[static_cast<std::size_t>(row)];
+    }
+
+    int LogCategoryTreeModel::_getRowOfChild(
+        logging::LogCategoryId parentId,
+        logging::LogCategoryId childId
+    ) const
+    {
+        const auto children = _categories.getChildrenOf(parentId);
+        for (std::size_t i = 0; i < children.size(); ++i)
+        {
+            if (children[i] == childId)
+                return static_cast<int>(i);
+        }
+
+        return -1;
     }
 
 }   // namespace ui

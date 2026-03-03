@@ -44,4 +44,11 @@ namespace logging
 
     LogCategoryId LogCategory::getId() const { return _id; }
 
+    LogCategoryId LogCategory::getParentId() const { return _parentId; }
+
+    std::vector<LogCategoryId> LogCategory::getSubCategoryIds() const
+    {
+        return _subCategoryIds;
+    }
+
 }   // namespace logging

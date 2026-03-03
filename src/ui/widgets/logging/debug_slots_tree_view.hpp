@@ -13,6 +13,9 @@ namespace ui
     {
         Q_OBJECT
 
+       private:
+        logging::LogCategories& _categories;
+
        public:
         enum Column
         {
@@ -22,7 +25,7 @@ namespace ui
         };
 
         explicit LogCategoryTreeModel(
-            logging::LogCategories& reg,
+            logging::LogCategories& categories,
             QObject*                parent
         );
 
@@ -48,26 +51,24 @@ namespace ui
         ) const override;
         Qt::ItemFlags flags(const QModelIndex& idx) const override;
 
-        // Optional: refresh after registry changes
-        void reset_from_registry();
-
        private:
-        logging::LogCategories& _categories;
+        [[nodiscard]] static logging::LogCategoryId _getIdFromIndex(
+            const QModelIndex& idx
+        );
 
-        // helpers
-        logging::LogCategoryId id_from_index_(const QModelIndex& idx) const;
-        QModelIndex index_from_id_(logging::LogCategoryId id, int column) const;
-
-        logging::LogCategoryId child_at_(
+        [[nodiscard]] logging::LogCategoryId _getChildAt(
             logging::LogCategoryId parent,
             int                    row
         ) const;
-        int row_of_child_(
+
+        [[nodiscard]] int _getRowOfChild(
             logging::LogCategoryId parent,
             logging::LogCategoryId child
         ) const;
 
-        logging::LogCategoryId parent_id_(logging::LogCategoryId id) const;
+        [[nodiscard]] logging::LogCategoryId _getParentId(
+            logging::LogCategoryId id
+        ) const;
     };
 
 }   // namespace ui
