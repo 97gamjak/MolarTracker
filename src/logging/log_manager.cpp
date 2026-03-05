@@ -64,7 +64,9 @@ namespace logging
      */
     LogCategories LogManager::getDefaultCategories() const
     {
-        LogCategories defaultCategories;
+        // make a copy of the startup categories and set all log levels to the
+        // default log level
+        LogCategories defaultCategories = _startupCategories;
 
         for (const auto& category : _startupCategories.getCategories())
         {

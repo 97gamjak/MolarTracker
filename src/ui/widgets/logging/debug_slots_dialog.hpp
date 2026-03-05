@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+#include "debug_slots_model.hpp"
 #include "logging/log_category.hpp"
 #include "logging/log_manager.hpp"
 
@@ -35,6 +36,8 @@ namespace ui
 
         /// UI elements
         QTreeView* _tree{};
+
+        LogCategoryModel* _model{};
 
         /// Buttons
         QPushButton* _defaultsButton{};
@@ -86,6 +89,7 @@ namespace ui
         void _emitDefaults();
         void _discardChanges();
         void _rejectChanges();
+        void _applyToChildren(const QModelIndex& idx);
     };
 
 }   // namespace ui

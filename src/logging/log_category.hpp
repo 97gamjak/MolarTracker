@@ -25,7 +25,7 @@ namespace logging
         std::string                _segment;
         std::string                _fullName;
         LogLevel                   _logLevel;
-        std::vector<LogCategoryId> _subCategoryIds;
+        std::vector<LogCategoryId> _children;
 
        public:
         static LogCategory createRootCategory(LogLevel logLevel);
@@ -44,11 +44,14 @@ namespace logging
         [[nodiscard]] LogLevel getLogLevel() const;
 
         [[nodiscard]] std::string getName() const;
+        [[nodiscard]] std::string getSegment() const;
 
         [[nodiscard]] LogCategoryId getId() const;
         [[nodiscard]] LogCategoryId getParentId() const;
 
-        [[nodiscard]] std::vector<LogCategoryId> getSubCategoryIds() const;
+        [[nodiscard]] std::vector<LogCategoryId> getChildren() const;
+
+        [[nodiscard]] bool hasChildren() const;
     };
 }   // namespace logging
 

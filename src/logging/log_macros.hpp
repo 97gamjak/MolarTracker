@@ -57,9 +57,9 @@ namespace logging::detail
 #define LOG_WARNING(message) LOG(LOG_WARNING_OBJECT(message))
 #define LOG_ERROR(message)   LOG(LOG_ERROR_OBJECT(message))
 
-#define LOG_ENTRY LogEntryScope __logEntryScope__(LOG_TRACE_OBJECT(""))
+#define LOG_ENTRY logging::LogEntryScope __logEntryScope__(LOG_TRACE_OBJECT(""))
 #define LOG_TIMED_ENTRY \
-    TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
+    logging::TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
 
 #define MT_DEBUG std::cerr
 

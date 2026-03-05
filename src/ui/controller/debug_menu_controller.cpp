@@ -177,7 +177,6 @@ namespace ui
         const auto  categories = logManager.getDefaultCategories();
 
         _debugSlotsDialog->setCategories(categories, false);
-        _debugSlotsDialog->populateTree();
     }
 
     /**

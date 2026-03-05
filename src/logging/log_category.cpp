@@ -30,7 +30,7 @@ namespace logging
 
     void LogCategory::addSubCategory(LogCategoryId subCategoryId)
     {
-        _subCategoryIds.push_back(subCategoryId);
+        _children.push_back(subCategoryId);
     }
 
     void LogCategory::setLogLevel(const LogLevel& logLevel)
@@ -41,14 +41,17 @@ namespace logging
     LogLevel LogCategory::getLogLevel() const { return _logLevel; }
 
     std::string LogCategory::getName() const { return _fullName; }
+    std::string LogCategory::getSegment() const { return _segment; }
 
     LogCategoryId LogCategory::getId() const { return _id; }
 
     LogCategoryId LogCategory::getParentId() const { return _parentId; }
 
-    std::vector<LogCategoryId> LogCategory::getSubCategoryIds() const
+    std::vector<LogCategoryId> LogCategory::getChildren() const
     {
-        return _subCategoryIds;
+        return _children;
     }
+
+    bool LogCategory::hasChildren() const { return !_children.empty(); }
 
 }   // namespace logging

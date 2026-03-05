@@ -1,7 +1,10 @@
 #include "log_categories.hpp"
 
 #include <cassert>
-#include <iostream>
+
+#include "log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("logging.categories");
 
 namespace logging
 {
@@ -19,6 +22,14 @@ namespace logging
                 InvalidLogCategoryId
             );
         }
+    }
+
+    LogCategories LogCategories::copy() const
+    {
+        LogCategories copy;
+        copy._categories          = _categories;
+        copy._categoryNameToIdMap = _categoryNameToIdMap;
+        return copy;
     }
 
     LogCategoryId LogCategories::findLogCategory(
@@ -67,7 +78,28 @@ namespace logging
         if (parentId == InvalidLogCategoryId || parentId >= _categories.size())
             return {};
 
-        return _categories[parentId].getSubCategoryIds();
+        return _categories[parentId].getChildren();
+    }
+
+    std::vector<LogCategoryId> LogCategories::getAllDescendantsOf(
+        LogCategoryId categoryId
+    ) const
+    {
+        std::vector<LogCategoryId> descendants;
+        std::vector<LogCategoryId> stack{categoryId};
+
+        while (!stack.empty())
+        {
+            const auto currentId = stack.back();
+            stack.pop_back();
+
+            descendants.push_back(currentId);
+
+            const auto children = getChildrenOf(currentId);
+            stack.insert(stack.end(), children.begin(), children.end());
+        }
+
+        return descendants;
     }
 
     void LogCategories::setLogLevel(
@@ -113,7 +145,14 @@ namespace logging
     )
     {
         if (fullName.empty())
-            return RootLogCategoryId;
+        {
+            return _addLogCategory(
+                InvalidLogCategoryId,
+                "",
+                fullName,
+                logLevel
+            );
+        }
 
         const auto existingId = findLogCategory(fullName);
 
@@ -121,6 +160,7 @@ namespace logging
             return existingId;
 
         LogCategoryId parentId = RootLogCategoryId;
+        LogCategoryId newId    = InvalidLogCategoryId;
         std::string   segment;
         segment.reserve(fullName.size());
 
@@ -128,12 +168,13 @@ namespace logging
             fullName,
             [&](const std::string& seg)
             {
-                parentId =
+                newId =
                     _getOrCreateLogCategory(parentId, seg, fullName, logLevel);
+                parentId = newId;
             }
         );
 
-        return parentId;
+        return newId;
     }
 
     LogCategoryId LogCategories::_addLogCategory(
@@ -147,7 +188,10 @@ namespace logging
         _categories
             .emplace_back(newId, parentCategoryId, segment, fullName, logLevel);
         _categoryNameToIdMap[fullName] = newId;
-        _categories[parentCategoryId].addSubCategory(newId);
+
+        if (parentCategoryId != InvalidLogCategoryId)
+            _categories[parentCategoryId].addSubCategory(newId);
+
         return newId;
     }
 

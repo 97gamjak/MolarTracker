@@ -29,6 +29,8 @@ namespace logging
             const LogLevel&              defaultLogLevel
         );
 
+        LogCategories copy() const;
+
         LogCategoryId findLogCategory(const std::string& categoryName) const;
 
         std::vector<LogCategory>   getCategories() const;
@@ -40,6 +42,9 @@ namespace logging
         ) const;
 
         std::vector<LogCategoryId> getChildrenOf(LogCategoryId parentId) const;
+        std::vector<LogCategoryId> getAllDescendantsOf(
+            LogCategoryId categoryId
+        ) const;
 
         void setLogLevel(
             const std::string& categoryName,
