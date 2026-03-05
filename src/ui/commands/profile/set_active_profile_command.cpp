@@ -6,7 +6,7 @@
 #include "logging/log_macros.hpp"
 #include "ui/commands/profile/add_profile_command_error.hpp"
 
-REGISTER_LOG_CATEGORY("ui.commands.profile");
+REGISTER_LOG_CATEGORY("UI.Commands.SetActiveProfileCommand");
 
 namespace ui
 {

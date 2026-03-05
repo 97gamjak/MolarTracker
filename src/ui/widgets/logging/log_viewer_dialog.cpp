@@ -13,7 +13,7 @@
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 
-REGISTER_LOG_CATEGORY("LogViewerDialog");
+REGISTER_LOG_CATEGORY("UI.Widgets.Logging.LogViewerDialog");
 
 namespace ui
 {

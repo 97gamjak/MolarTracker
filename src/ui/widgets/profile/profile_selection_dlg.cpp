@@ -10,7 +10,7 @@
 #include "logging/log_macros.hpp"
 #include "utils/qt_helpers.hpp"
 
-REGISTER_LOG_CATEGORY("ProfileSelectionDialog");
+REGISTER_LOG_CATEGORY("UI.Widgets.Profile.ProfileSelectionDialog");
 
 namespace ui
 {

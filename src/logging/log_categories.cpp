@@ -1,13 +1,21 @@
 #include "log_categories.hpp"
 
+#include <algorithm>
 #include <cassert>
 
+#include "log_exceptions.hpp"
 #include "log_macros.hpp"
 
-REGISTER_LOG_CATEGORY("logging.categories");
+REGISTER_LOG_CATEGORY("Logging.Categories");
 
 namespace logging
 {
+    /**
+     * @brief Construct a new Log Categories:: Log Categories object
+     *
+     * @param categoryNames
+     * @param defaultLogLevel
+     */
     LogCategories::LogCategories(
         const std::set<std::string>& categoryNames,
         const LogLevel&              defaultLogLevel
@@ -24,6 +32,11 @@ namespace logging
         }
     }
 
+    /**
+     * @brief Create a copy of the LogCategories object
+     *
+     * @return LogCategories
+     */
     LogCategories LogCategories::copy() const
     {
         LogCategories copy;
@@ -32,22 +45,40 @@ namespace logging
         return copy;
     }
 
+    /**
+     * @brief Find the ID of a log category by its name
+     *
+     * @param categoryName
+     * @return LogCategoryId
+     */
     LogCategoryId LogCategories::findLogCategory(
         const std::string& categoryName
     ) const
     {
         auto it = _categoryNameToIdMap.find(categoryName);
+
         if (it != _categoryNameToIdMap.end())
             return it->second;
 
         return InvalidLogCategoryId;
     }
 
+    /**
+     * @brief Get all log categories
+     *
+     * @return std::vector<LogCategory>
+     */
     std::vector<LogCategory> LogCategories::getCategories() const
     {
         return _categories;
     }
 
+    /**
+     * @brief Get a log category by its ID
+     *
+     * @param categoryId
+     * @return std::optional<LogCategory>
+     */
     std::optional<LogCategory> LogCategories::getCategory(
         const LogCategoryId& categoryId
     ) const
@@ -56,9 +87,26 @@ namespace logging
             categoryId >= _categories.size())
             return std::nullopt;
 
-        return _categories[categoryId];
+        const auto& category = _categories[categoryId];
+
+        if (category.getId() != categoryId ||
+            _categoryNameToIdMap.find(category.getName())->second != categoryId)
+        {
+            throw LogException(
+                "Inconsistent log category data: ID and name mapping do not "
+                "match"
+            );
+        }
+
+        return category;
     }
 
+    /**
+     * @brief Get a log category by its name
+     *
+     * @param categoryName
+     * @return std::optional<LogCategory>
+     */
     std::optional<LogCategory> LogCategories::getCategory(
         const std::string& categoryName
     ) const
@@ -71,18 +119,43 @@ namespace logging
         return _categories[id];
     }
 
+    /**
+     * @brief Get the child categories of a given parent category
+     *
+     * @param parentId
+     * @return std::vector<LogCategoryId>
+     */
     std::vector<LogCategoryId> LogCategories::getChildrenOf(
-        LogCategoryId parentId
+        const LogCategoryId& parentId
     ) const
     {
         if (parentId == InvalidLogCategoryId || parentId >= _categories.size())
             return {};
 
-        return _categories[parentId].getChildren();
+        // sort children by name to ensure consistent order
+        auto children = _categories[parentId].getChildren();
+
+        std::ranges::sort(
+            children,
+            [this](const LogCategoryId& catA, const LogCategoryId& catB)
+            {
+                const auto& categoryA = _categories[catA];
+                const auto& categoryB = _categories[catB];
+                return categoryA.getName() < categoryB.getName();
+            }
+        );
+
+        return children;
     }
 
+    /**
+     * @brief Get all descendant categories of a given category
+     *
+     * @param categoryId
+     * @return std::vector<LogCategoryId>
+     */
     std::vector<LogCategoryId> LogCategories::getAllDescendantsOf(
-        LogCategoryId categoryId
+        const LogCategoryId& categoryId
     ) const
     {
         std::vector<LogCategoryId> descendants;
@@ -102,6 +175,12 @@ namespace logging
         return descendants;
     }
 
+    /**
+     * @brief Set the log level for a given category
+     *
+     * @param categoryName
+     * @param logLevel
+     */
     void LogCategories::setLogLevel(
         const std::string& categoryName,
         const LogLevel&    logLevel
@@ -115,11 +194,20 @@ namespace logging
         _categories[id].setLogLevel(logLevel);
     }
 
+    /**
+     * @brief Get or create a log category
+     *
+     * @param parentCategoryId
+     * @param segment
+     * @param fullName
+     * @param logLevel
+     * @return LogCategoryId
+     */
     LogCategoryId LogCategories::_getOrCreateLogCategory(
-        LogCategoryId      parentCategoryId,
-        const std::string& segment,
-        const std::string& fullName,
-        const LogLevel&    logLevel
+        const LogCategoryId& parentCategoryId,
+        const std::string&   segment,
+        const std::string&   fullName,
+        const LogLevel&      logLevel
     )
     {
         std::string fullNameCopy = fullName;
@@ -139,6 +227,13 @@ namespace logging
         );
     }
 
+    /**
+     * @brief Add a log category by its full name
+     *
+     * @param fullName
+     * @param logLevel
+     * @return LogCategoryId
+     */
     LogCategoryId LogCategories::_addLogCategory(
         const std::string& fullName,
         const LogLevel&    logLevel
@@ -161,15 +256,27 @@ namespace logging
 
         LogCategoryId parentId = RootLogCategoryId;
         LogCategoryId newId    = InvalidLogCategoryId;
-        std::string   segment;
-        segment.reserve(fullName.size());
+        std::string   currentName;
 
         _forEachSegment(
             fullName,
             [&](const std::string& seg)
             {
-                newId =
-                    _getOrCreateLogCategory(parentId, seg, fullName, logLevel);
+                _appendSegmentToFullName(
+                    currentName,
+                    seg
+                );   // grows: "App" → "App.Store" → ...
+
+                const auto existingSegId = findLogCategory(currentName);
+                if (existingSegId != InvalidLogCategoryId)
+                {
+                    // Node already exists, just move down
+                    newId    = existingSegId;
+                    parentId = newId;
+                    return;
+                }
+
+                newId = _addLogCategory(parentId, seg, currentName, logLevel);
                 parentId = newId;
             }
         );
@@ -177,6 +284,12 @@ namespace logging
         return newId;
     }
 
+    /**
+     * @brief Get a log category by its ID
+     *
+     * @param categoryId
+     * @return std::optional<LogCategory>
+     */
     LogCategoryId LogCategories::_addLogCategory(
         const LogCategoryId& parentCategoryId,
         const std::string&   segment,
@@ -195,6 +308,12 @@ namespace logging
         return newId;
     }
 
+    /**
+     * @brief Append a segment to the full name of a log category
+     *
+     * @param parentFullName The full name of the parent category
+     * @param segment The segment to append
+     */
     void LogCategories::_appendSegmentToFullName(
         std::string&       parentFullName,
         const std::string& segment

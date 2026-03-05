@@ -14,7 +14,7 @@
 #include "ui/widgets/logging/log_viewer_dialog.hpp"
 #include "ui/widgets/menu_bar/debug_menu.hpp"
 
-REGISTER_LOG_CATEGORY("DebugMenuController");
+REGISTER_LOG_CATEGORY("UI.Controller.DebugMenuController");
 
 namespace ui
 {

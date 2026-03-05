@@ -4,7 +4,7 @@
 
 #include "logging/log_macros.hpp"
 
-REGISTER_LOG_CATEGORY("UndoStack");
+REGISTER_LOG_CATEGORY("UI.Commands.UndoStack");
 
 namespace ui
 {

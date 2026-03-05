@@ -12,7 +12,7 @@
 #include "logging/log_macros.hpp"
 #include "statement.hpp"
 
-REGISTER_LOG_CATEGORY("Database");
+REGISTER_LOG_CATEGORY("DB.Database");
 
 namespace db
 {

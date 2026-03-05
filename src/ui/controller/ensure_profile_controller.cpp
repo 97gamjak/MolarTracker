@@ -20,7 +20,7 @@
 #include "ui/widgets/utils/infos.hpp"
 #include "ui/widgets/utils/warnings.hpp"
 
-REGISTER_LOG_CATEGORY("EnsureProfileController");
+REGISTER_LOG_CATEGORY("UI.Controller.EnsureProfileController");
 
 namespace ui
 {

@@ -12,7 +12,7 @@
 #include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 
-REGISTER_LOG_CATEGORY("application");
+REGISTER_LOG_CATEGORY("Application");
 
 int main(int argc, char** argv)
 {

@@ -1,7 +1,6 @@
 #ifndef __LOGGING__LOG_CATEGORY_HPP__
 #define __LOGGING__LOG_CATEGORY_HPP__
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -14,7 +13,8 @@ namespace logging
     inline constexpr LogCategoryId RootLogCategoryId    = 0;
 
     /**
-     * @brief helper struct to register log categories at during build step
+     * @brief Class representing a single log category in the logging system,
+     * which can have a hierarchical structure with parent and child categories
      *
      */
     class LogCategory

@@ -48,6 +48,10 @@ namespace ui
         const auto parentId = _getIdFromIndex(parent);
         const auto childId  = _getChildAt(parentId, row);
 
+        MT_DEBUG << "Creating index for row " << row << ", column " << column
+                 << ", parentId " << parentId << ", childId " << childId
+                 << ", internal id " << parent.internalId() << "\n";
+
         if (childId == logging::InvalidLogCategoryId ||
             childId == logging::RootLogCategoryId ||
             parentId == logging::InvalidLogCategoryId)
@@ -68,15 +72,21 @@ namespace ui
             parentId == logging::InvalidLogCategoryId)
             return {};
 
+        MT_DEBUG << "Finding parent for childId " << childId << ", parentId "
+                 << parentId << "internal id " << child.internalId() << "\n";
+
         // Find the row of the parent category among its siblings
         logging::LogCategoryId grandParentId = _getParentId(parentId);
 
         int row = _getRowOfChild(
             grandParentId == logging::InvalidLogCategoryId
-                ? logging::InvalidLogCategoryId
+                ? logging::RootLogCategoryId
                 : grandParentId,
             parentId
         );
+
+        MT_DEBUG << "Parent row is " << row << " with grandParentId "
+                 << grandParentId << "\n";
 
         if (row < 0)
             return {};
@@ -86,6 +96,9 @@ namespace ui
 
     int LogCategoryModel::rowCount(const QModelIndex& parent) const
     {
+        if (parent.column() > 0)
+            return 0;
+
         const auto parentId = _getIdFromIndex(parent);
 
         if (parentId == logging::InvalidLogCategoryId)
@@ -93,9 +106,6 @@ namespace ui
 
         const auto rowCount =
             static_cast<int>(_getFilteredChildren(parentId).size());
-
-        MT_DEBUG << "rowCount for parentId " << parentId << " is " << rowCount
-                 << "\n";
 
         return rowCount;
     }

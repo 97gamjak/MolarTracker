@@ -9,7 +9,7 @@
 #include "logging/log_macros.hpp"
 #include "services_api/i_profile_service.hpp"
 
-REGISTER_LOG_CATEGORY("ProfileStore");
+REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
 
 namespace app
 {

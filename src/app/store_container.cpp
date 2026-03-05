@@ -3,7 +3,7 @@
 #include "logging/log_macros.hpp"
 #include "service_container.hpp"
 
-REGISTER_LOG_CATEGORY("StoreContainer");
+REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
 
 namespace app
 {

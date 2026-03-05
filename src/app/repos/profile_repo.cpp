@@ -11,7 +11,7 @@
 #include "orm/crud.hpp"
 #include "sql_models/profile_row.hpp"
 
-REGISTER_LOG_CATEGORY("app.repos.profile");
+REGISTER_LOG_CATEGORY("App.Repo.ProfileRepo");
 
 namespace app
 {

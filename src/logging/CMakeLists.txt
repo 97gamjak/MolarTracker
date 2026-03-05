@@ -4,6 +4,7 @@ add_library(molartracker_logging STATIC
     log_object.cpp
     log_category.cpp
     log_categories.cpp
+    log_exceptions.cpp
 )
 
 target_include_directories(molartracker_logging

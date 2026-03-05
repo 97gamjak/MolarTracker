@@ -41,15 +41,22 @@ namespace logging
             const std::string& categoryName
         ) const;
 
-        std::vector<LogCategoryId> getChildrenOf(LogCategoryId parentId) const;
+        std::vector<LogCategoryId> getChildrenOf(
+            const LogCategoryId& parentId
+        ) const;
+
         std::vector<LogCategoryId> getAllDescendantsOf(
-            LogCategoryId categoryId
+            const LogCategoryId& categoryId
         ) const;
 
         void setLogLevel(
             const std::string& categoryName,
             const LogLevel&    logLevel
         );
+
+        //
+        // private helper methods starting here
+        //
 
        private:
         [[nodiscard]] LogCategoryId _addLogCategory(
@@ -65,10 +72,10 @@ namespace logging
         );
 
         [[nodiscard]] LogCategoryId _getOrCreateLogCategory(
-            LogCategoryId      parentCategoryId,
-            const std::string& segment,
-            const std::string& fullName,
-            const LogLevel&    logLevel
+            const LogCategoryId& parentCategoryId,
+            const std::string&   segment,
+            const std::string&   fullName,
+            const LogLevel&      logLevel
         );
 
         static void _appendSegmentToFullName(
@@ -77,22 +84,13 @@ namespace logging
         );
 
         template <typename Fn>
-        void _forEachSegment(const std::string& fullName, Fn&& func) const
-        {
-            std::size_t pos = 0;
-            while (pos < fullName.size())
-            {
-                const auto dot = fullName.find('.', pos);
-                const auto end =
-                    (dot == std::string::npos) ? fullName.size() : dot;
-
-                std::forward<Fn>(func)(fullName.substr(pos, end - pos));
-
-                pos = end + 1;
-            }
-        }
+        void _forEachSegment(const std::string& fullName, Fn&& func) const;
     };
 
 }   // namespace logging
+
+#ifndef __LOGGING__LOG_CATEGORIES_TPP__
+#include "log_categories.tpp"
+#endif   // __LOGGING__LOG_CATEGORIES_TPP__
 
 #endif   // __LOGGING__LOG_CATEGORIES_HPP__

@@ -17,7 +17,7 @@
 #include "ui/widgets/utils/discard_changes.hpp"
 #include "utils/qt_helpers.hpp"
 
-REGISTER_LOG_CATEGORY("DebugSlotsDialog");
+REGISTER_LOG_CATEGORY("UI.Widgets.Logging.DebugSlotsDialog");
 
 namespace ui
 {
