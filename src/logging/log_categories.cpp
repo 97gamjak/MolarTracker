@@ -297,6 +297,11 @@ namespace logging
         const LogLevel&      logLevel
     )
     {
+        assert(
+            fullName.size() >= segment.size() &&
+            fullName.substr(fullName.size() - segment.size()) == segment
+        );
+
         const auto newId = static_cast<LogCategoryId>(_categories.size());
         _categories
             .emplace_back(newId, parentCategoryId, segment, fullName, logLevel);
