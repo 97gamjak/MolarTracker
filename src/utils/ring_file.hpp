@@ -7,7 +7,7 @@
 
 #include "ring_file_config.hpp"
 
-// TODO: migrate this RingFile to mstd
+// TODO(97gamjak): migrate this RingFile to mstd
 // https://97gamjak.atlassian.net/browse/MSTD-90
 
 /**
@@ -30,7 +30,7 @@ class RingFile
     Config _config{};
 
     /// The currently open file stream for writing log entries
-    std::ofstream _file{};
+    std::ofstream _file;
 
     /// The index of the current file in the ring
     std::uintmax_t _initialFileSize{0};

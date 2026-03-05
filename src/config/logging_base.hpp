@@ -17,6 +17,6 @@
 // cppcheck-suppress syntaxError
 MSTD_ENUM(LogLevel, std::int8_t, LOG_LEVEL);
 
-// NOLINTEND
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif   // __CONFIG__LOGGING_BASE_HPP__

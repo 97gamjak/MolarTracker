@@ -2,7 +2,9 @@
 
 #include <sqlite3.h>
 
+#include <cstdint>
 #include <filesystem>
+#include <format>
 #include <string>
 #include <utility>
 

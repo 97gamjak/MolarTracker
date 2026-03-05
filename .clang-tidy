@@ -9,16 +9,17 @@ Checks:
   -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
   -fuchsia-statically-constructed-objects,
+  -llvm-header-guard,
   -llvmlibc-callee-namespace,
   -llvmlibc-implementation-in-namespace,
   -llvmlibc-inline-function-decl,
   -llvmlibc-restrict-system-libc-headers,
   -modernize-use-trailing-return-type,
-  -readability-redundant-access-specifiers
+  -readability-redundant-access-specifiers,
+  -bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp
   '
 WarningsAsErrors: ''
 HeaderFileExtensions:
-  - ''
   - h
   - hh
   - hpp
@@ -29,7 +30,8 @@ ImplementationFileExtensions:
   - cc
   - cpp
   - cxx
-HeaderFilterRegex: '.*\.(hpp|tpp)$'
+HeaderFilterRegex: '.*/MolarTracker/src/.*'
+SystemHeaders: false
 FormatStyle:     google
 User:            jag
 CheckOptions:
