@@ -17,7 +17,7 @@ namespace db
      * @return true
      * @return false
      */
-    bool StepResultMeta::is_valid(int result)
+    bool StepResultMeta::isValid(int result)
     {
         const auto value = static_cast<StepResult>(result);
         switch (value)
@@ -86,7 +86,7 @@ namespace db
      * @return true
      * @return false
      */
-    bool Statement::is_valid() const { return _statement != nullptr; }
+    bool Statement::isValid() const { return _statement != nullptr; }
 
     /**
      * @brief take a step in the execution of the prepared statement
@@ -99,7 +99,7 @@ namespace db
 
         const auto result = sqlite3_step(_statement);
 
-        if (StepResultMeta::is_valid(result))
+        if (StepResultMeta::isValid(result))
             return static_cast<StepResult>(result);
 
         throw _generateError("step", result);

@@ -1,5 +1,5 @@
-#ifndef __ORM__MODEL_CONCEPT_HPP__
-#define __ORM__MODEL_CONCEPT_HPP__
+#ifndef __ORM__TYPE_TRAITS_HPP__
+#define __ORM__TYPE_TRAITS_HPP__
 
 #include <concepts>
 #include <string>
@@ -16,7 +16,7 @@ namespace orm
      */
     template <typename T>
     concept tuple_like =
-        requires { std::tuple_size<std::remove_reference_t<T>>::value; };
+        requires { std::tuple_size_v<std::remove_reference_t<T>>; };
 
     /**
      * @brief Concept for database models
@@ -78,4 +78,4 @@ namespace orm
     }
 }   // namespace orm
 
-#endif   // __ORM__MODEL_CONCEPT_HPP__
+#endif   // __ORM__TYPE_TRAITS_HPP__

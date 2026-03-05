@@ -8,7 +8,7 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
-#include "orm/model_concept.hpp"
+#include "orm/type_traits.hpp"
 
 /**
  * @brief Represents a row in the "profile" database table
@@ -34,17 +34,7 @@ struct ProfileRow final
     [[nodiscard]] constexpr auto fields();
     [[nodiscard]] constexpr auto fields() const;
 
-    /**
-     * @brief Get the Unique Groups object
-     *
-     * @return constexpr auto
-     */
-    static constexpr auto getUniqueGroups()
-    {
-        return orm::unique_set(
-            orm::unique<(&ProfileRow::name), (&ProfileRow::email)>()
-        );
-    }
+    [[nodiscard]] static constexpr auto getUniqueGroups();
 };
 
 #ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__

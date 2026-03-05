@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "db/statement.hpp"
+#include "orm/constraints.hpp"
 
 namespace orm
 {
@@ -51,6 +52,9 @@ namespace orm
         /// flag indicating whether this field is a primary key
         bool _isPk{false};
 
+        /// flag indicating whether this field is a foreign key
+        bool _isFk{false};
+
         /// flag indicating whether this field is auto-incremented
         bool _isAutoIncrement{false};
 
@@ -67,11 +71,17 @@ namespace orm
         /// Function pointer for getting the DDL definition of the field
         ddl_function_type _ddlFunction{nullptr};
 
+        /// The combined constraints for the field (e.g., primary key, unique,
+        /// not null, etc.)
+        ORMConstraint _constraints{};
+
        public:
         FieldView() = default;
 
         [[nodiscard]] std::string_view getColumnName() const;
+        [[nodiscard]] ORMConstraint    getConstraints() const;
         [[nodiscard]] bool             isPk() const;
+        [[nodiscard]] bool             isFk() const;
         [[nodiscard]] bool             isAutoIncrement() const;
         [[nodiscard]] bool             isAutoIncrementPk() const;
 

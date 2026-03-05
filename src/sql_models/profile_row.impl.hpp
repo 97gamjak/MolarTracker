@@ -18,4 +18,16 @@ constexpr auto ProfileRow::fields() { return std::tie(id, name, email); }
  */
 constexpr auto ProfileRow::fields() const { return std::tie(id, name, email); }
 
+/**
+ * @brief Get the Unique Groups object
+ *
+ * @return constexpr auto
+ */
+constexpr auto ProfileRow::getUniqueGroups()
+{
+    return orm::unique_set(
+        orm::unique<(&ProfileRow::name), (&ProfileRow::email)>()
+    );
+}
+
 #endif   // __SQL_MODELS__PROFILE_ROW_IMPL_HPP__

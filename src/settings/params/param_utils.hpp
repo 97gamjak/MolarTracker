@@ -117,6 +117,4 @@ namespace settings
 
 }   // namespace settings
 
-#undef __LOG_CATEGORY__
-
 #endif   // __SETTINGS__PARAMS__PARAM_UTILS_HPP__

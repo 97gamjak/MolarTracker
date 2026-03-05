@@ -8,8 +8,11 @@ target_include_directories(molartracker_orm
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
+add_subdirectory(crud)
+
 target_link_libraries(molartracker_orm
     PUBLIC
     molartracker_db
     mstd
+    molartracker_orm_crud
 )

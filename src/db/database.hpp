@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -47,8 +48,8 @@ namespace db
 
         [[nodiscard]] Statement prepare(std::string_view sql);
 
-        [[nodiscard]] std::int64_t lastInsertRowid() const;
-        [[nodiscard]] int          changes() const;
+        [[nodiscard]] std::optional<std::int64_t> getLastInsertRowid() const;
+        [[nodiscard]] std::int64_t getNumberOfLastChanges() const;
 
         void setBusyTimeout(int timeout_milliseconds);
         void enableForeignKeys(bool enabled);

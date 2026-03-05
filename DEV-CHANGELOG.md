@@ -16,10 +16,16 @@ All changes and updates, that are relevant for developers will be documented her
 #### ORM
 
 - Introduce `unique_group` to make it possible to have multiple fields as a single unique group
+- Introduce bit-wise `FieldConstraints`
+- Add `foreign_key_t` constraint
 
 #### Testing
 
 - Add test cases for `binder` struct
+
+### Dependencies
+
+- Upgrade `mstd` to `0.1.0`
 
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22

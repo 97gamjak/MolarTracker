@@ -184,20 +184,20 @@ TEST(Database, ExecuteValidSqlCreatesTableAndInsertsAndChangesReflectsRows)
     ));
 
     EXPECT_NO_THROW(db.execute("INSERT INTO test_items(v) VALUES('a');"));
-    EXPECT_EQ(db.changes(), 1);
-    const auto id1 = db.lastInsertRowid();
-    EXPECT_GE(id1, 1);
+    EXPECT_EQ(db.getNumberOfLastChanges(), 1);
+    const auto id1 = db.getLastInsertRowid();
+    EXPECT_GE(id1.value(), 1);
 
     EXPECT_NO_THROW(db.execute("INSERT INTO test_items(v) VALUES('b');"));
-    EXPECT_EQ(db.changes(), 1);
-    const auto id2 = db.lastInsertRowid();
-    EXPECT_EQ(id2, id1 + 1);
+    EXPECT_EQ(db.getNumberOfLastChanges(), 1);
+    const auto id2 = db.getLastInsertRowid();
+    EXPECT_EQ(id2.value(), id1.value() + 1);
 
     EXPECT_NO_THROW(db.execute("UPDATE test_items SET v='c' WHERE id=1;"));
-    EXPECT_EQ(db.changes(), 1);
+    EXPECT_EQ(db.getNumberOfLastChanges(), 1);
 
     EXPECT_NO_THROW(db.execute("UPDATE test_items SET v='c' WHERE id=999999;"));
-    EXPECT_EQ(db.changes(), 0);
+    EXPECT_EQ(db.getNumberOfLastChanges(), 0);
 }
 
 TEST(Database, ExecuteInvalidSqlThrowsAndMessageContainsSql)
@@ -274,7 +274,7 @@ TEST(Database, EnableForeignKeysEnforcesConstraintsWhenOnAndAllowsWhenOff)
     EXPECT_NO_THROW(
         db.execute("INSERT INTO child(id, parent_id) VALUES(2, 999);")
     );
-    EXPECT_EQ(db.changes(), 1);
+    EXPECT_EQ(db.getNumberOfLastChanges(), 1);
 
     EXPECT_NO_THROW(db.enableForeignKeys(true));
     EXPECT_THROW(

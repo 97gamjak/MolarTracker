@@ -19,7 +19,9 @@ namespace orm
         view._mutableFieldAddress = static_cast<void*>(&field);
         view._constFieldAddress   = static_cast<void const*>(&field);
 
-        view._columnName        = Field::name.view();
+        view._columnName  = Field::name.view();
+        view._constraints = Field::getConstraints();
+
         view._isPk              = Field::isPk;
         view._isAutoIncrement   = Field::isAutoIncrement;
         view._isAutoIncrementPk = Field::isAutoIncrementPk;
@@ -59,6 +61,7 @@ namespace orm
         view._constFieldAddress   = static_cast<void const*>(&field);
 
         view._columnName        = Field::name.view();
+        view._constraints       = Field::getConstraints();
         view._isPk              = Field::isPk;
         view._isAutoIncrement   = Field::isAutoIncrement;
         view._isAutoIncrementPk = Field::isAutoIncrementPk;
