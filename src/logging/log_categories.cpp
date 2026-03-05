@@ -297,6 +297,7 @@ namespace logging
         const LogLevel&      logLevel
     )
     {
+        // Sanity check: fullName should end with segment
         assert(
             fullName.size() >= segment.size() &&
             fullName.substr(fullName.size() - segment.size()) == segment
