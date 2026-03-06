@@ -308,6 +308,13 @@ namespace ui
         reject();
     }
 
+    /**
+     * @brief Apply the log level change to all child categories of the given
+     * index in the tree view
+     *
+     * @param idx The model index of the category for which to apply the log
+     * level change to its children
+     */
     void DebugSlotsDialog::_applyToChildren(const QModelIndex& idx)
     {
         _model->applyToChildren(idx);

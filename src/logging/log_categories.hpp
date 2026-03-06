@@ -18,7 +18,11 @@ namespace logging
     class LogCategories
     {
        private:
-        std::vector<LogCategory>                       _categories;
+        /// A vector of log categories, where each category has a unique ID
+        std::vector<LogCategory> _categories;
+
+        /// A map from category names to their corresponding IDs for quick
+        /// lookup
         std::unordered_map<std::string, LogCategoryId> _categoryNameToIdMap;
 
        public:

@@ -19,6 +19,12 @@ namespace ui
         ColumnCount
     };
 
+    /**
+     * @brief Construct a new Log Category Model:: Log Category Model object
+     *
+     * @param categories
+     * @param parent
+     */
     LogCategoryModel::LogCategoryModel(
         logging::LogCategories& categories,
         QObject*                parent
@@ -29,13 +35,25 @@ namespace ui
     {
     }
 
-    [[nodiscard]] int LogCategoryModel::columnCount(
+    /**
+     * @brief Get the number of columns in the model
+     *
+     * @param parent The parent index
+     * @return int The number of columns
+     */
+    int LogCategoryModel::columnCount(
         const QModelIndex& /*parent*/
     ) const
     {
         return ColumnCount;   // add an extra column for leaf nodes
     }
 
+    /**
+     * @brief Set the data for the editor widget based on the model index
+     *
+     * @param editor The editor widget to set the data for
+     * @param index The model index containing the data to set in the editor
+     */
     QModelIndex LogCategoryModel::index(
         int                row,
         int                column,
@@ -60,6 +78,13 @@ namespace ui
         return createIndex(row, column, static_cast<quintptr>(childId));
     }
 
+    /**
+     * @brief Get the parent index of a given child index
+     *
+     * @param child The model index of the child item
+     * @return QModelIndex The model index of the parent item, or an invalid
+     * index if the child is a root item or if the child index is invalid
+     */
     QModelIndex LogCategoryModel::parent(const QModelIndex& child) const
     {
         if (!child.isValid())
@@ -94,6 +119,12 @@ namespace ui
         return createIndex(row, 0, static_cast<quintptr>(parentId));
     }
 
+    /**
+     * @brief Get the number of rows (child items) under a given parent index
+     *
+     * @param parent The model index of the parent item
+     * @return int The number of child items under the given parent index
+     */
     int LogCategoryModel::rowCount(const QModelIndex& parent) const
     {
         if (parent.column() > 0)
@@ -110,6 +141,14 @@ namespace ui
         return rowCount;
     }
 
+    /**
+     * @brief Get the data for a given model index and role
+     *
+     * @param idx The model index for which to retrieve the data
+     * @param role The role for which to retrieve the data (e.g., display, edit)
+     * @return QVariant The data for the given index and role, or an empty
+     * QVariant if the index is invalid or if the role is not handled
+     */
     QVariant LogCategoryModel::data(const QModelIndex& idx, int role) const
     {
         if (!idx.isValid())
@@ -141,6 +180,15 @@ namespace ui
         return {};
     }
 
+    /**
+     * @brief Set the data in the model based on the editor widget's current
+     * value
+     *
+     * @param editor The editor widget containing the new value to set in the
+     * model
+     * @param model The model to update with the new value from the editor
+     * @param index The model index to update with the new value
+     */
     bool LogCategoryModel::setData(
         const QModelIndex& idx,
         const QVariant&    value,
@@ -172,6 +220,16 @@ namespace ui
         return true;
     }
 
+    /**
+     * @brief Get the header data for a given section, orientation, and role
+     *
+     * @param section The section index for which to retrieve the header data
+     * @param orientation The orientation (horizontal or vertical) of the header
+     * @param role The role for which to retrieve the header data (e.g.,
+     * display)
+     * @return QVariant The header data for the given section, orientation, and
+     * role, or an empty QVariant if the role is not handled
+     */
     QVariant LogCategoryModel::headerData(
         int             section,
         Qt::Orientation orientation,
@@ -193,6 +251,13 @@ namespace ui
         return {};
     }
 
+    /**
+     * @brief Get the item flags for a given model index
+     *
+     * @param idx The model index for which to retrieve the item flags
+     * @return Qt::ItemFlags The item flags for the given index, indicating
+     * whether the item is enabled, selectable, editable, etc.
+     */
     Qt::ItemFlags LogCategoryModel::flags(const QModelIndex& idx) const
     {
         if (!idx.isValid())
@@ -206,13 +271,30 @@ namespace ui
         return flags;
     }
 
+    /**
+     * @brief Get the column index for the log level column
+     *
+     * @return int The column index for the log level column
+     */
     int LogCategoryModel::getLogLevelColumn() { return Column::Level; }
 
+    /**
+     * @brief Get the column index for the "Apply to Children" column
+     *
+     * @return int The column index for the "Apply to Children" column
+     */
     int LogCategoryModel::getApplyToChildrenColumn()
     {
         return Column::ApplyToChildren;
     }
 
+    /**
+     * @brief Set whether to show only modified categories in the model, and
+     * refresh the view accordingly
+     *
+     * @param showModifiedOnly True to show only modified categories, false to
+     * show all categories
+     */
     void LogCategoryModel::setShowModifiedOnly(bool showModifiedOnly)
     {
         if (_showModifiedOnly == showModifiedOnly)

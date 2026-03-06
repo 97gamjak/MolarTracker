@@ -37,6 +37,7 @@ namespace ui
         /// UI elements
         QTreeView* _tree{};
 
+        /// The model for the tree view of the LogCategories
         LogCategoryModel* _model{};
 
         /// Buttons

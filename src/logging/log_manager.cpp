@@ -24,6 +24,10 @@ namespace logging
         return instance;
     }
 
+    /**
+     * @brief Initialize the logging categories based on the registered
+     * categories and the default log level
+     */
     void LogManager::initializeCategories()
     {
         _categories = LogCategories{
@@ -194,6 +198,13 @@ namespace logging
             flush();
     }
 
+    /**
+     * @brief Get a log category by its name
+     *
+     * @param name The name of the log category to retrieve
+     * @return LogCategory The log category with the specified name, or a root
+     * category with the default log level if the category is not found
+     */
     LogCategory LogManager::getCategory(const std::string& name) const
     {
         const auto categoryOpt = _categories.getCategory(name);

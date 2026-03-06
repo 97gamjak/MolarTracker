@@ -26,7 +26,12 @@ namespace logging
     class LogManager
     {
        private:
+        /// The collection of log categories, organized in a hierarchical
+        /// structure
         LogCategories _categories;
+
+        /// A copy of the initial log categories at startup, used for resetting
+        /// to default categories
         LogCategories _startupCategories;
 
         /// The ring file logger instance used for logging to files.
@@ -46,11 +51,13 @@ namespace logging
             const settings::LoggingSettings& settings,
             const std::filesystem::path&     directory
         );
+
         void changeLogLevel(const LogCategory& category, const LogLevel& level);
         bool isEnabled(
             const std::string& categoryName,
             const LogLevel&    level
         ) const;
+
         void flush();
 
         [[nodiscard]] LogCategories getCategories() const;

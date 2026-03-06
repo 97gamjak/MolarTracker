@@ -9,6 +9,12 @@ class QObject;   // Forward declaration
 
 namespace ui
 {
+    /**
+     * @brief A model for the debug slots tree view, which displays the log
+     * categories and their log levels. It allows editing the log levels and
+     * applying changes to child categories.
+     *
+     */
     class LogCategoryModel final : public QAbstractItemModel
     {
         Q_OBJECT

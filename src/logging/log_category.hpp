@@ -20,11 +20,25 @@ namespace logging
     class LogCategory
     {
        private:
-        LogCategoryId              _id{InvalidLogCategoryId};
-        LogCategoryId              _parentId{InvalidLogCategoryId};
-        std::string                _segment;
-        std::string                _fullName;
-        LogLevel                   _logLevel;
+        /// The unique identifier for the log category
+        LogCategoryId _id{InvalidLogCategoryId};
+
+        /// The identifier of the parent log category, or InvalidLogCategoryId
+        /// if this is a root category
+        LogCategoryId _parentId{InvalidLogCategoryId};
+
+        /// The segment name of the log category (the last part of the full
+        /// name)
+        std::string _segment;
+
+        /// The full name of the log category, including all segments separated
+        /// by dots
+        std::string _fullName;
+
+        /// The log level associated with this category
+        LogLevel _logLevel;
+
+        /// The identifiers of the child log categories
         std::vector<LogCategoryId> _children;
 
        public:

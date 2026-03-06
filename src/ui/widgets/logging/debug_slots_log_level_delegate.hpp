@@ -5,11 +5,17 @@
 
 namespace ui
 {
+    /**
+     * @brief A delegate for the log level column in the debug slots tree view.
+     * It provides a combo box editor to select the log level for each slot.
+     *
+     */
     class DebugSlotsLogLevelDelegate final : public QStyledItemDelegate
     {
         Q_OBJECT
 
        private:
+        /// A list of log level names corresponding to the LogLevel enum values
         QStringList _logLevelNames;
 
        public:
@@ -39,6 +45,12 @@ namespace ui
         ) const override;
     };
 
+    /**
+     * @brief A delegate that adds an "Apply to Children" button to the debug
+     * slots tree view. When the button is clicked, it emits a signal with the
+     * index of the item for which the action should be applied to its children.
+     *
+     */
     class DebugSlotsApplyToChildrenDelegate final : public QStyledItemDelegate
     {
         Q_OBJECT
@@ -66,6 +78,9 @@ namespace ui
         ) override;
 
        signals:
+        /// Emitted when the "Apply to Children" button is clicked, with the
+        /// index of the item for which the action should be applied to its
+        /// children
         void applyToChildrenRequested(const QModelIndex& index) const;
 
        private:

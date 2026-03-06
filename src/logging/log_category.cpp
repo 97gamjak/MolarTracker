@@ -5,14 +5,9 @@ namespace logging
     /**
      * @brief Construct a new Log Category:: Log Category object
      *
-     * @param id The unique identifier for the log category
-     * @param parentId The identifier of the parent log category, or
-     * InvalidLogCategoryId if this is a root category
-     * @param segment The segment name of the log category (the last part of the
-     * full name)
-     * @param fullName The full name of the log category, including all segments
-     * separated by dots
      * @param logLevel The log level associated with this category
+     * @return LogCategory A new LogCategory object representing the root
+     * category
      */
     LogCategory LogCategory::createRootCategory(LogLevel logLevel)
     {
@@ -72,6 +67,11 @@ namespace logging
         _logLevel = logLevel;
     }
 
+    /**
+     * @brief Get the log level associated with this category
+     *
+     * @return LogLevel The log level associated with this category
+     */
     LogLevel LogCategory::getLogLevel() const { return _logLevel; }
 
     /**

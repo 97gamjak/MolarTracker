@@ -287,8 +287,11 @@ namespace logging
     /**
      * @brief Get a log category by its ID
      *
-     * @param categoryId
-     * @return std::optional<LogCategory>
+     * @param parentCategoryId
+     * @param segment
+     * @param fullName
+     * @param logLevel
+     * @return LogCategoryId
      */
     LogCategoryId LogCategories::_addLogCategory(
         const LogCategoryId& parentCategoryId,
