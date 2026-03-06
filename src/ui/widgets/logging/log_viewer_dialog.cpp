@@ -173,15 +173,23 @@ namespace ui
     }
 
     /**
-     * @brief set the reload interval in seconds, this will update the timer
-     * interval accordingly
+     * @brief Construct a new Log Viewer Dialog:: Settings:: Settings object
      *
-     * @param intervalSec
+     * @param reloadIntervalMs
+     * @param autoReload
+     * @param lineWrap
      */
-    void LogViewerDialog::Settings::setIntervalSec(double intervalSec)
+    LogViewerDialog::Settings::Settings(
+        int  reloadIntervalMs,
+        bool autoReload,
+        bool lineWrap
+    )
+        : _reloadIntervalMs(reloadIntervalMs),
+          _autoReload(autoReload),
+          _lineWrap(
+              lineWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap
+          )
     {
-        const auto intervalMs = static_cast<int>(intervalSec * 1000);
-        _reloadIntervalMs     = std::max(0, intervalMs);
     }
 
     /**
@@ -195,16 +203,6 @@ namespace ui
     }
 
     /**
-     * @brief Enable or disable auto reload
-     *
-     * @param autoReload
-     */
-    void LogViewerDialog::Settings::setAutoReload(bool autoReload)
-    {
-        _autoReload = autoReload;
-    }
-
-    /**
      * @brief Check if auto reload is enabled
      *
      * @return true if auto reload is enabled, false otherwise
@@ -212,17 +210,6 @@ namespace ui
     bool LogViewerDialog::Settings::isAutoReloadEnabled() const
     {
         return _autoReload;
-    }
-
-    /**
-     * @brief Enable or disable line wrap
-     *
-     * @param enabled
-     */
-    void LogViewerDialog::Settings::setLineWrap(bool enabled)
-    {
-        _lineWrap =
-            enabled ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap;
     }
 
     /**

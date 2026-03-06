@@ -405,7 +405,7 @@ namespace app
             return;
         }
 
-        for (auto& profile : _profiles)
+        for (const auto& profile : _profiles)
         {
             switch (_profileStates[profile.getId()])
             {

@@ -211,6 +211,54 @@ namespace settings
     }
 
     /**
+     * @brief Get the minimum valid value for the numeric parameter
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return std::optional<T> The minimum valid value if set, otherwise
+     * std::nullopt
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    std::optional<T> NumericParam<T>::getMinValue() const
+    {
+        return _minValue;
+    }
+
+    /**
+     * @brief Get the maximum valid value for the numeric parameter
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return std::optional<T> The maximum valid value if set, otherwise
+     * std::nullopt
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    std::optional<T> NumericParam<T>::getMaxValue() const
+    {
+        return _maxValue;
+    }
+
+    /**
+     * @brief Get the precision for floating-point numeric parameters
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return std::optional<size_t> The number of decimal places to consider
+     * for validation and storage if set, otherwise std::nullopt
+     */
+    template <typename T>
+    requires(std::integral<T> || std::floating_point<T>)
+    std::optional<size_t> NumericParam<T>::getPrecision() const
+    {
+        if constexpr (std::floating_point<T>)
+            return _precision;
+        else
+            return std::nullopt;
+    }
+
+    /**
      * @brief Serialize NumericParam to JSON
      *
      * @tparam T

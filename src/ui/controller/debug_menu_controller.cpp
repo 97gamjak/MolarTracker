@@ -243,9 +243,11 @@ namespace ui
         const auto& settings =
             _appContext.getSettings().getUISettings().getLogViewerSettings();
 
-        _logViewerSettings.setAutoReload(settings.isAutoReloadEnabled());
-        _logViewerSettings.setIntervalSec(settings.getReloadIntervalSec());
-        _logViewerSettings.setLineWrap(settings.isLineWrapEnabled());
+        _logViewerSettings = LogViewerDialog::Settings{
+            settings.getReloadIntervalMs(),
+            settings.isAutoReloadEnabled(),
+            settings.isLineWrapEnabled()
+        };
     }
 
 }   // namespace ui

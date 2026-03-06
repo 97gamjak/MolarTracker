@@ -70,13 +70,13 @@ namespace ui
         QPlainTextEdit::LineWrapMode _lineWrap;
 
        public:
-        void              setIntervalSec(double intervalSec);
+        Settings() = delete;
+        explicit Settings(int reloadIntervalMs, bool autoReload, bool lineWrap);
+
         [[nodiscard]] int getIntervalMs() const;
 
-        void               setAutoReload(bool autoReload);
         [[nodiscard]] bool isAutoReloadEnabled() const;
 
-        void                                       setLineWrap(bool enabled);
         [[nodiscard]] QPlainTextEdit::LineWrapMode getLineWrapMode() const;
     };
 

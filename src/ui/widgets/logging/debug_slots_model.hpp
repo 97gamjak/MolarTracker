@@ -20,9 +20,13 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// Reference to the log categories being displayed and edited
         logging::LogCategories& _categories;
-        logging::LogCategories  _referenceCategories;
 
+        /// A copy of the reference categories at the time they were set
+        logging::LogCategories _referenceCategories;
+
+        /// Whether to show only modified categories compared to the reference
         bool _showModifiedOnly = false;
 
        public:
@@ -82,13 +86,13 @@ namespace ui
         );
 
         [[nodiscard]] logging::LogCategoryId _getChildAt(
-            logging::LogCategoryId parent,
+            logging::LogCategoryId parentId,
             int                    row
         ) const;
 
         [[nodiscard]] int _getRowOfChild(
-            logging::LogCategoryId parent,
-            logging::LogCategoryId child
+            logging::LogCategoryId parentId,
+            logging::LogCategoryId childId
         ) const;
 
         [[nodiscard]] logging::LogCategoryId _getParentId(
@@ -96,7 +100,7 @@ namespace ui
         ) const;
 
         [[nodiscard]] std::vector<logging::LogCategoryId> _getFilteredChildren(
-            logging::LogCategoryId parent
+            logging::LogCategoryId parentId
         ) const;
     };
 

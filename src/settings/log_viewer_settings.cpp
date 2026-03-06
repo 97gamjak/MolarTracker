@@ -35,6 +35,22 @@ namespace settings
     }
 
     /**
+     * @brief Get the reload interval in milliseconds
+     *
+     * @return int
+     */
+    int LogViewerSettings::getReloadIntervalMs() const
+    {
+        assert(
+            _reloadIntervalSec.getPrecision().has_value() &&
+            _reloadIntervalSec.getPrecision().value() == 3
+        );   // ensure that the precision is 3 decimal places for correct
+             // conversion to milliseconds
+
+        return static_cast<int>(getReloadIntervalSec() * 1000);
+    }
+
+    /**
      * @brief Get the auto-reload setting
      *
      * @return bool

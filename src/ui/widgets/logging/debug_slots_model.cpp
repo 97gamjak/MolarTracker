@@ -6,7 +6,6 @@
 #include "custom_roles.hpp"
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
-#include "logging/log_macros.hpp"
 
 namespace ui
 {
@@ -49,10 +48,12 @@ namespace ui
     }
 
     /**
-     * @brief Set the data for the editor widget based on the model index
+     * @brief make a QModelIndex for a given row, column, and parent index
      *
-     * @param editor The editor widget to set the data for
-     * @param index The model index containing the data to set in the editor
+     * @param row The row number of the item
+     * @param column The column number of the item
+     * @param parent The parent index of the item
+     * @return QModelIndex The created model index for the item
      */
     QModelIndex LogCategoryModel::index(
         int                row,
@@ -65,10 +66,6 @@ namespace ui
 
         const auto parentId = _getIdFromIndex(parent);
         const auto childId  = _getChildAt(parentId, row);
-
-        MT_DEBUG << "Creating index for row " << row << ", column " << column
-                 << ", parentId " << parentId << ", childId " << childId
-                 << ", internal id " << parent.internalId() << "\n";
 
         if (childId == logging::InvalidLogCategoryId ||
             childId == logging::RootLogCategoryId ||
@@ -97,10 +94,6 @@ namespace ui
             parentId == logging::InvalidLogCategoryId)
             return {};
 
-        MT_DEBUG << "Finding parent for childId " << childId << ", parentId "
-                 << parentId << "internal id " << child.internalId() << "\n";
-
-        // Find the row of the parent category among its siblings
         logging::LogCategoryId grandParentId = _getParentId(parentId);
 
         int row = _getRowOfChild(
@@ -109,9 +102,6 @@ namespace ui
                 : grandParentId,
             parentId
         );
-
-        MT_DEBUG << "Parent row is " << row << " with grandParentId "
-                 << grandParentId << "\n";
 
         if (row < 0)
             return {};
@@ -181,13 +171,14 @@ namespace ui
     }
 
     /**
-     * @brief Set the data in the model based on the editor widget's current
-     * value
+     * @brief Set the data in the model for a given index, value, and role
      *
-     * @param editor The editor widget containing the new value to set in the
-     * model
-     * @param model The model to update with the new value from the editor
-     * @param index The model index to update with the new value
+     * @param idx The model index for which to set the data
+     * @param value The new value to set in the model
+     * @param role The role for which to set the data (e.g., edit)
+     * @return bool True if the data was successfully set, false if the index
+     * is invalid, if the role is not handled, or if the value is invalid for
+     * the role
      */
     bool LogCategoryModel::setData(
         const QModelIndex& idx,
@@ -305,6 +296,12 @@ namespace ui
         endResetModel();
     }
 
+    /**
+     * @brief Set the log categories in the model, replacing the current
+     * categories with the given ones and refreshing the view
+     *
+     * @param categories The new log categories to set in the model
+     */
     void LogCategoryModel::setCategories(
         const logging::LogCategories& categories
     )
@@ -314,6 +311,14 @@ namespace ui
         endResetModel();
     }
 
+    /**
+     * @brief Set the reference log categories for tracking modifications, which
+     * are used to determine which categories have been modified compared to the
+     * reference state
+     *
+     * @param referenceCategories The log categories to set as the reference
+     * state
+     */
     void LogCategoryModel::setReferenceCategories(
         const logging::LogCategories& referenceCategories
     )
@@ -321,6 +326,13 @@ namespace ui
         _referenceCategories = referenceCategories;
     }
 
+    /**
+     * @brief Apply the log level change to all child categories of the given
+     * index in the tree view
+     *
+     * @param idx The model index of the category for which to apply the log
+     * level change to its children
+     */
     void LogCategoryModel::applyToChildren(const QModelIndex& idx)
     {
         if (!idx.isValid() || idx.column() != Column::ApplyToChildren)
@@ -350,6 +362,13 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Get the log category ID from a given model index
+     *
+     * @param idx The model index for which to retrieve the log category ID
+     * @return logging::LogCategoryId The log category ID associated with the
+     * given index, or InvalidLogCategoryId if the index is invalid
+     */
     logging::LogCategoryId LogCategoryModel::_getIdFromIndex(
         const QModelIndex& idx
     )
@@ -360,6 +379,14 @@ namespace ui
         return static_cast<logging::LogCategoryId>(idx.internalId());
     }
 
+    /**
+     * @brief Get the parent log category ID for a given log category ID
+     *
+     * @param id The log category ID for which to retrieve the parent ID
+     * @return logging::LogCategoryId The parent log category ID, or
+     * RootLogCategoryId if the given ID is a root category or if the ID is
+     * invalid
+     */
     logging::LogCategoryId LogCategoryModel::_getParentId(
         logging::LogCategoryId id
     ) const
@@ -372,6 +399,16 @@ namespace ui
         return categoryOpt->getParentId();
     }
 
+    /**
+     * @brief Get the child log category ID at a given row under a specified
+     * parent category ID
+     *
+     * @param parentId The log category ID of the parent category
+     * @param row The row index of the child category to retrieve
+     * @return logging::LogCategoryId The log category ID of the child at the
+     * specified row under the given parent, or InvalidLogCategoryId if the row
+     * index is out of bounds or if the parent ID is invalid
+     */
     logging::LogCategoryId LogCategoryModel::_getChildAt(
         logging::LogCategoryId parentId,
         int                    row
@@ -385,6 +422,17 @@ namespace ui
         return children[static_cast<std::size_t>(row)];
     }
 
+    /**
+     * @brief Get the row index of a child category under a specified parent
+     * category ID
+     *
+     * @param parentId The log category ID of the parent category
+     * @param childId The log category ID of the child category for which to
+     * find the row index
+     * @return int The row index of the child category under the given parent,
+     * or -1 if the child is not found among the parent's children or if the
+     * parent ID is invalid
+     */
     int LogCategoryModel::_getRowOfChild(
         logging::LogCategoryId parentId,
         logging::LogCategoryId childId
@@ -400,17 +448,24 @@ namespace ui
         return -1;
     }
 
+    /**
+     * @brief Get the child log category IDs under a specified parent category
+     * ID, optionally filtering to show only modified categories compared to a
+     * reference state
+     *
+     * @param parentId The log category ID of the parent category
+     * @return std::vector<logging::LogCategoryId> A vector of log category IDs
+     * representing the child categories under the given parent, filtered based
+     * on the _showModifiedOnly flag and the reference categories if applicable
+     */
     std::vector<logging::LogCategoryId> LogCategoryModel::_getFilteredChildren(
-        logging::LogCategoryId parent
+        logging::LogCategoryId parentId
     ) const
     {
-        auto children = _categories.getChildrenOf(parent);
+        auto children = _categories.getChildrenOf(parentId);
 
         if (!_showModifiedOnly)
             return children;
-
-        MT_DEBUG << "Filtering children of parentId " << parent
-                 << ", total children: " << children.size() << "\n";
 
         std::vector<logging::LogCategoryId> filteredChildren;
         for (const auto& child : children)
@@ -418,23 +473,8 @@ namespace ui
             const auto categoryOpt    = _categories.getCategory(child);
             const auto refCategoryOpt = _referenceCategories.getCategory(child);
 
-            MT_DEBUG << "ChildId: " << child << ", categoryOpt: "
-                     << (categoryOpt.has_value() ? categoryOpt->getName()
-                                                 : "<invalid category>")
-                     << ", refCategoryOpt: "
-                     << (refCategoryOpt.has_value() ? refCategoryOpt->getName()
-                                                    : "<invalid category>")
-                     << "\n";
-
             if (!categoryOpt.has_value() || !refCategoryOpt.has_value())
                 continue;
-
-            MT_DEBUG << "Comparing log levels for childId " << child
-                     << ": current level = "
-                     << LogLevelMeta::name(categoryOpt->getLogLevel())
-                     << ", reference level = "
-                     << LogLevelMeta::name(refCategoryOpt->getLogLevel())
-                     << "\n";
 
             if (categoryOpt->getLogLevel() != refCategoryOpt->getLogLevel())
             {

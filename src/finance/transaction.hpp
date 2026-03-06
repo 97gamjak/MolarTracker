@@ -1,11 +1,11 @@
 #ifndef __FINANCE__TRANSACTION_HPP__
 #define __FINANCE__TRANSACTION_HPP__
 
+#include <mstd/enum.hpp>
 #include <optional>
 #include <string>
 
 #include "config/id_types.hpp"
-#include "mstd/enum.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
