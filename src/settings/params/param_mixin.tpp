@@ -211,6 +211,20 @@ namespace settings
     }
 
     /**
+     * @brief Check whether the parameter value differs from its baseline
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return true if the current value differs from the baseline, false
+     * otherwise
+     */
+    template <typename Derived, typename T>
+    bool ParamMixin<Derived, T>::isDirty() const
+    {
+        return _self()._core.isDirty();
+    }
+
+    /**
      * @brief Commit the changes to the parameter, this should be called after
      * making any changes to the parameter to ensure that the changes are saved
      * and can be accessed by other parts of the application. The exact behavior

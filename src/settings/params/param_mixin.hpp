@@ -67,6 +67,8 @@ namespace settings
         [[nodiscard]] bool isRebootRequired() const;
         void               setRebootRequired(bool required);
 
+        [[nodiscard]] bool isDirty() const;
+
         void commit();
 
        private:

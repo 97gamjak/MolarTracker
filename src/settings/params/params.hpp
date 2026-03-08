@@ -5,6 +5,7 @@
 #include "param_container_mixin.hpp"   // IWYU pragma: export
 #include "param_core.hpp"              // IWYU pragma: export
 #include "param_error.hpp"             // IWYU pragma: export
+#include "param_group_mixin.hpp"       // IWYU pragma: export
 #include "param_mixin.hpp"             // IWYU pragma: export
 #include "param_utils.hpp"             // IWYU pragma: export
 
@@ -16,5 +17,8 @@
 #include "bool_param.hpp"      // IWYU pragma: export
 #include "string_param.hpp"    // IWYU pragma: export
 #include "version_param.hpp"   // IWYU pragma: export
+
+// Compound param groups
+#include "vec2_param.hpp"   // IWYU pragma: export
 
 #endif   // __SETTINGS__PARAMS__PARAMS_HPP__
