@@ -19,13 +19,17 @@ All changes and updates, that are relevant for developers will be documented her
 - Introduce bit-wise `FieldConstraints`
 - Add `foreign_key_t` constraint
 
-#### Testing
+### Testing
 
 - Add test cases for `binder` struct
 
 ### Dependencies
 
 - Upgrade `mstd` to `0.1.0`
+
+### Documentation
+
+- Add Claude Code instructions first version
 
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
@@ -69,13 +73,13 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Introduce `ProfileFactory` for converting between Domain and Row
 
-#### CI
+### CI
 
 - Add doxygen checks
 - Add cpp-checks and devops cpp checks
 - Add first ctest via googletest
 
-#### Testing
+### Testing
 
 - Adding unit tests for `Database` class
 - Adding unit tests for `Statement` class
@@ -121,12 +125,12 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `initGlobalConfig` for all singleton instances
 - Add `UpdateDebugFlagsCommand` for handling undo and redo
 
-#### CI
+### CI
 
 - make checks and updates for both `CHANGELOG.md` and `DEV-CHANGELOG.md` files available
 - introduce nice versioning scheme for artifacts on GitHub
 
-#### Dependencies
+### Dependencies
 
 - Add `mstd 0.0.2`
 
