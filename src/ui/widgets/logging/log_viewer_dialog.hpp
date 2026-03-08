@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QPlainTextEdit>
+#include <memory>
 
 class QPlainTextEdit;   // Forward declaration
 class QPushButton;      // Forward declaration

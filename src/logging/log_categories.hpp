@@ -1,6 +1,7 @@
 #ifndef __LOGGING__LOG_CATEGORIES_HPP__
 #define __LOGGING__LOG_CATEGORIES_HPP__
 
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
