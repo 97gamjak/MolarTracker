@@ -20,7 +20,7 @@ Constants& Constants::getInstance()
  */
 Constants::Constants()
 {
-    const auto& configDir = utils::config_dir(Constants::getDirPrefix());
+    const auto& configDir = utils::configDir(Constants::getDirPrefix());
 
     if (configDir)
         _configPath = std::filesystem::absolute(configDir.value());
@@ -31,7 +31,7 @@ Constants::Constants()
         throw DirException("Failed to resolve config directory");
     }
 
-    const auto& dataDir = utils::data_dir(Constants::getDirPrefix());
+    const auto& dataDir = utils::dataDir(Constants::getDirPrefix());
 
     if (dataDir)
         _dataPath = std::filesystem::absolute(dataDir.value());
