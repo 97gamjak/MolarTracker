@@ -164,9 +164,9 @@ namespace ui
      * since this delegate does not use an actual editor widget
      */
     QWidget* DebugSlotsApplyToChildrenDelegate::createEditor(
-        QWidget*                    parent,
-        const QStyleOptionViewItem& option,
-        const QModelIndex&          index
+        QWidget* /*parent*/,
+        const QStyleOptionViewItem& /*option*/,
+        const QModelIndex& /*index*/
     ) const
     {
         return nullptr;
@@ -188,8 +188,8 @@ namespace ui
      * otherwise
      */
     bool DebugSlotsApplyToChildrenDelegate::editorEvent(
-        QEvent*                     event,
-        QAbstractItemModel*         model,
+        QEvent* event,
+        QAbstractItemModel* /*model*/,
         const QStyleOptionViewItem& option,
         const QModelIndex&          index
     )

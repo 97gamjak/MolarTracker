@@ -2,6 +2,8 @@
 
 namespace logging
 {
+    bool isInvalid(LogCategoryId id) { return id <= InvalidLogCategoryId; }
+
     /**
      * @brief Construct a new Log Category:: Log Category object
      *
