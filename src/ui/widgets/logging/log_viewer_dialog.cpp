@@ -21,12 +21,15 @@ namespace ui
     /**
      * @brief Construct a new Log Viewer Dialog:: Log Viewer Dialog object
      *
-     * @param settings
-     * @param parent
+     * @param settings Settings for the log viewer dialog
+     * @param parent Parent widget
      */
-    LogViewerDialog::LogViewerDialog(Settings& settings, QWidget* parent)
+    LogViewerDialog::LogViewerDialog(
+        std::shared_ptr<Settings> settings,
+        QWidget*                  parent
+    )
         : QDialog(parent),
-          _settings(settings),
+          _settings(std::move(settings)),
           _textEdit(new QPlainTextEdit(this)),
           _reloadButton(new QPushButton(tr("Reload"), this)),
           _autoReloadCheckBox(new QCheckBox(tr("Auto Reload"), this)),
@@ -37,11 +40,11 @@ namespace ui
 
         _textEdit->setReadOnly(true);
 
-        _textEdit->setLineWrapMode(_settings.getLineWrapMode());
+        _textEdit->setLineWrapMode(_settings->getLineWrapMode());
         _textEdit->setMaximumBlockCount(50000);
 
-        _autoReloadCheckBox->setChecked(_settings.isAutoReloadEnabled());
-        _reloadTimer->setInterval(_settings.getIntervalMs());
+        _autoReloadCheckBox->setChecked(_settings->isAutoReloadEnabled());
+        _reloadTimer->setInterval(_settings->getIntervalMs());
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout();

@@ -2,9 +2,9 @@
 #define __ORM__BINDER_HPP__
 
 #include <cstdint>
+#include <mstd/type_traits.hpp>
 #include <string>
 
-#include "mstd/type_traits.hpp"
 #include "orm/concepts.hpp"
 #include "orm/orm_exception.hpp"
 

@@ -1,9 +1,8 @@
 #ifndef __SETTINGS__PARAMS__PARAM_UTILS_HPP__
 #define __SETTINGS__PARAMS__PARAM_UTILS_HPP__
 
+#include <nlohmann/json.hpp>
 #include <utility>
-
-#include "nlohmann/json.hpp"
 
 namespace settings
 {

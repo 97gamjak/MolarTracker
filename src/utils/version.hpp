@@ -1,10 +1,9 @@
 #ifndef __UTILS__VERSION_HPP__
 #define __UTILS__VERSION_HPP__
 
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
-
-#include "nlohmann/json.hpp"
 
 namespace utils
 {
@@ -50,6 +49,7 @@ namespace utils
 
 }   // namespace utils
 
+// cppcheck-suppress unknownMacro -- false positive
 NLOHMANN_JSON_NAMESPACE_BEGIN
 /**
  * @brief Serializer for utils::SemVer

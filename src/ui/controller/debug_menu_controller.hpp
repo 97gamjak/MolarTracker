@@ -37,7 +37,7 @@ namespace ui
         /// Reference to the undo stack for executing commands
         UndoStack& _undoStack;
         /// Settings for the log viewer dialog
-        LogViewerDialog::Settings _logViewerSettings;
+        std::shared_ptr<LogViewerDialog::Settings> _logViewerSettings;
 
         /// Pointer to the debug slots dialog, this is a QPointer to ensure that
         /// we do not have a dangling pointer if the dialog is closed outside of

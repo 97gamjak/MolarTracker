@@ -37,8 +37,7 @@ namespace ui
           _mainWindow(mainWindow),
           _debugMenu(debugMenu),
           _appContext(appContext),
-          _undoStack(undoStack),
-          _logViewerSettings{}
+          _undoStack(undoStack)
     {
         connect(
             &debugMenu,
@@ -243,11 +242,11 @@ namespace ui
         const auto& settings =
             _appContext.getSettings().getUISettings().getLogViewerSettings();
 
-        _logViewerSettings = LogViewerDialog::Settings{
+        _logViewerSettings = std::make_shared<LogViewerDialog::Settings>(
             settings.getReloadIntervalMs(),
             settings.isAutoReloadEnabled(),
             settings.isLineWrapEnabled()
-        };
+        );
     }
 
 }   // namespace ui

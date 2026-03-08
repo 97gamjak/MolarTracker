@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 
+// cppcheck-suppress unknownMacro -- false positive
 NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /**
