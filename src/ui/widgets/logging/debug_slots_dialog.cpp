@@ -8,7 +8,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QTreeWidget>
+#include <QTreeView>
 #include <QVBoxLayout>
 
 #include "debug_slots_log_level_delegate.hpp"
@@ -286,8 +286,13 @@ namespace ui
         auto isModified = false;
         for (const auto& category : _currentCategories.getCategories())
         {
-            if (category.getLogLevel() !=
-                _categories.getCategory(category.getName())->getLogLevel())
+            const auto categoryOpt =
+                _categories.getCategory(category.getName());
+
+            if (!categoryOpt.has_value())
+                continue;
+
+            if (category.getLogLevel() != categoryOpt->getLogLevel())
             {
                 isModified = true;
                 break;
