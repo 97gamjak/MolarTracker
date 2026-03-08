@@ -1,6 +1,8 @@
 #ifndef __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
 #define __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
 
+#include <utility>
+
 #include "exceptions/base.hpp"
 #include "params/params.hpp"
 

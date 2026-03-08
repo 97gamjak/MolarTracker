@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QPlainTextEdit>
 #include <memory>
+#include <utility>
 
 class QPlainTextEdit;   // Forward declaration
 class QPushButton;      // Forward declaration
