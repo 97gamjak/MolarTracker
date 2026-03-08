@@ -4,6 +4,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Documentation
+
+- Add Claude Code instructions first version
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
