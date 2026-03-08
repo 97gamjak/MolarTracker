@@ -163,7 +163,7 @@ namespace settings
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::string NumericVecParam<T, N>::getKey() const
+    const std::string& NumericVecParam<T, N>::getKey() const
     {
         return _key;
     }
