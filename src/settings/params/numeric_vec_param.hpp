@@ -76,7 +76,7 @@ namespace settings
         );
         [[nodiscard]] nlohmann::json toJson() const;
 
-        [[nodiscard]] std::string getKey() const;
+        [[nodiscard]] const std::string& getKey() const;
 
         std::vector<Connection> subscribeToDirty(
             OnDirtyChanged::func func,
