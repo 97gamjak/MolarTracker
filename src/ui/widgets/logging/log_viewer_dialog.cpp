@@ -7,7 +7,6 @@
 #include <QTextStream>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <algorithm>
 #include <filesystem>
 
 #include "logging/log_macros.hpp"
@@ -36,15 +35,15 @@ namespace ui
           _reloadTimer(new QTimer(this))
     {
         setWindowTitle(tr("Application Log"));
-        resize(900, 600);
+        resize(_settings->dialogSize.first, _settings->dialogSize.second);
 
         _textEdit->setReadOnly(true);
 
-        _textEdit->setLineWrapMode(_settings->getLineWrapMode());
+        _textEdit->setLineWrapMode(_settings->lineWrap);
         _textEdit->setMaximumBlockCount(50000);
 
-        _autoReloadCheckBox->setChecked(_settings->isAutoReloadEnabled());
-        _reloadTimer->setInterval(_settings->getIntervalMs());
+        _autoReloadCheckBox->setChecked(_settings->autoReload);
+        _reloadTimer->setInterval(_settings->reloadIntervalMs);
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout();
@@ -181,49 +180,21 @@ namespace ui
      * @param reloadIntervalMs
      * @param autoReload
      * @param lineWrap
+     * @param dialogSize
      */
     LogViewerDialog::Settings::Settings(
-        int  reloadIntervalMs,
-        bool autoReload,
-        bool lineWrap
+        int                 reloadIntervalMs,
+        bool                autoReload,
+        bool                lineWrap,
+        std::pair<int, int> dialogSize
     )
-        : _reloadIntervalMs(reloadIntervalMs),
-          _autoReload(autoReload),
-          _lineWrap(
+        : reloadIntervalMs(reloadIntervalMs),
+          autoReload(autoReload),
+          lineWrap(
               lineWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap
-          )
+          ),
+          dialogSize(dialogSize)
     {
-    }
-
-    /**
-     * @brief Get the reload interval in milliseconds
-     *
-     * @return int
-     */
-    int LogViewerDialog::Settings::getIntervalMs() const
-    {
-        return _reloadIntervalMs;
-    }
-
-    /**
-     * @brief Check if auto reload is enabled
-     *
-     * @return true if auto reload is enabled, false otherwise
-     */
-    bool LogViewerDialog::Settings::isAutoReloadEnabled() const
-    {
-        return _autoReload;
-    }
-
-    /**
-     * @brief Get the line wrap mode
-     *
-     * @return QPlainTextEdit::LineWrapMode
-     */
-    QPlainTextEdit::LineWrapMode LogViewerDialog::Settings::getLineWrapMode(
-    ) const
-    {
-        return _lineWrap;
     }
 
 }   // namespace ui

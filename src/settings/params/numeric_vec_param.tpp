@@ -15,6 +15,7 @@ namespace settings
      * @param descriptionPrefix
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     NumericVecParam<T, N>::NumericVecParam(
         const std::string& keyPrefix,
         const std::string& titlePrefix,
@@ -46,6 +47,7 @@ namespace settings
      * parameter in the vector, the size of this vector must be equal to N
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     void NumericVecParam<T, N>::setDefaults(const std::vector<T>& defaultValues)
     {
         if (defaultValues.size() != N)
@@ -69,6 +71,7 @@ namespace settings
      * @tparam N
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     void NumericVecParam<T, N>::commit()
     {
         for (auto& param : _params)
@@ -91,6 +94,7 @@ namespace settings
      * data from the JSON
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     void NumericVecParam<T, N>::fromJson(
         const nlohmann::json&  jsonData,
         NumericVecParam<T, N>& param
@@ -133,6 +137,7 @@ namespace settings
      * parameter
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     nlohmann::json NumericVecParam<T, N>::toJson() const
     {
         nlohmann::json jsonData;
@@ -157,6 +162,7 @@ namespace settings
      * @return std::string The key for the numeric vector parameter
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     std::string NumericVecParam<T, N>::getKey() const
     {
         return _key;
@@ -176,12 +182,13 @@ namespace settings
      * @param user A user-defined pointer that will be passed to the callback
      * function when it is called, this can be used to provide additional
      * context for the callback function
-     * @return Connection An object representing the subscription, this can be
-     * used to unsubscribe from changes by calling disconnect() on it or by
-     * letting it go out of scope
+     * @return std::vector<Connection> An object representing the subscription,
+     * this can be used to unsubscribe from changes by calling disconnect() on
+     * it or by letting it go out of scope
      */
     template <typename T, std::size_t N>
-    Connection NumericVecParam<T, N>::subscribeToDirty(
+    requires(N > 1)
+    std::vector<Connection> NumericVecParam<T, N>::subscribeToDirty(
         OnDirtyChanged::func func,
         void*                user
     )
@@ -192,6 +199,62 @@ namespace settings
         std::vector<Connection> connections;
         for (auto& param : _params)
             connections.push_back(param.subscribeToDirty(func, user));
+
+        return connections;
+    }
+
+    /**
+     * @brief Get the X value of the numeric vector parameter, this is a
+     * convenience function for accessing the first element of the vector when
+     * N is 2 or 3, if N is greater than 3, this function will not be available
+     *
+     * @tparam T
+     * @tparam N
+     * @return const T& The X value of the numeric vector parameter (first
+     * element of the vector)
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    const T& NumericVecParam<T, N>::x() const
+    requires(N <= 3)
+    {
+        return _params[0].get();
+    }
+
+    /**
+     * @brief Get the Y value of the numeric vector parameter, this is a
+     * convenience function for accessing the second element of the vector when
+     * N is 2 or 3, if N is greater than 3, this function will not be available
+     *
+     * @tparam T
+     * @tparam N
+     * @return const T& The Y value of the numeric vector parameter (second
+     * element of the vector)
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    const T& NumericVecParam<T, N>::y() const
+    requires(N <= 3)
+    {
+        return _params[1].get();
+    }
+
+    /**
+     * @brief Get the Z value of the numeric vector parameter, this is a
+     * convenience function for accessing the third element of the vector when
+     * N is 3, if N is not equal to 3, this function will not be available
+     *
+     * @tparam T
+     * @tparam N
+     * @return const T& The Z value of the numeric vector parameter (third
+     * element of the vector)
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    const T& NumericVecParam<T, N>::z() const
+    requires(N == 3)
+    {
+        return _params[2].get();
     }
 
 }   // namespace settings

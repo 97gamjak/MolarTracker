@@ -76,6 +76,16 @@ namespace settings
     }
 
     /**
+     * @brief Get the dialog size setting
+     *
+     * @return std::pair<int, int>
+     */
+    std::pair<int, int> LogViewerSettings::getDialogSize() const
+    {
+        return {_dialogSize.x(), _dialogSize.y()};
+    }
+
+    /**
      * @brief Construct a new
      * LogViewerSettingsException::LogViewerSettingsException object
      *

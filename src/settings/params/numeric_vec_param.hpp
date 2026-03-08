@@ -8,13 +8,24 @@
 
 namespace settings
 {
+    /**
+     * @brief Schema for the JSON representation of a NumericVecParam
+     *
+     */
     class NumericVecParamSchema
     {
        public:
-        static constexpr const char* KEY_KEY         = "key";
-        static constexpr const char* TITLE_KEY       = "title";
+        /// key for the parameter key in JSON
+        static constexpr const char* KEY_KEY = "key";
+
+        /// key for the parameter title in JSON
+        static constexpr const char* TITLE_KEY = "title";
+
+        /// key for the parameter description in JSON
         static constexpr const char* DESCRIPTION_KEY = "description";
-        static constexpr const char* PARAMS_VEC_KEY  = "params";
+
+        /// key for the parameter values in JSON
+        static constexpr const char* PARAMS_VEC_KEY = "params";
     };
 
     /**
@@ -25,17 +36,27 @@ namespace settings
      * @tparam N The size of the vector, this should be a positive integer
      */
     template <typename T, std::size_t N>
+    requires(N > 1)
     class NumericVecParam : public Observable<OnDirtyChanged>
     {
        private:
-        using Base   = Observable<OnDirtyChanged>;
+        /// Base class for the observable functionality
+        using Base = Observable<OnDirtyChanged>;
+
+        /// Schema for the JSON representation of the parameter
         using Schema = NumericVecParamSchema;
 
        private:
+        /// Key for the parameter
         std::string _key;
+
+        /// Title for the parameter
         std::string _title;
+
+        /// Description for the parameter
         std::string _description;
 
+        /// Vector of numeric parameters
         std::vector<NumericParam<T>> _params;
 
        public:
@@ -57,7 +78,19 @@ namespace settings
 
         [[nodiscard]] std::string getKey() const;
 
-        Connection subscribeToDirty(OnDirtyChanged::func func, void* user);
+        std::vector<Connection> subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        );
+
+        const T& x() const
+        requires(N <= 3);
+
+        const T& y() const
+        requires(N <= 3);
+
+        const T& z() const
+        requires(N == 3);
     };
 
     template <typename T>

@@ -245,7 +245,8 @@ namespace ui
         _logViewerSettings = std::make_shared<LogViewerDialog::Settings>(
             settings.getReloadIntervalMs(),
             settings.isAutoReloadEnabled(),
-            settings.isLineWrapEnabled()
+            settings.isLineWrapEnabled(),
+            settings.getDialogSize()
         );
     }
 
