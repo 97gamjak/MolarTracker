@@ -4,6 +4,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Feature
+
+- Change debug slots to hierarchical approach -> now also usable in debug slots selection dialog
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
