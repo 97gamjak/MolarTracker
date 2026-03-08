@@ -21,8 +21,7 @@ namespace app
      *
      * @param db
      */
-    ProfileRepo::ProfileRepo(db::Database& db)
-        : _db{std::make_shared<db::Database>(db)}
+    ProfileRepo::ProfileRepo(const std::shared_ptr<db::Database>& db) : _db{db}
     {
         _ensureSchema();
     }

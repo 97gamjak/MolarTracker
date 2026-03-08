@@ -13,7 +13,9 @@ namespace app
      */
     AppContext::AppContext(settings::Settings& settings)
         : _settings{settings},
-          _database{Constants::getInstance().getDatabasePath()},
+          _database{std::make_shared<db::Database>(
+              Constants::getInstance().getDatabasePath()
+          )},
           _repos{_database},
           _services{_repos},
           _store{_services}

@@ -10,7 +10,10 @@ namespace app
      *
      * @param db
      */
-    RepoContainer::RepoContainer(db::Database& db) : _profileRepo{db} {}
+    RepoContainer::RepoContainer(const std::shared_ptr<db::Database>& db)
+        : _profileRepo{db}
+    {
+    }
 
     /**
      * @brief Get the Profile Repo

@@ -22,7 +22,7 @@ namespace app
         ProfileRepo _profileRepo;
 
        public:
-        explicit RepoContainer(db::Database& db);
+        explicit RepoContainer(const std::shared_ptr<db::Database>& db);
 
         [[nodiscard]] IProfileRepo&       getProfileRepo();
         [[nodiscard]] const IProfileRepo& getProfileRepo() const;

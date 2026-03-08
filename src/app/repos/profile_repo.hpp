@@ -26,7 +26,7 @@ namespace app
         std::shared_ptr<db::Database> _db;
 
        public:
-        explicit ProfileRepo(db::Database& db);
+        explicit ProfileRepo(const std::shared_ptr<db::Database>& db);
 
         void ensureSchema() override;
 

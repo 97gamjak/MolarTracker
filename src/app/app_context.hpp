@@ -23,7 +23,7 @@ namespace app
         settings::Settings& _settings;
 
         /// The database instance for the application
-        db::Database _database;
+        std::shared_ptr<db::Database> _database;
 
         /// The repository container for the application
         RepoContainer _repos;
