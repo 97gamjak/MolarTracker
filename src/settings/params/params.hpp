@@ -19,6 +19,6 @@
 #include "version_param.hpp"   // IWYU pragma: export
 
 // Compound param groups
-#include "vec2_param.hpp"   // IWYU pragma: export
+#include "vecn_param.hpp"   // IWYU pragma: export
 
 #endif   // __SETTINGS__PARAMS__PARAMS_HPP__
