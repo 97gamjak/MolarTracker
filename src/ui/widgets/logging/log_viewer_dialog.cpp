@@ -183,17 +183,17 @@ namespace ui
      * @param dialogSize
      */
     LogViewerDialog::Settings::Settings(
-        int                 reloadIntervalMs,
-        bool                autoReload,
-        bool                lineWrap,
-        std::pair<int, int> dialogSize
+        int                 _reloadIntervalMs,
+        bool                _autoReload,
+        bool                _lineWrap,
+        std::pair<int, int> _dialogSize
     )
-        : reloadIntervalMs(reloadIntervalMs),
-          autoReload(autoReload),
+        : reloadIntervalMs(_reloadIntervalMs),
+          autoReload(_autoReload),
           lineWrap(
-              lineWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap
+              _lineWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap
           ),
-          dialogSize(dialogSize)
+          dialogSize(_dialogSize)
     {
     }
 

@@ -23,7 +23,7 @@ namespace ui
         Q_OBJECT
 
        public:
-        class Settings;
+        struct Settings;
 
        private:
         /// Settings for the log viewer dialog
@@ -78,10 +78,10 @@ namespace ui
        public:
         Settings() = delete;
         explicit Settings(
-            int                 reloadIntervalMs,
-            bool                autoReload,
-            bool                lineWrap,
-            std::pair<int, int> dialogSize
+            int                 _reloadIntervalMs,
+            bool                _autoReload,
+            bool                _lineWrap,
+            std::pair<int, int> _dialogSize
         );
     };
 
