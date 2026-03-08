@@ -39,19 +39,19 @@ class RingFile
     std::uintmax_t _bytesWritten{0};
 
    public:
-    // TODO: as soon as migration to mstd is done, create a nice Sink interface,
-    // so that std::cerr can be passed as a sink
+    // TODO(97gamjak): as soon as migration to mstd is done, create a nice Sink
+    // interface, so that std::cerr can be passed as a sink
     // https://97gamjak.atlassian.net/browse/MOLTRACK-93
     explicit RingFile() = default;   // for std::cerr outputs
-    explicit RingFile(const Config& config);
+    explicit RingFile(Config config);
 
     ~RingFile();
 
     RingFile(const RingFile&)            = delete;
     RingFile& operator=(const RingFile&) = delete;
 
-    RingFile(RingFile&& other);
-    RingFile& operator=(RingFile&& other);
+    RingFile(RingFile&& other) noexcept;
+    RingFile& operator=(RingFile&& other) noexcept;
 
     void writeLine(const std::string& line);
     void write(const std::string& text);
@@ -65,11 +65,11 @@ class RingFile
     void _normalizeConfig();
     void _openCurrent();
 
-    bool _wouldExceed(const std::uintmax_t additionalBytes) const;
-    void _ensureOpenAndRotateIfNeeded(const std::uintmax_t additionalBytes);
+    bool _wouldExceed(std::uintmax_t additionalBytes) const;
+    void _ensureOpenAndRotateIfNeeded(std::uintmax_t additionalBytes);
     void _rotateNow();
 
-    std::filesystem::path _pathForIndex(const std::size_t index) const;
+    std::filesystem::path _pathForIndex(std::size_t index) const;
 };
 
 #endif   // __UTILS__RING_FILE_HPP__

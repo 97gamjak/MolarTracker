@@ -13,7 +13,7 @@
  *
  * @param config Configuration for the RingFile
  */
-RingFile::RingFile(const Config& config) : _config(config)
+RingFile::RingFile(Config config) : _config(std::move(config))
 {
     _normalizeConfig();
     std::filesystem::create_directories(_config.directory);
@@ -40,7 +40,7 @@ RingFile::~RingFile()
  *
  * @param other The RingFile to move from
  */
-RingFile::RingFile(RingFile&& other) { *this = std::move(other); }
+RingFile::RingFile(RingFile&& other) noexcept { *this = std::move(other); }
 
 /**
  * @brief Move assignment operator for RingFile
@@ -48,7 +48,7 @@ RingFile::RingFile(RingFile&& other) { *this = std::move(other); }
  * @param other The RingFile to move from
  * @return RingFile& Reference to this RingFile
  */
-RingFile& RingFile::operator=(RingFile&& other)
+RingFile& RingFile::operator=(RingFile&& other) noexcept
 {
     if (this == &other)
         return *this;
@@ -86,7 +86,9 @@ void RingFile::writeLine(const std::string& line)
         _bytesWritten += additional;
     }
     else
+    {
         std::cerr << line << '\n';
+    }
 }
 
 /**
@@ -110,7 +112,9 @@ void RingFile::write(const std::string& text)
         _bytesWritten += additional;
     }
     else
+    {
         std::cerr << text;
+    }
 }
 
 /**
@@ -166,16 +170,16 @@ void RingFile::_normalizeConfig()
  * @return true If writing would exceed the maximum file size
  * @return false Otherwise
  */
-bool RingFile::_wouldExceed(const std::uintmax_t additionalBytes) const
+bool RingFile::_wouldExceed(std::uintmax_t additionalBytes) const
 {
     if (_config.maxSizeMB == 0)
         return false;
 
     const auto logicalSize = _initialFileSize + _bytesWritten + additionalBytes;
 
-    // TODO: clean this MB conversion later on
+    // TODO(97gamjak): clean this MB conversion later on
     // https://97gamjak.atlassian.net/browse/MOLTRACK-92
-    return logicalSize > _config.maxSizeMB * 1024 * 1024;
+    return logicalSize > _config.maxSizeMB * Config::MBtoBytes;
 }
 
 /**
@@ -184,9 +188,7 @@ bool RingFile::_wouldExceed(const std::uintmax_t additionalBytes) const
  *
  * @param additionalBytes The number of bytes to be written
  */
-void RingFile::_ensureOpenAndRotateIfNeeded(
-    const std::uintmax_t additionalBytes
-)
+void RingFile::_ensureOpenAndRotateIfNeeded(std::uintmax_t additionalBytes)
 {
     if (!_file.is_open())
         _openCurrent();
@@ -219,28 +221,28 @@ void RingFile::_rotateNow()
 
             if (std::filesystem::exists(dst))
             {
-                std::error_code ec;
-                std::filesystem::remove(dst, ec);
+                std::error_code errorCode;
+                std::filesystem::remove(dst, errorCode);
             }
 
             if (std::filesystem::exists(src))
             {
-                std::error_code ec;
-                std::filesystem::rename(src, dst, ec);
+                std::error_code errorCode;
+                std::filesystem::rename(src, dst, errorCode);
 
                 // If rename fails (e.g. cross-device), fall back to
                 // copy+remove.
-                if (ec)
+                if (errorCode)
                 {
-                    ec.clear();
+                    errorCode.clear();
                     std::filesystem::copy_file(
                         src,
                         dst,
                         std::filesystem::copy_options::overwrite_existing,
-                        ec
+                        errorCode
                     );
-                    if (!ec)
-                        std::filesystem::remove(src, ec);
+                    if (!errorCode)
+                        std::filesystem::remove(src, errorCode);
                 }
             }
         }
@@ -248,11 +250,11 @@ void RingFile::_rotateNow()
     else
     {
         // maxFiles == 1: just overwrite same file
-        const auto p = _pathForIndex(0);
-        if (std::filesystem::exists(p))
+        const auto path = _pathForIndex(0);
+        if (std::filesystem::exists(path))
         {
-            std::error_code ec;
-            std::filesystem::remove(p, ec);
+            std::error_code errorCode;
+            std::filesystem::remove(path, errorCode);
         }
     }
 }
@@ -264,20 +266,20 @@ void RingFile::_rotateNow()
  */
 void RingFile::_openCurrent()
 {
-    const auto p = _pathForIndex(0);
+    const auto path = _pathForIndex(0);
 
     auto mode  = std::ios::out;
     mode      |= (_config.append ? std::ios::app : std::ios::trunc);
 
     // determine initial size before open if append
-    if (_config.append && std::filesystem::exists(p))
-        _initialFileSize = std::filesystem::file_size(p);
+    if (_config.append && std::filesystem::exists(path))
+        _initialFileSize = std::filesystem::file_size(path);
     else
         _initialFileSize = 0;
 
     _bytesWritten = 0;
 
-    _file.open(p, mode);
+    _file.open(path, mode);
 }
 
 /**
@@ -286,7 +288,7 @@ void RingFile::_openCurrent()
  * @param index The index of the ring file
  * @return std::filesystem::path The constructed path
  */
-std::filesystem::path RingFile::_pathForIndex(const std::size_t index) const
+std::filesystem::path RingFile::_pathForIndex(std::size_t index) const
 {
     std::string buffer;
 
