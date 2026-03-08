@@ -22,6 +22,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Testing
 
 - Add test cases for `binder` struct
+- Add test cases for `utils`
 
 ### Dependencies
 
