@@ -14,43 +14,46 @@ namespace orm
 {
 
     template <db_model Model>
-    void createTable(db::Database& database);
+    void createTable(const std::shared_ptr<db::Database>& database);
 
     template <db_model Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        db::Database& database,
-        const Model&  row
+        const std::shared_ptr<db::Database>& database,
+        const Model&                         row
     );
 
     template <db_model Model>
     [[nodiscard]] std::expected<void, CrudError> update(
-        db::Database& database,
-        const Model&  row
+        const std::shared_ptr<db::Database>& database,
+        const Model&                         row
     );
 
     template <db_model Model, typename Field>
     [[nodiscard]] std::vector<Model> getByField(
-        db::Database& database,
-        Field const&  fieldToMatch
+        const std::shared_ptr<db::Database>& database,
+        Field const&                         fieldToMatch
     );
 
     template <db_model Model, typename Field>
     [[nodiscard]] std::expected<Model, CrudError> getByUniqueField(
-        db::Database& database,
-        Field const&  fieldToMatch
+        const std::shared_ptr<db::Database>& database,
+        Field const&                         fieldToMatch
     );
 
     template <db_model Model, typename PrimaryKeyValue>
     [[nodiscard]] std::optional<Model> getByPk(
-        db::Database&          database,
-        PrimaryKeyValue const& pkValue
+        const std::shared_ptr<db::Database>& database,
+        PrimaryKeyValue const&               pkValue
     );
 
     template <db_model Model>
     [[nodiscard]] std::vector<Model> getAll(db::Database& database);
 
     template <db_model Model, typename PrimaryKeyValue>
-    void deleteByPk(db::Database& database, PrimaryKeyValue const& pkValue);
+    void deleteByPk(
+        const std::shared_ptr<db::Database>& database,
+        PrimaryKeyValue const&               pkValue
+    );
 
 }   // namespace orm
 

@@ -26,8 +26,8 @@ namespace orm
      */
     template <db_model Model>
     std::expected<void, CrudError> update(
-        db::Database& database,
-        const Model&  row
+        const std::shared_ptr<db::Database>& database,
+        const Model&                         row
     )
     {
         auto const fieldViews = orm::fields(row);
@@ -65,7 +65,10 @@ namespace orm
         sqlText += mstd::join(whereClauses, " AND ");
         sqlText += ";";
 
-        db::Statement statement = database.prepare(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        db::Statement statement = database->prepare(sqlText);
 
         bindFieldsToStatement(
             statement,
@@ -82,7 +85,7 @@ namespace orm
 
         statement.executeToCompletion();
 
-        const auto changes = database.getNumberOfLastChanges();
+        const auto changes = database->getNumberOfLastChanges();
 
         if (changes == 0)
         {

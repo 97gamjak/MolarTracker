@@ -148,7 +148,7 @@ jobs:
       # -------------------------
       # - name: Run clang-tidy
       #   run: |
-          find src/  -p=.build
+          # find src/  -p=.build
 
       # -------------------------
       # Package for Release assets (ONLY on tags)

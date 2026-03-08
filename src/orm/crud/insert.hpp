@@ -23,8 +23,8 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        db::Database& database,
-        const Model&  row
+        const std::shared_ptr<db::Database>& database,
+        const Model&                         row
     )
     {
         const auto fieldViews = orm::fields(row);
@@ -61,7 +61,10 @@ namespace orm
 
         sqlText += ");";
 
-        auto statement = database.prepare(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        auto statement = database->prepare(sqlText);
 
         int index = 1;
 
@@ -76,7 +79,7 @@ namespace orm
 
         statement.executeToCompletion();
 
-        const auto lastInsertId = database.getLastInsertRowid();
+        const auto lastInsertId = database->getLastInsertRowid();
         if (lastInsertId.has_value())
             return lastInsertId.value();
 

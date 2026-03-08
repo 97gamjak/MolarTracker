@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "db/database.hpp"
 #include "db/statement.hpp"
 #include "orm/constraints.hpp"
 
