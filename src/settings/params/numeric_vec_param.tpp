@@ -170,10 +170,15 @@ namespace settings
 
     /**
      * @brief Subscribe to changes in the dirty state of the numeric vector
-     * parameter, the provided callback function will be called whenever the
-     * dirty state changes, the user pointer can be used to pass additional
-     * data to the callback function, the returned Connection object can be
-     * used to unsubscribe from changes
+     * parameter, this function subscribes to the dirty state changes of each
+     * individual numeric parameter in the vector, when any of them changes, we
+     * will emit a dirty change for the whole vector parameter, the provided
+     * callback function will be called whenever the dirty state changes, the
+     * user pointer can be used to pass additional data to the callback
+     * function, the returned vector of Connection objects can be used to
+     * unsubscribe from changes for each individual numeric parameter in the
+     * vector by calling disconnect() on each Connection object or by letting
+     * them go out of scope.
      *
      * @tparam T
      * @tparam N
