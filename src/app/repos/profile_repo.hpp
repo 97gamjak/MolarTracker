@@ -26,6 +26,8 @@ namespace app
 
        public:
         explicit ProfileRepo(db::Database& db);
+        ProfileRepo(const ProfileRepo&)            = delete;
+        ProfileRepo& operator=(const ProfileRepo&) = delete;
 
         void ensureSchema() override;
 

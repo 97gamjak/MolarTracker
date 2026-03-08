@@ -1,7 +1,5 @@
 #include "version.hpp"
 
-#include <charconv>
-
 namespace utils
 {
     /**
@@ -43,37 +41,46 @@ namespace utils
      */
     std::optional<SemVer> SemVer::_parse(const std::string& versionStr)
     {
-        std::size_t values[3]{};
-        std::size_t idx = 0;
+        std::vector<std::size_t> values;
+        std::string              valueStr;
 
-        const char* first = versionStr.data();
-        const char* last  = first + versionStr.size();
-
-        while (idx < 3)
+        for (const auto& character : versionStr)
         {
-            auto [ptr, ec] = std::from_chars(first, last, values[idx]);
-            if (ec != std::errc{})
+            if (character != '.' && character != '+' &&
+                !static_cast<bool>(std::isdigit(character)))
                 return std::nullopt;
 
-            first = ptr;
-
-            if (idx < 2)
+            if (character == '+' || character == '.')
             {
-                if (first == last || *first != '.')
+                if (valueStr.empty())
                     return std::nullopt;
-                ++first;
+
+                int value = 0;
+                try
+                {
+                    value = std::stoi(valueStr);
+                    if (value < 0)
+                        return std::nullopt;
+
+                    values.push_back(static_cast<std::size_t>(value));
+                }
+                catch (const std::exception&)
+                {
+                    return std::nullopt;
+                }
+            }
+            else
+            {
+                valueStr += character;
+                continue;
             }
 
-            ++idx;
+            if (character == '+')
+                break;
         }
 
-        // Allow SemVer build metadata: "+anything"
-        if (first != last)
-        {
-            if (*first != '+')
-                return std::nullopt;
-            // everything after '+' is ignored
-        }
+        if (values.size() != 3)
+            return std::nullopt;
 
         return SemVer(values[0], values[1], values[2]);
     }
@@ -116,12 +123,13 @@ namespace utils
      *
      * @return SemVer
      */
-    const SemVer SemVer::getInvalidVersion() { return SemVer{"invalid"}; }
+    SemVer SemVer::getInvalidVersion() { return SemVer{"invalid"}; }
 
     /**
-     * @brief Equality operator for SemVer, two SemVer objects are considered
-     * equal if their major, minor, and patch numbers are all equal, if both
-     * SemVer objects are invalid, they are also considered equal
+     * @brief Equality operator for SemVer, two SemVer objects are
+     * considered equal if their major, minor, and patch numbers are all
+     * equal, if both SemVer objects are invalid, they are also considered
+     * equal
      *
      * @param lhs
      * @param rhs

@@ -39,12 +39,12 @@ namespace utils
 
         [[nodiscard]] std::string toString() const;
 
-        static const SemVer getInvalidVersion();
+        static SemVer getInvalidVersion();
 
         friend bool operator==(const SemVer& lhs, const SemVer& rhs);
 
        private:
-        std::optional<SemVer> _parse(const std::string& versionStr);
+        static std::optional<SemVer> _parse(const std::string& versionStr);
     };
 
 }   // namespace utils
@@ -61,23 +61,23 @@ struct adl_serializer<utils::SemVer>
     /**
      * @brief Serialize SemVer to JSON
      *
-     * @param j
+     * @param jsonData
      * @param version
      */
-    static void to_json(nlohmann::json& j, const utils::SemVer& version)
+    static void to_json(nlohmann::json& jsonData, const utils::SemVer& version)
     {
-        j = version.toString();
+        jsonData = version.toString();
     }
 
     /**
      * @brief Deserialize SemVer from JSON
      *
-     * @param j
+     * @param jsonData
      * @return utils::SemVer
      */
-    static utils::SemVer from_json(const nlohmann::json& j)
+    static utils::SemVer from_json(const nlohmann::json& jsonData)
     {
-        return utils::SemVer(j.get<std::string>());
+        return utils::SemVer(jsonData.get<std::string>());
     }
 };
 NLOHMANN_JSON_NAMESPACE_END

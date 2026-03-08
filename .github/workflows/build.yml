@@ -69,7 +69,19 @@ jobs:
               pkg-config              \
               libcurl4-openssl-dev    \
               cppcheck                \
-              clang-tidy
+              clangd-20
+          sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install clangd-tidy
 
       # -------------------------
       # Install Qt
@@ -136,7 +148,7 @@ jobs:
       # -------------------------
       # - name: Run clang-tidy
       #   run: |
-      #     find src -name '*.cpp' | xargs clang-tidy-18 --warnings-as-errors=* -p=build --config-file=.clang-tidy
+          find src/  -p=.build
 
       # -------------------------
       # Package for Release assets (ONLY on tags)
