@@ -1,5 +1,7 @@
 #include "infos.hpp"
 
+#include <QStatusBar>
+
 #include "logging/log_manager.hpp"
 #include "logging/log_object.hpp"
 
@@ -12,12 +14,12 @@ namespace ui
      * @param statusBar Pointer to the QStatusBar where the message will be
      * shown
      */
-    void showInfoStatusBar(LogObject logObject, QStatusBar* statusBar)
+    void showInfoStatusBar(logging::LogObject logObject, QStatusBar* statusBar)
     {
         // ensure the log object is logged as an info
         logObject.level = LogLevel::Info;
 
-        LogManager::getInstance().log(logObject);
+        logging::LogManager::getInstance().log(logObject);
 
         if (statusBar != nullptr)
             statusBar->showMessage(QString::fromStdString(logObject.message));

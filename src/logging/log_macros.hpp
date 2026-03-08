@@ -3,32 +3,47 @@
 
 #include <iostream>   // IWYU pragma: keep
 
+#include "log_category.hpp"      // IWYU pragma: keep
 #include "log_entry_scope.hpp"   // IWYU pragma: keep
 #include "log_manager.hpp"       // IWYU pragma: keep
 #include "log_object.hpp"        // IWYU pragma: keep
-#include "mstd/error.hpp"
+
+namespace logging::detail
+{
+    inline std::string internNoexcept(const char* name) noexcept
+    {
+        try
+        {
+            return {name};
+        }
+        catch (...)
+        {
+            std::abort();
+        }
+    }
+}   // namespace logging::detail
+
+#define REGISTER_LOG_CATEGORY(name_literal)                \
+    namespace                                              \
+    {                                                      \
+                                                           \
+        [[maybe_unused]] const auto _logCategory =         \
+            logging::detail::internNoexcept(name_literal); \
+    }
 
 #define LOG_OBJECT_INTERNAL(level, category, message) \
-    (LogObject{level, category, message, __FILE__, __LINE__, __func__})
+    (logging::LogObject{level, category, message, __FILE__, __LINE__, __func__})
 
-// clang-format off
-#ifndef __LOG_CATEGORY__
-    #define LOG_OBJECT(level, message)                                          \
-        MSTD_COMPILE_FAIL(                                                      \
-            "LOG_CATEGORY must be defined before including log_macros.hpp"      \
-        );
-#else
-    #define LOG_OBJECT(level, message) LOG_OBJECT_INTERNAL(level, __LOG_CATEGORY__, message)
-#endif
-// clang-format on
+#define LOG_OBJECT(level, message) \
+    LOG_OBJECT_INTERNAL(level, _logCategory, message)
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-do-while)
-#define LOG(logObject)                              \
-    do                                              \
-    {                                               \
-        LogManager::getInstance().log((logObject)); \
+// NOLINTBEGIN(cppcoreguidelines-avoid-do-while, cppcoreguidelines-macro-usage)
+#define LOG(logObject)                                       \
+    do                                                       \
+    {                                                        \
+        logging::LogManager::getInstance().log((logObject)); \
     } while (0)
-// NOLINTEND(cppcoreguidelines-avoid-do-while)
+// NOLINTEND(cppcoreguidelines-avoid-do-while, cppcoreguidelines-macro-usage)
 
 #define LOG_TRACE_OBJECT(message)   LOG_OBJECT(LogLevel::Trace, message)
 #define LOG_DEBUG_OBJECT(message)   LOG_OBJECT(LogLevel::Debug, message)
@@ -42,9 +57,9 @@
 #define LOG_WARNING(message) LOG(LOG_WARNING_OBJECT(message))
 #define LOG_ERROR(message)   LOG(LOG_ERROR_OBJECT(message))
 
-#define LOG_ENTRY LogEntryScope __logEntryScope__(LOG_TRACE_OBJECT(""))
+#define LOG_ENTRY logging::LogEntryScope __logEntryScope__(LOG_TRACE_OBJECT(""))
 #define LOG_TIMED_ENTRY \
-    TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
+    logging::TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
 
 #define MT_DEBUG std::cerr
 

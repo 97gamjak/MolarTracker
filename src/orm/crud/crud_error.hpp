@@ -2,10 +2,10 @@
 #define __ORM__CRUD__CRUD_ERROR_HPP__
 
 #include <cstdint>
+#include <mstd/enum.hpp>
 #include <string>
 
 #include "exceptions/base.hpp"
-#include "mstd/enum.hpp"
 
 namespace orm
 {

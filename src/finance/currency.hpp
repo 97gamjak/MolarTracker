@@ -2,9 +2,8 @@
 #define __FINANCE__CURRENCY_HPP__
 
 #include <cstdint>
-
-#include "mstd/enum.hpp"
-#include "mstd/error.hpp"
+#include <mstd/enum.hpp>
+#include <mstd/error.hpp>
 
 namespace finance
 {

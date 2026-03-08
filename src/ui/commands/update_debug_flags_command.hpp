@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "command.hpp"
-#include "config/logging_base.hpp"
+#include "logging/log_manager.hpp"
 
 namespace ui
 {
@@ -16,12 +16,12 @@ namespace ui
     {
        private:
         /// The old categories before the update
-        LogCategoryMap _oldCategories;
+        logging::LogCategories _oldCategories;
         /// The new categories after the update
-        LogCategoryMap _categories;
+        logging::LogCategories _categories;
 
        public:
-        explicit UpdateDebugFlagsCommand(const LogCategoryMap& categories);
+        explicit UpdateDebugFlagsCommand(logging::LogCategories categories);
         ~UpdateDebugFlagsCommand() override = default;
 
         std::expected<void, CommandErrorPtr> undo() override;

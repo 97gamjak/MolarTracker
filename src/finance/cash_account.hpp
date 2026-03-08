@@ -2,10 +2,10 @@
 #define __FINANCE__CASH_ACCOUNT_HPP__
 
 #include <cstdint>
+#include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
 #include "currency.hpp"
-#include "mstd/enum.hpp"
 
 namespace finance
 {

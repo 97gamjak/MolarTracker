@@ -5,14 +5,13 @@
 #include <vector>
 
 #include "app/factories/profile_factory.hpp"
-#include "config/logging_base.hpp"
 #include "db/database.hpp"
 #include "domain/profile.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "sql_models/profile_row.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::repo_profile
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("App.Repo.ProfileRepo");
 
 namespace app
 {

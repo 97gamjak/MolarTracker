@@ -6,10 +6,10 @@
 #include <unordered_map>
 
 #include "drafts/profile_draft.hpp"
+#include "logging/log_macros.hpp"
 #include "services_api/i_profile_service.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::app_store_ProfileStore
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
 
 namespace app
 {
@@ -405,7 +405,7 @@ namespace app
             return;
         }
 
-        for (auto& profile : _profiles)
+        for (const auto& profile : _profiles)
         {
             switch (_profileStates[profile.getId()])
             {

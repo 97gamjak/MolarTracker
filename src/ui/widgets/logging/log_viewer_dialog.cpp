@@ -10,10 +10,10 @@
 #include <algorithm>
 #include <filesystem>
 
+#include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_logging
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("UI.Widgets.Logging.LogViewerDialog");
 
 namespace ui
 {
@@ -21,12 +21,15 @@ namespace ui
     /**
      * @brief Construct a new Log Viewer Dialog:: Log Viewer Dialog object
      *
-     * @param settings
-     * @param parent
+     * @param settings Settings for the log viewer dialog
+     * @param parent Parent widget
      */
-    LogViewerDialog::LogViewerDialog(Settings& settings, QWidget* parent)
+    LogViewerDialog::LogViewerDialog(
+        std::shared_ptr<Settings> settings,
+        QWidget*                  parent
+    )
         : QDialog(parent),
-          _settings(settings),
+          _settings(std::move(settings)),
           _textEdit(new QPlainTextEdit(this)),
           _reloadButton(new QPushButton(tr("Reload"), this)),
           _autoReloadCheckBox(new QCheckBox(tr("Auto Reload"), this)),
@@ -37,11 +40,11 @@ namespace ui
 
         _textEdit->setReadOnly(true);
 
-        _textEdit->setLineWrapMode(_settings.getLineWrapMode());
+        _textEdit->setLineWrapMode(_settings->getLineWrapMode());
         _textEdit->setMaximumBlockCount(50000);
 
-        _autoReloadCheckBox->setChecked(_settings.isAutoReloadEnabled());
-        _reloadTimer->setInterval(_settings.getIntervalMs());
+        _autoReloadCheckBox->setChecked(_settings->isAutoReloadEnabled());
+        _reloadTimer->setInterval(_settings->getIntervalMs());
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout();
@@ -96,7 +99,7 @@ namespace ui
      */
     void LogViewerDialog::_loadLogFile()
     {
-        auto&       logManager  = LogManager::getInstance();
+        auto&       logManager  = logging::LogManager::getInstance();
         const auto& logFilePath = logManager.getCurrentLogFilePath();
         const auto  absPath     = std::filesystem::absolute(logFilePath);
         const auto  qStrPath    = QString::fromStdString(absPath.string());
@@ -173,15 +176,23 @@ namespace ui
     }
 
     /**
-     * @brief set the reload interval in seconds, this will update the timer
-     * interval accordingly
+     * @brief Construct a new Log Viewer Dialog:: Settings:: Settings object
      *
-     * @param intervalSec
+     * @param reloadIntervalMs
+     * @param autoReload
+     * @param lineWrap
      */
-    void LogViewerDialog::Settings::setIntervalSec(double intervalSec)
+    LogViewerDialog::Settings::Settings(
+        int  reloadIntervalMs,
+        bool autoReload,
+        bool lineWrap
+    )
+        : _reloadIntervalMs(reloadIntervalMs),
+          _autoReload(autoReload),
+          _lineWrap(
+              lineWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap
+          )
     {
-        const auto intervalMs = static_cast<int>(intervalSec * 1000);
-        _reloadIntervalMs     = std::max(0, intervalMs);
     }
 
     /**
@@ -195,16 +206,6 @@ namespace ui
     }
 
     /**
-     * @brief Enable or disable auto reload
-     *
-     * @param autoReload
-     */
-    void LogViewerDialog::Settings::setAutoReload(bool autoReload)
-    {
-        _autoReload = autoReload;
-    }
-
-    /**
      * @brief Check if auto reload is enabled
      *
      * @return true if auto reload is enabled, false otherwise
@@ -212,17 +213,6 @@ namespace ui
     bool LogViewerDialog::Settings::isAutoReloadEnabled() const
     {
         return _autoReload;
-    }
-
-    /**
-     * @brief Enable or disable line wrap
-     *
-     * @param enabled
-     */
-    void LogViewerDialog::Settings::setLineWrap(bool enabled)
-    {
-        _lineWrap =
-            enabled ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap;
     }
 
     /**

@@ -129,6 +129,7 @@ namespace settings
         LogViewerSettings();
 
         [[nodiscard]] double getReloadIntervalSec() const;
+        [[nodiscard]] int    getReloadIntervalMs() const;
         [[nodiscard]] bool   isAutoReloadEnabled() const;
         [[nodiscard]] bool   isLineWrapEnabled() const;
 

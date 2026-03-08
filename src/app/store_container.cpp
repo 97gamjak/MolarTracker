@@ -1,9 +1,9 @@
 #include "store_container.hpp"
 
+#include "logging/log_macros.hpp"
 #include "service_container.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::app_storeContainer
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
 
 namespace app
 {

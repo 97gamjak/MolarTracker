@@ -2,9 +2,9 @@
 #define __SETTINGS__PARAMS__ENUM_PARAM_HPP__
 
 #include <expected>
+#include <mstd/type_traits.hpp>
+#include <nlohmann/json.hpp>
 
-#include "mstd/type_traits.hpp"
-#include "nlohmann/json.hpp"
 #include "param_core.hpp"
 #include "param_mixin.hpp"
 

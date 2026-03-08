@@ -6,8 +6,8 @@
 
 namespace db
 {
-    // TODO: use here MolarTracker's own exception hierarchy, e.g. by deriving
-    // from a base MolarTrackerException class
+    // TODO(97gamjak): use here MolarTracker's own exception hierarchy, e.g. by
+    // deriving from a base MolarTrackerException class
     /**
      * @brief Exception type for SQLite-related errors
      *

@@ -54,10 +54,10 @@ namespace orm
 
 }   // namespace orm
 
-#include "crud/create.hpp"   // IWYU pragma: keep
-#include "crud/delete.hpp"   // IWYU pragma: keep
-#include "crud/get.hpp"      // IWYU pragma: keep
-#include "crud/insert.hpp"   // IWYU pragma: keep
-#include "crud/update.hpp"   // IWYU pragma: keep
+#include "crud/create.hpp"   // IWYU pragma: export
+#include "crud/delete.hpp"   // IWYU pragma: export
+#include "crud/get.hpp"      // IWYU pragma: export
+#include "crud/insert.hpp"   // IWYU pragma: export
+#include "crud/update.hpp"   // IWYU pragma: export
 
 #endif   // __ORM__CRUD_HPP__

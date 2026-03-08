@@ -33,10 +33,10 @@ namespace ui
         _logLevelConnection = param.subscribe(
             [](void* user, const LogLevel& newLogLevel)
             {
-                if (auto* logManager = static_cast<LogManager*>(user))
+                if (auto* logManager = static_cast<logging::LogManager*>(user))
                     logManager->setDefaultLogLevel(newLogLevel);
             },
-            &LogManager::getInstance()
+            &logging::LogManager::getInstance()
         );
     }
 

@@ -3,67 +3,85 @@
 
 #include <filesystem>
 #include <string>
-#include <unordered_map>
 
-#include "config/logging_base.hpp"
+#include "log_categories.hpp"
+#include "log_category.hpp"
 #include "utils/ring_file.hpp"
 
-enum class LogLevel : size_t;      // forward declaration
-enum class LogCategory : size_t;   // forward declaration
-
-struct LogObject;   // forward declaration
+enum class LogLevel : std::int8_t;   // forward declaration
 
 namespace settings
 {
     class LoggingSettings;   // forward declaration
 }   // namespace settings
 
-/**
- * @brief Singleton class managing logging categories and levels
- *
- */
-class LogManager
+namespace logging
 {
-   private:
-    /// Mapping of log categories to their current log levels.
-    std::unordered_map<LogCategory, LogLevel> _categories;
+    struct LogObject;   // forward declaration
 
-    /// The ring file logger instance used for logging to files.
-    RingFile _ringFile;
+    /**
+     * @brief Singleton class managing logging categories and levels
+     *
+     */
+    class LogManager
+    {
+       private:
+        /// The collection of log categories, organized in a hierarchical
+        /// structure
+        LogCategories _categories;
 
-    /// The directory where log files are stored.
-    std::filesystem::path _logDirectory;
+        /// A copy of the initial log categories at startup, used for resetting
+        /// to default categories
+        LogCategories _startupCategories;
 
-    /// The default log level for categories that are not explicitly set.
-    LogLevel _defaultLogLevel{LogLevel::Info};
+        /// The ring file logger instance used for logging to files.
+        RingFile _ringFile;
 
-   public:
-    static LogManager& getInstance();
+        /// The directory where log files are stored.
+        std::filesystem::path _logDirectory;
 
-    void initializeRingFileLogger(
-        const settings::LoggingSettings& settings,
-        const std::filesystem::path&     directory
-    );
-    void changeLogLevel(const LogCategory& category, const LogLevel& level);
-    bool isEnabled(const LogCategory& category, const LogLevel& level) const;
-    void flush();
+        /// The default log level for categories that are not explicitly set.
+        LogLevel _defaultLogLevel = LogLevel::Info;
 
-    std::unordered_map<LogCategory, LogLevel> getCategories() const;
-    std::unordered_map<LogCategory, LogLevel> getDefaultCategories() const;
+       public:
+        static LogManager& getInstance();
 
-    std::filesystem::path getCurrentLogFilePath() const;
+        void initializeCategories();
+        void initializeRingFileLogger(
+            const settings::LoggingSettings& settings,
+            const std::filesystem::path&     directory
+        );
 
-    void log(const LogObject& logObject);
+        void changeLogLevel(const LogCategory& category, const LogLevel& level);
+        bool isEnabled(
+            const std::string& categoryName,
+            const LogLevel&    level
+        ) const;
 
-    // TODO(97gamjak): this should be done via a command and undo stack and
-    // should also be private
-    // https://97gamjak.atlassian.net/browse/MOLTRACK-102
-    void setDefaultLogLevel(const LogLevel& level);
+        void flush();
 
-   private:
-    LogManager();
+        [[nodiscard]] LogCategories getCategories() const;
+        [[nodiscard]] LogCategories getDefaultCategories() const;
 
-    static std::string _logLevelToString(const LogLevel& level);
-};
+        std::filesystem::path getCurrentLogFilePath() const;
+
+        void log(const LogObject& logObject);
+
+        // TODO(97gamjak): this should be done via a command and undo stack and
+        // should also be private
+        // https://97gamjak.atlassian.net/browse/MOLTRACK-102
+        void setDefaultLogLevel(const LogLevel& level);
+
+        LogCategory getCategory(const std::string& name) const;
+
+       private:
+        LogManager() = default;
+
+        [[nodiscard]] static std::string _logLevelToString(
+            const LogLevel& level
+        );
+    };
+
+}   // namespace logging
 
 #endif   // __LOGGING__LOG_MANAGER_HPP__

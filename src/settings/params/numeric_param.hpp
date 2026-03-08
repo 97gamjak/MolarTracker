@@ -76,6 +76,10 @@ namespace settings
         void setMaxValue(const T& maxValue);
         void setPrecision(size_t decimalPlaces);
 
+        [[nodiscard]] std::optional<T>      getMinValue() const;
+        [[nodiscard]] std::optional<T>      getMaxValue() const;
+        [[nodiscard]] std::optional<size_t> getPrecision() const;
+
         static void fromJson(
             const nlohmann::json& jsonData,
             NumericParam<T>&      param

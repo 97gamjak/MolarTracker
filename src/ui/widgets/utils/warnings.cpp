@@ -1,5 +1,8 @@
 #include "warnings.hpp"
 
+#include <QMessageBox>
+#include <string>
+
 #include "logging/log_manager.hpp"
 #include "logging/log_object.hpp"
 
@@ -14,14 +17,14 @@ namespace ui
      */
     void showWarningMessageBox(
         const std::string& title,
-        LogObject          logObject,
+        logging::LogObject logObject,
         QWidget*           parent
     )
     {
         // ensure the log object is logged as a warning
         logObject.level = LogLevel::Warning;
 
-        LogManager::getInstance().log(logObject);
+        logging::LogManager::getInstance().log(logObject);
 
         QMessageBox msgBox(parent);
         msgBox.setIcon(QMessageBox::Warning);

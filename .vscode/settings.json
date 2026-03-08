@@ -113,7 +113,9 @@
         "__memory": "cpp",
         "__functional_base_03": "cpp",
         "__tuple": "cpp",
-        "qvboxlayout": "cpp"
+        "qvboxlayout": "cpp",
+        "qstring": "cpp",
+        "qmessagebox": "cpp"
     },
     "cSpell.words": [
         "googletest",

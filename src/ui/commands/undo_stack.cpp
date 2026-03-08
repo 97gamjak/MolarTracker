@@ -1,20 +1,20 @@
 #include "undo_stack.hpp"
 
 #include <cassert>
-#include <format>
 
-#define __LOG_CATEGORY__ LogCategory::undoStack
 #include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("UI.Commands.UndoStack");
 
 namespace ui
 {
 
     /**
-     * @brief Push a new command onto the undo stack
+     * @brief Push new commands onto the undo stack
      *
-     * @param command The command to be pushed onto the stack
+     * @param commands The commands to be pushed onto the stack
      */
-    void UndoStack::push(Commands command)
+    void UndoStack::push(Commands commands)
     {
         if (_cursor < _commands.size())
         {
@@ -24,7 +24,7 @@ namespace ui
             );
         }
 
-        _commands.push_back(std::move(command));
+        _commands.push_back(std::move(commands));
         _cursor = _commands.size();
 
         emit changed();

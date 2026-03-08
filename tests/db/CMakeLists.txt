@@ -7,6 +7,7 @@ add_executable(tests_db
 target_link_libraries(tests_db
   PRIVATE
     molartracker_db
+    molartracker_logging
     GTest::gtest_main
 )
 

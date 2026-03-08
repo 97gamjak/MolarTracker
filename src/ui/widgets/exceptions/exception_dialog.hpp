@@ -2,9 +2,13 @@
 #define __UI__WIDGETS__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
 
 #include <QDialog>
-#include <QString>
 
-#include "logging/log_object.hpp"
+namespace logging
+{
+    struct LogObject;   // forward declaration
+}   // namespace logging
+
+class QString;   // forward declaration
 
 namespace ui
 {
@@ -17,11 +21,15 @@ namespace ui
 
        public:
         static void showFatal(
-            const QString& title,
-            LogObject      logObject,
-            QWidget*       parent
+            const QString&     title,
+            logging::LogObject logObject,
+            QWidget*           parent
         );
-        static void showFatal(const QString& title, LogObject logObject);
+
+        static void showFatal(
+            const QString&     title,
+            logging::LogObject logObject
+        );
 
        private:
         explicit ExceptionDialog(

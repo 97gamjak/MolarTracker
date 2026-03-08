@@ -1,8 +1,9 @@
 #ifndef __SETTINGS__PARAMS__ENUM_PARAM_TPP__
 #define __SETTINGS__PARAMS__ENUM_PARAM_TPP__
 
+#include <nlohmann/json.hpp>
+
 #include "enum_param.hpp"
-#include "nlohmann/json.hpp"
 #include "param_error.hpp"
 
 namespace settings

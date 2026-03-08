@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QPlainTextEdit>
+#include <memory>
 
 class QPlainTextEdit;   // Forward declaration
 class QPushButton;      // Forward declaration
@@ -25,9 +26,8 @@ namespace ui
         class Settings;
 
        private:
-        /// TODO: we might want to use here only some sub-settings
-        /// Reference to settings
-        Settings& _settings;
+        /// Settings for the log viewer dialog
+        std::shared_ptr<Settings> _settings;
 
         /// The text edit widget for displaying log contents
         QPlainTextEdit* _textEdit;
@@ -39,7 +39,10 @@ namespace ui
         QTimer* _reloadTimer;
 
        public:
-        explicit LogViewerDialog(Settings& settings, QWidget* parent);
+        explicit LogViewerDialog(
+            std::shared_ptr<Settings> settings,
+            QWidget*                  parent
+        );
 
        protected:
         void hideEvent(QHideEvent* event) override;
@@ -70,13 +73,13 @@ namespace ui
         QPlainTextEdit::LineWrapMode _lineWrap;
 
        public:
-        void              setIntervalSec(double intervalSec);
+        Settings() = delete;
+        explicit Settings(int reloadIntervalMs, bool autoReload, bool lineWrap);
+
         [[nodiscard]] int getIntervalMs() const;
 
-        void               setAutoReload(bool autoReload);
         [[nodiscard]] bool isAutoReloadEnabled() const;
 
-        void                                       setLineWrap(bool enabled);
         [[nodiscard]] QPlainTextEdit::LineWrapMode getLineWrapMode() const;
     };
 

@@ -136,11 +136,7 @@ jobs:
       # -------------------------
       # - name: Run clang-tidy
       #   run: |
-      #     clang-tidy \
-      #         --warnings-as-errors=* \
-      #         --compile-commands=build/compile_commands.json \
-      #         $(find src -name '*.cpp')
-      #TODO: in order to activate this we definitely need to clean up code base before
+      #     find src -name '*.cpp' | xargs clang-tidy-18 --warnings-as-errors=* -p=build --config-file=.clang-tidy
 
       # -------------------------
       # Package for Release assets (ONLY on tags)

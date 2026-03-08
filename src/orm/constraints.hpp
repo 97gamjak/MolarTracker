@@ -2,8 +2,7 @@
 #define __ORM__CONSTRAINTS_HPP__
 
 #include <cstdint>
-
-#include "mstd/enum.hpp"
+#include <mstd/enum.hpp>
 
 namespace orm
 {

@@ -3,11 +3,13 @@
 
 #include <QDialog>
 
-#include "config/logging_base.hpp"
+#include "debug_slots_model.hpp"
+#include "logging/log_category.hpp"
+#include "logging/log_manager.hpp"
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration
-class QTreeWidget;        // Forward declaration
+class QTreeView;          // Forward declaration
 class QDialogButtonBox;   // Forward declaration
 class QMainWindow;        // Forward declaration
 
@@ -24,16 +26,19 @@ namespace ui
 
        private:
         /// The reference map of log categories
-        LogCategoryMap _categories;
+        logging::LogCategories _categories;
         /// The current map of log categories
-        LogCategoryMap _currentCategories;
+        logging::LogCategories _currentCategories;
 
         /// Flag to indicate if only modified categories should be shown in the
         /// tree
         bool _modifiedOnly = false;
 
         /// UI elements
-        QTreeWidget* _tree{};
+        QTreeView* _tree{};
+
+        /// The model for the tree view of the LogCategories
+        LogCategoryModel* _model{};
 
         /// Buttons
         QPushButton* _defaultsButton{};
@@ -61,16 +66,19 @@ namespace ui
 
         explicit DebugSlotsDialog(QWidget* parent);
 
-        void setCategories(const LogCategoryMap& categories);
+        void setCategories(const logging::LogCategories& categories);
         void setCategories(
-            const LogCategoryMap& categories,
-            bool                  overrideReference
+            const logging::LogCategories& categories,
+            bool                          overrideReference
         );
         void populateTree();
 
        signals:
         /// Signal emitted when the user requests to apply changes
-        void requested(const Action& action, const LogCategoryMap& categories);
+        void requested(
+            const Action&                 action,
+            const logging::LogCategories& categories
+        );
 
        private:
         void _buildUi();
@@ -82,6 +90,7 @@ namespace ui
         void _emitDefaults();
         void _discardChanges();
         void _rejectChanges();
+        void _applyToChildren(const QModelIndex& idx);
     };
 
 }   // namespace ui

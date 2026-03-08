@@ -2,6 +2,8 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QObject>
+#include <QString>
 
 #include "config/constants.hpp"
 #include "ui/widgets/menu_bar/help_menu.hpp"

@@ -7,10 +7,10 @@
 #include <QVBoxLayout>
 
 #include "config/constants.hpp"
+#include "logging/log_macros.hpp"
 #include "utils/qt_helpers.hpp"
 
-#define __LOG_CATEGORY__ LogCategory::ui_profileSelectionDialog
-#include "logging/log_macros.hpp"
+REGISTER_LOG_CATEGORY("UI.Widgets.Profile.ProfileSelectionDialog");
 
 namespace ui
 {

@@ -2,7 +2,6 @@
 #define __UTILS__TIMESTAMP_HPP__
 
 #include <chrono>
-#include <format>
 #include <string>
 
 // TODO(97gamjak): migrate to mstd later on

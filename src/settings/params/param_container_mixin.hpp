@@ -1,11 +1,11 @@
 #ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__
 #define __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 #include "config/signal_tags.hpp"
-#include "nlohmann/json.hpp"
 
 class Connection;   // Forward declaration
 

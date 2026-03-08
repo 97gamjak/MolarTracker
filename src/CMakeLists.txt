@@ -5,16 +5,45 @@ qt_add_executable(MolarTracker
 add_library(json INTERFACE)
 
 target_include_directories(json
-    INTERFACE
+    SYSTEM INTERFACE
         ${CMAKE_SOURCE_DIR}/external/json/single_include
 )
 
 add_library(mstd INTERFACE)
 
 target_include_directories(mstd
-    INTERFACE
+    SYSTEM INTERFACE
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
+
+add_executable(logcat_generator ${CMAKE_SOURCE_DIR}/tools/generate_log_categories.cpp)
+
+set(GEN_DIR ${PROJECT_BINARY_DIR}/src/generated)
+set(GEN_HDR ${GEN_DIR}/log_categories.gen.hpp)
+
+file(GLOB_RECURSE LOGCAT_INPUTS CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/*.hpp
+    ${CMAKE_SOURCE_DIR}/src/*.tpp
+)
+
+add_custom_command(
+    OUTPUT  ${GEN_HDR}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}
+    COMMAND $<TARGET_FILE:logcat_generator> ${GEN_HDR} ${CMAKE_SOURCE_DIR}/src
+    DEPENDS logcat_generator ${LOGCAT_INPUTS}
+    VERBATIM
+    COMMENT "Generating log category header: ${GEN_HDR}"
+)
+
+add_custom_target(
+    generate_log_categories
+    DEPENDS ${GEN_HDR}
+)
+
+add_library(molartracker_log_categories_generated INTERFACE)
+target_include_directories(molartracker_log_categories_generated INTERFACE ${GEN_DIR})
+target_sources(molartracker_log_categories_generated INTERFACE ${GEN_HDR})
 
 add_subdirectory(config)
 add_subdirectory(logging)
@@ -32,7 +61,7 @@ add_subdirectory(connections)
 add_subdirectory(finance)
 
 target_link_libraries(MolarTracker
-    PRIVATE 
+    PUBLIC 
     molartracker_ui
     molartracker_app
     molartracker_db

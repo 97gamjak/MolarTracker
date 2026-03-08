@@ -87,8 +87,9 @@ namespace app
         [[nodiscard]] std::optional<Profile> getProfile(ProfileId id) const;
         [[nodiscard]] std::optional<Profile> getProfile(std::string_view) const;
 
-        [[nodiscard]] bool profileExists(std::string_view name) const;
+        // cppcheck-suppress functionStatic -- false positive
         [[nodiscard]] bool profileExists(const Profile& profile) const;
+        [[nodiscard]] bool profileExists(std::string_view name) const;
 
         [[nodiscard]] ProfileStoreResult addProfile(
             const drafts::ProfileDraft& draft

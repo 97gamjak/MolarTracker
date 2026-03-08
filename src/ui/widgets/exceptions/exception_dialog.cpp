@@ -9,6 +9,7 @@
 
 #include "config/logging_base.hpp"
 #include "logging/log_manager.hpp"
+#include "logging/log_object.hpp"
 
 namespace ui
 {
@@ -89,16 +90,16 @@ namespace ui
      * @param parent The parent widget of the dialog
      */
     void ExceptionDialog::showFatal(
-        const QString& title,
-        LogObject      logObject,
-        QWidget*       parent
+        const QString&     title,
+        logging::LogObject logObject,
+        QWidget*           parent
     )
     {
         // we set the log level to error to make sure it is visible in the log
         // viewer and stands out from other log messages
         logObject.level = LogLevel::Error;
 
-        LogManager::getInstance().log(logObject);
+        logging::LogManager::getInstance().log(logObject);
 
         ExceptionDialog dlg(
             title,
@@ -117,7 +118,10 @@ namespace ui
      * @param logObject The log object containing the details of the exception,
      * this will be logged as an error and shown in the details of the dialog
      */
-    void ExceptionDialog::showFatal(const QString& title, LogObject logObject)
+    void ExceptionDialog::showFatal(
+        const QString&     title,
+        logging::LogObject logObject
+    )
     {
         showFatal(title, std::move(logObject), nullptr);
     }

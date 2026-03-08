@@ -2,12 +2,12 @@
 #define __ORM__CRUD__UPDATE_HPP__
 
 #include <expected>
+#include <mstd/string.hpp>
 #include <string>
 
 #include "crud_detail.hpp"
 #include "crud_error.hpp"
 #include "db/database.hpp"
-#include "mstd/string.hpp"
 #include "orm/constraints.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
