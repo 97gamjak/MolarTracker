@@ -17,7 +17,7 @@ namespace settings
 
 namespace logging
 {
-    class LogObject;   // forward declaration
+    struct LogObject;   // forward declaration
 
     /**
      * @brief Singleton class managing logging categories and levels

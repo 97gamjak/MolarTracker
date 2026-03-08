@@ -5,7 +5,7 @@ class QStatusBar;   // forward declaration
 
 namespace logging
 {
-    class LogObject;   // forward declaration
+    struct LogObject;   // forward declaration
 }   // namespace logging
 
 namespace ui

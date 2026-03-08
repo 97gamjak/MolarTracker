@@ -5,7 +5,7 @@
 
 namespace logging
 {
-    class LogObject;   // forward declaration
+    struct LogObject;   // forward declaration
 }   // namespace logging
 
 class QString;   // forward declaration
