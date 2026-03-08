@@ -22,6 +22,11 @@ namespace settings
         _autoReload.setDefault(Schema::AUTO_RELOAD_DEFAULT);
 
         _lineWrap.setDefault(Schema::LINE_WRAP_DEFAULT);
+
+        _dialogSize.setDefaults(
+            {Schema::DIALOG_SIZE_DEFAULT.first,
+             Schema::DIALOG_SIZE_DEFAULT.second}
+        );
     }
 
     /**
@@ -68,6 +73,16 @@ namespace settings
     bool LogViewerSettings::isLineWrapEnabled() const
     {
         return _lineWrap.get();
+    }
+
+    /**
+     * @brief Get the dialog size setting
+     *
+     * @return std::pair<int, int>
+     */
+    std::pair<int, int> LogViewerSettings::getDialogSize() const
+    {
+        return {_dialogSize.x(), _dialogSize.y()};
     }
 
     /**

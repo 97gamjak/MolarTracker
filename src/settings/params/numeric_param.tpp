@@ -13,21 +13,6 @@
 namespace settings
 {
     /**
-     * @brief Construct a new NumericParam object
-     *
-     * @tparam Derived
-     * @tparam T
-     * @param key
-     * @param title
-     */
-    template <typename T>
-    requires(std::integral<T> || std::floating_point<T>)
-    NumericParam<T>::NumericParam(std::string key, std::string title)
-        : _core(std::move(key), std::move(title))
-    {
-    }
-
-    /**
      * @brief Construct a new NumericParam object with a description
      *
      * @tparam Derived

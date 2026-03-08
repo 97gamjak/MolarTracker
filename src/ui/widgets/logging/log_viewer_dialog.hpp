@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QPlainTextEdit>
 #include <memory>
+#include <utility>
 
 class QPlainTextEdit;   // Forward declaration
 class QPushButton;      // Forward declaration
@@ -23,7 +24,7 @@ namespace ui
         Q_OBJECT
 
        public:
-        class Settings;
+        struct Settings;
 
        private:
         /// Settings for the log viewer dialog
@@ -60,27 +61,29 @@ namespace ui
      * @brief Settings for LogViewerDialog
      *
      */
-    class LogViewerDialog::Settings
+    struct LogViewerDialog::Settings
     {
-       private:
         /// The interval for auto-reloading the log file, in milliseconds
-        int _reloadIntervalMs;
+        int reloadIntervalMs;
 
         /// Whether auto-reload is enabled
-        bool _autoReload;
+        bool autoReload;
 
         /// The line wrap mode for the text edit widget
-        QPlainTextEdit::LineWrapMode _lineWrap;
+        QPlainTextEdit::LineWrapMode lineWrap;
+
+        /// The size of the log viewer dialog in pixels, represented as a tuple
+        /// of (width, height)
+        std::pair<int, int> dialogSize;
 
        public:
         Settings() = delete;
-        explicit Settings(int reloadIntervalMs, bool autoReload, bool lineWrap);
-
-        [[nodiscard]] int getIntervalMs() const;
-
-        [[nodiscard]] bool isAutoReloadEnabled() const;
-
-        [[nodiscard]] QPlainTextEdit::LineWrapMode getLineWrapMode() const;
+        explicit Settings(
+            int                 _reloadIntervalMs,
+            bool                _autoReload,
+            bool                _lineWrap,
+            std::pair<int, int> _dialogSize
+        );
     };
 
 }   // namespace ui
