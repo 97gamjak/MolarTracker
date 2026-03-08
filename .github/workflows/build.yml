@@ -144,11 +144,11 @@ jobs:
               -I src
 
       # -------------------------
-      # Run clang-tidy (also using the compile_commands.json from the build)
+      # Run clangd-tidy (also using the compile_commands.json from the build)
       # -------------------------
-      # - name: Run clang-tidy
-      #   run: |
-          # find src/  -p=.build
+      - name: Run clangd-tidy
+        run: |
+          clangd-tidy $(find src/) -p=build
 
       # -------------------------
       # Package for Release assets (ONLY on tags)

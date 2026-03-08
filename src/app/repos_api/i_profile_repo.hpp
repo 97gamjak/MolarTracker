@@ -36,7 +36,7 @@ namespace app
          *
          * @return std::vector<Profile>
          */
-        virtual std::vector<Profile> getAll() const = 0;
+        [[nodiscard]] virtual std::vector<Profile> getAll() const = 0;
 
         /**
          * @brief Get a profile by its ID
@@ -45,7 +45,9 @@ namespace app
          * @return std::optional<Profile> The profile with the given ID, or
          * std::nullopt if no such profile exists
          */
-        virtual std::optional<Profile> get(ProfileId id) const = 0;
+        [[nodiscard]] virtual std::optional<Profile> get(
+            ProfileId id
+        ) const = 0;
 
         /**
          * @brief Get a profile by its name
@@ -54,7 +56,10 @@ namespace app
          * @return std::optional<Profile> The profile with the given name, or
          * std::nullopt if no such profile exists
          */
-        virtual std::optional<Profile> get(const std::string& name) const = 0;
+        [[nodiscard]] virtual std::optional<Profile> get(
+            const std::string& name
+        ) const = 0;
+
         /**
          * @brief Create a new profile with the given name and email, this will
          * return the ID of the newly created profile which can be used to
@@ -66,7 +71,7 @@ namespace app
          * @param email The email of the profile to create (optional)
          * @return ProfileId The ID of the newly created profile
          */
-        virtual ProfileId create(
+        [[nodiscard]] virtual ProfileId create(
             const std::string&         name,
             std::optional<std::string> email
         ) = 0;
