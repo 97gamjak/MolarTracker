@@ -1,6 +1,7 @@
 #ifndef __APP__REPOS__PROFILE_REPO_HPP__
 #define __APP__REPOS__PROFILE_REPO_HPP__
 
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -22,18 +23,18 @@ namespace app
     {
        private:
         /// reference to the database instance
-        db::Database& _db;
+        std::shared_ptr<db::Database> _db;
 
        public:
         explicit ProfileRepo(db::Database& db);
-        ProfileRepo(const ProfileRepo&)            = delete;
-        ProfileRepo& operator=(const ProfileRepo&) = delete;
 
         void ensureSchema() override;
 
-        std::vector<Profile>   getAll() const override;
-        std::optional<Profile> get(ProfileId id) const override;
-        std::optional<Profile> get(const std::string& name) const override;
+        [[nodiscard]] std::vector<Profile>   getAll() const override;
+        [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
+        [[nodiscard]] std::optional<Profile> get(
+            const std::string& name
+        ) const override;
 
         ProfileId create(
             const std::string&         name,

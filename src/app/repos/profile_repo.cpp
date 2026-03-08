@@ -21,7 +21,11 @@ namespace app
      *
      * @param db
      */
-    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} { _ensureSchema(); }
+    ProfileRepo::ProfileRepo(db::Database& db)
+        : _db{std::make_shared<db::Database>(db)}
+    {
+        _ensureSchema();
+    }
 
     /**
      * @brief Ensure the database schema for profiles exists
@@ -35,7 +39,7 @@ namespace app
      * ensureSchema() to not use virtual dispatch in constructor
      *
      */
-    void ProfileRepo::_ensureSchema() { orm::createTable<ProfileRow>(_db); }
+    void ProfileRepo::_ensureSchema() { orm::createTable<ProfileRow>(*_db); }
 
     /**
      * @brief Get all profiles from the database
@@ -44,7 +48,7 @@ namespace app
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return ProfileFactory::toDomains(orm::getAll<ProfileRow>(_db));
+        return ProfileFactory::toDomains(orm::getAll<ProfileRow>(*_db));
     }
 
     /**
@@ -55,7 +59,7 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
-        const auto profile = orm::getByPk<ProfileRow>(_db, id);
+        const auto profile = orm::getByPk<ProfileRow>(*_db, id);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -74,7 +78,7 @@ namespace app
         using name_field = decltype(ProfileRow::name);
 
         const auto profile = orm::getByUniqueField<ProfileRow, name_field>(
-            _db,
+            *_db,
             name_field{name}
         );
 
@@ -107,7 +111,7 @@ namespace app
     )
     {
         const auto profile = Profile{ProfileId::from(0), name, email};
-        const auto rowId   = orm::insert(_db, ProfileFactory::toRow(profile));
+        const auto rowId   = orm::insert(*_db, ProfileFactory::toRow(profile));
 
         if (rowId.has_value())
             return ProfileId::from(rowId.value());
@@ -148,7 +152,7 @@ namespace app
         Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
         const auto result =
-            orm::update(_db, ProfileFactory::toRow(updatedProfile));
+            orm::update(*_db, ProfileFactory::toRow(updatedProfile));
 
         if (!result)
         {
@@ -170,7 +174,7 @@ namespace app
      */
     void ProfileRepo::remove(ProfileId id)
     {
-        orm::deleteByPk<ProfileRow>(_db, id);
+        orm::deleteByPk<ProfileRow>(*_db, id);
     }
 
 }   // namespace app
