@@ -16,6 +16,7 @@ struct RingFileConfig
     /// Default maximum size of each file in megabytes
     static constexpr int DefaultMaxSizeMB = 50;
 
+    /// Conversion factor from megabytes to bytes
     static constexpr int MBtoBytes = 1024 * 1024;
 
     /// The directory where the log files will be stored
