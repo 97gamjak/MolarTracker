@@ -7,6 +7,7 @@ target_link_libraries(tests_utils
   PRIVATE
     molartracker_utils
     GTest::gtest_main
+    json
 )
 
 include(GoogleTest)
