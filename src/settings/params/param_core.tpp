@@ -288,6 +288,10 @@ namespace settings
         param._value = jsonData.at(Schema::VALUE_KEY).get<std::optional<T>>();
         param._defaultValue =
             jsonData.at(Schema::DEFAULT_KEY).get<std::optional<T>>();
+
+        // NOTE: loading from a json file always means baseline is reset to the
+        // value
+        param._baseLine = param._value;
     }
 
     /**

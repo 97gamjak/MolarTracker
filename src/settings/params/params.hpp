@@ -9,8 +9,9 @@
 #include "param_utils.hpp"             // IWYU pragma: export
 
 // Type-specific params
-#include "enum_param.hpp"      // IWYU pragma: export
-#include "numeric_param.hpp"   // IWYU pragma: export
+#include "enum_param.hpp"          // IWYU pragma: export
+#include "numeric_param.hpp"       // IWYU pragma: export
+#include "numeric_vec_param.hpp"   // IWYU pragma: export
 
 // Standard type params
 #include "bool_param.hpp"      // IWYU pragma: export

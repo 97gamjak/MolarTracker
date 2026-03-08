@@ -63,7 +63,6 @@ namespace settings
         std::optional<size_t> _precision;
 
        public:
-        NumericParam(std::string key, std::string title);
         NumericParam(
             std::string key,
             std::string title,

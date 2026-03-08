@@ -22,6 +22,11 @@ namespace settings
         _autoReload.setDefault(Schema::AUTO_RELOAD_DEFAULT);
 
         _lineWrap.setDefault(Schema::LINE_WRAP_DEFAULT);
+
+        _dialogSize.setDefaults(
+            {Schema::DIALOG_SIZE_DEFAULT.first,
+             Schema::DIALOG_SIZE_DEFAULT.second}
+        );
     }
 
     /**

@@ -29,6 +29,15 @@ namespace settings
         static constexpr const char* LOG_VIEWER_SETTINGS_DESC =
             "Settings related to the log viewer component.";
 
+        static constexpr const char* DIALOG_SIZE_KEY   = "dialogSize";
+        static constexpr const char* DIALOG_SIZE_TITLE = "Dialog Size";
+        static constexpr const char* DIALOG_SIZE_DESC =
+            "The size of the log viewer dialog in pixels, represented as a "
+            "tuple of (width, height). For example, (800, 600) would represent "
+            "a "
+            "dialog that is 800 pixels wide and 600 pixels tall.";
+        static constexpr std::pair<int, int> DIALOG_SIZE_DEFAULT = {800, 600};
+
         /*******************
          * Reload Interval *
          *******************/
@@ -123,6 +132,12 @@ namespace settings
             Schema::LINE_WRAP_KEY,
             Schema::LINE_WRAP_TITLE,
             Schema::LINE_WRAP_DESC
+        };
+
+        Numeric2DParam<int> _dialogSize{
+            Schema::DIALOG_SIZE_KEY,
+            Schema::DIALOG_SIZE_TITLE,
+            Schema::DIALOG_SIZE_DESC
         };
 
        public:

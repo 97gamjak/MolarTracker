@@ -18,6 +18,7 @@ namespace settings
         std::forward<Func>(func)(_reloadIntervalSec);
         std::forward<Func>(func)(_autoReload);
         std::forward<Func>(func)(_lineWrap);
+        std::forward<Func>(func)(_dialogSize);
     }
 
     /**
@@ -33,6 +34,7 @@ namespace settings
         std::forward<Func>(func)(_reloadIntervalSec);
         std::forward<Func>(func)(_autoReload);
         std::forward<Func>(func)(_lineWrap);
+        std::forward<Func>(func)(_dialogSize);
     }
 
 }   // namespace settings
