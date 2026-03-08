@@ -16,7 +16,6 @@ target_link_libraries(molartracker_utils
         Qt6::Core
         Qt6::Widgets
         json
-        molartracker_logging
 )
 
 set_property(TARGET molartracker_utils APPEND PROPERTY
