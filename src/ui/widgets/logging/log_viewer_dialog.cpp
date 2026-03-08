@@ -177,10 +177,10 @@ namespace ui
     /**
      * @brief Construct a new Log Viewer Dialog:: Settings:: Settings object
      *
-     * @param reloadIntervalMs
-     * @param autoReload
-     * @param lineWrap
-     * @param dialogSize
+     * @param _reloadIntervalMs
+     * @param _autoReload
+     * @param _lineWrap
+     * @param _dialogSize
      */
     LogViewerDialog::Settings::Settings(
         int                 _reloadIntervalMs,

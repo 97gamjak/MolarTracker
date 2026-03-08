@@ -2,6 +2,36 @@ qt_add_executable(MolarTracker
     main.cpp
 )
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnull-dereference")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wdouble-promotion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuseless-cast")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wduplicated-cond")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wduplicated-branches")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmisleading-indentation")
+
+    # lifetime / safety
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmaybe-uninitialized")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winit-self")
+
+    # switch needs to check all enum values
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
+endif()
+
 add_library(json INTERFACE)
 
 target_include_directories(json
@@ -93,40 +123,3 @@ set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
     ${CMAKE_BINARY_DIR}/bin
 )
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(MolarTracker PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Werror
-
-        # correctness
-        -Wshadow
-        -Wconversion
-        -Wsign-conversion
-        -Wcast-align
-        -Wformat=2
-        -Wnull-dereference
-        -Wdouble-promotion
-        -Wimplicit-fallthrough
-        -Woverloaded-virtual
-        -Wnon-virtual-dtor
-        -Wold-style-cast
-        -Wuseless-cast
-        -Wduplicated-cond
-        -Wduplicated-branches
-        -Wlogical-op
-        -Wmisleading-indentation
-
-        # lifetime / safety
-        -Wuninitialized
-        -Wmaybe-uninitialized
-        -Winit-self
-
-        # switch needs to check all enum values
-        -Wswitch-enum
-
-        -Wno-error=deprecated-declarations
-    )
-endif()

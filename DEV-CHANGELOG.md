@@ -23,6 +23,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Introduce bit-wise `FieldConstraints`
 - Add `foreign_key_t` constraint
 
+### Bugfix
+
+- Make GNU compiler flags to be actually applied
+
 ### Testing
 
 - Add test cases for `binder` struct

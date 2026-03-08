@@ -28,8 +28,8 @@ namespace ui
             // there
             if (isDirty)
             {
-                if (auto* mainWindow = static_cast<ui::MainWindow*>(user))
-                    mainWindow->setWindowTitle(isDirty);
+                if (auto* _mainWindow = static_cast<ui::MainWindow*>(user))
+                    _mainWindow->setWindowTitle(isDirty);
             }
         };
 

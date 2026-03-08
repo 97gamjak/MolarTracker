@@ -83,11 +83,11 @@ namespace logging
         const LogCategoryId& categoryId
     ) const
     {
-        if (categoryId == InvalidLogCategoryId ||
-            categoryId >= _categories.size())
+        if (isInvalid(categoryId) ||
+            categoryId >= static_cast<LogCategoryId>(_categories.size()))
             return std::nullopt;
 
-        const auto& category = _categories[categoryId];
+        const auto& category = _categories[static_cast<size_t>(categoryId)];
 
         if (category.getId() != categoryId ||
             _categoryNameToIdMap.find(category.getName())->second != categoryId)
@@ -113,10 +113,10 @@ namespace logging
     {
         const auto id = findLogCategory(categoryName);
 
-        if (id == InvalidLogCategoryId)
+        if (isInvalid(id))
             return std::nullopt;
 
-        return _categories[id];
+        return _categories[static_cast<size_t>(id)];
     }
 
     /**
@@ -129,18 +129,21 @@ namespace logging
         const LogCategoryId& parentId
     ) const
     {
-        if (parentId == InvalidLogCategoryId || parentId >= _categories.size())
+        if (isInvalid(parentId) ||
+            parentId >= static_cast<LogCategoryId>(_categories.size()))
             return {};
 
         // sort children by name to ensure consistent order
-        auto children = _categories[parentId].getChildren();
+        auto children =
+            _categories[static_cast<size_t>(parentId)].getChildren();
 
         std::ranges::sort(
             children,
             [this](const LogCategoryId& catA, const LogCategoryId& catB)
             {
-                const auto& categoryA = _categories[catA];
-                const auto& categoryB = _categories[catB];
+                assert(!isInvalid(catA) && !isInvalid(catB));
+                const auto& categoryA = _categories[static_cast<size_t>(catA)];
+                const auto& categoryB = _categories[static_cast<size_t>(catB)];
                 return categoryA.getName() < categoryB.getName();
             }
         );
@@ -188,10 +191,10 @@ namespace logging
     {
         const auto id = findLogCategory(categoryName);
 
-        if (id == InvalidLogCategoryId)
+        if (isInvalid(id))
             return;
 
-        _categories[id].setLogLevel(logLevel);
+        _categories[static_cast<size_t>(id)].setLogLevel(logLevel);
     }
 
     /**
@@ -311,8 +314,10 @@ namespace logging
             .emplace_back(newId, parentCategoryId, segment, fullName, logLevel);
         _categoryNameToIdMap[fullName] = newId;
 
-        if (parentCategoryId != InvalidLogCategoryId)
-            _categories[parentCategoryId].addSubCategory(newId);
+        if (!isInvalid(parentCategoryId))
+            _categories[static_cast<size_t>(parentCategoryId)].addSubCategory(
+                newId
+            );
 
         return newId;
     }

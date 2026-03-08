@@ -11,6 +11,7 @@ namespace logging
     using LogCategoryId                                 = std::int64_t;
     inline constexpr LogCategoryId InvalidLogCategoryId = -1;
     inline constexpr LogCategoryId RootLogCategoryId    = 0;
+    bool                           isInvalid(LogCategoryId id);
 
     /**
      * @brief Class representing a single log category in the logging system,
