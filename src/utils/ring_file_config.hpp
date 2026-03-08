@@ -10,8 +10,14 @@
  */
 struct RingFileConfig
 {
+    /// Default maximum number of files to keep in the ring
+    static constexpr int DefaultMaxFiles = 10;
+
+    /// Default maximum size of each file in megabytes
+    static constexpr int DefaultMaxSizeMB = 50;
+
     /// The directory where the log files will be stored
-    std::filesystem::path directory{};
+    std::filesystem::path directory;
 
     /// The base name for the log files, e.g. if baseName is "log", the
     /// files will be named "log_0.txt", "log_1.txt", etc.
@@ -22,11 +28,11 @@ struct RingFileConfig
 
     /// The maximum number of files to keep in the ring, when this number is
     /// exceeded, the oldest file will be deleted
-    std::size_t maxFiles{10};
+    std::size_t maxFiles{DefaultMaxFiles};
 
     /// The maximum size of each file in megabytes, when this size is
     /// exceeded, a new file will be created
-    std::uintmax_t maxSizeMB{50};
+    std::uintmax_t maxSizeMB{DefaultMaxSizeMB};
 
     /// Whether to append to existing files or overwrite them when opening
     bool append{true};

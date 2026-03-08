@@ -19,9 +19,9 @@ TimePoint Timestamp::now()
 {
     const auto now = Clock::now();
 
-    const auto* tz = current_zone();
+    const auto* timeZone = current_zone();
 
-    zoned_time local_time{tz, now};
+    zoned_time local_time{timeZone, now};
 
     return local_time.get_local_time();
 }
