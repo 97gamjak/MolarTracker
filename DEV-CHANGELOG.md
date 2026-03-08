@@ -6,6 +6,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Features
 
+#### Settings
+
+- Add first implementation approach for `ParamGroup` via `NumericVecParam`
+
 #### Finance
 
 - Add `Currency` enum and `CurrencyTraits` for handling different current

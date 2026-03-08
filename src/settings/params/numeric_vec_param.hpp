@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "connections/observable.hpp"
 #include "numeric_param.hpp"
 
 namespace settings
@@ -24,9 +25,10 @@ namespace settings
      * @tparam N The size of the vector, this should be a positive integer
      */
     template <typename T, std::size_t N>
-    class NumericVecParam
+    class NumericVecParam : public Observable<OnDirtyChanged>
     {
        private:
+        using Base   = Observable<OnDirtyChanged>;
         using Schema = NumericVecParamSchema;
 
        private:
@@ -54,11 +56,17 @@ namespace settings
         [[nodiscard]] nlohmann::json toJson() const;
 
         [[nodiscard]] std::string getKey() const;
+
+        Connection subscribeToDirty(OnDirtyChanged::func func, void* user);
     };
 
     template <typename T>
     using Numeric2DParam = NumericVecParam<T, 2>;
 
 }   // namespace settings
+
+#ifndef __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
+#include "numeric_vec_param.tpp"
+#endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
 
 #endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__

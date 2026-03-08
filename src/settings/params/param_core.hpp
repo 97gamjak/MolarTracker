@@ -76,7 +76,6 @@ namespace settings
                           ParamOptionalChanged<T>>
     {
        private:
-        /// Type alias for the base class
         using Base = Observable<
             OnDirtyChanged,
             ParamValueChanged<T>,

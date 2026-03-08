@@ -162,6 +162,38 @@ namespace settings
         return _key;
     }
 
+    /**
+     * @brief Subscribe to changes in the dirty state of the numeric vector
+     * parameter, the provided callback function will be called whenever the
+     * dirty state changes, the user pointer can be used to pass additional
+     * data to the callback function, the returned Connection object can be
+     * used to unsubscribe from changes
+     *
+     * @tparam T
+     * @tparam N
+     * @param func The callback function to call when the dirty state changes,
+     * it should have the signature void(void* user, bool isDirty)
+     * @param user A user-defined pointer that will be passed to the callback
+     * function when it is called, this can be used to provide additional
+     * context for the callback function
+     * @return Connection An object representing the subscription, this can be
+     * used to unsubscribe from changes by calling disconnect() on it or by
+     * letting it go out of scope
+     */
+    template <typename T, std::size_t N>
+    Connection NumericVecParam<T, N>::subscribeToDirty(
+        OnDirtyChanged::func func,
+        void*                user
+    )
+    {
+        // subscribe to all individual numeric parameters in the vector, when
+        // any of them changes, we will emit a dirty change for the whole vector
+        // parameter
+        std::vector<Connection> connections;
+        for (auto& param : _params)
+            connections.push_back(param.subscribeToDirty(func, user));
+    }
+
 }   // namespace settings
 
 #endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
