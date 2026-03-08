@@ -108,7 +108,7 @@ namespace logging
         if (!categoryOpt.has_value())
             return false;
 
-        return level >= categoryOpt->getLogLevel();
+        return level <= categoryOpt->getLogLevel();
     }
 
     /**
