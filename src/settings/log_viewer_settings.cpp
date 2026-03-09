@@ -46,11 +46,12 @@ namespace settings
      */
     int LogViewerSettings::getReloadIntervalMs() const
     {
+        // ensure that the precision is 3 decimal places for correct
+        // conversion to milliseconds
         assert(
             _reloadIntervalSec.getPrecision().has_value() &&
             _reloadIntervalSec.getPrecision().value() == 3
-        );   // ensure that the precision is 3 decimal places for correct
-             // conversion to milliseconds
+        );
 
         return static_cast<int>(getReloadIntervalSec() * 1000);
     }

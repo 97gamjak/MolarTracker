@@ -21,14 +21,13 @@ namespace logging
         const LogLevel&              defaultLogLevel
     )
     {
-        assert(_addLogCategory("", defaultLogLevel) != InvalidLogCategoryId);
+        const auto id = _addLogCategory("", defaultLogLevel);
+        assert(id == RootLogCategoryId);
 
         for (const auto& categoryName : categoryNames)
         {
-            assert(
-                _addLogCategory(categoryName, defaultLogLevel) !=
-                InvalidLogCategoryId
-            );
+            const auto _id = _addLogCategory(categoryName, defaultLogLevel);
+            assert(_id != InvalidLogCategoryId);
         }
     }
 
