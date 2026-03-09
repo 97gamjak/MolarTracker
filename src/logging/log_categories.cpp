@@ -21,12 +21,14 @@ namespace logging
         const LogLevel&              defaultLogLevel
     )
     {
-        const auto id = _addLogCategory("", defaultLogLevel);
+        [[maybe_unused]] const auto id = _addLogCategory("", defaultLogLevel);
         assert(id == RootLogCategoryId);
 
         for (const auto& categoryName : categoryNames)
         {
-            const auto _id = _addLogCategory(categoryName, defaultLogLevel);
+            [[maybe_unused]] const auto _id =
+                _addLogCategory(categoryName, defaultLogLevel);
+
             assert(_id != InvalidLogCategoryId);
         }
     }
