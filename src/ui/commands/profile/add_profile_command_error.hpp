@@ -44,18 +44,19 @@ namespace ui
         /// The error message describing the error that occurred when adding a
         /// profile
         std::string _message;
+
         /// The error code representing the type of error that occurred when
         /// adding a profile
         AddProfileCommandErrorCode _code;
 
        public:
         AddProfileCommandError(
-            const std::string&         message,
+            std::string                message,
             AddProfileCommandErrorCode code
         );
 
-        std::string                              getMessage() const override;
-        std::string                              getCodeStr() const override;
+        [[nodiscard]] std::string                getMessage() const override;
+        [[nodiscard]] std::string                getCodeStr() const override;
         [[nodiscard]] AddProfileCommandErrorCode getCode() const;
     };
 

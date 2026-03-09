@@ -11,10 +11,10 @@ namespace ui
      * @param code
      */
     AddProfileCommandError::AddProfileCommandError(
-        const std::string&         message,
+        std::string                message,
         AddProfileCommandErrorCode code
     )
-        : _message{message}, _code{code}
+        : _message{std::move(message)}, _code{code}
     {
     }
 
