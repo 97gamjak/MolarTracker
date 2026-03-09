@@ -4,8 +4,6 @@
 #include <QDialog>
 
 #include "debug_slots_model.hpp"
-#include "logging/log_category.hpp"
-#include "logging/log_manager.hpp"
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration

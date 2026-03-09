@@ -88,6 +88,7 @@ namespace ui
         header->setSectionResizeMode(QHeaderView::Stretch);
         _tree->setAlternatingRowColors(true);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _model = new LogCategoryModel(_currentCategories, _tree);
         _tree->setModel(_model);
 
@@ -96,6 +97,7 @@ namespace ui
             new DebugSlotsLogLevelDelegate(this)
         );
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* applyToChildrenDelegate =
             new DebugSlotsApplyToChildrenDelegate(this);
         _tree->setItemDelegateForColumn(

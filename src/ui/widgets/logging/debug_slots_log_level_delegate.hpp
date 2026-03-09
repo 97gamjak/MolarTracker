@@ -84,9 +84,9 @@ namespace ui
         void applyToChildrenRequested(const QModelIndex& index) const;
 
        private:
-        [[nodiscard]] QRect _getButtonRect(
+        [[nodiscard]] static QRect _getButtonRect(
             const QStyleOptionViewItem& option
-        ) const;
+        );
     };
 
 }   // namespace ui
