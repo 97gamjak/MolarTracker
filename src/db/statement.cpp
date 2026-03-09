@@ -261,6 +261,7 @@ namespace db
             return {};
 
         return std::string{
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
             reinterpret_cast<char const*>(bytes),
             static_cast<std::size_t>(byteCount)
         };
@@ -327,6 +328,7 @@ namespace db
      *
      * @param other The other Statement object to move from
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Statement::_moveFrom(Statement&& other)
     {
         _db           = other._db;

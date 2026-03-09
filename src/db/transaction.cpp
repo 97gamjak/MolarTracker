@@ -1,6 +1,7 @@
 #include "transaction.hpp"
 
 #include "database.hpp"
+#include "db_exception.hpp"
 
 namespace db
 {
@@ -40,8 +41,11 @@ namespace db
             {
                 rollback();
             }
-            catch (...)
+            catch (const std::exception& e)
             {
+                throw SqliteError(
+                    std::string("Failed to rollback transaction: ") + e.what()
+                );
             }
         }
     }
@@ -115,6 +119,7 @@ namespace db
      *
      * @param other
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Transaction::_moveFrom(Transaction&& other)
     {
         _db       = other._db;

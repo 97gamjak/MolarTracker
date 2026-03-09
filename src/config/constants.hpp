@@ -37,6 +37,9 @@ class ConstantsSchema
     /// The Git tag of the application, this is set during build time using
     /// CMake.
     static constexpr const char* _gitTag = MOLARTRACKER_GIT_TAG;
+
+    /// The busy timeout for the database in milliseconds
+    static constexpr int _dbBusyTimeoutMs = 5000;
 };
 
 /**
@@ -67,6 +70,8 @@ class Constants
 
     [[nodiscard]] static std::string getVersion();
     [[nodiscard]] static std::string getGitTag();
+
+    [[nodiscard]] static int getDbBusyTimeoutMs();
 
    private:
     Constants();

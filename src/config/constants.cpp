@@ -136,3 +136,15 @@ std::string Constants::getVersion() { return ConstantsSchema::_version; }
  * @return const std::string
  */
 std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }
+
+/**
+ * @brief Get the database busy timeout in milliseconds, this is the amount of
+ * time the application will wait for the database to become available when it
+ * is locked by another process before throwing an error
+ *
+ * @return std::size_t
+ */
+std::size_t Constants::getDbBusyTimeoutMs()
+{
+    return ConstantsSchema::_dbBusyTimeoutMs;
+}
