@@ -76,13 +76,17 @@ namespace ui
         /// of (width, height)
         std::pair<int, int> dialogSize;
 
+        /// The maximum number of blocks in the log viewer
+        int maxBlockCount;
+
        public:
         Settings() = delete;
         explicit Settings(
             int                 _reloadIntervalMs,
             bool                _autoReload,
             bool                _lineWrap,
-            std::pair<int, int> _dialogSize
+            std::pair<int, int> _dialogSize,
+            int                 _maxBlockCount
         );
     };
 

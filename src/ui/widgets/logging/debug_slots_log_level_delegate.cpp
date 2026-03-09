@@ -63,6 +63,7 @@ namespace ui
         const auto levelText = index.data(Qt::DisplayRole).toString();
         const auto idx       = _logLevelNames.indexOf(levelText);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
         auto* combo = static_cast<QComboBox*>(editor);
 
         if (idx >= 0)
@@ -84,6 +85,7 @@ namespace ui
         const QModelIndex&  index
     ) const
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
         auto* combo = static_cast<QComboBox*>(editor);
 
         const auto levelText = combo->currentText();
@@ -146,7 +148,7 @@ namespace ui
         button.text   = "Apply to children";
         button.state |= QStyle::State_Enabled;
 
-        if (option.state & QStyle::State_MouseOver)
+        if ((option.state & QStyle::State_MouseOver) != 0)
             button.state |= QStyle::State_MouseOver;
 
         QApplication::style()
@@ -199,6 +201,7 @@ namespace ui
 
         if (event->type() == QEvent::MouseButtonRelease)
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
             auto* mouseEvent = static_cast<QMouseEvent*>(event);
             auto  buttonRect = _getButtonRect(option);
 
@@ -223,7 +226,7 @@ namespace ui
      */
     QRect DebugSlotsApplyToChildrenDelegate::_getButtonRect(
         const QStyleOptionViewItem& option
-    ) const
+    )
     {
         auto buttonRect = option.rect;
         return buttonRect;

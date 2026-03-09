@@ -29,7 +29,6 @@ namespace ui
     {
         setWindowTitle(title);
         setModal(true);
-        setMinimumWidth(600);
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout(this);

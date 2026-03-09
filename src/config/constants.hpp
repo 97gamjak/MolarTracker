@@ -37,6 +37,33 @@ class ConstantsSchema
     /// The Git tag of the application, this is set during build time using
     /// CMake.
     static constexpr const char* _gitTag = MOLARTRACKER_GIT_TAG;
+
+    /// The busy timeout for the database in milliseconds
+    static constexpr int _dbBusyTimeoutMs = 5000;
+
+    /// The name of the settings file
+    static constexpr const char* _settingsFileName = "settings.json";
+
+    // TODO(97gamjak): move this to a specialized quantity approach
+    // as soon as it is implemented in mstd
+    /// The multiplier to convert seconds to milliseconds
+    static constexpr const int _secondsToMs = 1000;
+
+    /// The global minimum dialog size for all dialogs in the application, this
+    /// is used to ensure that all dialogs have a reasonable minimum size and
+    /// are not too small to be usable
+    static constexpr const std::pair<int, int> _globalMinDialogSize = {40, 30};
+
+    /// The margins for the core content of dialogs in the application, this is
+    /// used to ensure that there is consistent spacing between the edges of the
+    /// dialog and the content, this is represented as a tuple of (left, top,
+    /// right, bottom) margins in pixels
+    static constexpr const std::tuple<int, int, int, int> _coreWindowMargins =
+        {8, 8, 8, 8};
+
+    /// Main window default size, this is used as the default size for the main
+    /// window when it is first created
+    static constexpr const std::pair<int, int> _mainWindowSize = {4000, 3000};
 };
 
 /**
@@ -67,6 +94,18 @@ class Constants
 
     [[nodiscard]] static std::string getVersion();
     [[nodiscard]] static std::string getGitTag();
+
+    [[nodiscard]] static int getDbBusyTimeoutMs();
+
+    // TODO(97gamjak): move this to a specialized quantity approach
+    // as soon as it is implemented in mstd
+    [[nodiscard]] static int getSecondsToMs();
+
+    [[nodiscard]] static std::string getSettingsFileName();
+
+    [[nodiscard]] static std::pair<int, int> getGlobalMinDialogSize();
+    [[nodiscard]] static std::pair<int, int> getMainWindowSize();
+    [[nodiscard]] static std::tuple<int, int, int, int> getCoreWindowMargins();
 
    private:
     Constants();

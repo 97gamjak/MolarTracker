@@ -40,7 +40,7 @@ namespace ui
         _textEdit->setReadOnly(true);
 
         _textEdit->setLineWrapMode(_settings->lineWrap);
-        _textEdit->setMaximumBlockCount(50000);
+        _textEdit->setMaximumBlockCount(_settings->maxBlockCount);
 
         _autoReloadCheckBox->setChecked(_settings->autoReload);
         _reloadTimer->setInterval(_settings->reloadIntervalMs);
@@ -181,19 +181,22 @@ namespace ui
      * @param _autoReload
      * @param _lineWrap
      * @param _dialogSize
+     * @param _maxBlockCount
      */
     LogViewerDialog::Settings::Settings(
         int                 _reloadIntervalMs,
         bool                _autoReload,
         bool                _lineWrap,
-        std::pair<int, int> _dialogSize
+        std::pair<int, int> _dialogSize,
+        int                 _maxBlockCount
     )
         : reloadIntervalMs(_reloadIntervalMs),
           autoReload(_autoReload),
           lineWrap(
               _lineWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap
           ),
-          dialogSize(_dialogSize)
+          dialogSize(_dialogSize),
+          maxBlockCount(_maxBlockCount)
     {
     }
 

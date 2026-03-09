@@ -14,4 +14,5 @@ target_link_libraries(molartracker_settings_params
     molartracker_connections
     PUBLIC
     json
+    mstd
 )

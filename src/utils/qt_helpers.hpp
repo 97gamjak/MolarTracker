@@ -10,7 +10,7 @@ class QWidget;   // Forward declaration
 
 namespace utils
 {
-    QStringList toQStringList(const std::span<const std::string_view> vec);
+    QStringList toQStringList(const std::span<const std::string_view>& vec);
 
     void moveDialogToParentScreenCenter(QDialog* dlg, QWidget* parent);
 

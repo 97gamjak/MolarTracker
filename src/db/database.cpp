@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include "config/constants.hpp"
 #include "db_exception.hpp"
 #include "logging/log_macros.hpp"
 #include "statement.hpp"
@@ -68,6 +69,7 @@ namespace db
      *
      * @param other
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Database::_moveFrom(Database&& other)
     {
         _db     = std::exchange(other._db, nullptr);
@@ -117,7 +119,7 @@ namespace db
         _dbPath = dbPath;
 
         enableForeignKeys(true);
-        setBusyTimeout(5000);
+        setBusyTimeout(Constants::getDbBusyTimeoutMs());
     }
 
     /**

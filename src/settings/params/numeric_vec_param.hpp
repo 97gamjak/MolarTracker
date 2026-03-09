@@ -67,6 +67,11 @@ namespace settings
         );
 
         void setDefaults(const std::vector<T>& defaultValues);
+        void setDefaults(const std::pair<T, T>& defaultValues)
+        requires(N == 2);
+        void setMinValues(const std::vector<T>& minValues);
+        void setMinValues(const std::pair<T, T>& minValues)
+        requires(N == 2);
 
         void commit();
 

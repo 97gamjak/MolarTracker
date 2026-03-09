@@ -19,6 +19,7 @@ namespace settings
         std::forward<Func>(func)(_autoReload);
         std::forward<Func>(func)(_lineWrap);
         std::forward<Func>(func)(_dialogSize);
+        std::forward<Func>(func)(_maxBlockCount);
     }
 
     /**
@@ -35,6 +36,7 @@ namespace settings
         std::forward<Func>(func)(_autoReload);
         std::forward<Func>(func)(_lineWrap);
         std::forward<Func>(func)(_dialogSize);
+        std::forward<Func>(func)(_maxBlockCount);
     }
 
 }   // namespace settings

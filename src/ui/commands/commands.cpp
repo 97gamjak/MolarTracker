@@ -65,11 +65,12 @@ namespace ui
         if (result)
             return *this << std::move(result).value();
 
-        // TODO: maybe throw an exception here, as this indicates a logic error
-        // in the code where the command was created, and silently ignoring it
-        // might lead to unexpected behavior. This should be investigated
-        // further to determine the best way to handle this case, and whether it
-        // should be considered a fatal error or if it can be safely ignored.
+        // TODO(97gamjak): maybe throw an exception here, as this indicates a
+        // logic error in the code where the command was created, and silently
+        // ignoring it might lead to unexpected behavior. This should be
+        // investigated further to determine the best way to handle this case,
+        // and whether it should be considered a fatal error or if it can be
+        // safely ignored.
         return *this;
     }
 
@@ -100,6 +101,7 @@ namespace ui
      * commands added to it, or this Commands object unchanged if the given
      * Commands object is empty.
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     Commands& Commands::operator<<(Commands&& commands)
     {
         if (commands.empty())

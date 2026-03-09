@@ -10,21 +10,27 @@ namespace app
      *
      * @param db
      */
-    RepoContainer::RepoContainer(db::Database& db) : _profileRepo{db} {}
+    RepoContainer::RepoContainer(const std::shared_ptr<db::Database>& db)
+        : _profileRepo{std::make_shared<ProfileRepo>(db)}
+    {
+    }
 
     /**
      * @brief Get the Profile Repo
      *
-     * @return IProfileRepo&
+     * @return std::shared_ptr<IProfileRepo>
      */
-    IProfileRepo& RepoContainer::getProfileRepo() { return _profileRepo; }
+    std::shared_ptr<IProfileRepo> RepoContainer::getProfileRepo()
+    {
+        return _profileRepo;
+    }
 
     /**
      * @brief Get the Profile Repo (const version)
      *
-     * @return const IProfileRepo&
+     * @return std::shared_ptr<const IProfileRepo>
      */
-    const IProfileRepo& RepoContainer::getProfileRepo() const
+    std::shared_ptr<const IProfileRepo> RepoContainer::getProfileRepo() const
     {
         return _profileRepo;
     }

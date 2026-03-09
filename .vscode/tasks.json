@@ -46,8 +46,8 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "-lc",
-                "set -euo pipefail; find \"${workspaceFolder}/src\" -type f -name '*.cpp' -print0 | xargs -0 clang-tidy --config-file=\"${workspaceFolder}/.clang-tidy\" -checks='*' --warnings-as-errors='*' --header-filter=\"^${workspaceFolder}/(src|include)/\" -p \"${workspaceFolder}/.build\""
+                "-c",
+                "clangd-tidy $(find src/) -j12 -p=.build --tqdm"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

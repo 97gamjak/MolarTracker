@@ -21,7 +21,10 @@ namespace app
      *
      * @param db
      */
-    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} { _ensureSchema(); }
+    ProfileRepo::ProfileRepo(const std::shared_ptr<db::Database>& db) : _db{db}
+    {
+        _ensureSchema();
+    }
 
     /**
      * @brief Ensure the database schema for profiles exists
@@ -35,7 +38,10 @@ namespace app
      * ensureSchema() to not use virtual dispatch in constructor
      *
      */
-    void ProfileRepo::_ensureSchema() { orm::createTable<ProfileRow>(_db); }
+    void ProfileRepo::_ensureSchema() const
+    {
+        orm::createTable<ProfileRow>(_db);
+    }
 
     /**
      * @brief Get all profiles from the database

@@ -14,11 +14,16 @@ namespace logging
      */
     class LogEntryScope
     {
-       protected:
+       private:
         /// The LogObject associated with this scope
         LogObject _logObject;
         /// Flag indicating whether the scope is enabled
         bool _enabled;
+
+       protected:
+        [[nodiscard]] LogObject getLogObject() const;
+
+        [[nodiscard]] bool isEnabled() const;
 
        public:
         explicit LogEntryScope(const LogObject& logObject);

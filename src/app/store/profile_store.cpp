@@ -46,7 +46,7 @@ namespace app
      */
     bool ProfileStore::hasProfiles() const
     {
-        auto isNotDeleted = [this](const auto& pair)
+        auto isNotDeleted = [](const auto& pair)
         { return pair.second != StoreState::Deleted; };
 
         return std::ranges::any_of(_profileStates, isNotDeleted);

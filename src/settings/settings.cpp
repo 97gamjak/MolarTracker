@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 
+#include "config/constants.hpp"
 #include "params/params.hpp"
 
 namespace settings
@@ -16,7 +17,7 @@ namespace settings
      */
     Settings::Settings(const std::filesystem::path& configDir)
         : _core{SettingsSchema::SETTINGS_KEY, SettingsSchema::SETTINGS_TITLE, SettingsSchema::SETTINGS_DESC},
-          _settingsPath{absolute(configDir / _settingsFileName)}
+          _settingsPath{absolute(configDir / Constants::getSettingsFileName())}
     {
         _fromJson();
     }

@@ -8,7 +8,7 @@
 // https://97gamjak.atlassian.net/browse/MSTD-89
 // https://97gamjak.atlassian.net/browse/MOLTRACK-94
 
-// TODO: implement this with timezone support
+// TODO(97gamjak): implement this with timezone support
 // https://97gamjak.atlassian.net/browse/MOLTRACK-95
 
 /**

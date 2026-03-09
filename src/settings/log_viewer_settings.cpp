@@ -1,5 +1,6 @@
 #include "log_viewer_settings.hpp"
 
+#include "config/constants.hpp"
 #include "params/params.hpp"
 
 namespace settings
@@ -9,11 +10,6 @@ namespace settings
      *
      */
     LogViewerSettings::LogViewerSettings()
-        : _core(
-              Schema::LOG_VIEWER_SETTINGS_KEY,
-              Schema::LOG_VIEWER_SETTINGS_TITLE,
-              Schema::LOG_VIEWER_SETTINGS_DESC
-          )
     {
         _reloadIntervalSec.setDefault(Schema::RELOAD_INTERVAL_SEC_DEFAULT);
         _reloadIntervalSec.setMinValue(Schema::RELOAD_INTERVAL_SEC_MIN);
@@ -23,10 +19,11 @@ namespace settings
 
         _lineWrap.setDefault(Schema::LINE_WRAP_DEFAULT);
 
-        _dialogSize.setDefaults(
-            {Schema::DIALOG_SIZE_DEFAULT.first,
-             Schema::DIALOG_SIZE_DEFAULT.second}
-        );
+        _dialogSize.setDefaults(Schema::DIALOG_SIZE_DEFAULT);
+        _dialogSize.setMinValues(Constants::getGlobalMinDialogSize());
+
+        _maxBlockCount.setDefault(Schema::MAX_BLOCK_COUNT_DEFAULT);
+        _maxBlockCount.setMinValue(Schema::MAX_BLOCK_COUNT_MIN);
     }
 
     /**
@@ -46,13 +43,16 @@ namespace settings
      */
     int LogViewerSettings::getReloadIntervalMs() const
     {
+        // ensure that the precision is 3 decimal places for correct
+        // conversion to milliseconds
         assert(
             _reloadIntervalSec.getPrecision().has_value() &&
             _reloadIntervalSec.getPrecision().value() == 3
-        );   // ensure that the precision is 3 decimal places for correct
-             // conversion to milliseconds
+        );
 
-        return static_cast<int>(getReloadIntervalSec() * 1000);
+        return static_cast<int>(
+            getReloadIntervalSec() * Constants::getSecondsToMs()
+        );
     }
 
     /**
@@ -83,6 +83,16 @@ namespace settings
     std::pair<int, int> LogViewerSettings::getDialogSize() const
     {
         return {_dialogSize.x(), _dialogSize.y()};
+    }
+
+    /**
+     * @brief Get the maximum block count setting
+     *
+     * @return int
+     */
+    int LogViewerSettings::getMaxBlockCount() const
+    {
+        return _maxBlockCount.get();
     }
 
     /**

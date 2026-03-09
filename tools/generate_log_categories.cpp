@@ -32,11 +32,10 @@ int main(int argc, char** argv)
                 path.path().extension() != ".tpp")
                 continue;
 
-            std::ifstream in(path.path());
-            std::string   content(
-                (std::istreambuf_iterator<char>(in)),
-                std::istreambuf_iterator<char>()
-            );
+            std::ifstream      inBuffer(path.path());
+            std::ostringstream buffer;
+            buffer << inBuffer.rdbuf();
+            std::string content = buffer.str();
 
             std::smatch match;
             auto        begin = content.cbegin();

@@ -21,11 +21,11 @@ namespace ui
         /// A regular expression for allowed characters in names, this allows
         /// letters, numbers, underscores, hyphens, and periods. This can be
         /// adjusted as needed to allow or disallow certain characters in names.
-        inline static const QRegularExpression _allowedCharsRegex =
+        const QRegularExpression _allowedCharsRegex =
             QRegularExpression(R"(^[A-Za-z0-9_\-.]+$)");
 
        public:
-        explicit NameLineEdit(QWidget* parent = nullptr);
+        explicit NameLineEdit(QWidget* parent);
 
        protected:
         [[nodiscard]] QString _getRequiredErrorMessage() const override;

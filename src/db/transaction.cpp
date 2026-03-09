@@ -1,5 +1,7 @@
 #include "transaction.hpp"
 
+#include <iostream>
+
 #include "database.hpp"
 
 namespace db
@@ -40,8 +42,10 @@ namespace db
             {
                 rollback();
             }
-            catch (...)
+            catch (const std::exception& e)
             {
+                std::cerr << "Failed to rollback transaction in destructor: "
+                          << e.what() << "\n";
             }
         }
     }
@@ -115,6 +119,7 @@ namespace db
      *
      * @param other
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Transaction::_moveFrom(Transaction&& other)
     {
         _db       = other._db;

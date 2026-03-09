@@ -20,7 +20,7 @@ Constants& Constants::getInstance()
  */
 Constants::Constants()
 {
-    const auto& configDir = utils::config_dir(Constants::getDirPrefix());
+    const auto& configDir = utils::configDir(Constants::getDirPrefix());
 
     if (configDir)
         _configPath = std::filesystem::absolute(configDir.value());
@@ -31,7 +31,7 @@ Constants::Constants()
         throw DirException("Failed to resolve config directory");
     }
 
-    const auto& dataDir = utils::data_dir(Constants::getDirPrefix());
+    const auto& dataDir = utils::dataDir(Constants::getDirPrefix());
 
     if (dataDir)
         _dataPath = std::filesystem::absolute(dataDir.value());
@@ -136,3 +136,69 @@ std::string Constants::getVersion() { return ConstantsSchema::_version; }
  * @return const std::string
  */
 std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }
+
+/**
+ * @brief Get the database busy timeout in milliseconds, this is the amount of
+ * time the application will wait for the database to become available when it
+ * is locked by another process before throwing an error
+ *
+ * @return int
+ */
+int Constants::getDbBusyTimeoutMs()
+{
+    return ConstantsSchema::_dbBusyTimeoutMs;
+}
+
+/**
+ * @brief Get the multiplier to convert seconds to milliseconds, this is used
+ * for settings that are stored in seconds but need to be converted to
+ * milliseconds for use in the application (e.g. auto-reload interval)
+ *
+ * @return int
+ */
+int Constants::getSecondsToMs() { return ConstantsSchema::_secondsToMs; }
+
+/**
+ * @brief Get the name of the settings file
+ *
+ * @return const std::string
+ */
+std::string Constants::getSettingsFileName()
+{
+    return ConstantsSchema::_settingsFileName;
+}
+
+/**
+ * @brief Get the global minimum dialog size, this is used as a minimum size
+ * for all dialogs in the application to ensure they are not too small to be
+ * usable
+ *
+ * @return std::pair<int, int>
+ */
+std::pair<int, int> Constants::getGlobalMinDialogSize()
+{
+    return ConstantsSchema::_globalMinDialogSize;
+}
+
+/**
+ * @brief Get the main window default size, this is used as the default size
+ * for the main window when it is first created
+ *
+ * @return std::pair<int, int>
+ */
+std::pair<int, int> Constants::getMainWindowSize()
+{
+    return ConstantsSchema::_mainWindowSize;
+}
+
+/**
+ * @brief Get the core window margins, this is used as the default margins for
+ * the core content of dialogs in the application to ensure consistent spacing
+ * between the edges of the dialog and the content
+ *
+ * @return std::tuple<int, int, int, int>
+ */
+std::tuple<int, int, int, int> Constants::getCoreWindowMargins()
+{
+    return ConstantsSchema::_coreWindowMargins;
+}

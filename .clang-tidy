@@ -16,7 +16,8 @@ Checks:
   -llvmlibc-restrict-system-libc-headers,
   -modernize-use-trailing-return-type,
   -readability-redundant-access-specifiers,
-  -bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp
+  -bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,
+  -misc-include-cleaner, # to be removed!
   '
 WarningsAsErrors: ''
 HeaderFileExtensions:

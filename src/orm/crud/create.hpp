@@ -2,6 +2,7 @@
 #define __ORM__CRUD__CREATE_HPP__
 
 #include "crud_detail.hpp"
+#include "crud_error.hpp"
 #include "db/database.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
@@ -15,7 +16,7 @@ namespace orm
      * @param database
      */
     template <db_model Model>
-    void createTable(db::Database& database)
+    void createTable(const std::shared_ptr<db::Database>& database)
     {
         std::string sqlText  = "CREATE TABLE IF NOT EXISTS ";
         sqlText             += Model::table_name;
@@ -41,7 +42,10 @@ namespace orm
 
         sqlText += ");";
 
-        database.execute(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        database->execute(sqlText);
     }
 }   // namespace orm
 

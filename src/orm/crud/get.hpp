@@ -27,8 +27,8 @@ namespace orm
      */
     template <db_model Model, typename Field>
     [[nodiscard]] std::vector<Model> getByField(
-        db::Database& database,
-        Field const&  fieldToMatch
+        const std::shared_ptr<db::Database>& database,
+        Field const&                         fieldToMatch
     )
     {
         const auto fieldView       = orm::FieldView::from(fieldToMatch);
@@ -46,7 +46,10 @@ namespace orm
         sqlText += std::string{fieldView.getColumnName()};
         sqlText += "=?;";
 
-        db::Statement statement = database.prepare(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        db::Statement statement = database->prepare(sqlText);
         fieldView.bind(statement, 1);
 
         std::vector<Model> results;
@@ -71,8 +74,8 @@ namespace orm
      */
     template <db_model Model, typename Field>
     [[nodiscard]] std::expected<Model, CrudError> getByUniqueField(
-        db::Database& database,
-        Field const&  fieldToMatch
+        const std::shared_ptr<db::Database>& database,
+        Field const&                         fieldToMatch
     )
     {
         static_assert(Field::isUnique);
@@ -92,7 +95,10 @@ namespace orm
         sqlText += std::string{fieldView.getColumnName()};
         sqlText += "=?;";
 
-        db::Statement statement = database.prepare(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        db::Statement statement = database->prepare(sqlText);
         fieldView.bind(statement, 1);
 
         const db::StepResult result = statement.step();
@@ -119,8 +125,8 @@ namespace orm
      */
     template <db_model Model, typename PrimaryKeyValue>
     [[nodiscard]] std::optional<Model> getByPk(
-        db::Database&          database,
-        PrimaryKeyValue const& pkValue
+        const std::shared_ptr<db::Database>& database,
+        PrimaryKeyValue const&               pkValue
     )
     {
         const auto numberOfPkFields = getNumberOfPkFields<Model>();
@@ -162,7 +168,12 @@ namespace orm
         sqlText += whereClauses[0];
         sqlText += ";";
 
-        db::Statement statement = database.prepare(sqlText);
+        if (database == nullptr)
+        {
+            throw CrudException("Database pointer is null");
+        }
+
+        db::Statement statement = database->prepare(sqlText);
         binder<db::Statement, PrimaryKeyValue>::bind(statement, 1, pkValue);
 
         const db::StepResult result = statement.step();
@@ -180,7 +191,9 @@ namespace orm
      * @return std::vector<Model>
      */
     template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(db::Database& database)
+    [[nodiscard]] std::vector<Model> getAll(
+        const std::shared_ptr<db::Database>& database
+    )
     {
         auto const emptyFieldViews = orm::fields<Model>();
 
@@ -194,7 +207,10 @@ namespace orm
         sqlText += Model::table_name;
         sqlText += ";";
 
-        db::Statement statement = database.prepare(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        db::Statement statement = database->prepare(sqlText);
 
         std::vector<Model> results;
 

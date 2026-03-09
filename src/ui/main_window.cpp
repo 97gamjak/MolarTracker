@@ -32,7 +32,12 @@ namespace ui
         _handlers.getDirtyStateHandler().subscribe(appContext, this);
 
         setWindowTitle(false);
-        resize(5000, 3000);
+
+        resize(
+            Constants::getMainWindowSize().first,
+            Constants::getMainWindowSize().second
+        );
+
         _buildUI();
     }
 
@@ -104,7 +109,14 @@ namespace ui
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout{root};
-        layout->setContentsMargins(8, 8, 8, 8);
+
+        const auto& margins = Constants::getCoreWindowMargins();
+        layout->setContentsMargins(
+            std::get<0>(margins),
+            std::get<1>(margins),
+            std::get<2>(margins),
+            std::get<3>(margins)
+        );
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* tabs = new QTabWidget{root};

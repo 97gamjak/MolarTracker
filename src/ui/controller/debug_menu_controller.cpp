@@ -135,8 +135,18 @@ namespace ui
         if (_debugSlotsDialog != nullptr)
             return;
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _debugSlotsDialog = new DebugSlotsDialog{&_mainWindow};
+        auto debugSlotsSettings = std::make_shared<DebugSlotsDialog::Settings>(
+            _appContext.getSettings()
+                .getUISettings()
+                .getDebugSlotsSettings()
+                .getWindowSize()
+        );
+
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
+        _debugSlotsDialog =
+            new DebugSlotsDialog{debugSlotsSettings, &_mainWindow};
+        // NOLINTEND(cppcoreguidelines-owning-memory)
+
         _debugSlotsDialog->setModal(false);
 
         connect(
@@ -246,7 +256,8 @@ namespace ui
             settings.getReloadIntervalMs(),
             settings.isAutoReloadEnabled(),
             settings.isLineWrapEnabled(),
-            settings.getDialogSize()
+            settings.getDialogSize(),
+            settings.getMaxBlockCount()
         );
     }
 

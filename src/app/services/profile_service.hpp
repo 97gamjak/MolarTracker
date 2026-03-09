@@ -1,6 +1,7 @@
 #ifndef __APP__SERVICES__PROFILE_SERVICE_HPP__
 #define __APP__SERVICES__PROFILE_SERVICE_HPP__
 
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -19,15 +20,15 @@ namespace app
     {
        private:
         /// reference to the Profile repository
-        IProfileRepo& _profileRepo;
+        std::shared_ptr<IProfileRepo> _profileRepo;
 
        public:
-        explicit ProfileService(IProfileRepo& getProfileRepo);
+        explicit ProfileService(const std::shared_ptr<IProfileRepo>& repo);
 
-        std::optional<Profile> get(ProfileId id) const override;
-        std::vector<Profile>   getAll() const override;
+        [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
+        [[nodiscard]] std::vector<Profile>   getAll() const override;
 
-        ProfileId create(
+        [[nodiscard]] ProfileId create(
             const std::string&                name,
             const std::optional<std::string>& email
         ) override;

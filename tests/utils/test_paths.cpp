@@ -36,7 +36,7 @@ namespace
 
 TEST(UtilsPaths, UserDirConfigReturnsValidPath)
 {
-    const auto result = utils::user_dir(utils::DirKind::Config, "TestApp");
+    const auto result = utils::userDir(utils::DirKind::Config, "TestApp");
     ASSERT_TRUE(result.has_value());
     EXPECT_FALSE(result.value().empty());
     EXPECT_TRUE(result.value().string().find("TestApp") != std::string::npos);
@@ -44,7 +44,7 @@ TEST(UtilsPaths, UserDirConfigReturnsValidPath)
 
 TEST(UtilsPaths, UserDirDataReturnsValidPath)
 {
-    const auto result = utils::user_dir(utils::DirKind::Data, "TestApp");
+    const auto result = utils::userDir(utils::DirKind::Data, "TestApp");
     ASSERT_TRUE(result.has_value());
     EXPECT_FALSE(result.value().empty());
     EXPECT_TRUE(result.value().string().find("TestApp") != std::string::npos);
@@ -52,21 +52,21 @@ TEST(UtilsPaths, UserDirDataReturnsValidPath)
 
 TEST(UtilsPaths, UserDirEmptyAppNameReturnsInvalidAppName)
 {
-    const auto result = utils::user_dir(utils::DirKind::Config, "");
+    const auto result = utils::userDir(utils::DirKind::Config, "");
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), utils::PathError::InvalidAppName);
 }
 
 TEST(UtilsPaths, UserDirAppNameWithSlashReturnsInvalidAppName)
 {
-    const auto result = utils::user_dir(utils::DirKind::Config, "bad/name");
+    const auto result = utils::userDir(utils::DirKind::Config, "bad/name");
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), utils::PathError::InvalidAppName);
 }
 
 TEST(UtilsPaths, UserDirAppNameWithDotDotReturnsInvalidAppName)
 {
-    const auto result = utils::user_dir(utils::DirKind::Config, "..");
+    const auto result = utils::userDir(utils::DirKind::Config, "..");
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), utils::PathError::InvalidAppName);
 }
@@ -77,7 +77,7 @@ TEST(UtilsPaths, EnsureDirCreatesDirectoryAndReturnsPath)
 
     EXPECT_FALSE(std::filesystem::exists(dir));
 
-    const auto result = utils::ensure_dir(dir);
+    const auto result = utils::ensureDir(dir);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), dir);
     EXPECT_TRUE(std::filesystem::is_directory(dir));
@@ -88,7 +88,7 @@ TEST(UtilsPaths, EnsureDirCreatesDirectoryAndReturnsPath)
 
 TEST(UtilsPaths, EnsureDirEmptyPathReturnsEmpty)
 {
-    const auto result = utils::ensure_dir(std::filesystem::path{});
+    const auto result = utils::ensureDir(std::filesystem::path{});
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), utils::PathError::Empty);
 }
@@ -100,7 +100,7 @@ TEST(UtilsPaths, EnsureDirIdempotentOnExistingDirectory)
     std::filesystem::create_directories(dir);
     ASSERT_TRUE(std::filesystem::is_directory(dir));
 
-    const auto result = utils::ensure_dir(dir);
+    const auto result = utils::ensureDir(dir);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), dir);
 
@@ -110,7 +110,7 @@ TEST(UtilsPaths, EnsureDirIdempotentOnExistingDirectory)
 
 TEST(UtilsPaths, ConfigDirCreatesDirectoryAndReturnsPath)
 {
-    const auto result = utils::config_dir("MolarTrackerTest");
+    const auto result = utils::configDir("MolarTrackerTest");
     ASSERT_TRUE(result.has_value());
     EXPECT_FALSE(result.value().empty());
     EXPECT_TRUE(std::filesystem::is_directory(result.value()));
@@ -121,7 +121,7 @@ TEST(UtilsPaths, ConfigDirCreatesDirectoryAndReturnsPath)
 
 TEST(UtilsPaths, DataDirCreatesDirectoryAndReturnsPath)
 {
-    const auto result = utils::data_dir("MolarTrackerTest");
+    const auto result = utils::dataDir("MolarTrackerTest");
     ASSERT_TRUE(result.has_value());
     EXPECT_FALSE(result.value().empty());
     EXPECT_TRUE(std::filesystem::is_directory(result.value()));
@@ -132,14 +132,14 @@ TEST(UtilsPaths, DataDirCreatesDirectoryAndReturnsPath)
 
 TEST(UtilsPaths, ConfigDirInvalidAppNameReturnsInvalidAppName)
 {
-    const auto result = utils::config_dir("");
+    const auto result = utils::configDir("");
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), utils::PathError::InvalidAppName);
 }
 
 TEST(UtilsPaths, DataDirInvalidAppNameReturnsInvalidAppName)
 {
-    const auto result = utils::data_dir("bad/name");
+    const auto result = utils::dataDir("bad/name");
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), utils::PathError::InvalidAppName);
 }

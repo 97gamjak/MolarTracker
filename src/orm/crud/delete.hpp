@@ -20,7 +20,10 @@ namespace orm
      * @param pkValue
      */
     template <db_model Model, typename PrimaryKeyValue>
-    void deleteByPk(db::Database& database, PrimaryKeyValue const& pkValue)
+    void deleteByPk(
+        const std::shared_ptr<db::Database>& database,
+        PrimaryKeyValue const&               pkValue
+    )
     {
         const auto numberOfPkFields = getNumberOfPkFields<Model>();
 
@@ -54,7 +57,10 @@ namespace orm
         sqlText += whereClauses[0];
         sqlText += ";";
 
-        db::Statement statement = database.prepare(sqlText);
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        db::Statement statement = database->prepare(sqlText);
         orm::binder<db::Statement, PrimaryKeyValue>::bind(
             statement,
             1,

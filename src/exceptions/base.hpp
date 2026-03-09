@@ -21,9 +21,9 @@ class MolarTrackerException : public std::exception
     std::string _message;
 
    public:
-    explicit MolarTrackerException(const std::string& message);
+    explicit MolarTrackerException(std::string message);
 
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 };
 
 #endif   // __EXCEPTIONS__BASE_HPP__

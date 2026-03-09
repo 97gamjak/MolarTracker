@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 
     try
     {
-        // TODO: move this to some initialization module
+        // TODO(97gamjak): move this to some initialization module
         // https://97gamjak.atlassian.net/browse/MOLTRACK-96
 
         // initialize settings
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
         mainWindow.show();
         mainWindow.start();
 
-        return app.exec();
+        return ui::MolarTrackerApplication::exec();
     }
     catch (const MolarTrackerException& e)
     {

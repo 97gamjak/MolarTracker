@@ -41,10 +41,10 @@ namespace ui
         AddProfileCommand(AddProfileCommand&&)                 = delete;
         AddProfileCommand& operator=(AddProfileCommand&&)      = delete;
 
-        std::expected<void, CommandErrorPtr> undo() override;
-        std::expected<void, CommandErrorPtr> redo() override;
+        [[nodiscard]] std::expected<void, CommandErrorPtr> undo() override;
+        [[nodiscard]] std::expected<void, CommandErrorPtr> redo() override;
 
-        std::string getLabel() const override;
+        [[nodiscard]] std::string getLabel() const override;
     };
 }   // namespace ui
 
