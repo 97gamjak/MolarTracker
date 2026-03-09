@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "command.hpp"
-#include "logging/log_manager.hpp"
+#include "logging/log_categories.hpp"
 
 namespace ui
 {
@@ -24,10 +24,10 @@ namespace ui
         explicit UpdateDebugFlagsCommand(logging::LogCategories categories);
         ~UpdateDebugFlagsCommand() override = default;
 
-        std::expected<void, CommandErrorPtr> undo() override;
-        std::expected<void, CommandErrorPtr> redo() override;
+        [[nodiscard]] std::expected<void, CommandErrorPtr> undo() override;
+        [[nodiscard]] std::expected<void, CommandErrorPtr> redo() override;
 
-        std::string getLabel() const override;
+        [[nodiscard]] std::string getLabel() const override;
     };
 
 }   // namespace ui

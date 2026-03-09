@@ -21,14 +21,14 @@ namespace ui
          *
          * @return std::string
          */
-        virtual std::string getMessage() const = 0;
+        [[nodiscard]] virtual std::string getMessage() const = 0;
 
         /**
          * @brief Get the Code Str object
          *
          * @return std::string
          */
-        virtual std::string getCodeStr() const = 0;
+        [[nodiscard]] virtual std::string getCodeStr() const = 0;
     };
 
     using CommandErrorPtr = std::shared_ptr<ICommandError>;
@@ -60,13 +60,12 @@ namespace ui
        public:
         explicit CommandError(Type type);
 
-        std::string getMessage() const override;
+        [[nodiscard]] std::string getMessage() const override;
+        [[nodiscard]] std::string getCodeStr() const override;
 
-        std::string getCodeStr() const override;
-
-        static CommandErrorPtr makeNothingToUndoErrorPtr();
-        static CommandErrorPtr makeNothingToRedoErrorPtr();
-        static CommandErrorPtr makeInvalidCommandErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeNothingToUndoErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeNothingToRedoErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeInvalidCommandErrorPtr();
     };
 
 }   // namespace ui
