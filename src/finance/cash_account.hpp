@@ -11,7 +11,7 @@ namespace finance
 {
 
     // clang-format off
-    // NOLINTBEGIN
+    // NOLINTBEGIN(cppcoreguidelines-macro-usage)
     #define ACCOUNT_STATUS_LIST(X) \
         X(Active)                  \
         X(Closed)
@@ -19,14 +19,7 @@ namespace finance
     // cppcheck-suppress syntaxError
     MSTD_ENUM(AccountStatus, uint8_t, ACCOUNT_STATUS_LIST);
 
-    #define ACCOUNT_TYPE_LIST(X) \
-        X(Cash)                  \
-        X(Securities)            \
-        X(External)
-
-    // cppcheck-suppress syntaxError
-    MSTD_ENUM(AccountType, uint8_t, ACCOUNT_TYPE_LIST);
-    // NOLINTEND
+    // NOLINTEND(cppcoreguidelines-macro-usage)
     // clang-format on
 
     /**
@@ -40,9 +33,6 @@ namespace finance
        private:
         /// The unique identifier for the cash account
         AccountId _id;
-
-        /// The type of the account (e.g., Cash, Securities, External)
-        AccountType _type;
 
         /// The status of the account (e.g., Active, Closed)
         AccountStatus _status;
@@ -59,7 +49,6 @@ namespace finance
        public:
         explicit CashAccount(
             AccountId     id,
-            AccountType   type,
             AccountStatus status,
             ProfileId     profileId,
             Currency      currency,

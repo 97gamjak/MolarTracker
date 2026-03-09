@@ -16,6 +16,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `Cash` class for representing a cash amount together with a currency
 - Add `CashAccount` class
 - Add `Transaction` class
+- Add `TransactionEntry` class
 
 #### ORM
 

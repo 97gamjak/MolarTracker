@@ -32,8 +32,6 @@ struct ProfileRow final
    public:   // methods
     [[nodiscard]] constexpr auto fields();
     [[nodiscard]] constexpr auto fields() const;
-
-    [[nodiscard]] static constexpr auto getUniqueGroups();
 };
 
 #ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
