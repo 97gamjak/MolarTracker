@@ -4,6 +4,7 @@
 #include "debug_slots_settings.hpp"
 #include "log_viewer_settings.hpp"
 #include "params/params.hpp"
+#include "profile_ui_settings.hpp"
 
 namespace settings
 {
@@ -19,13 +20,13 @@ namespace settings
     {
        public:
         /// The key for the UI settings container
-        static constexpr const char* UI_SETTINGS_KEY = "uiSettings";
+        static constexpr const char* KEY = "uiSettings";
 
         /// The title for the UI settings container
-        static constexpr const char* UI_SETTINGS_TITLE = "UI Settings";
+        static constexpr const char* TITLE = "UI Settings";
 
         /// The description for the UI settings container
-        static constexpr const char* UI_SETTINGS_DESC =
+        static constexpr const char* DESCRIPTION =
             "Settings related to the user interface.";
     };
 
@@ -41,7 +42,11 @@ namespace settings
         /// functionality for UI settings
         friend ParamContainerMixin<UISettings>;
         /// The core container for the UI settings parameters
-        ParamContainer _core;
+        ParamContainer _core{
+            UISettingsSchema::KEY,
+            UISettingsSchema::TITLE,
+            UISettingsSchema::DESCRIPTION
+        };
 
         /// The UI settings parameters
         LogViewerSettings _logViewerSettings;
@@ -49,14 +54,20 @@ namespace settings
         /// The debug slots settings
         DebugSlotsSettings _debugSlotsSettings;
 
+        /// The profile UI settings
+        ProfileUISettings _profileUISettings;
+
        public:
-        UISettings();
+        UISettings() = default;
 
         [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
         [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
 
         [[nodiscard]] DebugSlotsSettings&       getDebugSlotsSettings();
         [[nodiscard]] const DebugSlotsSettings& getDebugSlotsSettings() const;
+
+        [[nodiscard]] ProfileUISettings&       getProfileUISettings();
+        [[nodiscard]] const ProfileUISettings& getProfileUISettings() const;
 
        private:
         template <typename Func>

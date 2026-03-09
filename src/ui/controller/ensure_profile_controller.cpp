@@ -217,10 +217,17 @@ namespace ui
      */
     void EnsureProfileController::_showAddProfileDialog()
     {
+        auto settings = std::make_shared<AddProfileDialog::Settings>(
+            _appContext.getSettings()
+                .getUISettings()
+                .getProfileUISettings()
+                .getDialogSize()
+        );
+
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _addProfileDialog = new AddProfileDialog{
+            settings,
             _appContext.getStore().getProfileStore(),
-            _appContext.getSettings(),
             _undoStack,
             false,   // canBeClosed = false to disable the close button
             &_mainWindow

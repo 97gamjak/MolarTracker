@@ -48,6 +48,11 @@ class ConstantsSchema
     // as soon as it is implemented in mstd
     /// The multiplier to convert seconds to milliseconds
     static constexpr const int _secondsToMs = 1000;
+
+    /// The global minimum dialog size for all dialogs in the application, this
+    /// is used to ensure that all dialogs have a reasonable minimum size and
+    /// are not too small to be usable
+    static constexpr const std::pair<int, int> _globalMinDialogSize = {40, 30};
 };
 
 /**
@@ -86,6 +91,8 @@ class Constants
     [[nodiscard]] static int getSecondsToMs();
 
     [[nodiscard]] static std::string getSettingsFileName();
+
+    [[nodiscard]] static std::pair<int, int> getGlobalMinDialogSize();
 
    private:
     Constants();

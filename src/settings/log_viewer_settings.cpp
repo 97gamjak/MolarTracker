@@ -10,11 +10,6 @@ namespace settings
      *
      */
     LogViewerSettings::LogViewerSettings()
-        : _core(
-              Schema::LOG_VIEWER_SETTINGS_KEY,
-              Schema::LOG_VIEWER_SETTINGS_TITLE,
-              Schema::LOG_VIEWER_SETTINGS_DESC
-          )
     {
         _reloadIntervalSec.setDefault(Schema::RELOAD_INTERVAL_SEC_DEFAULT);
         _reloadIntervalSec.setMinValue(Schema::RELOAD_INTERVAL_SEC_MIN);
@@ -24,11 +19,8 @@ namespace settings
 
         _lineWrap.setDefault(Schema::LINE_WRAP_DEFAULT);
 
-        _dialogSize.setDefaults(
-            {Schema::DIALOG_SIZE_DEFAULT.first,
-             Schema::DIALOG_SIZE_DEFAULT.second}
-        );
-        _dialogSize.setMinValues({1, 1});
+        _dialogSize.setDefaults(Schema::DIALOG_SIZE_DEFAULT);
+        _dialogSize.setMinValues(Constants::getGlobalMinDialogSize());
 
         _maxBlockCount.setDefault(Schema::MAX_BLOCK_COUNT_DEFAULT);
         _maxBlockCount.setMinValue(Schema::MAX_BLOCK_COUNT_MIN);

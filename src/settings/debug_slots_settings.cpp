@@ -1,5 +1,7 @@
 #include "debug_slots_settings.hpp"
 
+#include "config/constants.hpp"
+
 namespace settings
 {
     /**
@@ -7,13 +9,9 @@ namespace settings
      *
      */
     DebugSlotsSettings::DebugSlotsSettings()
-        : _core(Schema::KEY, Schema::TITLE, Schema::DESCRIPTION)
     {
-        _windowSize.setDefaults(
-            {Schema::WINDOW_SIZE_DEFAULT.first,
-             Schema::WINDOW_SIZE_DEFAULT.second}
-        );
-        _windowSize.setMinValues({1, 1});
+        _windowSize.setDefaults(Schema::WINDOW_SIZE_DEFAULT);
+        _windowSize.setMinValues(Constants::getGlobalMinDialogSize());
     }
 
     /**

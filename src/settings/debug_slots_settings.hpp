@@ -61,7 +61,7 @@ namespace settings
         friend class ParamContainerMixin<DebugSlotsSettings>;
 
         /// The core container for the debug slots settings parameters
-        ParamContainer _core;
+        ParamContainer _core{Schema::KEY, Schema::TITLE, Schema::DESCRIPTION};
 
         /// The size of the debug slots dialog window in pixels, represented as
         /// a tuple of (width, height)

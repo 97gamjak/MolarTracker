@@ -5,19 +5,6 @@
 namespace settings
 {
     /**
-     * @brief Construct a new UISettings::UISettings object
-     *
-     */
-    UISettings::UISettings()
-        : _core{
-              UISettingsSchema::UI_SETTINGS_KEY,
-              UISettingsSchema::UI_SETTINGS_TITLE,
-              UISettingsSchema::UI_SETTINGS_DESC
-          }
-    {
-    }
-
-    /**
      * @brief Get the LogViewerSettings object
      *
      * @return LogViewerSettings&
@@ -55,6 +42,26 @@ namespace settings
     const DebugSlotsSettings& UISettings::getDebugSlotsSettings() const
     {
         return _debugSlotsSettings;
+    }
+
+    /**
+     * @brief Get the ProfileUISettings object
+     *
+     * @return ProfileUISettings&
+     */
+    ProfileUISettings& UISettings::getProfileUISettings()
+    {
+        return _profileUISettings;
+    }
+
+    /**
+     * @brief Get the ProfileUISettings object (const version)
+     *
+     * @return const ProfileUISettings&
+     */
+    const ProfileUISettings& UISettings::getProfileUISettings() const
+    {
+        return _profileUISettings;
     }
 
 }   // namespace settings

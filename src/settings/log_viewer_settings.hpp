@@ -136,7 +136,11 @@ namespace settings
         friend ParamContainerMixin<LogViewerSettings>;
 
         /// The core container for the log viewer settings parameters
-        ParamContainer _core;
+        ParamContainer _core{
+            Schema::LOG_VIEWER_SETTINGS_KEY,
+            Schema::LOG_VIEWER_SETTINGS_TITLE,
+            Schema::LOG_VIEWER_SETTINGS_DESC
+        };
 
         /// The interval in seconds for reloading logs
         NumericParam<double> _reloadIntervalSec{

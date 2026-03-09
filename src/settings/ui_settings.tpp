@@ -17,6 +17,7 @@ namespace settings
     {
         std::forward<Func>(func)(_logViewerSettings);
         std::forward<Func>(func)(_debugSlotsSettings);
+        std::forward<Func>(func)(_profileUISettings);
     }
 
     /**
@@ -31,6 +32,7 @@ namespace settings
     {
         std::forward<Func>(func)(_logViewerSettings);
         std::forward<Func>(func)(_debugSlotsSettings);
+        std::forward<Func>(func)(_profileUISettings);
     }
 
 }   // namespace settings

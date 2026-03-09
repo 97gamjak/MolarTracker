@@ -11,7 +11,6 @@
 
 #include "app/store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
-#include "settings/settings.hpp"
 #include "ui/commands/profile/add_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"
 #include "utils/qt_helpers.hpp"
@@ -30,20 +29,20 @@ namespace ui
      * @param parent Parent widget
      */
     AddProfileDialog::AddProfileDialog(
-        app::ProfileStore&  profileStore,
-        settings::Settings& settings,
-        UndoStack&          undoStack,
-        bool                canBeClosed,
-        QWidget*            parent
+        std::shared_ptr<Settings> settings,
+        app::ProfileStore&        profileStore,
+        UndoStack&                undoStack,
+        bool                      canBeClosed,
+        QWidget*                  parent
     )
         : QDialog{parent},
+          _settings{std::move(settings)},
           _profileStore{profileStore},
-          _settings{settings},
           _undoStack{undoStack},
           _canBeClosed{canBeClosed}
     {
         setWindowTitle("Add New Profile");
-        resize(400, 200);
+        resize(_settings->dialogSize.first, _settings->dialogSize.second);
         utils::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI();
@@ -58,14 +57,14 @@ namespace ui
      * @param parent
      */
     AddProfileDialog::AddProfileDialog(
-        app::ProfileStore&  profileStore,
-        settings::Settings& settings,
-        UndoStack&          undoStack,
-        QWidget*            parent
+        std::shared_ptr<Settings> settings,
+        app::ProfileStore&        profileStore,
+        UndoStack&                undoStack,
+        QWidget*                  parent
     )
         : AddProfileDialog(
+              std::move(settings),
               profileStore,
-              settings,
               undoStack,
               true,   // canBeClosed = true to allow closing without adding a
                       // profile
@@ -313,6 +312,16 @@ namespace ui
             _emitCancel();
             QDialog::reject();
         }
+    }
+
+    /**
+     * @brief Construct a new Add Profile Dialog:: Settings:: Settings object
+     *
+     * @param _dialogSize The size of the dialog (width, height)
+     */
+    AddProfileDialog::Settings::Settings(std::pair<int, int> _dialogSize)
+        : dialogSize(_dialogSize)
+    {
     }
 
 }   // namespace ui

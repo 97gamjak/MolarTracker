@@ -167,3 +167,15 @@ std::string Constants::getSettingsFileName()
 {
     return ConstantsSchema::_settingsFileName;
 }
+
+/**
+ * @brief Get the global minimum dialog size, this is used as a minimum size
+ * for all dialogs in the application to ensure they are not too small to be
+ * usable
+ *
+ * @return std::pair<int, int>
+ */
+std::pair<int, int> Constants::getGlobalMinDialogSize()
+{
+    return ConstantsSchema::_globalMinDialogSize;
+}

@@ -16,11 +16,6 @@ namespace app
     class ProfileStore;   // Forward declaration
 }   // namespace app
 
-namespace settings
-{
-    class Settings;   // Forward declaration
-}   // namespace settings
-
 class QLineEdit;     // Forward declaration
 class QPushButton;   // Forward declaration
 class QCheckBox;     // Forward declaration
@@ -38,11 +33,15 @@ namespace ui
     {
         Q_OBJECT
 
+       public:
+        struct Settings;
+
        private:
+        /// Settings for the add profile dialog
+        std::shared_ptr<Settings> _settings;
+
         /// Reference to the profile store
         app::ProfileStore& _profileStore;
-        /// Reference to the settings
-        settings::Settings& _settings;
         /// Reference to the undo stack
         UndoStack& _undoStack;
 
@@ -70,17 +69,17 @@ namespace ui
 
        public:
         explicit AddProfileDialog(
-            app::ProfileStore&  profileStore,
-            settings::Settings& settings,
-            UndoStack&          undoStack,
-            bool                canBeClosed,
-            QWidget*            parent
+            std::shared_ptr<Settings> settings,
+            app::ProfileStore&        profileStore,
+            UndoStack&                undoStack,
+            bool                      canBeClosed,
+            QWidget*                  parent
         );
         explicit AddProfileDialog(
-            app::ProfileStore&  profileStore,
-            settings::Settings& settings,
-            UndoStack&          undoStack,
-            QWidget*            parent
+            std::shared_ptr<Settings> settings,
+            app::ProfileStore&        profileStore,
+            UndoStack&                undoStack,
+            QWidget*                  parent
         );
 
         void setEnforceDefaultProfile(bool value);
@@ -129,6 +128,19 @@ namespace ui
         void _emit(const Action& action);
         void _emitOk();
         void _emitCancel();
+    };
+
+    /**
+     * @brief Settings for AddProfileDialog
+     *
+     */
+    struct AddProfileDialog::Settings
+    {
+        /// The size of the dialog (width, height)
+        std::pair<int, int> dialogSize;
+
+        Settings() = delete;
+        explicit Settings(std::pair<int, int> _dialogSize);
     };
 
 }   // namespace ui
