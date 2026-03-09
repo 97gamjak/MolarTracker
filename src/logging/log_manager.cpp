@@ -58,6 +58,9 @@ namespace logging
         config.maxFiles  = settings.getMaxLogFiles();
         config.maxSizeMB = settings.getMaxLogFileSizeMB();
 
+        config.symlinkPath = config.directory / (settings.getLogFilePrefix() +
+                                                 "latest" + config.extension);
+
         _ringFile = RingFile(config);
     }
 

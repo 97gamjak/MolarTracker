@@ -280,6 +280,37 @@ void RingFile::_openCurrent()
     _bytesWritten = 0;
 
     _file.open(path, mode);
+
+    if (_config.symlinkPath.has_value())
+    {
+        if (_currentSymlinkPath != path)
+        {
+            std::error_code errorCode;
+            std::filesystem::remove(_config.symlinkPath.value(), errorCode);
+            if (errorCode)
+            {
+                std::cerr << "Failed to remove existing symlink: "
+                          << errorCode.message() << "\n";
+                return;
+            }
+
+            // Create new symlink pointing to the current log file
+            auto target = std::filesystem::absolute(path);
+            std::filesystem::create_symlink(
+                target,
+                _config.symlinkPath.value(),
+                errorCode
+            );
+            if (errorCode)
+            {
+                std::cerr << "Failed to create symlink: " << errorCode.message()
+                          << "\n";
+                return;
+            }
+
+            _currentSymlinkPath = path;
+        }
+    }
 }
 
 /**

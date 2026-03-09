@@ -32,6 +32,9 @@ class RingFile
     /// The currently open file stream for writing log entries
     std::ofstream _file;
 
+    /// The path to which the current symlink points
+    std::filesystem::path _currentSymlinkPath;
+
     /// The index of the current file in the ring
     std::uintmax_t _initialFileSize{0};
 
