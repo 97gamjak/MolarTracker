@@ -2,6 +2,7 @@
 #define __UTILS__RING_FILE_CONFIG_HPP__
 
 #include <filesystem>
+#include <optional>
 #include <string>
 
 /**
@@ -47,6 +48,13 @@ struct RingFileConfig
     /// useful to avoid confusion with non-rotating log files that might be
     /// named "log.txt"
     bool ignoreZeroIndex{true};
+
+    /// Optional path for a symlink to the current log file, if provided, a
+    /// symlink will be created that points to the current log file, this can be
+    /// useful for easily accessing the current log file without needing to know
+    /// its name, if the symlink already exists, it will be updated to point to
+    /// the new current log file when it changes
+    std::optional<std::filesystem::path> symlinkPath{std::nullopt};
 };
 
 #endif   // __UTILS__RING_FILE_CONFIG_HPP__

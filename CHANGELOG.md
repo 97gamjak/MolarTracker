@@ -6,7 +6,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Feature
 
+#### Logging
+
 - Change debug slots to hierarchical approach -> now also usable in debug slots selection dialog
+- Now a symlink to the latest log file called `molar_tracker_latest.log` is created
 
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
