@@ -246,7 +246,8 @@ namespace ui
             settings.getReloadIntervalMs(),
             settings.isAutoReloadEnabled(),
             settings.isLineWrapEnabled(),
-            settings.getDialogSize()
+            settings.getDialogSize(),
+            settings.getMaxBlockCount()
         );
     }
 

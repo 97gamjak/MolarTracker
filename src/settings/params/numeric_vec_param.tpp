@@ -63,6 +63,34 @@ namespace settings
     }
 
     /**
+     * @brief Set the minimum values for the numeric vector parameter, this
+     * function sets the minimum value for each individual numeric parameter in
+     * the vector, the size of the provided minValues vector must match the
+     * size of the numeric vector parameter (N), otherwise an exception is
+     * thrown
+     *
+     * @tparam T
+     * @tparam N
+     * @param minValues A vector of minimum values to set for each numeric
+     * parameter in the vector, the size of this vector must be equal to N
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    void NumericVecParam<T, N>::setMinValues(const std::vector<T>& minValues)
+    {
+        if (minValues.size() != N)
+        {
+            throw ParamException(
+                "The size of the minimum values vector must be equal to " +
+                std::to_string(N)
+            );
+        }
+
+        for (std::size_t i = 0; i < N; ++i)
+            _params[i].setMinValue(minValues[i]);
+    }
+
+    /**
      * @brief Commit the current values of the numeric vector parameter, this
      * function calls commit() on each individual numeric parameter in the
      * vector to save their current values as the baseline for dirty checking

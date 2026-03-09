@@ -28,6 +28,10 @@ namespace settings
             {Schema::DIALOG_SIZE_DEFAULT.first,
              Schema::DIALOG_SIZE_DEFAULT.second}
         );
+        _dialogSize.setMinValues({1, 1});
+
+        _maxBlockCount.setDefault(Schema::MAX_BLOCK_COUNT_DEFAULT);
+        _maxBlockCount.setMinValue(Schema::MAX_BLOCK_COUNT_MIN);
     }
 
     /**
@@ -87,6 +91,16 @@ namespace settings
     std::pair<int, int> LogViewerSettings::getDialogSize() const
     {
         return {_dialogSize.x(), _dialogSize.y()};
+    }
+
+    /**
+     * @brief Get the maximum block count setting
+     *
+     * @return int
+     */
+    int LogViewerSettings::getMaxBlockCount() const
+    {
+        return _maxBlockCount.get();
     }
 
     /**

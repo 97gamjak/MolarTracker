@@ -102,6 +102,22 @@ namespace settings
             "may require horizontal scrolling to view the entire line.";
         /// line wrap default value
         static constexpr bool LINE_WRAP_DEFAULT = false;
+
+        /******************
+         * Max Block Count *
+         ******************/
+
+        /// max block count key
+        static constexpr const char* MAX_BLOCK_COUNT_KEY = "maxBlockCount";
+        /// max block count title
+        static constexpr const char* MAX_BLOCK_COUNT_TITLE = "Max Block Count";
+        /// max block count description
+        static constexpr const char* MAX_BLOCK_COUNT_DESC =
+            "The maximum number of blocks in the log viewer.";
+        /// max block count default value
+        static constexpr int MAX_BLOCK_COUNT_DEFAULT = 50000;
+        /// max block count minimum value
+        static constexpr int MAX_BLOCK_COUNT_MIN = 100;
     };
 
     /**
@@ -151,6 +167,13 @@ namespace settings
             Schema::DIALOG_SIZE_DESC
         };
 
+        /// The maximum number of blocks in the log viewer
+        NumericParam<int> _maxBlockCount{
+            Schema::MAX_BLOCK_COUNT_KEY,
+            Schema::MAX_BLOCK_COUNT_TITLE,
+            Schema::MAX_BLOCK_COUNT_DESC
+        };
+
        public:
         LogViewerSettings();
 
@@ -159,6 +182,7 @@ namespace settings
         [[nodiscard]] bool                isAutoReloadEnabled() const;
         [[nodiscard]] bool                isLineWrapEnabled() const;
         [[nodiscard]] std::pair<int, int> getDialogSize() const;
+        [[nodiscard]] int                 getMaxBlockCount() const;
 
        private:
         template <typename Func>

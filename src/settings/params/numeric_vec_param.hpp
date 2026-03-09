@@ -67,6 +67,7 @@ namespace settings
         );
 
         void setDefaults(const std::vector<T>& defaultValues);
+        void setMinValues(const std::vector<T>& minValues);
 
         void commit();
 
