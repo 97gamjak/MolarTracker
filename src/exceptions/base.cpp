@@ -5,8 +5,8 @@
  *
  * @param message The exception message
  */
-MolarTrackerException::MolarTrackerException(const std::string& message)
-    : _message{message}
+MolarTrackerException::MolarTrackerException(std::string message)
+    : _message{std::move(message)}
 {
 }
 

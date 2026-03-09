@@ -142,9 +142,9 @@ std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }
  * time the application will wait for the database to become available when it
  * is locked by another process before throwing an error
  *
- * @return std::size_t
+ * @return int
  */
-std::size_t Constants::getDbBusyTimeoutMs()
+int Constants::getDbBusyTimeoutMs()
 {
     return ConstantsSchema::_dbBusyTimeoutMs;
 }

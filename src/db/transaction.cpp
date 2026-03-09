@@ -1,7 +1,8 @@
 #include "transaction.hpp"
 
+#include <iostream>
+
 #include "database.hpp"
-#include "db_exception.hpp"
 
 namespace db
 {
@@ -43,9 +44,8 @@ namespace db
             }
             catch (const std::exception& e)
             {
-                throw SqliteError(
-                    std::string("Failed to rollback transaction: ") + e.what()
-                );
+                std::cerr << "Failed to rollback transaction in destructor: "
+                          << e.what() << "\n";
             }
         }
     }
