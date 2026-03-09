@@ -1,6 +1,7 @@
 #ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
 #define __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
 
+#include "orm/type_traits.hpp"
 #include "profile_row.hpp"
 
 /**
