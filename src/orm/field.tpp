@@ -1,6 +1,7 @@
 #ifndef __ORM__FIELD_TPP__
 #define __ORM__FIELD_TPP__
 
+#include <mstd/error.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -89,18 +90,52 @@ namespace orm
             conditional_t<is_optional_v<Value>, optional_inner_t<Value>, Value>;
 
         std::string definition;
-        definition += std::string{name.view()};
-        definition += " ";
-        definition += std::string{sql_type<storage_type>::name};
 
-        if constexpr (isPk)
-            definition += " PRIMARY KEY";
-        if constexpr (isAutoIncrement)
-            definition += " AUTOINCREMENT";
-        if constexpr (isUnique)
-            definition += " UNIQUE";
-        if constexpr (!isNullable)
-            definition += " NOT NULL";
+        if constexpr (isFk)
+            definition += "FOREIGN KEY (";
+
+        definition += std::string{name.view()};
+
+        if constexpr (isFk)
+            definition += ")";
+
+        definition += " ";
+
+        if constexpr (isFk)
+            definition += "REFERENCES";
+        else
+            definition += std::string{sql_type<storage_type>::name};
+
+        if constexpr (isFk)
+        {
+            using foreignKeyInfo   = find_foreign_key_t<Value, Options...>;
+            using field            = typename foreignKeyInfo::Field;
+            using table            = typename foreignKeyInfo::Table;
+            using DeletionBehavior = typename foreignKeyInfo::DeletionBehavior;
+
+            definition += " " + table::tableName;
+            definition += "(" + field::getColumnName() + ")";
+
+            if constexpr (std::same_as<DeletionBehavior, CascadeDelete>)
+                definition += " ON DELETE CASCADE";
+            else if constexpr (std::same_as<DeletionBehavior, RestrictDelete>)
+                definition += " ON DELETE RESTRICT";
+            else
+                MSTD_COMPILE_FAIL(
+                    "Unsupported deletion behavior for foreign key"
+                );
+        }
+        else
+        {
+            if constexpr (isPk)
+                definition += " PRIMARY KEY";
+            if constexpr (isAutoIncrement)
+                definition += " AUTOINCREMENT";
+            if constexpr (isUnique)
+                definition += " UNIQUE";
+            if constexpr (!isNullable)
+                definition += " NOT NULL";
+        }
 
         return definition;
     }

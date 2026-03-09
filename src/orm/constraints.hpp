@@ -6,6 +6,32 @@
 
 namespace orm
 {
+    /**
+     * @brief Struct representing the cascade delete behavior for a foreign key
+     * constraint
+     *
+     */
+    struct CascadeDelete
+    {
+    };
+
+    /**
+     * @brief Struct representing the restrict delete behavior for a foreign key
+     * constraint
+     *
+     */
+    struct RestrictDelete
+    {
+    };
+
+    /**
+     * @brief Concept for valid deletion behaviors for foreign key constraints
+     *
+     * @tparam T
+     */
+    template <typename T>
+    concept DeletionType =
+        std::same_as<T, CascadeDelete> || std::same_as<T, RestrictDelete>;
 
     // NOLINTBEGIN
 #define ORM_CONSTRAINT_LIST(X) \
@@ -33,11 +59,22 @@ namespace orm
     /**
      * @brief struct representing the foreign key constraint for a field
      *
+     * @tparam DeletionType
+     * @tparam TableType
+     * @tparam FieldType
      */
+    template <DeletionType T, typename TableType, typename FieldType>
     struct foreign_key_t
     {
         /// Compile-time constant representing the foreign key constraint
         static constexpr ORMConstraint value = ORMConstraint::ForeignKey;
+
+        /// Type aliases for the deletion behavior
+        using DeletionBehavior = T;
+        /// Type alias for the referenced table
+        using Table = TableType;
+        /// Type alias for the referenced field
+        using Field = FieldType;
     };
 
     /**

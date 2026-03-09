@@ -115,7 +115,8 @@
         "__tuple": "cpp",
         "qvboxlayout": "cpp",
         "qstring": "cpp",
-        "qmessagebox": "cpp"
+        "qmessagebox": "cpp",
+        "__config": "cpp"
     },
     "cSpell.words": [
         "googletest",
