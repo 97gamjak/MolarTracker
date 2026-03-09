@@ -120,6 +120,7 @@
     },
     "cSpell.words": [
         "googletest",
+        "insertable",
         "MSTD"
     ],
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"

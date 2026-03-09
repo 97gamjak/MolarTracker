@@ -1,5 +1,5 @@
-#ifndef __SQL_MODELS__CASH_ACCOUNT_ROW_IMPL_HPP__
-#define __SQL_MODELS__CASH_ACCOUNT_ROW_IMPL_HPP__
+#ifndef __SQL_MODELS__ACCOUNT_ROW_IMPL_HPP__
+#define __SQL_MODELS__ACCOUNT_ROW_IMPL_HPP__
 
 #include <tuple>
 
@@ -44,4 +44,4 @@ constexpr auto CashAccountRow::fields() const
     return std::tie(id, status, profileId, currency, name);
 }
 
-#endif   // __SQL_MODELS__CASH_ACCOUNT_ROW_IMPL_HPP__
+#endif   // __SQL_MODELS__ACCOUNT_ROW_IMPL_HPP__

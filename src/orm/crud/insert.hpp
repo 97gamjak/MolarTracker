@@ -7,6 +7,7 @@
 
 #include "crud_error.hpp"
 #include "db/database.hpp"
+#include "orm/constraints.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
 
@@ -22,6 +23,7 @@ namespace orm
      * or an error
      */
     template <db_model Model>
+    requires is_freely_insertable_v<Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
         const std::shared_ptr<db::Database>& database,
         const Model&                         row

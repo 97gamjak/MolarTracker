@@ -3,12 +3,14 @@
 
 #include <cstdint>
 #include <expected>
+#include <mstd/error.hpp>
 #include <optional>
 #include <vector>
 
+#include "constraints.hpp"
 #include "db/database.hpp"
 #include "orm/crud/crud_error.hpp"
-#include "orm/type_traits.hpp"
+#include "type_traits.hpp"
 
 namespace orm
 {
@@ -17,6 +19,7 @@ namespace orm
     void createTable(const std::shared_ptr<db::Database>& database);
 
     template <db_model Model>
+    requires is_freely_insertable_v<Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
         const std::shared_ptr<db::Database>& database,
         const Model&                         row
