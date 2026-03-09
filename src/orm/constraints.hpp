@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <mstd/enum.hpp>
 
+#include "type_traits.hpp"
+
 namespace orm
 {
     /**
@@ -117,7 +119,74 @@ namespace orm
         static constexpr ORMConstraint value = ORMConstraint::Nullable;
     };
 
-    // clang-format on
+    /**
+     * @brief struct representing the requirement for a paired insert for a
+     * model, this is used to indicate that a model cannot be inserted on its
+     * own and requires a corresponding insert of another model (e.g., for 1:1
+     * relationships)
+     *
+     */
+    struct requires_paired_insert_t
+    {
+    };
+
+    /**
+     * @brief Concept for valid insert policies for models, this is used to
+     * determine if a model is freely insertable (i.e., does not require a
+     * paired insert)
+     *
+     * @tparam T
+     */
+    template <db_model Model, typename Default, typename = void>
+    struct insert_policy_or
+    {
+        /// Type alias for the insert policy of the model, this will be the
+        /// Default type if the model does not have a nested insert_policy type
+        using type = Default;
+    };
+
+    /**
+     * @brief Helper struct to determine the insert policy of a model, this
+     * checks if the model has a nested type named insert_policy, and if so,
+     * uses that as the insert policy, otherwise it defaults to void
+     *
+     */
+    template <db_model Model, typename Default>
+    struct insert_policy_or<
+        Model,
+        Default,
+        std::void_t<typename Model::insert_policy>>
+    {
+        /// Type alias for the insert policy of the model, this will be the type
+        /// of the nested insert_policy type if it exists, otherwise it will be
+        /// the Default type
+        using type = typename Model::insert_policy;
+    };
+
+    /**
+     * @brief Type trait to determine if a model is freely insertable (i.e.,
+     * does not require a paired insert)
+     *
+     * @tparam Model
+     */
+    template <db_model Model>
+    struct insert_policy
+    {
+        /// Type alias for the insert policy of the model
+        using type = typename insert_policy_or<Model, void>::type;
+    };
+
+    /**
+     * @brief Variable template to determine if a model is freely insertable
+     * (i.e., does not require a paired insert)
+     *
+     * @tparam Model
+     */
+    template <db_model Model>
+    constexpr bool is_freely_insertable_v = !std::same_as<
+        typename insert_policy<Model>::type,
+        requires_paired_insert_t>;
+
 }   // namespace orm
 
 #endif   // __ORM__CONSTRAINTS_HPP__

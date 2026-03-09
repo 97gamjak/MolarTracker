@@ -1,5 +1,5 @@
-#ifndef __SQL_MODELS__CASH_ACCOUNT_ROW_HPP__
-#define __SQL_MODELS__CASH_ACCOUNT_ROW_HPP__
+#ifndef __SQL_MODELS__ACCOUNT_ROW_HPP__
+#define __SQL_MODELS__ACCOUNT_ROW_HPP__
 
 #include <string>
 
@@ -22,6 +22,10 @@ struct AccountRow
     /// The name of the database table this struct represents
     static constexpr std::string table_name = "account";
 
+    /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
+    /// disallow inserting an AccountRow without a corresponding CashAccountRow
+    using insert_policy = orm::requires_paired_insert_t;
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     orm::IdField<AccountId> id;
@@ -43,6 +47,10 @@ struct CashAccountRow final
    public:   // fields
     /// The name of the database table this struct represents
     static constexpr std::string table_name = "cash_account";
+
+    /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
+    /// disallow inserting a CashAccountRow without a corresponding AccountRow
+    using insert_policy = orm::requires_paired_insert_t;
 
     /// The id field, this is the primary key of the table and is also a foreign
     /// key referencing the id field of the AccountRow table, this indicates
@@ -74,8 +82,8 @@ struct CashAccountRow final
     [[nodiscard]] constexpr auto fields() const;
 };
 
-#ifndef __SQL_MODELS__CASH_ACCOUNT_ROW_IMPL_HPP__
+#ifndef __SQL_MODELS__ACCOUNT_ROW_IMPL_HPP__
 #include "account_row.impl.hpp"   // IWYU pragma: keep
 #endif
 
-#endif   // __SQL_MODELS__CASH_ACCOUNT_ROW_HPP__
+#endif   // __SQL_MODELS__ACCOUNT_ROW_HPP__

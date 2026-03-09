@@ -19,6 +19,11 @@ struct InstrumentRow
     /// The name of the database table this struct represents
     static constexpr std::string table_name = "instrument";
 
+    /// as we have a 1:1 relationship between InstrumentRow and
+    /// CashInstrumentRow, we disallow inserting an InstrumentRow without a
+    /// corresponding CashInstrumentRow
+    using insert_policy = orm::requires_paired_insert_t;
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     orm::IdField<InstrumentId> id;
@@ -43,6 +48,11 @@ struct CashInstrumentRow
 {
     /// The name of the database table this struct represents
     static constexpr std::string table_name = "cash_instrument";
+
+    /// as we have a 1:1 relationship between InstrumentRow and
+    /// CashInstrumentRow, we disallow inserting a CashInstrumentRow without a
+    /// corresponding InstrumentRow
+    using insert_policy = orm::requires_paired_insert_t;
 
     /// The id field, this is the primary key of the table and is also a foreign
     /// key referencing the id field of the InstrumentRow table, this indicates
