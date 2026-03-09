@@ -43,10 +43,6 @@ namespace settings
         /// The core container for the settings parameters
         ParamContainer _core;
 
-        // TODO: maybe move this somewhere else
-        /// The name of the settings file
-        static constexpr const char* _settingsFileName = "settings.json";
-
         /// The path to the settings file
         std::filesystem::path _settingsPath;
 

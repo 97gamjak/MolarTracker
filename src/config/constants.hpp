@@ -40,6 +40,14 @@ class ConstantsSchema
 
     /// The busy timeout for the database in milliseconds
     static constexpr int _dbBusyTimeoutMs = 5000;
+
+    /// The name of the settings file
+    static constexpr const char* _settingsFileName = "settings.json";
+
+    // TODO(97gamjak): move this to a specialized quantity approach
+    // as soon as it is implemented in mstd
+    /// The multiplier to convert seconds to milliseconds
+    static constexpr const int _secondsToMs = 1000;
 };
 
 /**
@@ -72,6 +80,12 @@ class Constants
     [[nodiscard]] static std::string getGitTag();
 
     [[nodiscard]] static int getDbBusyTimeoutMs();
+
+    // TODO(97gamjak): move this to a specialized quantity approach
+    // as soon as it is implemented in mstd
+    [[nodiscard]] static int getSecondsToMs();
+
+    [[nodiscard]] static std::string getSettingsFileName();
 
    private:
     Constants();

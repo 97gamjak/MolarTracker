@@ -16,6 +16,8 @@ struct RingFileConfig
     /// Default maximum size of each file in megabytes
     static constexpr int DefaultMaxSizeMB = 50;
 
+    // TODO(97gamjak): move this to a specialized quantity approach
+    // as soon as it is implemented in mstd
     /// Conversion factor from megabytes to bytes
     static constexpr int MBtoBytes = 1024 * 1024;
 

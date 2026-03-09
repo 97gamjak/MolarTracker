@@ -1,5 +1,6 @@
 #include "log_viewer_settings.hpp"
 
+#include "config/constants.hpp"
 #include "params/params.hpp"
 
 namespace settings
@@ -53,7 +54,9 @@ namespace settings
             _reloadIntervalSec.getPrecision().value() == 3
         );
 
-        return static_cast<int>(getReloadIntervalSec() * 1000);
+        return static_cast<int>(
+            getReloadIntervalSec() * Constants::getSecondsToMs()
+        );
     }
 
     /**

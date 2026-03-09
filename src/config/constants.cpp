@@ -148,3 +148,22 @@ int Constants::getDbBusyTimeoutMs()
 {
     return ConstantsSchema::_dbBusyTimeoutMs;
 }
+
+/**
+ * @brief Get the multiplier to convert seconds to milliseconds, this is used
+ * for settings that are stored in seconds but need to be converted to
+ * milliseconds for use in the application (e.g. auto-reload interval)
+ *
+ * @return int
+ */
+int Constants::getSecondsToMs() { return ConstantsSchema::_secondsToMs; }
+
+/**
+ * @brief Get the name of the settings file
+ *
+ * @return const std::string
+ */
+std::string Constants::getSettingsFileName()
+{
+    return ConstantsSchema::_settingsFileName;
+}
