@@ -12,10 +12,10 @@ namespace app
     /**
      * @brief Construct a new Profile Service:: Profile Service object
      *
-     * @param getProfileRepo
+     * @param repo
      */
-    ProfileService::ProfileService(IProfileRepo& getProfileRepo)
-        : _profileRepo{getProfileRepo}
+    ProfileService::ProfileService(const std::shared_ptr<IProfileRepo>& repo)
+        : _profileRepo{repo}
     {
     }
 
@@ -27,7 +27,7 @@ namespace app
      */
     std::optional<Profile> ProfileService::get(ProfileId id) const
     {
-        return _profileRepo.get(id);
+        return _profileRepo->get(id);
     }
 
     /**
@@ -37,7 +37,7 @@ namespace app
      */
     std::vector<Profile> ProfileService::getAll() const
     {
-        return _profileRepo.getAll();
+        return _profileRepo->getAll();
     }
 
     /**
@@ -52,7 +52,7 @@ namespace app
         const std::optional<std::string>& email
     )
     {
-        return _profileRepo.create(name, email);
+        return _profileRepo->create(name, email);
     }
 
     /**
@@ -68,7 +68,7 @@ namespace app
         const std::optional<std::string>& newEmail
     )
     {
-        _profileRepo.update(id, newName, newEmail);
+        _profileRepo->update(id, newName, newEmail);
     }
 
     /**
@@ -76,6 +76,6 @@ namespace app
      *
      * @param id
      */
-    void ProfileService::remove(ProfileId id) { _profileRepo.remove(id); }
+    void ProfileService::remove(ProfileId id) { _profileRepo->remove(id); }
 
 }   // namespace app

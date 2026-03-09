@@ -19,13 +19,14 @@ namespace app
     {
        private:
         /// The Profile repository
-        ProfileRepo _profileRepo;
+        std::shared_ptr<IProfileRepo> _profileRepo;
 
        public:
         explicit RepoContainer(const std::shared_ptr<db::Database>& db);
 
-        [[nodiscard]] IProfileRepo&       getProfileRepo();
-        [[nodiscard]] const IProfileRepo& getProfileRepo() const;
+        [[nodiscard]] std::shared_ptr<IProfileRepo>       getProfileRepo();
+        [[nodiscard]] std::shared_ptr<const IProfileRepo> getProfileRepo(
+        ) const;
     };
 
 }   // namespace app
