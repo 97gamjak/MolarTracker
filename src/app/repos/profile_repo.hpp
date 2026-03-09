@@ -50,7 +50,7 @@ namespace app
         void remove(ProfileId id) override;
 
        private:
-        void _ensureSchema();
+        void _ensureSchema() const;
     };
 
 }   // namespace app

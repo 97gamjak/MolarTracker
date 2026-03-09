@@ -38,7 +38,10 @@ namespace app
      * ensureSchema() to not use virtual dispatch in constructor
      *
      */
-    void ProfileRepo::_ensureSchema() { orm::createTable<ProfileRow>(_db); }
+    void ProfileRepo::_ensureSchema() const
+    {
+        orm::createTable<ProfileRow>(_db);
+    }
 
     /**
      * @brief Get all profiles from the database
