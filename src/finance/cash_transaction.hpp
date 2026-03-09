@@ -6,6 +6,16 @@
 
 namespace finance
 {
+    /**
+     * @brief A class representing a cash transaction entry, which is a specific
+     * type of transaction entry that involves a cash movement in a specific
+     * account. This class includes the account associated with the transaction
+     * and the cash amount involved in the transaction. It serves as a component
+     * of a larger financial transaction, which may include multiple entries
+     * representing different cash movements or account changes related to the
+     * transaction.
+     *
+     */
     class CashTransaction
     {
        private:

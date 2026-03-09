@@ -1,8 +1,9 @@
 #ifndef __CONFIG__ID_TYPES_HPP__
 #define __CONFIG__ID_TYPES_HPP__
 
+#include <mstd/enum.hpp>
+
 #include "config/strong_id.hpp"
-#include "mstd/enum.hpp"
 
 // clang-format off
 struct ProfileTag {};
@@ -34,10 +35,20 @@ struct TransactionEntryTag {};
 using TransactionEntryId = StrongId<TransactionEntryTag>;
 // clang-format on
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define INSTRUMENT_KIND_LIST(X) \
-    X(Security)                 \
+    X(Stock)                    \
     X(Cash)
 
 MSTD_ENUM(InstrumentKind, std::uint8_t, INSTRUMENT_KIND_LIST);
+
+#define ACCOUNT_KIND_LIST(X) \
+    X(Cash)                  \
+    X(Security)              \
+    X(External)
+
+MSTD_ENUM(AccountKind, std::uint8_t, ACCOUNT_KIND_LIST);
+
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif   // __CONFIG__ID_TYPES_HPP__
