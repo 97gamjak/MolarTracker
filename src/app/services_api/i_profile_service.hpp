@@ -28,14 +28,16 @@ namespace app
          * @return std::optional<Profile> The profile with the given ID, or
          * std::nullopt if no such profile exists
          */
-        virtual std::optional<Profile> get(ProfileId id) const = 0;
+        [[nodiscard]] virtual std::optional<Profile> get(
+            ProfileId id
+        ) const = 0;
 
         /**
          * @brief Get all profiles
          *
          * @return std::vector<Profile> A vector of all profiles
          */
-        virtual std::vector<Profile> getAll() const = 0;
+        [[nodiscard]] virtual std::vector<Profile> getAll() const = 0;
 
         /**
          * @brief Create a new profile with the given name and email, this will
@@ -46,7 +48,7 @@ namespace app
          * @param email The email of the new profile (optional)
          * @return ProfileId The ID of the newly created profile
          */
-        virtual ProfileId create(
+        [[nodiscard]] virtual ProfileId create(
             const std::string&                name,
             const std::optional<std::string>& email
         ) = 0;
