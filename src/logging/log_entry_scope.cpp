@@ -24,6 +24,20 @@ namespace logging
     }
 
     /**
+     * @brief Get the log object associated with this scope
+     *
+     * @return const LogObject& The log object associated with this scope
+     */
+    LogObject LogEntryScope::getLogObject() const { return _logObject; }
+
+    /**
+     * @brief Check if the scope is enabled for logging
+     *
+     * @return true if the scope is enabled for logging, false otherwise
+     */
+    bool LogEntryScope::isEnabled() const { return _enabled; }
+
+    /**
      * @brief Destroy the Log Entry Scope:: Log Entry Scope object
      *
      */
@@ -60,7 +74,7 @@ namespace logging
      */
     TimedLogEntryScope::~TimedLogEntryScope()
     {
-        if (_enabled)
+        if (isEnabled())
         {
             using std::chrono::duration_cast;
             using std::chrono::milliseconds;
@@ -70,11 +84,13 @@ namespace logging
             const auto _ms     = duration_cast<milliseconds>(timeDifference);
             const auto time_ms = _ms.count();
 
-            _logObject.message = "⧖ exit  " + std::string(_logObject.function) +
-                                 " (duration: " + std::to_string(time_ms) +
-                                 " ms)";
+            auto logObject = getLogObject();
 
-            LogManager::getInstance().log(_logObject);
+            logObject.message = "⧖ exit  " + std::string(logObject.function) +
+                                " (duration: " + std::to_string(time_ms) +
+                                " ms)";
+
+            LogManager::getInstance().log(logObject);
         }
     }
 

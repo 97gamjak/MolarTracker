@@ -8,6 +8,8 @@
 #include "log_manager.hpp"       // IWYU pragma: keep
 #include "log_object.hpp"        // IWYU pragma: keep
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
 namespace logging::detail
 {
     inline std::string internNoexcept(const char* name) noexcept
@@ -62,5 +64,7 @@ namespace logging::detail
     logging::TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
 
 #define MT_DEBUG std::cerr
+
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif   // __LOGGING__LOG_MACROS_HPP__

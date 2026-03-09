@@ -4,7 +4,6 @@
 #include <string>
 
 #include "config/logging_base.hpp"
-#include "log_category.hpp"
 
 namespace logging
 {
