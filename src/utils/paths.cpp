@@ -58,7 +58,7 @@ namespace utils
      */
     inline bool _isWindowsReservedName(std::string_view s)
     {
-        const std::string name = _win_normalize_name(s);
+        const std::string name = _winNormalizeName(s);
 
         if (name == "CON" || name == "PRN" || name == "AUX" || name == "NUL")
             return true;
