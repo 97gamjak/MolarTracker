@@ -34,7 +34,7 @@ namespace orm
         static constexpr bool isPk = has_option_v<primary_key_t, Options...>;
 
         /// Compile-time flag indicating whether this field is a foreign key
-        static constexpr bool isFk = has_option_v<foreign_key_t, Options...>;
+        static constexpr bool isFk = has_foreign_key_v<Value, Options...>;
 
         /// Compile-time flag indicating whether this field is auto-incremented
         static constexpr bool isAutoIncrement =
@@ -73,10 +73,6 @@ namespace orm
     template <typename Value>
     using IdField =
         Field<"id", Value, primary_key_t, auto_increment_t, unique_t>;
-
-    template <typename Value>
-    using ForeignIdField =
-        Field<"id", Value, primary_key_t, foreign_key_t, unique_t>;
 
 }   // namespace orm
 

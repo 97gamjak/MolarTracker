@@ -54,10 +54,11 @@ RingFile& RingFile::operator=(RingFile&& other) noexcept
         return *this;
 
     close();
-    _config          = std::move(other._config);
-    _file            = std::move(other._file);
-    _initialFileSize = other._initialFileSize;
-    _bytesWritten    = other._bytesWritten;
+    _config             = std::move(other._config);
+    _file               = std::move(other._file);
+    _initialFileSize    = other._initialFileSize;
+    _bytesWritten       = other._bytesWritten;
+    _currentSymlinkPath = std::move(other._currentSymlinkPath);
 
     other._initialFileSize = 0;
     other._bytesWritten    = 0;
