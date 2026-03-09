@@ -179,3 +179,26 @@ std::pair<int, int> Constants::getGlobalMinDialogSize()
 {
     return ConstantsSchema::_globalMinDialogSize;
 }
+
+/**
+ * @brief Get the main window default size, this is used as the default size
+ * for the main window when it is first created
+ *
+ * @return std::pair<int, int>
+ */
+std::pair<int, int> Constants::getMainWindowSize()
+{
+    return ConstantsSchema::_mainWindowSize;
+}
+
+/**
+ * @brief Get the core window margins, this is used as the default margins for
+ * the core content of dialogs in the application to ensure consistent spacing
+ * between the edges of the dialog and the content
+ *
+ * @return std::tuple<int, int, int, int>
+ */
+std::tuple<int, int, int, int> Constants::getCoreWindowMargins()
+{
+    return ConstantsSchema::_coreWindowMargins;
+}

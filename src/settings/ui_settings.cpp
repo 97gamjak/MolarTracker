@@ -1,7 +1,5 @@
 #include "ui_settings.hpp"
 
-#include "params/params.hpp"
-
 namespace settings
 {
     /**
