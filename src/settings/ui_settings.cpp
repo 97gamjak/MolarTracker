@@ -37,4 +37,24 @@ namespace settings
         return _logViewerSettings;
     }
 
+    /**
+     * @brief Get the DebugSlotsSettings object
+     *
+     * @return DebugSlotsSettings&
+     */
+    DebugSlotsSettings& UISettings::getDebugSlotsSettings()
+    {
+        return _debugSlotsSettings;
+    }
+
+    /**
+     * @brief Get the DebugSlotsSettings object (const version)
+     *
+     * @return const DebugSlotsSettings&
+     */
+    const DebugSlotsSettings& UISettings::getDebugSlotsSettings() const
+    {
+        return _debugSlotsSettings;
+    }
+
 }   // namespace settings

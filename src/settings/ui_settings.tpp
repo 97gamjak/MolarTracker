@@ -16,6 +16,7 @@ namespace settings
     void UISettings::_forEachParam(Func&& func) const
     {
         std::forward<Func>(func)(_logViewerSettings);
+        std::forward<Func>(func)(_debugSlotsSettings);
     }
 
     /**
@@ -29,6 +30,7 @@ namespace settings
     void UISettings::_forEachParam(Func&& func)
     {
         std::forward<Func>(func)(_logViewerSettings);
+        std::forward<Func>(func)(_debugSlotsSettings);
     }
 
 }   // namespace settings

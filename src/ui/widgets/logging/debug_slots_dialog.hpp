@@ -22,7 +22,13 @@ namespace ui
     {
         Q_OBJECT
 
+       public:
+        struct Settings;
+
        private:
+        /// Settings for the debug slots dialog
+        std::shared_ptr<Settings> _settings;
+
         /// The reference map of log categories
         logging::LogCategories _categories;
         /// The current map of log categories
@@ -62,7 +68,10 @@ namespace ui
             ResetDefault
         };
 
-        explicit DebugSlotsDialog(QWidget* parent);
+        explicit DebugSlotsDialog(
+            std::shared_ptr<Settings> settings,
+            QWidget*                  parent
+        );
 
         void setCategories(const logging::LogCategories& categories);
         void setCategories(
@@ -91,6 +100,21 @@ namespace ui
         void _applyToChildren(const QModelIndex& idx);
     };
 
+    /**
+     * @brief Settings for DebugSlotsDialog
+     *
+     */
+    struct DebugSlotsDialog::Settings
+    {
+       public:
+        /// The size of the debug slots dialog window in pixels, represented as
+        /// a tuple of (width, height)
+        std::pair<int, int> windowSize;
+
+       public:
+        Settings() = delete;
+        explicit Settings(std::pair<int, int> _windowSize);
+    };
 }   // namespace ui
 
 #endif   // __UI__WIDGETS__LOGGING__DEBUG_SLOTS_DIALOG_HPP__

@@ -2,6 +2,7 @@ add_library(molartracker_settings STATIC
     settings.cpp
     ui_settings.cpp
     log_viewer_settings.cpp
+    debug_slots_settings.cpp
     general_settings.cpp
     logging_settings.cpp
 )

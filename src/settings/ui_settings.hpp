@@ -1,6 +1,7 @@
 #ifndef __SETTINGS__UI_SETTINGS_HPP__
 #define __SETTINGS__UI_SETTINGS_HPP__
 
+#include "debug_slots_settings.hpp"
 #include "log_viewer_settings.hpp"
 #include "params/params.hpp"
 
@@ -45,11 +46,17 @@ namespace settings
         /// The UI settings parameters
         LogViewerSettings _logViewerSettings;
 
+        /// The debug slots settings
+        DebugSlotsSettings _debugSlotsSettings;
+
        public:
         UISettings();
 
         [[nodiscard]] LogViewerSettings&       getLogViewerSettings();
         [[nodiscard]] const LogViewerSettings& getLogViewerSettings() const;
+
+        [[nodiscard]] DebugSlotsSettings&       getDebugSlotsSettings();
+        [[nodiscard]] const DebugSlotsSettings& getDebugSlotsSettings() const;
 
        private:
         template <typename Func>

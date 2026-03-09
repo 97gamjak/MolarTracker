@@ -25,9 +25,14 @@ namespace ui
     /**
      * @brief Constructs the DebugSlotsDialog
      *
-     * @param parent widget
+     * @param settings Settings for the debug slots dialog
+     * @param parent Parent widget
      */
-    DebugSlotsDialog::DebugSlotsDialog(QWidget* parent) : QDialog(parent)
+    DebugSlotsDialog::DebugSlotsDialog(
+        std::shared_ptr<Settings> settings,
+        QWidget*                  parent
+    )
+        : QDialog(parent), _settings(std::move(settings))
     {
         _buildUi();
         _connectButtons();
@@ -74,7 +79,7 @@ namespace ui
     void DebugSlotsDialog::_buildUi()
     {
         setWindowTitle("Logging Debug Flags");
-        resize(820, 560);
+        resize(_settings->windowSize.first, _settings->windowSize.second);
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _tree = new QTreeView(this);
@@ -92,10 +97,12 @@ namespace ui
         _model = new LogCategoryModel(_currentCategories, _tree);
         _tree->setModel(_model);
 
+        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         _tree->setItemDelegateForColumn(
             LogCategoryModel::getLogLevelColumn(),
             new DebugSlotsLogLevelDelegate(this)
         );
+        // NOLINTEND(cppcoreguidelines-owning-memory)
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* applyToChildrenDelegate =
@@ -325,6 +332,16 @@ namespace ui
     void DebugSlotsDialog::_applyToChildren(const QModelIndex& idx)
     {
         _model->applyToChildren(idx);
+    }
+
+    /**
+     * @brief Construct a new Debug Slots Dialog:: Settings:: Settings object
+     *
+     * @param _windowSize
+     */
+    DebugSlotsDialog::Settings::Settings(std::pair<int, int> _windowSize)
+        : windowSize(std::move(_windowSize))
+    {
     }
 
 }   // namespace ui
