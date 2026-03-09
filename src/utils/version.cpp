@@ -63,6 +63,7 @@ namespace utils
                         return std::nullopt;
 
                     values.push_back(static_cast<std::size_t>(value));
+                    valueStr.clear();
                 }
                 catch (const std::exception&)
                 {
@@ -77,6 +78,23 @@ namespace utils
 
             if (character == '+')
                 break;
+        }
+
+        if (!valueStr.empty())
+        {
+            int value = 0;
+            try
+            {
+                value = std::stoi(valueStr);
+                if (value < 0)
+                    return std::nullopt;
+
+                values.push_back(static_cast<std::size_t>(value));
+            }
+            catch (const std::exception&)
+            {
+                return std::nullopt;
+            }
         }
 
         if (values.size() != 3)
