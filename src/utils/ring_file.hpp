@@ -1,6 +1,8 @@
 #ifndef __UTILS__RING_FILE_HPP__
 #define __UTILS__RING_FILE_HPP__
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <string>
