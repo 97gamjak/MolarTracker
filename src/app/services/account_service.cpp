@@ -10,8 +10,10 @@ namespace app
      *
      * @param accountRepo
      */
-    AccountService::AccountService(std::shared_ptr<IAccountRepo> accountRepo)
-        : _accountRepo(std::move(accountRepo))
+    AccountService::AccountService(
+        const std::shared_ptr<IAccountRepo>& accountRepo
+    )
+        : _accountRepo(accountRepo)
     {
     }
 

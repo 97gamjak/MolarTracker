@@ -11,6 +11,7 @@ target_link_libraries(molartracker_app_repos
     molartracker_db
     molartracker_app_domain
     molartracker_app_factories
+    molartracker_finance
 )
 
 target_include_directories(molartracker_app_repos

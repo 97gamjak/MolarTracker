@@ -2,6 +2,7 @@
 #define __APP__STORE_CONTAINER_HPP__
 
 #include "config/signal_tags.hpp"
+#include "store/account_store.hpp"
 #include "store/profile_store.hpp"
 
 namespace app
@@ -19,6 +20,9 @@ namespace app
         /// The Profile store
         ProfileStore _profileStore;
 
+        /// The Account store
+        AccountStore _accountStore;
+
         /// list of all stores
         std::vector<IStore*> _allStores;
 
@@ -33,8 +37,11 @@ namespace app
             void*                user
         );
 
-        ProfileStore&       getProfileStore();
-        const ProfileStore& getProfileStore() const;
+        [[nodiscard]] ProfileStore&       getProfileStore();
+        [[nodiscard]] const ProfileStore& getProfileStore() const;
+
+        [[nodiscard]] AccountStore&       getAccountStore();
+        [[nodiscard]] const AccountStore& getAccountStore() const;
     };
 
 }   // namespace app

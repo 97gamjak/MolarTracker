@@ -1,6 +1,7 @@
 #ifndef __APP__STORE__PROFILE_STORE_HPP__
 #define __APP__STORE__PROFILE_STORE_HPP__
 
+#include <memory>
 #include <optional>
 #include <set>
 #include <string>
@@ -9,8 +10,8 @@
 #include <vector>
 
 #include "app/domain/profile.hpp"
-#include "app/services_api/i_profile_service.hpp"
 #include "app/store/i_store.hpp"
+#include "config/id_types.hpp"
 
 namespace drafts
 {
@@ -19,6 +20,9 @@ namespace drafts
 
 namespace app
 {
+
+    class IProfileService;   // forward declaration
+
     /**
      * @brief Result of profile store operations
      *
@@ -39,7 +43,7 @@ namespace app
     {
        private:
         /// reference to the profile service
-        IProfileService& _profileService;
+        std::shared_ptr<IProfileService> _profileService;
 
         /// in-memory cache of profiles, this is the source of truth for the UI
         /// and is only committed to the profile service when commit() is
@@ -62,13 +66,9 @@ namespace app
         std::optional<ProfileId> _activeProfileId;
 
        public:
-        explicit ProfileStore(IProfileService& getProfileService);
-        ~ProfileStore() override = default;
-
-        ProfileStore(ProfileStore const&)                = delete;
-        ProfileStore& operator=(ProfileStore const&)     = delete;
-        ProfileStore(ProfileStore&&) noexcept            = delete;
-        ProfileStore& operator=(ProfileStore&&) noexcept = delete;
+        explicit ProfileStore(
+            const std::shared_ptr<IProfileService>& profileService
+        );
 
         void reload();
 

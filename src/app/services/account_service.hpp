@@ -21,7 +21,9 @@ namespace app
         std::shared_ptr<IAccountRepo> _accountRepo;
 
        public:
-        explicit AccountService(std::shared_ptr<IAccountRepo> accountRepo);
+        explicit AccountService(
+            const std::shared_ptr<IAccountRepo>& accountRepo
+        );
 
         [[nodiscard]] AccountId createCashAccount(
             const finance::CashAccount& cashAccount

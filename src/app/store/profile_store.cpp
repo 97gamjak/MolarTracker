@@ -5,6 +5,7 @@
 #include <format>
 #include <unordered_map>
 
+#include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "services_api/i_profile_service.hpp"
@@ -22,12 +23,14 @@ namespace app
      * for each profile and maintains a set of used IDs to ensure uniqueness
      * when generating new profile IDs.
      *
-     * @param getProfileService
+     * @param profileService
      */
-    ProfileStore::ProfileStore(IProfileService& getProfileService)
-        : _profileService{getProfileService}
+    ProfileStore::ProfileStore(
+        const std::shared_ptr<IProfileService>& profileService
+    )
+        : _profileService{profileService}
     {
-        _profiles = _profileService.getAll();
+        _profiles = _profileService->getAll();
 
         for (const auto& profile : _profiles)
         {
@@ -304,7 +307,7 @@ namespace app
      */
     void ProfileStore::reload()
     {
-        _profiles = _profileService.getAll();
+        _profiles = _profileService->getAll();
 
         _profileStates.clear();
         _usedIds.clear();
@@ -328,7 +331,7 @@ namespace app
     {
         const auto& name  = profile.getName();
         const auto& email = profile.getEmail();
-        const auto  newId = _profileService.create(name, email);
+        const auto  newId = _profileService->create(name, email);
         const auto  oldId = profile.getId();
 
         if (newId != oldId)
@@ -366,7 +369,7 @@ namespace app
         const auto& email = profile.getEmail();
         const auto  id    = profile.getId();
 
-        _profileService.update(id, name, email);
+        _profileService->update(id, name, email);
         _profileStates[id] = StoreState::Clean;
 
         LOG_INFO(
@@ -383,7 +386,7 @@ namespace app
     {
         const auto id = profile.getId();
 
-        _profileService.remove(id);
+        _profileService->remove(id);
         _usedIds.erase(id);
         _profileStates.erase(id);
         _removeInternal(id);
