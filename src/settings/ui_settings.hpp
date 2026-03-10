@@ -1,6 +1,8 @@
 #ifndef __SETTINGS__UI_SETTINGS_HPP__
 #define __SETTINGS__UI_SETTINGS_HPP__
 
+#include <string>
+
 #include "debug_slots_settings.hpp"
 #include "log_viewer_settings.hpp"
 #include "params/params.hpp"
@@ -79,7 +81,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__UI_SETTINGS_TPP__
-#include "ui_settings.tpp"
-#endif   // __SETTINGS__UI_SETTINGS_TPP__
+#include "ui_settings.tpp"   // IWYU pragma: keep
+#endif
 
 #endif   // __SETTINGS__UI_SETTINGS_HPP__

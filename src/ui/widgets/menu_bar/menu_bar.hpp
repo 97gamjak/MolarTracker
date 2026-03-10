@@ -2,7 +2,7 @@
 #define __UI__WIDGETS__MENU_BAR__MENU_BAR_HPP__
 
 #include <QMenuBar>
-#include <QObject>
+#include <QMetaType>
 
 #include "debug_menu.hpp"
 #include "edit_menu.hpp"
@@ -10,8 +10,7 @@
 #include "help_menu.hpp"
 #include "settings_menu.hpp"
 
-class QMainWindow;   // Forward declaration
-class QAction;       // Forward declaration
+class QWidget;   // Forward declaration
 
 namespace ui
 {

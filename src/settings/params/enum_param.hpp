@@ -50,7 +50,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__PARAMS__ENUM_PARAM_TPP__
-#include "enum_param.tpp"
-#endif   // __SETTINGS__PARAMS__ENUM_PARAM_TPP__
+#include "enum_param.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __SETTINGS__PARAMS__ENUM_PARAM_HPP__

@@ -1,5 +1,12 @@
 #include "name_line_edit.hpp"
 
+#include <QStringView>
+#include <utility>
+
+#include "line_validator.hpp"
+
+class QWidget;   // Forward declaration
+
 namespace ui
 {
     /**

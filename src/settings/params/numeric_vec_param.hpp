@@ -104,7 +104,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
-#include "numeric_vec_param.tpp"
-#endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
+#include "numeric_vec_param.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__

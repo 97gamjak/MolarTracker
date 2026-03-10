@@ -1,5 +1,7 @@
 #include "exceptions/base.hpp"
 
+#include <utility>
+
 /**
  * @brief Constructs a new Molar Tracker Exception object
  *

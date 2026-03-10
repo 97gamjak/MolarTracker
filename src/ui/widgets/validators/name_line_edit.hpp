@@ -1,9 +1,13 @@
 #ifndef __UI__WIDGETS__VALIDATORS__NAME_LINE_EDIT_HPP__
 #define __UI__WIDGETS__VALIDATORS__NAME_LINE_EDIT_HPP__
 
+#include <QMetaType>
 #include <QRegularExpression>
+#include <QString>
 
 #include "line_validator.hpp"
+
+class QWidget;   // Forward declaration
 
 namespace ui
 {

@@ -1,5 +1,7 @@
 #include "cash.hpp"
 
+#include <string>
+
 #include "currency_exception.hpp"
 
 namespace finance

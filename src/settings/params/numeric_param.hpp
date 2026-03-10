@@ -97,7 +97,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
-#include "numeric_param.tpp"
-#endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
+#include "numeric_param.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__

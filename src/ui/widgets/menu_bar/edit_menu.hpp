@@ -1,7 +1,9 @@
 #ifndef __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__
 #define __UI__WIDGETS__MENU_BAR__EDIT_MENU_HPP__
 
+#include <QMetaType>
 #include <QObject>
+#include <QString>
 
 class QAction;    // Forward declaration
 class QMenu;      // Forward declaration

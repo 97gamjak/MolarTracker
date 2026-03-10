@@ -1,7 +1,7 @@
 #ifndef __UTILS__PATHS_HPP__
 #define __UTILS__PATHS_HPP__
 
-#include <cstdlib>
+#include <cstdint>
 #include <expected>
 #include <filesystem>
 #include <string_view>

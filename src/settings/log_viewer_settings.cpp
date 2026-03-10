@@ -1,5 +1,8 @@
 #include "log_viewer_settings.hpp"
 
+#include <cassert>
+#include <optional>
+
 #include "config/constants.hpp"
 #include "params/params.hpp"
 

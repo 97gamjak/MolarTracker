@@ -1,6 +1,13 @@
 #include "email_line_edit.hpp"
 
 #include <QRegularExpression>
+#include <QString>
+#include <QStringView>
+#include <utility>
+
+#include "line_validator.hpp"
+
+class QWidget;   // Forward declaration
 
 namespace ui
 {

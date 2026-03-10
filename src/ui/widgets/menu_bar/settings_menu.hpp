@@ -1,6 +1,7 @@
 #ifndef __UI__WIDGETS__MENU_BAR__SETTINGS_MENU_HPP__
 #define __UI__WIDGETS__MENU_BAR__SETTINGS_MENU_HPP__
 
+#include <QMetaType>
 #include <QObject>
 
 class QMenu;

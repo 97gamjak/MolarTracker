@@ -116,7 +116,11 @@
         "qvboxlayout": "cpp",
         "qstring": "cpp",
         "qmessagebox": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "qdialog": "cpp",
+        "qkeysequence": "cpp",
+        "qfunctionpointer": "cpp",
+        "qtcore": "cpp"
     },
     "cSpell.words": [
         "googletest",

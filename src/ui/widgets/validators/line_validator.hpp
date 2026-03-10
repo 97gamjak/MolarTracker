@@ -2,8 +2,13 @@
 #define __UI__WIDGETS__VALIDATORS__LINE_VALIDATOR_HPP__
 
 #include <QLineEdit>
+#include <QMetaType>
+#include <QString>
+#include <QStringView>
+#include <utility>
 
-class QLabel;   // Forward declaration
+class QLabel;    // Forward declaration
+class QWidget;   // Forward declaration
 
 namespace ui
 {

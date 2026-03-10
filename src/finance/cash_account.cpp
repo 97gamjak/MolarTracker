@@ -1,7 +1,23 @@
 #include "cash_account.hpp"
 
+#include <utility>
+
 namespace finance
 {
+
+    /*
+    // clang-format off
+    // NOLINTBEGIN(cppcoreguidelines-macro-usage)
+    #define ACCOUNT_STATUS_LIST(X) \
+        X(Active)                  \
+        X(Closed)
+
+    // cppcheck-suppress syntaxError
+    MSTD_ENUM(AccountStatus, uint8_t, ACCOUNT_STATUS_LIST);
+
+    // NOLINTEND(cppcoreguidelines-macro-usage)
+    // clang-format on
+    */
 
     /**
      * @brief Construct a new CashAccount:: CashAccount object

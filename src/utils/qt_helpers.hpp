@@ -1,7 +1,7 @@
 #ifndef __UTILS__QT_HELPERS_HPP__
 #define __UTILS__QT_HELPERS_HPP__
 
-#include <QStringList>
+#include <QtContainerFwd>
 #include <span>
 #include <string_view>
 

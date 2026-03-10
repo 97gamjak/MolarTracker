@@ -1,6 +1,8 @@
 #ifndef __FINANCE__CURRENCY_EXCEPTION_HPP__
 #define __FINANCE__CURRENCY_EXCEPTION_HPP__
 
+#include <string>
+
 #include "exceptions/base.hpp"
 
 namespace finance

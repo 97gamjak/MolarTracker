@@ -2,6 +2,8 @@
 
 #include <expected>
 #include <format>
+#include <memory>
+#include <utility>
 
 #include "add_profile_command_error.hpp"
 #include "app/store/profile_store.hpp"

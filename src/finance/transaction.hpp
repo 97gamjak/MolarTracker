@@ -1,9 +1,10 @@
 #ifndef __FINANCE__TRANSACTION_HPP__
 #define __FINANCE__TRANSACTION_HPP__
 
-#include <mstd/enum.hpp>
+#include <cstdint>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "config/id_types.hpp"
 #include "transaction_entry.hpp"
@@ -11,15 +12,11 @@
 
 namespace finance
 {
-    // clang-format off
-    // NOLINTBEGIN
-    #define TRANSACTION_STATUS_LIST(X) \
-        X(Completed) \
-        X(Deleted)
+    enum class TransactionStatus : std::uint8_t;   // Forward declaration
+}   // namespace finance
 
-    MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST)
-    // NOLINTEND
-    // clang-format on
+namespace finance
+{
 
     /**
      * @brief A class representing a financial transaction, which may involve

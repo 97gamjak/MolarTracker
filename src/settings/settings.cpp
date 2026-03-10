@@ -2,9 +2,18 @@
 
 #include <filesystem>
 #include <fstream>
+#include <nlohmann/json.hpp>
+#include <string>
 
 #include "config/constants.hpp"
 #include "params/params.hpp"
+
+namespace settings
+{
+    class GeneralSettings;
+    class LoggingSettings;
+    class UISettings;
+}   // namespace settings
 
 namespace settings
 {

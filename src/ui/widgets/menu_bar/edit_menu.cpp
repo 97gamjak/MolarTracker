@@ -1,6 +1,7 @@
 #include "edit_menu.hpp"
 
 #include <QAction>
+#include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
 

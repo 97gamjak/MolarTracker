@@ -1,6 +1,8 @@
 #ifndef __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
 #define __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
 
+#include <cstddef>
+#include <string>
 #include <utility>
 
 #include "exceptions/base.hpp"
@@ -210,7 +212,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
-#include "log_viewer_settings.tpp"
-#endif   // __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
+#include "log_viewer_settings.tpp"   // IWYU pragma: keep
+#endif
 
 #endif   // __SETTINGS__LOG_VIEWER_SETTINGS_HPP__

@@ -4,11 +4,10 @@
 #include <filesystem>
 #include <string>
 
+#include "config/logging_base.hpp"
 #include "log_categories.hpp"
 #include "log_category.hpp"
 #include "utils/ring_file.hpp"
-
-enum class LogLevel : std::int8_t;   // forward declaration
 
 namespace settings
 {

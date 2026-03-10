@@ -1,6 +1,7 @@
 #ifndef __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__
 #define __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__
 
+#include <cstddef>
 #include <mstd/enum.hpp>
 #include <string>
 

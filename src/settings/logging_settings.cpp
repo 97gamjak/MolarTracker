@@ -1,5 +1,9 @@
 #include "logging_settings.hpp"
 
+#include <optional>
+
+#include "params/params.hpp"
+
 namespace settings
 {
     /**

@@ -58,7 +58,7 @@ class Signal
 };
 
 #ifndef __CONNECTIONS__SIGNAL_TPP__
-#include "signal.tpp"
-#endif   // __CONNECTIONS__SIGNAL_TPP__
+#include "signal.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __CONNECTIONS__SIGNAL_HPP__

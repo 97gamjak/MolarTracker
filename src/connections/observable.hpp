@@ -44,7 +44,7 @@ class Observable
 };
 
 #ifndef __CONNECTIONS__OBSERVABLE_TPP__
-#include "observable.tpp"
-#endif   // __CONNECTIONS__OBSERVABLE_TPP__
+#include "observable.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __CONNECTIONS__OBSERVABLE_HPP__

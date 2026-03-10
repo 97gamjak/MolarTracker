@@ -1,6 +1,8 @@
 #include "file_menu.hpp"
 
-#include <QMainWindow>
+#include <QAction>
+#include <QKeySequence>
+#include <QMenu>
 #include <QMenuBar>
 #include <QObject>
 

@@ -1,11 +1,11 @@
 #ifndef __UI__COMMANDS__PROFILE__SET_DEFAULT_PROFILE_COMMAND_HPP__
 #define __UI__COMMANDS__PROFILE__SET_DEFAULT_PROFILE_COMMAND_HPP__
 
-#include <expected>
 #include <optional>
 #include <string>
 
 #include "ui/commands/command.hpp"
+#include "ui/commands/command_error.hpp"
 
 namespace settings
 {

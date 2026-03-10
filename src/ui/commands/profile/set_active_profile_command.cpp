@@ -1,6 +1,9 @@
 #include "set_active_profile_command.hpp"
 
+#include <expected>
 #include <format>
+#include <memory>
+#include <utility>
 
 #include "app/store/profile_store.hpp"
 #include "logging/log_macros.hpp"

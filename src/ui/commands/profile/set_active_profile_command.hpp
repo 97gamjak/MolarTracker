@@ -1,11 +1,12 @@
 #ifndef __UI__COMMANDS__PROFILE__SET_ACTIVE_PROFILE_COMMAND_HPP__
 #define __UI__COMMANDS__PROFILE__SET_ACTIVE_PROFILE_COMMAND_HPP__
 
-#include <expected>
 #include <optional>
+#include <string>
 
 #include "app/domain/profile.hpp"
 #include "ui/commands/command.hpp"
+#include "ui/commands/command_error.hpp"
 
 namespace app
 {

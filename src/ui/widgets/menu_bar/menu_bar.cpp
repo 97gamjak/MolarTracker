@@ -1,14 +1,17 @@
 #include "menu_bar.hpp"
 
-#include <QMainWindow>
 #include <QMenuBar>
-#include <QObject>
 
-#include "debug_menu.hpp"
-#include "file_menu.hpp"
+class QWidget;   // Forward declaration
 
 namespace ui
 {
+
+    class DebugMenu;      // Forward declaration
+    class FileMenu;       // Forward declaration
+    class EditMenu;       // Forward declaration
+    class SettingsMenu;   // Forward declaration
+    class HelpMenu;       // Forward declaration
 
     /**
      * @brief Construct a new Menu Bar:: Menu Bar object
