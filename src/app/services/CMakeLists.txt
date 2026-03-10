@@ -1,5 +1,6 @@
 add_library(molartracker_app_services STATIC
     profile_service.cpp
+    account_service.cpp
 )
 
 target_include_directories(molartracker_app_services
