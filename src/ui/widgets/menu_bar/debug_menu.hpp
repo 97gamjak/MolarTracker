@@ -1,6 +1,7 @@
 #ifndef __UI__WIDGETS__MENU_BAR__DEBUG_MENU_HPP__
 #define __UI__WIDGETS__MENU_BAR__DEBUG_MENU_HPP__
 
+#include <QMetaType>
 #include <QObject>
 
 class QAction;    // Forward declaration

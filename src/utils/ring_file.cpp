@@ -1,8 +1,13 @@
 #include "utils/ring_file.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <optional>
+#include <system_error>
+#include <utility>
 
 /**
  * @brief Constructs a RingFile with the given configuration

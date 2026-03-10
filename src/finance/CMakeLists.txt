@@ -13,4 +13,6 @@ target_include_directories(molartracker_finance
 target_link_libraries(molartracker_finance
     PUBLIC
     mstd
+    PRIVATE
+    molartracker_config
 )

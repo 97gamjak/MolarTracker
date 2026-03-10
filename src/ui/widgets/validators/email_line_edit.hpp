@@ -1,7 +1,11 @@
 #ifndef __UI__WIDGETS__VALIDATORS__EMAIL_LINE_EDIT_HPP__
 #define __UI__WIDGETS__VALIDATORS__EMAIL_LINE_EDIT_HPP__
 
+#include <QMetaType>
+
 #include "line_validator.hpp"
+
+class QWidget;   // Forward declaration
 
 namespace ui
 {

@@ -1,13 +1,18 @@
 #include "log_manager.hpp"
 
+#include <algorithm>
 #include <format>
+#include <optional>
+#include <string>
 
 #include "config/logging_base.hpp"
 #include "log_categories.gen.hpp"
+#include "log_categories.hpp"
 #include "log_category.hpp"
 #include "log_object.hpp"
 #include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
+#include "utils/ring_file_config.hpp"
 #include "utils/timestamp.hpp"
 
 namespace logging

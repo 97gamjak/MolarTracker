@@ -1,5 +1,7 @@
 add_library(molartracker_app_repos STATIC
     profile_repo.cpp
+    account_repo.cpp
+    repo_errors.cpp
 )
 
 target_link_libraries(molartracker_app_repos

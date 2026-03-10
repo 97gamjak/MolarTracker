@@ -1,6 +1,10 @@
 #include "general_settings.hpp"
 
 #include "config/constants.hpp"
+#include "connections/observable.hpp"   // IWYU pragma: keep
+#include "connections/signal.hpp"       // IWYU pragma: keep
+#include "params/params.hpp"
+#include "utils/version.hpp"
 
 namespace settings
 {

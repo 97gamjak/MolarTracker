@@ -19,7 +19,7 @@ namespace orm
     void createTable(const std::shared_ptr<db::Database>& database)
     {
         std::string sqlText  = "CREATE TABLE IF NOT EXISTS ";
-        sqlText             += Model::table_name;
+        sqlText             += Model::tableName;
         sqlText             += " (";
 
         auto firstCol = true;

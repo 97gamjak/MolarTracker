@@ -1,12 +1,15 @@
 #include "utils/paths.hpp"
 
+#include <algorithm>
+#include <cstdlib>
+#include <string>
+#include <system_error>
+
 #if defined(_WIN32)
 #include <algorithm>
 #include <cctype>
 #include <string>
 #endif
-
-#include <algorithm>
 
 namespace utils
 {
@@ -135,6 +138,9 @@ namespace utils
             // Disallow segments like "a/..", "a\.." already blocked by
             // separators, but also reject any occurrence of ".." to be
             // conservative:
+            // TODO(97gamjak): add strContains method to mstd and use
+            // it here instead of find
+            // https://97gamjak.atlassian.net/browse/MSTD-100
             if (appName.find("..") != std::string_view::npos)
                 return false;
 

@@ -1,9 +1,13 @@
 #include "qt_helpers.hpp"
 
 #include <QDialog>
+#include <QList>
+#include <QPoint>
+#include <QRect>
 #include <QScreen>
-#include <QStringList>
+#include <QString>
 #include <QWidget>
+#include <string>
 
 namespace utils
 {

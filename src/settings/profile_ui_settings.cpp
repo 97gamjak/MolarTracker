@@ -1,6 +1,7 @@
 #include "profile_ui_settings.hpp"
 
 #include "config/constants.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {

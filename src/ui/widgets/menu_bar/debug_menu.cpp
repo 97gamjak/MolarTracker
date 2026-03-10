@@ -1,6 +1,6 @@
 #include "debug_menu.hpp"
 
-#include <QMainWindow>
+#include <QAction>
 #include <QMenu>
 #include <QMenuBar>
 

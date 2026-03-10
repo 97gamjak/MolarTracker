@@ -1,5 +1,7 @@
 #include "transaction.hpp"
 
+#include <utility>
+
 namespace finance
 {
     /**

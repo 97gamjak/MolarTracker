@@ -1,5 +1,8 @@
 #include "set_default_profile_command.hpp"
 
+#include <expected>
+#include <utility>
+
 #include "settings/general_settings.hpp"
 
 namespace ui

@@ -11,8 +11,9 @@ target_include_directories(molartracker_orm
 add_subdirectory(crud)
 
 target_link_libraries(molartracker_orm
-    PUBLIC
+    PRIVATE
     molartracker_db
-    mstd
     molartracker_orm_crud
+    molartracker_config
+    mstd
 )

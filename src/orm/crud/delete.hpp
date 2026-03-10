@@ -39,7 +39,7 @@ namespace orm
 
         std::string sqlText;
         sqlText += "DELETE FROM ";
-        sqlText += Model::table_name;
+        sqlText += Model::tableName;
         sqlText += " WHERE ";
 
         const auto whereClauses = getColumnNames(

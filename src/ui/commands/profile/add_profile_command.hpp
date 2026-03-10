@@ -1,20 +1,16 @@
 #ifndef __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__
 #define __UI__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__
 
-#include <expected>
+#include <string>
 
 #include "drafts/profile_draft.hpp"
 #include "ui/commands/command.hpp"
+#include "ui/commands/command_error.hpp"
 
 namespace app
 {
     class ProfileStore;   // Forward declaration
 }   // namespace app
-
-namespace settings
-{
-    class Settings;   // Forward declaration
-}   // namespace settings
 
 namespace ui
 {

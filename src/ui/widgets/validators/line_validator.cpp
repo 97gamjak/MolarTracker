@@ -1,6 +1,9 @@
 #include "line_validator.hpp"
 
+#include <QFunctionPointer>
 #include <QLabel>
+
+class QWidget;   // Forward declaration
 
 namespace ui
 {

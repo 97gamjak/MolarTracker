@@ -2,6 +2,13 @@
 
 namespace settings
 {
+    class DebugSlotsSettings;   // Forward declaration
+    class LogViewerSettings;    // Forward declaration
+    class ProfileUISettings;    // Forward declaration
+}   // namespace settings
+
+namespace settings
+{
     /**
      * @brief Get the LogViewerSettings object
      *

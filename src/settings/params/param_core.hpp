@@ -164,7 +164,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__PARAMS__PARAM_CORE_TPP__
-#include "param_core.tpp"
-#endif   // __SETTINGS__PARAMS__PARAM_CORE_TPP__
+#include "param_core.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __SETTINGS__PARAMS__PARAM_CORE_HPP__

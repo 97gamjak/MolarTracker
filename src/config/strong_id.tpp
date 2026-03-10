@@ -65,6 +65,17 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator-() const
 }
 
 /**
+ * @brief Convert the StrongId to a string representation
+ *
+ * @return std::string
+ */
+template <class Tag, class Rep>
+constexpr std::string StrongId<Tag, Rep>::toString() const
+{
+    return std::to_string(_value);
+}
+
+/**
  * @brief Output stream operator for StrongId
  *
  * @param output

@@ -1,6 +1,8 @@
 #ifndef __EXCEPTIONS__FILE_EXCEPTIONS_HPP__
 #define __EXCEPTIONS__FILE_EXCEPTIONS_HPP__
 
+#include <string>
+
 #include "exceptions/base.hpp"
 
 /**

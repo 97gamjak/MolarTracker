@@ -3,9 +3,8 @@
 
 #include <string>
 
+#include "config/finance_enums.hpp"
 #include "config/id_types.hpp"
-#include "finance/cash_account.hpp"
-#include "finance/currency.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
 
@@ -20,7 +19,7 @@
 struct AccountRow
 {
     /// The name of the database table this struct represents
-    static constexpr std::string table_name = "account";
+    static constexpr std::string tableName = "account";
 
     /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
     /// disallow inserting an AccountRow without a corresponding CashAccountRow
@@ -46,7 +45,7 @@ struct CashAccountRow final
 {
    public:   // fields
     /// The name of the database table this struct represents
-    static constexpr std::string table_name = "cash_account";
+    static constexpr std::string tableName = "cash_account";
 
     /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
     /// disallow inserting a CashAccountRow without a corresponding AccountRow
@@ -68,12 +67,12 @@ struct CashAccountRow final
         id;
 
     /// The status field, this is a required field
-    orm::Field<"status", finance::AccountStatus, orm::not_null_t> status;
+    orm::Field<"status", AccountStatus, orm::not_null_t> status;
     /// The profile_id field, this is a required field and is a foreign key
     /// referencing the profile table
     orm::Field<"profile_id", ProfileId, orm::not_null_t> profileId;
     /// The currency field, this is a required field
-    orm::Field<"currency", finance::Currency, orm::not_null_t> currency;
+    orm::Field<"currency", Currency, orm::not_null_t> currency;
     /// The name field, this is a required field
     orm::Field<"name", std::string, orm::not_null_t> name;
 

@@ -1,6 +1,9 @@
 #ifndef __SETTINGS__PROFILE_UI_SETTINGS_HPP__
 #define __SETTINGS__PROFILE_UI_SETTINGS_HPP__
 
+#include <string>
+#include <utility>
+
 #include "params/params.hpp"
 
 namespace settings
@@ -88,7 +91,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__PROFILE_UI_SETTINGS_TPP__
-#include "profile_ui_settings.tpp"
-#endif   // __SETTINGS__PROFILE_UI_SETTINGS_TPP__
+#include "profile_ui_settings.tpp"   // IWYU pragma: keep
+#endif
 
 #endif   // __SETTINGS__PROFILE_UI_SETTINGS_HPP__

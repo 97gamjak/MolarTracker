@@ -2,25 +2,15 @@
 #define __FINANCE__CASH_ACCOUNT_HPP__
 
 #include <cstdint>
-#include <mstd/enum.hpp>
+#include <string>
 
 #include "config/id_types.hpp"
-#include "currency.hpp"
+
+enum class Currency : std::uint8_t;        // Forward declaration
+enum class AccountStatus : std::uint8_t;   // Forward declaration
 
 namespace finance
 {
-
-    // clang-format off
-    // NOLINTBEGIN(cppcoreguidelines-macro-usage)
-    #define ACCOUNT_STATUS_LIST(X) \
-        X(Active)                  \
-        X(Closed)
-
-    // cppcheck-suppress syntaxError
-    MSTD_ENUM(AccountStatus, uint8_t, ACCOUNT_STATUS_LIST);
-
-    // NOLINTEND(cppcoreguidelines-macro-usage)
-    // clang-format on
 
     /**
      * @brief A class representing a cash account, which holds a certain amount
@@ -54,6 +44,12 @@ namespace finance
             Currency      currency,
             std::string   name
         );
+
+        [[nodiscard]] AccountId     getId() const;
+        [[nodiscard]] AccountStatus getStatus() const;
+        [[nodiscard]] ProfileId     getProfileId() const;
+        [[nodiscard]] Currency      getCurrency() const;
+        [[nodiscard]] std::string   getName() const;
     };
 
 }   // namespace finance

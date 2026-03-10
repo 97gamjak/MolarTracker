@@ -25,7 +25,7 @@ namespace orm
      */
     template <typename T>
     concept db_model = requires(T instance) {
-        { T::table_name } -> std::convertible_to<std::string>;
+        { T::tableName } -> std::convertible_to<std::string>;
         { instance.fields() } -> tuple_like;
         { std::as_const(instance).fields() } -> tuple_like;
     };

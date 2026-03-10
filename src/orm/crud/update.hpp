@@ -34,7 +34,7 @@ namespace orm
 
         std::string sqlText;
         sqlText += "UPDATE ";
-        sqlText += Model::table_name;
+        sqlText += Model::tableName;
         sqlText += " SET ";
 
         const auto columnNames = getColumnNames(

@@ -28,7 +28,7 @@ namespace orm
                 sql += ", ";
             first = false;
 
-            sql += std::string((Model{}.*member).getColumnName().view());
+            sql += (Model{}.*member).getColumnName().toString();
         };
 
         auto const& members = Group::members;

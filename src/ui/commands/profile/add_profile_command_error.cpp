@@ -1,5 +1,7 @@
 #include "add_profile_command_error.hpp"
 
+#include <utility>
+
 namespace ui
 {
 

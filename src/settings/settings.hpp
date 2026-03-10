@@ -5,7 +5,8 @@
 
 #include "general_settings.hpp"
 #include "logging_settings.hpp"
-#include "params/params.hpp"
+#include "params/param_container.hpp"
+#include "params/param_container_mixin.hpp"
 #include "ui_settings.hpp"
 
 namespace settings
@@ -84,7 +85,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__SETTINGS_TPP__
-#include "settings.tpp"
-#endif   // __SETTINGS__SETTINGS_TPP__
+#include "settings.tpp"   // IWYU pragma: keep
+#endif
 
 #endif   // __SETTINGS__SETTINGS_HPP__

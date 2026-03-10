@@ -2,6 +2,9 @@
 #define __CONFIG__CONSTANTS_HPP__
 
 #include <filesystem>
+#include <string>
+#include <tuple>
+#include <utility>
 
 /**
  * @brief Class containing compile-time constants for the application, these

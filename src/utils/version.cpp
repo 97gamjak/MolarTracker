@@ -1,5 +1,9 @@
 #include "version.hpp"
 
+#include <cctype>
+#include <exception>
+#include <vector>
+
 namespace utils
 {
     /**

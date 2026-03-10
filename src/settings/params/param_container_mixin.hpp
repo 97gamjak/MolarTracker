@@ -46,7 +46,7 @@ namespace settings
 }   // namespace settings
 
 #ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
-#include "param_container_mixin.tpp"
-#endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
+#include "param_container_mixin.tpp"   // IWYU pragma: export
+#endif
 
 #endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_HPP__

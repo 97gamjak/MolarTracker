@@ -1,6 +1,7 @@
 #include "debug_slots_settings.hpp"
 
 #include "config/constants.hpp"
+#include "params/params.hpp"
 
 namespace settings
 {

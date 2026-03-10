@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstddef>
+#include <string>
 #include <string_view>
 
 #include "fixed_string.hpp"
@@ -33,6 +34,18 @@ namespace orm
     constexpr std::string_view fixed_string<Size>::view() const
     {
         return std::string_view{_data.data(), Size - 1};
+    }
+
+    /**
+     * @brief Convert the fixed_string to a std::string
+     *
+     * @tparam Size
+     * @return std::string
+     */
+    template <std::size_t Size>
+    std::string fixed_string<Size>::toString() const
+    {
+        return std::string{_data.data(), Size - 1};
     }
 
 }   // namespace orm

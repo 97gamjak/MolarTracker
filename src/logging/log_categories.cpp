@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 
 #include "log_exceptions.hpp"
 #include "log_macros.hpp"

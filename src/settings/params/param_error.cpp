@@ -1,5 +1,7 @@
 #include "param_error.hpp"
 
+#include <utility>
+
 namespace settings
 {
     /**

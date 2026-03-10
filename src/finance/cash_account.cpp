@@ -1,5 +1,7 @@
 #include "cash_account.hpp"
 
+#include <utility>
+
 namespace finance
 {
 
@@ -26,5 +28,40 @@ namespace finance
           _name(std::move(name))
     {
     }
+
+    /**
+     * @brief Get the Id of the cash account
+     *
+     * @return AccountId
+     */
+    AccountId CashAccount::getId() const { return _id; }
+
+    /**
+     * @brief Get the status of the cash account
+     *
+     * @return AccountStatus
+     */
+    AccountStatus CashAccount::getStatus() const { return _status; }
+
+    /**
+     * @brief Get the profile ID associated with the cash account
+     *
+     * @return ProfileId
+     */
+    ProfileId CashAccount::getProfileId() const { return _profileId; }
+
+    /**
+     * @brief Get the currency of the cash account
+     *
+     * @return Currency
+     */
+    Currency CashAccount::getCurrency() const { return _currency; }
+
+    /**
+     * @brief Get the name of the cash account
+     *
+     * @return std::string
+     */
+    std::string CashAccount::getName() const { return _name; }
 
 }   // namespace finance
