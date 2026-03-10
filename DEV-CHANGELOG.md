@@ -17,6 +17,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `CashAccount` class
 - Add `Transaction` class
 - Add `TransactionEntry` class
+- Add `AccountRepo` with first `createCashAccount` method
 
 #### ORM
 

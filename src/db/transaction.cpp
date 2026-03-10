@@ -13,8 +13,8 @@ namespace db
      * @param db
      * @param immediate
      */
-    Transaction::Transaction(Database& db, bool immediate)
-        : _db(&db), _isActive(true)
+    Transaction::Transaction(std::shared_ptr<Database> db, bool immediate)
+        : _db(std::move(db)), _isActive(true)
     {
         if (immediate)
             _db->execute("BEGIN IMMEDIATE;");
@@ -28,7 +28,10 @@ namespace db
      *
      * @param db
      */
-    Transaction::Transaction(Database& db) : Transaction(db, true) {}
+    Transaction::Transaction(std::shared_ptr<Database> db)
+        : Transaction(std::move(db), true)
+    {
+    }
 
     /**
      * @brief Destroy the Transaction:: Transaction object

@@ -14,7 +14,7 @@ struct TransactionRow final
 {
    public:   // fields
     /// The name of the database table this struct represents
-    static constexpr std::string table_name = "transaction";
+    static constexpr std::string tableName = "transaction";
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented

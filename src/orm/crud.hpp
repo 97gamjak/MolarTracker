@@ -8,15 +8,23 @@
 #include <vector>
 
 #include "constraints.hpp"
+#include "crud/crud_error.hpp"
 #include "db/database.hpp"
-#include "orm/crud/crud_error.hpp"
+#include "db/transaction.hpp"
 #include "type_traits.hpp"
 
 namespace orm
 {
+    /******************
+     * CREATE METHODS *
+     ******************/
 
     template <db_model Model>
     void createTable(const std::shared_ptr<db::Database>& database);
+
+    /******************
+     * INSERT METHODS *
+     ******************/
 
     template <db_model Model>
     requires is_freely_insertable_v<Model>
@@ -26,10 +34,32 @@ namespace orm
     );
 
     template <db_model Model>
+    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
+        const std::shared_ptr<db::Database>& database,
+        const db::Transaction&               transaction,
+        const Model&                         row
+    );
+
+    template <typename... Models>
+    requires(db_model<Models> && ...)
+    [[nodiscard]] std::expected<std::vector<std::int64_t>, CrudError> batchInsert(
+        const std::shared_ptr<db::Database>& database,
+        const Models&... rows
+    );
+
+    /******************
+     * UPDATE METHODS *
+     ******************/
+
+    template <db_model Model>
     [[nodiscard]] std::expected<void, CrudError> update(
         const std::shared_ptr<db::Database>& database,
         const Model&                         row
     );
+
+    /***************
+     * GET METHODS *
+     ***************/
 
     template <db_model Model, typename Field>
     [[nodiscard]] std::vector<Model> getByField(

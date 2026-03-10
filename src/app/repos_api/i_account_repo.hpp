@@ -3,10 +3,10 @@
 
 #include "config/id_types.hpp"
 
-namespace app
+namespace finance
 {
     class CashAccount;   // forward declaration
-}   // namespace app
+}   // namespace finance
 
 namespace app
 {
@@ -39,7 +39,9 @@ namespace app
          * @return AccountId The ID of the newly created cash account
          */
         [[nodiscard]]
-        virtual AccountId createCashAccount(const CashAccount& cashAccount) = 0;
+        virtual AccountId createCashAccount(
+            const finance::CashAccount& cashAccount
+        ) = 0;
     };
 
 }   // namespace app

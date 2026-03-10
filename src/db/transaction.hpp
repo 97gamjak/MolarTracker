@@ -1,6 +1,8 @@
 #ifndef __DB__TRANSACTION_HPP__
 #define __DB__TRANSACTION_HPP__
 
+#include <memory>
+
 namespace db
 {
     class Database;
@@ -12,15 +14,15 @@ namespace db
     class Transaction
     {
        private:
-        /// Pointer to the Database instance (not owned by this class)
-        Database* _db{nullptr};
+        /// Pointer to the Database instance
+        std::shared_ptr<Database> _db;
 
         /// Flag to indicate whether the transaction is currently active
         bool _isActive{false};
 
        public:
-        explicit Transaction(Database& db, bool immediate);
-        explicit Transaction(Database& db);
+        explicit Transaction(std::shared_ptr<Database> db, bool immediate);
+        explicit Transaction(std::shared_ptr<Database> db);
         ~Transaction();
 
         Transaction(Transaction const&)            = delete;

@@ -6,11 +6,8 @@
 
 #include "config/id_types.hpp"
 
-namespace finance
-{
-    enum class Currency : std::uint8_t;        // Forward declaration
-    enum class AccountStatus : std::uint8_t;   // Forward declaration
-}   // namespace finance
+enum class Currency : std::uint8_t;        // Forward declaration
+enum class AccountStatus : std::uint8_t;   // Forward declaration
 
 namespace finance
 {
@@ -47,6 +44,12 @@ namespace finance
             Currency      currency,
             std::string   name
         );
+
+        [[nodiscard]] AccountId     getId() const;
+        [[nodiscard]] AccountStatus getStatus() const;
+        [[nodiscard]] ProfileId     getProfileId() const;
+        [[nodiscard]] Currency      getCurrency() const;
+        [[nodiscard]] std::string   getName() const;
     };
 
 }   // namespace finance

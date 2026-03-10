@@ -1,7 +1,13 @@
 #include "account_repo.hpp"
 
+#include "app/factories/account_factory.hpp"
+#include "finance/cash_account.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "repo_errors.hpp"
 #include "sql_models/account_row.hpp"
+
+REGISTER_LOG_CATEGORY("App.Repo.AccountRepo");
 
 namespace app
 {
@@ -44,10 +50,51 @@ namespace app
      * fails, the method should throw an exception with details about the
      * failure.
      */
-    AccountId AccountRepo::createCashAccount(const CashAccount& account)
+    AccountId AccountRepo::createCashAccount(
+        const finance::CashAccount& account
+    )
     {
-        const auto accountId =
-            orm::insert(_db, AccountFactory::toAccountRow(account));
+        auto [accountRow, cashAccountRow] = CashAccountFactory::toRow(account);
+
+        db::Transaction transaction{_db};
+
+        const auto result = orm::insert(_db, transaction, accountRow);
+
+        if (!result.has_value())
+        {
+            transaction.rollback();
+
+            const auto whatFailed =
+                "account entry for cash account with name '" +
+                account.getName() + "'";
+
+            const auto msg = getInsertError(result.error(), whatFailed);
+
+            LOG_ERROR(msg);
+            throw orm::CrudException(msg);
+        }
+
+        cashAccountRow.id = AccountId(result.value());
+
+        const auto cashResult = orm::insert(_db, transaction, cashAccountRow);
+
+        if (!cashResult.has_value())
+        {
+            transaction.rollback();
+
+            const auto whatFailed = "cash account details for account ID " +
+                                    accountRow.id.value().toString() +
+                                    " with name '" + account.getName() + "'";
+
+            const auto msg = getInsertError(cashResult.error(), whatFailed);
+
+            LOG_ERROR(msg);
+            throw orm::CrudException(msg);
+        }
+
+        transaction.commit();
+
+        return account.getId();
     }
 
     /**

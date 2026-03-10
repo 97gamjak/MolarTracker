@@ -94,7 +94,7 @@ namespace orm
         if constexpr (isFk)
             definition += "FOREIGN KEY (";
 
-        definition += std::string{name.view()};
+        definition += name.toString();
 
         if constexpr (isFk)
             definition += ")";
@@ -114,7 +114,7 @@ namespace orm
             using DeletionBehavior = typename foreignKeyInfo::DeletionBehavior;
 
             definition += " " + table::tableName;
-            definition += "(" + field::getColumnName() + ")";
+            definition += "(" + field::getColumnName().toString() + ")";
 
             if constexpr (std::same_as<DeletionBehavior, CascadeDelete>)
                 definition += " ON DELETE CASCADE";

@@ -17,7 +17,7 @@ struct ProfileRow final
 {
    public:   // fields
     /// The name of the database table this struct represents
-    static constexpr std::string table_name = "profile";
+    static constexpr std::string tableName = "profile";
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented

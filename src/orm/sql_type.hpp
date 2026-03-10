@@ -1,7 +1,9 @@
 #ifndef __ORM__SQL_TYPE_HPP__
 #define __ORM__SQL_TYPE_HPP__
 
+#include <config/finance_enums.hpp>
 #include <cstdint>
+#include <mstd/type_traits.hpp>
 #include <string>
 #include <string_view>
 
@@ -99,6 +101,20 @@ namespace orm
         /// We assume that strong_id types are represented as integers in the
         /// database, so we use INTEGER as the SQL type
         static constexpr std::string_view name = "INTEGER";
+    };
+
+    /**
+     * @brief Specialization of sql_type for finance::Currency enum class.
+     *
+     * @tparam finance::Currency The C++ type to specialize for, which is
+     * finance::Currency in this case.
+     */
+    template <typename T>
+    requires mstd::has_enum_meta<T>
+    struct sql_type<T>
+    {
+        /// SQLite mapping for enum types is typically a string
+        static constexpr std::string_view name = "TEXT";
     };
 
 }   // namespace orm

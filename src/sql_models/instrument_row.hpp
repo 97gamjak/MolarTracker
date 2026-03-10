@@ -1,8 +1,8 @@
 #ifndef __SQL_MODELS__INSTRUMENT_ROW_HPP__
 #define __SQL_MODELS__INSTRUMENT_ROW_HPP__
 
+#include "config/finance_enums.hpp"
 #include "config/id_types.hpp"
-#include "finance/currency.hpp"
 #include "orm/field.hpp"
 
 /**
@@ -17,7 +17,7 @@
 struct InstrumentRow
 {
     /// The name of the database table this struct represents
-    static constexpr std::string table_name = "instrument";
+    static constexpr std::string tableName = "instrument";
 
     /// as we have a 1:1 relationship between InstrumentRow and
     /// CashInstrumentRow, we disallow inserting an InstrumentRow without a
@@ -47,7 +47,7 @@ struct InstrumentRow
 struct CashInstrumentRow
 {
     /// The name of the database table this struct represents
-    static constexpr std::string table_name = "cash_instrument";
+    static constexpr std::string tableName = "cash_instrument";
 
     /// as we have a 1:1 relationship between InstrumentRow and
     /// CashInstrumentRow, we disallow inserting a CashInstrumentRow without a
@@ -74,8 +74,7 @@ struct CashInstrumentRow
     /// and is a required field, it is also unique because we want to ensure
     /// that there is only one cash instrument per currency, this allows us to
     /// easily query for the cash instrument of a specific currency
-    orm::Field<"currency", finance::Currency, orm::not_null_t, orm::unique_t>
-        currency;
+    orm::Field<"currency", Currency, orm::not_null_t, orm::unique_t> currency;
 
     [[nodiscard]] constexpr auto fields();
     [[nodiscard]] constexpr auto fields() const;

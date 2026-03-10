@@ -6,32 +6,25 @@
 namespace finance
 {
     class CashAccount;   // Forward declaration
-}
+}   // namespace finance
 
 namespace app
 {
 
     /**
-     * @brief Factory class for converting between Account domain models and
-     * AccountRow database models, this class provides static methods for
-     * converting between the CashAccount domain model and the corresponding
-     * AccountRow and CashAccountRow database models, it serves as a centralized
-     * place for handling all conversions related to accounts, ensuring that the
-     * conversion logic is consistent and maintainable across the application.
+     * @brief Factory class for converting between CashAccount domain models and
+     * CashAccountRow database models, including the associated AccountRow for
+     * the base account information.
      *
      */
-    class AccountFactory
+    class CashAccountFactory
     {
        public:
-        /// Convert a CashAccount domain model to an AccountRow database model,
-        /// this method should take a CashAccount object and return an
-        /// AccountRow object with the appropriate fields set based on the
-        /// properties of the CashAccount, this may involve setting the kind
-        /// field to indicate that it is a cash account, and any other necessary
-        /// fields for the base account information.
-        static std::pair<AccountRow, CashAccountRow> fromCashAccount(
+        static std::pair<AccountRow, CashAccountRow> toRow(
             const finance::CashAccount& account
         );
     };
 
 }   // namespace app
+
+#endif   // __APP__FACTORIES__ACCOUNT_FACTORY_HPP__

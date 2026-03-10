@@ -20,7 +20,7 @@
 struct TransactionEntryRow final
 {
     /// The name of the database table this struct represents
-    static constexpr auto table_name = "transaction_entry";
+    static constexpr auto tableName = "transaction_entry";
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented

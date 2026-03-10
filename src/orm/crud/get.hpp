@@ -41,7 +41,7 @@ namespace orm
         sqlText                += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
-        sqlText += Model::table_name;
+        sqlText += Model::tableName;
         sqlText += " WHERE ";
         sqlText += std::string{fieldView.getColumnName()};
         sqlText += "=?;";
@@ -90,7 +90,7 @@ namespace orm
         sqlText                += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
-        sqlText += Model::table_name;
+        sqlText += Model::tableName;
         sqlText += " WHERE ";
         sqlText += std::string{fieldView.getColumnName()};
         sqlText += "=?;";
@@ -148,7 +148,7 @@ namespace orm
         sqlText += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
-        sqlText += Model::table_name;
+        sqlText += Model::tableName;
         sqlText += " WHERE ";
 
         const auto whereClauses = getColumnNames(
@@ -204,7 +204,7 @@ namespace orm
         sqlText                += mstd::join(columnNames, ", ");
 
         sqlText += " FROM ";
-        sqlText += Model::table_name;
+        sqlText += Model::tableName;
         sqlText += ";";
 
         if (database == nullptr)

@@ -4,18 +4,6 @@
 
 namespace finance
 {
-    /*
-    // clang-format off
-    // NOLINTBEGIN
-    #define TRANSACTION_STATUS_LIST(X) \
-        X(Completed) \
-        X(Deleted)
-
-    MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST)
-    // NOLINTEND
-    // clang-format on
-    */
-
     /**
      * @brief Construct a new Transaction:: Transaction object
      *

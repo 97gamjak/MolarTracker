@@ -9,6 +9,7 @@
 #include "domain/profile.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "repo_errors.hpp"
 #include "sql_models/profile_row.hpp"
 
 REGISTER_LOG_CATEGORY("App.Repo.ProfileRepo");
@@ -118,10 +119,8 @@ namespace app
         if (rowId.has_value())
             return ProfileId::from(rowId.value());
 
-        const auto msg =
-            "Inserting profile with name '" + name +
-            "' failed: " + rowId.error().getMessage() + " (type: " +
-            orm::CrudErrorTypeMeta::toString(rowId.error().getType()) + ")";
+        const auto whatFailed = "profile with name '" + name + "'";
+        const auto msg        = getInsertError(rowId.error(), whatFailed);
 
         LOG_ERROR(msg);
         throw orm::CrudException(msg);

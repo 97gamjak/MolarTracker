@@ -120,7 +120,9 @@
         "qdialog": "cpp",
         "qkeysequence": "cpp",
         "qfunctionpointer": "cpp",
-        "qtcore": "cpp"
+        "qtcore": "cpp",
+        "source_location": "cpp",
+        "shared_mutex": "cpp"
     },
     "cSpell.words": [
         "googletest",

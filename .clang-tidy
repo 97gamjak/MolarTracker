@@ -1,7 +1,13 @@
 ---
+# -altera-unroll-loops:             wants to use everywhere #pragma unroll
+# -abseil-string-find-str-contains: strange string library
+
+# TO BE REMOVED:
+# -misc-include-cleaner:            problems with QT < 6.8
 Checks:          
   '
   *,
+  -abseil-string-find-str-contains,
   -altera-unroll-loops,
   -altera-struct-pack-align,
   -bugprone-easily-swappable-parameters,
@@ -17,7 +23,7 @@ Checks:
   -modernize-use-trailing-return-type,
   -readability-redundant-access-specifiers,
   -bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,
-  -misc-include-cleaner, # to be removed!
+  -misc-include-cleaner
   '
 WarningsAsErrors: ''
 HeaderFileExtensions:
@@ -59,7 +65,7 @@ CheckOptions:
   - key:             hicpp-braces-around-statements.ShortStatementLines
     value:           4
 
-  ### allow std::ranges
+  ### necessary for POD-structs!
   - key:             misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
     value:           true
 ...

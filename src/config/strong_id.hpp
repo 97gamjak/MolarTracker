@@ -48,6 +48,7 @@ class StrongId final
     [[nodiscard]] static constexpr StrongId from(Rep value);
     [[nodiscard]] constexpr Rep             value() const;
     [[nodiscard]] constexpr StrongId        operator-() const;
+    [[nodiscard]] constexpr std::string     toString() const;
 
     /// @cond DOXYGEN_IGNORE
     bool operator==(const StrongId&) const  = default;

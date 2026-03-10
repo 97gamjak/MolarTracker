@@ -29,7 +29,7 @@ namespace app
         void ensureSchema() override;
 
         [[nodiscard]] AccountId createCashAccount(
-            const CashAccount& account
+            const finance::CashAccount& account
         ) override;
 
        private:
