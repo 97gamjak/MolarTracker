@@ -19,15 +19,16 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include "app/domain/profile.hpp"
-#include "app/services_api/i_profile_service.hpp"
-#include "app/store/profile_store.hpp"
 #include "config/id_types.hpp"
+#include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
+#include "services_api/i_profile_service.hpp"
+#include "store/profile_store/profile_store.hpp"
 
 using namespace app;
 using ::testing::NiceMock;
@@ -60,8 +61,8 @@ namespace
     };
 
     Profile makeProfile(
-        std::int64_t             id,
-        const std::string&       name,
+        std::int64_t               id,
+        const std::string&         name,
         std::optional<std::string> email = std::nullopt
     )
     {
@@ -69,7 +70,7 @@ namespace
     }
 
     drafts::ProfileDraft makeDraft(
-        const std::string&       name,
+        const std::string&         name,
         std::optional<std::string> email = std::nullopt
     )
     {
@@ -79,12 +80,17 @@ namespace
     class ProfileStoreTest : public ::testing::Test
     {
        protected:
-        NiceMock<MockProfileService> service;
-        std::unique_ptr<ProfileStore> store;
+        std::shared_ptr<NiceMock<MockProfileService>> service;
+        std::unique_ptr<ProfileStore>                 store;
+
+        void SetUp() override
+        {
+            service = std::make_shared<NiceMock<MockProfileService>>();
+        }
 
         void createStore(std::vector<Profile> initialProfiles = {})
         {
-            EXPECT_CALL(service, getAll()).WillOnce(Return(initialProfiles));
+            EXPECT_CALL(*service, getAll()).WillOnce(Return(initialProfiles));
             store = std::make_unique<ProfileStore>(service);
         }
     };
@@ -474,7 +480,10 @@ TEST_F(ProfileStoreTest, RemoveProfileUnsetsActiveProfileWhenActiveProfileIsRemo
     EXPECT_FALSE(store->hasActiveProfile());
 }
 
-TEST_F(ProfileStoreTest, RemoveProfileDoesNotAffectActiveProfileWhenDifferentProfileRemoved)
+TEST_F(
+    ProfileStoreTest,
+    RemoveProfileDoesNotAffectActiveProfileWhenDifferentProfileRemoved
+)
 {
     createStore({makeProfile(1, "Alice"), makeProfile(2, "Bob")});
     store->setActiveProfile("Alice");
@@ -493,7 +502,7 @@ TEST_F(ProfileStoreTest, ReloadFetchesProfilesFromServiceAgain)
 {
     createStore({makeProfile(1, "Alice")});
 
-    EXPECT_CALL(service, getAll())
+    EXPECT_CALL(*service, getAll())
         .WillOnce(Return(std::vector<Profile>{
             makeProfile(1, "Alice Updated"),
             makeProfile(2, "Bob"),
@@ -512,7 +521,7 @@ TEST_F(ProfileStoreTest, ReloadClearsDirtyState)
     store->addProfile(makeDraft("Alice"));
     EXPECT_TRUE(store->isDirty());
 
-    EXPECT_CALL(service, getAll()).WillOnce(Return(std::vector<Profile>{}));
+    EXPECT_CALL(*service, getAll()).WillOnce(Return(std::vector<Profile>{}));
 
     store->reload();
 
@@ -525,7 +534,7 @@ TEST_F(ProfileStoreTest, ReloadResetsActiveProfileIfNoLongerExists)
     store->setActiveProfile("Alice");
     EXPECT_TRUE(store->hasActiveProfile());
 
-    EXPECT_CALL(service, getAll()).WillOnce(Return(std::vector<Profile>{}));
+    EXPECT_CALL(*service, getAll()).WillOnce(Return(std::vector<Profile>{}));
 
     store->reload();
 
@@ -537,7 +546,7 @@ TEST_F(ProfileStoreTest, ReloadPreservesActiveProfileWhenStillExists)
     createStore({makeProfile(1, "Alice")});
     store->setActiveProfile("Alice");
 
-    EXPECT_CALL(service, getAll())
+    EXPECT_CALL(*service, getAll())
         .WillOnce(Return(std::vector<Profile>{makeProfile(1, "Alice")}));
 
     store->reload();
@@ -554,10 +563,10 @@ TEST_F(ProfileStoreTest, CommitDoesNothingWhenClean)
 {
     createStore({makeProfile(1, "Alice")});
 
-    EXPECT_CALL(service, create(_, _)).Times(0);
-    EXPECT_CALL(service, update(_, _, _)).Times(0);
-    EXPECT_CALL(service, remove(_)).Times(0);
-    EXPECT_CALL(service, getAll()).Times(0);
+    EXPECT_CALL(*service, create(_, _)).Times(0);
+    EXPECT_CALL(*service, update(_, _, _)).Times(0);
+    EXPECT_CALL(*service, remove(_)).Times(0);
+    EXPECT_CALL(*service, getAll()).Times(0);
 
     store->commit();
 
@@ -569,9 +578,9 @@ TEST_F(ProfileStoreTest, CommitCallsServiceCreateForNewProfile)
     createStore();
     store->addProfile(makeDraft("Alice"));
 
-    EXPECT_CALL(service, create("Alice", std::optional<std::string>{std::nullopt}))
+    EXPECT_CALL(*service, create("Alice", std::optional<std::string>{std::nullopt}))
         .WillOnce(Return(ProfileId{1}));
-    EXPECT_CALL(service, getAll())
+    EXPECT_CALL(*service, getAll())
         .WillOnce(Return(std::vector<Profile>{makeProfile(1, "Alice")}));
 
     store->commit();
@@ -582,8 +591,8 @@ TEST_F(ProfileStoreTest, CommitCallsServiceRemoveForDeletedProfile)
     createStore({makeProfile(1, "Alice")});
     store->removeProfile(makeDraft("Alice"));
 
-    EXPECT_CALL(service, remove(ProfileId{1}));
-    EXPECT_CALL(service, getAll()).WillOnce(Return(std::vector<Profile>{}));
+    EXPECT_CALL(*service, remove(ProfileId{1}));
+    EXPECT_CALL(*service, getAll()).WillOnce(Return(std::vector<Profile>{}));
 
     store->commit();
 }
@@ -596,14 +605,14 @@ TEST_F(ProfileStoreTest, CommitCallsServiceUpdateForRestoredProfile)
     store->addProfile(makeDraft("Alice", "updated@example.com"));
 
     EXPECT_CALL(
-        service,
+        *service,
         update(
             ProfileId{1},
             std::string{"Alice"},
             std::optional<std::string>{"updated@example.com"}
         )
     );
-    EXPECT_CALL(service, getAll())
+    EXPECT_CALL(*service, getAll())
         .WillOnce(Return(std::vector<Profile>{
             makeProfile(1, "Alice", "updated@example.com"),
         }));
@@ -617,8 +626,8 @@ TEST_F(ProfileStoreTest, CommitMakesStoreCleanAfterNewProfile)
     store->addProfile(makeDraft("Alice"));
     EXPECT_TRUE(store->isDirty());
 
-    EXPECT_CALL(service, create(_, _)).WillOnce(Return(ProfileId{1}));
-    EXPECT_CALL(service, getAll())
+    EXPECT_CALL(*service, create(_, _)).WillOnce(Return(ProfileId{1}));
+    EXPECT_CALL(*service, getAll())
         .WillOnce(Return(std::vector<Profile>{makeProfile(1, "Alice")}));
 
     store->commit();
@@ -632,8 +641,8 @@ TEST_F(ProfileStoreTest, CommitMakesStoreCleanAfterDeletedProfile)
     store->removeProfile(makeDraft("Alice"));
     EXPECT_TRUE(store->isDirty());
 
-    EXPECT_CALL(service, remove(ProfileId{1}));
-    EXPECT_CALL(service, getAll()).WillOnce(Return(std::vector<Profile>{}));
+    EXPECT_CALL(*service, remove(ProfileId{1}));
+    EXPECT_CALL(*service, getAll()).WillOnce(Return(std::vector<Profile>{}));
 
     store->commit();
 
