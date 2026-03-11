@@ -9,7 +9,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "app/store/profile_store.hpp"
+#include "app/store/profile_store/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "ui/commands/profile/add_profile_command.hpp"
 #include "ui/commands/undo_stack.hpp"

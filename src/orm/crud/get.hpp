@@ -19,56 +19,6 @@ REGISTER_LOG_CATEGORY("Orm.Crud.Get");
 namespace orm::details
 {
     /**
-     * @brief Get a single row by primary key value
-     *
-     * @tparam Model
-     * @param database
-     * @param model
-     * @return std::optional<Model> The loaded model if found, or std::nullopt
-     * if not found
-     */
-    template <db_model Model>
-    [[nodiscard]] std::optional<Model> getByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
-    )
-    {
-        const auto numberOfPkFields = getNumberOfPkFields<Model>();
-
-        const auto whereClauses = getPkWhereClauses<Model>(model);
-
-        if (whereClauses.empty())
-        {
-            throw CrudException(
-                "orm::getByPk requires at least one primary key field"
-            );
-        }
-
-        if (whereClauses.size() != numberOfPkFields)
-        {
-            throw CrudException(
-                "orm::getByPk requires all primary key fields to be set"
-            );
-        }
-
-        const auto returnedModels =
-            getAll<Model>(database, Joins{}, whereClauses);
-
-        if (returnedModels.size() > 1)
-        {
-            throw CrudException(
-                "orm::getByPk expected to find at most one row matching the "
-                "primary key value, but found multiple rows"
-            );
-        }
-
-        if (returnedModels.empty())
-            return std::nullopt;
-
-        return returnedModels.front();
-    }
-
-    /**
      * @brief Get all rows matching the specified where clauses
      *
      * @tparam Model
@@ -78,7 +28,7 @@ namespace orm::details
      * @return std::vector<Model>
      */
     template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(
+    [[nodiscard]] std::vector<Model> _getAll(
         const std::shared_ptr<db::Database>& database,
         const Joins&                         joins,
         const WhereClauses&                  whereClauses
@@ -114,6 +64,56 @@ namespace orm::details
         }
 
         return results;
+    }
+
+    /**
+     * @brief Get a single row by primary key value
+     *
+     * @tparam Model
+     * @param database
+     * @param model
+     * @return std::optional<Model> The loaded model if found, or std::nullopt
+     * if not found
+     */
+    template <db_model Model>
+    [[nodiscard]] std::optional<Model> _getByPk(
+        const std::shared_ptr<db::Database>& database,
+        const Model&                         model
+    )
+    {
+        const auto numberOfPkFields = getNumberOfPkFields<Model>();
+
+        const auto whereClauses = getPkWhereClauses<Model>(model);
+
+        if (whereClauses.empty())
+        {
+            throw CrudException(
+                "orm::getByPk requires at least one primary key field"
+            );
+        }
+
+        if (whereClauses.size() != numberOfPkFields)
+        {
+            throw CrudException(
+                "orm::getByPk requires all primary key fields to be set"
+            );
+        }
+
+        const auto returnedModels =
+            _getAll<Model>(database, Joins{}, whereClauses);
+
+        if (returnedModels.size() > 1)
+        {
+            throw CrudException(
+                "orm::getByPk expected to find at most one row matching the "
+                "primary key value, but found multiple rows"
+            );
+        }
+
+        if (returnedModels.empty())
+            return std::nullopt;
+
+        return returnedModels.front();
     }
 
 }   // namespace orm::details
