@@ -25,6 +25,7 @@ namespace app
        private:
         /// The Profile repository
         std::shared_ptr<IProfileRepo> _profileRepo;
+        /// The Account repository
         std::shared_ptr<IAccountRepo> _accountRepo;
 
        public:

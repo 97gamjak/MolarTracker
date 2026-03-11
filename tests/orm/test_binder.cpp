@@ -10,6 +10,7 @@
 
 #include "mstd/enum.hpp"
 #include "orm/binder.hpp"
+#include "orm/index.hpp"
 
 namespace
 {
@@ -130,14 +131,20 @@ TEST(OrmBinder, Int64BindAndRead)
 {
     FakeStatement statement;
 
-    orm::binder<FakeStatement, std::int64_t>::bind(statement, 3, 123456789LL);
+    orm::binder<FakeStatement, std::int64_t>::bind(
+        statement,
+        orm::BindIndex{3},
+        123456789LL
+    );
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->index, 3);
     EXPECT_EQ(statement.last_int64_bind->value, 123456789LL);
 
     statement.col_i64[7] = -42LL;
-    const auto result =
-        orm::binder<FakeStatement, std::int64_t>::read(statement, 7);
+    const auto result    = orm::binder<FakeStatement, std::int64_t>::read(
+        statement,
+        orm::ColumnIndex{7}
+    );
     EXPECT_EQ(result, -42LL);
 }
 
@@ -145,13 +152,14 @@ TEST(OrmBinder, IntBindCastsToInt64AndReadCastsBack)
 {
     FakeStatement statement;
 
-    orm::binder<FakeStatement, int>::bind(statement, 1, 42);
+    orm::binder<FakeStatement, int>::bind(statement, orm::BindIndex{1}, 42);
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->index, 1);
     EXPECT_EQ(statement.last_int64_bind->value, static_cast<std::int64_t>(42));
 
     statement.col_i64[0] = 99;
-    const auto result    = orm::binder<FakeStatement, int>::read(statement, 0);
+    const auto result =
+        orm::binder<FakeStatement, int>::read(statement, orm::ColumnIndex{0});
     EXPECT_EQ(result, 99);
 }
 
@@ -159,23 +167,23 @@ TEST(OrmBinder, BoolBindAs0or1AndReadNonZeroAsTrue)
 {
     FakeStatement statement;
 
-    orm::binder<FakeStatement, bool>::bind(statement, 2, true);
+    orm::binder<FakeStatement, bool>::bind(statement, orm::BindIndex{2}, true);
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->index, 2);
     EXPECT_EQ(statement.last_int64_bind->value, 1);
 
-    orm::binder<FakeStatement, bool>::bind(statement, 2, false);
+    orm::binder<FakeStatement, bool>::bind(statement, orm::BindIndex{2}, false);
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->value, 0);
 
     statement.col_i64[5] = 0;
     const auto false_result =
-        orm::binder<FakeStatement, bool>::read(statement, 5);
+        orm::binder<FakeStatement, bool>::read(statement, orm::ColumnIndex{5});
     EXPECT_FALSE(false_result);
 
     statement.col_i64[6] = 2;
     const auto true_result =
-        orm::binder<FakeStatement, bool>::read(statement, 6);
+        orm::binder<FakeStatement, bool>::read(statement, orm::ColumnIndex{6});
     EXPECT_TRUE(true_result);
 }
 
@@ -183,13 +191,20 @@ TEST(OrmBinder, DoubleBindAndRead)
 {
     FakeStatement statement;
 
-    orm::binder<FakeStatement, double>::bind(statement, 4, 3.14159);
+    orm::binder<FakeStatement, double>::bind(
+        statement,
+        orm::BindIndex{4},
+        3.14159
+    );
     ASSERT_TRUE(statement.last_double_bind.has_value());
     EXPECT_EQ(statement.last_double_bind->index, 4);
     EXPECT_DOUBLE_EQ(statement.last_double_bind->value, 3.14159);
 
     statement.col_dbl[9] = -0.25;
-    const auto result = orm::binder<FakeStatement, double>::read(statement, 9);
+    const auto result    = orm::binder<FakeStatement, double>::read(
+        statement,
+        orm::ColumnIndex{9}
+    );
     EXPECT_DOUBLE_EQ(result, -0.25);
 }
 
@@ -199,7 +214,7 @@ TEST(OrmBinder, StringBindAndRead)
 
     orm::binder<FakeStatement, std::string>::bind(
         statement,
-        8,
+        orm::BindIndex{8},
         std::string{"hello"}
     );
     ASSERT_TRUE(statement.last_text_bind.has_value());
@@ -207,8 +222,10 @@ TEST(OrmBinder, StringBindAndRead)
     EXPECT_EQ(statement.last_text_bind->value, "hello");
 
     statement.col_txt[1] = "world";
-    const auto result =
-        orm::binder<FakeStatement, std::string>::read(statement, 1);
+    const auto result    = orm::binder<FakeStatement, std::string>::read(
+        statement,
+        orm::ColumnIndex{1}
+    );
     EXPECT_EQ(result, "world");
 }
 
@@ -218,13 +235,20 @@ TEST(OrmBinder, StrongIdBindUsesValueAndReadUsesFrom)
 
     // If this test doesn't compile, replace TestId with your project StrongId
     // type that satisfies `orm::strong_id`.
-    orm::binder<FakeStatement, TestId>::bind(statement, 0, TestId::from(777));
+    orm::binder<FakeStatement, TestId>::bind(
+        statement,
+        orm::BindIndex{0},
+        TestId::from(777)
+    );
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->index, 0);
     EXPECT_EQ(statement.last_int64_bind->value, 777);
 
     statement.col_i64[3] = 1234;
-    const auto result = orm::binder<FakeStatement, TestId>::read(statement, 3);
+    const auto result    = orm::binder<FakeStatement, TestId>::read(
+        statement,
+        orm::ColumnIndex{3}
+    );
     EXPECT_EQ(result, TestId::from(1234));
 }
 
@@ -232,14 +256,20 @@ TEST(OrmBinder, EnumMetaBindStoresNameAndReadParsesString)
 {
     FakeStatement statement;
 
-    orm::binder<FakeStatement, TestEnum>::bind(statement, 5, TestEnum::Beta);
+    orm::binder<FakeStatement, TestEnum>::bind(
+        statement,
+        orm::BindIndex{5},
+        TestEnum::Beta
+    );
     ASSERT_TRUE(statement.last_text_bind.has_value());
     EXPECT_EQ(statement.last_text_bind->index, 5);
     EXPECT_EQ(statement.last_text_bind->value, "Beta");
 
     statement.col_txt[2] = "Alpha";
-    const auto result =
-        orm::binder<FakeStatement, TestEnum>::read(statement, 2);
+    const auto result    = orm::binder<FakeStatement, TestEnum>::read(
+        statement,
+        orm::ColumnIndex{2}
+    );
     EXPECT_EQ(result, TestEnum::Alpha);
 }
 
@@ -250,7 +280,10 @@ TEST(OrmBinder, EnumMetaReadInvalidThrowsOrmError)
 
     try
     {
-        (void) orm::binder<FakeStatement, TestEnum>::read(statement, 0);
+        (void) orm::binder<FakeStatement, TestEnum>::read(
+            statement,
+            orm::ColumnIndex{0}
+        );
         FAIL() << "Expected ORMError";
     }
     catch (orm::ORMError const& e)

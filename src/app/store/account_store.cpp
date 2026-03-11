@@ -19,10 +19,24 @@ namespace app
     {
     }
 
+    /**
+     * @brief Reload the account data from the underlying service
+     *
+     */
     void AccountStore::reload() {}
 
+    /**
+     * @brief
+     *
+     * @return true
+     * @return false
+     */
     bool AccountStore::isDirty() const { return false; }
 
+    /**
+     * @brief
+     *
+     */
     void AccountStore::commit() {}
 
 }   // namespace app

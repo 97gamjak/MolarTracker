@@ -5,8 +5,9 @@
 #include <mstd/type_traits.hpp>
 #include <string>
 
-#include "orm/concepts.hpp"
-#include "orm/orm_exception.hpp"
+#include "concepts.hpp"
+#include "index.hpp"
+#include "orm_exception.hpp"
 
 namespace orm
 {
@@ -28,9 +29,13 @@ namespace orm
          * @param index
          * @param value
          */
-        static void bind(Statement& statement, int index, std::int64_t value)
+        static void bind(
+            Statement&   statement,
+            BindIndex    index,
+            std::int64_t value
+        )
         {
-            statement.bindInt64(index, value);
+            statement.bindInt64(index.value(), value);
         }
 
         /**
@@ -40,9 +45,9 @@ namespace orm
          * @param col
          * @return std::int64_t
          */
-        static std::int64_t read(Statement const& statement, int col)
+        static std::int64_t read(Statement const& statement, ColumnIndex col)
         {
-            return statement.columnInt64(col);
+            return statement.columnInt64(col.value());
         }
     };
 
@@ -61,9 +66,12 @@ namespace orm
          * @param index
          * @param value
          */
-        static void bind(Statement& statement, int index, int value)
+        static void bind(Statement& statement, BindIndex index, int value)
         {
-            statement.bindInt64(index, static_cast<std::int64_t>(value));
+            statement.bindInt64(
+                index.value(),
+                static_cast<std::int64_t>(value)
+            );
         }
 
         /**
@@ -73,9 +81,9 @@ namespace orm
          * @param col
          * @return int
          */
-        static int read(Statement const& statement, int col)
+        static int read(Statement const& statement, ColumnIndex col)
         {
-            return static_cast<int>(statement.columnInt64(col));
+            return static_cast<int>(statement.columnInt64(col.value()));
         }
     };
 
@@ -94,9 +102,9 @@ namespace orm
          * @param index
          * @param value
          */
-        static void bind(Statement& statement, int index, bool value)
+        static void bind(Statement& statement, BindIndex index, bool value)
         {
-            statement.bindInt64(index, value ? 1 : 0);
+            statement.bindInt64(index.value(), value ? 1 : 0);
         }
 
         /**
@@ -106,9 +114,9 @@ namespace orm
          * @param col
          * @return bool
          */
-        static bool read(Statement const& statement, int col)
+        static bool read(Statement const& statement, ColumnIndex col)
         {
-            return statement.columnInt64(col) != 0;
+            return statement.columnInt64(col.value()) != 0;
         }
     };
 
@@ -127,9 +135,9 @@ namespace orm
          * @param index
          * @param value
          */
-        static void bind(Statement& statement, int index, double value)
+        static void bind(Statement& statement, BindIndex index, double value)
         {
-            statement.bindDouble(index, value);
+            statement.bindDouble(index.value(), value);
         }
 
         /**
@@ -139,9 +147,9 @@ namespace orm
          * @param col
          * @return double
          */
-        static double read(Statement const& statement, int col)
+        static double read(Statement const& statement, ColumnIndex col)
         {
-            return statement.columnDouble(col);
+            return statement.columnDouble(col.value());
         }
     };
 
@@ -162,11 +170,11 @@ namespace orm
          */
         static void bind(
             Statement&         statement,
-            int                index,
+            BindIndex          index,
             std::string const& value
         )
         {
-            statement.bindText(index, value);
+            statement.bindText(index.value(), value);
         }
 
         /**
@@ -176,9 +184,9 @@ namespace orm
          * @param col
          * @return std::string
          */
-        static std::string read(Statement const& statement, int col)
+        static std::string read(Statement const& statement, ColumnIndex col)
         {
-            return statement.columnText(col);
+            return statement.columnText(col.value());
         }
     };
 
@@ -198,9 +206,9 @@ namespace orm
          * @param index
          * @param value
          */
-        static void bind(Statement& statement, int index, T const& value)
+        static void bind(Statement& statement, BindIndex index, T const& value)
         {
-            statement.bindInt64(index, value.value());
+            statement.bindInt64(index.value(), value.value());
         }
 
         /**
@@ -210,9 +218,9 @@ namespace orm
          * @param col
          * @return T
          */
-        static T read(Statement const& statement, int col)
+        static T read(Statement const& statement, ColumnIndex col)
         {
-            return T::from(statement.columnInt64(col));
+            return T::from(statement.columnInt64(col.value()));
         }
     };
 
@@ -235,10 +243,10 @@ namespace orm
          * @param index
          * @param value
          */
-        static void bind(Statement& statement, int index, T const& value)
+        static void bind(Statement& statement, BindIndex index, T const& value)
         {
             const auto name = EnumMeta::name(value);
-            statement.bindText(index, std::string{name});
+            statement.bindText(index.value(), std::string{name});
         }
 
         /**
@@ -248,15 +256,16 @@ namespace orm
          * @param col
          * @return T
          */
-        static T read(Statement const& statement, int col)
+        static T read(Statement const& statement, ColumnIndex col)
         {
-            const auto value = EnumMeta::from_string(statement.columnText(col));
+            const auto value =
+                EnumMeta::from_string(statement.columnText(col.value()));
 
             if (!value.has_value())
             {
                 throw ORMError(
                     "Invalid currency value in database: " +
-                    statement.columnText(col)
+                    statement.columnText(col.value())
                 );
             }
 

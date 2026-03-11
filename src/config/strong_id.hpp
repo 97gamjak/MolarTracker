@@ -62,6 +62,19 @@ class StrongId final
     );
 };
 
+template <class Tag>
+struct isStrongId : std::false_type
+{
+};
+
+template <class Tag, class Rep>
+struct isStrongId<StrongId<Tag, Rep>> : std::true_type
+{
+};
+
+template <typename T>
+inline constexpr bool isStrongId_v = isStrongId<T>::value;
+
 #ifndef __CONFIG__STRONG_ID_TPP__
 #include "strong_id.tpp"
 #endif   // __CONFIG__STRONG_ID_TPP__

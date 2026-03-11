@@ -19,6 +19,7 @@ namespace app
        private:
         /// The Profile service
         std::shared_ptr<IProfileService> _profileService;
+        /// The Account service
         std::shared_ptr<IAccountService> _accountService;
 
        public:

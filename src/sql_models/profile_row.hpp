@@ -15,7 +15,6 @@
  */
 struct ProfileRow final
 {
-   public:   // fields
     /// The name of the database table this struct represents
     static constexpr std::string tableName = "profile";
 
@@ -29,13 +28,10 @@ struct ProfileRow final
     /// The email field, this is an optional field
     orm::Field<"email", std::optional<std::string>> email;
 
-   public:   // methods
-    [[nodiscard]] constexpr auto fields();
-    [[nodiscard]] constexpr auto fields() const;
-};
+    explicit ProfileRow() = default;
+    explicit ProfileRow(ProfileId _id);
 
-#ifndef __SQL_MODELS__PROFILE_ROW_IMPL_HPP__
-#include "profile_row.impl.hpp"   // IWYU pragma: keep
-#endif
+    ORM_FIELDS(ProfileRow, id, name, email)
+};
 
 #endif   // __SQL_MODELS__PROFILE_ROW_HPP__

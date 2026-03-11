@@ -25,7 +25,7 @@ namespace app
             const std::shared_ptr<IAccountService>& accountService
         );
 
-        void reload();
+        static void reload();
 
         [[nodiscard]] bool isDirty() const override;
         void               commit() override;
