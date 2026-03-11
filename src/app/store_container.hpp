@@ -3,7 +3,7 @@
 
 #include "config/signal_tags.hpp"
 #include "store/account_store.hpp"
-#include "store/profile_store.hpp"
+#include "store/profile_store/profile_store.hpp"
 
 namespace app
 {

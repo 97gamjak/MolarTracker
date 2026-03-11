@@ -21,6 +21,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `AccountService` with first `createCashAccount` method
 - Add first draft of `AccountStore`
 
+#### Profile
+
+- Add Listener to active `ProfileId`
+
 #### ORM
 
 - Introduce `unique_group` to make it possible to have multiple fields as a single unique group

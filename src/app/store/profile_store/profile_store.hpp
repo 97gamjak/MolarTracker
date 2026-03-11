@@ -12,6 +12,8 @@
 #include "app/domain/profile.hpp"
 #include "app/store/i_store.hpp"
 #include "config/id_types.hpp"
+#include "config/signal_tags.hpp"
+#include "connections/observable.hpp"
 
 namespace drafts
 {
@@ -39,7 +41,9 @@ namespace app
      * @brief Store for managing profiles
      *
      */
-    class ProfileStore : public IStore
+    // TODO(97gamjak): consider refactoring to avoid multiple inheritance
+    // NOLINTNEXTLINE(fuchsia-multiple-inheritance)
+    class ProfileStore : public IStore, public Observable<OnProfileChanged>
     {
        private:
         /// reference to the profile service
@@ -101,6 +105,11 @@ namespace app
 
         void commit() override;
 
+        Connection subscribeToProfileChange(
+            OnProfileChanged::func func,
+            void*                  user
+        );
+
        private:
         [[nodiscard]] ProfileId _generateNewId();
         [[nodiscard]] bool      _isDeleted(ProfileId id) const;
@@ -122,6 +131,8 @@ namespace app
         void _commitNewProfile(const Profile& profile);
         void _commitModifiedProfile(const Profile& profile);
         void _commitDeletedProfile(const Profile& profile);
+
+        void _notifyProfileChanged(const std::optional<ProfileId>& profileId);
     };
 
 }   // namespace app

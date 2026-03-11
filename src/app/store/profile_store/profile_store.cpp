@@ -76,38 +76,6 @@ namespace app
     }
 
     /**
-     * @brief Set the active profile by name
-     *
-     * @param name
-     */
-    void ProfileStore::setActiveProfile(std::optional<std::string_view> name)
-    {
-        if (!name.has_value())
-        {
-            _activeProfileId.reset();
-            return;
-        }
-
-        const auto profile = getProfile(name.value());
-        if (!profile)
-        {
-            // TODO(97gamjak): make here MT specific error handling for stores
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-88
-            throw std::runtime_error(
-                std::format("Profile '{}' not found", name.value())
-            );
-        }
-
-        _activeProfileId = profile->getId();
-    }
-
-    /**
-     * @brief Unset the active profile, leaving no profile active
-     *
-     */
-    void ProfileStore::unsetActiveProfile() { _activeProfileId.reset(); }
-
-    /**
      * @brief Check if there is an active profile set
      *
      * @return true
@@ -283,7 +251,7 @@ namespace app
         if (_activeProfileId.has_value() &&
             profile->getId() == _activeProfileId.value())
         {
-            _activeProfileId.reset();
+            unsetActiveProfile();
         }
 
         // if the profile is new and not yet committed, just remove it
@@ -543,6 +511,37 @@ namespace app
                 return;
             }
         }
+    }
+
+    /**
+     * @brief Subscribe to profile change events
+     *
+     * @param func
+     * @param user
+     * @return Connection
+     */
+    Connection ProfileStore::subscribeToProfileChange(
+        OnProfileChanged::func func,
+        void*                  user
+    )
+    {
+        return Observable<OnProfileChanged>::template on<OnProfileChanged>(
+            func,
+            user
+        );
+    }
+
+    /**
+     * @brief Notify subscribers that a profile has changed
+     *
+     * @param profileId
+     */
+    void ProfileStore::_notifyProfileChanged(
+        const std::optional<ProfileId>& profileId
+    )
+    {
+        Observable<OnProfileChanged>::template _emit<OnProfileChanged>(profileId
+        );
     }
 
 }   // namespace app

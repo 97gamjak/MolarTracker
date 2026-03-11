@@ -5,7 +5,7 @@
 #include <memory>
 #include <utility>
 
-#include "app/store/profile_store.hpp"
+#include "app/store/profile_store/profile_store.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/commands/profile/add_profile_command_error.hpp"
 

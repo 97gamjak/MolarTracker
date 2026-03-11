@@ -148,7 +148,7 @@ namespace orm
         const Model&                         model
     )
     {
-        return details::getByPk<Model>(database, model);
+        return details::_getByPk<Model>(database, model);
     }
 
     /*******************
@@ -171,7 +171,7 @@ namespace orm
         const WhereClauses&                  whereClauses
     )
     {
-        return details::getAll<Model>(database, joins, whereClauses);
+        return details::_getAll<Model>(database, joins, whereClauses);
     }
 
     /**
