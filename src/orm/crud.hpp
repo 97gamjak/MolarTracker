@@ -156,24 +156,39 @@ namespace orm
      *******************/
 
     /**
-     * @brief Get all rows from the table
+     * @brief Get all rows matching the specified where clauses
      *
      * @tparam Model
-     * @tparam Field
      * @param database
-     * @param whereClause
+     * @param joins
+     * @param whereClauses
      * @return std::vector<Model>
      */
-    template <db_model Model, typename Field>
+    template <db_model Model>
     [[nodiscard]] std::vector<Model> getAll(
         const std::shared_ptr<db::Database>& database,
-        const WhereClause<Field>&            whereClause
+        const Joins&                         joins,
+        const WhereClauses&                  whereClauses
     )
     {
-        WhereClauses whereClauses;
-        whereClauses.addClause(whereClause);
+        return details::getAll<Model>(database, joins, whereClauses);
+    }
 
-        return getAll<Model>(database, whereClauses);
+    /**
+     * @brief Get all rows matching the specified where clauses
+     *
+     * @tparam Model
+     * @param database
+     * @param whereClauses
+     * @return std::vector<Model>
+     */
+    template <db_model Model>
+    [[nodiscard]] std::vector<Model> getAll(
+        const std::shared_ptr<db::Database>& database,
+        const WhereClauses&                  whereClauses
+    )
+    {
+        return getAll<Model>(database, Joins{}, whereClauses);
     }
 
     /**
@@ -192,45 +207,27 @@ namespace orm
     }
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get a unique row matching the specified where clause
      *
      * @tparam Model
      * @param database
      * @param whereClauses
-     * @return std::vector<Model>
+     * @return std::expected<Model, CrudError> The unique model matching the
+     * where clause, or an error if no results or multiple results are found
      */
     template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(
+    [[nodiscard]] std::expected<Model, CrudError> getUnique(
         const std::shared_ptr<db::Database>& database,
         const WhereClauses&                  whereClauses
     )
     {
-        return details::getAll<Model>(database, whereClauses);
-    }
-
-    /**
-     * @brief Get a unique row matching the specified where clause
-     *
-     * @tparam Model
-     * @tparam Field
-     * @param database
-     * @param whereClause
-     * @return std::expected<Model, CrudError> The unique model matching the
-     * where clause, or an error if no results or multiple results are found
-     */
-    template <db_model Model, typename Field>
-    [[nodiscard]] std::expected<Model, CrudError> getUnique(
-        const std::shared_ptr<db::Database>& database,
-        const WhereClause<Field>&            whereClause
-    )
-    {
-        const auto results = getAll<Model>(database, whereClause);
+        const auto results = getAll<Model>(database, whereClauses);
 
         if (results.empty())
         {
             const auto msg =
                 "No results found for getUnique with where clause: " +
-                whereClause.getDBOperations();
+                whereClauses.getDBOperations();
 
             return std::unexpected(CrudError{CrudErrorType::NotFound, msg});
         }

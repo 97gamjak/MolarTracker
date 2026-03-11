@@ -15,6 +15,9 @@ namespace orm
     std::vector<std::string> getColumnNames();
 
     template <db_model Model>
+    std::string getColumnNames(const std::string& delimiter);
+
+    template <db_model Model>
     WhereClauses getPkWhereClauses(const Model& model);
 
     template <db_model Model>

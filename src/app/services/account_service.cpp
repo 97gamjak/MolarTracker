@@ -1,6 +1,7 @@
 #include "account_service.hpp"
 
 #include "app/repos_api/i_account_repo.hpp"
+#include "finance/cash_account.hpp"
 
 namespace app
 {
@@ -15,6 +16,16 @@ namespace app
     )
         : _accountRepo(accountRepo)
     {
+    }
+
+    /**
+     * @brief Get all cash accounts
+     *
+     * @return std::vector<finance::CashAccount>
+     */
+    std::vector<finance::CashAccount> AccountService::getAllCashAccounts() const
+    {
+        return _accountRepo->getAllCashAccounts();
     }
 
     /**

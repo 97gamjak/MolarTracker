@@ -12,11 +12,18 @@ namespace orm
      *
      * @tparam Field
      * @param field
+     * @param tableName
      * @param operator_
      */
     template <typename Field>
-    WhereClause<Field>::WhereClause(Field field, WhereOperator operator_)
-        : _field(std::move(field)), _operator(operator_)
+    WhereClause<Field>::WhereClause(
+        Field         field,
+        std::string   tableName,
+        WhereOperator operator_
+    )
+        : _field(std::move(field)),
+          _tableName(std::move(tableName)),
+          _operator(operator_)
     {
     }
 
@@ -25,10 +32,15 @@ namespace orm
      *
      * @tparam Field
      * @param field
+     * @param tableName
      */
     template <typename Field>
-    UniqueClause<Field>::UniqueClause(Field field)
-        : WhereClause<Field>(std::move(field), WhereOperator::Equal)
+    UniqueClause<Field>::UniqueClause(Field field, std::string tableName)
+        : WhereClause<Field>(
+              std::move(field),
+              std::move(tableName),
+              WhereOperator::Equal
+          )
     {
     }
 
@@ -68,6 +80,9 @@ namespace orm
         if (operatorStr.empty())
             throw ORMError("Invalid WhereOperator value");
 
+        if (!_tableName.empty())
+            return _tableName + "." + _field.getColumnName() + operatorStr;
+
         return _field.getColumnName() + operatorStr;
     }
 
@@ -86,6 +101,18 @@ namespace orm
     ) const
     {
         _field.bind(statement, index);
+    }
+
+    /**
+     * @brief Construct a new Where Clauses object with the specified clauses
+     *
+     * @tparam Clauses
+     * @param clauses
+     */
+    template <typename... Clauses>
+    WhereClauses::WhereClauses(Clauses... clauses)
+    {
+        (addClause(std::move(clauses)), ...);
     }
 
     /**

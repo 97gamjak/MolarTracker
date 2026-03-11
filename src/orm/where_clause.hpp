@@ -68,11 +68,18 @@ namespace orm
         /// compare against
         Field _field;
 
+        /// table name for joins
+        std::string _tableName;
+
         /// the operator to use for the comparison
         WhereOperator _operator;
 
        public:
-        explicit WhereClause(Field field, WhereOperator operator_);
+        explicit WhereClause(
+            Field         field,
+            std::string   tableName,
+            WhereOperator operator_
+        );
 
         [[nodiscard]] std::string getDBOperations() const override;
 
@@ -89,8 +96,11 @@ namespace orm
     class UniqueClause : public WhereClause<Field>
     {
        public:
-        explicit UniqueClause(Field field);
+        explicit UniqueClause(Field field, std::string tableName);
     };
+
+    template <typename Field>
+    using EqualClause = UniqueClause<Field>;
 
     /**
      * @brief A collection of where clauses that can be combined with AND
@@ -103,6 +113,11 @@ namespace orm
         std::vector<std::unique_ptr<IWhereClause>> _clauses;
 
        public:
+        WhereClauses() = default;
+
+        template <typename... Clauses>
+        explicit WhereClauses(Clauses... clauses);
+
         template <typename Field>
         void addClause(Field field, WhereOperator operator_);
 

@@ -1,6 +1,8 @@
 #ifndef __APP__FACTORIES__ACCOUNT_FACTORY_HPP__
 #define __APP__FACTORIES__ACCOUNT_FACTORY_HPP__
 
+#include <vector>
+
 #include "sql_models/account_row.hpp"
 
 namespace finance
@@ -20,6 +22,14 @@ namespace app
     class CashAccountFactory
     {
        public:
+        static finance::CashAccount toDomain(
+            const CashAccountRow& cashAccountRow
+        );
+
+        static std::vector<finance::CashAccount> toDomains(
+            const std::vector<CashAccountRow>& cashAccountRows
+        );
+
         static std::pair<AccountRow, CashAccountRow> toRow(
             const finance::CashAccount& account
         );

@@ -10,6 +10,7 @@
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "logging/log_macros.hpp"
+#include "orm/join.hpp"
 #include "orm/type_traits.hpp"
 #include "orm/where_clause.hpp"
 
@@ -50,7 +51,8 @@ namespace orm::details
             );
         }
 
-        const auto returnedModels = getAll<Model>(database, whereClauses);
+        const auto returnedModels =
+            getAll<Model>(database, Joins{}, whereClauses);
 
         if (returnedModels.size() > 1)
         {
@@ -71,27 +73,23 @@ namespace orm::details
      *
      * @tparam Model
      * @param database
+     * @param joins
      * @param whereClauses
      * @return std::vector<Model>
      */
     template <db_model Model>
     [[nodiscard]] std::vector<Model> getAll(
         const std::shared_ptr<db::Database>& database,
+        const Joins&                         joins,
         const WhereClauses&                  whereClauses
     )
     {
         std::string sqlText;
         sqlText += "SELECT ";
 
-        const auto columnNames  = getColumnNames<Model>();
-        sqlText                += mstd::join(columnNames, ", ");
-
-        sqlText += " FROM ";
-        sqlText += Model::tableName;
-
-        sqlText += " ";
-        sqlText += whereClauses.getDBOperations();
-        sqlText += ";";
+        sqlText += getColumnNames<Model>(", ") + " ";
+        sqlText += joins.getDBOperations(Model::tableName) + " ";
+        sqlText += whereClauses.getDBOperations() + ";";
 
         if (database == nullptr)
             throw CrudException("Database pointer is null");

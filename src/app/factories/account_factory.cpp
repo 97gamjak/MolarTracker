@@ -7,6 +7,32 @@
 namespace app
 {
 
+    finance::CashAccount CashAccountFactory::toDomain(
+        const CashAccountRow& cashAccountRow
+    )
+    {
+        return finance::CashAccount(
+            cashAccountRow.id.value(),
+            cashAccountRow.status.value(),
+            cashAccountRow.profileId.value(),
+            cashAccountRow.currency.value(),
+            cashAccountRow.name.value()
+        );
+    }
+
+    std::vector<finance::CashAccount> CashAccountFactory::toDomains(
+        const std::vector<CashAccountRow>& cashAccountRows
+    )
+    {
+        std::vector<finance::CashAccount> accounts;
+        accounts.reserve(cashAccountRows.size());
+
+        for (const auto& row : cashAccountRows)
+            accounts.push_back(toDomain(row));
+
+        return accounts;
+    }
+
     /**
      * @brief Convert a CashAccount domain model to a pair of AccountRow and
      * CashAccountRow database models, this method takes a CashAccount object as

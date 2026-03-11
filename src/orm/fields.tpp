@@ -1,6 +1,8 @@
 #ifndef __ORM__FIELDS_TPP__
 #define __ORM__FIELDS_TPP__
 
+#include <mstd/string.hpp>
+
 #include "fields.hpp"
 #include "logging/log_macros.hpp"
 
@@ -44,6 +46,24 @@ namespace orm
     }
 
     /**
+     * @brief Get the Column Names
+     *
+     * @tparam Model
+     * @param delimiter The delimiter to use between column names
+     * @return std::string
+     */
+    template <db_model Model>
+    std::string getColumnNames(const std::string& delimiter)
+    {
+        std::vector<std::string> columnNames;
+
+        Model::forEachColumn([&](auto& field)
+                             { columnNames.push_back(field.getColumnName()); });
+
+        return mstd::join(columnNames, delimiter);
+    }
+
+    /**
      * @brief Get the Pk Where Clauses
      *
      * @tparam Model
@@ -60,7 +80,11 @@ namespace orm
                 if (field.isPk)
                 {
                     whereClauses.addClause(
-                        WhereClause{field, WhereOperator::Equal}
+                        WhereClause{
+                            field,
+                            Model::tableName,
+                            WhereOperator::Equal
+                        }
                     );
                 }
             }

@@ -80,11 +80,14 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(const std::string& name) const
     {
-        auto model        = ProfileRow{};
-        model.name        = name;
-        const auto clause = orm::UniqueClause(model.name);
+        auto model = ProfileRow{};
+        model.name = name;
 
-        const auto profile = orm::getUnique<ProfileRow>(_db, clause);
+        const auto clause =
+            orm::UniqueClause(model.name, ProfileRow::tableName);
+
+        const auto profile =
+            orm::getUnique<ProfileRow>(_db, orm::WhereClauses{clause});
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
