@@ -1,9 +1,11 @@
 add_library(molartracker_app_store STATIC
-    i_store.cpp
     account_store.cpp
-)
 
-add_subdirectory(profile_store)
+    profile/profile_store.cpp
+    profile/active_profile.cpp
+
+    base/i_store.cpp
+)
 
 target_include_directories(molartracker_app_store
     PUBLIC
@@ -13,7 +15,6 @@ target_include_directories(molartracker_app_store
 target_link_libraries(molartracker_app_store
     PUBLIC
         molartracker_app_domain
-        molartracker_app_store_profile
         molartracker_config
         molartracker_logging
 )

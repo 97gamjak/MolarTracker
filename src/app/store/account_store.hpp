@@ -5,8 +5,8 @@
 #include <set>
 #include <vector>
 
+#include "base/i_store.hpp"
 #include "finance/cash_account.hpp"
-#include "i_store.hpp"
 
 namespace app
 {

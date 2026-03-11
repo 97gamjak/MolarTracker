@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "app/domain/profile.hpp"
-#include "app/store/i_store.hpp"
+#include "app/store/base/i_store.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
