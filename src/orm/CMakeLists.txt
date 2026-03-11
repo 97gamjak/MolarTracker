@@ -1,6 +1,7 @@
 add_library(molartracker_orm STATIC
-    field_view.cpp
     orm_exception.cpp
+    where_clause.cpp
+    join.cpp
 )
 
 target_include_directories(molartracker_orm

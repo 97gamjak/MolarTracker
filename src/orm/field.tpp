@@ -2,11 +2,14 @@
 #define __ORM__FIELD_TPP__
 
 #include <mstd/error.hpp>
+#include <mstd/type_traits.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>
 #include <utility>
 
+#include "config/strong_id.hpp"
+#include "index.hpp"
 #include "orm/binder.hpp"
 #include "orm/concepts.hpp"
 #include "orm/field.hpp"
@@ -55,6 +58,20 @@ namespace orm
     Value const& Field<Name, Value, Options...>::value() const
     {
         return _value;
+    }
+
+    /**
+     * @brief Get the string representation of the field's value
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return std::string
+     */
+    template <fixed_string Name, typename Value, typename... Options>
+    std::string Field<Name, Value, Options...>::valueAsString() const
+    {
+        return _valueAsString(_value);
     }
 
     /**
@@ -114,7 +131,7 @@ namespace orm
             using DeletionBehavior = typename foreignKeyInfo::DeletionBehavior;
 
             definition += " " + table::tableName;
-            definition += "(" + field::getColumnName().toString() + ")";
+            definition += "(" + field::getColumnName() + ")";
 
             if constexpr (std::same_as<DeletionBehavior, CascadeDelete>)
                 definition += " ON DELETE CASCADE";
@@ -154,14 +171,14 @@ namespace orm
     template <typename Statement>
     void Field<Name, Value, Options...>::bind(
         Statement& statement,
-        int        index
+        BindIndex  index
     ) const
     {
         if constexpr (is_optional_v<Value>)
         {
             if (!_value.has_value())
             {
-                statement.bindNull(index);
+                statement.bindNull(index.value());
                 return;
             }
 
@@ -188,14 +205,14 @@ namespace orm
     template <typename Statement>
     void Field<Name, Value, Options...>::readFrom(
         Statement const& statement,
-        int              col
+        ColumnIndex      col
     )
     {
         if constexpr (is_optional_v<Value>)
         {
             using inner_type = optional_inner_t<Value>;
 
-            if (statement.columnIsNull(col))
+            if (statement.columnIsNull(col.value()))
             {
                 _value = std::nullopt;
                 return;
@@ -218,9 +235,9 @@ namespace orm
      * @return std::string_view
      */
     template <fixed_string Name, typename Value, typename... Options>
-    constexpr auto Field<Name, Value, Options...>::getColumnName()
+    constexpr std::string Field<Name, Value, Options...>::getColumnName()
     {
-        return name;
+        return name.toString();
     }
 
     /**
@@ -235,6 +252,48 @@ namespace orm
     constexpr ORMConstraint Field<Name, Value, Options...>::getConstraints()
     {
         return (ORMConstraint{} | ... | Options::value);
+    }
+
+    /**
+     * @brief Get the string representation of a field value, handling special
+     * cases like optional values, strong IDs, and enums
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @param value
+     * @return std::string
+     */
+    template <fixed_string Name, typename Value, typename... Options>
+    std::string Field<Name, Value, Options...>::_valueAsString(Value value)
+    {
+        if constexpr (is_optional_v<Value>)
+        {
+            if (!value.has_value())
+                return "null";
+
+            using InnerType = optional_inner_t<Value>;
+            return Field<Name, InnerType, Options...>::_valueAsString(
+                value.value()
+            );
+        }
+        else if constexpr (isStrongId_v<Value>)
+        {
+            return value.toString();
+        }
+        else if constexpr (mstd::has_enum_meta<Value>)
+        {
+            using enumMeta = mstd::enum_meta_t<Value>;
+            return enumMeta::toString(value);
+        }
+        else if constexpr (std::is_same_v<Value, std::string>)
+        {
+            return "\"" + value + "\"";
+        }
+        else
+        {
+            return std::to_string(value);
+        }
     }
 
 }   // namespace orm

@@ -2,6 +2,8 @@
 #define __LOGGING__LOG_MACROS_HPP__
 
 #include <iostream>   // IWYU pragma: keep
+#include <map>
+#include <string_view>
 
 #include "log_category.hpp"      // IWYU pragma: keep
 #include "log_entry_scope.hpp"   // IWYU pragma: keep
@@ -12,32 +14,91 @@
 
 namespace logging::detail
 {
-    inline std::string internNoexcept(const char* name) noexcept
+    /**
+     * @brief Get the Category Map object
+     *
+     * @return std::map<std::string_view, std::string_view>&
+     */
+    inline std::map<std::string_view, std::string_view>& getCategoryMap(
+    ) noexcept
     {
         try
         {
-            return {name};
+            static std::map<std::string_view, std::string_view> map;
+            return map;
+        }
+        catch (const std::exception& e)
+        {
+            std::abort();   // If we can't create the map, we can't continue
+        }
+    }
+
+    /**
+     * @brief Get the Category object
+     *
+     * @param file
+     * @return std::string_view
+     */
+    inline std::string_view getCategory(const char* file) noexcept
+    {
+        try
+        {
+            auto& map = getCategoryMap();
+            auto  it  = map.find(file);
+            return it != map.end() ? it->second : "Unknown";
         }
         catch (...)
         {
-            std::abort();
+            std::abort();   // If we can't access the map, we can't continue
         }
     }
+
+    /**
+     * @brief Add a logging category for a file
+     *
+     */
+    struct addLoggingCategory
+    {
+        /**
+         * @brief Construct a new add Logging Category object
+         *
+         * @param file
+         * @param category
+         */
+        addLoggingCategory(const char* file, std::string_view category) noexcept
+        {
+            try
+            {
+                auto& map = getCategoryMap();
+                map[file] = category;
+            }
+            catch (...)
+            {
+                std::abort();   // If we can't modify the map, we can't continue
+            }
+        }
+    };
 }   // namespace logging::detail
 
-#define REGISTER_LOG_CATEGORY(name_literal)                \
-    namespace                                              \
-    {                                                      \
-                                                           \
-        [[maybe_unused]] const auto _logCategory =         \
-            logging::detail::internNoexcept(name_literal); \
-    }
+#define CONCATENATE_DETAIL(x, y) x##y
+#define CONCATENATE(x, y)        CONCATENATE_DETAIL(x, y)
+
+#define REGISTER_LOG_CATEGORY(name_literal)                    \
+    namespace logging::detail                                  \
+    {                                                          \
+        const auto CONCATENATE(__logCategory__, __COUNTER__) = \
+            addLoggingCategory{(__FILE__), name_literal};      \
+    }   // NOLINT
 
 #define LOG_OBJECT_INTERNAL(level, category, message) \
     (logging::LogObject{level, category, message, __FILE__, __LINE__, __func__})
 
-#define LOG_OBJECT(level, message) \
-    LOG_OBJECT_INTERNAL(level, _logCategory, message)
+#define LOG_OBJECT(level, message)                           \
+    LOG_OBJECT_INTERNAL(                                     \
+        level,                                               \
+        std::string(logging::detail::getCategory(__FILE__)), \
+        message                                              \
+    )
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-do-while, cppcoreguidelines-macro-usage)
 #define LOG(logObject)                                       \

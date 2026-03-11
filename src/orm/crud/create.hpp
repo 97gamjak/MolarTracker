@@ -1,13 +1,17 @@
 #ifndef __ORM__CRUD__CREATE_HPP__
 #define __ORM__CRUD__CREATE_HPP__
 
-#include "crud_detail.hpp"
+#include <mstd/string.hpp>
+
 #include "crud_error.hpp"
 #include "db/database.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/fields.hpp"
 #include "orm/type_traits.hpp"
 
-namespace orm
+REGISTER_LOG_CATEGORY("Orm.Crud.Create");
+
+namespace orm::details
 {
     /**
      * @brief Create a table for the specified model in the database
@@ -22,31 +26,27 @@ namespace orm
         sqlText             += Model::tableName;
         sqlText             += " (";
 
-        auto firstCol = true;
-
-        for (const auto& field : orm::fields<Model>())
-        {
-            if (!firstCol)
-                sqlText += ", ";
-
-            firstCol  = false;
-            sqlText  += field.ddl();
-        }
+        const auto ddl  = getDDl<Model>();
+        sqlText        += mstd::join(ddl, ", ");
 
         if constexpr (has_unique_groups<Model>)
-        {
-            auto const            groups = Model::getUniqueGroups();
-            constexpr std::size_t size   = std::tuple_size_v<decltype(groups)>;
-            appendAllUniqueGroups<Model>(sqlText, groups, index_seq<size>{});
-        }
+            appendAllUniqueGroups<Model>(sqlText);
 
         sqlText += ");";
 
         if (database == nullptr)
             throw CrudException("Database pointer is null");
 
+        LOG_DEBUG(
+            std::format(
+                "Creating table '{}' with SQL: {}",
+                Model::tableName,
+                sqlText
+            )
+        );
+
         database->execute(sqlText);
     }
-}   // namespace orm
+}   // namespace orm::details
 
 #endif   // __ORM__CRUD__CREATE_HPP__

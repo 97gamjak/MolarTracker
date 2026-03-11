@@ -1,11 +1,13 @@
 #ifndef __ORM__FIELD_HPP__
 #define __ORM__FIELD_HPP__
 
+#include <format>   // IWYU pragma: keep
 #include <string>
 
 #include "orm/concepts.hpp"
 #include "orm/constraints.hpp"
 #include "orm/fixed_string.hpp"
+#include "orm/index.hpp"
 
 namespace orm
 {
@@ -56,23 +58,86 @@ namespace orm
         [[nodiscard]] Value&       value();
         [[nodiscard]] Value const& value() const;
 
+        [[nodiscard]] std::string valueAsString() const;
+
         Field& operator=(Value value);
 
         [[nodiscard]] static std::string ddl();
 
         template <typename Statement>
-        void bind(Statement& statement, int index) const;
+        void bind(Statement& statement, BindIndex index) const;
 
         template <typename Statement>
-        void readFrom(Statement const& statement, int col);
+        void readFrom(Statement const& statement, ColumnIndex col);
 
-        [[nodiscard]] static constexpr auto          getColumnName();
+        [[nodiscard]] static constexpr std::string   getColumnName();
         [[nodiscard]] static constexpr ORMConstraint getConstraints();
+
+       private:
+        /// Allow Field with different template parameters to access private
+        /// members
+        template <
+            fixed_string NewName,
+            typename NewValueType,
+            typename... NewOptions>
+        friend class Field;
+
+        [[nodiscard]] static std::string _valueAsString(Value value);
     };
 
     template <typename Value>
     using IdField =
         Field<"id", Value, primary_key_t, auto_increment_t, unique_t>;
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define ORM_FIELDS(Self, ...)                                                \
+    constexpr auto fields() { return std::tie(__VA_ARGS__); }                \
+    constexpr auto fields() const { return std::tie(__VA_ARGS__); }          \
+                                                                             \
+    template <typename Func>                                                 \
+    static void forEachColumn(Func&& func)                                   \
+    {                                                                        \
+        std::apply(                                                          \
+            [&](auto... field) { (std::forward<Func>(func)(field), ...); },  \
+            Self{}.fields()                                                  \
+        );                                                                   \
+    }                                                                        \
+                                                                             \
+    template <typename Func>                                                 \
+    void forEachField(Func&& func)                                           \
+    {                                                                        \
+        std::apply(                                                          \
+            [&](auto&... field) { (std::forward<Func>(func)(field), ...); }, \
+            fields()                                                         \
+        );                                                                   \
+    }                                                                        \
+                                                                             \
+    template <typename Func>                                                 \
+    void forEachField(Func&& func) const                                     \
+    {                                                                        \
+        std::apply(                                                          \
+            [&](auto&... field) { (std::forward<Func>(func)(field), ...); }, \
+            fields()                                                         \
+        );                                                                   \
+    }                                                                        \
+                                                                             \
+    [[nodiscard]] std::string toString() const                               \
+    {                                                                        \
+        std::string result = std::format("{} {{ ", tableName);               \
+        bool        first  = true;                                           \
+        forEachField(                                                        \
+            [&](const auto& field)                                           \
+            {                                                                \
+                if (!first)                                                  \
+                    result += ", ";                                          \
+                first = false;                                               \
+                result +=                                                    \
+                    field.getColumnName() + ": " + field.valueAsString();    \
+            }                                                                \
+        );                                                                   \
+        result += " }";                                                      \
+        return result;                                                       \
+    }
 
 }   // namespace orm
 

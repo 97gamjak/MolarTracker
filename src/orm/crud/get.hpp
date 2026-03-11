@@ -1,162 +1,41 @@
 #ifndef __ORM__CRUD__GET_HPP__
 #define __ORM__CRUD__GET_HPP__
 
-#include <expected>
 #include <mstd/string.hpp>
 #include <string>
 #include <vector>
 
-#include "crud_detail.hpp"
 #include "crud_error.hpp"
 #include "db/database.hpp"
-#include "orm/binder.hpp"
-#include "orm/field_view.hpp"
-#include "orm/fields.hpp"
+#include "db/statement.hpp"
+#include "db/transaction.hpp"
+#include "logging/log_macros.hpp"
+#include "orm/join.hpp"
 #include "orm/type_traits.hpp"
+#include "orm/where_clause.hpp"
 
-namespace orm
+REGISTER_LOG_CATEGORY("Orm.Crud.Get");
+
+namespace orm::details
 {
-    /**
-     * @brief Get rows by matching field value
-     *
-     * @tparam Model
-     * @tparam Field
-     * @param database
-     * @param fieldToMatch
-     * @return std::vector<Model>
-     */
-    template <db_model Model, typename Field>
-    [[nodiscard]] std::vector<Model> getByField(
-        const std::shared_ptr<db::Database>& database,
-        Field const&                         fieldToMatch
-    )
-    {
-        const auto fieldView       = orm::FieldView::from(fieldToMatch);
-        auto const emptyFieldViews = orm::fields<Model>();
-
-        std::string sqlText;
-        sqlText += "SELECT ";
-
-        const auto columnNames  = getColumnNames(emptyFieldViews);
-        sqlText                += mstd::join(columnNames, ", ");
-
-        sqlText += " FROM ";
-        sqlText += Model::tableName;
-        sqlText += " WHERE ";
-        sqlText += std::string{fieldView.getColumnName()};
-        sqlText += "=?;";
-
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
-        db::Statement statement = database->prepare(sqlText);
-        fieldView.bind(statement, 1);
-
-        std::vector<Model> results;
-
-        while (statement.step() == db::StepResult::RowAvailable)
-        {
-            results.push_back(loadModelFromStatement<Model>(statement));
-        }
-
-        return results;
-    }
-
-    /**
-     * @brief Get a single row by matching unique field value
-     *
-     * @tparam Model
-     * @tparam Field
-     * @param database
-     * @param fieldToMatch
-     * @return std::expected<Model, CrudError> The loaded model on success, or
-     * an error on failure
-     */
-    template <db_model Model, typename Field>
-    [[nodiscard]] std::expected<Model, CrudError> getByUniqueField(
-        const std::shared_ptr<db::Database>& database,
-        Field const&                         fieldToMatch
-    )
-    {
-        static_assert(Field::isUnique);
-        const auto fieldView = orm::FieldView::from(fieldToMatch);
-
-        auto const emptyFieldViews = orm::fields<Model>();
-
-        std::string sqlText;
-        sqlText += "SELECT ";
-
-        const auto columnNames  = getColumnNames(emptyFieldViews);
-        sqlText                += mstd::join(columnNames, ", ");
-
-        sqlText += " FROM ";
-        sqlText += Model::tableName;
-        sqlText += " WHERE ";
-        sqlText += std::string{fieldView.getColumnName()};
-        sqlText += "=?;";
-
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
-        db::Statement statement = database->prepare(sqlText);
-        fieldView.bind(statement, 1);
-
-        const db::StepResult result = statement.step();
-        if (result != db::StepResult::RowAvailable)
-        {
-            return std::unexpected(CrudError(
-                CrudErrorType::NotFound,
-                "No row found matching the specified unique field value"
-            ));
-        }
-
-        return loadModelFromStatement<Model>(statement);
-    }
-
     /**
      * @brief Get a single row by primary key value
      *
      * @tparam Model
-     * @tparam PrimaryKeyValue
      * @param database
-     * @param pkValue
+     * @param model
      * @return std::optional<Model> The loaded model if found, or std::nullopt
      * if not found
      */
-    template <db_model Model, typename PrimaryKeyValue>
+    template <db_model Model>
     [[nodiscard]] std::optional<Model> getByPk(
         const std::shared_ptr<db::Database>& database,
-        PrimaryKeyValue const&               pkValue
+        const Model&                         model
     )
     {
         const auto numberOfPkFields = getNumberOfPkFields<Model>();
-        if (numberOfPkFields != 1)
-        {
-            throw CrudException(
-                "orm::getByPk requires a model with exactly one primary key "
-                "field"
-            );
-        }
 
-        auto const emptyFieldViews = orm::fields<Model>();
-
-        std::string sqlText;
-        sqlText += "SELECT ";
-
-        const auto columnNames = getColumnNames(emptyFieldViews);
-
-        sqlText += mstd::join(columnNames, ", ");
-
-        sqlText += " FROM ";
-        sqlText += Model::tableName;
-        sqlText += " WHERE ";
-
-        const auto whereClauses = getColumnNames(
-            emptyFieldViews,
-            ORMConstraint::PrimaryKey,
-            ORMConstraintMode::Only,
-            "=?"
-        );
+        const auto whereClauses = getPkWhereClauses<Model>(model);
 
         if (whereClauses.empty())
         {
@@ -165,52 +44,67 @@ namespace orm
             );
         }
 
-        sqlText += whereClauses[0];
-        sqlText += ";";
-
-        if (database == nullptr)
+        if (whereClauses.size() != numberOfPkFields)
         {
-            throw CrudException("Database pointer is null");
+            throw CrudException(
+                "orm::getByPk requires all primary key fields to be set"
+            );
         }
 
-        db::Statement statement = database->prepare(sqlText);
-        binder<db::Statement, PrimaryKeyValue>::bind(statement, 1, pkValue);
+        const auto returnedModels =
+            getAll<Model>(database, Joins{}, whereClauses);
 
-        const db::StepResult result = statement.step();
-        if (result != db::StepResult::RowAvailable)
+        if (returnedModels.size() > 1)
+        {
+            throw CrudException(
+                "orm::getByPk expected to find at most one row matching the "
+                "primary key value, but found multiple rows"
+            );
+        }
+
+        if (returnedModels.empty())
             return std::nullopt;
 
-        return loadModelFromStatement<Model>(statement);
+        return returnedModels.front();
     }
 
     /**
-     * @brief Get all rows from the table
+     * @brief Get all rows matching the specified where clauses
      *
      * @tparam Model
      * @param database
+     * @param joins
+     * @param whereClauses
      * @return std::vector<Model>
      */
     template <db_model Model>
     [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database
+        const std::shared_ptr<db::Database>& database,
+        const Joins&                         joins,
+        const WhereClauses&                  whereClauses
     )
     {
-        auto const emptyFieldViews = orm::fields<Model>();
-
         std::string sqlText;
         sqlText += "SELECT ";
 
-        const auto columnNames  = getColumnNames(emptyFieldViews);
-        sqlText                += mstd::join(columnNames, ", ");
-
-        sqlText += " FROM ";
-        sqlText += Model::tableName;
-        sqlText += ";";
+        sqlText += getColumnNames<Model>(", ") + " ";
+        sqlText += joins.getDBOperations(Model::tableName) + " ";
+        sqlText += whereClauses.getDBOperations() + ";";
 
         if (database == nullptr)
             throw CrudException("Database pointer is null");
 
+        LOG_DEBUG(
+            std::format(
+                "Getting from table '{}' with SQL: {}",
+                Model::tableName,
+                sqlText
+            )
+        );
+
         db::Statement statement = database->prepare(sqlText);
+
+        whereClauses.bind(statement);
 
         std::vector<Model> results;
 
@@ -222,6 +116,6 @@ namespace orm
         return results;
     }
 
-}   // namespace orm
+}   // namespace orm::details
 
 #endif   // __ORM__CRUD__GET_HPP__

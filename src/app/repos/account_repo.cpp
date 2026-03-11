@@ -4,6 +4,7 @@
 #include "finance/cash_account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "orm/join.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/account_row.hpp"
 
@@ -95,6 +96,38 @@ namespace app
         transaction.commit();
 
         return account.getId();
+    }
+
+    [[nodiscard]] std::vector<finance::CashAccount> AccountRepo::
+        getAllCashAccounts() const
+    {
+        const auto baseName = CashAccountRow::tableName;
+        const auto joinName = AccountRow::tableName;
+
+        const auto fieldPair = std::make_pair(
+            decltype(CashAccountRow{}.id)::getColumnName(),
+            decltype(AccountRow{}.id)::getColumnName()
+        );
+
+        orm::Joins joins;
+        joins.addJoin(orm::Join(baseName, joinName, fieldPair));
+
+        auto dummyAccountRow = AccountRow{};
+        dummyAccountRow.kind = AccountKind::Cash;
+
+        const auto kindClause = orm::WhereClause(
+            dummyAccountRow.kind,
+            AccountRow::tableName,
+            orm::WhereOperator::Equal
+        );
+
+        const auto cashAccountRows = orm::getAll<CashAccountRow>(
+            _db,
+            joins,
+            orm::WhereClauses{kindClause}
+        );
+
+        return CashAccountFactory::toDomains(cashAccountRows);
     }
 
     /**

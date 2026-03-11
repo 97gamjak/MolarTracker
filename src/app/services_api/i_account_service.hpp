@@ -1,6 +1,8 @@
 #ifndef __APP__SERVICES_API__I_ACCOUNT_SERVICE_HPP__
 #define __APP__SERVICES_API__I_ACCOUNT_SERVICE_HPP__
 
+#include <vector>
+
 #include "config/id_types.hpp"
 
 namespace finance
@@ -18,6 +20,17 @@ namespace app
     {
        public:
         virtual ~IAccountService() = default;
+
+        /**
+         * @brief Get all cash accounts, this method retrieves all cash accounts
+         * from the underlying data source and returns them as a vector of
+         * CashAccount domain objects.
+         *
+         * @return std::vector<finance::CashAccount> A vector containing all
+         * cash accounts
+         */
+        [[nodiscard]] virtual std::vector<finance::CashAccount> getAllCashAccounts(
+        ) const = 0;
 
         /**
          * @brief Create a new cash account, this method takes a CashAccount

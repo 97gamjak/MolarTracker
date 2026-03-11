@@ -2,6 +2,7 @@
 #define __APP__SERVICES__ACCOUNT_SERVICE_HPP__
 
 #include <memory>
+#include <vector>
 
 #include "services_api/i_account_service.hpp"
 
@@ -21,7 +22,12 @@ namespace app
         std::shared_ptr<IAccountRepo> _accountRepo;
 
        public:
-        explicit AccountService(std::shared_ptr<IAccountRepo> accountRepo);
+        explicit AccountService(
+            const std::shared_ptr<IAccountRepo>& accountRepo
+        );
+
+        [[nodiscard]] std::vector<finance::CashAccount> getAllCashAccounts(
+        ) const override;
 
         [[nodiscard]] AccountId createCashAccount(
             const finance::CashAccount& cashAccount

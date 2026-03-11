@@ -14,9 +14,11 @@ namespace app
      * @param services
      */
     StoreContainer::StoreContainer(ServiceContainer& services)
-        : _profileStore{services.getProfileService()}
+        : _profileStore{services.getProfileService()},
+          _accountStore{services.getAccountService()}
     {
         _allStores.push_back(&_profileStore);
+        _allStores.push_back(&_accountStore);
     }
 
     /**
@@ -88,6 +90,23 @@ namespace app
     const ProfileStore& StoreContainer::getProfileStore() const
     {
         return _profileStore;
+    }
+
+    /**
+     * @brief Get the AccountStore
+     *
+     * @return AccountStore&
+     */
+    AccountStore& StoreContainer::getAccountStore() { return _accountStore; }
+
+    /**
+     * @brief Get the AccountStore (const version)
+     *
+     * @return const AccountStore&
+     */
+    const AccountStore& StoreContainer::getAccountStore() const
+    {
+        return _accountStore;
     }
 
 }   // namespace app

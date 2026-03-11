@@ -8,6 +8,46 @@ namespace app
 {
 
     /**
+     * @brief Convert a CashAccountRow database model to a
+     * CashAccount
+     *
+     * @param cashAccountRow
+     * @return finance::CashAccount
+     */
+    finance::CashAccount CashAccountFactory::toDomain(
+        const CashAccountRow& cashAccountRow
+    )
+    {
+        return finance::CashAccount(
+            cashAccountRow.id.value(),
+            cashAccountRow.status.value(),
+            cashAccountRow.profileId.value(),
+            cashAccountRow.currency.value(),
+            cashAccountRow.name.value()
+        );
+    }
+
+    /**
+     * @brief Convert a vector of CashAccountRow database models to a vector of
+     * CashAccount domain models
+     *
+     * @param cashAccountRows
+     * @return std::vector<finance::CashAccount>
+     */
+    std::vector<finance::CashAccount> CashAccountFactory::toDomains(
+        const std::vector<CashAccountRow>& cashAccountRows
+    )
+    {
+        std::vector<finance::CashAccount> accounts;
+        accounts.reserve(cashAccountRows.size());
+
+        for (const auto& row : cashAccountRows)
+            accounts.push_back(toDomain(row));
+
+        return accounts;
+    }
+
+    /**
      * @brief Convert a CashAccount domain model to a pair of AccountRow and
      * CashAccountRow database models, this method takes a CashAccount object as
      * input and extracts the relevant information to populate an AccountRow and

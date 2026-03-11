@@ -1,6 +1,7 @@
 add_library(molartracker_app_store STATIC
     i_store.cpp
     profile_store.cpp
+    account_store.cpp
 )
 
 target_include_directories(molartracker_app_store

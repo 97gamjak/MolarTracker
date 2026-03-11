@@ -28,6 +28,9 @@ namespace app
 
         void ensureSchema() override;
 
+        [[nodiscard]] std::vector<finance::CashAccount> getAllCashAccounts(
+        ) const override;
+
         [[nodiscard]] AccountId createCashAccount(
             const finance::CashAccount& account
         ) override;

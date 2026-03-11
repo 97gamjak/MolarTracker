@@ -5,14 +5,16 @@
 #include <mstd/string.hpp>
 #include <string>
 
-#include "crud_detail.hpp"
 #include "crud_error.hpp"
 #include "db/database.hpp"
-#include "orm/constraints.hpp"
-#include "orm/fields.hpp"
+#include "db/statement.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/type_traits.hpp"
+#include "orm/where_clause.hpp"
 
-namespace orm
+REGISTER_LOG_CATEGORY("Orm.Crud.Update");
+
+namespace orm::details
 {
 
     /**
@@ -30,58 +32,63 @@ namespace orm
         const Model&                         row
     )
     {
-        auto const fieldViews = orm::fields(row);
-
         std::string sqlText;
         sqlText += "UPDATE ";
         sqlText += Model::tableName;
         sqlText += " SET ";
 
-        const auto columnNames = getColumnNames(
-            fieldViews,
-            ORMConstraint::PrimaryKey,
-            ORMConstraintMode::Not,
-            "=?"
+        std::vector<std::string> columnNames;
+        Model::forEachColumn(
+            [&](const auto& field)
+            {
+                if (field.isPk)
+                    return;
+
+                columnNames.push_back(field.getColumnName() + "=?");
+            }
         );
 
         sqlText += mstd::join(columnNames, ", ");
-        sqlText += " WHERE ";
 
-        const auto whereClauses = getColumnNames(
-            fieldViews,
-            ORMConstraint::PrimaryKey,
-            ORMConstraintMode::Only,
-            "=?"
-        );
+        const auto whereClauses = getPkWhereClauses(row);
 
         if (whereClauses.empty())
         {
             return std::unexpected(CrudError(
                 CrudErrorType::NoPrimaryKey,
-                "orm::update requires at least one primary key field"
+                "orm::update requires a model with at least one primary key "
+                "field"
             ));
         }
 
-        sqlText += mstd::join(whereClauses, " AND ");
+        sqlText += whereClauses.getDBOperations();
         sqlText += ";";
 
         if (database == nullptr)
             throw CrudException("Database pointer is null");
 
+        LOG_DEBUG(
+            std::format(
+                "Updating table '{}' with SQL: {}",
+                Model::tableName,
+                sqlText
+            )
+        );
         db::Statement statement = database->prepare(sqlText);
 
-        bindFieldsToStatement(
-            statement,
-            fieldViews,
-            ORMConstraint::PrimaryKey,
-            ORMConstraintMode::Not
+        std::size_t index = 0;
+        row.forEachField(
+            [&](const auto& field)
+            {
+                if (field.isPk)
+                    return;
+
+                field.bind(statement, bindIndex(index));
+                ++index;
+            }
         );
-        bindFieldsToStatement(
-            statement,
-            fieldViews,
-            ORMConstraint::PrimaryKey,
-            ORMConstraintMode::Only
-        );
+
+        whereClauses.bind(statement);
 
         statement.executeToCompletion();
 
@@ -107,6 +114,6 @@ namespace orm
 
         return {};
     }
-}   // namespace orm
+}   // namespace orm::details
 
 #endif   // __ORM__CRUD__UPDATE_HPP__

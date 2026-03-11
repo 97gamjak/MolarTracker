@@ -1,67 +1,185 @@
 #ifndef __ORM__FIELDS_TPP__
 #define __ORM__FIELDS_TPP__
 
-#include <tuple>
-#include <type_traits>
-#include <utility>
+#include <mstd/string.hpp>
 
 #include "fields.hpp"
-#include "fields_detail.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("Orm.Fields");
 
 namespace orm
 {
-    // TODO(97gamjak): extract this to mstd
-    // https://97gamjak.atlassian.net/browse/MSTD-84
-    template <std::size_t N>
-    using index_seq = std::make_index_sequence<N>;
-
-    // TODO(97gamjak): extract this to mstd
-    // https://97gamjak.atlassian.net/browse/MSTD-85
-    template <typename T>
-    using rm_ref_t = std::remove_reference_t<T>;
-
     /**
-     * @brief get an array of FieldView from a model instance
+     * @brief Get the DDL strings for all fields in the specified model, e.g.
+     * "id INTEGER PRIMARY KEY AUTOINCREMENT"
      *
      * @tparam Model
-     * @param model
-     * @return constexpr auto
+     * @return std::vector<std::string>
      */
-    template <typename Model>
-    constexpr auto fields(Model& model)
+    template <db_model Model>
+    std::vector<std::string> getDDl()
     {
-        auto tuple                     = model.fields();
-        using tuple_type               = rm_ref_t<decltype(tuple)>;
-        constexpr std::size_t n_fields = std::tuple_size_v<tuple_type>;
+        std::vector<std::string> ddlStrings;
 
-        return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
+        Model::forEachColumn([&](auto& field)
+                             { ddlStrings.push_back(field.ddl()); });
+
+        return ddlStrings;
     }
 
     /**
-     * @brief get an array of FieldView from a const model instance
+     * @brief Get the Column Names
+     *
+     * @tparam Model
+     * @return std::vector<std::string>
+     */
+    template <db_model Model>
+    std::vector<std::string> getColumnNames()
+    {
+        std::vector<std::string> columnNames;
+
+        Model::forEachColumn([&](auto& field)
+                             { columnNames.push_back(field.getColumnName()); });
+
+        return columnNames;
+    }
+
+    /**
+     * @brief Get the Column Names
+     *
+     * @tparam Model
+     * @param delimiter The delimiter to use between column names
+     * @return std::string
+     */
+    template <db_model Model>
+    std::string getColumnNames(const std::string& delimiter)
+    {
+        std::vector<std::string> columnNames;
+
+        Model::forEachColumn([&](auto& field)
+                             { columnNames.push_back(field.getColumnName()); });
+
+        return mstd::join(columnNames, delimiter);
+    }
+
+    /**
+     * @brief Get the Pk Where Clauses
      *
      * @tparam Model
      * @param model
-     * @return constexpr auto
+     * @return WhereClauses
      */
-    template <typename Model>
-    constexpr auto fields(Model const& model)
+    template <db_model Model>
+    WhereClauses getPkWhereClauses(const Model& model)
     {
-        auto tuple                     = model.fields();
-        using tuple_type               = rm_ref_t<decltype(tuple)>;
-        constexpr std::size_t n_fields = std::tuple_size_v<tuple_type>;
-
-        return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
+        WhereClauses whereClauses;
+        model.forEachField(
+            [&](const auto& field)
+            {
+                if (field.isPk)
+                {
+                    whereClauses.addClause(
+                        WhereClause{
+                            field,
+                            Model::tableName,
+                            WhereOperator::Equal
+                        }
+                    );
+                }
+            }
+        );
+        return whereClauses;
     }
 
-    template <typename Model>
-    constexpr auto fields()
+    /**
+     * @brief Get the Number Of Pk Fields
+     *
+     * @tparam Model
+     * @return std::size_t
+     */
+    template <db_model Model>
+    std::size_t getNumberOfPkFields()
     {
-        auto tuple                     = Model{}.fields();
-        using tuple_type               = rm_ref_t<decltype(tuple)>;
-        constexpr std::size_t n_fields = std::tuple_size_v<tuple_type>;
+        std::size_t count = 0;
 
-        return detail::tuple_to_field_array(tuple, index_seq<n_fields>{});
+        Model::forEachColumn(
+            [&](const auto& field)
+            {
+                if (field.isPk)
+                    ++count;
+            }
+        );
+
+        return count;
+    }
+
+    /**
+     * @brief Get the Number Of Auto Increment Pk Fields
+     *
+     * @tparam Model
+     * @return std::size_t
+     */
+    template <db_model Model>
+    std::size_t getNumberOfAutoIncrementPkFields()
+    {
+        std::size_t count = 0;
+
+        Model::forEachColumn(
+            [&](const auto& field)
+            {
+                if (field.isAutoIncrementPk)
+                    ++count;
+            }
+        );
+
+        return count;
+    }
+
+    /**
+     * @brief Get the Number Of Fields
+     *
+     * @tparam Model
+     * @return std::size_t
+     */
+    template <db_model Model>
+    std::size_t getNumberOfFields()
+    {
+        std::size_t count = 0;
+
+        Model::forEachColumn([&](const auto& /*field*/) { ++count; });
+
+        return count;
+    }
+
+    /**
+     * @brief Load a model from a database statement, reading the field values
+     * from the statement's columns in order
+     *
+     * @tparam Model
+     * @param statement
+     * @return Model
+     */
+    template <typename Model>
+    Model loadModelFromStatement(db::Statement const& statement)
+    {
+        LOG_ENTRY;
+
+        Model loadedModel{};
+
+        std::size_t col = 0;
+
+        loadedModel.forEachField(
+            [&](auto& field)
+            {
+                field.readFrom(statement, columnIndex(col));
+                ++col;
+            }
+        );
+
+        LOG_DEBUG(std::format("Loaded model {}", loadedModel.toString()));
+
+        return loadedModel;
     }
 
 }   // namespace orm

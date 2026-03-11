@@ -3,154 +3,95 @@
 
 #include <cstdint>
 #include <expected>
+#include <mstd/string.hpp>
 #include <optional>
 #include <vector>
 
 #include "crud_error.hpp"
 #include "db/database.hpp"
 #include "db/transaction.hpp"
-#include "orm/constraints.hpp"
-#include "orm/fields.hpp"
+#include "logging/log_macros.hpp"
+#include "orm/index.hpp"
 #include "orm/type_traits.hpp"
 
-namespace orm
+REGISTER_LOG_CATEGORY("Orm.Crud.Insert");
+
+namespace orm::details
 {
-    namespace details
-    {
-        /**
-         * @brief Insert a row into the database
-         *
-         * @tparam Model
-         * @param database
-         * @param row
-         * @return std::expected<std::int64_t, CrudError> The ID of the inserted
-         * row or an error
-         */
-        template <db_model Model>
-        [[nodiscard]] std::expected<std::int64_t, CrudError> _insert(
-            const std::shared_ptr<db::Database>& database,
-            const Model&                         row
-        )
-        {
-            const auto fieldViews = orm::fields(row);
-            auto       sqlText    = "INSERT INTO " + Model::tableName + " (";
-            auto       firstCol   = true;
-
-            for (const auto& field : fieldViews)
-            {
-                if (field.isAutoIncrementPk())
-                    continue;
-
-                if (!firstCol)
-                    sqlText += ", ";
-
-                firstCol  = false;
-                sqlText  += std::string{field.getColumnName()};
-            }
-
-            sqlText += ") VALUES (";
-
-            firstCol = true;
-
-            for (FieldView const& field : fieldViews)
-            {
-                if (field.isAutoIncrementPk())
-                    continue;
-
-                if (!firstCol)
-                    sqlText += ", ";
-
-                firstCol  = false;
-                sqlText  += "?";
-            }
-
-            sqlText += ");";
-
-            if (database == nullptr)
-                throw CrudException("Database pointer is null");
-
-            auto statement = database->prepare(sqlText);
-
-            int index = 1;
-
-            for (FieldView const& field : fieldViews)
-            {
-                if (field.isAutoIncrementPk())
-                    continue;
-
-                field.bind(statement, index);
-                ++index;
-            }
-
-            statement.executeToCompletion();
-
-            const auto lastInsertId = database->getLastInsertRowid();
-            if (lastInsertId.has_value())
-                return lastInsertId.value();
-
-            const auto error = CrudError{
-                CrudErrorType::InsertFailed,
-                "Failed to retrieve last insert ID after insert operation"
-            };
-
-            return std::unexpected(error);
-        }
-    }   // namespace details
-
     /**
      * @brief Insert a row into the database
      *
      * @tparam Model
      * @param database
      * @param row
-     * @return std::expected<std::int64_t, CrudError> The ID of the inserted row
-     * or an error
+     * @return std::expected<std::int64_t, CrudError> The ID of the inserted
+     * row or an error
      */
     template <db_model Model>
-    requires is_freely_insertable_v<Model>
-    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
+    [[nodiscard]] std::expected<std::int64_t, CrudError> _insert(
         const std::shared_ptr<db::Database>& database,
         const Model&                         row
     )
     {
-        db::Transaction transaction{database};
-        auto            result = details::_insert(database, row);
+        auto sqlText = "INSERT INTO " + Model::tableName + " (";
 
-        if (result.has_value())
-            transaction.commit();
+        std::vector<std::string> columnNames;
+        Model::forEachColumn(
+            [&](const auto& field)
+            {
+                if (field.isAutoIncrementPk)
+                    return;
 
-        return result;
-    }
+                columnNames.push_back(field.getColumnName());
+            }
+        );
 
-    /**
-     * @brief Insert a row into the database
-     *
-     * @tparam Model
-     * @param database
-     * @param transaction An active transaction to use for the insert operation,
-     * this is used to ensure that the caller has control over the transaction
-     * scope and can manage it as needed (e.g., commit, rollback, etc.), the
-     * method will not manage the transaction itself, it will only use it to
-     * ensure that the insert operation is performed within the context of the
-     * provided transaction.
-     * @param row
-     * @return std::expected<std::int64_t, CrudError> The ID of the inserted row
-     * or an error
-     */
-    template <db_model Model>
-    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        const std::shared_ptr<db::Database>& database,
-        const db::Transaction& /*transaction*/,
-        const Model& row
-    )
-    {
-        // here the passed transaction is used only to enforce that the caller
-        // has an active transaction, the actual transaction object is not used
-        // because the details::_insert method will create save points for
-        // nested transactions if needed, so we can just call it directly
-        // without worrying about the transaction management here
+        sqlText += mstd::join(columnNames, ", ");
+        sqlText += ") VALUES (";
 
-        return details::_insert(database, row);
+        const std::vector<std::string> placeholders(columnNames.size(), "?");
+        sqlText += mstd::join(placeholders, ", ");
+
+        sqlText += ");";
+
+        if (database == nullptr)
+            throw CrudException("Database pointer is null");
+
+        LOG_DEBUG(
+            std::format(
+                "Inserting into table '{}' with SQL: {}",
+                Model::tableName,
+                sqlText
+            )
+        );
+
+        auto statement = database->prepare(sqlText);
+
+        std::size_t counter = 0;
+
+        row.forEachField(
+            [&](const auto& field)
+            {
+                if (field.isAutoIncrementPk)
+                    return;
+
+                field.bind(statement, bindIndex(counter));
+                ++counter;
+            }
+        );
+
+        statement.executeToCompletion();
+
+        const auto lastInsertId = database->getLastInsertRowid();
+        if (lastInsertId.has_value())
+            return lastInsertId.value();
+
+        const auto error = CrudError{
+            CrudErrorType::InsertFailed,
+            "Failed to retrieve last insert ID after insert operation"
+        };
+
+        return std::unexpected(error);
     }
 
     /**
@@ -201,6 +142,6 @@ namespace orm
         return insertedIds;
     }
 
-}   // namespace orm
+}   // namespace orm::details
 
 #endif   // __ORM__CRUD__INSERT_HPP__

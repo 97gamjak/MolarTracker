@@ -9,6 +9,7 @@
 #include "domain/profile.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "orm/where_clause.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/profile_row.hpp"
 
@@ -62,7 +63,8 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
-        const auto profile = orm::getByPk<ProfileRow>(_db, id);
+        const auto row     = ProfileRow{id};
+        const auto profile = orm::getByPk(_db, row);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -78,12 +80,14 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(const std::string& name) const
     {
-        using name_field = decltype(ProfileRow::name);
+        auto model = ProfileRow{};
+        model.name = name;
 
-        const auto profile = orm::getByUniqueField<ProfileRow, name_field>(
-            _db,
-            name_field{name}
-        );
+        const auto clause =
+            orm::UniqueClause(model.name, ProfileRow::tableName);
+
+        const auto profile =
+            orm::getUnique<ProfileRow>(_db, orm::WhereClauses{clause});
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -175,7 +179,7 @@ namespace app
      */
     void ProfileRepo::remove(ProfileId id)
     {
-        orm::deleteByPk<ProfileRow>(_db, id);
+        orm::deleteByPk(_db, ProfileRow{id});
     }
 
 }   // namespace app

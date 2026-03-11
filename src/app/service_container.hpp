@@ -1,12 +1,14 @@
 #ifndef __APP__SERVICE_CONTAINER_HPP__
 #define __APP__SERVICE_CONTAINER_HPP__
 
-#include "services/profile_service.hpp"
+#include <memory>
 
 namespace app
 {
 
-    class RepoContainer;   // Forward declaration
+    class RepoContainer;     // Forward declaration
+    class IProfileService;   // Forward declaration
+    class IAccountService;   // Forward declaration
 
     /**
      * @brief Container for all services
@@ -16,13 +18,20 @@ namespace app
     {
        private:
         /// The Profile service
-        ProfileService _profileService;
+        std::shared_ptr<IProfileService> _profileService;
+        /// The Account service
+        std::shared_ptr<IAccountService> _accountService;
 
        public:
         explicit ServiceContainer(RepoContainer& repos);
 
-        IProfileService&                     getProfileService();
-        [[nodiscard]] const IProfileService& getProfileService() const;
+        [[nodiscard]] std::shared_ptr<IProfileService> getProfileService();
+        [[nodiscard]] std::shared_ptr<const IProfileService> getProfileService(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<IAccountService> getAccountService();
+        [[nodiscard]] std::shared_ptr<const IAccountService> getAccountService(
+        ) const;
     };
 
 }   // namespace app

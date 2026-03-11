@@ -1,6 +1,8 @@
 #ifndef __APP__REPOS_API__I_ACCOUNT_REPO_HPP__
 #define __APP__REPOS_API__I_ACCOUNT_REPO_HPP__
 
+#include <vector>
+
 #include "config/id_types.hpp"
 
 namespace finance
@@ -38,10 +40,20 @@ namespace app
          * details of the cash account to be created
          * @return AccountId The ID of the newly created cash account
          */
-        [[nodiscard]]
-        virtual AccountId createCashAccount(
+        [[nodiscard]] virtual AccountId createCashAccount(
             const finance::CashAccount& cashAccount
         ) = 0;
+
+        /**
+         * @brief Get all cash accounts from the repository, this method
+         * retrieves all cash account entries from the database and returns them
+         * as a vector of CashAccount domain objects
+         *
+         * @return std::vector<finance::CashAccount> A vector containing all
+         * cash accounts in the repository
+         */
+        [[nodiscard]] virtual std::vector<finance::CashAccount> getAllCashAccounts(
+        ) const = 0;
     };
 
 }   // namespace app

@@ -40,7 +40,7 @@ namespace logging
         std::filesystem::path _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
-        LogLevel _defaultLogLevel = LogLevel::Info;
+        LogLevel _defaultLogLevel = LogLevel::Trace;
 
        public:
         static LogManager& getInstance();
