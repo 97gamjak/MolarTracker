@@ -7,9 +7,15 @@
 
 namespace orm
 {
+    /**
+     * @brief Represents a SQL JOIN between two tables, including the fields to
+     * join on
+     *
+     */
     class Join
     {
        private:
+        /// Allow Joins to access private members of Join for constructing SQL
         friend class Joins;
 
         /// the name of the base table (the one being joined from)
@@ -36,9 +42,15 @@ namespace orm
         [[nodiscard]] std::string getDBOperations() const;
     };
 
+    /**
+     * @brief A collection of Joins that can be used to generate the JOIN
+     * clauses for a SQL query
+     *
+     */
     class Joins
     {
        private:
+        /// the individual joins that make up this collection
         std::vector<Join> _joins;
 
        public:

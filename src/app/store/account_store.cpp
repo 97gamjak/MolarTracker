@@ -1,5 +1,7 @@
 #include "account_store.hpp"
 
+#include "app/services_api/i_account_service.hpp"
+
 namespace app
 {
 
@@ -23,10 +25,22 @@ namespace app
      * @brief Reload the account data from the underlying service
      *
      */
-    void AccountStore::reload() {}
+    void AccountStore::reload()
+    {
+        _cashAccounts = _accountService->getAllCashAccounts();
+
+        _accountStates.clear();
+        _usedIds.clear();
+
+        for (const auto& account : _cashAccounts)
+        {
+            _accountStates.emplace(account.getId(), StoreState::Clean);
+            _usedIds.emplace(account.getId());
+        }
+    }
 
     /**
-     * @brief
+     * @brief Check if there are any pending changes in the store
      *
      * @return true
      * @return false
@@ -34,7 +48,7 @@ namespace app
     bool AccountStore::isDirty() const { return false; }
 
     /**
-     * @brief
+     * @brief Commit any pending changes in the store to the underlying service
      *
      */
     void AccountStore::commit() {}

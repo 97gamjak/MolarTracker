@@ -7,6 +7,13 @@
 namespace app
 {
 
+    /**
+     * @brief Convert a CashAccountRow database model to a
+     * CashAccount
+     *
+     * @param cashAccountRow
+     * @return finance::CashAccount
+     */
     finance::CashAccount CashAccountFactory::toDomain(
         const CashAccountRow& cashAccountRow
     )
@@ -20,6 +27,13 @@ namespace app
         );
     }
 
+    /**
+     * @brief Convert a vector of CashAccountRow database models to a vector of
+     * CashAccount domain models
+     *
+     * @param cashAccountRows
+     * @return std::vector<finance::CashAccount>
+     */
     std::vector<finance::CashAccount> CashAccountFactory::toDomains(
         const std::vector<CashAccountRow>& cashAccountRows
     )

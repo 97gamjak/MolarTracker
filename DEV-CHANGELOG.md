@@ -19,6 +19,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `TransactionEntry` class
 - Add `AccountRepo` with first `createCashAccount` method
 - Add `AccountService` with first `createCashAccount` method
+- Add first draft of `AccountStore`
 
 #### ORM
 
@@ -27,6 +28,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `foreign_key_t` constraint
 - Add `foreign_key_t` parsing for `ddl` member function of `Field`
 - Implement `insert_policy` with corresponding `requires_paired_insert_t` type for 1:1 relationships
+- Introduce `Joins` and `WhereClauses`
 
 ### Bugfix
 
