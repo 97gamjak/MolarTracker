@@ -3,10 +3,8 @@
 
 #include <memory>
 #include <optional>
-#include <set>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <vector>
 
 #include "app/domain/profile.hpp"
@@ -87,7 +85,7 @@ namespace app
             const drafts::ProfileDraft& draft
         );
 
-        void commit();
+        void commit() override;
 
         Connection subscribeToProfileChange(
             OnProfileChanged::func func,

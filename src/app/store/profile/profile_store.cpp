@@ -1,9 +1,7 @@
 #include "profile_store.hpp"
 
-#include <algorithm>
 #include <cctype>
 #include <format>
-#include <unordered_map>
 
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
@@ -193,14 +191,12 @@ namespace app
         {
             if (entry->state != StoreState::Deleted)
                 return ProfileStoreResult::NameAlreadyExists;
-            else
-            {
-                entry->state = StoreState::Modified;
-                entry->value.setName(draft.name);
-                entry->value.setEmail(draft.email);
 
-                return ProfileStoreResult::Ok;
-            }
+            entry->state = StoreState::Modified;
+            entry->value.setName(draft.name);
+            entry->value.setEmail(draft.email);
+
+            return ProfileStoreResult::Ok;
         }
 
         const auto newId = _generateNewId();
@@ -224,7 +220,7 @@ namespace app
     {
         _markPotentiallyDirty();
 
-        const auto entry = _findEntry(HasProfileName(draft.name));
+        auto* const entry = _findEntry(HasProfileName(draft.name));
 
         if (entry == nullptr)
             return ProfileStoreResult::ProfileNotFound;

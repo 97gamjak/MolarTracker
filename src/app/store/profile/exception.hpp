@@ -5,6 +5,12 @@
 
 namespace app
 {
+    /**
+     * @brief Exception class for errors related to the ProfileStore. Inherits
+     * from MolarTrackerException and provides a custom error message prefix for
+     * profile store errors.
+     *
+     */
     class ProfileStoreException : public MolarTrackerException
     {
        public:
