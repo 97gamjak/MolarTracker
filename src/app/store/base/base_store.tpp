@@ -65,14 +65,14 @@ namespace app
     void BaseStore<T, IdType>::_markPotentiallyDirty()
     {
         _isPotentiallyDirty = true;
-        DirtyObservable::_emit(true);
+        DirtyObservable::_emit<OnDirtyChanged>(true);
     }
 
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::clearPotentiallyDirty()
     {
         _isPotentiallyDirty = false;
-        DirtyObservable::_emit(false);
+        DirtyObservable::_emit<OnDirtyChanged>(false);
     }
 
 }   // namespace app

@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "app/domain/profile.hpp"
-#include "app/store/base/i_store.hpp"
+#include "app/store/base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
@@ -43,7 +43,8 @@ namespace app
      */
     // TODO(97gamjak): consider refactoring to avoid multiple inheritance
     // NOLINTNEXTLINE(fuchsia-multiple-inheritance)
-    class ProfileStore : public IStore, public Observable<OnProfileChanged>
+    class ProfileStore : public BaseStore<Profile, ProfileId>,
+                         public Observable<OnProfileChanged>
     {
        private:
         /// reference to the profile service
@@ -86,8 +87,6 @@ namespace app
         [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
         [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 
-        [[nodiscard]] bool isDirty() const override;
-
         [[nodiscard]] std::optional<Profile> getProfile(ProfileId id) const;
         [[nodiscard]] std::optional<Profile> getProfile(std::string_view) const;
 
@@ -103,7 +102,7 @@ namespace app
             const drafts::ProfileDraft& draft
         );
 
-        void commit() override;
+        void commit();
 
         Connection subscribeToProfileChange(
             OnProfileChanged::func func,

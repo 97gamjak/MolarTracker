@@ -113,20 +113,6 @@ namespace app
     }
 
     /**
-     * @brief Check if there are any pending changes in the store
-     *
-     * @return true
-     * @return false
-     */
-    bool ProfileStore::isDirty() const
-    {
-        return std::ranges::any_of(
-            _profileStates,
-            [](const auto& pair) { return pair.second != StoreState::Clean; }
-        );
-    }
-
-    /**
      * @brief Get a profile by its ID
      *
      * @note Ignores profiles marked as deleted
@@ -370,7 +356,7 @@ namespace app
      */
     void ProfileStore::commit()
     {
-        if (!isDirty())
+        if (!_isDirty())
         {
             LOG_DEBUG("No changes to save in ProfileStore");
             return;

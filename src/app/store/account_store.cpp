@@ -40,14 +40,6 @@ namespace app
     }
 
     /**
-     * @brief Check if there are any pending changes in the store
-     *
-     * @return true
-     * @return false
-     */
-    bool AccountStore::isDirty() const { return false; }
-
-    /**
      * @brief Commit any pending changes in the store to the underlying service
      *
      */

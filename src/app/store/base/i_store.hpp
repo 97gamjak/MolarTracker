@@ -58,18 +58,6 @@ namespace app
         void _notifySubscribers(const bool& isDirty);
     };
 
-    /**
-     * @brief State of an item in the store
-     *
-     */
-    enum class StoreState : std::uint8_t
-    {
-        Clean,
-        New,
-        Modified,
-        Deleted
-    };
-
 }   // namespace app
 
 #endif   // __APP__STORE__BASE__I_STORE_HPP__
