@@ -1,8 +1,6 @@
 #ifndef __APP__STORE__BASE__I_STORE_HPP__
 #define __APP__STORE__BASE__I_STORE_HPP__
 
-#include <cstdint>
-
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
 
@@ -14,17 +12,8 @@ namespace app
      * @brief Interface for a generic store
      *
      */
-    class IStore : public Observable<OnDirtyChanged>
+    class IStore
     {
-       private:
-        /// Type alias for the base class
-        using Base = Observable<OnDirtyChanged>;
-
-       private:
-        /// Flag to indicate if the store has potentially dirty data that
-        /// needs to be committed
-        bool _isPotentiallyDirty = false;
-
        public:
         virtual ~IStore() = default;
 
@@ -48,14 +37,34 @@ namespace app
          */
         [[nodiscard]] virtual bool isDirty() const = 0;
 
-        Connection subscribeToDirty(OnDirtyChanged::func func, void* user);
-        void       clearPotentiallyDirty();
+        /**
+         * @brief Subscribe to changes in the dirty state of the store, the
+         * provided callback function will be called whenever the dirty state
+         * changes, the user pointer can be used to pass additional data to the
+         * callback function, the returned Connection object can be used to
+         * unsubscribe from changes
+         *
+         * @param func The callback function to call when the dirty state of the
+         * store changes, it should have the signature void(void* user, bool
+         * isDirty)
+         * @param user A user-defined pointer that will be passed to the
+         * callback function when it is called, this can be used to provide
+         * additional context for the callback function
+         * @return Connection An object representing the subscription, this can
+         * be used to unsubscribe from changes by calling disconnect() on it or
+         * by letting it go out of scope
+         */
+        virtual Connection subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        ) = 0;
 
-       protected:
-        void _markPotentiallyDirty();
-
-       private:
-        void _notifySubscribers(const bool& isDirty);
+        /**
+         * @brief Mark the store as clean, this should be called after
+         * committing changes to the store to indicate that there is no
+         * longer any dirty data that needs to be committed.
+         */
+        virtual void clearPotentiallyDirty() = 0;
     };
 
 }   // namespace app

@@ -5,13 +5,14 @@
 
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
+#include "i_store.hpp"
 #include "store_state.hpp"
 
 namespace app
 {
 
     template <typename T, typename IdType>
-    class BaseStore : public Observable<OnDirtyChanged>
+    class BaseStore : public Observable<OnDirtyChanged>, public IStore
     {
        public:
         using DirtyObservable = Observable<OnDirtyChanged>;
@@ -26,7 +27,6 @@ namespace app
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
-        [[nodiscard]] bool _isDirty() const;
 
         [[nodiscard]] Entry* _findEntry(IdType id);
         [[nodiscard]] IdType _generateNewId() const;
@@ -35,8 +35,15 @@ namespace app
 
         void _markPotentiallyDirty();
 
+        [[nodiscard]] Connection subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        ) override;
+
        public:
-        void clearPotentiallyDirty();
+        [[nodiscard]] bool isDirty() const override;
+
+        void clearPotentiallyDirty() override;
     };
 
     template <typename T, typename IdType>

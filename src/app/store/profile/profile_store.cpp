@@ -356,7 +356,7 @@ namespace app
      */
     void ProfileStore::commit()
     {
-        if (!_isDirty())
+        if (!isDirty())
         {
             LOG_DEBUG("No changes to save in ProfileStore");
             return;

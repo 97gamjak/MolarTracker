@@ -16,7 +16,7 @@ namespace app
     }
 
     template <typename T, typename IdType>
-    bool BaseStore<T, IdType>::_isDirty() const
+    bool BaseStore<T, IdType>::isDirty() const
     {
         return std::ranges::any_of(
             _entries,
@@ -73,6 +73,15 @@ namespace app
     {
         _isPotentiallyDirty = false;
         DirtyObservable::_emit<OnDirtyChanged>(false);
+    }
+
+    template <typename T, typename IdType>
+    [[nodiscard]] Connection BaseStore<T, IdType>::subscribeToDirty(
+        OnDirtyChanged::func func,
+        void*                user
+    )
+    {
+        return DirtyObservable::template on<OnDirtyChanged>(func, user);
     }
 
 }   // namespace app
