@@ -3,6 +3,7 @@ add_library(molartracker_app_store STATIC
 
     profile/profile_store.cpp
     profile/active_profile.cpp
+    profile/exception.cpp
 )
 
 target_include_directories(molartracker_app_store

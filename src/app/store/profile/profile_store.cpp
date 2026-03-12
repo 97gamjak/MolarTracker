@@ -7,7 +7,9 @@
 
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
+#include "exception.hpp"
 #include "logging/log_macros.hpp"
+#include "predicates.hpp"
 #include "services_api/i_profile_service.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
@@ -20,8 +22,7 @@ namespace app
      *
      * @note It loads all profiles from the underlying service upon
      * construction. Additionally, it initializes the internal state tracking
-     * for each profile and maintains a set of used IDs to ensure uniqueness
-     * when generating new profile IDs.
+     * for each profile.
      *
      * @param profileService
      */
@@ -30,13 +31,10 @@ namespace app
     )
         : _profileService{profileService}
     {
-        _profiles = _profileService->getAll();
+        const auto profiles = _profileService->getAll();
 
-        for (const auto& profile : _profiles)
-        {
-            _profileStates.emplace(profile.getId(), StoreState::Clean);
-            _usedIds.emplace(profile.getId());
-        }
+        for (const auto& profile : profiles)
+            _addEntry(profile, StoreState::Clean);
     }
 
     /**
@@ -47,13 +45,7 @@ namespace app
      * @return true
      * @return false
      */
-    bool ProfileStore::hasProfiles() const
-    {
-        auto isNotDeleted = [](const auto& pair)
-        { return pair.second != StoreState::Deleted; };
-
-        return std::ranges::any_of(_profileStates, isNotDeleted);
-    }
+    bool ProfileStore::hasProfiles() const { return _hasNonDeletedEntries(); }
 
     /**
      * @brief Get a list of all profile names in the store
@@ -66,10 +58,12 @@ namespace app
     {
         std::vector<std::string> names;
 
-        for (const auto& profile : _profiles)
+        for (const auto& entr : _getEntries())
         {
-            if (!_isDeleted(profile.getId()))
-                names.push_back(profile.getName());
+            if (entr.state == StoreState::Deleted)
+                continue;
+
+            names.push_back(entr.value.getName());
         }
 
         return names;
@@ -122,10 +116,12 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(ProfileId id) const
     {
-        if (_isDeleted(id))
+        auto profile = _get(HasProfileId(id) && !IsDeleted<Entry>());
+
+        if (!profile.has_value())
             return std::nullopt;
 
-        return _findProfile(id);
+        return profile;
     }
 
     /**
@@ -138,12 +134,12 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
     {
-        auto profile = _findProfile(name);
+        auto profile = _get(HasProfileName(name) && !IsDeleted<Entry>());
 
-        if (profile.has_value() && _isDeleted(profile->getId()))
-            return std::nullopt;
+        if (profile.has_value())
+            return profile;
 
-        return profile;
+        return std::nullopt;
     }
 
     /**
@@ -191,26 +187,25 @@ namespace app
     {
         _markPotentiallyDirty();
 
-        const auto profileOpt = _findProfile(draft.name);
+        auto* entry = _findEntry(HasProfileName(draft.name));
 
-        if (profileOpt.has_value() && !_isDeleted(profileOpt->getId()))
-            return ProfileStoreResult::NameAlreadyExists;
-
-        if (profileOpt.has_value() && _isDeleted(profileOpt->getId()))
+        if (entry != nullptr)
         {
-            const auto id      = profileOpt->getId();
-            _profileStates[id] = StoreState::Modified;
+            if (entry->state != StoreState::Deleted)
+                return ProfileStoreResult::NameAlreadyExists;
+            else
+            {
+                entry->state = StoreState::Modified;
+                entry->value.setName(draft.name);
+                entry->value.setEmail(draft.email);
 
-            _updateInternal(id, draft.name, draft.email);
-
-            return ProfileStoreResult::Ok;
+                return ProfileStoreResult::Ok;
+            }
         }
 
-        const auto newId = _generateNewId();   // marks ID as used
-        _profileStates.emplace(newId, StoreState::New);
+        const auto newId = _generateNewId();
+        _addEntry(Profile{newId, draft.name, draft.email}, StoreState::New);
 
-        Profile newProfile{newId, draft.name, draft.email};
-        _profiles.push_back(newProfile);
         return ProfileStoreResult::Ok;
     }
 
@@ -229,28 +224,26 @@ namespace app
     {
         _markPotentiallyDirty();
 
-        const auto profile = _findProfile(draft.name);
+        const auto entry = _findEntry(HasProfileName(draft.name));
 
-        if (!profile.has_value())
+        if (entry == nullptr)
             return ProfileStoreResult::ProfileNotFound;
 
         if (_activeProfileId.has_value() &&
-            profile->getId() == _activeProfileId.value())
+            entry->value.getId() == _activeProfileId.value())
         {
             unsetActiveProfile();
         }
 
         // if the profile is new and not yet committed, just remove it
         // entirely
-        if (_profileStates[profile->getId()] == StoreState::New)
+        if (entry->state == StoreState::New)
         {
-            _removeInternal(profile->getId());
-            _profileStates.erase(profile->getId());
-            _usedIds.erase(profile->getId());
+            _removeEntry(entry->value.getId());
             return ProfileStoreResult::Ok;
         }
 
-        _profileStates[profile->getId()] = StoreState::Deleted;
+        entry->state = StoreState::Deleted;
 
         return ProfileStoreResult::Ok;
     }
@@ -261,18 +254,15 @@ namespace app
      */
     void ProfileStore::reload()
     {
-        _profiles = _profileService->getAll();
+        const auto profiles = _profileService->getAll();
 
-        _profileStates.clear();
-        _usedIds.clear();
+        _clearEntries();
 
-        for (const auto& profile : _profiles)
-        {
-            _profileStates.emplace(profile.getId(), StoreState::Clean);
-            _usedIds.emplace(profile.getId());
-        }
+        for (const auto& profile : profiles)
+            _addEntry(profile, StoreState::Clean);
 
-        if (_activeProfileId && !_findProfile(_activeProfileId.value()))
+        if (_activeProfileId &&
+            !_get(HasProfileId(_activeProfileId.value())).has_value())
             _activeProfileId.reset();
     }
 
@@ -281,19 +271,17 @@ namespace app
      *
      * @param profile
      */
-    void ProfileStore::_commitNewProfile(const Profile& profile)
+    void ProfileStore::_commitNewProfile(Entry* entry)
     {
-        const auto& name  = profile.getName();
-        const auto& email = profile.getEmail();
+        const auto& name  = entry->value.getName();
+        const auto& email = entry->value.getEmail();
         const auto  newId = _profileService->create(name, email);
-        const auto  oldId = profile.getId();
+        const auto  oldId = entry->value.getId();
 
         if (newId != oldId)
         {
-            _profileStates.erase(oldId);
-            _usedIds.erase(oldId);
-            _profileStates.emplace(newId, StoreState::Clean);
-            _usedIds.insert(newId);
+            entry->value.setId(newId);
+            entry->state = StoreState::Clean;
 
             // Update the active profile ID if it was pointing to the old ID
             if (_activeProfileId.has_value() &&
@@ -304,11 +292,14 @@ namespace app
         }
         else
         {
-            _profileStates[profile.getId()] = StoreState::Clean;
+            entry->state = StoreState::Clean;
         }
 
         LOG_INFO(
-            std::format("Profile '{}' saved to database", profile.getName())
+            std::format(
+                "Profile '{}' saved to database",
+                entry->value.getName()
+            )
         );
     }
 
@@ -317,17 +308,20 @@ namespace app
      *
      * @param profile
      */
-    void ProfileStore::_commitModifiedProfile(const Profile& profile)
+    void ProfileStore::_commitModifiedProfile(Entry* entry)
     {
-        const auto& name  = profile.getName();
-        const auto& email = profile.getEmail();
-        const auto  id    = profile.getId();
+        const auto& name  = entry->value.getName();
+        const auto& email = entry->value.getEmail();
+        const auto  id    = entry->value.getId();
 
         _profileService->update(id, name, email);
-        _profileStates[id] = StoreState::Clean;
+        entry->state = StoreState::Clean;
 
         LOG_INFO(
-            std::format("Profile '{}' updated in database", profile.getName())
+            std::format(
+                "Profile '{}' updated in database",
+                entry->value.getName()
+            )
         );
     }
 
@@ -336,17 +330,18 @@ namespace app
      *
      * @param profile
      */
-    void ProfileStore::_commitDeletedProfile(const Profile& profile)
+    void ProfileStore::_commitDeletedProfile(Entry* entry)
     {
-        const auto id = profile.getId();
+        const auto id = entry->value.getId();
 
         _profileService->remove(id);
-        _usedIds.erase(id);
-        _profileStates.erase(id);
-        _removeInternal(id);
+        // NOTE: deleted entries will be removed in one go!
 
         LOG_INFO(
-            std::format("Profile '{}' removed from database", profile.getName())
+            std::format(
+                "Profile '{}' removed from database",
+                entry->value.getName()
+            )
         );
     }
 
@@ -362,117 +357,26 @@ namespace app
             return;
         }
 
-        for (const auto& profile : _profiles)
+        for (auto& entry : _getEntries())
         {
-            switch (_profileStates[profile.getId()])
+            switch (entry.state)
             {
                 case StoreState::New:
-                    _commitNewProfile(profile);
+                    _commitNewProfile(&entry);
                     break;
                 case StoreState::Modified:
-                    _commitModifiedProfile(profile);
+                    _commitModifiedProfile(&entry);
                     break;
                 case StoreState::Deleted:
-                    _commitDeletedProfile(profile);
+                    _commitDeletedProfile(&entry);
                     break;
                 case StoreState::Clean:
                     break;
             }
         }
 
+        _cleanEntries();
         reload();
-    }
-
-    /**
-     * @brief generate a new unique ProfileId and mark it as used
-     *
-     * @return ProfileId
-     */
-    ProfileId ProfileStore::_generateNewId()
-    {
-        ProfileId newId{0};
-        while (_usedIds.contains(newId) || _usedIds.contains(-newId))
-            newId = ProfileId::from(newId.value() + 1);
-
-        _usedIds.insert(newId);
-        return newId;
-    }
-
-    /**
-     * @brief Check if a profile with the given ID is marked as deleted
-     *
-     * @param id
-     * @return true
-     * @return false
-     */
-    bool ProfileStore::_isDeleted(ProfileId id) const
-    {
-        const auto it = _profileStates.find(id);
-
-        if (it == _profileStates.end())
-            return false;
-
-        return it->second == StoreState::Deleted;
-    }
-
-    /**
-     * @brief find a profile by its ID
-     *
-     * @param id
-     * @return std::optional<Profile>
-     */
-    std::optional<Profile> ProfileStore::_findProfile(ProfileId id) const
-    {
-        const auto it = std::ranges::find_if(_profiles, HasProfileId{id});
-
-        if (it == _profiles.end())
-            return std::nullopt;
-
-        return *it;
-    }
-
-    /**
-     * @brief find a profile by its name
-     *
-     * @param name
-     * @return std::optional<Profile>
-     */
-    std::optional<Profile> ProfileStore::_findProfile(
-        std::string_view name
-    ) const
-    {
-        const auto it = std::ranges::find_if(_profiles, HasProfileName{name});
-
-        if (it == _profiles.end())
-            return std::nullopt;
-
-        return *it;
-    }
-
-    /**
-     * @brief Remove a profile by its ID
-     *
-     * @param id
-     */
-    void ProfileStore::_removeInternal(ProfileId id)
-    {
-        auto [beg, end] = std::ranges::remove_if(_profiles, HasProfileId{id});
-
-        _profiles.erase(beg, end);
-    }
-
-    /**
-     * @brief Remove a profile by its name
-     *
-     * @param name
-     */
-    void ProfileStore::_removeInternal(std::string_view name)
-    {
-        using std::ranges::remove_if;
-
-        auto [beg, end] = remove_if(_profiles, HasProfileName{name});
-
-        _profiles.erase(beg, end);
     }
 
     /**
@@ -488,15 +392,20 @@ namespace app
         const std::optional<std::string>& newEmail
     )
     {
-        for (auto& profile : _profiles)
+        auto* entry = _findEntry(HasProfileId(id));
+
+        if (entry == nullptr)
         {
-            if (profile.getId() == id)
-            {
-                profile.setName(std::string{newName});
-                profile.setEmail(newEmail);
-                return;
-            }
+            throw ProfileStoreException(
+                std::format(
+                    "Profile with ID {} not found for update",
+                    id.value()
+                )
+            );
         }
+
+        entry->value.setName(std::string{newName});
+        entry->value.setEmail(newEmail);
     }
 
     /**

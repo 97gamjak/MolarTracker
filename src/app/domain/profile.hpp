@@ -42,30 +42,6 @@ namespace app
         void setEmail(const std::optional<std::string>& newEmail);
     };
 
-    /**
-     * @brief Predicate for finding a profile by its ID
-     *
-     */
-    struct HasProfileId
-    {
-        /// The ID to compare against
-        ProfileId id;
-
-        [[nodiscard]] bool operator()(const Profile& profile) const;
-    };
-
-    /**
-     * @brief Predicate for finding a profile by its name
-     *
-     */
-    struct HasProfileName
-    {
-        /// The name to compare against
-        std::string_view name;
-
-        [[nodiscard]] bool operator()(const Profile& profile) const;
-    };
-
 }   // namespace app
 
 #endif   // __APP__DOMAIN__PROFILE_HPP__

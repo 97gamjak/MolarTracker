@@ -68,26 +68,4 @@ namespace app
         _email = newEmail;
     }
 
-    /**
-     * @brief Predicate for finding a profile by its ID
-     *
-     * @param profile
-     * @return true if the profile has the specified ID, false otherwise
-     */
-    bool HasProfileId::operator()(const Profile& profile) const
-    {
-        return profile.getId() == id;
-    }
-
-    /**
-     * @brief Predicate for finding a profile by its name
-     *
-     * @param profile
-     * @return true if the profile has the specified name, false otherwise
-     */
-    bool HasProfileName::operator()(const Profile& profile) const
-    {
-        return profile.getName() == name;
-    }
-
 }   // namespace app

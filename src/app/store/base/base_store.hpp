@@ -1,11 +1,14 @@
 #ifndef __APP__STORE__BASE__BASE_STORE_HPP__
 #define __APP__STORE__BASE__BASE_STORE_HPP__
 
+#include <functional>
+#include <optional>
 #include <vector>
 
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
 #include "i_store.hpp"
+#include "predicate.hpp"
 #include "store_state.hpp"
 
 namespace app
@@ -16,8 +19,6 @@ namespace app
     {
        public:
         using DirtyObservable = Observable<OnDirtyChanged>;
-
-       protected:
         struct Entry;
 
        private:
@@ -27,11 +28,21 @@ namespace app
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
+        [[nodiscard]] bool _hasNonDeletedEntries() const;
 
-        [[nodiscard]] Entry* _findEntry(IdType id);
-        [[nodiscard]] IdType _generateNewId() const;
+        [[nodiscard]] const std::vector<Entry>& _getEntries() const;
+        [[nodiscard]] std::vector<Entry>&       _getEntries();
 
+        [[nodiscard]] Entry*           _findEntry(IdType id);
+        [[nodiscard]] Entry*           _findEntry(Predicate<Entry> pred);
+        [[nodiscard]] std::optional<T> _get(Predicate<Entry> pred) const;
+
+        void _addEntry(const T& value, StoreState state);
         void _removeEntry(IdType id);
+        void _cleanEntries();
+        void _clearEntries();
+
+        [[nodiscard]] IdType _generateNewId() const;
 
         void _markPotentiallyDirty();
 
