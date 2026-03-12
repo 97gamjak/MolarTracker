@@ -40,7 +40,7 @@ namespace app
 
         void reload();
 
-        void commit();
+        void commit() override;
     };
 
 }   // namespace app
