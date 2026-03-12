@@ -1,7 +1,6 @@
 #ifndef __APP__STORE__BASE__BASE_STORE_HPP__
 #define __APP__STORE__BASE__BASE_STORE_HPP__
 
-#include <functional>
 #include <optional>
 #include <vector>
 
@@ -14,16 +13,40 @@
 namespace app
 {
 
+    /*
+     * BaseStore is a base class for stores that manage a collection of entries.
+     * It provides common functionality for adding, removing, and querying
+     * entries, as well as tracking the dirty state of the store.
+     *
+     * Template Parameters:
+     * - T: The type of the value stored in each entry.
+     * - IdType: The type used for identifying entries (e.g., int, std::string).
+     *
+     * The Entry struct represents an individual entry in the store, containing
+     * a value of type T and a StoreState indicating whether the entry is clean,
+     * dirty, or deleted.
+     *
+     * The BaseStore class inherits from Observable<OnDirtyChanged> to allow
+     * subscribers to be notified when the dirty state changes, and from IStore
+     * to provide a common interface for all stores.
+     */
     template <typename T, typename IdType>
     class BaseStore : public Observable<OnDirtyChanged>, public IStore
     {
        public:
+        /// Helper type for the dirty state change signal.
         using DirtyObservable = Observable<OnDirtyChanged>;
+
+        /// struct representing an entry in the store, containing a value and
+        /// its state.
         struct Entry;
 
        private:
+        /// The collection of entries in the store.
         std::vector<Entry> _entries;
 
+        /// Flag indicating whether the store is potentially dirty (i.e., has
+        /// unsaved changes).
         bool _isPotentiallyDirty = false;
 
        protected:
@@ -57,6 +80,13 @@ namespace app
         void clearPotentiallyDirty() override;
     };
 
+    /**
+     * @brief Struct representing an entry in the BaseStore, containing a value
+     * of type T and its state.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
     template <typename T, typename IdType>
     struct BaseStore<T, IdType>::Entry
     {

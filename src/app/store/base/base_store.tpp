@@ -8,6 +8,16 @@
 namespace app
 {
 
+    /**
+     * @brief Checks if an entry with the given ID is marked as deleted in the
+     * store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param id
+     * @return true
+     * @return false
+     */
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::_isDeleted(IdType id) const
     {
@@ -15,6 +25,15 @@ namespace app
         return entry != nullptr && entry->state == StoreState::Deleted;
     }
 
+    /**
+     * @brief Checks if the store has any entries that are not marked as
+     * deleted.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return true
+     * @return false
+     */
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::_hasNonDeletedEntries() const
     {
@@ -24,6 +43,15 @@ namespace app
         );
     }
 
+    /**
+     * @brief Checks if the store is dirty, meaning it has any entries that are
+     * not in the Clean state (i.e., they are either New or Deleted).
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return true
+     * @return false
+     */
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::isDirty() const
     {
@@ -33,6 +61,15 @@ namespace app
         );
     }
 
+    /**
+     * @brief Finds an entry in the store by its ID and returns a pointer to it,
+     * or nullptr if not found.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param id
+     * @return BaseStore<T, IdType>::Entry*
+     */
     template <typename T, typename IdType>
     typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
         IdType id
@@ -42,6 +79,15 @@ namespace app
                           { return entry.value.getId() == id; });
     }
 
+    /**
+     * @brief Finds an entry in the store that matches the given predicate and
+     * returns a pointer to it, or nullptr if not found.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param pred
+     * @return BaseStore<T, IdType>::Entry*
+     */
     template <typename T, typename IdType>
     typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
         Predicate<Entry> pred
@@ -55,6 +101,16 @@ namespace app
         return it != _entries.end() ? &(*it) : nullptr;
     }
 
+    /**
+     * @brief Retrieves the value of an entry that matches the given predicate,
+     * returning it as an optional. If no matching entry is found, returns
+     * std::nullopt.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param pred
+     * @return std::optional<T>
+     */
     template <typename T, typename IdType>
     std::optional<T> BaseStore<T, IdType>::_get(Predicate<Entry> pred) const
     {
@@ -67,6 +123,14 @@ namespace app
                                     : std::nullopt;
     }
 
+    /**
+     * @brief Retrieves a const reference to the collection of entries in the
+     * store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return const std::vector<typename BaseStore<T, IdType>::Entry>&
+     */
     template <typename T, typename IdType>
     [[nodiscard]] const std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<
         T,
@@ -75,6 +139,13 @@ namespace app
         return _entries;
     }
 
+    /**
+     * @brief Retrieves a reference to the collection of entries in the store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return std::vector<typename BaseStore<T, IdType>::Entry>&
+     */
     template <typename T, typename IdType>
     [[nodiscard]] std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<
         T,
@@ -83,6 +154,15 @@ namespace app
         return _entries;
     }
 
+    /**
+     * @brief Generates a new unique ID for an entry in the store by
+     * incrementing from 0 until it finds an ID that is not already used by any
+     * existing entry.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return IdType
+     */
     template <typename T, typename IdType>
     IdType BaseStore<T, IdType>::_generateNewId() const
     {
@@ -97,6 +177,15 @@ namespace app
         return newId;
     }
 
+    /**
+     * @brief Adds a new entry to the store with the given value and state. If
+     * the state is not Clean, marks the store as potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param value
+     * @param state
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_addEntry(const T& value, StoreState state)
     {
@@ -106,6 +195,15 @@ namespace app
         _entries.push_back(Entry{value, state});
     }
 
+    /**
+     * @brief Removes an entry with the given ID from the store. If an entry
+     * with the specified ID is found and removed, marks the store as
+     * potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param id
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_removeEntry(IdType id)
     {
@@ -116,6 +214,14 @@ namespace app
         _entries.erase(beg, end);
     }
 
+    /**
+     * @brief Removes all entries from the store that are not in the Clean state
+     * (i.e., they are either New or Deleted). If any entries are removed, marks
+     * the store as potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_cleanEntries()
     {
@@ -126,6 +232,13 @@ namespace app
         _entries.erase(beg, end);
     }
 
+    /**
+     * @brief Clears all entries from the store. If any entries are cleared,
+     * marks the store as potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_clearEntries()
     {
@@ -136,6 +249,14 @@ namespace app
         }
     }
 
+    /**
+     * @brief Marks the store as potentially dirty, indicating that it has
+     * unsaved changes. Emits a signal to notify subscribers of the dirty state
+     * change.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_markPotentiallyDirty()
     {
@@ -143,6 +264,14 @@ namespace app
         DirtyObservable::_emit<OnDirtyChanged>(true);
     }
 
+    /**
+     * @brief Clears the potentially dirty state of the store, indicating that
+     * there are no unsaved changes. Emits a signal to notify subscribers of the
+     * dirty state change.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::clearPotentiallyDirty()
     {
@@ -150,6 +279,17 @@ namespace app
         DirtyObservable::_emit<OnDirtyChanged>(false);
     }
 
+    /**
+     * @brief Subscribes a callback function to be called when the dirty state
+     * of the store changes. The callback will receive a boolean indicating
+     * whether the store is now dirty (true) or not (false).
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param func
+     * @param user
+     * @return Connection
+     */
     template <typename T, typename IdType>
     [[nodiscard]] Connection BaseStore<T, IdType>::subscribeToDirty(
         OnDirtyChanged::func func,

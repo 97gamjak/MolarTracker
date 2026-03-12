@@ -3,8 +3,6 @@
 
 #include <functional>
 
-#include "store_state.hpp"
-
 namespace app
 {
 
@@ -15,38 +13,24 @@ namespace app
     template <typename Entry>
     struct Predicate
     {
-        using EntryType = Entry;
-
+        /// A function that takes an Entry and returns a boolean indicating
+        /// whether the entry matches the predicate.
         std::function<bool(const Entry&)> func;
 
-        bool operator()(const Entry& entry) const { return func(entry); }
+        bool operator()(const Entry& entry) const;
 
-        Predicate operator&&(const Predicate& other) const
-        {
-            return Predicate{[first = *this, second = other](const Entry& entry)
-                             { return first(entry) && second(entry); }};
-        }
-
-        Predicate operator||(const Predicate& other) const
-        {
-            return Predicate{[first = *this, second = other](const Entry& entry)
-                             { return first(entry) || second(entry); }};
-        }
-
-        Predicate operator!() const
-        {
-            return Predicate{[pred = *this](const Entry& entry)
-                             { return !pred(entry); }};
-        }
+        Predicate operator&&(const Predicate& other) const;
+        Predicate operator||(const Predicate& other) const;
+        Predicate operator!() const;
     };
 
     template <typename Entry>
-    Predicate<Entry> IsDeleted()
-    {
-        return Predicate<Entry>{[](const Entry& entry)
-                                { return entry.state == StoreState::Deleted; }};
-    }
+    Predicate<Entry> IsDeleted();
 
 }   // namespace app
+
+#ifndef __APP__STORE__BASE__PREDICATE_TPP__
+#include "predicate.tpp"
+#endif   // __APP__STORE__BASE__PREDICATE_TPP__
 
 #endif   // __APP__STORE__BASE__PREDICATE_HPP__
