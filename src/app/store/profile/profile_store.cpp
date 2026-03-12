@@ -265,7 +265,7 @@ namespace app
     /**
      * @brief Commit a new profile to the underlying service
      *
-     * @param profile
+     * @param entry
      */
     void ProfileStore::_commitNewProfile(Entry* entry)
     {
@@ -302,7 +302,7 @@ namespace app
     /**
      * @brief Commit a modified profile to the underlying service
      *
-     * @param profile
+     * @param entry
      */
     void ProfileStore::_commitModifiedProfile(Entry* entry)
     {
@@ -324,7 +324,7 @@ namespace app
     /**
      * @brief Commit a deleted profile to the underlying service
      *
-     * @param profile
+     * @param entry
      */
     void ProfileStore::_commitDeletedProfile(Entry* entry)
     {

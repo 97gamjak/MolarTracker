@@ -13,10 +13,10 @@
 namespace app
 {
 
-    /*
-     * BaseStore is a base class for stores that manage a collection of entries.
-     * It provides common functionality for adding, removing, and querying
-     * entries, as well as tracking the dirty state of the store.
+    /**
+     * @brief BaseStore is a base class for stores that manage a collection of
+     * entries. It provides common functionality for adding, removing, and
+     * querying entries, as well as tracking the dirty state of the store.
      *
      * Template Parameters:
      * - T: The type of the value stored in each entry.
@@ -90,7 +90,10 @@ namespace app
     template <typename T, typename IdType>
     struct BaseStore<T, IdType>::Entry
     {
-        T          value;
+        /// The value stored in the entry.
+        T value;
+
+        /// The state of the entry (e.g., Clean, New, Modified, Deleted).
         StoreState state;
     };
 
