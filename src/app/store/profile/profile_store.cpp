@@ -369,35 +369,6 @@ namespace app
     }
 
     /**
-     * @brief Update a profile's name and email by its ID
-     *
-     * @param id
-     * @param newName
-     * @param newEmail
-     */
-    void ProfileStore::_updateInternal(
-        ProfileId                         id,
-        std::string_view                  newName,
-        const std::optional<std::string>& newEmail
-    )
-    {
-        auto* entry = _findEntry(HasProfileId(id));
-
-        if (entry == nullptr)
-        {
-            throw ProfileStoreException(
-                std::format(
-                    "Profile with ID {} not found for update",
-                    id.value()
-                )
-            );
-        }
-
-        entry->value.setName(std::string{newName});
-        entry->value.setEmail(newEmail);
-    }
-
-    /**
      * @brief Subscribe to profile change events
      *
      * @param func
