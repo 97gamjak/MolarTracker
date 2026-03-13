@@ -14,7 +14,6 @@ REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
 
 namespace app
 {
-
     /**
      * @brief Construct a new Profile Store:: Profile Store object
      *
@@ -68,15 +67,30 @@ namespace app
     }
 
     /**
+     * @brief Set the active profile by name
+     *
+     * @param name
+     */
+    void ProfileStore::setActiveProfile(std::string_view name)
+    {
+        const auto profile = getProfile(name);
+        if (!profile)
+        {
+            throw ProfileStoreException(
+                std::format("Profile '{}' not found", name)
+            );
+        }
+
+        _activeProfile.set(profile->getId());
+    }
+
+    /**
      * @brief Check if there is an active profile set
      *
      * @return true
      * @return false
      */
-    bool ProfileStore::hasActiveProfile() const
-    {
-        return _activeProfileId.has_value();
-    }
+    bool ProfileStore::hasActiveProfile() const { return _activeProfile.has(); }
 
     /**
      * @brief Get the currently active profile
@@ -85,10 +99,10 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getActiveProfile() const
     {
-        if (!_activeProfileId)
+        if (!_activeProfile.has())
             return std::nullopt;
 
-        return getProfile(_activeProfileId.value());
+        return getProfile(_activeProfile.get().value());
     }
 
     /**
@@ -98,7 +112,8 @@ namespace app
      */
     std::optional<std::string> ProfileStore::getActiveProfileName() const
     {
-        if (const auto profile = getActiveProfile())
+        const auto profile = getActiveProfile();
+        if (profile.has_value())
             return profile->getName();
 
         return std::nullopt;
@@ -225,10 +240,10 @@ namespace app
         if (entry == nullptr)
             return ProfileStoreResult::ProfileNotFound;
 
-        if (_activeProfileId.has_value() &&
-            entry->value.getId() == _activeProfileId.value())
+        if (_activeProfile.has() &&
+            entry->value.getId() == _activeProfile.get().value())
         {
-            unsetActiveProfile();
+            _activeProfile.unset();
         }
 
         // if the profile is new and not yet committed, just remove it
@@ -242,24 +257,6 @@ namespace app
         entry->state = StoreState::Deleted;
 
         return ProfileStoreResult::Ok;
-    }
-
-    /**
-     * @brief Reload all profiles from the underlying service
-     *
-     */
-    void ProfileStore::reload()
-    {
-        const auto profiles = _profileService->getAll();
-
-        _clearEntries();
-
-        for (const auto& profile : profiles)
-            _addEntry(profile, StoreState::Clean);
-
-        if (_activeProfileId &&
-            !_get(HasProfileId(_activeProfileId.value())).has_value())
-            _activeProfileId.reset();
     }
 
     /**
@@ -280,11 +277,8 @@ namespace app
             entry->state = StoreState::Clean;
 
             // Update the active profile ID if it was pointing to the old ID
-            if (_activeProfileId.has_value() &&
-                _activeProfileId.value() == oldId)
-            {
-                _activeProfileId = newId;
-            }
+            if (_activeProfile.has() && _activeProfile.get().value() == oldId)
+                _activeProfile.set(newId);
         }
         else
         {
@@ -372,36 +366,6 @@ namespace app
         }
 
         _cleanEntries();
-        reload();
-    }
-
-    /**
-     * @brief Update a profile's name and email by its ID
-     *
-     * @param id
-     * @param newName
-     * @param newEmail
-     */
-    void ProfileStore::_updateInternal(
-        ProfileId                         id,
-        std::string_view                  newName,
-        const std::optional<std::string>& newEmail
-    )
-    {
-        auto* entry = _findEntry(HasProfileId(id));
-
-        if (entry == nullptr)
-        {
-            throw ProfileStoreException(
-                std::format(
-                    "Profile with ID {} not found for update",
-                    id.value()
-                )
-            );
-        }
-
-        entry->value.setName(std::string{newName});
-        entry->value.setEmail(newEmail);
     }
 
     /**
@@ -416,23 +380,7 @@ namespace app
         void*                  user
     )
     {
-        return Observable<OnProfileChanged>::template on<OnProfileChanged>(
-            func,
-            user
-        );
-    }
-
-    /**
-     * @brief Notify subscribers that a profile has changed
-     *
-     * @param profileId
-     */
-    void ProfileStore::_notifyProfileChanged(
-        const std::optional<ProfileId>& profileId
-    )
-    {
-        Observable<OnProfileChanged>::template _emit<OnProfileChanged>(profileId
-        );
+        return _activeProfile.on<OnProfileChanged>(func, user);
     }
 
 }   // namespace app

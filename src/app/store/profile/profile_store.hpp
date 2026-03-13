@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include "active_profile.hpp"
 #include "app/domain/profile.hpp"
 #include "app/store/base/base_store.hpp"
 #include "config/id_types.hpp"
@@ -39,10 +40,7 @@ namespace app
      * @brief Store for managing profiles
      *
      */
-    // TODO(97gamjak): consider refactoring to avoid multiple inheritance
-    // NOLINTNEXTLINE(fuchsia-multiple-inheritance)
-    class ProfileStore : public BaseStore<Profile, ProfileId>,
-                         public Observable<OnProfileChanged>
+    class ProfileStore : public BaseStore<Profile, ProfileId>
     {
        private:
         /// reference to the profile service
@@ -51,22 +49,19 @@ namespace app
         /// the ID of the currently active profile, this is used to determine
         /// which profile is currently active in the application and should be
         /// loaded when the application starts.
-        std::optional<ProfileId> _activeProfileId;
+        ActiveProfile _activeProfile;
 
        public:
         explicit ProfileStore(
             const std::shared_ptr<IProfileService>& profileService
         );
 
-        void reload();
-
         [[nodiscard]] bool hasProfiles() const;
 
         [[nodiscard]] std::vector<std::string> getAllProfileNames() const;
 
-        void setActiveProfile(std::optional<std::string_view> name);
-        void unsetActiveProfile();
-        [[nodiscard]] bool                       hasActiveProfile() const;
+        void               setActiveProfile(std::string_view name);
+        [[nodiscard]] bool hasActiveProfile() const;
         [[nodiscard]] std::optional<Profile>     getActiveProfile() const;
         [[nodiscard]] std::optional<std::string> getActiveProfileName() const;
 
@@ -93,17 +88,9 @@ namespace app
         );
 
        private:
-        void _updateInternal(
-            ProfileId                         id,
-            std::string_view                  newName,
-            const std::optional<std::string>& newEmail
-        );
-
         void _commitNewProfile(Entry* entry);
         void _commitModifiedProfile(Entry* entry);
         void _commitDeletedProfile(Entry* entry);
-
-        void _notifyProfileChanged(const std::optional<ProfileId>& profileId);
     };
 
 }   // namespace app

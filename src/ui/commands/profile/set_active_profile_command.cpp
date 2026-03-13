@@ -29,16 +29,23 @@ namespace ui
 
     std::expected<void, CommandErrorPtr> SetActiveProfileCommand::undo()
     {
-        // We assume that everything is correct in the undo/redo process, so we
-        // do not check if the previous profile exists, if it does not exist, we
-        // just unset the active profile, which is a valid state for the
-        // application, and it is better than having an error state because of a
-        // missing profile.
-
         if (!_previousProfile.has_value())
-            _profileStore.unsetActiveProfile();
-        else
-            _profileStore.setActiveProfile(_previousProfile->getName());
+        {
+            const auto* const errorMessage =
+                "Failed to undo set active profile: No previous active profile";
+
+            LOG_ERROR(errorMessage);
+
+            std::unique_ptr<AddProfileCommandError> errorMessagePtr =
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::ProfileNotFound
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
+        }
+
+        _profileStore.setActiveProfile(_previousProfile->getName());
 
         return {};
     }
