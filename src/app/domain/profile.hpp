@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <string>
-#include <string_view>
 
 #include "config/id_types.hpp"
 
@@ -40,30 +39,6 @@ namespace app
         void setId(ProfileId newId);
         void setName(const std::string& newName);
         void setEmail(const std::optional<std::string>& newEmail);
-    };
-
-    /**
-     * @brief Predicate for finding a profile by its ID
-     *
-     */
-    struct HasProfileId
-    {
-        /// The ID to compare against
-        ProfileId id;
-
-        [[nodiscard]] bool operator()(const Profile& profile) const;
-    };
-
-    /**
-     * @brief Predicate for finding a profile by its name
-     *
-     */
-    struct HasProfileName
-    {
-        /// The name to compare against
-        std::string_view name;
-
-        [[nodiscard]] bool operator()(const Profile& profile) const;
     };
 
 }   // namespace app

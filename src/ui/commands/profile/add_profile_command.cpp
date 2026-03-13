@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "add_profile_command_error.hpp"
-#include "app/store/profile_store/profile_store.hpp"
+#include "app/store/profile/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
 

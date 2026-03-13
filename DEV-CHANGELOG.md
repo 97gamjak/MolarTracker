@@ -34,6 +34,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Implement `insert_policy` with corresponding `requires_paired_insert_t` type for 1:1 relationships
 - Introduce `Joins` and `WhereClauses`
 
+#### Store
+
+- Introduce general base class `BaseStore` and interface `IStore`
+
 ### Bugfix
 
 - Make GNU compiler flags to be actually applied
