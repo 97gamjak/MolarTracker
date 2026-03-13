@@ -40,10 +40,7 @@ namespace app
      * @brief Store for managing profiles
      *
      */
-    // TODO(97gamjak): consider refactoring to avoid multiple inheritance
-    // NOLINTNEXTLINE(fuchsia-multiple-inheritance)
-    class ProfileStore : public BaseStore<Profile, ProfileId>,
-                         public Observable<OnProfileChanged>
+    class ProfileStore : public BaseStore<Profile, ProfileId>
     {
        private:
         /// reference to the profile service
@@ -100,8 +97,6 @@ namespace app
         void _commitNewProfile(Entry* entry);
         void _commitModifiedProfile(Entry* entry);
         void _commitDeletedProfile(Entry* entry);
-
-        void _notifyProfileChanged(const std::optional<ProfileId>& profileId);
     };
 
 }   // namespace app

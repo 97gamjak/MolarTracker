@@ -24,6 +24,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Profile
 
 - Add Listener to active `ProfileId`
+- Introduce `ActiveProfile` type with Observable base in profile store to globally handle changes in profile
 
 #### ORM
 

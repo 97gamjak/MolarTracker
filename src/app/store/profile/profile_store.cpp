@@ -409,23 +409,7 @@ namespace app
         void*                  user
     )
     {
-        return Observable<OnProfileChanged>::template on<OnProfileChanged>(
-            func,
-            user
-        );
-    }
-
-    /**
-     * @brief Notify subscribers that a profile has changed
-     *
-     * @param profileId
-     */
-    void ProfileStore::_notifyProfileChanged(
-        const std::optional<ProfileId>& profileId
-    )
-    {
-        Observable<OnProfileChanged>::template _emit<OnProfileChanged>(profileId
-        );
+        return _activeProfile.on<OnProfileChanged>(func, user);
     }
 
 }   // namespace app
