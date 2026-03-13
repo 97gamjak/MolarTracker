@@ -5,40 +5,38 @@
 namespace app
 {
     /**
-     * @brief Set the active profile by name
+     * @brief Get the active profile ID
      *
-     * @param name
+     * @return std::optional<ProfileId>
      */
-    void ProfileStore::setActiveProfile(std::optional<std::string_view> name)
+    std::optional<ProfileId> ActiveProfile::get() const { return _value; }
+
+    /**
+     * @brief Check if there is an active profile
+     *
+     * @return true
+     * @return false
+     */
+    bool ActiveProfile::has() const { return _value.has_value(); }
+
+    /**
+     * @brief Set the active profile by ID
+     *
+     * @param profileId
+     */
+    void ActiveProfile::set(const std::optional<ProfileId>& profileId)
     {
-        if (!name.has_value())
-        {
-            _activeProfileId.reset();
-            return;
-        }
-
-        const auto profile = getProfile(name.value());
-        if (!profile)
-        {
-            // TODO(97gamjak): make here MT specific error handling for stores
-            // https://97gamjak.atlassian.net/browse/MOLTRACK-88
-            throw std::runtime_error(
-                std::format("Profile '{}' not found", name.value())
-            );
-        }
-
-        _activeProfileId = profile->getId();
-        _notifyProfileChanged(_activeProfileId);
+        _value = profileId;
+        _emit<OnProfileChanged>(_value);
     }
 
     /**
      * @brief Unset the active profile, leaving no profile active
      *
      */
-    void ProfileStore::unsetActiveProfile()
+    void ActiveProfile::unset()
     {
-        _activeProfileId.reset();
-        _notifyProfileChanged(std::nullopt);
+        _value.reset();
+        _emit<OnProfileChanged>(std::nullopt);
     }
-
 }   // namespace app
