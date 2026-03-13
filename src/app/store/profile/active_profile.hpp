@@ -7,6 +7,14 @@
 
 namespace app
 {
+    /**
+     * @brief Class for managing the active profile in the application, this
+     * class is responsible for keeping track of which profile is currently
+     * active in the application, allowing other parts of the application to
+     * subscribe to changes in the active profile, and providing methods for
+     * setting and unsetting the active profile.
+     *
+     */
     class ActiveProfile : public Observable<OnProfileChanged>
     {
        private:

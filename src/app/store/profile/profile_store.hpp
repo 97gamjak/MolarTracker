@@ -88,12 +88,6 @@ namespace app
         );
 
        private:
-        void _updateInternal(
-            ProfileId                         id,
-            std::string_view                  newName,
-            const std::optional<std::string>& newEmail
-        );
-
         void _commitNewProfile(Entry* entry);
         void _commitModifiedProfile(Entry* entry);
         void _commitDeletedProfile(Entry* entry);
