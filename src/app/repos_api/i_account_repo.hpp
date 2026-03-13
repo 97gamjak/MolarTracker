@@ -38,21 +38,29 @@ namespace app
          *
          * @param cashAccount The CashAccount domain object containing the
          * details of the cash account to be created
+         * @param profileId The ID of the profile to which the cash account
+         * belongs
          * @return AccountId The ID of the newly created cash account
          */
         [[nodiscard]] virtual AccountId createCashAccount(
-            const finance::CashAccount& cashAccount
+            const finance::CashAccount& cashAccount,
+            const ProfileId&            profileId
         ) = 0;
 
         /**
          * @brief Get all cash accounts from the repository, this method
-         * retrieves all cash account entries from the database and returns them
+         * retrieves all cash account entries from the database and returns
+         them
          * as a vector of CashAccount domain objects
          *
+         * @param profileId The ID of the profile whose cash accounts are to
+         be
+         * retrieved
          * @return std::vector<finance::CashAccount> A vector containing all
          * cash accounts in the repository
          */
         [[nodiscard]] virtual std::vector<finance::CashAccount> getAllCashAccounts(
+            const ProfileId& profileId
         ) const = 0;
     };
 

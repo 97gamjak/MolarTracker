@@ -14,24 +14,25 @@ namespace app
 {
 
     /**
-     * @brief Factory class for converting between CashAccount domain models and
-     * CashAccountRow database models, including the associated AccountRow for
-     * the base account information.
+     * @brief Factory class for converting between Account domain models and
+     * AccountRow database models, including the associated CashAccountRow for
+     * the specific account type information.
      *
      */
-    class CashAccountFactory
+    class AccountFactory
     {
        public:
-        static finance::CashAccount toDomain(
-            const CashAccountRow& cashAccountRow
+        static finance::CashAccount toCashAccountDomain(
+            const AccountRow& accountRow
         );
 
-        static std::vector<finance::CashAccount> toDomains(
-            const std::vector<CashAccountRow>& cashAccountRows
+        static std::vector<finance::CashAccount> toCashAccountDomains(
+            const std::vector<AccountRow>& accountRows
         );
 
-        static std::pair<AccountRow, CashAccountRow> toRow(
-            const finance::CashAccount& account
+        static std::pair<AccountRow, CashAccountRow> toCashAccountRow(
+            const finance::CashAccount& account,
+            const ProfileId&            profileId
         );
     };
 

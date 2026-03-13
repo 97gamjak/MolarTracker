@@ -19,26 +19,57 @@ namespace app
     }
 
     /**
+     * @brief Get all accounts
+     *
+     * @param profileId The ID of the profile whose accounts are to be retrieved
+     *
+     * @return std::vector<finance::AccountVariant>
+     */
+    std::vector<finance::AccountVariant> AccountService::getAllAccounts(
+        const ProfileId& profileId
+    ) const
+    {
+        const auto cashAccounts = _accountRepo->getAllCashAccounts(profileId);
+
+        std::vector<finance::AccountVariant> accounts;
+        accounts.reserve(cashAccounts.size());
+
+        for (const auto& account : cashAccounts)
+            accounts.emplace_back(account);
+
+        return accounts;
+    }
+
+    /**
      * @brief Get all cash accounts
+     *
+     * @param profileId The ID of the profile whose cash accounts are to be
+     * retrieved
      *
      * @return std::vector<finance::CashAccount>
      */
-    std::vector<finance::CashAccount> AccountService::getAllCashAccounts() const
+    std::vector<finance::CashAccount> AccountService::getAllCashAccounts(
+        const ProfileId& profileId
+    ) const
     {
-        return _accountRepo->getAllCashAccounts();
+        return _accountRepo->getAllCashAccounts(profileId);
     }
 
     /**
      * @brief Create a new cash account
      *
-     * @param cashAccount
+     * @param cashAccount The CashAccount domain object containing the
+     * details of the cash account to be created
+     * @param profileId The ID of the profile to which the cash account belongs
+     *
      * @return AccountId
      */
     AccountId AccountService::createCashAccount(
-        const finance::CashAccount& cashAccount
+        const finance::CashAccount& cashAccount,
+        const ProfileId&            profileId
     )
     {
-        return _accountRepo->createCashAccount(cashAccount);
+        return _accountRepo->createCashAccount(cashAccount, profileId);
     }
 
 }   // namespace app

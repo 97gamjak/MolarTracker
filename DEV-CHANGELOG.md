@@ -20,6 +20,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `AccountRepo` with first `createCashAccount` method
 - Add `AccountService` with first `createCashAccount` method
 - Add first draft of `AccountStore`
+- Include proper handling of `ProfileId` on `Account` database side
 
 #### Profile
 

@@ -29,10 +29,12 @@ namespace app
         void ensureSchema() override;
 
         [[nodiscard]] std::vector<finance::CashAccount> getAllCashAccounts(
+            const ProfileId& profileId
         ) const override;
 
         [[nodiscard]] AccountId createCashAccount(
-            const finance::CashAccount& account
+            const finance::CashAccount& account,
+            const ProfileId&            profileId
         ) override;
 
        private:

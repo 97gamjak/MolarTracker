@@ -8,41 +8,40 @@ namespace app
 {
 
     /**
-     * @brief Convert a CashAccountRow database model to a
+     * @brief Convert an AccountRow database model to a
      * CashAccount
      *
-     * @param cashAccountRow
+     * @param accountRow
      * @return finance::CashAccount
      */
-    finance::CashAccount CashAccountFactory::toDomain(
-        const CashAccountRow& cashAccountRow
+    finance::CashAccount AccountFactory::toCashAccountDomain(
+        const AccountRow& accountRow
     )
     {
-        return finance::CashAccount(
-            cashAccountRow.id.value(),
-            cashAccountRow.status.value(),
-            cashAccountRow.profileId.value(),
-            cashAccountRow.currency.value(),
-            cashAccountRow.name.value()
-        );
+        return {
+            accountRow.id.value(),
+            accountRow.status.value(),
+            accountRow.name.value(),
+            accountRow.currency.value()
+        };
     }
 
     /**
-     * @brief Convert a vector of CashAccountRow database models to a vector of
+     * @brief Convert a vector of AccountRow database models to a vector of
      * CashAccount domain models
      *
-     * @param cashAccountRows
+     * @param accountRows
      * @return std::vector<finance::CashAccount>
      */
-    std::vector<finance::CashAccount> CashAccountFactory::toDomains(
-        const std::vector<CashAccountRow>& cashAccountRows
+    std::vector<finance::CashAccount> AccountFactory::toCashAccountDomains(
+        const std::vector<AccountRow>& accountRows
     )
     {
         std::vector<finance::CashAccount> accounts;
-        accounts.reserve(cashAccountRows.size());
+        accounts.reserve(accountRows.size());
 
-        for (const auto& row : cashAccountRows)
-            accounts.push_back(toDomain(row));
+        for (const auto& row : accountRows)
+            accounts.push_back(toCashAccountDomain(row));
 
         return accounts;
     }
@@ -54,24 +53,25 @@ namespace app
      * a CashAccountRow, it returns a pair containing both rows.
      *
      * @param account
+     * @param profileId
      * @return std::pair<AccountRow, CashAccountRow>
      */
-    std::pair<AccountRow, CashAccountRow> CashAccountFactory::toRow(
-        const finance::CashAccount& account
+    std::pair<AccountRow, CashAccountRow> AccountFactory::toCashAccountRow(
+        const finance::CashAccount& account,
+        const ProfileId&            profileId
     )
     {
         AccountRow     accountRow;
         CashAccountRow cashAccountRow;
 
-        accountRow.id   = account.getId();
-        accountRow.kind = AccountKind::Cash;
+        accountRow.id        = account.getId();
+        accountRow.kind      = AccountKind::Cash;
+        accountRow.status    = account.getStatus();
+        accountRow.name      = account.getName();
+        accountRow.currency  = account.getCurrency();
+        accountRow.profileId = profileId;
 
-        cashAccountRow.id        = account.getId();
-        cashAccountRow.status    = account.getStatus();
-        cashAccountRow.profileId = account.getProfileId();
-        cashAccountRow.currency  = account.getCurrency();
-        cashAccountRow.name      = account.getName();
-
+        cashAccountRow.id = account.getId();
         return {accountRow, cashAccountRow};
     }
 
