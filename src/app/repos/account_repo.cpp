@@ -4,7 +4,6 @@
 #include "finance/cash_account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
-#include "orm/join.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/account_row.hpp"
 
@@ -22,6 +21,7 @@ namespace app
      */
     AccountRepo::AccountRepo(const std::shared_ptr<db::Database>& db) : _db(db)
     {
+        _ensureSchema();
     }
 
     /**
@@ -45,6 +45,10 @@ namespace app
      * account to create, this should include all necessary information such as
      * the account name, initial balance, etc., and the method should validate
      * this information before attempting to create the account in the database.
+     * @param profileId The ID of the profile to which the cash account belongs,
+     * this is necessary to associate the account with the correct user profile
+     * in the database, and should be validated to ensure that it corresponds to
+     * an existing profile before creating the account.
      *
      * @return AccountId The ID of the newly created cash account, this can be
      * used to retrieve or manage the account later on, if the account creation
@@ -52,10 +56,12 @@ namespace app
      * failure.
      */
     AccountId AccountRepo::createCashAccount(
-        const finance::CashAccount& account
+        const finance::CashAccount& account,
+        const ProfileId&            profileId
     )
     {
-        auto [accountRow, cashAccountRow] = CashAccountFactory::toRow(account);
+        auto [accountRow, cashAccountRow] =
+            AccountFactory::toCashAccountRow(account, profileId);
 
         db::Transaction transaction{_db};
 
@@ -98,36 +104,39 @@ namespace app
         return account.getId();
     }
 
+    /**
+     * @brief Get the All Cash Accounts
+     *
+     * @details This implementation at the moment works only because the
+     * CashAccountRow does not contain any additional fields yet
+     *
+     * @param profileId
+     * @return std::vector<finance::CashAccount>
+     */
     [[nodiscard]] std::vector<finance::CashAccount> AccountRepo::
-        getAllCashAccounts() const
+        getAllCashAccounts(const ProfileId& profileId) const
     {
-        const auto baseName = CashAccountRow::tableName;
-        const auto joinName = AccountRow::tableName;
-
-        const auto fieldPair = std::make_pair(
-            decltype(CashAccountRow{}.id)::getColumnName(),
-            decltype(AccountRow{}.id)::getColumnName()
-        );
-
-        orm::Joins joins;
-        joins.addJoin(orm::Join(baseName, joinName, fieldPair));
-
-        auto dummyAccountRow = AccountRow{};
-        dummyAccountRow.kind = AccountKind::Cash;
+        auto dummyAccountRow      = AccountRow{};
+        dummyAccountRow.kind      = AccountKind::Cash;
+        dummyAccountRow.profileId = profileId;
 
         const auto kindClause = orm::WhereClause(
             dummyAccountRow.kind,
             AccountRow::tableName,
             orm::WhereOperator::Equal
         );
-
-        const auto cashAccountRows = orm::getAll<CashAccountRow>(
-            _db,
-            joins,
-            orm::WhereClauses{kindClause}
+        const auto profileClause = orm::WhereClause(
+            dummyAccountRow.profileId,
+            AccountRow::tableName,
+            orm::WhereOperator::Equal
         );
 
-        return CashAccountFactory::toDomains(cashAccountRows);
+        const auto cashAccountRows = orm::getAll<AccountRow>(
+            _db,
+            orm::WhereClauses{kindClause, profileClause}
+        );
+
+        return AccountFactory::toCashAccountDomains(cashAccountRows);
     }
 
     /**
@@ -142,6 +151,7 @@ namespace app
     void AccountRepo::_ensureSchema() const
     {
         orm::createTable<AccountRow>(_db);
+        orm::createTable<CashAccountRow>(_db);
     }
 
 }   // namespace app

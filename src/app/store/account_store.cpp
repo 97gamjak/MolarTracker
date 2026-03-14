@@ -19,24 +19,10 @@ namespace app
     )
         : _accountService(accountService)
     {
-    }
+        const auto accounts = _accountService->getAllAccounts(_activeProfileId);
 
-    /**
-     * @brief Reload the account data from the underlying service
-     *
-     */
-    void AccountStore::reload()
-    {
-        _cashAccounts = _accountService->getAllCashAccounts();
-
-        _accountStates.clear();
-        _usedIds.clear();
-
-        for (const auto& account : _cashAccounts)
-        {
-            _accountStates.emplace(account.getId(), StoreState::Clean);
-            _usedIds.emplace(account.getId());
-        }
+        for (const auto& account : accounts)
+            _addEntry(account, StoreState::Clean);
     }
 
     /**

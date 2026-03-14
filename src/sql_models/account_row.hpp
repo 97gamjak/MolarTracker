@@ -33,7 +33,20 @@ struct AccountRow
     /// security, etc.) and is a required field
     orm::Field<"kind", AccountKind, orm::not_null_t> kind;
 
-    ORM_FIELDS(AccountRow, id, kind)
+    /// The profile_id field, this is a required field and is a foreign key
+    /// referencing the profile table
+    orm::Field<"profile_id", ProfileId, orm::not_null_t> profileId;
+
+    /// The name field, this is a required field
+    orm::Field<"name", std::string, orm::not_null_t> name;
+
+    /// The status field, this is a required field
+    orm::Field<"status", AccountStatus, orm::not_null_t> status;
+
+    /// The currency field, this is a required field
+    orm::Field<"currency", Currency, orm::not_null_t> currency;
+
+    ORM_FIELDS(AccountRow, id, kind, profileId, name, status, currency)
 };
 
 /**
@@ -65,17 +78,7 @@ struct CashAccountRow final
             decltype(AccountRow::id)>>
         id;
 
-    /// The status field, this is a required field
-    orm::Field<"status", AccountStatus, orm::not_null_t> status;
-    /// The profile_id field, this is a required field and is a foreign key
-    /// referencing the profile table
-    orm::Field<"profile_id", ProfileId, orm::not_null_t> profileId;
-    /// The currency field, this is a required field
-    orm::Field<"currency", Currency, orm::not_null_t> currency;
-    /// The name field, this is a required field
-    orm::Field<"name", std::string, orm::not_null_t> name;
-
-    ORM_FIELDS(CashAccountRow, id, status, profileId, currency, name)
+    ORM_FIELDS(CashAccountRow, id)
 };
 
 #endif   // __SQL_MODELS__ACCOUNT_ROW_HPP__
