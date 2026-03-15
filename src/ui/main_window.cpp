@@ -13,9 +13,9 @@
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/handlers/handlers.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
-#include "ui/widgets/profile/add_profile_dlg.hpp"
-#include "ui/widgets/profile/profile_selection_dlg.hpp"
-#include "utils/qt_helpers.hpp"
+#include "ui/widgets/side_bar/account_category.hpp"
+#include "ui/widgets/side_bar/overview_category.hpp"
+#include "ui/widgets/side_bar/side_bar.hpp"
 
 namespace ui
 {
@@ -54,7 +54,43 @@ namespace ui
     void MainWindow::_buildUI()
     {
         _buildMenuBar();
-        _buildCentral();
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* root = new QWidget{this};
+        setCentralWidget(root);
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* layout = new QVBoxLayout{root};
+
+        const auto& margins = Constants::getCoreWindowMargins();
+        layout->setContentsMargins(
+            std::get<0>(margins),
+            std::get<1>(margins),
+            std::get<2>(margins),
+            std::get<3>(margins)
+        );
+
+        _sideBar       = new SideBar{this};
+        auto* overview = new OverviewCategory{this};
+        auto* accounts = new AccountCategory{this};
+
+        // load accounts
+        accounts->refresh();
+
+        _sideBar->registerCategory(overview);
+        _sideBar->registerCategory(accounts);
+
+        // connect(
+        //     accounts,
+        //     &SideBar::itemSelected,
+        //     this,
+        //     [/*this*/](int /*id*/)
+        //     {
+        //         // TODO(97gamjak): swap main content area
+        //     }
+        // );
+
+        layout->addWidget(_sideBar);
     }
 
     /**
@@ -95,39 +131,6 @@ namespace ui
             *this,
             _menuBar->getHelpMenu()
         );
-    }
-
-    /**
-     * @brief Build the central widget of the main window
-     *
-     */
-    void MainWindow::_buildCentral()
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* root = new QWidget{this};
-        setCentralWidget(root);
-
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout{root};
-
-        const auto& margins = Constants::getCoreWindowMargins();
-        layout->setContentsMargins(
-            std::get<0>(margins),
-            std::get<1>(margins),
-            std::get<2>(margins),
-            std::get<3>(margins)
-        );
-
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* tabs = new QTabWidget{root};
-        layout->addWidget(tabs);
-
-        // Placeholder pages
-        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
-        tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
-        tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
-        tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
-        // NOLINTEND(cppcoreguidelines-owning-memory)
     }
 
     /**

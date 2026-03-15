@@ -19,7 +19,8 @@ namespace app
 
 namespace ui
 {
-    class MenuBar;    // Forward declaration
+    class MenuBar;   // Forward declaration
+    class SideBar;
     class Handlers;   // Forward declaration
 
     /**
@@ -38,6 +39,8 @@ namespace ui
         Handlers& _handlers;
         /// Pointer to the menu bar widget
         MenuBar* _menuBar = nullptr;
+        /// Pointer to side bar widget
+        SideBar* _sideBar = nullptr;
 
         /// File menu controller
         std::unique_ptr<FileMenuController> _fileMenuController;
