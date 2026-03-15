@@ -108,27 +108,19 @@ namespace orm
 
         std::string definition;
 
-        if constexpr (isFk)
-            definition += "FOREIGN KEY (";
-
         definition += name.toString();
-
-        if constexpr (isFk)
-            definition += ")";
-
         definition += " ";
-
-        if constexpr (isFk)
-            definition += "REFERENCES";
-        else
-            definition += std::string{sql_type<storage_type>::name};
+        definition += std::string{sql_type<storage_type>::name};
 
         if constexpr (isFk)
         {
-            using foreignKeyInfo   = find_foreign_key_t<Value, Options...>;
-            using field            = typename foreignKeyInfo::Field;
-            using table            = typename foreignKeyInfo::Table;
-            using DeletionBehavior = typename foreignKeyInfo::DeletionBehavior;
+            definition             += ", FOREIGN KEY (";
+            definition             += name.toString();
+            definition             += ") REFERENCES";
+            using foreignKeyInfo    = find_foreign_key_t<Value, Options...>;
+            using field             = typename foreignKeyInfo::Field;
+            using table             = typename foreignKeyInfo::Table;
+            using DeletionBehavior  = typename foreignKeyInfo::DeletionBehavior;
 
             definition += " " + table::tableName;
             definition += "(" + field::getColumnName() + ")";
@@ -141,17 +133,6 @@ namespace orm
                 MSTD_COMPILE_FAIL(
                     "Unsupported deletion behavior for foreign key"
                 );
-        }
-        else
-        {
-            if constexpr (isPk)
-                definition += " PRIMARY KEY";
-            if constexpr (isAutoIncrement)
-                definition += " AUTOINCREMENT";
-            if constexpr (isUnique)
-                definition += " UNIQUE";
-            if constexpr (!isNullable)
-                definition += " NOT NULL";
         }
 
         return definition;
