@@ -74,11 +74,10 @@ namespace ui
         auto* overview = new OverviewCategory{this};
         auto* accounts = new AccountCategory{this};
 
-        // load accounts
-        accounts->refresh();
-
         _sideBar->registerCategory(overview);
         _sideBar->registerCategory(accounts);
+
+        accounts->refresh();
 
         // connect(
         //     accounts,

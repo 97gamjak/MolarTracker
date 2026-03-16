@@ -25,7 +25,7 @@ namespace ui
         _categoryBar->setFlow(QListView::TopToBottom);
 
         layout->addWidget(_categoryBar);
-        layout->addWidget(_stack);
+        layout->addWidget(_stack, 1);
 
         connect(
             _categoryBar,

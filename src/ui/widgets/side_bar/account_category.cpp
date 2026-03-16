@@ -1,6 +1,7 @@
 #include "account_category.hpp"
 
 #include <QListWidget>
+#include <QMenu>
 #include <QVBoxLayout>
 
 namespace ui
@@ -51,15 +52,22 @@ namespace ui
     void AccountCategory::showContextMenu(const QPoint& pos)
     {
         auto* item = _accountList->itemAt(pos);
-        if (item)
+        QMenu menu(this);
+
+        if (item != nullptr)
         {
             // TODO(97gamjak): Implement context menu for account items
         }
         else
         {
-            // TODO(97gamjak): Implement context menu for empty space (e.g. add
-            // new account)
+            menu.addAction(
+                "New Account",
+                this,
+                [this] { emit createRequested(); }
+            );
         }
+
+        menu.exec(_accountList->viewport()->mapToGlobal(pos));
     }
 
 }   // namespace ui
