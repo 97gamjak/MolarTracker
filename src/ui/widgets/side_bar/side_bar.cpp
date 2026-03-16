@@ -17,7 +17,7 @@ namespace ui
           _stack(new QStackedWidget{})
     {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QHBoxLayout(this);
+        auto* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
@@ -25,7 +25,6 @@ namespace ui
         _categoryBar->setFlow(QListView::TopToBottom);
 
         layout->addWidget(_categoryBar);
-        layout->addWidget(_stack, 1);
 
         connect(
             _categoryBar,

@@ -60,7 +60,7 @@ namespace ui
         setCentralWidget(root);
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout{root};
+        auto* layout = new QHBoxLayout{root};
 
         const auto& margins = Constants::getCoreWindowMargins();
         layout->setContentsMargins(
