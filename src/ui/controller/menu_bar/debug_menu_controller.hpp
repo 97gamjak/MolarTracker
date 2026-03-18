@@ -1,5 +1,5 @@
-#ifndef __UI__CONTROLLER__DEBUG_MENU_CONTROLLER_HPP__
-#define __UI__CONTROLLER__DEBUG_MENU_CONTROLLER_HPP__
+#ifndef __UI__CONTROLLER__MENU_BAR__DEBUG_MENU_CONTROLLER_HPP__
+#define __UI__CONTROLLER__MENU_BAR__DEBUG_MENU_CONTROLLER_HPP__
 
 #include <QObject>
 #include <QPointer>
@@ -78,4 +78,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__CONTROLLER__DEBUG_MENU_CONTROLLER_HPP__
+#endif   // __UI__CONTROLLER__MENU_BAR__DEBUG_MENU_CONTROLLER_HPP__

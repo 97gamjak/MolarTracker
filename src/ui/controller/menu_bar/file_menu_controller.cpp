@@ -1,6 +1,5 @@
 #include "file_menu_controller.hpp"
 
-#include <QMainWindow>
 #include <QMenuBar>
 #include <QObject>
 #include <QStatusBar>

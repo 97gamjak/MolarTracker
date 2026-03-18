@@ -94,33 +94,11 @@ namespace ui
         _menuBar = new MenuBar{this};
         setMenuBar(_menuBar);
 
-        _fileMenuController = std::make_unique<FileMenuController>(
-            *this,
-            _menuBar->getFileMenu(),
-            _appContext
-        );
-
-        _editMenuController = std::make_unique<EditMenuController>(
-            *this,
-            _menuBar->getEditMenu(),
-            _undoStack
-        );
-
-        _debugMenuController = std::make_unique<DebugMenuController>(
-            *this,
-            _menuBar->getDebugMenu(),
+        _menuBarController = std::make_unique<MenuBarController>(
+            this,
+            *_menuBar,
             _appContext,
             _undoStack
-        );
-
-        _settingsMenuController = std::make_unique<SettingsMenuController>(
-            *this,
-            _menuBar->getSettingsMenu()
-        );
-
-        _helpMenuController = std::make_unique<HelpMenuController>(
-            *this,
-            _menuBar->getHelpMenu()
         );
     }
 

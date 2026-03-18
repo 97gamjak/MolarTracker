@@ -5,12 +5,8 @@
 #include <memory>
 
 #include "commands/undo_stack.hpp"
-#include "ui/controller/debug_menu_controller.hpp"
-#include "ui/controller/edit_menu_controller.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
-#include "ui/controller/file_menu_controller.hpp"
-#include "ui/controller/help_menu_controller.hpp"
-#include "ui/controller/settings_menu_controller.hpp"
+#include "ui/controller/menu_bar/menu_bar_controller.hpp"
 
 namespace app
 {
@@ -45,16 +41,7 @@ namespace ui
         SideBar*        _sideBar      = nullptr;
         QStackedWidget* _centralStack = nullptr;
 
-        /// File menu controller
-        std::unique_ptr<FileMenuController> _fileMenuController;
-        /// Edit menu controller
-        std::unique_ptr<EditMenuController> _editMenuController;
-        /// Debug menu controller
-        std::unique_ptr<DebugMenuController> _debugMenuController;
-        /// Settings menu controller
-        std::unique_ptr<SettingsMenuController> _settingsMenuController;
-        /// Help menu controller
-        std::unique_ptr<HelpMenuController> _helpMenuController;
+        std::unique_ptr<MenuBarController> _menuBarController;
 
         /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;
