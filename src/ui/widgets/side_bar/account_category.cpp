@@ -1,73 +1,52 @@
 #include "account_category.hpp"
 
-#include <QListWidget>
+#include <QAction>
 #include <QMenu>
-#include <QVBoxLayout>
+#include <QString>
+
+#include "account_item.hpp"
 
 namespace ui
 {
-    AccountCategory::AccountCategory(QWidget* parent)
-        : ICategory(parent), _accountList(new QListWidget(this))
+    /**
+     * @brief Construct a new Account Category:: Account Category object
+     *
+     */
+    AccountCategory::AccountCategory() : Category("Accounts") {}
+
+    /**
+     * @brief Add an account to the category, this will create a new account
+     * item and add it to the category in the side bar
+     *
+     * @param id The id of the account, used to identify which account is
+     * selected when the itemSelected signal is emitted
+     * @param name The name of the account to display in the side bar
+     */
+    void AccountCategory::addAccount(int id, const QString& name)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(0, 0, 0, 0);
-
-        _accountList->setContextMenuPolicy(Qt::CustomContextMenu);
-        layout->addWidget(_accountList);
-
-        connect(
-            _accountList,
-            &QListWidget::itemDoubleClicked,
-            this,
-            &AccountCategory::onItemDoubleClicked
-        );
-
-        _accountList->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(
-            _accountList,
-            &QListWidget::customContextMenuRequested,
-            this,
-            &AccountCategory::showContextMenu
-        );
+        auto* accountItem = new AccountItem(id, name);
+        appendRow(accountItem);
     }
 
-    QString AccountCategory::getName() const { return "Accounts"; }
+    /**
+     * @brief Clear all accounts from the category, this will remove all account
+     * items from the category in the side bar
+     *
+     */
+    void AccountCategory::clearAccounts() { removeRows(0, rowCount()); }
 
-    void AccountCategory::refresh()
+    /**
+     * @brief Populate the context menu of the account category, this will be
+     * called when the account category is right-clicked, and the menu will be
+     * shown to the user
+     *
+     * @param menu The menu to populate, the account category should add its
+     * actions to this menu
+     */
+    void AccountCategory::populateContextMenu(QMenu& menu)
     {
-        _accountList->clear();
-        // TODO(97gamjak): Load accounts from the profile and populate the list
-        auto* dummyWidget = new QListWidgetItem("Dummy Widget");
-        dummyWidget->setData(Qt::UserRole, 1);
-        _accountList->addItem(dummyWidget);
-    }
-
-    void AccountCategory::onItemDoubleClicked(QListWidgetItem* item)
-    {
-        const auto id = item->data(Qt::UserRole).toInt();
-        emit       itemSelected(id);
-    }
-
-    void AccountCategory::showContextMenu(const QPoint& pos)
-    {
-        auto* item = _accountList->itemAt(pos);
-        QMenu menu(this);
-
-        if (item != nullptr)
-        {
-            // TODO(97gamjak): Implement context menu for account items
-        }
-        else
-        {
-            menu.addAction(
-                "New Account",
-                this,
-                [this] { emit createRequested(); }
-            );
-        }
-
-        menu.exec(_accountList->viewport()->mapToGlobal(pos));
+        _createAction = menu.addAction("Create Account");
     }
 
 }   // namespace ui

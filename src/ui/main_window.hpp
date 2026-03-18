@@ -17,6 +17,8 @@ namespace app
     class AppContext;   // Forward declaration
 }   // namespace app
 
+class QStackedWidget;   // Forward declaration
+
 namespace ui
 {
     class MenuBar;   // Forward declaration
@@ -40,7 +42,8 @@ namespace ui
         /// Pointer to the menu bar widget
         MenuBar* _menuBar = nullptr;
         /// Pointer to side bar widget
-        SideBar* _sideBar = nullptr;
+        SideBar*        _sideBar      = nullptr;
+        QStackedWidget* _centralStack = nullptr;
 
         /// File menu controller
         std::unique_ptr<FileMenuController> _fileMenuController;

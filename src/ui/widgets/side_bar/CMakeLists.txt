@@ -1,8 +1,10 @@
 add_library(molartracker_ui_side_bar STATIC
     side_bar.cpp
-    i_category.cpp
-    
+    side_bar_item.cpp
+    category.cpp
+
     account_category.cpp
+    account_item.cpp
     overview_category.cpp
 )
 

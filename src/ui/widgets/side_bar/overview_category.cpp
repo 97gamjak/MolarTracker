@@ -1,23 +1,25 @@
 #include "overview_category.hpp"
 
-#include <QLabel>
-#include <QVBoxLayout>
-
 namespace ui
 {
-    OverviewCategory::OverviewCategory(QWidget* parent) : ICategory(parent)
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout(this);
+    /**
+     * @brief Construct a new Overview Category:: Overview Category object
+     *
+     */
+    OverviewCategory::OverviewCategory() : Category("Overview") {}
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        layout->addWidget(new QLabel("Overview coming soon...", this));
+    /**
+     * @brief Populate the context menu of the overview category, this will be
+     * called when the overview category is right-clicked, and the menu will be
+     * shown to the user
+     *
+     * @param menu The menu to populate, the overview category should add its
+     * actions to this menu
+     */
+    void OverviewCategory::populateContextMenu(QMenu& /*menu*/)
+    {
+        // No actions for now
+        // menu.addAction("Some Action");
     }
 
-    QString OverviewCategory::getName() const { return "Overview"; }
-
-    void OverviewCategory::refresh()
-    {
-        // Refresh logic for the overview category
-    }
 }   // namespace ui

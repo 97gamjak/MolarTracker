@@ -1,19 +1,16 @@
 #ifndef __UI__WIDGETS__SIDE_BAR__OVERVIEW_CATEGORY_HPP__
 #define __UI__WIDGETS__SIDE_BAR__OVERVIEW_CATEGORY_HPP__
 
-#include "i_category.hpp"
+#include "category.hpp"
 
 namespace ui
 {
-    class OverviewCategory : public ICategory
+    class OverviewCategory : public Category
     {
-        Q_OBJECT
-
        public:
-        explicit OverviewCategory(QWidget* parent);
+        explicit OverviewCategory();
 
-        [[nodiscard]] QString getName() const override;
-        void                  refresh() override;
+        void populateContextMenu(QMenu& menu) override;
     };
 }   // namespace ui
 

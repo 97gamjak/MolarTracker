@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
+#include <QStackedWidget>
 #include <QStatusBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -33,10 +34,8 @@ namespace ui
 
         setWindowTitle(false);
 
-        resize(
-            Constants::getMainWindowSize().first,
-            Constants::getMainWindowSize().second
-        );
+        const auto size = Constants::getMainWindowSize();
+        resize(size.first, size.second);
 
         _buildUI();
     }
@@ -69,27 +68,20 @@ namespace ui
             std::get<2>(margins),
             std::get<3>(margins)
         );
+        layout->setSpacing(0);
 
-        _sideBar       = new SideBar{this};
-        auto* overview = new OverviewCategory{this};
-        auto* accounts = new AccountCategory{this};
+        _sideBar = new SideBar{this};
+        _sideBar->setFixedWidth(120);
 
-        _sideBar->registerCategory(overview);
-        _sideBar->registerCategory(accounts);
-
-        accounts->refresh();
-
-        // connect(
-        //     accounts,
-        //     &SideBar::itemSelected,
-        //     this,
-        //     [/*this*/](int /*id*/)
-        //     {
-        //         // TODO(97gamjak): swap main content area
-        //     }
-        // );
+        _centralStack = new QStackedWidget{this};
 
         layout->addWidget(_sideBar);
+        layout->addWidget(_centralStack);
+
+        auto* overviewCategory = new OverviewCategory();
+        auto* accountCategory  = new AccountCategory();
+        _sideBar->addCategory(overviewCategory);
+        _sideBar->addCategory(accountCategory);
     }
 
     /**

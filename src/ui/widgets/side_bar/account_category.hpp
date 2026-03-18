@@ -1,29 +1,28 @@
 #ifndef __UI__WIDGETS__SIDE_BAR__ACCOUNT_CATEGORY_HPP__
 #define __UI__WIDGETS__SIDE_BAR__ACCOUNT_CATEGORY_HPP__
 
-#include "i_category.hpp"
+#include "category.hpp"
 
-class QListWidget;       // Forward declaration
-class QListWidgetItem;   // Forward declaration
+class QString;   // Forward declaration
+class QMenu;     // Forward declaration
+class QAction;   // Forward declaration
 
 namespace ui
 {
-    class AccountCategory : public ICategory
-    {
-        Q_OBJECT
+    class AccountItem;
 
+    class AccountCategory : public Category
+    {
        private:
-        QListWidget* _accountList;
+        QAction* _createAction;
 
        public:
-        explicit AccountCategory(QWidget* parent);
+        explicit AccountCategory();
 
-        [[nodiscard]] QString getName() const override;
-        void                  refresh() override;
+        void addAccount(int id, const QString& name);
+        void clearAccounts();
 
-       private:
-        void onItemDoubleClicked(QListWidgetItem* item);
-        void showContextMenu(const QPoint& pos);
+        void populateContextMenu(QMenu& menu) override;
     };
 }   // namespace ui
 
