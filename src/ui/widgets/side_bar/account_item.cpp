@@ -19,6 +19,32 @@ namespace ui
     }
 
     /**
+     * @brief Get the id of the account, this is used to identify which account
+     * is selected when the itemSelected signal is emitted
+     *
+     * @return int The id of the account
+     */
+    int AccountItem::getId() const { return _id; }
+
+    /**
+     * @brief Get the open action of the account item, this is used to connect
+     * the open action to the respective functionality when the context menu is
+     * populated
+     *
+     * @return QAction* The open action of the account item
+     */
+    QAction* AccountItem::getOpenAction() const { return _openAction; }
+
+    /**
+     * @brief Get the delete action of the account item, this is used to
+     * connect the delete action to the respective functionality when the
+     * context menu is populated
+     *
+     * @return QAction* The delete action of the account item
+     */
+    QAction* AccountItem::getDeleteAction() const { return _deleteAction; }
+
+    /**
      * @brief Populate the context menu of the account item, this will be called
      * when the account item is right-clicked, and the menu will be shown to the
      * user

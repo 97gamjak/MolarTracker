@@ -7,6 +7,7 @@
 #include "commands/undo_stack.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/controller/menu_bar/menu_bar_controller.hpp"
+#include "ui/controller/side_bar_controller.hpp"
 
 namespace app
 {
@@ -42,6 +43,8 @@ namespace ui
         QStackedWidget* _centralStack = nullptr;
 
         std::unique_ptr<MenuBarController> _menuBarController;
+
+        std::unique_ptr<SideBarController> _sideBarController;
 
         /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;

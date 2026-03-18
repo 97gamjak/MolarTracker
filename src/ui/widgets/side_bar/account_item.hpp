@@ -20,6 +20,11 @@ namespace ui
        public:
         explicit AccountItem(int id, const QString& name);
 
+        [[nodiscard]] int getId() const;
+
+        [[nodiscard]] QAction* getOpenAction() const;
+        [[nodiscard]] QAction* getDeleteAction() const;
+
         void populateContextMenu(QMenu& menu) override;
     };
 }   // namespace ui

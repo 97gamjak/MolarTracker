@@ -78,10 +78,8 @@ namespace ui
         layout->addWidget(_sideBar);
         layout->addWidget(_centralStack);
 
-        auto* overviewCategory = new OverviewCategory();
-        auto* accountCategory  = new AccountCategory();
-        _sideBar->addCategory(overviewCategory);
-        _sideBar->addCategory(accountCategory);
+        _sideBarController =
+            std::make_unique<SideBarController>(_sideBar, _centralStack);
     }
 
     /**

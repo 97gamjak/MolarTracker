@@ -15,6 +15,7 @@ namespace ui
     SideBarItem::SideBarItem(const QString& name, SideBarItemType type)
         : QStandardItem(name), _type(type), _name(name)
     {
+        setEditable(false);
     }
 
     /**
