@@ -5,10 +5,17 @@
 
 namespace ui
 {
+    /**
+     * @brief Category in the side bar, this is a special type of item that can
+     * contain other items, and has a context menu for actions related to the
+     * category as a whole (e.g., creating a new account in the accounts
+     * category)
+     *
+     */
     class Category : public SideBarItem
     {
        public:
-        explicit Category(const QString& name);
+        explicit Category(const QString& name, SideBarItemType type);
 
         /**
          * @brief Populate the context menu of the category, this will be called

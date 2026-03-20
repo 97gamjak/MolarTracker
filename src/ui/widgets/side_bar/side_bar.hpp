@@ -11,12 +11,22 @@ namespace ui
     class Category;      // Forward declaration
     class SideBarItem;   // Forward declaration
 
+    /**
+     * @brief The side bar widget, this is responsible for displaying the
+     * categories and items in the side bar, and emitting signals when items are
+     * clicked or when context menu actions are triggered
+     *
+     */
     class SideBar : public QWidget
     {
         Q_OBJECT
 
        private:
-        QTreeView*          _tree;
+        /// The tree view for displaying the categories and items in the side
+        /// bar
+        QTreeView* _tree;
+        /// The model for the tree view, this is used to manage the items in the
+        /// side bar
         QStandardItemModel* _model;
 
        public:
@@ -26,7 +36,10 @@ namespace ui
         void removeCategory(SideBarItem* item);
 
        signals:
+        /// Emitted when an item in the side bar is clicked
         void itemClicked(SideBarItem* item);
+        /// Emitted when a context menu action is triggered for an item in the
+        /// side bar
         void contextMenuRequested(SideBarItem* item, QAction* action);
 
        private:

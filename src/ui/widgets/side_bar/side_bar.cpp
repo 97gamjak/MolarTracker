@@ -13,6 +13,8 @@ namespace ui
     /**
      * @brief Construct a new Side Bar:: Side Bar object
      *
+     * @param parent The parent widget of the side bar
+     *
      */
     SideBar::SideBar(QWidget* parent)
         : QWidget(parent),
@@ -22,12 +24,28 @@ namespace ui
         _buildUI();
     }
 
+    /**
+     * @brief Add a category to the side bar, this will create a new category
+     * item and add it to the side bar
+     *
+     * @param category The category to add to the side bar, this should be a
+     * pointer to a Category object that will be added as an item in the side
+     * bar
+     */
     void SideBar::addCategory(Category* category)
     {
         _model->appendRow(category);
         _tree->expand(_model->indexFromItem(category));
     }
 
+    /**
+     * @brief Remove a category from the side bar, this will remove the category
+     * item from the side bar
+     *
+     * @param item The item to remove from the side bar, this should be a
+     * pointer to a SideBarItem that is currently in the side bar, and will be
+     * removed from the side bar
+     */
     void SideBar::removeCategory(SideBarItem* item)
     {
         if (item == nullptr)
@@ -46,12 +64,15 @@ namespace ui
      */
     void SideBar::_buildUI()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _model = new QStandardItemModel(this);
-        _tree  = new QTreeView(this);
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _tree = new QTreeView(this);
 
         _tree->setModel(_model);
         _tree->setHeaderHidden(true);
@@ -85,7 +106,7 @@ namespace ui
         if (!index.isValid())
             return;
 
-        auto* item = static_cast<SideBarItem*>(_model->itemFromIndex(index));
+        auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
         emit  itemClicked(item);
     }
 
@@ -105,9 +126,14 @@ namespace ui
         if (!index.isValid())
             return;
 
-        auto*  item = static_cast<SideBarItem*>(_model->itemFromIndex(index));
-        QMenu* menu = nullptr;
+        auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* menu = new QMenu(this);
         item->populateContextMenu(*menu);
+
+        if (menu == nullptr || menu->actions().isEmpty())
+            return;
 
         QAction* selectedAction =
             menu->exec(_tree->viewport()->mapToGlobal(pos));

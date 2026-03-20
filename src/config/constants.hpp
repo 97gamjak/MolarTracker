@@ -67,6 +67,9 @@ class ConstantsSchema
     /// Main window default size, this is used as the default size for the main
     /// window when it is first created
     static constexpr const std::pair<int, int> _mainWindowSize = {4000, 3000};
+
+    /// Width of the side bar
+    static constexpr const int _sideBarWidth = 120;
 };
 
 /**
@@ -109,6 +112,7 @@ class Constants
     [[nodiscard]] static std::pair<int, int> getGlobalMinDialogSize();
     [[nodiscard]] static std::pair<int, int> getMainWindowSize();
     [[nodiscard]] static std::tuple<int, int, int, int> getCoreWindowMargins();
+    [[nodiscard]] static int                            getSideBarWidth();
 
    private:
     Constants();

@@ -39,13 +39,14 @@ namespace ui
         /// Pointer to the menu bar widget
         MenuBar* _menuBar = nullptr;
         /// Pointer to side bar widget
-        SideBar*        _sideBar      = nullptr;
+        SideBar* _sideBar = nullptr;
+        /// Pointer to the central stacked widget
         QStackedWidget* _centralStack = nullptr;
 
+        /// Menu bar controller
         std::unique_ptr<MenuBarController> _menuBarController;
-
+        /// Side bar controller
         std::unique_ptr<SideBarController> _sideBarController;
-
         /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;
 
@@ -61,7 +62,6 @@ namespace ui
        private:
         void _buildUI();
         void _buildMenuBar();
-        void _buildCentral();
 
         void _ensureProfileExists();
     };

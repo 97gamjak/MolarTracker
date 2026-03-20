@@ -7,7 +7,7 @@ namespace ui
      *
      * @param type Type of the command error
      */
-    CommandError::CommandError(Type type) : _type{type} {}
+    CommandError::CommandError(CommandErrorType type) : _type{type} {}
 
     /**
      * @brief Get the error message
@@ -18,12 +18,20 @@ namespace ui
     {
         switch (_type)
         {
-            case Type::InvalidCommand:
+            case CommandErrorType::InvalidCommand:
                 return "The command is invalid.";
-            case Type::NothingToRedo:
+            case CommandErrorType::NothingToRedo:
                 return "There is nothing to redo.";
-            case Type::NothingToUndo:
+            case CommandErrorType::NothingToUndo:
                 return "There is nothing to undo.";
+            case CommandErrorType::UndoNotImplemented:
+                return "Undo is not implemented for this command.";
+            case CommandErrorType::RedoNotImplemented:
+                return "Redo is not implemented for this command.";
+            case CommandErrorType::UndoNotSupported:
+                return "Undo is not supported for this command.";
+            case CommandErrorType::RedoNotSupported:
+                return "Redo is not supported for this command.";
         }
         return "An unknown error occurred.";
     }
@@ -35,16 +43,7 @@ namespace ui
      */
     std::string CommandError::getCodeStr() const
     {
-        switch (_type)
-        {
-            case Type::InvalidCommand:
-                return "InvalidCommand";
-            case Type::NothingToRedo:
-                return "NothingToRedo";
-            case Type::NothingToUndo:
-                return "NothingToUndo";
-        }
-        return "UnknownError";
+        return CommandErrorTypeMeta::toString(_type);
     }
 
     /**
@@ -54,7 +53,7 @@ namespace ui
      */
     CommandErrorPtr CommandError::makeNothingToUndoErrorPtr()
     {
-        return std::make_shared<CommandError>(Type::NothingToUndo);
+        return std::make_shared<CommandError>(CommandErrorType::NothingToUndo);
     }
 
     /**
@@ -64,7 +63,7 @@ namespace ui
      */
     CommandErrorPtr CommandError::makeNothingToRedoErrorPtr()
     {
-        return std::make_shared<CommandError>(Type::NothingToRedo);
+        return std::make_shared<CommandError>(CommandErrorType::NothingToRedo);
     }
 
     /**
@@ -74,7 +73,53 @@ namespace ui
      */
     CommandErrorPtr CommandError::makeInvalidCommandErrorPtr()
     {
-        return std::make_shared<CommandError>(Type::InvalidCommand);
+        return std::make_shared<CommandError>(CommandErrorType::InvalidCommand);
+    }
+
+    /**
+     * @brief Create a CommandErrorPtr for UndoNotImplemented error
+     *
+     * @return CommandErrorPtr
+     */
+    CommandErrorPtr CommandError::makeUndoNotImplementedErrorPtr()
+    {
+        return std::make_shared<CommandError>(
+            CommandErrorType::UndoNotImplemented
+        );
+    }
+
+    /**
+     * @brief Create a CommandErrorPtr for RedoNotImplemented error
+     *
+     * @return CommandErrorPtr
+     */
+    CommandErrorPtr CommandError::makeRedoNotImplementedErrorPtr()
+    {
+        return std::make_shared<CommandError>(
+            CommandErrorType::RedoNotImplemented
+        );
+    }
+
+    /**
+     * @brief Create a CommandErrorPtr for UndoNotSupported error
+     *
+     * @return CommandErrorPtr
+     */
+    CommandErrorPtr CommandError::makeUndoNotSupportedErrorPtr()
+    {
+        return std::make_shared<CommandError>(CommandErrorType::UndoNotSupported
+        );
+    }
+
+    /**
+     * @brief Create a CommandErrorPtr for RedoNotSupported error
+     *
+     * @return CommandErrorPtr
+     */
+    CommandErrorPtr CommandError::makeRedoNotSupportedErrorPtr()
+    {
+        return std::make_shared<CommandError>(CommandErrorType::RedoNotSupported
+        );
     }
 
 }   // namespace ui

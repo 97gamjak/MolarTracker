@@ -6,6 +6,7 @@ add_library(molartracker_ui_commands STATIC
 )
 
 add_subdirectory(profile)
+add_subdirectory(account)
 
 target_include_directories(molartracker_ui_commands
     PUBLIC
@@ -16,6 +17,7 @@ target_link_libraries(molartracker_ui_commands
     PUBLIC
     Qt6::Core
     molartracker_ui_commands_profile
+    molartracker_ui_commands_account
     PRIVATE
     molartracker_logging
 )

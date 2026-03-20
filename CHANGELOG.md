@@ -33,6 +33,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### UI
 
 - The App title shows now if there are some unsaved changes or not
+- Add Sidebar to main window
 
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 

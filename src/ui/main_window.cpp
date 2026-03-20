@@ -15,7 +15,6 @@
 #include "ui/handlers/handlers.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
-#include "ui/widgets/side_bar/overview_category.hpp"
 #include "ui/widgets/side_bar/side_bar.hpp"
 
 namespace ui
@@ -70,9 +69,11 @@ namespace ui
         );
         layout->setSpacing(0);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _sideBar = new SideBar{this};
-        _sideBar->setFixedWidth(120);
+        _sideBar->setFixedWidth(Constants::getSideBarWidth());
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         _centralStack = new QStackedWidget{this};
 
         layout->addWidget(_sideBar);

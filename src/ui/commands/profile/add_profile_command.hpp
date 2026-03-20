@@ -21,6 +21,8 @@ namespace ui
     class AddProfileCommand : public ICommand
     {
        private:
+        // TODO(97gamjak) [MOLTRACK-204]: make a shared pointer to the profile
+        // store
         /// Reference to the profile store
         app::ProfileStore& _profileStore;
         /// The profile draft

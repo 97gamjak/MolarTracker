@@ -5,6 +5,10 @@
 
 namespace ui
 {
+    /**
+     * @brief Category for the overview section in the side bar
+     *
+     */
     class OverviewCategory : public Category
     {
        public:

@@ -6,7 +6,10 @@ namespace ui
      * @brief Construct a new Overview Category:: Overview Category object
      *
      */
-    OverviewCategory::OverviewCategory() : Category("Overview") {}
+    OverviewCategory::OverviewCategory()
+        : Category("Overview", SideBarItemType::OverviewCategory)
+    {
+    }
 
     /**
      * @brief Populate the context menu of the overview category, this will be

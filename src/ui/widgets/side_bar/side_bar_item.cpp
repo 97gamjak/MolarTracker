@@ -26,6 +26,12 @@ namespace ui
      */
     SideBarItemType SideBarItem::getType() const { return _type; }
 
+    /**
+     * @brief Set the name of the item, this will update the text displayed in
+     * the side bar for this item
+     *
+     * @param name The new name of the item to display in the side bar
+     */
     void SideBarItem::setName(const QString& name)
     {
         _name = name;

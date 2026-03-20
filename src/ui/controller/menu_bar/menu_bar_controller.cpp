@@ -24,6 +24,15 @@ namespace ui
         _makeControllers(mainWindow, menuBar, appContext, undoStack);
     }
 
+    /**
+     * @brief Create the controllers for each menu in the menu bar
+     *
+     * @param mainWindow The main window of the application
+     * @param menuBar The menu bar of the application
+     * @param appContext The application context
+     * @param undoStack The undo stack for managing undoable commands in the
+     * application
+     */
     void MenuBarController::_makeControllers(
         MainWindow*      mainWindow,
         MenuBar&         menuBar,

@@ -14,7 +14,10 @@ namespace ui
      * @param name The name of the account to display in the side bar
      */
     AccountItem::AccountItem(int id, const QString& name)
-        : SideBarItem(name, SideBarItemType::Accounts), _id(id)
+        : SideBarItem(name, SideBarItemType::AccountsItem),
+          _id(id),
+          _openAction(nullptr),
+          _deleteAction(nullptr)
     {
     }
 

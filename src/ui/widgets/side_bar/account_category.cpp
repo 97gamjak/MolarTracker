@@ -12,7 +12,11 @@ namespace ui
      * @brief Construct a new Account Category:: Account Category object
      *
      */
-    AccountCategory::AccountCategory() : Category("Accounts") {}
+    AccountCategory::AccountCategory()
+        : Category("Accounts", SideBarItemType::AccountCategory),
+          _createAction(nullptr)
+    {
+    }
 
     /**
      * @brief Add an account to the category, this will create a new account
@@ -35,6 +39,15 @@ namespace ui
      *
      */
     void AccountCategory::clearAccounts() { removeRows(0, rowCount()); }
+
+    /**
+     * @brief Get the Create Action object, this is used to connect the action
+     * to a slot in the controller that will handle creating a new account when
+     * the action is triggered
+     *
+     * @return QAction*
+     */
+    QAction* AccountCategory::getCreateAction() const { return _createAction; }
 
     /**
      * @brief Populate the context menu of the account category, this will be

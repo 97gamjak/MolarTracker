@@ -19,9 +19,9 @@ namespace ui
      */
     enum class SideBarItemType : std::uint8_t
     {
-        Category = 0,
-        Overview,
-        Accounts,
+        AccountCategory,
+        OverviewCategory,
+        AccountsItem,
     };
 
     /**
@@ -36,6 +36,7 @@ namespace ui
         /// The type of the item
         SideBarItemType _type;
 
+        /// The name of the item
         QString _name;
 
        public:

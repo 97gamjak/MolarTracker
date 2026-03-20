@@ -9,6 +9,8 @@ add_library(molartracker_ui_controller STATIC
     ensure_profile_controller.cpp
 
     side_bar_controller.cpp
+    side_bar_category_controller.cpp
+    account_controller.cpp
 )
 
 target_include_directories(molartracker_ui_controller

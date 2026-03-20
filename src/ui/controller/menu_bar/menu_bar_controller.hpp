@@ -14,6 +14,11 @@ namespace ui
     class MenuBar;      // Forward declaration
     class MainWindow;   // Forward declaration
 
+    /**
+     * @brief Controller for the menu bar, this is responsible for creating and
+     * managing the controllers for each menu in the menu bar
+     *
+     */
     class MenuBarController
     {
        private:
