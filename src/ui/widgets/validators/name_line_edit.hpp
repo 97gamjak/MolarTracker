@@ -7,7 +7,8 @@
 
 #include "line_validator.hpp"
 
-class QWidget;   // Forward declaration
+class QWidget;       // Forward declaration
+class QVBoxLayout;   // Forward declaration
 
 namespace ui
 {
@@ -25,11 +26,12 @@ namespace ui
         /// A regular expression for allowed characters in names, this allows
         /// letters, numbers, underscores, hyphens, and periods. This can be
         /// adjusted as needed to allow or disallow certain characters in names.
-        const QRegularExpression _allowedCharsRegex =
-            QRegularExpression(R"(^[A-Za-z0-9_\-.]+$)");
+        QRegularExpression _allowedCharsRegex;
 
        public:
         explicit NameLineEdit(QWidget* parent);
+
+        void allowWhiteSpaces(bool allowWhiteSpaces);
 
        protected:
         [[nodiscard]] QString _getRequiredErrorMessage() const override;
@@ -37,6 +39,10 @@ namespace ui
             QStringView trimmedText
         ) const override;
     };
+
+    std::pair<NameLineEdit*, QWidget*> createNameLineEditWithLabel(
+        QWidget* parent
+    );
 
 }   // namespace ui
 

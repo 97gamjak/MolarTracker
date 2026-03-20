@@ -1,6 +1,8 @@
 #include "name_line_edit.hpp"
 
+#include <QLabel>
 #include <QStringView>
+#include <QVBoxLayout>
 #include <utility>
 
 #include "line_validator.hpp"
@@ -9,12 +11,23 @@ class QWidget;   // Forward declaration
 
 namespace ui
 {
+    void NameLineEdit::allowWhiteSpaces(bool allowWhiteSpaces)
+    {
+        if (allowWhiteSpaces)
+            _allowedCharsRegex = QRegularExpression(R"(^[A-Za-z 0-9_\-.]+$)");
+        else
+            _allowedCharsRegex = QRegularExpression(R"(^[A-Za-z0-9_\-.]+$)");
+    }
+
     /**
      * @brief Construct a new Name Line Edit:: Name Line Edit object
      *
      * @param parent Parent widget
      */
-    NameLineEdit::NameLineEdit(QWidget* parent) : LineValidator(parent) {}
+    NameLineEdit::NameLineEdit(QWidget* parent) : LineValidator(parent)
+    {
+        allowWhiteSpaces(false);
+    }
 
     /**
      * @brief Get the error message to be shown when the field is required but
@@ -55,6 +68,29 @@ namespace ui
         }
 
         return {true, ""};
+    }
+
+    std::pair<NameLineEdit*, QWidget*> createNameLineEditWithLabel(
+        QWidget* parent
+    )
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* errorLabel = new QLabel{parent};
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* lineEdit = new NameLineEdit{parent};
+        lineEdit->attachErrorLabel(errorLabel);
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* container = new QWidget{parent};
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* layout = new QVBoxLayout{container};
+
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(2);
+        layout->addWidget(lineEdit);
+        layout->addWidget(errorLabel);
+
+        return {lineEdit, container};
     }
 
 }   // namespace ui

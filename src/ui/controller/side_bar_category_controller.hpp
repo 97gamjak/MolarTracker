@@ -1,6 +1,8 @@
 #ifndef __UI__CONTROLLER__SIDE_BAR_CATEGORY_CONTROLLER_HPP__
 #define __UI__CONTROLLER__SIDE_BAR_CATEGORY_CONTROLLER_HPP__
 
+class QMainWindow;   // Forward declaration
+
 namespace ui
 {
     class Category;   // Forward declaration
@@ -18,9 +20,17 @@ namespace ui
         /// The category that this controller manages
         Category* _category;
 
+        QMainWindow* _mainWindow;
+
+       protected:
+        [[nodiscard]] QMainWindow* getMainWindow();
+
        public:
         virtual ~SideBarCategoryController() = default;
-        explicit SideBarCategoryController(Category* category);
+        explicit SideBarCategoryController(
+            Category*    category,
+            QMainWindow* mainWindow
+        );
 
         [[nodiscard]] Category* getCategory() const;
 

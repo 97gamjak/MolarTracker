@@ -1,5 +1,7 @@
 #include "side_bar_category_controller.hpp"
 
+#include <QMainWindow>
+
 namespace ui
 {
     /**
@@ -11,8 +13,11 @@ namespace ui
      * underlying data changes, and providing an interface for managing the
      * state of the category and its items
      */
-    SideBarCategoryController::SideBarCategoryController(Category* category)
-        : _category(category)
+    SideBarCategoryController::SideBarCategoryController(
+        Category*    category,
+        QMainWindow* mainWindow
+    )
+        : _category(category), _mainWindow(mainWindow)
     {
     }
 
@@ -24,6 +29,11 @@ namespace ui
     Category* SideBarCategoryController::getCategory() const
     {
         return _category;
+    }
+
+    QMainWindow* SideBarCategoryController::getMainWindow()
+    {
+        return _mainWindow;
     }
 
 }   // namespace ui

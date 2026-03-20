@@ -82,56 +82,58 @@ namespace ui
         QDialog::setModal(true);
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _mainLayout = new QVBoxLayout{this};
+        auto* mainLayout = new QVBoxLayout{this};
 
-        _buildFormSection();
+        _buildFormSection(mainLayout);
 
-        _buildToggleSection();
+        _buildToggleSection(mainLayout);
 
-        _buildButtonSection();
+        _buildButtonSection(mainLayout);
     }
 
     /**
      * @brief build the form section for user input
      *
+     * @param parent The parent layout of the form section
      */
-    void AddProfileDialog::_buildFormSection()
+    void AddProfileDialog::_buildFormSection(QVBoxLayout* parent)
     {
-        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* formLayout = new QFormLayout{};
 
-        auto* nameErrorLabel = new QLabel{this};
-        _nameLineEdit        = new NameLineEdit{this};
-        _nameLineEdit->setRequired(true);
-        _nameLineEdit->attachErrorLabel(nameErrorLabel);
-        auto* nameContainer = new QWidget{this};
-        auto* nameLayout    = new QVBoxLayout{nameContainer};
-        nameLayout->setContentsMargins(0, 0, 0, 0);
-        nameLayout->setSpacing(2);
-        nameLayout->addWidget(_nameLineEdit);
-        nameLayout->addWidget(nameErrorLabel);
+        auto [nameLineEdit, nameContainer] = createNameLineEditWithLabel(this);
+
+        _nameLineEdit = nameLineEdit;
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         formLayout->addRow(new QLabel{"Name*:"}, nameContainer);
 
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* emailErrorLabel = new QLabel{this};
-        _emailLineEdit        = new EmailLineEdit{this};
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _emailLineEdit = new EmailLineEdit{this};
         _emailLineEdit->attachErrorLabel(emailErrorLabel);
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* emailContainer = new QWidget{this};
-        auto* emailLayout    = new QVBoxLayout{emailContainer};
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* emailLayout = new QVBoxLayout{emailContainer};
         emailLayout->setContentsMargins(0, 0, 0, 0);
         emailLayout->setSpacing(2);
         emailLayout->addWidget(_emailLineEdit);
         emailLayout->addWidget(emailErrorLabel);
-        formLayout->addRow(new QLabel{"Email:"}, emailContainer);
-        // NOLINTEND(cppcoreguidelines-owning-memory)
 
-        _mainLayout->addLayout(formLayout);
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        formLayout->addRow(new QLabel{"Email:"}, emailContainer);
+
+        parent->addLayout(formLayout);
     }
 
     /**
      * @brief build the toggle section
      *
+     * @param parent The parent layout of the toggle section
      */
-    void AddProfileDialog::_buildToggleSection()
+    void AddProfileDialog::_buildToggleSection(QVBoxLayout* parent)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* toggleLayout = new QHBoxLayout{};
@@ -149,14 +151,15 @@ namespace ui
 
         _updateToggleStates();
 
-        _mainLayout->addLayout(toggleLayout);
+        parent->addLayout(toggleLayout);
     }
 
     /**
      * @brief build the button section
      *
+     * @param parent The parent layout of the button section
      */
-    void AddProfileDialog::_buildButtonSection()
+    void AddProfileDialog::_buildButtonSection(QVBoxLayout* parent)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* buttonLayout = new QHBoxLayout{};
@@ -196,7 +199,7 @@ namespace ui
             );
         }
 
-        _mainLayout->addLayout(buttonLayout);
+        parent->addLayout(buttonLayout);
     }
 
     /**

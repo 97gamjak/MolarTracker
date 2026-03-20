@@ -1,5 +1,7 @@
 #include "side_bar_controller.hpp"
 
+#include <QMainWindow>
+
 #include "account_controller.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
@@ -15,17 +17,19 @@ namespace ui
     /**
      * @brief Construct a new Side Bar Controller:: Side Bar Controller object
      *
+     * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
      */
     SideBarController::SideBarController(
+        QMainWindow*    mainWindow,
         SideBar*        sideBar,
         QStackedWidget* centralStack
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
           _accountSideBarController(
-              std::make_unique<AccountSideBarController>()
+              std::make_unique<AccountSideBarController>(mainWindow)
           ),
           _overviewCategory(new OverviewCategory())
     {
@@ -128,7 +132,7 @@ namespace ui
             case SideBarItemType::AccountCategory:
                 const auto* accountCategory =
                     dynamic_cast<AccountCategory*>(item);
-                AccountSideBarController::handleContextMenuAction(
+                _accountSideBarController->handleContextMenuAction(
                     accountCategory,
                     action
                 );

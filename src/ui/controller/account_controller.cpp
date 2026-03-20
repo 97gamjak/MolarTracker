@@ -1,6 +1,14 @@
 #include "account_controller.hpp"
 
+#include <QAction>
+#include <QMainWindow>
+#include <QObject>
+
+#include "app/app_context.hpp"
 #include "logging/log_macros.hpp"
+#include "ui/commands/account/create_account_command.hpp"
+#include "ui/commands/undo_stack.hpp"
+#include "ui/widgets/account/create_account_dlg.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
@@ -12,8 +20,14 @@ namespace ui
      * Controller object
      *
      */
-    AccountSideBarController::AccountSideBarController()
-        : SideBarCategoryController(new AccountCategory())
+    AccountSideBarController::AccountSideBarController(
+        UndoStack&       undoStack,
+        app::AppContext& appContext,
+        QMainWindow*     mainWindow
+    )
+        : SideBarCategoryController(new AccountCategory(), mainWindow),
+          _undoStack(std::make_shared<UndoStack>(undoStack)),
+          _appContext(std::make_shared<app::AppContext>(appContext))
     {
     }
 
@@ -63,7 +77,55 @@ namespace ui
         if (action == item->getCreateAction())
         {
             LOG_INFO("Create Account action triggered");
-            // Handle create account action
+
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+            auto* dialog = new CreateAccountDialog(getMainWindow());
+
+            connect(
+                dialog,
+                &CreateAccountDialog::requested,
+                this,
+                &AccountSideBarController::_onCreateAccountRequested
+            );
+
+            dialog->exec();
+        }
+    }
+
+    void AccountSideBarController::_onCreateAccountRequested(
+        const drafts::AccountDraft& account
+    )
+    {
+        LOG_INFO("Create Account requested with name: " + account.name);
+
+        if (account.kind == AccountKind::Cash)
+        {
+            Commands command("Create Account");
+
+            auto result = Commands::makeAndDo<CreateAccountCommand>(
+                _appContext->getStore().getAccountStore(),
+                account
+            );
+
+            if (!result)
+            {
+                const auto& error = result.error();
+                const auto  msg =
+                    "Failed to create account: " + error->getMessage();
+                LOG_ERROR(msg);
+                return;
+            }
+
+            command << std::move(result);
+
+            _undoStack->push(std::move(command));
+        }
+        else
+        {
+            LOG_WARNING(
+                "Unsupported account kind: " +
+                AccountKindMeta::toString(account.kind)
+            );
         }
     }
 

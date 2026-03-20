@@ -1,12 +1,26 @@
 #ifndef __UI__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 #define __UI__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 
+#include <QObject>
+
 #include "side_bar_category_controller.hpp"
 
-class QAction;   // Forward declaration
+class QAction;       // Forward declaration
+class QMainWindow;   // Forward declaration
+
+namespace drafts
+{
+    struct AccountDraft;   // Forward declaration
+}
+
+namespace app
+{
+    class AppContext;   // Forward declaration
+}
 
 namespace ui
 {
+    class UndoStack;         // Forward declaration
     class AccountCategory;   // Forward declaration
 
     /**
@@ -15,15 +29,28 @@ namespace ui
      */
     class AccountSideBarController : public SideBarCategoryController
     {
+        Q_OBJECT
+
+       private:
+        std::shared_ptr<UndoStack>       _undoStack;
+        std::shared_ptr<app::AppContext> _appContext;
+
        public:
-        explicit AccountSideBarController();
+        explicit AccountSideBarController(
+            UndoStack&       undoStack,
+            app::AppContext& appContext,
+            QMainWindow*     mainWindow
+        );
 
         void refresh() override;
 
-        static void handleContextMenuAction(
+        void handleContextMenuAction(
             const AccountCategory* item,
             const QAction*         action
         );
+
+       private slots:
+        void _onCreateAccountRequested(const drafts::AccountDraft& account);
     };
 
 }   // namespace ui

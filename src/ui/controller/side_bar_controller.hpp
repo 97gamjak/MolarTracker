@@ -8,6 +8,7 @@
 
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
+class QMainWindow;      // Forward declaration
 
 namespace ui
 {
@@ -38,6 +39,7 @@ namespace ui
 
        public:
         explicit SideBarController(
+            QMainWindow*    mainWindow,
             SideBar*        sideBar,
             QStackedWidget* centralStack
         );

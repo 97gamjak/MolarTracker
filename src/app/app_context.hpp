@@ -20,6 +20,7 @@ namespace app
        private:
         /// The settings object for the application, which can be used to
         /// subscribe to settings changes
+        // TODO(97gamjak): make this a shared ptr
         settings::Settings& _settings;
 
         /// The database instance for the application
@@ -39,11 +40,6 @@ namespace app
        public:
         explicit AppContext(settings::Settings& settings);
         ~AppContext() = default;
-
-        AppContext(const AppContext&)            = delete;
-        AppContext& operator=(const AppContext&) = delete;
-        AppContext(AppContext&&)                 = delete;
-        AppContext& operator=(AppContext&&)      = delete;
 
         StoreContainer&       getStore();
         const StoreContainer& getStore() const;

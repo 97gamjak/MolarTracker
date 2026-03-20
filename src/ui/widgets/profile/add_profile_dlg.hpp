@@ -52,8 +52,6 @@ namespace ui
         /// dialog is closed without adding a profile
         bool _canBeClosed = true;
 
-        /// ptr to the main layout of the dialog
-        QVBoxLayout* _mainLayout = nullptr;
         /// Line edit for the profile name
         NameLineEdit* _nameLineEdit = nullptr;
         /// Line edit for the profile email
@@ -117,9 +115,9 @@ namespace ui
 
        private:
         void _buildUI();
-        void _buildFormSection();
-        void _buildToggleSection();
-        void _buildButtonSection();
+        void _buildFormSection(QVBoxLayout* parent);
+        void _buildToggleSection(QVBoxLayout* parent);
+        void _buildButtonSection(QVBoxLayout* parent);
 
         void _updateToggleStates();
 
