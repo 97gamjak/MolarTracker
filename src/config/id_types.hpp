@@ -3,7 +3,7 @@
 
 #include <mstd/enum.hpp>
 
-#include "config/strong_id.hpp"
+#include "strong_id.hpp"
 
 // clang-format off
 struct ProfileTag {};
@@ -42,13 +42,13 @@ using TransactionEntryId = StrongId<TransactionEntryTag>;
 
 MSTD_ENUM(InstrumentKind, std::uint8_t, INSTRUMENT_KIND_LIST);
 
-#define ACCOUNT_KIND_LIST(X) \
-    X(Cash)                  \
-    X(Security)              \
-    X(External)
-
-MSTD_ENUM(AccountKind, std::uint8_t, ACCOUNT_KIND_LIST);
-
 // NOLINTEND(cppcoreguidelines-macro-usage)
+
+template <typename T>
+auto getId(const T& value);
+
+#ifndef __CONFIG__ID_TYPES_TPP__
+#include "id_types.tpp"
+#endif   // __CONFIG__ID_TYPES_TPP__
 
 #endif   // __CONFIG__ID_TYPES_HPP__

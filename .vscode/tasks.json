@@ -47,7 +47,7 @@
             "command": "bash",
             "args": [
                 "-c",
-                "clangd-tidy $(find src/) -j12 -p=.build --tqdm"
+                "clangd-tidy $(find src/) -j3 -p=.build --tqdm"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

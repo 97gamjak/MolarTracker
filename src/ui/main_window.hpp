@@ -5,21 +5,21 @@
 #include <memory>
 
 #include "commands/undo_stack.hpp"
-#include "ui/controller/debug_menu_controller.hpp"
-#include "ui/controller/edit_menu_controller.hpp"
 #include "ui/controller/ensure_profile_controller.hpp"
-#include "ui/controller/file_menu_controller.hpp"
-#include "ui/controller/help_menu_controller.hpp"
-#include "ui/controller/settings_menu_controller.hpp"
+#include "ui/controller/menu_bar/menu_bar_controller.hpp"
+#include "ui/controller/side_bar_controller.hpp"
 
 namespace app
 {
     class AppContext;   // Forward declaration
 }   // namespace app
 
+class QStackedWidget;   // Forward declaration
+
 namespace ui
 {
-    class MenuBar;    // Forward declaration
+    class MenuBar;   // Forward declaration
+    class SideBar;
     class Handlers;   // Forward declaration
 
     /**
@@ -38,18 +38,15 @@ namespace ui
         Handlers& _handlers;
         /// Pointer to the menu bar widget
         MenuBar* _menuBar = nullptr;
+        /// Pointer to side bar widget
+        SideBar* _sideBar = nullptr;
+        /// Pointer to the central stacked widget
+        QStackedWidget* _centralStack = nullptr;
 
-        /// File menu controller
-        std::unique_ptr<FileMenuController> _fileMenuController;
-        /// Edit menu controller
-        std::unique_ptr<EditMenuController> _editMenuController;
-        /// Debug menu controller
-        std::unique_ptr<DebugMenuController> _debugMenuController;
-        /// Settings menu controller
-        std::unique_ptr<SettingsMenuController> _settingsMenuController;
-        /// Help menu controller
-        std::unique_ptr<HelpMenuController> _helpMenuController;
-
+        /// Menu bar controller
+        std::unique_ptr<MenuBarController> _menuBarController;
+        /// Side bar controller
+        std::unique_ptr<SideBarController> _sideBarController;
         /// Ensure profile controller
         std::unique_ptr<EnsureProfileController> _ensureProfileController;
 
@@ -65,7 +62,6 @@ namespace ui
        private:
         void _buildUI();
         void _buildMenuBar();
-        void _buildCentral();
 
         void _ensureProfileExists();
     };

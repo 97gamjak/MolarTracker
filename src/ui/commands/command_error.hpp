@@ -2,7 +2,19 @@
 #define __UI__COMMANDS__COMMAND_ERROR_HPP__
 
 #include <memory>
+#include <mstd/enum.hpp>
 #include <string>
+
+#define COMMAND_ERROR_TYPE_LIST(X) \
+    X(InvalidCommand)              \
+    X(NothingToRedo)               \
+    X(NothingToUndo)               \
+    X(UndoNotImplemented)          \
+    X(RedoNotImplemented)          \
+    X(UndoNotSupported)            \
+    X(RedoNotSupported)
+
+MSTD_ENUM(CommandErrorType, std::uint8_t, COMMAND_ERROR_TYPE_LIST);
 
 namespace ui
 {
@@ -39,26 +51,12 @@ namespace ui
      */
     class CommandError : public ICommandError
     {
-       public:
-        // TODO(97gamjak): implement this via mstd::enum
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-110
-        /**
-         * @brief Enum class for command error types
-         *
-         */
-        enum class Type : std::uint8_t
-        {
-            InvalidCommand,
-            NothingToRedo,
-            NothingToUndo
-        };
-
        private:
         /// The type of the command error
-        Type _type;
+        CommandErrorType _type;
 
        public:
-        explicit CommandError(Type type);
+        explicit CommandError(CommandErrorType type);
 
         [[nodiscard]] std::string getMessage() const override;
         [[nodiscard]] std::string getCodeStr() const override;
@@ -66,6 +64,10 @@ namespace ui
         [[nodiscard]] static CommandErrorPtr makeNothingToUndoErrorPtr();
         [[nodiscard]] static CommandErrorPtr makeNothingToRedoErrorPtr();
         [[nodiscard]] static CommandErrorPtr makeInvalidCommandErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeUndoNotImplementedErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeRedoNotImplementedErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeUndoNotSupportedErrorPtr();
+        [[nodiscard]] static CommandErrorPtr makeRedoNotSupportedErrorPtr();
     };
 
 }   // namespace ui

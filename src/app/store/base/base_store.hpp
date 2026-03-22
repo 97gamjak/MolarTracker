@@ -30,6 +30,8 @@ namespace app
      * subscribers to be notified when the dirty state changes, and from IStore
      * to provide a common interface for all stores.
      */
+    // TODO (97gamjak)[MOLTRACK-206]: introduce concepts for types containing
+    // Ids and ids
     template <typename T, typename IdType>
     class BaseStore : public Observable<OnDirtyChanged>, public IStore
     {

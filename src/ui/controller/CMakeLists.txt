@@ -1,10 +1,16 @@
 add_library(molartracker_ui_controller STATIC
-    file_menu_controller.cpp
-    debug_menu_controller.cpp
-    settings_menu_controller.cpp
-    help_menu_controller.cpp
-    edit_menu_controller.cpp
+    menu_bar/menu_bar_controller.cpp
+    menu_bar/file_menu_controller.cpp
+    menu_bar/debug_menu_controller.cpp
+    menu_bar/settings_menu_controller.cpp
+    menu_bar/help_menu_controller.cpp
+    menu_bar/edit_menu_controller.cpp
+
     ensure_profile_controller.cpp
+
+    side_bar_controller.cpp
+    side_bar_category_controller.cpp
+    account_controller.cpp
 )
 
 target_include_directories(molartracker_ui_controller

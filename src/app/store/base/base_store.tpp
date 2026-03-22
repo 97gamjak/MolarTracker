@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "base_store.hpp"
+#include "config/id_types.hpp"
 
 namespace app
 {
@@ -76,7 +77,7 @@ namespace app
     )
     {
         return _findEntry([id](const auto& entry)
-                          { return entry.value.getId() == id; });
+                          { return getId(entry.value) == id; });
     }
 
     /**
@@ -169,7 +170,7 @@ namespace app
         IdType newId{0};
         while (std::ranges::any_of(
             _entries,
-            [&newId](const auto& entry) { return entry.value.getId() == newId; }
+            [&newId](const auto& entry) { return getId(entry.value) == newId; }
         ))
         {
             newId = IdType{newId.value() + 1};

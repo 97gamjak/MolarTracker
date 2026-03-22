@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
+#include <QStackedWidget>
 #include <QStatusBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -13,9 +14,8 @@
 #include "ui/controller/ensure_profile_controller.hpp"
 #include "ui/handlers/handlers.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
-#include "ui/widgets/profile/add_profile_dlg.hpp"
-#include "ui/widgets/profile/profile_selection_dlg.hpp"
-#include "utils/qt_helpers.hpp"
+#include "ui/widgets/side_bar/account_category.hpp"
+#include "ui/widgets/side_bar/side_bar.hpp"
 
 namespace ui
 {
@@ -33,10 +33,8 @@ namespace ui
 
         setWindowTitle(false);
 
-        resize(
-            Constants::getMainWindowSize().first,
-            Constants::getMainWindowSize().second
-        );
+        const auto size = Constants::getMainWindowSize();
+        resize(size.first, size.second);
 
         _buildUI();
     }
@@ -54,7 +52,35 @@ namespace ui
     void MainWindow::_buildUI()
     {
         _buildMenuBar();
-        _buildCentral();
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* root = new QWidget{this};
+        setCentralWidget(root);
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        auto* layout = new QHBoxLayout{root};
+
+        const auto& margins = Constants::getCoreWindowMargins();
+        layout->setContentsMargins(
+            std::get<0>(margins),
+            std::get<1>(margins),
+            std::get<2>(margins),
+            std::get<3>(margins)
+        );
+        layout->setSpacing(0);
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _sideBar = new SideBar{this};
+        _sideBar->setFixedWidth(Constants::getSideBarWidth());
+
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        _centralStack = new QStackedWidget{this};
+
+        layout->addWidget(_sideBar);
+        layout->addWidget(_centralStack);
+
+        _sideBarController =
+            std::make_unique<SideBarController>(_sideBar, _centralStack);
     }
 
     /**
@@ -67,67 +93,12 @@ namespace ui
         _menuBar = new MenuBar{this};
         setMenuBar(_menuBar);
 
-        _fileMenuController = std::make_unique<FileMenuController>(
-            *this,
-            _menuBar->getFileMenu(),
-            _appContext
-        );
-
-        _editMenuController = std::make_unique<EditMenuController>(
-            *this,
-            _menuBar->getEditMenu(),
-            _undoStack
-        );
-
-        _debugMenuController = std::make_unique<DebugMenuController>(
-            *this,
-            _menuBar->getDebugMenu(),
+        _menuBarController = std::make_unique<MenuBarController>(
+            this,
+            *_menuBar,
             _appContext,
             _undoStack
         );
-
-        _settingsMenuController = std::make_unique<SettingsMenuController>(
-            *this,
-            _menuBar->getSettingsMenu()
-        );
-
-        _helpMenuController = std::make_unique<HelpMenuController>(
-            *this,
-            _menuBar->getHelpMenu()
-        );
-    }
-
-    /**
-     * @brief Build the central widget of the main window
-     *
-     */
-    void MainWindow::_buildCentral()
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* root = new QWidget{this};
-        setCentralWidget(root);
-
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout{root};
-
-        const auto& margins = Constants::getCoreWindowMargins();
-        layout->setContentsMargins(
-            std::get<0>(margins),
-            std::get<1>(margins),
-            std::get<2>(margins),
-            std::get<3>(margins)
-        );
-
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* tabs = new QTabWidget{root};
-        layout->addWidget(tabs);
-
-        // Placeholder pages
-        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
-        tabs->addTab(new QLabel{"Home (placeholder)"}, "Home");
-        tabs->addTab(new QLabel{"Data (placeholder)"}, "Data");
-        tabs->addTab(new QLabel{"Tools (placeholder)"}, "Tools");
-        // NOLINTEND(cppcoreguidelines-owning-memory)
     }
 
     /**

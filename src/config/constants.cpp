@@ -202,3 +202,10 @@ std::tuple<int, int, int, int> Constants::getCoreWindowMargins()
 {
     return ConstantsSchema::_coreWindowMargins;
 }
+
+/**
+ * @brief get the side bar width
+ *
+ * @return int
+ */
+int Constants::getSideBarWidth() { return ConstantsSchema::_sideBarWidth; }
