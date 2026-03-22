@@ -19,6 +19,15 @@ namespace app
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
+
+        auto connectProfileIdUpdate =
+            [](void* user, const std::optional<ProfileId>& profileId)
+        { static_cast<AccountStore*>(user)->updateActiveProfile(profileId); };
+
+        _connections.push_back(_profileStore.subscribeToProfileChange(
+            connectProfileIdUpdate,
+            &_accountStore
+        ));
     }
 
     /**

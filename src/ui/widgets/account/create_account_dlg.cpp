@@ -94,7 +94,7 @@ namespace ui
         auto* buttonLayout = new QHBoxLayout{};
 
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _addButton = new QPushButton{"Add Profile", this};
+        _addButton = new QPushButton{"Create Account", this};
 
         // check the validity of the input to enable or disable the add button
         _addButton->setEnabled(false);

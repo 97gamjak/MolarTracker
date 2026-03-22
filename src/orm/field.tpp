@@ -112,6 +112,11 @@ namespace orm
         definition += " ";
         definition += std::string{sql_type<storage_type>::name};
 
+        const auto constraints = getConstraints();
+
+        if ((constraints & ORMConstraint::PrimaryKey) != ORMConstraint::None)
+            definition += " PRIMARY KEY";
+
         if constexpr (isFk)
         {
             definition             += ", FOREIGN KEY (";
@@ -133,6 +138,18 @@ namespace orm
                 MSTD_COMPILE_FAIL(
                     "Unsupported deletion behavior for foreign key"
                 );
+        }
+        else
+        {
+            if ((constraints & ORMConstraint::AutoIncrement) !=
+                ORMConstraint::None)
+                definition += " AUTOINCREMENT";
+
+            if ((constraints & ORMConstraint::NotNull) != ORMConstraint::None)
+                definition += " NOT NULL";
+
+            if ((constraints & ORMConstraint::Unique) != ORMConstraint::None)
+                definition += " UNIQUE";
         }
 
         return definition;

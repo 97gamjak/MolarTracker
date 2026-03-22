@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "app/app_context.hpp"
+#include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/commands/account/create_account_command.hpp"
 #include "ui/commands/undo_stack.hpp"
@@ -26,8 +27,8 @@ namespace ui
         QMainWindow*     mainWindow
     )
         : SideBarCategoryController(new AccountCategory(), mainWindow),
-          _undoStack(std::make_shared<UndoStack>(undoStack)),
-          _appContext(std::make_shared<app::AppContext>(appContext))
+          _undoStack(undoStack),
+          _appContext(appContext)
     {
     }
 
@@ -103,7 +104,7 @@ namespace ui
             Commands command("Create Account");
 
             auto result = Commands::makeAndDo<CreateAccountCommand>(
-                _appContext->getStore().getAccountStore(),
+                _appContext.getStore().getAccountStore(),
                 account
             );
 
@@ -118,7 +119,7 @@ namespace ui
 
             command << std::move(result);
 
-            _undoStack->push(std::move(command));
+            _undoStack.push(std::move(command));
         }
         else
         {

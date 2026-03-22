@@ -22,8 +22,7 @@ namespace ui
         app::AccountStore&   accountStore,
         drafts::AccountDraft accountDraft
     )
-        : _accountStore(std::make_shared<app::AccountStore>(accountStore)),
-          _accountDraft(std::move(accountDraft))
+        : _accountStore(accountStore), _accountDraft(std::move(accountDraft))
     {
     }
 
@@ -58,7 +57,7 @@ namespace ui
      */
     std::expected<void, CommandErrorPtr> CreateAccountCommand::redo()
     {
-        const auto result = _accountStore->createAccount(_accountDraft);
+        const auto result = _accountStore.createAccount(_accountDraft);
         if (result != app::AccountStoreResult::Ok)
         {
             const auto errorMessage = std::format(

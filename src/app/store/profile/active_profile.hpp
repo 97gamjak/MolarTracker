@@ -1,12 +1,15 @@
 #ifndef __APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
 #define __APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
 
+#include <optional>
+
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
 
 namespace app
 {
+
     /**
      * @brief ActiveProfile manages the currently active profile in the
      * application.
@@ -27,8 +30,11 @@ namespace app
         [[nodiscard]] std::optional<ProfileId> get() const;
         [[nodiscard]] bool                     has() const;
 
-        void set(const std::optional<ProfileId>& profileId);
         void unset();
+        void set(
+            const std::optional<ProfileId>& profileId,
+            OnProfileChanged::Reason        reason
+        );
     };
 
 }   // namespace app

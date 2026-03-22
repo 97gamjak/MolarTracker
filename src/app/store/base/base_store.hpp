@@ -51,6 +51,22 @@ namespace app
         /// unsaved changes).
         bool _isPotentiallyDirty = false;
 
+       public:
+        BaseStore()                       = default;
+        ~BaseStore() override             = default;
+        BaseStore(BaseStore&&)            = default;
+        BaseStore& operator=(BaseStore&&) = default;
+
+        // Deleted copy constructor and copy assignment operator to prevent
+        // copying of the store, as it manages a collection of entries and
+        // copying could lead to issues with shared state and dirty tracking.
+        BaseStore(const BaseStore&)            = delete;
+        BaseStore& operator=(const BaseStore&) = delete;
+
+        [[nodiscard]] bool isDirty() const override;
+
+        void clearPotentiallyDirty() override;
+
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
@@ -75,11 +91,6 @@ namespace app
             OnDirtyChanged::func func,
             void*                user
         ) override;
-
-       public:
-        [[nodiscard]] bool isDirty() const override;
-
-        void clearPotentiallyDirty() override;
     };
 
     /**

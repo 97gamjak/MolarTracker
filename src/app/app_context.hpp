@@ -20,7 +20,6 @@ namespace app
        private:
         /// The settings object for the application, which can be used to
         /// subscribe to settings changes
-        // TODO(97gamjak): make this a shared ptr
         settings::Settings& _settings;
 
         /// The database instance for the application

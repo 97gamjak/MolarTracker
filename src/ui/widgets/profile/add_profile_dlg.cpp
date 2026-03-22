@@ -102,6 +102,7 @@ namespace ui
         auto* formLayout = new QFormLayout{};
 
         auto [nameLineEdit, nameContainer] = createNameLineEditWithLabel(this);
+        nameLineEdit->setRequired(true);
 
         _nameLineEdit = nameLineEdit;
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)

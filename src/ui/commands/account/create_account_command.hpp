@@ -20,8 +20,8 @@ namespace ui
     class CreateAccountCommand : public ICommand
     {
        private:
-        /// shared pointer to the account store
-        std::shared_ptr<app::AccountStore> _accountStore;
+        /// Reference to the account store
+        app::AccountStore& _accountStore;
         /// The draft of the account to create
         drafts::AccountDraft _accountDraft;
 
@@ -30,6 +30,12 @@ namespace ui
             app::AccountStore&   accountStore,
             drafts::AccountDraft accountDraft
         );
+
+        ~CreateAccountCommand() override                             = default;
+        CreateAccountCommand(const CreateAccountCommand&)            = delete;
+        CreateAccountCommand& operator=(const CreateAccountCommand&) = delete;
+        CreateAccountCommand(CreateAccountCommand&&)                 = delete;
+        CreateAccountCommand& operator=(CreateAccountCommand&&)      = delete;
 
         [[nodiscard]] std::expected<void, CommandErrorPtr> redo() override;
         [[nodiscard]] std::expected<void, CommandErrorPtr> undo() override;

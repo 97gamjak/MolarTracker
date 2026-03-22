@@ -32,8 +32,15 @@ struct OnProfileChanged
     /// Type alias for the type of data associated with the event
     using TagType = std::optional<ProfileId>;
 
+    enum class Reason : std::uint8_t
+    {
+        ChangeProfile,
+        DBOperation,
+        UnsetProfile,
+    };
+
     /// Type alias for the change callback function for the dirty state
-    using func = void (*)(void*, const TagType& profileId);
+    using func = void (*)(void*, const TagType& profileId, Reason reason);
 };
 
 #endif   // __CONFIG__SIGNAL_TAGS_HPP__

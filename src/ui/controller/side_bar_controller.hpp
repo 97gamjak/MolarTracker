@@ -10,11 +10,17 @@ class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 
+namespace app
+{
+    class AppContext;   // Forward declaration
+}   // namespace app
+
 namespace ui
 {
     class SideBar;            // Forward declaration
     class OverviewCategory;   // Forward declaration
     class SideBarItem;        // Forward declaration
+    class UndoStack;          // Forward declaration
 
     /**
      * @brief Controller for the side bar, this is responsible for managing the
@@ -33,15 +39,17 @@ namespace ui
         QStackedWidget* _centralStack;
 
         /// Controller for the accounts category in the side bar
-        std::unique_ptr<AccountSideBarController> _accountSideBarController;
+        AccountSideBarController _accountSideBarController;
         /// Pointer to the overview category in the side bar
         OverviewCategory* _overviewCategory;
 
        public:
         explicit SideBarController(
-            QMainWindow*    mainWindow,
-            SideBar*        sideBar,
-            QStackedWidget* centralStack
+            UndoStack&       undoStack,
+            app::AppContext& appContext,
+            QMainWindow*     mainWindow,
+            SideBar*         sideBar,
+            QStackedWidget*  centralStack
         );
 
         void refresh();

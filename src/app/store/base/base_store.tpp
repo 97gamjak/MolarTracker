@@ -5,6 +5,9 @@
 
 #include "base_store.hpp"
 #include "config/id_types.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("App.Store.BaseStore");
 
 namespace app
 {
@@ -208,6 +211,8 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_removeEntry(IdType id)
     {
+        LOG_ENTRY;
+
         auto [beg, end] = std::ranges::remove_if(
             _entries,
             [id](const auto& entry) { return entry.value.getId() == id; }
@@ -226,6 +231,8 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_cleanEntries()
     {
+        LOG_ENTRY;
+
         auto [beg, end] = std::ranges::remove_if(
             _entries,
             [](const auto& entry) { return entry.state != StoreState::Clean; }
@@ -243,6 +250,8 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_clearEntries()
     {
+        LOG_ENTRY;
+
         if (!_entries.empty())
         {
             _markPotentiallyDirty();

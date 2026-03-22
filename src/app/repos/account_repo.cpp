@@ -101,7 +101,7 @@ namespace app
 
         transaction.commit();
 
-        return account.getId();
+        return cashAccountRow.id.value();
     }
 
     /**

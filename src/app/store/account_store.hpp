@@ -46,7 +46,7 @@ namespace app
 
         /// The ID of the active profile, this is used to determine which
         /// accounts to load and manage in the store
-        ProfileId _activeProfileId;
+        ProfileId _activeProfileId = ProfileId::invalid();
 
        public:
         explicit AccountStore(
@@ -59,10 +59,14 @@ namespace app
 
         void commit() override;
 
+        void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);
+
        private:
         [[nodiscard]] AccountStoreResult _addCashAccount(
             const drafts::AccountDraft& accountDraft
         );
+
+        void _refresh();
     };
 
 }   // namespace app

@@ -1,8 +1,6 @@
 #ifndef __UI__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 #define __UI__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 
-#include <QObject>
-
 #include "side_bar_category_controller.hpp"
 
 class QAction;       // Forward declaration
@@ -11,12 +9,12 @@ class QMainWindow;   // Forward declaration
 namespace drafts
 {
     struct AccountDraft;   // Forward declaration
-}
+}   // namespace drafts
 
 namespace app
 {
     class AppContext;   // Forward declaration
-}
+}   // namespace app
 
 namespace ui
 {
@@ -29,11 +27,9 @@ namespace ui
      */
     class AccountSideBarController : public SideBarCategoryController
     {
-        Q_OBJECT
-
        private:
-        std::shared_ptr<UndoStack>       _undoStack;
-        std::shared_ptr<app::AppContext> _appContext;
+        UndoStack&       _undoStack;
+        app::AppContext& _appContext;
 
        public:
         explicit AccountSideBarController(
@@ -41,6 +37,14 @@ namespace ui
             app::AppContext& appContext,
             QMainWindow*     mainWindow
         );
+
+        // clang-format off
+        ~AccountSideBarController() override = default;
+        AccountSideBarController(const AccountSideBarController&)            = delete;
+        AccountSideBarController& operator=(const AccountSideBarController&) = delete;
+        AccountSideBarController(AccountSideBarController&&)                 = delete;
+        AccountSideBarController& operator=(AccountSideBarController&&)      = delete;
+        // clang-format on
 
         void refresh() override;
 

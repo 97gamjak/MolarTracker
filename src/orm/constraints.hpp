@@ -37,6 +37,7 @@ namespace orm
 
     // NOLINTBEGIN
 #define ORM_CONSTRAINT_LIST(X) \
+    X(None, 0x00)              \
     X(PrimaryKey, 0x01)        \
     X(AutoIncrement, 0x02)     \
     X(Unique, 0x04)            \

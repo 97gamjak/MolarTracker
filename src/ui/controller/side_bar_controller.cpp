@@ -17,24 +17,26 @@ namespace ui
     /**
      * @brief Construct a new Side Bar Controller:: Side Bar Controller object
      *
+     * @param undoStack The undo stack for the application
+     * @param appContext The application context
      * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
      */
     SideBarController::SideBarController(
-        QMainWindow*    mainWindow,
-        SideBar*        sideBar,
-        QStackedWidget* centralStack
+        UndoStack&       undoStack,
+        app::AppContext& appContext,
+        QMainWindow*     mainWindow,
+        SideBar*         sideBar,
+        QStackedWidget*  centralStack
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
-          _accountSideBarController(
-              std::make_unique<AccountSideBarController>(mainWindow)
-          ),
+          _accountSideBarController(undoStack, appContext, mainWindow),
           _overviewCategory(new OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
-        _sideBar->addCategory(_accountSideBarController->getCategory());
+        _sideBar->addCategory(_accountSideBarController.getCategory());
 
         connect(
             _sideBar,
@@ -60,7 +62,7 @@ namespace ui
      * reflect those changes
      *
      */
-    void SideBarController::refresh() { _accountSideBarController->refresh(); }
+    void SideBarController::refresh() { _accountSideBarController.refresh(); }
 
     /**
      * @brief Handle an item being clicked in the side bar, this will determine
@@ -132,7 +134,7 @@ namespace ui
             case SideBarItemType::AccountCategory:
                 const auto* accountCategory =
                     dynamic_cast<AccountCategory*>(item);
-                _accountSideBarController->handleContextMenuAction(
+                _accountSideBarController.handleContextMenuAction(
                     accountCategory,
                     action
                 );

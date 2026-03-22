@@ -98,18 +98,7 @@ namespace ui
         const bool canRedo = _undoStack.canRedo();
 
         _editMenu.setUndoEnabled(canUndo);
-        _editMenu.setUndoText(
-            canUndo
-                ? QString::fromStdString("Undo " + _undoStack.getUndoLabel())
-                : "Undo"
-        );
-
         _editMenu.setRedoEnabled(canRedo);
-        _editMenu.setRedoText(
-            canRedo
-                ? QString::fromStdString("Redo " + _undoStack.getRedoLabel())
-                : "Redo"
-        );
     }
 
 }   // namespace ui
