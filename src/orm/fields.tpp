@@ -29,6 +29,30 @@ namespace orm
     }
 
     /**
+     * @brief Get the foreign key constraint strings for all fields in the
+     * specified model that are foreign keys, e.g.
+     * "FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE RESTRICT"
+     *
+     * @tparam Model
+     * @return std::vector<std::string>
+     */
+    template <db_model Model>
+    std::vector<std::string> getFKConstraints()
+    {
+        std::vector<std::string> fkConstraints;
+
+        Model::forEachColumn(
+            [&](auto& field)
+            {
+                if constexpr (field.isFk)
+                    fkConstraints.push_back(field.getFkConstraints());
+            }
+        );
+
+        return fkConstraints;
+    }
+
+    /**
      * @brief Get the Column Names
      *
      * @tparam Model

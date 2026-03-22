@@ -12,6 +12,9 @@ namespace orm
     std::vector<std::string> getDDl();
 
     template <db_model Model>
+    std::vector<std::string> getFKConstraints();
+
+    template <db_model Model>
     std::vector<std::string> getColumnNames();
 
     template <db_model Model>
