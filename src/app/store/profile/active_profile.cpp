@@ -25,19 +25,11 @@ namespace app
      * @brief Set the active profile by ID
      *
      * @param profileId
-     * @param reason The reason for the profile change, this can be used by
-     * subscribers to the OnProfileChanged signal to determine how to respond to
-     * the change (e.g., if the profile was changed due to a user action, they
-     * might want to refresh the UI, if it was changed due to a database
-     * operation, they might want to update cached data, etc.)
      */
-    void ActiveProfile::set(
-        const std::optional<ProfileId>& profileId,
-        OnProfileChanged::Reason        reason
-    )
+    void ActiveProfile::set(const std::optional<ProfileId>& profileId)
     {
         _value = profileId;
-        _emit<OnProfileChanged>(_value, reason);
+        _emit<OnProfileChanged>(_value);
     }
 
     /**
@@ -47,9 +39,6 @@ namespace app
     void ActiveProfile::unset()
     {
         _value.reset();
-        _emit<OnProfileChanged>(
-            std::nullopt,
-            OnProfileChanged::Reason::UnsetProfile
-        );
+        _emit<OnProfileChanged>(std::nullopt);
     }
 }   // namespace app

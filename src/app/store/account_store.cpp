@@ -78,9 +78,6 @@ namespace app
     {
         LOG_ENTRY;
 
-        MT_DEBUG << "Committing changes in AccountStore, number of entries: "
-                 << _getEntries().size();
-
         for (auto& entry : _getEntries())
         {
             if (entry.state == StoreState::New)
@@ -137,7 +134,7 @@ namespace app
                 "No active profile set, ignoring updateActiveProfile call"
             );
             _activeProfileId = ProfileId::invalid();
-            _refresh();
+            _clearEntries();
             return;
         }
 
@@ -154,7 +151,6 @@ namespace app
         );
 
         _activeProfileId = profileId;
-        _refresh();
     }
 
     /**

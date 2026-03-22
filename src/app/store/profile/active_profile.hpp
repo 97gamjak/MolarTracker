@@ -31,10 +31,7 @@ namespace app
         [[nodiscard]] bool                     has() const;
 
         void unset();
-        void set(
-            const std::optional<ProfileId>& profileId,
-            OnProfileChanged::Reason        reason
-        );
+        void set(const std::optional<ProfileId>& profileId);
     };
 
 }   // namespace app
