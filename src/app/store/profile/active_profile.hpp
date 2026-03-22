@@ -30,8 +30,8 @@ namespace app
         [[nodiscard]] std::optional<ProfileId> get() const;
         [[nodiscard]] bool                     has() const;
 
-        void unset();
         void set(const std::optional<ProfileId>& profileId);
+        void unset();
     };
 
 }   // namespace app
