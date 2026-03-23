@@ -130,5 +130,13 @@
         "MOLTRACK",
         "MSTD"
     ],
+    "files.watcherExclude": {
+        "**/.build/**": true,
+        "**/.cache/**": true
+    },
+    "files.exclude": {
+        "**/.build": true,
+        "**/.cache": true
+    },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }
