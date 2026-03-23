@@ -43,6 +43,8 @@ namespace finance
             Currency      currency
         );
 
+        void setId(AccountId id);
+
         [[nodiscard]] AccountId     getId() const;
         [[nodiscard]] AccountStatus getStatus() const;
         [[nodiscard]] std::string   getName() const;

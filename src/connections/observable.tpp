@@ -51,14 +51,15 @@ const Signal<Tag>& Observable<Tags...>::_getSignal() const
  *
  * @tparam Tag The event tag for which to emit the event, this should be one of
  * the tags specified in the template parameter pack of the Observable class
- * @param arg The argument to pass to the connected callback functions, this
- * should be of the type defined as `arg_type` in the event tag struct
+ * @param args The arguments to pass to the connected callback functions, these
+ * should match the signature of the callback functions connected to the signal
+ * for the given event tag
  */
 template <typename... Tags>
-template <typename Tag>
-void Observable<Tags...>::_emit(const typename Tag::TagType& arg)
+template <typename Tag, typename... Args>
+void Observable<Tags...>::_emit(Args&&... args)
 {
-    _getSignal<Tag>().notify(arg);
+    _getSignal<Tag>().notify(std::forward<Args>(args)...);
 }
 
 /**

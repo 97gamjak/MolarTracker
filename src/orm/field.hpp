@@ -63,6 +63,7 @@ namespace orm
         Field& operator=(Value value);
 
         [[nodiscard]] static std::string ddl();
+        [[nodiscard]] static std::string getFkConstraints();
 
         template <typename Statement>
         void bind(Statement& statement, BindIndex index) const;

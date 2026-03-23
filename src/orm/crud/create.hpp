@@ -29,6 +29,10 @@ namespace orm::details
         const auto ddl  = getDDl<Model>();
         sqlText        += mstd::join(ddl, ", ");
 
+        const auto fkConstraints = getFKConstraints<Model>();
+        if (!fkConstraints.empty())
+            sqlText += ", " + mstd::join(fkConstraints, ", ");
+
         if constexpr (has_unique_groups<Model>)
             appendAllUniqueGroups<Model>(sqlText);
 

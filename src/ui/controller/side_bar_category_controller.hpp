@@ -1,6 +1,10 @@
 #ifndef __UI__CONTROLLER__SIDE_BAR_CATEGORY_CONTROLLER_HPP__
 #define __UI__CONTROLLER__SIDE_BAR_CATEGORY_CONTROLLER_HPP__
 
+#include <QObject>
+
+class QMainWindow;   // Forward declaration
+
 namespace ui
 {
     class Category;   // Forward declaration
@@ -12,15 +16,26 @@ namespace ui
      * data changes
      *
      */
-    class SideBarCategoryController
+    class SideBarCategoryController : public QObject
     {
+        Q_OBJECT
+
        private:
         /// The category that this controller manages
         Category* _category;
 
+        /// Pointer to the main window
+        QMainWindow* _mainWindow;
+
+       protected:
+        [[nodiscard]] QMainWindow* getMainWindow();
+
        public:
-        virtual ~SideBarCategoryController() = default;
-        explicit SideBarCategoryController(Category* category);
+        ~SideBarCategoryController() override = default;
+        explicit SideBarCategoryController(
+            Category*    category,
+            QMainWindow* mainWindow
+        );
 
         [[nodiscard]] Category* getCategory() const;
 

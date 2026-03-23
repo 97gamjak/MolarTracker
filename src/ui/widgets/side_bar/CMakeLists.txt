@@ -16,4 +16,6 @@ target_include_directories(molartracker_ui_side_bar
 target_link_libraries(molartracker_ui_side_bar
     PRIVATE
     Qt6::Widgets
+    PUBLIC
+    mstd
 )

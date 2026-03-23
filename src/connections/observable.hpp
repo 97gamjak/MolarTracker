@@ -32,8 +32,8 @@ class Observable
     Connection on(typename Signal<Tag>::CallbackFn func, void* user);
 
    protected:
-    template <typename Tag>
-    void _emit(const typename Tag::TagType& arg);
+    template <typename Tag, typename... Args>
+    void _emit(Args&&... args);
 
    private:
     template <typename Tag>

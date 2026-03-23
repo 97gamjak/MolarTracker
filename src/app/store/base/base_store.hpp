@@ -2,6 +2,7 @@
 #define __APP__STORE__BASE__BASE_STORE_HPP__
 
 #include <optional>
+#include <unordered_map>
 #include <vector>
 
 #include "config/signal_tags.hpp"
@@ -47,9 +48,34 @@ namespace app
         /// The collection of entries in the store.
         std::vector<Entry> _entries;
 
+        /// A mapping of old IDs to new IDs for entries that have been updated
+        std::unordered_map<IdType, IdType, typename IdType::Hash> _changedIds;
+
         /// Flag indicating whether the store is potentially dirty (i.e., has
         /// unsaved changes).
         bool _isPotentiallyDirty = false;
+
+       public:
+        BaseStore()           = default;
+        ~BaseStore() override = default;
+
+        /// @cond DOXYGEN_IGNORE
+        BaseStore(BaseStore&&)            = default;
+        BaseStore& operator=(BaseStore&&) = default;
+        /// @endcond
+
+        // Deleted copy constructor and copy assignment operator to prevent
+        // copying of the store, as it manages a collection of entries and
+        // copying could lead to issues with shared state and dirty tracking.
+        BaseStore(const BaseStore&)            = delete;
+        BaseStore& operator=(const BaseStore&) = delete;
+
+        [[nodiscard]] bool isDirty() const override;
+
+        void clearPotentiallyDirty() override;
+
+        [[nodiscard]] const std::unordered_map<IdType, IdType>& getChangedIds(
+        ) const;
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
@@ -67,6 +93,9 @@ namespace app
         void _cleanEntries();
         void _clearEntries();
 
+        void _appendChangedIds(IdType oldId, IdType newId);
+        void _clearChangedIds();
+
         [[nodiscard]] IdType _generateNewId() const;
 
         void _markPotentiallyDirty();
@@ -75,11 +104,6 @@ namespace app
             OnDirtyChanged::func func,
             void*                user
         ) override;
-
-       public:
-        [[nodiscard]] bool isDirty() const override;
-
-        void clearPotentiallyDirty() override;
     };
 
     /**

@@ -3,11 +3,26 @@
 
 #include "side_bar_category_controller.hpp"
 
-class QAction;   // Forward declaration
+class QAction;       // Forward declaration
+class QMainWindow;   // Forward declaration
+
+#include <QPointer>
+
+namespace drafts
+{
+    struct AccountDraft;   // Forward declaration
+}   // namespace drafts
+
+namespace app
+{
+    class AppContext;   // Forward declaration
+}   // namespace app
 
 namespace ui
 {
-    class AccountCategory;   // Forward declaration
+    class UndoStack;             // Forward declaration
+    class AccountCategory;       // Forward declaration
+    class CreateAccountDialog;   // Forward declaration
 
     /**
      * @brief Controller for the account category in the side bar
@@ -15,15 +30,39 @@ namespace ui
      */
     class AccountSideBarController : public SideBarCategoryController
     {
+       private:
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
+        /// Reference to the application context
+        app::AppContext& _appContext;
+
+        /// Pointer to the create account dialog
+        QPointer<CreateAccountDialog> _createAccountDialog;
+
        public:
-        explicit AccountSideBarController();
+        explicit AccountSideBarController(
+            UndoStack&       undoStack,
+            app::AppContext& appContext,
+            QMainWindow*     mainWindow
+        );
+
+        // clang-format off
+        ~AccountSideBarController() override = default;
+        AccountSideBarController(const AccountSideBarController&)            = delete;
+        AccountSideBarController& operator=(const AccountSideBarController&) = delete;
+        AccountSideBarController(AccountSideBarController&&)                 = delete;
+        AccountSideBarController& operator=(AccountSideBarController&&)      = delete;
+        // clang-format on
 
         void refresh() override;
 
-        static void handleContextMenuAction(
+        void handleContextMenuAction(
             const AccountCategory* item,
             const QAction*         action
         );
+
+       private slots:
+        void _onCreateAccountRequested(drafts::AccountDraft account);
     };
 
 }   // namespace ui

@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#include "config/signal_tags.hpp"
+
 namespace app
 {
     /**

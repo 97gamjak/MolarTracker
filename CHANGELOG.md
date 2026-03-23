@@ -15,6 +15,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Add Sidebar to main window
 
+#### Finance
+
+- Add possibility to create CashAccounts
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 

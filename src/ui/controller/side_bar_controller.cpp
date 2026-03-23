@@ -1,5 +1,7 @@
 #include "side_bar_controller.hpp"
 
+#include <QMainWindow>
+
 #include "account_controller.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
@@ -15,22 +17,26 @@ namespace ui
     /**
      * @brief Construct a new Side Bar Controller:: Side Bar Controller object
      *
+     * @param undoStack The undo stack for the application
+     * @param appContext The application context
+     * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
      */
     SideBarController::SideBarController(
-        SideBar*        sideBar,
-        QStackedWidget* centralStack
+        UndoStack&       undoStack,
+        app::AppContext& appContext,
+        QMainWindow*     mainWindow,
+        SideBar*         sideBar,
+        QStackedWidget*  centralStack
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
-          _accountSideBarController(
-              std::make_unique<AccountSideBarController>()
-          ),
+          _accountSideBarController(undoStack, appContext, mainWindow),
           _overviewCategory(new OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
-        _sideBar->addCategory(_accountSideBarController->getCategory());
+        _sideBar->addCategory(_accountSideBarController.getCategory());
 
         connect(
             _sideBar,
@@ -56,7 +62,7 @@ namespace ui
      * reflect those changes
      *
      */
-    void SideBarController::refresh() { _accountSideBarController->refresh(); }
+    void SideBarController::refresh() { _accountSideBarController.refresh(); }
 
     /**
      * @brief Handle an item being clicked in the side bar, this will determine
@@ -73,7 +79,7 @@ namespace ui
         {
             case SideBarItemType::AccountsItem:
             {
-                _openAccount(dynamic_cast<AccountItem*>(item)->getId());
+                // open the account page for the selected account
                 break;
             }
             case SideBarItemType::OverviewCategory:
@@ -115,7 +121,10 @@ namespace ui
             {
                 const auto* accountItem = dynamic_cast<AccountItem*>(item);
                 if (action == accountItem->getOpenAction())
-                    _openAccount(accountItem->getId());
+                // NOLINTNEXTLINE(bugprone-branch-clone)
+                {
+                    // _openAccount(accountItem->getId());
+                }
                 else if (action == accountItem->getDeleteAction())
                 {
                     //_deleteAccount(accountItem->getId());
@@ -128,22 +137,12 @@ namespace ui
             case SideBarItemType::AccountCategory:
                 const auto* accountCategory =
                     dynamic_cast<AccountCategory*>(item);
-                AccountSideBarController::handleContextMenuAction(
+                _accountSideBarController.handleContextMenuAction(
                     accountCategory,
                     action
                 );
                 break;
         }
     }
-
-    /**
-     * @brief Open the account page for the account with the given id, this will
-     * switch the central stack to the account page and display the information
-     * for the account with the given id
-     *
-     * @param accountId The id of the account to open, this should be used to
-     * determine which account's information to display on the account page
-     */
-    void SideBarController::_openAccount(int /*accountId*/) {}
 
 }   // namespace ui

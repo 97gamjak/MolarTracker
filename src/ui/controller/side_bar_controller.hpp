@@ -2,18 +2,24 @@
 #define __UI__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
 
 #include <QObject>
-#include <memory>
 
 #include "account_controller.hpp"
 
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
+class QMainWindow;      // Forward declaration
+
+namespace app
+{
+    class AppContext;   // Forward declaration
+}   // namespace app
 
 namespace ui
 {
     class SideBar;            // Forward declaration
     class OverviewCategory;   // Forward declaration
     class SideBarItem;        // Forward declaration
+    class UndoStack;          // Forward declaration
 
     /**
      * @brief Controller for the side bar, this is responsible for managing the
@@ -32,23 +38,24 @@ namespace ui
         QStackedWidget* _centralStack;
 
         /// Controller for the accounts category in the side bar
-        std::unique_ptr<AccountSideBarController> _accountSideBarController;
+        AccountSideBarController _accountSideBarController;
         /// Pointer to the overview category in the side bar
         OverviewCategory* _overviewCategory;
 
        public:
         explicit SideBarController(
-            SideBar*        sideBar,
-            QStackedWidget* centralStack
+            UndoStack&       undoStack,
+            app::AppContext& appContext,
+            QMainWindow*     mainWindow,
+            SideBar*         sideBar,
+            QStackedWidget*  centralStack
         );
 
         void refresh();
 
        private:
-        void _onItemClicked(SideBarItem* item);
-        void _onContextMenuRequested(SideBarItem* item, QAction* action);
-
-        void _openAccount(int accountId);
+        static void _onItemClicked(SideBarItem* item);
+        void        _onContextMenuRequested(SideBarItem* item, QAction* action);
     };
 
 }   // namespace ui

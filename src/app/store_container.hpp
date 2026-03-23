@@ -2,6 +2,7 @@
 #define __APP__STORE_CONTAINER_HPP__
 
 #include "config/signal_tags.hpp"
+#include "connections/connection.hpp"
 #include "store/account_store.hpp"
 #include "store/profile/profile_store.hpp"
 
@@ -25,6 +26,9 @@ namespace app
 
         /// list of all stores
         std::vector<IStore*> _allStores;
+
+        /// list of connections for all stores
+        std::vector<Connection> _connections;
 
        public:
         explicit StoreContainer(ServiceContainer& services);

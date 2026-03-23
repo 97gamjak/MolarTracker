@@ -2,6 +2,7 @@
 #define __UI__WIDGETS__SIDE_BAR__ACCOUNT_CATEGORY_HPP__
 
 #include "category.hpp"
+#include "config/id_types.hpp"
 
 class QString;   // Forward declaration
 class QMenu;     // Forward declaration
@@ -24,7 +25,7 @@ namespace ui
        public:
         explicit AccountCategory();
 
-        void addAccount(int id, const QString& name);
+        void addAccount(AccountId id, const QString& name);
         void clearAccounts();
 
         [[nodiscard]] QAction* getCreateAction() const;

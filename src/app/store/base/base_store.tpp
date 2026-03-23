@@ -5,6 +5,9 @@
 
 #include "base_store.hpp"
 #include "config/id_types.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("App.Store.BaseStore");
 
 namespace app
 {
@@ -208,6 +211,8 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_removeEntry(IdType id)
     {
+        LOG_ENTRY;
+
         auto [beg, end] = std::ranges::remove_if(
             _entries,
             [id](const auto& entry) { return entry.value.getId() == id; }
@@ -226,6 +231,8 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_cleanEntries()
     {
+        LOG_ENTRY;
+
         auto [beg, end] = std::ranges::remove_if(
             _entries,
             [](const auto& entry) { return entry.state != StoreState::Clean; }
@@ -243,6 +250,8 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_clearEntries()
     {
+        LOG_ENTRY;
+
         if (!_entries.empty())
         {
             _markPotentiallyDirty();
@@ -298,6 +307,55 @@ namespace app
     )
     {
         return DirtyObservable::template on<OnDirtyChanged>(func, user);
+    }
+
+    /**
+     * @brief Appends a mapping of old ID to new ID to the collection of changed
+     * IDs in the store. This is used to track changes to entry IDs, such as
+     * when an entry is updated and its ID changes. Marks the store as
+     * potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param oldId
+     * @param newId
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_appendChangedIds(IdType oldId, IdType newId)
+    {
+        _changedIds[oldId] = newId;
+    }
+
+    /**
+     * @brief Clears the collection of changed IDs in the store, indicating that
+     * there are no tracked changes to entry IDs. Marks the store as
+     * potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_clearChangedIds()
+    {
+        _changedIds.clear();
+    }
+
+    /**
+     * @brief Retrieves the collection of changed IDs in the store, which is a
+     * mapping of old IDs to new IDs for entries that have been updated. This
+     * allows callers to understand how entry IDs have changed as a result of
+     * updates to the store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return const std::unordered_map<IdType, IdType>&
+     */
+    template <typename T, typename IdType>
+    [[nodiscard]] const std::unordered_map<IdType, IdType>& BaseStore<
+        T,
+        IdType>::getChangedIds() const
+    {
+        return _changedIds;
     }
 
 }   // namespace app

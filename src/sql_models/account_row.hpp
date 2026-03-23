@@ -7,6 +7,7 @@
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "profile_row.hpp"
 
 /**
  * @brief Represents a row in the "account" database table, which serves as a
@@ -35,7 +36,14 @@ struct AccountRow
 
     /// The profile_id field, this is a required field and is a foreign key
     /// referencing the profile table
-    orm::Field<"profile_id", ProfileId, orm::not_null_t> profileId;
+    orm::Field<
+        "profile_id",
+        ProfileId,
+        orm::foreign_key_t<
+            orm::RestrictDelete,
+            ProfileRow,
+            decltype(ProfileRow::id)>>
+        profileId;
 
     /// The name field, this is a required field
     orm::Field<"name", std::string, orm::not_null_t> name;

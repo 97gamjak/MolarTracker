@@ -79,8 +79,13 @@ namespace ui
         layout->addWidget(_sideBar);
         layout->addWidget(_centralStack);
 
-        _sideBarController =
-            std::make_unique<SideBarController>(_sideBar, _centralStack);
+        _sideBarController = std::make_unique<SideBarController>(
+            _undoStack,
+            _appContext,
+            this,
+            _sideBar,
+            _centralStack
+        );
     }
 
     /**

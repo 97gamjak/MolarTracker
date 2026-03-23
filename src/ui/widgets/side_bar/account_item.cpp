@@ -13,7 +13,7 @@ namespace ui
      * selected when the itemSelected signal is emitted
      * @param name The name of the account to display in the side bar
      */
-    AccountItem::AccountItem(int id, const QString& name)
+    AccountItem::AccountItem(AccountId id, const QString& name)
         : SideBarItem(name, SideBarItemType::AccountsItem),
           _id(id),
           _openAction(nullptr),
@@ -25,9 +25,9 @@ namespace ui
      * @brief Get the id of the account, this is used to identify which account
      * is selected when the itemSelected signal is emitted
      *
-     * @return int The id of the account
+     * @return AccountId The id of the account
      */
-    int AccountItem::getId() const { return _id; }
+    AccountId AccountItem::getId() const { return _id; }
 
     /**
      * @brief Get the open action of the account item, this is used to connect

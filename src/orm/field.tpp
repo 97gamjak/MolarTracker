@@ -112,9 +112,47 @@ namespace orm
         definition += " ";
         definition += std::string{sql_type<storage_type>::name};
 
+        const auto constraints = getConstraints();
+
+        if ((constraints & ORMConstraint::PrimaryKey) != ORMConstraint::None)
+            definition += " PRIMARY KEY";
+
+        if constexpr (!isFk)
+        {
+            if ((constraints & ORMConstraint::AutoIncrement) !=
+                ORMConstraint::None)
+                definition += " AUTOINCREMENT";
+
+            if ((constraints & ORMConstraint::NotNull) != ORMConstraint::None)
+                definition += " NOT NULL";
+
+            if ((constraints & ORMConstraint::Unique) != ORMConstraint::None)
+                definition += " UNIQUE";
+        }
+
+        return definition;
+    }
+
+    /**
+     * @brief Get the foreign key constraints for the field, if it is a foreign
+     * key, this will return a string containing the SQL definition of the
+     * foreign key constraint for this field, including the referenced table and
+     * column, and any specified deletion behavior (e.g., ON DELETE CASCADE).
+     * If the field is not a foreign key, this will return an empty string.
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return std::string
+     */
+    template <fixed_string Name, typename Value, typename... Options>
+    std::string Field<Name, Value, Options...>::getFkConstraints()
+    {
+        std::string definition;
+
         if constexpr (isFk)
         {
-            definition             += ", FOREIGN KEY (";
+            definition             += "FOREIGN KEY (";
             definition             += name.toString();
             definition             += ") REFERENCES";
             using foreignKeyInfo    = find_foreign_key_t<Value, Options...>;

@@ -1,12 +1,15 @@
 #ifndef __APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
 #define __APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
 
+#include <optional>
+
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
 
 namespace app
 {
+
     /**
      * @brief ActiveProfile manages the currently active profile in the
      * application.
