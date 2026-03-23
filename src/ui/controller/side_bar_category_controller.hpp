@@ -22,14 +22,16 @@ namespace ui
 
        private:
         /// The category that this controller manages
-        Category*    _category;
+        Category* _category;
+
+        /// Pointer to the main window
         QMainWindow* _mainWindow;
 
        protected:
         [[nodiscard]] QMainWindow* getMainWindow();
 
        public:
-        virtual ~SideBarCategoryController() override = default;
+        ~SideBarCategoryController() override = default;
         explicit SideBarCategoryController(
             Category*    category,
             QMainWindow* mainWindow

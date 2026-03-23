@@ -11,6 +11,11 @@ class QWidget;   // Forward declaration
 
 namespace ui
 {
+    /**
+     * @brief weather to allow white spaces in the name field
+     *
+     * @param allowWhiteSpaces
+     */
     void NameLineEdit::allowWhiteSpaces(bool allowWhiteSpaces)
     {
         if (allowWhiteSpaces)

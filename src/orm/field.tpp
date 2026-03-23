@@ -133,6 +133,18 @@ namespace orm
         return definition;
     }
 
+    /**
+     * @brief Get the foreign key constraints for the field, if it is a foreign
+     * key, this will return a string containing the SQL definition of the
+     * foreign key constraint for this field, including the referenced table and
+     * column, and any specified deletion behavior (e.g., ON DELETE CASCADE).
+     * If the field is not a foreign key, this will return an empty string.
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam Options
+     * @return std::string
+     */
     template <fixed_string Name, typename Value, typename... Options>
     std::string Field<Name, Value, Options...>::getFkConstraints()
     {

@@ -31,9 +31,12 @@ namespace ui
     class AccountSideBarController : public SideBarCategoryController
     {
        private:
-        UndoStack&       _undoStack;
+        /// Reference to the undo stack
+        UndoStack& _undoStack;
+        /// Reference to the application context
         app::AppContext& _appContext;
 
+        /// Pointer to the create account dialog
         QPointer<CreateAccountDialog> _createAccountDialog;
 
        public:

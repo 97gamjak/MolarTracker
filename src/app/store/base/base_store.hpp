@@ -48,6 +48,7 @@ namespace app
         /// The collection of entries in the store.
         std::vector<Entry> _entries;
 
+        /// A mapping of old IDs to new IDs for entries that have been updated
         std::unordered_map<IdType, IdType, typename IdType::Hash> _changedIds;
 
         /// Flag indicating whether the store is potentially dirty (i.e., has
@@ -55,10 +56,13 @@ namespace app
         bool _isPotentiallyDirty = false;
 
        public:
-        BaseStore()                       = default;
-        ~BaseStore() override             = default;
+        BaseStore()           = default;
+        ~BaseStore() override = default;
+
+        /// @cond DOXYGEN_IGNORE
         BaseStore(BaseStore&&)            = default;
         BaseStore& operator=(BaseStore&&) = default;
+        /// @endcond
 
         // Deleted copy constructor and copy assignment operator to prevent
         // copying of the store, as it manages a collection of entries and

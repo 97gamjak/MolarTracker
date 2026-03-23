@@ -27,6 +27,7 @@ namespace app
         /// list of all stores
         std::vector<IStore*> _allStores;
 
+        /// list of connections for all stores
         std::vector<Connection> _connections;
 
        public:

@@ -12,6 +12,16 @@ namespace ui
 {
     class NameLineEdit;   // Forward declaration
 
+    /**
+     * @brief Dialog for creating a new account, this dialog will be used to
+     * gather the necessary information from the user to create a new account,
+     * such as the account name, type, and currency, once the user has provided
+     * the necessary information and confirmed the creation of the account, this
+     * dialog will emit a signal with the account draft containing the provided
+     * information, which can then be used by the controller to create the
+     * actual account in the store
+     *
+     */
     class CreateAccountDialog : public QDialog
     {
         Q_OBJECT
@@ -20,11 +30,14 @@ namespace ui
         /// Line edit for the profile name
         NameLineEdit* _nameLineEdit = nullptr;
 
+        /// Combo box for the account type (e.g. cash, security, etc.)
         QComboBox* _accountType = nullptr;
-
+        /// Combo box for the account currency
         QComboBox* _currency = nullptr;
 
-        QPushButton* _addButton    = nullptr;
+        /// Button to confirm the creation of the account
+        QPushButton* _addButton = nullptr;
+        /// Button to cancel the creation of the account
         QPushButton* _cancelButton = nullptr;
 
        public:

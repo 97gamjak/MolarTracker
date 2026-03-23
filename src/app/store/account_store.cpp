@@ -129,6 +129,16 @@ namespace app
         }
     }
 
+    /**
+     * @brief Update the active profile for the store, this will determine which
+     * accounts are loaded and managed in the store, and should be called
+     * whenever the active profile changes to ensure that the store is managing
+     * the correct set of accounts for the current profile.
+     *
+     * @param profileIdOpt An optional containing the ID of the new active
+     * profile, if std::nullopt is passed, it indicates that there is no active
+     * profile, and the store should clear its data and not manage any accounts.
+     */
     void AccountStore::updateActiveProfile(
         const std::optional<ProfileId>& profileIdOpt
     )
@@ -188,6 +198,15 @@ namespace app
         return AccountStoreResult::Ok;
     }
 
+    /**
+     * @brief Refresh the store's data by clearing existing entries and loading
+     * accounts from the underlying service for the active profile, this should
+     * be called whenever the active profile changes or when the store needs to
+     * ensure that it has the most up-to-date data from the service, and will
+     * repopulate the store with accounts that are relevant to the current
+     * active profile.
+     *
+     */
     void AccountStore::_refresh()
     {
         _clearEntries();
@@ -198,6 +217,17 @@ namespace app
             _addEntry(account, StoreState::Clean);
     }
 
+    /**
+     * @brief Retrieves a vector of pointers to all accounts currently in the
+     * store, this allows callers to access the accounts managed by the store,
+     * and provides a way to retrieve the account data for display or further
+     * processing.
+     *
+     * @return std::vector<const finance::Account*> A vector of pointers to all
+     * accounts currently in the store, each pointer points to an account object
+     * that is managed by the store, and the caller can use these pointers to
+     * access the account data and perform operations on the accounts as needed.
+     */
     [[nodiscard]] std::vector<const finance::Account*> AccountStore::
         getAllAccounts() const
     {

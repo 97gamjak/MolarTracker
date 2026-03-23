@@ -54,8 +54,8 @@ namespace ui
         void refresh();
 
        private:
-        void _onItemClicked(SideBarItem* item);
-        void _onContextMenuRequested(SideBarItem* item, QAction* action);
+        static void _onItemClicked(SideBarItem* item);
+        void        _onContextMenuRequested(SideBarItem* item, QAction* action);
     };
 
 }   // namespace ui

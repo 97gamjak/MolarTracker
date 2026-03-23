@@ -20,6 +20,22 @@ namespace ui
      * @brief Construct a new Account Side Bar Controller:: Account Side Bar
      * Controller object
      *
+     * @param undoStack A reference to the undo stack, this is used to push
+     * commands that are created as a result of actions in the account category
+     * (e.g. creating a new account), this allows the user to undo and redo
+     * actions related to accounts using the undo stack.
+     * @param appContext A reference to the application context, this is used to
+     * access the stores and services needed to perform operations related to
+     * accounts (e.g. creating a new account), this allows the controller to
+     * interact with the underlying data and business logic for accounts, and
+     * ensures that the controller can perform the necessary operations to
+     * manage accounts effectively.
+     * @param mainWindow A pointer to the main window, this is used as the
+     * parent widget for dialogs that are opened as a result of actions in the
+     * account category (e.g. the create account dialog), this ensures that the
+     * dialogs are properly parented in the UI and will be modal to the main
+     * window when opened.
+     *
      */
     AccountSideBarController::AccountSideBarController(
         UndoStack&       undoStack,
@@ -101,6 +117,21 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Handle the creation of a new account based on the given account
+     * draft, this will be called when the create account dialog emits the
+     * requested signal with the account draft, and should handle creating a new
+     * account based on the information in the draft (e.g. by calling a method
+     * on the store to add a new account), this allows the controller to take
+     * the user input from the dialog and use it to create a new account in the
+     * underlying data, and ensures that the creation of new accounts is handled
+     * in a consistent way through the controller.
+     *
+     * @param account The account draft containing the information needed to
+     * create a new account, this includes details such as the name, currency,
+     * and kind of account to create, and should be used by the controller to
+     * create a new account in the underlying data.
+     */
     void AccountSideBarController::_onCreateAccountRequested(
         drafts::AccountDraft account
     )

@@ -121,6 +121,7 @@ namespace ui
             {
                 const auto* accountItem = dynamic_cast<AccountItem*>(item);
                 if (action == accountItem->getOpenAction())
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 {
                     // _openAccount(accountItem->getId());
                 }

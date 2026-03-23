@@ -122,12 +122,30 @@ namespace ui
         parent->addLayout(buttonLayout);
     }
 
+    /**
+     * @brief Emit the requested signal with the account draft created from the
+     * user input, this will be called when the add button is clicked, and will
+     * take the user input from the form, create an account draft, and emit the
+     * requested signal with the draft, allowing the controller to handle the
+     * creation of a new account based on the user's input.
+     *
+     */
     void CreateAccountDialog::_emitOk()
     {
         emit requested(_getAccount());
         close();
     }
 
+    /**
+     * @brief Create an account draft from the user input in the form, this will
+     * take the values from the form fields and create a draft that can be used
+     * by the controller to create a new account, this allows the dialog to
+     * convert the raw user input into a structured format that can be easily
+     * consumed by the rest of the application.
+     *
+     * @return drafts::AccountDraft The account draft created from the user
+     * input
+     */
     drafts::AccountDraft CreateAccountDialog::_getAccount()
     {
         return drafts::AccountDraft{
