@@ -10,6 +10,7 @@
 #include "config/logging_base.hpp"
 #include "logging/log_manager.hpp"
 #include "logging/log_object.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -30,16 +31,14 @@ namespace ui
         setWindowTitle(title);
         setModal(true);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = utils::makeQChild<QVBoxLayout>(this);
 
         auto* summary = new QLabel(
             "The application encountered a fatal error and must close."
         );
         summary->setWordWrap(true);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* detailBox = new QPlainTextEdit(details);
+        auto* detailBox = utils::makeQChild<QPlainTextEdit>(details);
         detailBox->setReadOnly(true);
         detailBox->setVisible(false);
 

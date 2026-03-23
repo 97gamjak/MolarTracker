@@ -81,8 +81,7 @@ namespace ui
         setWindowTitle("Logging Debug Flags");
         resize(_settings->windowSize.first, _settings->windowSize.second);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _tree = new QTreeView(this);
+        _tree = utils::makeQChild<QTreeView>(this);
         _tree->setRootIsDecorated(true);
         _tree->setUniformRowHeights(true);
         _tree->setEditTriggers(
@@ -93,20 +92,16 @@ namespace ui
         header->setSectionResizeMode(QHeaderView::Stretch);
         _tree->setAlternatingRowColors(true);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _model = new LogCategoryModel(_currentCategories, _tree);
+        _model = utils::makeQChild<LogCategoryModel>(_currentCategories, _tree);
         _tree->setModel(_model);
 
-        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
         _tree->setItemDelegateForColumn(
             LogCategoryModel::getLogLevelColumn(),
-            new DebugSlotsLogLevelDelegate(this)
+            utils::makeQChild<DebugSlotsLogLevelDelegate>(this)
         );
-        // NOLINTEND(cppcoreguidelines-owning-memory)
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* applyToChildrenDelegate =
-            new DebugSlotsApplyToChildrenDelegate(this);
+            utils::makeQChild<DebugSlotsApplyToChildrenDelegate>(this);
         _tree->setItemDelegateForColumn(
             LogCategoryModel::getApplyToChildrenColumn(),
             applyToChildrenDelegate
@@ -119,36 +114,32 @@ namespace ui
             &DebugSlotsDialog::_applyToChildren
         );
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _defaultsButton = new QPushButton("Use default flags", this);
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _discardChangesButton = new QPushButton("Discard Changes", this);
+        _defaultsButton =
+            utils::makeQChild<QPushButton>("Use default flags", this);
+        _discardChangesButton =
+            utils::makeQChild<QPushButton>("Discard Changes", this);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _showOnlyModifiedCheckBox = new QCheckBox("Show only modified", this);
+        _showOnlyModifiedCheckBox =
+            utils::makeQChild<QCheckBox>("Show only modified", this);
         _showOnlyModifiedCheckBox->setChecked(false);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _buttonBox = new QDialogButtonBox(
+        _buttonBox = utils::makeQChild<QDialogButtonBox>(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
                 QDialogButtonBox::Apply,
             this
         );
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* upperBottomRow = new QHBoxLayout();
+        auto* upperBottomRow = utils::makeQChild<QHBoxLayout>();
         upperBottomRow->addWidget(_showOnlyModifiedCheckBox);
         upperBottomRow->addStretch(1);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* bottomRow = new QHBoxLayout();
+        auto* bottomRow = utils::makeQChild<QHBoxLayout>();
         bottomRow->addWidget(_defaultsButton);
         bottomRow->addWidget(_discardChangesButton);
         bottomRow->addStretch(1);
         bottomRow->addWidget(_buttonBox);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* root = new QVBoxLayout();
+        auto* root = utils::makeQChild<QVBoxLayout>();
         root->addWidget(_tree, 1);
         root->addLayout(upperBottomRow);
         root->addLayout(bottomRow);

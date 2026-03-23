@@ -9,6 +9,7 @@
 #include "config/finance_enums.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/widgets/validators/name_line_edit.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -31,8 +32,7 @@ namespace ui
      */
     void CreateAccountDialog::_buildUI()
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* mainLayout = new QVBoxLayout{this};
+        auto* mainLayout = utils::makeQChild<QVBoxLayout>(this);
 
         _buildFormLayout(mainLayout);
         _buildButtonSection(mainLayout);
@@ -45,13 +45,11 @@ namespace ui
      */
     void CreateAccountDialog::_buildFormLayout(QVBoxLayout* parent)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* formLayout = new QFormLayout{};
+        auto* formLayout = utils::makeQChild<QFormLayout>();
 
         parent->addLayout(formLayout);
 
-        // "Credit Card" NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _accountType = new QComboBox{this};
+        _accountType = utils::makeQChild<QComboBox>(this);
         for (const auto& type : AccountKindMeta::values)
         {
             // we disallow creating accounts of kind External, since those are
@@ -74,8 +72,7 @@ namespace ui
 
         formLayout->addRow("Account Name:", nameContainer);
 
-        // "Credit Card" NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _currency = new QComboBox{this};
+        _currency = utils::makeQChild<QComboBox>(this);
         for (const auto& type : CurrencyMeta::names)
         {
             _currency->addItem(QString::fromStdString(std::string(type)));
@@ -90,11 +87,9 @@ namespace ui
      */
     void CreateAccountDialog::_buildButtonSection(QVBoxLayout* parent)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* buttonLayout = new QHBoxLayout{};
+        auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _addButton = new QPushButton{"Create Account", this};
+        _addButton = utils::makeQChild<QPushButton>("Create Account", this);
 
         // check the validity of the input to enable or disable the add button
         _addButton->setEnabled(false);
@@ -115,8 +110,7 @@ namespace ui
 
         buttonLayout->addWidget(_addButton);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _cancelButton = new QPushButton{"Cancel", this};
+        _cancelButton = utils::makeQChild<QPushButton>("Cancel", this);
         buttonLayout->addWidget(_cancelButton);
 
         parent->addLayout(buttonLayout);

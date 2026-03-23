@@ -19,6 +19,7 @@
 #include "ui/widgets/profile/profile_selection_dlg.hpp"
 #include "ui/widgets/utils/infos.hpp"
 #include "ui/widgets/utils/warnings.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.EnsureProfileController");
 
@@ -224,14 +225,13 @@ namespace ui
                 .getDialogSize()
         );
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _addProfileDialog = new AddProfileDialog{
+        _addProfileDialog = utils::makeQChild<AddProfileDialog>(
             settings,
             _appContext.getStore().getProfileStore(),
             _undoStack,
             false,   // canBeClosed = false to disable the close button
             &_mainWindow
-        };
+        );
 
         connect(
             _addProfileDialog,
@@ -257,12 +257,11 @@ namespace ui
     {
         const auto& profileStore = _appContext.getStore().getProfileStore();
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _profileSelectionDialog = new ProfileSelectionDialog{
+        _profileSelectionDialog = utils::makeQChild<ProfileSelectionDialog>(
             &_mainWindow,
             profileStore.getAllProfileNames(),
             false   // canBeClosed = false to disable the close button
-        };
+        );
 
         connect(
             _profileSelectionDialog,

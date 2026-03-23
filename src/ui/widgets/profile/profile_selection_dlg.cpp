@@ -74,8 +74,8 @@ namespace ui
                            ? QDialogButtonBox::Ok | QDialogButtonBox::Cancel
                            : QDialogButtonBox::Ok;
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _buttonBox = new QDialogButtonBox(buttons, Qt::Horizontal, this);
+        _buttonBox =
+            utils::makeQChild<QDialogButtonBox>(buttons, Qt::Horizontal, this);
 
         connect(
             _buttonBox,

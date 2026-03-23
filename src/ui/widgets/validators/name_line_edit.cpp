@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "line_validator.hpp"
+#include "utils/qt_helpers.hpp"
 
 class QWidget;   // Forward declaration
 
@@ -79,16 +80,12 @@ namespace ui
         QWidget* parent
     )
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* errorLabel = new QLabel{parent};
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* lineEdit = new NameLineEdit{parent};
+        auto* errorLabel = utils::makeQChild<QLabel>(parent);
+        auto* lineEdit   = utils::makeQChild<NameLineEdit>(parent);
         lineEdit->attachErrorLabel(errorLabel);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* container = new QWidget{parent};
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout{container};
+        auto* container = utils::makeQChild<QWidget>(parent);
+        auto* layout    = utils::makeQChild<QVBoxLayout>(container);
 
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(2);

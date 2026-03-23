@@ -11,6 +11,7 @@
 #include "ui/commands/undo_stack.hpp"
 #include "ui/widgets/account/create_account_dlg.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
 
@@ -103,8 +104,8 @@ namespace ui
         {
             LOG_INFO("Create Account action triggered");
 
-            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-            _createAccountDialog = new CreateAccountDialog(getMainWindow());
+            _createAccountDialog =
+                utils::makeQChild<CreateAccountDialog>(getMainWindow());
 
             connect(
                 _createAccountDialog,

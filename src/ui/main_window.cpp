@@ -16,6 +16,7 @@
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
 #include "ui/widgets/side_bar/side_bar.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -53,12 +54,10 @@ namespace ui
     {
         _buildMenuBar();
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* root = new QWidget{this};
+        auto* root = utils::makeQChild<QWidget>(this);
         setCentralWidget(root);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QHBoxLayout{root};
+        auto* layout = utils::makeQChild<QHBoxLayout>(root);
 
         const auto& margins = Constants::getCoreWindowMargins();
         layout->setContentsMargins(
@@ -69,12 +68,10 @@ namespace ui
         );
         layout->setSpacing(0);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _sideBar = new SideBar{this};
+        _sideBar = utils::makeQChild<SideBar>(this);
         _sideBar->setFixedWidth(Constants::getSideBarWidth());
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _centralStack = new QStackedWidget{this};
+        _centralStack = utils::makeQChild<QStackedWidget>(this);
 
         layout->addWidget(_sideBar);
         layout->addWidget(_centralStack);
@@ -94,8 +91,7 @@ namespace ui
      */
     void MainWindow::_buildMenuBar()
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _menuBar = new MenuBar{this};
+        _menuBar = utils::makeQChild<MenuBar>(this);
         setMenuBar(_menuBar);
 
         _menuBarController = std::make_unique<MenuBarController>(

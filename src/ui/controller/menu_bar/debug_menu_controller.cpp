@@ -13,6 +13,7 @@
 #include "ui/widgets/logging/debug_slots_dialog.hpp"
 #include "ui/widgets/logging/log_viewer_dialog.hpp"
 #include "ui/widgets/menu_bar/debug_menu.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.DebugMenuController");
 
@@ -168,10 +169,10 @@ namespace ui
 
         _applyLogViewerSettings();
 
-        // clang-format off
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _logViewerDialog = new LogViewerDialog{_logViewerSettings, &_mainWindow};
-        // clang-format on
+        _logViewerDialog = utils::makeQChild<LogViewerDialog>(
+            _logViewerSettings,
+            &_mainWindow
+        );
 
         _logViewerDialog->setModal(false);
     }
