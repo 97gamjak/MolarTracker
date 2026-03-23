@@ -113,7 +113,8 @@ namespace ui
                 &AccountSideBarController::_onCreateAccountRequested
             );
 
-            _createAccountDialog->exec();
+            if (auto* dialog = _createAccountDialog.data())
+                dialog->exec();
         }
     }
 
