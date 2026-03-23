@@ -1,5 +1,5 @@
-#ifndef __UI__UTILS__QT_HELPERS_TPP__
-#define __UI__UTILS__QT_HELPERS_TPP__
+#ifndef __UTILS__QT_HELPERS_TPP__
+#define __UTILS__QT_HELPERS_TPP__
 
 #include "qt_helpers.hpp"
 
@@ -34,4 +34,4 @@ namespace utils
 
 }   // namespace utils
 
-#endif   // __UI__UTILS__QT_HELPERS_TPP__
+#endif   // __UTILS__QT_HELPERS_TPP__
