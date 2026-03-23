@@ -57,6 +57,9 @@ namespace app
             const drafts::AccountDraft& accountDraft
         );
 
+        [[nodiscard]] std::vector<const finance::Account*> getAllAccounts(
+        ) const;
+
         void commit() override;
 
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);

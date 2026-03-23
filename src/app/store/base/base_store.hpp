@@ -2,6 +2,7 @@
 #define __APP__STORE__BASE__BASE_STORE_HPP__
 
 #include <optional>
+#include <unordered_map>
 #include <vector>
 
 #include "config/signal_tags.hpp"
@@ -47,6 +48,8 @@ namespace app
         /// The collection of entries in the store.
         std::vector<Entry> _entries;
 
+        std::unordered_map<IdType, IdType, typename IdType::Hash> _changedIds;
+
         /// Flag indicating whether the store is potentially dirty (i.e., has
         /// unsaved changes).
         bool _isPotentiallyDirty = false;
@@ -67,6 +70,9 @@ namespace app
 
         void clearPotentiallyDirty() override;
 
+        [[nodiscard]] const std::unordered_map<IdType, IdType>& getChangedIds(
+        ) const;
+
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
@@ -82,6 +88,9 @@ namespace app
         void _removeEntry(IdType id);
         void _cleanEntries();
         void _clearEntries();
+
+        void _appendChangedIds(IdType oldId, IdType newId);
+        void _clearChangedIds();
 
         [[nodiscard]] IdType _generateNewId() const;
 

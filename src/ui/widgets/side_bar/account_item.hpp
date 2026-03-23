@@ -1,6 +1,7 @@
 #ifndef __UI__WIDGETS__SIDE_BAR__ACCOUNT_ITEM_HPP__
 #define __UI__WIDGETS__SIDE_BAR__ACCOUNT_ITEM_HPP__
 
+#include "config/id_types.hpp"
 #include "side_bar_item.hpp"
 
 class QString;   // Forward declaration
@@ -9,6 +10,7 @@ class QAction;   // Forward declaration
 
 namespace ui
 {
+
     /**
      * @brief Item representing an account in the side bar
      *
@@ -16,9 +18,8 @@ namespace ui
     class AccountItem : public SideBarItem
     {
        private:
-        // TODO(97gamjak): make this id an AccountId
         /// The ID of the account this item represents
-        int _id;
+        AccountId _id;
 
         /// action to open the account
         QAction* _openAction;
@@ -26,9 +27,9 @@ namespace ui
         QAction* _deleteAction;
 
        public:
-        explicit AccountItem(int id, const QString& name);
+        explicit AccountItem(AccountId id, const QString& name);
 
-        [[nodiscard]] int getId() const;
+        [[nodiscard]] AccountId getId() const;
 
         [[nodiscard]] QAction* getOpenAction() const;
         [[nodiscard]] QAction* getDeleteAction() const;

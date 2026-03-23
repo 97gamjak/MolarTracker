@@ -79,7 +79,7 @@ namespace ui
         {
             case SideBarItemType::AccountsItem:
             {
-                _openAccount(dynamic_cast<AccountItem*>(item)->getId());
+                // open the account page for the selected account
                 break;
             }
             case SideBarItemType::OverviewCategory:
@@ -121,7 +121,9 @@ namespace ui
             {
                 const auto* accountItem = dynamic_cast<AccountItem*>(item);
                 if (action == accountItem->getOpenAction())
-                    _openAccount(accountItem->getId());
+                {
+                    // _openAccount(accountItem->getId());
+                }
                 else if (action == accountItem->getDeleteAction())
                 {
                     //_deleteAccount(accountItem->getId());
@@ -141,15 +143,5 @@ namespace ui
                 break;
         }
     }
-
-    /**
-     * @brief Open the account page for the account with the given id, this will
-     * switch the central stack to the account page and display the information
-     * for the account with the given id
-     *
-     * @param accountId The id of the account to open, this should be used to
-     * determine which account's information to display on the account page
-     */
-    void SideBarController::_openAccount(int /*accountId*/) {}
 
 }   // namespace ui

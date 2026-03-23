@@ -2,7 +2,6 @@
 #define __UI__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
 
 #include <QObject>
-#include <memory>
 
 #include "account_controller.hpp"
 
@@ -57,8 +56,6 @@ namespace ui
        private:
         void _onItemClicked(SideBarItem* item);
         void _onContextMenuRequested(SideBarItem* item, QAction* action);
-
-        void _openAccount(int accountId);
     };
 
 }   // namespace ui

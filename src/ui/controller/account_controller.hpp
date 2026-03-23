@@ -6,6 +6,8 @@
 class QAction;       // Forward declaration
 class QMainWindow;   // Forward declaration
 
+#include <QPointer>
+
 namespace drafts
 {
     struct AccountDraft;   // Forward declaration
@@ -18,8 +20,9 @@ namespace app
 
 namespace ui
 {
-    class UndoStack;         // Forward declaration
-    class AccountCategory;   // Forward declaration
+    class UndoStack;             // Forward declaration
+    class AccountCategory;       // Forward declaration
+    class CreateAccountDialog;   // Forward declaration
 
     /**
      * @brief Controller for the account category in the side bar
@@ -30,6 +33,8 @@ namespace ui
        private:
         UndoStack&       _undoStack;
         app::AppContext& _appContext;
+
+        QPointer<CreateAccountDialog> _createAccountDialog;
 
        public:
         explicit AccountSideBarController(
@@ -54,7 +59,7 @@ namespace ui
         );
 
        private slots:
-        void _onCreateAccountRequested(const drafts::AccountDraft& account);
+        void _onCreateAccountRequested(drafts::AccountDraft account);
     };
 
 }   // namespace ui

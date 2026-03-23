@@ -78,6 +78,8 @@ namespace app
     {
         LOG_ENTRY;
 
+        _clearChangedIds();
+
         for (auto& entry : _getEntries())
         {
             if (entry.state == StoreState::New)
@@ -93,11 +95,14 @@ namespace app
                     throw AccountStoreException(msg);
                 }
 
-                [[maybe_unused]] auto result =
-                    _accountService->createCashAccount(
-                        std::get<finance::CashAccount>(entry.value),
-                        _activeProfileId
-                    );
+                auto& cashAccount = std::get<finance::CashAccount>(entry.value);
+                const auto oldId  = cashAccount.getId();
+                auto       id     = _accountService->createCashAccount(
+                    cashAccount,
+                    _activeProfileId
+                );
+                cashAccount.setId(id);
+                _appendChangedIds(oldId, id);
                 entry.state = StoreState::Clean;
 
                 LOG_INFO(
@@ -191,6 +196,30 @@ namespace app
 
         for (const auto& account : accounts)
             _addEntry(account, StoreState::Clean);
+    }
+
+    [[nodiscard]] std::vector<const finance::Account*> AccountStore::
+        getAllAccounts() const
+    {
+        std::vector<const finance::Account*> accounts;
+
+        for (const auto& entry : _getEntries())
+        {
+            if (std::holds_alternative<finance::CashAccount>(entry.value))
+            {
+                accounts.push_back(&std::get<finance::CashAccount>(entry.value)
+                );
+            }
+            else
+            {
+                LOG_WARNING(
+                    "Encountered unsupported account type in getAllAccounts, "
+                    "skipping"
+                );
+            }
+        }
+
+        return accounts;
     }
 
 }   // namespace app

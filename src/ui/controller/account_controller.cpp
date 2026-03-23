@@ -46,8 +46,16 @@ namespace ui
             return;
 
         category->clearAccounts();
-        category->addAccount(1, "Account 1");
-        category->addAccount(2, "Account 2");
+        const auto accounts =
+            _appContext.getStore().getAccountStore().getAllAccounts();
+
+        for (const auto* account : accounts)
+        {
+            category->addAccount(
+                account->getId(),
+                QString::fromStdString(account->getName())
+            );
+        }
     }
 
     /**
@@ -80,21 +88,21 @@ namespace ui
             LOG_INFO("Create Account action triggered");
 
             // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-            auto* dialog = new CreateAccountDialog(getMainWindow());
+            _createAccountDialog = new CreateAccountDialog(getMainWindow());
 
             connect(
-                dialog,
+                _createAccountDialog,
                 &CreateAccountDialog::requested,
                 this,
                 &AccountSideBarController::_onCreateAccountRequested
             );
 
-            dialog->exec();
+            _createAccountDialog->exec();
         }
     }
 
     void AccountSideBarController::_onCreateAccountRequested(
-        const drafts::AccountDraft& account
+        drafts::AccountDraft account
     )
     {
         LOG_INFO("Create Account requested with name: " + account.name);
@@ -128,6 +136,8 @@ namespace ui
                 AccountKindMeta::toString(account.kind)
             );
         }
+
+        refresh();
     }
 
 }   // namespace ui

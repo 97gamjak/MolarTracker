@@ -26,7 +26,7 @@ namespace ui
      * selected when the itemSelected signal is emitted
      * @param name The name of the account to display in the side bar
      */
-    void AccountCategory::addAccount(int id, const QString& name)
+    void AccountCategory::addAccount(AccountId id, const QString& name)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
         auto* accountItem = new AccountItem(id, name);

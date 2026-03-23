@@ -309,6 +309,26 @@ namespace app
         return DirtyObservable::template on<OnDirtyChanged>(func, user);
     }
 
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_appendChangedIds(IdType oldId, IdType newId)
+    {
+        _changedIds[oldId] = newId;
+    }
+
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_clearChangedIds()
+    {
+        _changedIds.clear();
+    }
+
+    template <typename T, typename IdType>
+    [[nodiscard]] const std::unordered_map<IdType, IdType>& BaseStore<
+        T,
+        IdType>::getChangedIds() const
+    {
+        return _changedIds;
+    }
+
 }   // namespace app
 
 #endif   // __APP__STORE__BASE__BASE_STORE_TPP__

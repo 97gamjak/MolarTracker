@@ -3,13 +3,10 @@
 
 #include <QDialog>
 
+#include "drafts/account_draft.hpp"
+
 class QVBoxLayout;   // Forward declaration
 class QComboBox;     // Forward declaration
-
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-}
 
 namespace ui
 {
@@ -40,7 +37,7 @@ namespace ui
          *
          * @param account
          */
-        void requested(const drafts::AccountDraft& account);
+        void requested(drafts::AccountDraft account);
 
        private:
         void _buildUI();

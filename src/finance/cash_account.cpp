@@ -24,6 +24,13 @@ namespace finance
     }
 
     /**
+     * @brief set the id of the account
+     *
+     * @param id
+     */
+    void Account::setId(AccountId id) { _id = id; }
+
+    /**
      * @brief Get the Id of the cash account
      *
      * @return AccountId
