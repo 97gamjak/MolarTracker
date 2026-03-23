@@ -61,8 +61,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-private-field") # TODO: for now... later we should remove this and fix the warnings
-
 endif()
 
 add_library(json INTERFACE)
@@ -93,6 +91,7 @@ add_subdirectory(settings)
 add_subdirectory(json)
 add_subdirectory(connections)
 add_subdirectory(finance)
+add_subdirectory(controller)
 
 target_link_libraries(MolarTracker
     PUBLIC 
@@ -110,6 +109,7 @@ target_link_libraries(MolarTracker
     molartracker_json
     molartracker_connections
     molartracker_finance
+    molartracker_controller
 )
 
 set_target_properties(MolarTracker PROPERTIES

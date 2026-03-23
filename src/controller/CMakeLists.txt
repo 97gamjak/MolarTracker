@@ -1,4 +1,4 @@
-add_library(molartracker_ui_controller STATIC
+add_library(molartracker_controller STATIC
     menu_bar/menu_bar_controller.cpp
     menu_bar/file_menu_controller.cpp
     menu_bar/debug_menu_controller.cpp
@@ -13,12 +13,12 @@ add_library(molartracker_ui_controller STATIC
     account_controller.cpp
 )
 
-target_include_directories(molartracker_ui_controller
+target_include_directories(molartracker_controller
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-target_link_libraries(molartracker_ui_controller
+target_link_libraries(molartracker_controller
     PRIVATE
         Qt6::Widgets
         molartracker_ui_widgets

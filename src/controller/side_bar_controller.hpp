@@ -1,5 +1,5 @@
-#ifndef __UI__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
-#define __UI__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#ifndef __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#define __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
 
 #include <QObject>
 
@@ -60,4 +60,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#endif   // __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
