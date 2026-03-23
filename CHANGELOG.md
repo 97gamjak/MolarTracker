@@ -11,6 +11,10 @@ All changes and updates, that are relevant for a user will be documented here
 - Change debug slots to hierarchical approach -> now also usable in debug slots selection dialog
 - Now a symlink to the latest log file called `molar_tracker_latest.log` is created
 
+#### UI
+
+- Add Sidebar to main window
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
@@ -33,7 +37,6 @@ All changes and updates, that are relevant for a user will be documented here
 #### UI
 
 - The App title shows now if there are some unsaved changes or not
-- Add Sidebar to main window
 
 ## [0.0.2](https://github.com/repo/owner/releases/tag/0.0.2) - 2026-02-07
 
