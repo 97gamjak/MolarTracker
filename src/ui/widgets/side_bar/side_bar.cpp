@@ -7,6 +7,7 @@
 
 #include "category.hpp"
 #include "side_bar_item.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -64,15 +65,12 @@ namespace ui
      */
     void SideBar::_buildUI()
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = utils::makeQChild<QVBoxLayout>(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _model = new QStandardItemModel(this);
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _tree = new QTreeView(this);
+        _model = utils::makeQChild<QStandardItemModel>(this);
+        _tree  = utils::makeQChild<QTreeView>(this);
 
         _tree->setModel(_model);
         _tree->setHeaderHidden(true);
@@ -128,11 +126,10 @@ namespace ui
 
         auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* menu = new QMenu(this);
+        auto* menu = utils::makeQChild<QMenu>(this);
         item->populateContextMenu(*menu);
 
-        if (menu == nullptr || menu->actions().isEmpty())
+        if (menu->actions().isEmpty())
             return;
 
         QAction* selectedAction =

@@ -43,8 +43,7 @@ namespace ui
         const QModelIndex& /*index*/
     ) const
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* combo = new QComboBox(parent);
+        auto* combo = utils::makeQChild<QComboBox>(parent);
         combo->addItems(_logLevelNames);
         return combo;
     }

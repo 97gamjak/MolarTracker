@@ -11,6 +11,7 @@
 
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Widgets.Logging.LogViewerDialog");
 
@@ -45,14 +46,12 @@ namespace ui
         _autoReloadCheckBox->setChecked(_settings->autoReload);
         _reloadTimer->setInterval(_settings->reloadIntervalMs);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* buttonLayout = new QHBoxLayout();
+        auto* buttonLayout = utils::makeQChild<QHBoxLayout>(this);
         buttonLayout->addWidget(_reloadButton);
         buttonLayout->addStretch(1);
         buttonLayout->addWidget(_autoReloadCheckBox);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = utils::makeQChild<QVBoxLayout>(this);
         layout->addWidget(_textEdit);
         layout->addLayout(buttonLayout);
 

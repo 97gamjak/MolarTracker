@@ -81,8 +81,7 @@ namespace ui
     {
         QDialog::setModal(true);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* mainLayout = new QVBoxLayout{this};
+        auto* mainLayout = utils::makeQChild<QVBoxLayout>(this);
 
         _buildFormSection(mainLayout);
 
@@ -98,33 +97,27 @@ namespace ui
      */
     void AddProfileDialog::_buildFormSection(QVBoxLayout* parent)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* formLayout = new QFormLayout{};
+        auto* formLayout = utils::makeQChild<QFormLayout>(this);
 
         auto [nameLineEdit, nameContainer] = createNameLineEditWithLabel(this);
         nameLineEdit->setRequired(true);
 
         _nameLineEdit = nameLineEdit;
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        formLayout->addRow(new QLabel{"Name*:"}, nameContainer);
+        formLayout->addRow(utils::makeQChild<QLabel>("Name*:"), nameContainer);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* emailErrorLabel = new QLabel{this};
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _emailLineEdit = new EmailLineEdit{this};
+        auto* emailErrorLabel = utils::makeQChild<QLabel>(this);
+
+        _emailLineEdit = utils::makeQChild<EmailLineEdit>(this);
         _emailLineEdit->attachErrorLabel(emailErrorLabel);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* emailContainer = new QWidget{this};
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* emailLayout = new QVBoxLayout{emailContainer};
+        auto* emailContainer = utils::makeQChild<QWidget>(this);
+        auto* emailLayout    = utils::makeQChild<QVBoxLayout>(emailContainer);
         emailLayout->setContentsMargins(0, 0, 0, 0);
         emailLayout->setSpacing(2);
         emailLayout->addWidget(_emailLineEdit);
         emailLayout->addWidget(emailErrorLabel);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        formLayout->addRow(new QLabel{"Email:"}, emailContainer);
+        formLayout->addRow(utils::makeQChild<QLabel>("Email:"), emailContainer);
 
         parent->addLayout(formLayout);
     }
@@ -136,15 +129,14 @@ namespace ui
      */
     void AddProfileDialog::_buildToggleSection(QVBoxLayout* parent)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* toggleLayout = new QHBoxLayout{};
+        auto* toggleLayout = utils::makeQChild<QHBoxLayout>(this);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _setActiveCheckBox = new QCheckBox{"Set as Active Profile", this};
+        _setActiveCheckBox =
+            utils::makeQChild<QCheckBox>("Set as Active Profile", this);
         toggleLayout->addWidget(_setActiveCheckBox);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _setAsDefaultCheckBox = new QCheckBox{"Set as Default Profile", this};
+        _setAsDefaultCheckBox =
+            utils::makeQChild<QCheckBox>("Set as Default Profile", this);
         toggleLayout->addWidget(_setAsDefaultCheckBox);
 
         _setActiveCheckBox->setChecked(false);
@@ -162,11 +154,9 @@ namespace ui
      */
     void AddProfileDialog::_buildButtonSection(QVBoxLayout* parent)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* buttonLayout = new QHBoxLayout{};
+        auto* buttonLayout = utils::makeQChild<QHBoxLayout>(this);
 
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        _addButton = new QPushButton{"Add Profile", this};
+        _addButton = utils::makeQChild<QPushButton>("Add Profile", this);
 
         // check the validity of the input to enable or disable the add button
         _addButton->setEnabled(false);
@@ -189,8 +179,7 @@ namespace ui
 
         if (_canBeClosed)
         {
-            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-            _cancelButton = new QPushButton{"Cancel", this};
+            _cancelButton = utils::makeQChild<QPushButton>("Cancel", this);
             buttonLayout->addWidget(_cancelButton);
             connect(
                 _cancelButton,

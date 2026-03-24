@@ -5,6 +5,7 @@
 #include <QString>
 
 #include "account_item.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -28,8 +29,7 @@ namespace ui
      */
     void AccountCategory::addAccount(AccountId id, const QString& name)
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        auto* accountItem = new AccountItem(id, name);
+        auto* accountItem = utils::makeQChild<AccountItem>(id, name);
         appendRow(accountItem);
     }
 
