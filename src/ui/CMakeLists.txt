@@ -5,16 +5,12 @@ qt_add_library(molartracker_ui STATIC
 
 add_subdirectory(commands)
 add_subdirectory(widgets)
-add_subdirectory(handlers)
 
 target_link_libraries(molartracker_ui
-    PUBLIC
-        Qt6::Widgets
     PRIVATE
-        molartracker_ui_commands
-        molartracker_ui_widgets
-        molartracker_ui_handlers
-        molartracker_app
+    Qt6::Widgets
+    molartracker_ui_commands
+    molartracker_ui_widgets
 )
 
 target_include_directories(molartracker_ui

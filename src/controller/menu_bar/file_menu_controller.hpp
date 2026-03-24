@@ -10,9 +10,12 @@ namespace app
 
 namespace ui
 {
-    class FileMenu;     // Forward declaration
     class MainWindow;   // Forward declaration
+    class FileMenu;     // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Binds the file menu actions to their respective functionalities.
      *
@@ -23,9 +26,9 @@ namespace ui
 
        private:
         /// Reference to the main window
-        MainWindow& _mainWindow;
+        ui::MainWindow& _mainWindow;
         /// Reference to the file menu
-        FileMenu& _fileMenu;
+        ui::FileMenu& _fileMenu;
         /// Reference to the application context
         app::AppContext& _appContext;
 
@@ -35,12 +38,12 @@ namespace ui
 
        public:
         explicit FileMenuController(
-            MainWindow&      mainWindow,
-            FileMenu&        fileMenu,
+            ui::MainWindow&  mainWindow,
+            ui::FileMenu&    fileMenu,
             app::AppContext& appContext
         );
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__MENU_BAR__FILE_MENU_CONTROLLER_HPP__

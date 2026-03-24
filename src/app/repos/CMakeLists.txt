@@ -5,12 +5,9 @@ add_library(molartracker_app_repos STATIC
 )
 
 target_link_libraries(molartracker_app_repos
-    PUBLIC
-    molartracker_app_repos_api
     PRIVATE
-    molartracker_app_domain
+    molartracker_app_repos_api
     molartracker_app_factories
-    molartracker_db
     molartracker_finance
     molartracker_sql_models
 )

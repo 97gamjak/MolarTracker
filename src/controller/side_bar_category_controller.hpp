@@ -8,7 +8,10 @@ class QMainWindow;   // Forward declaration
 namespace ui
 {
     class Category;   // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Base controller for a category in the side bar, this is
      * responsible for managing the state of the category and its items, and
@@ -22,7 +25,7 @@ namespace ui
 
        private:
         /// The category that this controller manages
-        Category* _category;
+        ui::Category* _category;
 
         /// Pointer to the main window
         QMainWindow* _mainWindow;
@@ -32,12 +35,13 @@ namespace ui
 
        public:
         ~SideBarCategoryController() override = default;
+
         explicit SideBarCategoryController(
-            Category*    category,
-            QMainWindow* mainWindow
+            ui::Category* category,
+            QMainWindow*  mainWindow
         );
 
-        [[nodiscard]] Category* getCategory() const;
+        [[nodiscard]] ui::Category* getCategory() const;
 
         /**
          * @brief Refresh the category, this should update the items in the
@@ -48,6 +52,6 @@ namespace ui
          */
         virtual void refresh() = 0;
     };
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__SIDE_BAR_CATEGORY_CONTROLLER_HPP__

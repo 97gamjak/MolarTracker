@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Side Bar Category Controller:: Side Bar Category
@@ -19,8 +19,8 @@ namespace ui
      * opened.
      */
     SideBarCategoryController::SideBarCategoryController(
-        Category*    category,
-        QMainWindow* mainWindow
+        ui::Category* category,
+        QMainWindow*  mainWindow
     )
         : _category(category), _mainWindow(mainWindow)
     {
@@ -29,9 +29,9 @@ namespace ui
     /**
      * @brief Get the Category object
      *
-     * @return Category*
+     * @return ui::Category*
      */
-    Category* SideBarCategoryController::getCategory() const
+    ui::Category* SideBarCategoryController::getCategory() const
     {
         return _category;
     }
@@ -49,4 +49,4 @@ namespace ui
         return _mainWindow;
     }
 
-}   // namespace ui
+}   // namespace controller

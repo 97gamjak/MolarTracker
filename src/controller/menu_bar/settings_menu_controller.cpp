@@ -5,7 +5,7 @@
 
 #include "ui/widgets/menu_bar/settings_menu.hpp"
 
-namespace ui
+namespace controller
 {
 
     /**
@@ -16,8 +16,8 @@ namespace ui
      * @param settingsMenu
      */
     SettingsMenuController::SettingsMenuController(
-        QMainWindow&  mainWindow,
-        SettingsMenu& settingsMenu
+        QMainWindow&      mainWindow,
+        ui::SettingsMenu& settingsMenu
     )
         : QObject{&mainWindow},
           _mainWindow(mainWindow),
@@ -25,7 +25,7 @@ namespace ui
     {
         connect(
             &_settingsMenu,
-            &SettingsMenu::requestPreferences,
+            &ui::SettingsMenu::requestPreferences,
             this,
             &SettingsMenuController::_onPreferencesRequested
         );
@@ -44,4 +44,4 @@ namespace ui
         );
     }
 
-}   // namespace ui
+}   // namespace controller

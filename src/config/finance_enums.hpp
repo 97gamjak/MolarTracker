@@ -33,6 +33,12 @@ MSTD_ENUM(AccountStatus, uint8_t, ACCOUNT_STATUS_LIST);
 
 MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST);
 
+#define INSTRUMENT_KIND_LIST(X) \
+    X(Stock)                    \
+    X(Cash)
+
+MSTD_ENUM(InstrumentKind, std::uint8_t, INSTRUMENT_KIND_LIST);
+
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif   // __CONFIG__FINANCE_ENUMS_HPP__

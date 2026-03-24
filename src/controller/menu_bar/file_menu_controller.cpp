@@ -8,7 +8,7 @@
 #include "ui/main_window.hpp"
 #include "ui/widgets/menu_bar/file_menu.hpp"
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new FileMenuController:: File Menu Controller object
@@ -18,8 +18,8 @@ namespace ui
      * @param appContext The application context
      */
     FileMenuController::FileMenuController(
-        MainWindow&      mainWindow,
-        FileMenu&        fileMenu,
+        ui::MainWindow&  mainWindow,
+        ui::FileMenu&    fileMenu,
         app::AppContext& appContext
     )
         : QObject(&mainWindow),
@@ -29,14 +29,14 @@ namespace ui
     {
         connect(
             &_fileMenu,
-            &FileMenu::requestSave,
+            &ui::FileMenu::requestSave,
             this,
             &FileMenuController::_onRequestSave
         );
 
         connect(
             &_fileMenu,
-            &FileMenu::requestQuit,
+            &ui::FileMenu::requestQuit,
             this,
             &FileMenuController::_onRequestQuit
         );
@@ -66,4 +66,4 @@ namespace ui
      */
     void FileMenuController::_onRequestQuit() { _mainWindow.close(); }
 
-}   // namespace ui
+}   // namespace controller

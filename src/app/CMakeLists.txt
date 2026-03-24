@@ -20,11 +20,14 @@ target_include_directories(molartracker_app
 
 target_link_libraries(molartracker_app
     PUBLIC
-    molartracker_db
+    molartracker_app_domain
+    molartracker_app_factories
     molartracker_app_repos
     molartracker_app_services
-    molartracker_app_domain
     molartracker_app_store
-    molartracker_app_factories
+    PRIVATE
+    molartracker_db
     molartracker_logging
+    molartracker_orm
+    molartracker_settings
 )

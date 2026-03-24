@@ -1,6 +1,8 @@
 #ifndef __CONFIG__SIGNAL_TAGS_HPP__
 #define __CONFIG__SIGNAL_TAGS_HPP__
 
+#include <optional>
+
 #include "id_types.hpp"
 
 /**

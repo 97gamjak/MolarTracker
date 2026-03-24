@@ -3,7 +3,7 @@
 #include "logging/log_manager.hpp"
 #include "settings/logging_settings.hpp"
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Logging Handler:: Logging Handler object
@@ -40,4 +40,4 @@ namespace ui
         );
     }
 
-}   // namespace ui
+}   // namespace controller

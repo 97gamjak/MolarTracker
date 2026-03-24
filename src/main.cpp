@@ -1,15 +1,11 @@
 #include <cstdlib>
 #include <exception>
 
-#include "app/app_context.hpp"
-#include "config/constants.hpp"
+#include "controller/main_controller.hpp"
 #include "exceptions/base.hpp"
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
-#include "settings/settings.hpp"
 #include "ui/application.hpp"
-#include "ui/handlers/handlers.hpp"
-#include "ui/main_window.hpp"
 #include "ui/widgets/exceptions/exception_dialog.hpp"
 
 REGISTER_LOG_CATEGORY("Application");
@@ -20,26 +16,8 @@ int main(int argc, char** argv)
 
     try
     {
-        // TODO(97gamjak): move this to some initialization module
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-96
-
-        // initialize settings
-        settings::Settings settings{Constants::getInstance().getConfigPath()};
-        auto&              loggingSettings = settings.getLoggingSettings();
-
-        // initialize ring file buffered logger
-        logging::LogManager::getInstance().initializeCategories();
-        logging::LogManager::getInstance().initializeRingFileLogger(
-            loggingSettings,
-            Constants::getInstance().getDataPath()
-        );
-
-        app::AppContext appContext{settings};
-        ui::Handlers    handlers{settings};
-        ui::MainWindow  mainWindow{appContext, handlers};
-
-        mainWindow.show();
-        mainWindow.start();
+        controller::MainController mainController;
+        mainController.start();
 
         return ui::MolarTrackerApplication::exec();
     }

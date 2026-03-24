@@ -13,11 +13,12 @@ target_include_directories(molartracker_logging
 )
 
 target_link_libraries(molartracker_logging
+    PRIVATE
+    molartracker_log_categories_generated
+    molartracker_settings
+    molartracker_config
     PUBLIC
-        molartracker_utils
-        molartracker_config
-        molartracker_settings
-        molartracker_log_categories_generated
+    mstd
 )
 
 set_property(TARGET molartracker_logging APPEND PROPERTY

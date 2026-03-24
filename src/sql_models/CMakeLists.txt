@@ -9,6 +9,5 @@ target_include_directories(molartracker_sql_models
 
 target_link_libraries(molartracker_sql_models
     PRIVATE
-    molartracker_config
-    molartracker_orm
+    mstd
 )

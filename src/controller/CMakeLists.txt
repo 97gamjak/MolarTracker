@@ -11,7 +11,11 @@ add_library(molartracker_controller STATIC
     side_bar_controller.cpp
     side_bar_category_controller.cpp
     account_controller.cpp
+
+    main_controller.cpp
 )
+
+add_subdirectory(handlers)
 
 target_include_directories(molartracker_controller
     PUBLIC
@@ -20,10 +24,10 @@ target_include_directories(molartracker_controller
 
 target_link_libraries(molartracker_controller
     PRIVATE
-        Qt6::Widgets
-        molartracker_ui_widgets
-        molartracker_ui_logging
-        molartracker_ui_commands
-        molartracker_app_repos_api
-        molartracker_logging
+    Qt6::Widgets
+    mstd
+    json
+    PRIVATE
+    molartracker_handlers
+    molartracker_app
 )

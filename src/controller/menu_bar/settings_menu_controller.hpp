@@ -8,7 +8,10 @@ class QMainWindow;   // Forward declaration
 namespace ui
 {
     class SettingsMenu;   // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Controller for the settings menu actions
      *
@@ -21,18 +24,18 @@ namespace ui
         /// Reference to the main window
         QMainWindow& _mainWindow;
         /// Reference to the settings menu
-        SettingsMenu& _settingsMenu;
+        ui::SettingsMenu& _settingsMenu;
 
        private slots:
         void _onPreferencesRequested();
 
        public:
         explicit SettingsMenuController(
-            QMainWindow&  mainWindow,
-            SettingsMenu& settingsMenu
+            QMainWindow&      mainWindow,
+            ui::SettingsMenu& settingsMenu
         );
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__MENU_BAR__SETTINGS_MENU_CONTROLLER_HPP__

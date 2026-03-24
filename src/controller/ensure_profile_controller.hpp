@@ -23,7 +23,10 @@ namespace drafts
 namespace ui
 {
     class UndoStack;   // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Controller to ensure a profile exists on application startup
      *
@@ -43,35 +46,37 @@ namespace ui
         /// Reference to the application context
         app::AppContext& _appContext;
         /// Reference to the undo stack
-        UndoStack& _undoStack;
+        ui::UndoStack& _undoStack;
 
         /// Pointer to the profile selection dialog
-        QPointer<ProfileSelectionDialog> _profileSelectionDialog;
+        QPointer<ui::ProfileSelectionDialog> _profileSelectionDialog;
         /// Pointer to the add profile dialog
-        QPointer<AddProfileDialog> _addProfileDialog;
+        QPointer<ui::AddProfileDialog> _addProfileDialog;
 
         /// Command for ensuring profile existence, this command will contain
         /// the sub-commands for setting the default profile, setting the active
         /// profile and adding a new profile if needed
-        Commands _ensureProfileExistsCommand{"Ensure Profile Exists Command"};
+        ui::Commands _ensureProfileExistsCommand{
+            "Ensure Profile Exists Command"
+        };
 
        public:
         explicit EnsureProfileController(
             QMainWindow&     mainWindow,
             app::AppContext& appContext,
-            UndoStack&       undoStack
+            ui::UndoStack&   undoStack
         );
 
         void ensureProfileExists();
 
        private slots:
         void _onProfileSelectionRequested(
-            const ProfileSelectionDialog::Action& action,
-            const std::string&                    profileName
+            const ui::ProfileSelectionDialog::Action& action,
+            const std::string&                        profileName
         );
         void _onAddProfileRequested(
-            const AddProfileDialog::Action& action,
-            const drafts::ProfileDraft&     profileDraft
+            const ui::AddProfileDialog::Action& action,
+            const drafts::ProfileDraft&         profileDraft
         );
 
        private:
@@ -84,6 +89,6 @@ namespace ui
         static void _fatalError(const std::string& message);
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__ENSURE_PROFILE_CONTROLLER_HPP__

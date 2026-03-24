@@ -23,7 +23,7 @@
 
 REGISTER_LOG_CATEGORY("UI.Controller.EnsureProfileController");
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Ensure Profile Controller:: Ensure Profile
@@ -36,7 +36,7 @@ namespace ui
     EnsureProfileController::EnsureProfileController(
         QMainWindow&     mainWindow,
         app::AppContext& appContext,
-        UndoStack&       undoStack
+        ui::UndoStack&   undoStack
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
@@ -122,10 +122,11 @@ namespace ui
 
         if (profileStore.profileExists(name))
         {
-            auto cmdResult = Commands::makeAndDo<SetActiveProfileCommand>(
-                name,
-                profileStore
-            );
+            auto cmdResult =
+                ui::Commands::makeAndDo<ui::SetActiveProfileCommand>(
+                    name,
+                    profileStore
+                );
 
             if (!cmdResult)
             {
@@ -145,7 +146,7 @@ namespace ui
             const auto msg =
                 "Default profile '" + name + "' loaded successfully.";
 
-            showInfoStatusBar(LOG_INFO_OBJECT(msg), statusBar);
+            ui::showInfoStatusBar(LOG_INFO_OBJECT(msg), statusBar);
 
             return true;
         }
@@ -166,7 +167,7 @@ namespace ui
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
 
-        showWarningMessageBox(
+        ui::showWarningMessageBox(
             "Default Profile Not Found",
             LOG_WARNING_OBJECT(
                 std::format(
@@ -194,7 +195,7 @@ namespace ui
      */
     void EnsureProfileController::_noDefaultProfile()
     {
-        showWarningMessageBox(
+        ui::showWarningMessageBox(
             "No Default Profile Configured",
             LOG_WARNING_OBJECT(
                 "No Default Profile Configured - No default profile is "
@@ -218,14 +219,14 @@ namespace ui
      */
     void EnsureProfileController::_showAddProfileDialog()
     {
-        auto settings = std::make_shared<AddProfileDialog::Settings>(
+        auto settings = std::make_shared<ui::AddProfileDialog::Settings>(
             _appContext.getSettings()
                 .getUISettings()
                 .getProfileUISettings()
                 .getDialogSize()
         );
 
-        _addProfileDialog = utils::makeQChild<AddProfileDialog>(
+        _addProfileDialog = utils::makeQChild<ui::AddProfileDialog>(
             settings,
             _appContext.getStore().getProfileStore(),
             _undoStack,
@@ -235,7 +236,7 @@ namespace ui
 
         connect(
             _addProfileDialog,
-            &AddProfileDialog::requested,
+            &ui::AddProfileDialog::requested,
             this,
             &EnsureProfileController::_onAddProfileRequested
         );
@@ -257,7 +258,7 @@ namespace ui
     {
         const auto& profileStore = _appContext.getStore().getProfileStore();
 
-        _profileSelectionDialog = utils::makeQChild<ProfileSelectionDialog>(
+        _profileSelectionDialog = utils::makeQChild<ui::ProfileSelectionDialog>(
             &_mainWindow,
             profileStore.getAllProfileNames(),
             false   // canBeClosed = false to disable the close button
@@ -265,7 +266,7 @@ namespace ui
 
         connect(
             _profileSelectionDialog,
-            &ProfileSelectionDialog::requested,
+            &ui::ProfileSelectionDialog::requested,
             this,
             &EnsureProfileController::_onProfileSelectionRequested
         );
@@ -289,14 +290,14 @@ namespace ui
      * is Ok).
      */
     void EnsureProfileController::_onProfileSelectionRequested(
-        const ProfileSelectionDialog::Action& action,
-        const std::string&                    profileName
+        const ui::ProfileSelectionDialog::Action& action,
+        const std::string&                        profileName
     )
     {
-        if (action == ProfileSelectionDialog::Action::Ok)
+        if (action == ui::ProfileSelectionDialog::Action::Ok)
         {
             auto setDefaultCommand =
-                Commands::makeAndDo<SetDefaultProfileCommand>(
+                ui::Commands::makeAndDo<ui::SetDefaultProfileCommand>(
                     profileName,
                     _appContext.getSettings().getGeneralSettings()
                 );
@@ -313,7 +314,10 @@ namespace ui
             const auto msg =
                 "Profile '" + profileName + "' selected successfully.";
 
-            showInfoStatusBar(LOG_INFO_OBJECT(msg), _mainWindow.statusBar());
+            ui::showInfoStatusBar(
+                LOG_INFO_OBJECT(msg),
+                _mainWindow.statusBar()
+            );
         }
     }
 
@@ -347,15 +351,15 @@ namespace ui
      * profile is set.
      */
     void EnsureProfileController::_onAddProfileRequested(
-        const AddProfileDialog::Action& action,
-        const drafts::ProfileDraft&     profileDraft
+        const ui::AddProfileDialog::Action& action,
+        const drafts::ProfileDraft&         profileDraft
     )
     {
-        if (action == AddProfileDialog::Action::Ok)
+        if (action == ui::AddProfileDialog::Action::Ok)
         {
             // We only need to invoke AddProfileCommand here to add the profile;
             // default/active status is managed by separate commands below.
-            auto result = Commands::makeAndDo<AddProfileCommand>(
+            auto result = ui::Commands::makeAndDo<ui::AddProfileCommand>(
                 _appContext.getStore().getProfileStore(),
                 profileDraft
             );
@@ -366,7 +370,7 @@ namespace ui
                 auto*       errorPtr        = addProfileError.get();
 
                 if (auto* addError =
-                        dynamic_cast<AddProfileCommandError*>(errorPtr))
+                        dynamic_cast<ui::AddProfileCommandError*>(errorPtr))
                 {
                     using enum AddProfileCommandErrorCode;
                     if (addError->getCode() == NameAlreadyExists)
@@ -379,13 +383,13 @@ namespace ui
                 auto msg       = addProfileError->getMessage();
                 msg            = "Failed to add profile: " + msg;
                 const auto log = LOG_ERROR_OBJECT(msg);
-                ExceptionDialog::showFatal("Add Profile Error", log);
+                ui::ExceptionDialog::showFatal("Add Profile Error", log);
 
                 return;
             }
 
             auto setDefaultCommand =
-                Commands::makeAndDo<SetDefaultProfileCommand>(
+                ui::Commands::makeAndDo<ui::SetDefaultProfileCommand>(
                     profileDraft.name,
                     _appContext.getSettings().getGeneralSettings()
                 );
@@ -400,7 +404,7 @@ namespace ui
             _ensureProfileExistsCommand << std::move(result)
                                         << std::move(setDefaultCommand);
 
-            showInfoStatusBar(
+            ui::showInfoStatusBar(
                 LOG_INFO_OBJECT(
                     "Profile '" + profileDraft.name + "' created successfully."
                 ),
@@ -422,7 +426,10 @@ namespace ui
      */
     void EnsureProfileController::_fatalError(const std::string& message)
     {
-        ExceptionDialog::showFatal("Critical Error", LOG_ERROR_OBJECT(message));
+        ui::ExceptionDialog::showFatal(
+            "Critical Error",
+            LOG_ERROR_OBJECT(message)
+        );
     }
 
-}   // namespace ui
+}   // namespace controller

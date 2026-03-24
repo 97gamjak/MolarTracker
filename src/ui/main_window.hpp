@@ -2,12 +2,6 @@
 #define __UI__MAIN_WINDOW_HPP__
 
 #include <QMainWindow>
-#include <memory>
-
-#include "commands/undo_stack.hpp"
-#include "ui/controller/ensure_profile_controller.hpp"
-#include "ui/controller/menu_bar/menu_bar_controller.hpp"
-#include "ui/controller/side_bar_controller.hpp"
 
 namespace app
 {
@@ -19,8 +13,7 @@ class QStackedWidget;   // Forward declaration
 namespace ui
 {
     class MenuBar;   // Forward declaration
-    class SideBar;
-    class Handlers;   // Forward declaration
+    class SideBar;   // Forward declaration
 
     /**
      * @brief The main window of the application. This is the central widget
@@ -32,10 +25,6 @@ namespace ui
         Q_OBJECT
 
        private:
-        /// Reference to the application context
-        app::AppContext& _appContext;
-        /// Reference to the handlers container
-        Handlers& _handlers;
         /// Pointer to the menu bar widget
         MenuBar* _menuBar = nullptr;
         /// Pointer to side bar widget
@@ -43,27 +32,20 @@ namespace ui
         /// Pointer to the central stacked widget
         QStackedWidget* _centralStack = nullptr;
 
-        /// Menu bar controller
-        std::unique_ptr<MenuBarController> _menuBarController;
-        /// Side bar controller
-        std::unique_ptr<SideBarController> _sideBarController;
-        /// Ensure profile controller
-        std::unique_ptr<EnsureProfileController> _ensureProfileController;
-
         /// Undo stack for managing undoable commands in the application
-        UndoStack _undoStack;
 
        public:
-        explicit MainWindow(app::AppContext& app, Handlers& handlers);
+        explicit MainWindow();
 
-        void start();
         void setWindowTitle(const bool& isDirty);
+
+        [[nodiscard]] MenuBar&        getMenuBar();
+        [[nodiscard]] SideBar&        getSideBar();
+        [[nodiscard]] QStackedWidget* getCentralWidget();
 
        private:
         void _buildUI();
         void _buildMenuBar();
-
-        void _ensureProfileExists();
     };
 
 }   // namespace ui

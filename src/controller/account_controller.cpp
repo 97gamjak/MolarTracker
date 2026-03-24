@@ -15,7 +15,7 @@
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Account Side Bar Controller:: Account Side Bar
@@ -39,11 +39,11 @@ namespace ui
      *
      */
     AccountSideBarController::AccountSideBarController(
-        UndoStack&       undoStack,
+        ui::UndoStack&   undoStack,
         app::AppContext& appContext,
         QMainWindow*     mainWindow
     )
-        : SideBarCategoryController(new AccountCategory(), mainWindow),
+        : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
           _appContext(appContext)
     {
@@ -58,7 +58,7 @@ namespace ui
      */
     void AccountSideBarController::refresh()
     {
-        auto* category = dynamic_cast<AccountCategory*>(getCategory());
+        auto* category = dynamic_cast<ui::AccountCategory*>(getCategory());
         if (category == nullptr)
             return;
 
@@ -87,8 +87,8 @@ namespace ui
      * @param action The action that was triggered
      */
     void AccountSideBarController::handleContextMenuAction(
-        const AccountCategory* item,
-        const QAction*         action
+        const ui::AccountCategory* item,
+        const QAction*             action
     )
     {
         if (item == nullptr || action == nullptr)
@@ -105,11 +105,11 @@ namespace ui
             LOG_INFO("Create Account action triggered");
 
             _createAccountDialog =
-                utils::makeQChild<CreateAccountDialog>(getMainWindow());
+                utils::makeQChild<ui::CreateAccountDialog>(getMainWindow());
 
             connect(
                 _createAccountDialog,
-                &CreateAccountDialog::requested,
+                &ui::CreateAccountDialog::requested,
                 this,
                 &AccountSideBarController::_onCreateAccountRequested
             );
@@ -135,16 +135,16 @@ namespace ui
      * create a new account in the underlying data.
      */
     void AccountSideBarController::_onCreateAccountRequested(
-        drafts::AccountDraft account
+        const drafts::AccountDraft& account
     )
     {
         LOG_INFO("Create Account requested with name: " + account.name);
 
         if (account.kind == AccountKind::Cash)
         {
-            Commands command("Create Account");
+            ui::Commands command("Create Account");
 
-            auto result = Commands::makeAndDo<CreateAccountCommand>(
+            auto result = ui::Commands::makeAndDo<ui::CreateAccountCommand>(
                 _appContext.getStore().getAccountStore(),
                 account
             );
@@ -173,4 +173,4 @@ namespace ui
         refresh();
     }
 
-}   // namespace ui
+}   // namespace controller

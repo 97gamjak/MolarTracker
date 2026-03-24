@@ -5,8 +5,9 @@ add_library(molartracker_app_factories STATIC
 
 target_link_libraries(molartracker_app_factories
     PRIVATE
-    molartracker_app_repos
     molartracker_app_domain
+    molartracker_config
+    molartracker_sql_models
 )
 
 target_include_directories(molartracker_app_factories

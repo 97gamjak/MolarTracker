@@ -60,10 +60,8 @@ namespace ui
         const std::vector<std::string>& profiles
     )
     {
-        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
-        auto* mainLayout   = new QVBoxLayout{this};
-        _profileListWidget = new QListWidget{this};
-        // NOLINTEND(cppcoreguidelines-owning-memory)
+        auto* mainLayout   = utils::makeQChild<QVBoxLayout>(this);
+        _profileListWidget = utils::makeQChild<QListWidget>(this);
 
         for (const auto& profileName : profiles)
             _profileListWidget->addItem(QString::fromStdString(profileName));

@@ -8,7 +8,7 @@ namespace ui
     /**
      * @brief The main application class for Molar Tracker
      *
-     * @note Don't missuse this class. It is a simple wrapper around
+     * @note Don't miss-use this class. It is a simple wrapper around
      * QApplication to setup application-wide settings like the application
      * name.
      */

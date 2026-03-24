@@ -1,5 +1,5 @@
-#ifndef __UI__HANDLERS__DIRTY_HANDLER_HPP__
-#define __UI__HANDLERS__DIRTY_HANDLER_HPP__
+#ifndef __CONTROLLER__HANDLERS__DIRTY_HANDLER_HPP__
+#define __CONTROLLER__HANDLERS__DIRTY_HANDLER_HPP__
 
 #include <vector>
 
@@ -15,7 +15,7 @@ namespace ui
     class MainWindow;   // Forward declaration
 }   // namespace ui
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Handler for managing the dirty state of the application, this
@@ -38,6 +38,6 @@ namespace ui
         void subscribe(app::AppContext& appContext, ui::MainWindow* mainWindow);
     };
 
-}   // namespace ui
+}   // namespace controller
 
-#endif   // __UI__HANDLERS__DIRTY_HANDLER_HPP__
+#endif   // __CONTROLLER__HANDLERS__DIRTY_HANDLER_HPP__

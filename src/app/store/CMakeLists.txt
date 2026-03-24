@@ -13,8 +13,7 @@ target_include_directories(molartracker_app_store
 )
 
 target_link_libraries(molartracker_app_store
-    PUBLIC
-        molartracker_app_domain
-        molartracker_config
-        molartracker_logging
+    PRIVATE
+    molartracker_config
+    molartracker_settings
 )

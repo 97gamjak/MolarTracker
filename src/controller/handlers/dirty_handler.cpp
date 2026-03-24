@@ -5,7 +5,7 @@
 #include "settings/settings.hpp"
 #include "ui/main_window.hpp"
 
-namespace ui
+namespace controller
 {
 
     /**
@@ -43,4 +43,4 @@ namespace ui
             settings.subscribeToDirty(setTitleDirty, mainWindow);
     }
 
-}   // namespace ui
+}   // namespace controller
