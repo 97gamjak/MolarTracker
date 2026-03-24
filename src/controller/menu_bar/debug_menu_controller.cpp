@@ -17,7 +17,7 @@
 
 REGISTER_LOG_CATEGORY("UI.Controller.DebugMenuController");
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Debug Menu Controller:: Debug Menu Controller
@@ -30,9 +30,9 @@ namespace ui
      */
     DebugMenuController::DebugMenuController(
         QMainWindow&     mainWindow,
-        DebugMenu&       debugMenu,
+        ui::DebugMenu&   debugMenu,
         app::AppContext& appContext,
-        UndoStack&       undoStack
+        ui::UndoStack&   undoStack
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
@@ -42,14 +42,14 @@ namespace ui
     {
         connect(
             &debugMenu,
-            &DebugMenu::requestDebugSlots,
+            &ui::DebugMenu::requestDebugSlots,
             this,
             &DebugMenuController::_onRequestDebugSlots
         );
 
         connect(
             &debugMenu,
-            &DebugMenu::requestLogViewer,
+            &ui::DebugMenu::requestLogViewer,
             this,
             &DebugMenuController::_onRequestLogViewer
         );
@@ -89,11 +89,11 @@ namespace ui
      * @param categories The new debug flag categories to set
      */
     void DebugMenuController::_onDebugSlotsChangeRequested(
-        const DebugSlotsDialog::Action& action,
-        const logging::LogCategories&   categories
+        const ui::DebugSlotsDialog::Action& action,
+        const logging::LogCategories&       categories
     )
     {
-        using enum DebugSlotsDialog::Action;
+        using enum ui::DebugSlotsDialog::Action;
 
         switch (action)
         {
@@ -136,23 +136,24 @@ namespace ui
         if (_debugSlotsDialog != nullptr)
             return;
 
-        auto debugSlotsSettings = std::make_shared<DebugSlotsDialog::Settings>(
-            _appContext.getSettings()
-                .getUISettings()
-                .getDebugSlotsSettings()
-                .getWindowSize()
-        );
+        auto debugSlotsSettings =
+            std::make_shared<ui::DebugSlotsDialog::Settings>(
+                _appContext.getSettings()
+                    .getUISettings()
+                    .getDebugSlotsSettings()
+                    .getWindowSize()
+            );
 
-        // NOLINTBEGIN(cppcoreguidelines-owning-memory)
-        _debugSlotsDialog =
-            new DebugSlotsDialog{debugSlotsSettings, &_mainWindow};
-        // NOLINTEND(cppcoreguidelines-owning-memory)
+        _debugSlotsDialog = utils::makeQChild<ui::DebugSlotsDialog>(
+            debugSlotsSettings,
+            &_mainWindow
+        );
 
         _debugSlotsDialog->setModal(false);
 
         connect(
             _debugSlotsDialog,
-            &DebugSlotsDialog::requested,
+            &ui::DebugSlotsDialog::requested,
             this,
             &DebugMenuController::_onDebugSlotsChangeRequested
         );
@@ -169,7 +170,7 @@ namespace ui
 
         _applyLogViewerSettings();
 
-        _logViewerDialog = utils::makeQChild<LogViewerDialog>(
+        _logViewerDialog = utils::makeQChild<ui::LogViewerDialog>(
             _logViewerSettings,
             &_mainWindow
         );
@@ -203,7 +204,8 @@ namespace ui
         const logging::LogCategories& categories
     )
     {
-        auto result = Commands::makeAndDo<UpdateDebugFlagsCommand>(categories);
+        auto result =
+            ui::Commands::makeAndDo<ui::UpdateDebugFlagsCommand>(categories);
 
         if (!result)
         {
@@ -253,7 +255,7 @@ namespace ui
         const auto& settings =
             _appContext.getSettings().getUISettings().getLogViewerSettings();
 
-        _logViewerSettings = std::make_shared<LogViewerDialog::Settings>(
+        _logViewerSettings = std::make_shared<ui::LogViewerDialog::Settings>(
             settings.getReloadIntervalMs(),
             settings.isAutoReloadEnabled(),
             settings.isLineWrapEnabled(),
@@ -262,4 +264,4 @@ namespace ui
         );
     }
 
-}   // namespace ui
+}   // namespace controller

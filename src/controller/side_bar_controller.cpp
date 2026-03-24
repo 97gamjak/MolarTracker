@@ -12,7 +12,7 @@
 
 REGISTER_LOG_CATEGORY("UI.Controller.SideBarController");
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Side Bar Controller:: Side Bar Controller object
@@ -24,30 +24,30 @@ namespace ui
      * @param centralStack
      */
     SideBarController::SideBarController(
-        UndoStack&       undoStack,
+        ui::UndoStack&   undoStack,
         app::AppContext& appContext,
         QMainWindow*     mainWindow,
-        SideBar*         sideBar,
+        ui::SideBar*     sideBar,
         QStackedWidget*  centralStack
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
           _accountSideBarController(undoStack, appContext, mainWindow),
-          _overviewCategory(new OverviewCategory())
+          _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
         _sideBar->addCategory(_accountSideBarController.getCategory());
 
         connect(
             _sideBar,
-            &SideBar::itemClicked,
+            &ui::SideBar::itemClicked,
             this,
             &SideBarController::_onItemClicked
         );
 
         connect(
             _sideBar,
-            &SideBar::contextMenuRequested,
+            &ui::SideBar::contextMenuRequested,
             this,
             &SideBarController::_onContextMenuRequested
         );
@@ -73,17 +73,17 @@ namespace ui
      * SideBarItem that is currently in the side bar, and will be used to
      * determine which item was clicked and what action to perform
      */
-    void SideBarController::_onItemClicked(SideBarItem* item)
+    void SideBarController::_onItemClicked(ui::SideBarItem* item)
     {
         switch (item->getType())
         {
-            case SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::AccountsItem:
             {
                 // open the account page for the selected account
                 break;
             }
-            case SideBarItemType::OverviewCategory:
-            case SideBarItemType::AccountCategory:
+            case ui::SideBarItemType::OverviewCategory:
+            case ui::SideBarItemType::AccountCategory:
                 break;
         }
     }
@@ -103,8 +103,8 @@ namespace ui
      * used to determine which action was triggered
      */
     void SideBarController::_onContextMenuRequested(
-        SideBarItem* item,
-        QAction*     action
+        ui::SideBarItem* item,
+        QAction*         action
     )
     {
         if (item == nullptr || action == nullptr)
@@ -117,9 +117,9 @@ namespace ui
 
         switch (item->getType())
         {
-            case SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::AccountsItem:
             {
-                const auto* accountItem = dynamic_cast<AccountItem*>(item);
+                const auto* accountItem = dynamic_cast<ui::AccountItem*>(item);
                 if (action == accountItem->getOpenAction())
                 // NOLINTNEXTLINE(bugprone-branch-clone)
                 {
@@ -131,12 +131,12 @@ namespace ui
                 }
                 break;
             }
-            case SideBarItemType::OverviewCategory:
+            case ui::SideBarItemType::OverviewCategory:
                 // Handle overview item click
                 break;
-            case SideBarItemType::AccountCategory:
+            case ui::SideBarItemType::AccountCategory:
                 const auto* accountCategory =
-                    dynamic_cast<AccountCategory*>(item);
+                    dynamic_cast<ui::AccountCategory*>(item);
                 _accountSideBarController.handleContextMenuAction(
                     accountCategory,
                     action
@@ -145,4 +145,4 @@ namespace ui
         }
     }
 
-}   // namespace ui
+}   // namespace controller

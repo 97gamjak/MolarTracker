@@ -8,7 +8,7 @@
 #include "config/constants.hpp"
 #include "ui/widgets/menu_bar/help_menu.hpp"
 
-namespace ui
+namespace controller
 {
 
     /**
@@ -18,14 +18,14 @@ namespace ui
      * @param helpMenu
      */
     HelpMenuController::HelpMenuController(
-        QMainWindow& mainWindow,
-        HelpMenu&    helpMenu
+        QMainWindow&  mainWindow,
+        ui::HelpMenu& helpMenu
     )
         : QObject{&mainWindow}, _mainWindow(mainWindow), _helpMenu(helpMenu)
     {
         connect(
             &_helpMenu,
-            &HelpMenu::requestAbout,
+            &ui::HelpMenu::requestAbout,
             this,
             &HelpMenuController::_onAboutRequested
         );
@@ -58,4 +58,4 @@ namespace ui
         );
     }
 
-}   // namespace ui
+}   // namespace controller

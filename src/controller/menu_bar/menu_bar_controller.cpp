@@ -3,7 +3,7 @@
 #include "ui/main_window.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Menu Bar Controller:: Menu Bar Controller object
@@ -15,10 +15,10 @@ namespace ui
      * application
      */
     MenuBarController::MenuBarController(
-        MainWindow*      mainWindow,
-        MenuBar&         menuBar,
+        ui::MainWindow*  mainWindow,
+        ui::MenuBar&     menuBar,
         app::AppContext& appContext,
-        UndoStack&       undoStack
+        ui::UndoStack&   undoStack
     )
     {
         _makeControllers(mainWindow, menuBar, appContext, undoStack);
@@ -34,10 +34,10 @@ namespace ui
      * application
      */
     void MenuBarController::_makeControllers(
-        MainWindow*      mainWindow,
-        MenuBar&         menuBar,
+        ui::MainWindow*  mainWindow,
+        ui::MenuBar&     menuBar,
         app::AppContext& appContext,
-        UndoStack&       undoStack
+        ui::UndoStack&   undoStack
     )
     {
         _fileMenuController = std::make_unique<FileMenuController>(
@@ -70,4 +70,4 @@ namespace ui
         );
     }
 
-}   // namespace ui
+}   // namespace controller

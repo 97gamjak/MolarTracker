@@ -23,7 +23,10 @@ namespace ui
     class UndoStack;             // Forward declaration
     class AccountCategory;       // Forward declaration
     class CreateAccountDialog;   // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Controller for the account category in the side bar
      *
@@ -32,16 +35,16 @@ namespace ui
     {
        private:
         /// Reference to the undo stack
-        UndoStack& _undoStack;
+        ui::UndoStack& _undoStack;
         /// Reference to the application context
         app::AppContext& _appContext;
 
         /// Pointer to the create account dialog
-        QPointer<CreateAccountDialog> _createAccountDialog;
+        QPointer<ui::CreateAccountDialog> _createAccountDialog;
 
        public:
         explicit AccountSideBarController(
-            UndoStack&       undoStack,
+            ui::UndoStack&   undoStack,
             app::AppContext& appContext,
             QMainWindow*     mainWindow
         );
@@ -57,14 +60,14 @@ namespace ui
         void refresh() override;
 
         void handleContextMenuAction(
-            const AccountCategory* item,
-            const QAction*         action
+            const ui::AccountCategory* item,
+            const QAction*             action
         );
 
        private slots:
-        void _onCreateAccountRequested(drafts::AccountDraft account);
+        void _onCreateAccountRequested(const drafts::AccountDraft& account);
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__ACCOUNT_CONTROLLER_HPP__

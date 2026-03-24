@@ -11,5 +11,5 @@ target_include_directories(molartracker_ui_validators
 
 target_link_libraries(molartracker_ui_validators
     PRIVATE
-        Qt6::Widgets
+    Qt6::Widgets
 )

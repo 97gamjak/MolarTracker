@@ -6,7 +6,7 @@
 #include "ui/commands/undo_stack.hpp"
 #include "ui/widgets/menu_bar/edit_menu.hpp"
 
-namespace ui
+namespace controller
 {
 
     /**
@@ -17,9 +17,9 @@ namespace ui
      * @param undoStack The undo stack managing undo/redo operations
      */
     EditMenuController::EditMenuController(
-        QMainWindow& mainWindow,
-        EditMenu&    editMenu,
-        UndoStack&   undoStack
+        QMainWindow&   mainWindow,
+        ui::EditMenu&  editMenu,
+        ui::UndoStack& undoStack
     )
         : QObject{&mainWindow},
           _mainWindow(mainWindow),
@@ -28,19 +28,19 @@ namespace ui
     {
         connect(
             &_editMenu,
-            &EditMenu::requestUndo,
+            &ui::EditMenu::requestUndo,
             this,
             &EditMenuController::_onUndoRequested
         );
         connect(
             &_editMenu,
-            &EditMenu::requestRedo,
+            &ui::EditMenu::requestRedo,
             this,
             &EditMenuController::_onRedoRequested
         );
         connect(
             &_undoStack,
-            &UndoStack::changed,
+            &ui::UndoStack::changed,
             this,
             &EditMenuController::refresh
         );
@@ -101,4 +101,4 @@ namespace ui
         _editMenu.setRedoEnabled(canRedo);
     }
 
-}   // namespace ui
+}   // namespace controller

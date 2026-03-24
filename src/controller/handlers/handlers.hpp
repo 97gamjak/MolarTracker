@@ -1,5 +1,5 @@
-#ifndef __UI__HANDLERS__HANDLERS_HPP__
-#define __UI__HANDLERS__HANDLERS_HPP__
+#ifndef __CONTROLLER__HANDLERS__HANDLERS_HPP__
+#define __CONTROLLER__HANDLERS__HANDLERS_HPP__
 
 #include "dirty_handler.hpp"
 #include "logging_handler.hpp"
@@ -9,7 +9,7 @@ namespace settings
     class Settings;   // Forward declaration
 }   // namespace settings
 
-namespace ui
+namespace controller
 {
     /**
      * @brief A container for all handlers in the application. This class is
@@ -33,6 +33,6 @@ namespace ui
         [[nodiscard]] DirtyStateHandler&       getDirtyStateHandler();
         [[nodiscard]] const DirtyStateHandler& getDirtyStateHandler() const;
     };
-}   // namespace ui
+}   // namespace controller
 
-#endif   // __UI__HANDLERS__HANDLERS_HPP__
+#endif   // __CONTROLLER__HANDLERS__HANDLERS_HPP__

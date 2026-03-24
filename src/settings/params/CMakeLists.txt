@@ -10,9 +10,5 @@ target_include_directories(molartracker_settings_params
 
 target_link_libraries(molartracker_settings_params
     PUBLIC
-    molartracker_json
-    molartracker_connections
-    PUBLIC
     json
-    mstd
 )

@@ -1,5 +1,5 @@
-#ifndef __UI__HANDLERS__LOGGING_HANDLER_HPP__
-#define __UI__HANDLERS__LOGGING_HANDLER_HPP__
+#ifndef __CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__
+#define __CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__
 
 #include "connections/connection.hpp"
 
@@ -8,7 +8,7 @@ namespace settings
     class LoggingSettings;   // Forward declaration
 }   // namespace settings
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Handler for managing logging settings and behavior in the UI.
@@ -35,6 +35,6 @@ namespace ui
         void subscribe(settings::LoggingSettings& loggingSettings);
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __UI__HANDLERS__LOGGING_HANDLER_HPP__

@@ -12,8 +12,6 @@ target_include_directories(molartracker_ui_logging
 
 target_link_libraries(molartracker_ui_logging
     PRIVATE
-        molartracker_logging
-        molartracker_utils
-        molartracker_ui_utils
-        Qt6::Widgets
+    Qt6::Widgets
+    molartracker_logging
 )

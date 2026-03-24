@@ -12,8 +12,17 @@
 namespace ui
 {
     class MenuBar;      // Forward declaration
+    class UndoStack;    // Forward declaration
     class MainWindow;   // Forward declaration
+}   // namespace ui
 
+namespace app
+{
+    class AppContext;   // Forward declaration
+}   // namespace app
+
+namespace controller
+{
     /**
      * @brief Controller for the menu bar, this is responsible for creating and
      * managing the controllers for each menu in the menu bar
@@ -35,20 +44,20 @@ namespace ui
 
        public:
         explicit MenuBarController(
-            MainWindow*      mainWindow,
-            MenuBar&         menuBar,
+            ui::MainWindow*  mainWindow,
+            ui::MenuBar&     menuBar,
             app::AppContext& appContext,
-            UndoStack&       undoStack
+            ui::UndoStack&   undoStack
         );
 
         void _makeControllers(
-            MainWindow*      mainWindow,
-            MenuBar&         menuBar,
+            ui::MainWindow*  mainWindow,
+            ui::MenuBar&     menuBar,
             app::AppContext& appContext,
-            UndoStack&       undoStack
+            ui::UndoStack&   undoStack
         );
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__MENU_BAR__MENU_BAR_CONTROLLER_HPP__

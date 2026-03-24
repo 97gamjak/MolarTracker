@@ -7,8 +7,11 @@ class QMainWindow;   // Forward declaration
 
 namespace ui
 {
-    class HelpMenu;
+    class HelpMenu;   // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Controller for the help menu actions
      *
@@ -21,18 +24,18 @@ namespace ui
         /// Reference to the main window
         QMainWindow& _mainWindow;
         /// Reference to the help menu
-        HelpMenu& _helpMenu;
+        ui::HelpMenu& _helpMenu;
 
        private slots:
         void _onAboutRequested();
 
        public:
         explicit HelpMenuController(
-            QMainWindow& mainWindow,
-            HelpMenu&    helpMenu
+            QMainWindow&  mainWindow,
+            ui::HelpMenu& helpMenu
         );
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__MENU_BAR__HELP_MENU_CONTROLLER_HPP__

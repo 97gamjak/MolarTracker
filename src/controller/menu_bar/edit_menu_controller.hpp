@@ -7,9 +7,12 @@ class QMainWindow;   // Forward declaration
 
 namespace ui
 {
-    class EditMenu;
-    class UndoStack;
+    class EditMenu;    // Forward declaration
+    class UndoStack;   // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Binds the edit menu actions to their respective functionalities.
      *
@@ -22,9 +25,9 @@ namespace ui
         /// Reference to the main window
         QMainWindow& _mainWindow;
         /// Reference to the edit menu
-        EditMenu& _editMenu;
+        ui::EditMenu& _editMenu;
         /// Reference to the undo stack
-        UndoStack& _undoStack;
+        ui::UndoStack& _undoStack;
 
        private slots:
         void _onUndoRequested();
@@ -32,14 +35,14 @@ namespace ui
 
        public:
         explicit EditMenuController(
-            QMainWindow& mainWindow,
-            EditMenu&    editMenu,
-            UndoStack&   undoStack
+            QMainWindow&   mainWindow,
+            ui::EditMenu&  editMenu,
+            ui::UndoStack& undoStack
         );
 
         void refresh();
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__MENU_BAR__EDIT_MENU_CONTROLLER_HPP__

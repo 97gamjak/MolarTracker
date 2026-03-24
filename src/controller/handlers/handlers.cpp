@@ -2,7 +2,7 @@
 
 #include "settings/settings.hpp"
 
-namespace ui
+namespace controller
 {
     /**
      * @brief Construct a new Handlers:: Handlers object
@@ -35,4 +35,4 @@ namespace ui
         return _dirtyStateHandler;
     }
 
-}   // namespace ui
+}   // namespace controller

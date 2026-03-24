@@ -20,7 +20,10 @@ namespace ui
     class OverviewCategory;   // Forward declaration
     class SideBarItem;        // Forward declaration
     class UndoStack;          // Forward declaration
+}   // namespace ui
 
+namespace controller
+{
     /**
      * @brief Controller for the side bar, this is responsible for managing the
      * state of the side bar and its categories and items, and providing an
@@ -33,31 +36,31 @@ namespace ui
 
        private:
         /// Pointer to the side bar widget
-        SideBar* _sideBar;
+        ui::SideBar* _sideBar;
         /// Pointer to the central stacked widget
         QStackedWidget* _centralStack;
 
         /// Controller for the accounts category in the side bar
         AccountSideBarController _accountSideBarController;
         /// Pointer to the overview category in the side bar
-        OverviewCategory* _overviewCategory;
+        ui::OverviewCategory* _overviewCategory;
 
        public:
         explicit SideBarController(
-            UndoStack&       undoStack,
+            ui::UndoStack&   undoStack,
             app::AppContext& appContext,
             QMainWindow*     mainWindow,
-            SideBar*         sideBar,
+            ui::SideBar*     sideBar,
             QStackedWidget*  centralStack
         );
 
         void refresh();
 
        private:
-        static void _onItemClicked(SideBarItem* item);
-        void        _onContextMenuRequested(SideBarItem* item, QAction* action);
+        static void _onItemClicked(ui::SideBarItem* item);
+        void _onContextMenuRequested(ui::SideBarItem* item, QAction* action);
     };
 
-}   // namespace ui
+}   // namespace controller
 
 #endif   // __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__

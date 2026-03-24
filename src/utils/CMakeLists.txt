@@ -12,10 +12,10 @@ target_include_directories(molartracker_utils
 )
 
 target_link_libraries(molartracker_utils
-    PUBLIC
-        Qt6::Core
-        Qt6::Widgets
-        json
+    PRIVATE
+    Qt6::Core
+    Qt6::Widgets
+    json
 )
 
 set_property(TARGET molartracker_utils APPEND PROPERTY

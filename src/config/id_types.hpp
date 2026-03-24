@@ -1,8 +1,6 @@
 #ifndef __CONFIG__ID_TYPES_HPP__
 #define __CONFIG__ID_TYPES_HPP__
 
-#include <mstd/enum.hpp>
-
 #include "strong_id.hpp"
 
 // clang-format off
@@ -34,15 +32,6 @@ using TransactionId = StrongId<TransactionTag>;
 struct TransactionEntryTag {};
 using TransactionEntryId = StrongId<TransactionEntryTag>;
 // clang-format on
-
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define INSTRUMENT_KIND_LIST(X) \
-    X(Stock)                    \
-    X(Cash)
-
-MSTD_ENUM(InstrumentKind, std::uint8_t, INSTRUMENT_KIND_LIST);
-
-// NOLINTEND(cppcoreguidelines-macro-usage)
 
 template <typename T>
 auto getId(const T& value);

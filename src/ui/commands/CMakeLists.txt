@@ -3,10 +3,15 @@ add_library(molartracker_ui_commands STATIC
     command_error.cpp
     update_debug_flags_command.cpp
     commands.cpp
+
+    account/create_account_command.cpp
+
+    profile/add_profile_command.cpp
+    profile/add_profile_command_error.cpp
+    profile/set_active_profile_command.cpp
+    profile/set_default_profile_command.cpp
 )
 
-add_subdirectory(profile)
-add_subdirectory(account)
 
 target_include_directories(molartracker_ui_commands
     PUBLIC
@@ -14,10 +19,8 @@ target_include_directories(molartracker_ui_commands
 )
 
 target_link_libraries(molartracker_ui_commands
-    PUBLIC
-    Qt6::Core
-    molartracker_ui_commands_profile
-    molartracker_ui_commands_account
     PRIVATE
+    Qt6::Core
     molartracker_logging
+    molartracker_settings
 )

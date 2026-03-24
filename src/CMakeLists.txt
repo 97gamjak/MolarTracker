@@ -94,22 +94,11 @@ add_subdirectory(finance)
 add_subdirectory(controller)
 
 target_link_libraries(MolarTracker
-    PUBLIC 
-    molartracker_ui
-    molartracker_app
-    molartracker_db
-    molartracker_config
-    molartracker_drafts
-    molartracker_orm
-    molartracker_sql_models
-    molartracker_logging
-    molartracker_utils
-    molartracker_exceptions
-    molartracker_settings
-    molartracker_json
-    molartracker_connections
-    molartracker_finance
+    PRIVATE 
+    Qt6::Widgets
     molartracker_controller
+    molartracker_ui
+    molartracker_logging
 )
 
 set_target_properties(MolarTracker PROPERTIES

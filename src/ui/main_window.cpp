@@ -9,10 +9,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-#include "app/app_context.hpp"
 #include "config/constants.hpp"
-#include "ui/controller/ensure_profile_controller.hpp"
-#include "ui/handlers/handlers.hpp"
 #include "ui/widgets/menu_bar/menu_bar.hpp"
 #include "ui/widgets/side_bar/account_category.hpp"
 #include "ui/widgets/side_bar/side_bar.hpp"
@@ -23,15 +20,9 @@ namespace ui
 
     /**
      * @brief Construct a new Main Window:: Main Window object
-     *
-     * @param appContext The application context
-     * @param handlers The handlers
      */
-    MainWindow::MainWindow(app::AppContext& appContext, Handlers& handlers)
-        : _appContext{appContext}, _handlers{handlers}
+    MainWindow::MainWindow()
     {
-        _handlers.getDirtyStateHandler().subscribe(appContext, this);
-
         setWindowTitle(false);
 
         const auto size = Constants::getMainWindowSize();
@@ -39,12 +30,6 @@ namespace ui
 
         _buildUI();
     }
-
-    /**
-     * @brief Start the main window (show it)
-     *
-     */
-    void MainWindow::start() { _ensureProfileExists(); }
 
     /**
      * @brief Build the UI of the main window
@@ -75,14 +60,6 @@ namespace ui
 
         layout->addWidget(_sideBar);
         layout->addWidget(_centralStack);
-
-        _sideBarController = std::make_unique<SideBarController>(
-            _undoStack,
-            _appContext,
-            this,
-            _sideBar,
-            _centralStack
-        );
     }
 
     /**
@@ -93,29 +70,6 @@ namespace ui
     {
         _menuBar = utils::makeQChild<MenuBar>(this);
         setMenuBar(_menuBar);
-
-        _menuBarController = std::make_unique<MenuBarController>(
-            this,
-            *_menuBar,
-            _appContext,
-            _undoStack
-        );
-    }
-
-    /**
-     * @brief Ensure that a profile exists, and if not, prompt the user to
-     * create one
-     *
-     */
-    void MainWindow::_ensureProfileExists()
-    {
-        _ensureProfileController = std::make_unique<EnsureProfileController>(
-            *this,
-            _appContext,
-            _undoStack
-        );
-
-        _ensureProfileController->ensureProfileExists();
     }
 
     /**
@@ -135,5 +89,11 @@ namespace ui
         const auto name = QString::fromStdString(baseTitle);
         QMainWindow::setWindowTitle(name);
     }
+
+    MenuBar& MainWindow::getMenuBar() { return *_menuBar; }
+
+    SideBar& MainWindow::getSideBar() { return *_sideBar; }
+
+    QStackedWidget* MainWindow::getCentralWidget() { return _centralStack; }
 
 }   // namespace ui

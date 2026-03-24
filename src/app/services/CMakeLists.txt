@@ -9,9 +9,6 @@ target_include_directories(molartracker_app_services
 )
 
 target_link_libraries(molartracker_app_services
-    PUBLIC
-    molartracker_app_services_api
     PRIVATE
-    molartracker_app_repos
-    molartracker_app_domain
+    molartracker_app_services_api
 )
