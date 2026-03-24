@@ -129,7 +129,7 @@ namespace ui
         auto* menu = utils::makeQChild<QMenu>(this);
         item->populateContextMenu(*menu);
 
-        if (menu == nullptr || menu->actions().isEmpty())
+        if (menu->actions().isEmpty())
             return;
 
         QAction* selectedAction =
