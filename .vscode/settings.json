@@ -125,10 +125,12 @@
         "shared_mutex": "cpp"
     },
     "cSpell.words": [
+        "bugprone",
         "googletest",
         "insertable",
         "MOLTRACK",
-        "MSTD"
+        "MSTD",
+        "NOMINMAX"
     ],
     "files.watcherExclude": {
         "**/.build/**": true,

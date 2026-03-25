@@ -1,0 +1,104 @@
+#include "edit_menu_controller.hpp"
+
+#include <QMainWindow>
+#include <QStatusBar>
+
+#include "commands/undo_stack.hpp"
+#include "ui/menu_bar/edit_menu.hpp"
+
+namespace controller
+{
+
+    /**
+     * @brief Construct a new Edit Menu Controller:: Edit Menu Controller object
+     *
+     * @param mainWindow The main window of the application
+     * @param editMenu The edit menu containing undo/redo actions
+     * @param undoStack The undo stack managing undo/redo operations
+     */
+    EditMenuController::EditMenuController(
+        QMainWindow&    mainWindow,
+        ui::EditMenu&   editMenu,
+        cmd::UndoStack& undoStack
+    )
+        : QObject{&mainWindow},
+          _mainWindow(mainWindow),
+          _editMenu(editMenu),
+          _undoStack(undoStack)
+    {
+        connect(
+            &_editMenu,
+            &ui::EditMenu::requestUndo,
+            this,
+            &EditMenuController::_onUndoRequested
+        );
+        connect(
+            &_editMenu,
+            &ui::EditMenu::requestRedo,
+            this,
+            &EditMenuController::_onRedoRequested
+        );
+        connect(
+            &_undoStack,
+            &cmd::UndoStack::changed,
+            this,
+            &EditMenuController::refresh
+        );
+
+        refresh();
+    }
+
+    /**
+     * @brief Slot called when an undo is requested from the UI
+     *
+     */
+    void EditMenuController::_onUndoRequested()
+    {
+        std::string msg = _undoStack.getUndoLabel();
+
+        const auto& result = _undoStack.undo();
+
+        if (!result)
+            msg = result.error()->getMessage();
+
+        auto* statusBar = _mainWindow.statusBar();
+
+        if (statusBar != nullptr)
+            statusBar->showMessage(QString::fromStdString(msg));
+    }
+
+    /**
+     * @brief Slot called when a redo is requested from the UI
+     *
+     */
+    void EditMenuController::_onRedoRequested()
+    {
+        std::string msg = _undoStack.getRedoLabel();
+
+        const auto& result = _undoStack.redo();
+
+        if (!result)
+            msg = result.error()->getMessage();
+
+        auto* statusBar = _mainWindow.statusBar();
+
+        if (statusBar != nullptr)
+            statusBar->showMessage(QString::fromStdString(msg));
+    }
+
+    /**
+     * @brief Refresh the state of the edit menu actions based on the undo stack
+     * state, this should be called whenever the undo stack changes to update
+     * the enabled state and text of the undo/redo actions in the edit menu.
+     *
+     */
+    void EditMenuController::refresh()
+    {
+        const bool canUndo = _undoStack.canUndo();
+        const bool canRedo = _undoStack.canRedo();
+
+        _editMenu.setUndoEnabled(canUndo);
+        _editMenu.setRedoEnabled(canRedo);
+    }
+
+}   // namespace controller

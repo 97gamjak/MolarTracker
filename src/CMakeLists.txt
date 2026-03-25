@@ -8,15 +8,15 @@ set(GEN_DIR ${PROJECT_BINARY_DIR}/src/generated)
 set(GEN_HDR ${GEN_DIR}/log_categories.gen.hpp)
 
 file(GLOB_RECURSE LOGCAT_INPUTS CONFIGURE_DEPENDS
-    ${CMAKE_SOURCE_DIR}/src/*.cpp
-    ${CMAKE_SOURCE_DIR}/src/*.hpp
-    ${CMAKE_SOURCE_DIR}/src/*.tpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.tpp
 )
 
 add_custom_command(
     OUTPUT  ${GEN_HDR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}
-    COMMAND $<TARGET_FILE:logcat_generator> ${GEN_HDR} ${CMAKE_SOURCE_DIR}/src
+    COMMAND $<TARGET_FILE:logcat_generator> ${GEN_HDR} ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS logcat_generator ${LOGCAT_INPUTS}
     VERBATIM
     COMMENT "Generating log category header: ${GEN_HDR}"
@@ -92,6 +92,7 @@ add_subdirectory(json)
 add_subdirectory(connections)
 add_subdirectory(finance)
 add_subdirectory(controller)
+add_subdirectory(commands)
 
 target_link_libraries(MolarTracker
     PRIVATE 
@@ -99,6 +100,7 @@ target_link_libraries(MolarTracker
     molartracker_controller
     molartracker_ui
     molartracker_logging
+    molartracker_exceptions
 )
 
 set_target_properties(MolarTracker PROPERTIES

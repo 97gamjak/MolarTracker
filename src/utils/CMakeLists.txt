@@ -1,14 +1,16 @@
 add_library(molartracker_utils STATIC
-    timestamp.cpp
-    ring_file.cpp
-    paths.cpp
-    qt_helpers.cpp
-    version.cpp
+    src/utils/timestamp.cpp
+    src/utils/ring_file.cpp
+    src/utils/paths.cpp
+    src/utils/qt_helpers.cpp
+    src/utils/version.cpp
 )
 
 target_include_directories(molartracker_utils
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(molartracker_utils
