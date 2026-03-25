@@ -1,4 +1,4 @@
-#include "exception.hpp"
+#include "app/store/profile/exception.hpp"
 
 namespace app
 {

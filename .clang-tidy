@@ -36,6 +36,7 @@ ImplementationFileExtensions:
   - c
   - cc
   - cpp
+  - tpp
   - cxx
 HeaderFilterRegex: '.*/MolarTracker/src/.*'
 SystemHeaders: false

@@ -1,14 +1,14 @@
-#include "profile_store.hpp"
+#include "app/store/profile/profile_store.hpp"
 
 #include <cctype>
 #include <format>
 
 #include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
+#include "app/store/profile/exception.hpp"
+#include "app/store/profile/predicates.hpp"
 #include "drafts/profile_draft.hpp"
-#include "exception.hpp"
 #include "logging/log_macros.hpp"
-#include "predicates.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
 

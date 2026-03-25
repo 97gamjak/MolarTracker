@@ -32,8 +32,8 @@ struct InstrumentRow
     /// stock, bond, etc.) and is a required field
     orm::Field<"kind", InstrumentKind, orm::not_null_t> kind;
 
-    [[nodiscard]] constexpr auto fields();
-    [[nodiscard]] constexpr auto fields() const;
+    /// auto generate the fields() function using the ORM_FIELDS macro
+    ORM_FIELDS(InstrumentRow, id, kind);
 };
 
 /**
@@ -76,8 +76,8 @@ struct CashInstrumentRow
     /// easily query for the cash instrument of a specific currency
     orm::Field<"currency", Currency, orm::not_null_t, orm::unique_t> currency;
 
-    [[nodiscard]] constexpr auto fields();
-    [[nodiscard]] constexpr auto fields() const;
+    /// auto generate the fields() function using the ORM_FIELDS macro
+    ORM_FIELDS(CashInstrumentRow, id, currency);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__

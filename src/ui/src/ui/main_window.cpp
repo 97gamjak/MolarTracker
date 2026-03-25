@@ -90,10 +90,25 @@ namespace ui
         QMainWindow::setWindowTitle(name);
     }
 
+    /**
+     * @brief getter for the menu bar
+     *
+     * @return MenuBar&
+     */
     MenuBar& MainWindow::getMenuBar() { return *_menuBar; }
 
+    /**
+     * @brief getter for the side bar
+     *
+     * @return SideBar&
+     */
     SideBar& MainWindow::getSideBar() { return *_sideBar; }
 
+    /**
+     * @brief getter for the central widget
+     *
+     * @return QStackedWidget*
+     */
     QStackedWidget* MainWindow::getCentralWidget() { return _centralStack; }
 
 }   // namespace ui

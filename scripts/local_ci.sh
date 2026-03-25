@@ -10,7 +10,7 @@ ctest --output-on-failure
 cd ..
 
 cppcheck \
-    --project=build/compile_commands.json \
+    --project=compile_commands.json \
     --quiet \
     --file-filter=src/* \
     --suppress=useStlAlgorithm \
@@ -27,4 +27,4 @@ cppcheck \
     --library=qt \
     -I src
 
-clangd-tidy $(find src/) -p=build
+clangd-tidy $(find src/) -p=.

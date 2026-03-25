@@ -29,9 +29,8 @@ struct TransactionRow final
     /// The comment field, this is an optional field
     orm::Field<"comment", std::optional<std::string>> comment;
 
-   public:   // methods
-    [[nodiscard]] constexpr auto fields();
-    [[nodiscard]] constexpr auto fields() const;
+    /// auto generate the fields() function using the ORM_FIELDS macro
+    ORM_FIELDS(TransactionRow, id, timestamp, status, comment);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ROW_HPP__

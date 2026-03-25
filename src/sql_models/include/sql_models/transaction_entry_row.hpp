@@ -77,8 +77,15 @@ struct TransactionEntryRow final
     /// for USD) to avoid floating-point precision issues
     orm::Field<"amount", std::int64_t, orm::not_null_t> amount;
 
-    [[nodiscard]] constexpr auto fields();
-    [[nodiscard]] constexpr auto fields() const;
+    /// auto generate the fields() function using the ORM_FIELDS macro
+    ORM_FIELDS(
+        TransactionEntryRow,
+        id,
+        transactionId,
+        accountId,
+        instrumentId,
+        amount
+    );
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
