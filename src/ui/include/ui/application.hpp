@@ -1,5 +1,5 @@
-#ifndef __UI__APPLICATION_HPP__
-#define __UI__APPLICATION_HPP__
+#ifndef __UI__INCLUDE__UI__APPLICATION_HPP__
+#define __UI__INCLUDE__UI__APPLICATION_HPP__
 
 #include <QApplication>
 
@@ -26,4 +26,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__APPLICATION_HPP__
+#endif   // __UI__INCLUDE__UI__APPLICATION_HPP__

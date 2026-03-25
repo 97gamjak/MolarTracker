@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__UI_SETTINGS_TPP__
-#define __SETTINGS__UI_SETTINGS_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__UI_SETTINGS_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__UI_SETTINGS_TPP__
 
 #include "ui_settings.hpp"
 
@@ -37,4 +37,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__UI_SETTINGS_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__UI_SETTINGS_TPP__

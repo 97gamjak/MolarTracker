@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__BASE__PREDICATE_TPP__
-#define __APP__STORE__BASE__PREDICATE_TPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__PREDICATE_TPP__
+#define __APP__INCLUDE__APP__STORE__BASE__PREDICATE_TPP__
 
 #include "predicate.hpp"
 #include "store_state.hpp"
@@ -83,4 +83,4 @@ namespace app
     }
 }   // namespace app
 
-#endif   // __APP__STORE__BASE__PREDICATE_TPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__PREDICATE_TPP__

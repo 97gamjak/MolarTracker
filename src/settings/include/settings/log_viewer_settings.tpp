@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
-#define __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_TPP__
 
 #include "log_viewer_settings.hpp"
 
@@ -41,4 +41,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_TPP__

@@ -1,5 +1,5 @@
-#ifndef __APP__REPOS__ACCOUNT_REPO_HPP__
-#define __APP__REPOS__ACCOUNT_REPO_HPP__
+#ifndef __APP__SRC__APP__REPOS__ACCOUNT_REPO_HPP__
+#define __APP__SRC__APP__REPOS__ACCOUNT_REPO_HPP__
 
 #include <memory>
 
@@ -43,4 +43,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__REPOS__ACCOUNT_REPO_HPP__
+#endif   // __APP__SRC__APP__REPOS__ACCOUNT_REPO_HPP__

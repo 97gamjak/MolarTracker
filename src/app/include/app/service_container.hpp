@@ -1,5 +1,5 @@
-#ifndef __APP__SERVICE_CONTAINER_HPP__
-#define __APP__SERVICE_CONTAINER_HPP__
+#ifndef __APP__INCLUDE__APP__SERVICE_CONTAINER_HPP__
+#define __APP__INCLUDE__APP__SERVICE_CONTAINER_HPP__
 
 #include <memory>
 
@@ -36,4 +36,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__SERVICE_CONTAINER_HPP__
+#endif   // __APP__INCLUDE__APP__SERVICE_CONTAINER_HPP__

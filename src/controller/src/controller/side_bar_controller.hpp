@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
-#define __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
 
 #include <QObject>
 
@@ -67,4 +67,4 @@ namespace controller
 
 }   // namespace controller
 
-#endif   // __CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__

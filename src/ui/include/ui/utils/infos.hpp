@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__UTILS__INFOS_HPP__
-#define __UI__WIDGETS__UTILS__INFOS_HPP__
+#ifndef __UI__INCLUDE__UI__UTILS__INFOS_HPP__
+#define __UI__INCLUDE__UI__UTILS__INFOS_HPP__
 
 class QStatusBar;   // forward declaration
 
@@ -14,4 +14,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__UTILS__INFOS_HPP__
+#endif   // __UI__INCLUDE__UI__UTILS__INFOS_HPP__

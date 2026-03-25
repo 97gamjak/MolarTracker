@@ -1,5 +1,5 @@
-#ifndef __ORM__SQL_TYPE_HPP__
-#define __ORM__SQL_TYPE_HPP__
+#ifndef __ORM__INCLUDE__ORM__SQL_TYPE_HPP__
+#define __ORM__INCLUDE__ORM__SQL_TYPE_HPP__
 
 #include <cstdint>
 #include <mstd/type_traits.hpp>
@@ -118,4 +118,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__SQL_TYPE_HPP__
+#endif   // __ORM__INCLUDE__ORM__SQL_TYPE_HPP__

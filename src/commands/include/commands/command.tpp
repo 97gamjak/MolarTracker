@@ -1,5 +1,5 @@
-#ifndef __UI__COMMANDS__COMMAND_TPP__
-#define __UI__COMMANDS__COMMAND_TPP__
+#ifndef __COMMANDS__INCLUDE__COMMANDS__COMMAND_TPP__
+#define __COMMANDS__INCLUDE__COMMANDS__COMMAND_TPP__
 
 #include <expected>
 #include <utility>
@@ -39,4 +39,4 @@ namespace cmd
     }
 }   // namespace cmd
 
-#endif   // __UI__COMMANDS__COMMAND_TPP__
+#endif   // __COMMANDS__INCLUDE__COMMANDS__COMMAND_TPP__

@@ -1,5 +1,5 @@
-#ifndef __ORM__TYPE_TRAITS_HPP__
-#define __ORM__TYPE_TRAITS_HPP__
+#ifndef __ORM__INCLUDE__ORM__TYPE_TRAITS_HPP__
+#define __ORM__INCLUDE__ORM__TYPE_TRAITS_HPP__
 
 #include <concepts>
 #include <string>
@@ -78,4 +78,4 @@ namespace orm
     }
 }   // namespace orm
 
-#endif   // __ORM__TYPE_TRAITS_HPP__
+#endif   // __ORM__INCLUDE__ORM__TYPE_TRAITS_HPP__

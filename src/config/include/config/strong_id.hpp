@@ -1,5 +1,5 @@
-#ifndef __CONFIG__STRONG_ID_HPP__
-#define __CONFIG__STRONG_ID_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__STRONG_ID_HPP__
+#define __CONFIG__INCLUDE__CONFIG__STRONG_ID_HPP__
 
 #include <cstdint>
 #include <ostream>
@@ -75,8 +75,8 @@ struct isStrongId<StrongId<Tag, Rep>> : std::true_type
 template <typename T>
 inline constexpr bool isStrongId_v = isStrongId<T>::value;
 
-#ifndef __CONFIG__DETAILS__STRONG_ID_TPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 #include "config/details/strong_id.tpp"
-#endif   // __CONFIG__DETAILS__STRONG_ID_TPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 
-#endif   // __CONFIG__STRONG_ID_HPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__STRONG_ID_HPP__

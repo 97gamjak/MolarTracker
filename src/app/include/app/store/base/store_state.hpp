@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__BASE__STORE_STATE_HPP__
-#define __APP__STORE__BASE__STORE_STATE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__STORE_STATE_HPP__
+#define __APP__INCLUDE__APP__STORE__BASE__STORE_STATE_HPP__
 
 #include <cstdint>
 
@@ -20,4 +20,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__STORE__BASE__STORE_STATE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__STORE_STATE_HPP__

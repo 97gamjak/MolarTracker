@@ -1,5 +1,5 @@
-#ifndef __CONNECTIONS__OBSERVABLE_TPP__
-#define __CONNECTIONS__OBSERVABLE_TPP__
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_TPP__
+#define __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_TPP__
 
 #include "observable.hpp"
 
@@ -91,4 +91,4 @@ Connection Observable<Tags...>::on(
     return _getSignal<Tag>().connect(func, user);
 }
 
-#endif   // __CONNECTIONS__OBSERVABLE_TPP__
+#endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_TPP__

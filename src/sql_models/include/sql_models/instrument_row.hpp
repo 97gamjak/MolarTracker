@@ -1,5 +1,5 @@
-#ifndef __SQL_MODELS__INSTRUMENT_ROW_HPP__
-#define __SQL_MODELS__INSTRUMENT_ROW_HPP__
+#ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
+#define __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 
 #include "config/finance_enums.hpp"
 #include "config/id_types.hpp"
@@ -80,8 +80,4 @@ struct CashInstrumentRow
     [[nodiscard]] constexpr auto fields() const;
 };
 
-#ifndef __SQL_MODELS__INSTRUMENT_ROW_IMPL_HPP__
-#include "instrument_row.impl.hpp"   // IWYU pragma: keep
-#endif
-
-#endif   // __SQL_MODELS__INSTRUMENT_ROW_HPP__
+#endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__

@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__VERSION_PARAM_HPP__
-#define __SETTINGS__PARAMS__VERSION_PARAM_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__VERSION_PARAM_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__VERSION_PARAM_HPP__
 
 #include "settings/params/param_core.hpp"
 #include "utils/version.hpp"
@@ -11,4 +11,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS__VERSION_PARAM_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__VERSION_PARAM_HPP__

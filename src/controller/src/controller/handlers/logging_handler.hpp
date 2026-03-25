@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__
-#define __CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__
 
 #include "connections/connection.hpp"
 
@@ -37,4 +37,4 @@ namespace controller
 
 }   // namespace controller
 
-#endif   // __UI__HANDLERS__LOGGING_HANDLER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__HANDLERS__LOGGING_HANDLER_HPP__

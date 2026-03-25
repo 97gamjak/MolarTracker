@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOG_EXCEPTIONS_HPP__
-#define __LOGGING__LOG_EXCEPTIONS_HPP__
+#ifndef __LOGGING__SRC__LOGGING__LOG_EXCEPTIONS_HPP__
+#define __LOGGING__SRC__LOGGING__LOG_EXCEPTIONS_HPP__
 
 #include "exceptions/base.hpp"
 
@@ -19,4 +19,4 @@ namespace logging
 
 }   // namespace logging
 
-#endif   // __LOGGING__LOG_EXCEPTIONS_HPP__
+#endif   // __LOGGING__SRC__LOGGING__LOG_EXCEPTIONS_HPP__

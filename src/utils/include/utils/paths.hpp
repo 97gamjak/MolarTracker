@@ -1,5 +1,5 @@
-#ifndef __UTILS__PATHS_HPP__
-#define __UTILS__PATHS_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__PATHS_HPP__
+#define __UTILS__INCLUDE__UTILS__PATHS_HPP__
 
 #include <cstdint>
 #include <expected>
@@ -49,4 +49,4 @@ namespace utils
 
 }   // namespace utils
 
-#endif   // __UTILS__PATHS_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__PATHS_HPP__

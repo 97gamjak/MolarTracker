@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__SIDE_BAR__CATEGORY_HPP__
-#define __UI__WIDGETS__SIDE_BAR__CATEGORY_HPP__
+#ifndef __UI__INCLUDE__UI__SIDE_BAR__CATEGORY_HPP__
+#define __UI__INCLUDE__UI__SIDE_BAR__CATEGORY_HPP__
 
 #include "side_bar_item.hpp"
 
@@ -30,4 +30,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__SIDE_BAR__CATEGORY_HPP__
+#endif   // __UI__INCLUDE__UI__SIDE_BAR__CATEGORY_HPP__

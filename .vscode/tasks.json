@@ -71,6 +71,35 @@
             "group": "build"
         },
         {
+            "label": "local-CI",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "scripts/local_ci.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "local-CI",
+                    "fileLocation": [
+                        "absolute"
+                    ],
+                    "pattern": {
+                        "regexp": "^(.*?):(\\d+):(\\d+):\\s*(warning|error|note):\\s*(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": "build"
+        },
+        {
             "type": "cmake",
             "label": "CMake: build",
             "command": "build",

@@ -1,5 +1,5 @@
-#ifndef __CONFIG__ID_TYPES_HPP__
-#define __CONFIG__ID_TYPES_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__ID_TYPES_HPP__
+#define __CONFIG__INCLUDE__CONFIG__ID_TYPES_HPP__
 
 #include "config/strong_id.hpp"
 
@@ -36,8 +36,8 @@ using TransactionEntryId = StrongId<TransactionEntryTag>;
 template <typename T>
 auto getId(const T& value);
 
-#ifndef __CONFIG__DETAILS__ID_TYPES_TPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__ID_TYPES_TPP__
 #include "config/details/id_types.tpp"
-#endif   // __CONFIG__DETAILS__ID_TYPES_TPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__ID_TYPES_TPP__
 
-#endif   // __CONFIG__ID_TYPES_HPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__ID_TYPES_HPP__

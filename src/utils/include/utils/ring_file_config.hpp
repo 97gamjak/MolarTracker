@@ -1,5 +1,5 @@
-#ifndef __UTILS__RING_FILE_CONFIG_HPP__
-#define __UTILS__RING_FILE_CONFIG_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__RING_FILE_CONFIG_HPP__
+#define __UTILS__INCLUDE__UTILS__RING_FILE_CONFIG_HPP__
 
 #include <filesystem>
 #include <optional>
@@ -57,4 +57,4 @@ struct RingFileConfig
     std::optional<std::filesystem::path> symlinkPath{std::nullopt};
 };
 
-#endif   // __UTILS__RING_FILE_CONFIG_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__RING_FILE_CONFIG_HPP__

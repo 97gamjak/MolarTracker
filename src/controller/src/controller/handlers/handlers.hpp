@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER__HANDLERS__HANDLERS_HPP__
-#define __CONTROLLER__HANDLERS__HANDLERS_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__HANDLERS__HANDLERS_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__HANDLERS__HANDLERS_HPP__
 
 #include "dirty_handler.hpp"
 #include "logging_handler.hpp"
@@ -35,4 +35,4 @@ namespace controller
     };
 }   // namespace controller
 
-#endif   // __CONTROLLER__HANDLERS__HANDLERS_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__HANDLERS__HANDLERS_HPP__

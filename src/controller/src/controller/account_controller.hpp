@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER__ACCOUNT_CONTROLLER_HPP__
-#define __CONTROLLER__ACCOUNT_CONTROLLER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 
 #include "side_bar_category_controller.hpp"
 
@@ -74,4 +74,4 @@ namespace controller
 
 }   // namespace controller
 
-#endif   // __CONTROLLER__ACCOUNT_CONTROLLER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__ACCOUNT_CONTROLLER_HPP__

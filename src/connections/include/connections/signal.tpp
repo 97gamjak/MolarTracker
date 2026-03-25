@@ -1,5 +1,5 @@
-#ifndef __CONNECTIONS__SIGNAL_TPP__
-#define __CONNECTIONS__SIGNAL_TPP__
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_TPP__
+#define __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_TPP__
 
 #include "connection.hpp"
 #include "signal.hpp"
@@ -71,4 +71,4 @@ void Signal<Tag>::_disconnect(void* owner, std::size_t id)
     self->_subscribers.erase(id);
 }
 
-#endif   // __CONNECTIONS__SIGNAL_TPP__
+#endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_TPP__

@@ -1,5 +1,5 @@
-#ifndef __CONNECTIONS__OBSERVABLE_HPP__
-#define __CONNECTIONS__OBSERVABLE_HPP__
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_HPP__
+#define __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_HPP__
 
 #include <tuple>
 
@@ -43,8 +43,8 @@ class Observable
     const Signal<Tag>& _getSignal() const;
 };
 
-#ifndef __CONNECTIONS__OBSERVABLE_TPP__
-#include "observable.tpp"   // IWYU pragma: export
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_TPP__
+#include "observable.tpp"
 #endif
 
-#endif   // __CONNECTIONS__OBSERVABLE_HPP__
+#endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__OBSERVABLE_HPP__

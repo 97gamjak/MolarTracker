@@ -1,5 +1,5 @@
-#ifndef __ORM__CRUD__CRUD_DETAIL_HPP__
-#define __ORM__CRUD__CRUD_DETAIL_HPP__
+#ifndef __ORM__INCLUDE__ORM__CRUD__CRUD_DETAIL_HPP__
+#define __ORM__INCLUDE__ORM__CRUD__CRUD_DETAIL_HPP__
 
 #include <cstddef>
 #include <cstdint>
@@ -41,8 +41,8 @@ namespace orm
 
 }   // namespace orm
 
-#ifndef __ORM__CRUD__CRUD_DETAIL_TPP__
+#ifndef __ORM__INCLUDE__ORM__CRUD__CRUD_DETAIL_TPP__
 #include "crud_detail.tpp"
-#endif   // __ORM__CRUD__CRUD_DETAIL_TPP__
+#endif   // __ORM__INCLUDE__ORM__CRUD__CRUD_DETAIL_TPP__
 
-#endif   // __ORM__CRUD__CRUD_DETAIL_HPP__
+#endif   // __ORM__INCLUDE__ORM__CRUD__CRUD_DETAIL_HPP__

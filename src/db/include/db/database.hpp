@@ -1,5 +1,5 @@
-#ifndef __DB__DATABASE_HPP__
-#define __DB__DATABASE_HPP__
+#ifndef __DB__INCLUDE__DB__DATABASE_HPP__
+#define __DB__INCLUDE__DB__DATABASE_HPP__
 
 #include <cstdint>
 #include <filesystem>
@@ -61,4 +61,4 @@ namespace db
     };
 }   // namespace db
 
-#endif   // __DB__DATABASE_HPP__
+#endif   // __DB__INCLUDE__DB__DATABASE_HPP__

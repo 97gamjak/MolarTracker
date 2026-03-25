@@ -1,5 +1,5 @@
-#ifndef __ORM__CRUD__CRUD_ERROR_HPP__
-#define __ORM__CRUD__CRUD_ERROR_HPP__
+#ifndef __ORM__INCLUDE__ORM__CRUD__CRUD_ERROR_HPP__
+#define __ORM__INCLUDE__ORM__CRUD__CRUD_ERROR_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -56,4 +56,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__CRUD__CRUD_ERROR_HPP__
+#endif   // __ORM__INCLUDE__ORM__CRUD__CRUD_ERROR_HPP__

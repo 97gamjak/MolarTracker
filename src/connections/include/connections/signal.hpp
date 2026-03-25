@@ -1,5 +1,5 @@
-#ifndef __CONNECTIONS__SIGNAL_HPP__
-#define __CONNECTIONS__SIGNAL_HPP__
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_HPP__
+#define __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_HPP__
 
 #include <cstddef>
 #include <unordered_map>
@@ -57,8 +57,8 @@ class Signal
     static void _disconnect(void* owner, std::size_t id);
 };
 
-#ifndef __CONNECTIONS__SIGNAL_TPP__
-#include "signal.tpp"   // IWYU pragma: export
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_TPP__
+#include "signal.tpp"
 #endif
 
-#endif   // __CONNECTIONS__SIGNAL_HPP__
+#endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_HPP__

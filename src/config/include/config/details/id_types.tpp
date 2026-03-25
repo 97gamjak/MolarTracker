@@ -1,5 +1,5 @@
-#ifndef __CONFIG__DETAILS__ID_TYPES_TPP__
-#define __CONFIG__DETAILS__ID_TYPES_TPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__ID_TYPES_TPP__
+#define __CONFIG__INCLUDE__CONFIG__DETAILS__ID_TYPES_TPP__
 
 #include "config/id_types.hpp"
 #include "config/type_traits.hpp"
@@ -20,4 +20,4 @@ auto getId(const T& value)
     }
 }
 
-#endif   // __CONFIG__DETAILS__ID_TYPES_TPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__ID_TYPES_TPP__

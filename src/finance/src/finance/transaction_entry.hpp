@@ -1,5 +1,5 @@
-#ifndef __FINANCE__TRANSACTION_ENTRY_HPP__
-#define __FINANCE__TRANSACTION_ENTRY_HPP__
+#ifndef __FINANCE__SRC__FINANCE__TRANSACTION_ENTRY_HPP__
+#define __FINANCE__SRC__FINANCE__TRANSACTION_ENTRY_HPP__
 
 #include <variant>
 
@@ -11,4 +11,4 @@ namespace finance
 
 }   // namespace finance
 
-#endif   // __FINANCE__TRANSACTION_ENTRY_HPP__
+#endif   // __FINANCE__SRC__FINANCE__TRANSACTION_ENTRY_HPP__

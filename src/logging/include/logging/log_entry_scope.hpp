@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOG_ENTRY_SCOPE_HPP__
-#define __LOGGING__LOG_ENTRY_SCOPE_HPP__
+#ifndef __LOGGING__INCLUDE__LOGGING__LOG_ENTRY_SCOPE_HPP__
+#define __LOGGING__INCLUDE__LOGGING__LOG_ENTRY_SCOPE_HPP__
 
 #include <chrono>
 
@@ -49,4 +49,4 @@ namespace logging
 
 }   // namespace logging
 
-#endif   // __LOGGING__LOG_ENTRY_SCOPE_HPP__
+#endif   // __LOGGING__INCLUDE__LOGGING__LOG_ENTRY_SCOPE_HPP__

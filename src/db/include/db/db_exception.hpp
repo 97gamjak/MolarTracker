@@ -1,5 +1,5 @@
-#ifndef __DB__DB_EXCEPTION_HPP__
-#define __DB__DB_EXCEPTION_HPP__
+#ifndef __DB__INCLUDE__DB__DB_EXCEPTION_HPP__
+#define __DB__INCLUDE__DB__DB_EXCEPTION_HPP__
 
 #include <stdexcept>
 #include <string>
@@ -20,4 +20,4 @@ namespace db
 
 }   // namespace db
 
-#endif   // __DB__DB_EXCEPTION_HPP__
+#endif   // __DB__INCLUDE__DB__DB_EXCEPTION_HPP__

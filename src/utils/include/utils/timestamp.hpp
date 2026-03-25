@@ -1,5 +1,5 @@
-#ifndef __UTILS__TIMESTAMP_HPP__
-#define __UTILS__TIMESTAMP_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
+#define __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 
 #include <chrono>
 #include <string>
@@ -35,4 +35,4 @@ class Timestamp final
     [[nodiscard]] static std::string fileSafe();
 };
 
-#endif   // __UTILS__TIMESTAMP_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__

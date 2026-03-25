@@ -1,5 +1,5 @@
-#ifndef __APP__SERVICES__ACCOUNT_SERVICE_HPP__
-#define __APP__SERVICES__ACCOUNT_SERVICE_HPP__
+#ifndef __APP__SRC__APP__SERVICES__ACCOUNT_SERVICE_HPP__
+#define __APP__SRC__APP__SERVICES__ACCOUNT_SERVICE_HPP__
 
 #include <memory>
 #include <vector>
@@ -42,4 +42,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__SERVICES__ACCOUNT_SERVICE_HPP__
+#endif   // __APP__SRC__APP__SERVICES__ACCOUNT_SERVICE_HPP__

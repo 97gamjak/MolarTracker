@@ -1,5 +1,5 @@
-#ifndef __APP__STORE_CONTAINER_HPP__
-#define __APP__STORE_CONTAINER_HPP__
+#ifndef __APP__INCLUDE__APP__STORE_CONTAINER_HPP__
+#define __APP__INCLUDE__APP__STORE_CONTAINER_HPP__
 
 #include "app/store/account_store.hpp"
 #include "app/store/profile/profile_store.hpp"
@@ -50,4 +50,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__STORE_CONTAINER_HPP__
+#endif   // __APP__INCLUDE__APP__STORE_CONTAINER_HPP__

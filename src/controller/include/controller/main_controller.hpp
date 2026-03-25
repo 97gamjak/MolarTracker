@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER__MAIN_CONTROLLER_HPP__
-#define __CONTROLLER__MAIN_CONTROLLER_HPP__
+#ifndef __CONTROLLER__INCLUDE__CONTROLLER__MAIN_CONTROLLER_HPP__
+#define __CONTROLLER__INCLUDE__CONTROLLER__MAIN_CONTROLLER_HPP__
 
 #include <memory>
 
@@ -20,4 +20,4 @@ namespace controller
 
 }   // namespace controller
 
-#endif   // __CONTROLLER__MAIN_CONTROLLER_HPP__
+#endif   // __CONTROLLER__INCLUDE__CONTROLLER__MAIN_CONTROLLER_HPP__

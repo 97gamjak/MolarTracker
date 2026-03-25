@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__
-#define __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__
 
 #include <vector>
 
@@ -103,8 +103,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
-#include "numeric_vec_param.tpp"   // IWYU pragma: export
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
+#include "numeric_vec_param.tpp"
 #endif
 
-#endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_HPP__

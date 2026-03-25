@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__PARAMS_HPP__
-#define __SETTINGS__PARAMS__PARAMS_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAMS_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAMS_HPP__
 
 #include "settings/params/param_container.hpp"         // IWYU pragma: export
 #include "settings/params/param_container_mixin.hpp"   // IWYU pragma: export
@@ -18,4 +18,4 @@
 #include "settings/params/string_param.hpp"    // IWYU pragma: export
 #include "settings/params/version_param.hpp"   // IWYU pragma: export
 
-#endif   // __SETTINGS__PARAMS__PARAMS_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAMS_HPP__

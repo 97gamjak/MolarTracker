@@ -1,5 +1,5 @@
-#ifndef __ORM__WHERE_CLAUSE_HPP__
-#define __ORM__WHERE_CLAUSE_HPP__
+#ifndef __ORM__INCLUDE__ORM__WHERE_CLAUSE_HPP__
+#define __ORM__INCLUDE__ORM__WHERE_CLAUSE_HPP__
 
 #include <cstdint>
 #include <memory>
@@ -134,8 +134,8 @@ namespace orm
 
 }   // namespace orm
 
-#ifndef __ORM__WHERE_CLAUSE_TPP__
+#ifndef __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__
 #include "where_clause.tpp"   // IWYU pragma: keep
 #endif
 
-#endif   // __ORM__WHERE_CLAUSE_HPP__
+#endif   // __ORM__INCLUDE__ORM__WHERE_CLAUSE_HPP__

@@ -1,5 +1,5 @@
-#ifndef __UTILS__VERSION_HPP__
-#define __UTILS__VERSION_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__VERSION_HPP__
+#define __UTILS__INCLUDE__UTILS__VERSION_HPP__
 
 #include <cstddef>
 #include <nlohmann/json.hpp>
@@ -83,4 +83,4 @@ struct adl_serializer<utils::SemVer>
 };
 NLOHMANN_JSON_NAMESPACE_END
 
-#endif   // __UTILS__VERSION_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__VERSION_HPP__

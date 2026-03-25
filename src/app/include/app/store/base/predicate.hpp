@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__BASE__PREDICATE_HPP__
-#define __APP__STORE__BASE__PREDICATE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__PREDICATE_HPP__
+#define __APP__INCLUDE__APP__STORE__BASE__PREDICATE_HPP__
 
 #include <functional>
 
@@ -29,8 +29,8 @@ namespace app
 
 }   // namespace app
 
-#ifndef __APP__STORE__BASE__PREDICATE_TPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__PREDICATE_TPP__
 #include "predicate.tpp"
-#endif   // __APP__STORE__BASE__PREDICATE_TPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__PREDICATE_TPP__
 
-#endif   // __APP__STORE__BASE__PREDICATE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__PREDICATE_HPP__

@@ -1,5 +1,5 @@
-#ifndef __APP__APP_CONTEXT_HPP__
-#define __APP__APP_CONTEXT_HPP__
+#ifndef __APP__INCLUDE__APP__APP_CONTEXT_HPP__
+#define __APP__INCLUDE__APP__APP_CONTEXT_HPP__
 
 #include "app/repo_container.hpp"
 #include "app/service_container.hpp"
@@ -49,4 +49,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__APP_CONTEXT_HPP__
+#endif   // __APP__INCLUDE__APP__APP_CONTEXT_HPP__

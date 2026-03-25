@@ -1,5 +1,5 @@
-#ifndef __ORM__FIELDS_TPP__
-#define __ORM__FIELDS_TPP__
+#ifndef __ORM__INCLUDE__ORM__FIELDS_TPP__
+#define __ORM__INCLUDE__ORM__FIELDS_TPP__
 
 #include <mstd/string.hpp>
 
@@ -208,4 +208,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__FIELDS_TPP__
+#endif   // __ORM__INCLUDE__ORM__FIELDS_TPP__

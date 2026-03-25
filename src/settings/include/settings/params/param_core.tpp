@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__PARAM_CORE_TPP__
-#define __SETTINGS__PARAMS__PARAM_CORE_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_TPP__
 
 #include <cmath>
 #include <concepts>
@@ -426,4 +426,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS__PARAM_CORE_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_TPP__

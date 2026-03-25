@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__PARAM_MIXIN_HPP__
-#define __SETTINGS__PARAMS__PARAM_MIXIN_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_MIXIN_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_MIXIN_HPP__
 
 #include <optional>
 #include <string>
@@ -76,8 +76,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAMS__PARAM_MIXIN_TPP__
-#include "param_mixin.tpp"   // IWYU pragma: export
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_MIXIN_TPP__
+#include "param_mixin.tpp"
 #endif
 
-#endif   // __SETTINGS__PARAMS__PARAM_MIXIN_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_MIXIN_HPP__

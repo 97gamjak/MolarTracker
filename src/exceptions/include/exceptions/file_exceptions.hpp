@@ -1,5 +1,5 @@
-#ifndef __EXCEPTIONS__FILE_EXCEPTIONS_HPP__
-#define __EXCEPTIONS__FILE_EXCEPTIONS_HPP__
+#ifndef __EXCEPTIONS__INCLUDE__EXCEPTIONS__FILE_EXCEPTIONS_HPP__
+#define __EXCEPTIONS__INCLUDE__EXCEPTIONS__FILE_EXCEPTIONS_HPP__
 
 #include <string>
 
@@ -18,4 +18,4 @@ class DirException : public MolarTrackerException
     explicit DirException(const std::string& message);
 };
 
-#endif   // __EXCEPTIONS__FILE_EXCEPTIONS_HPP__
+#endif   // __EXCEPTIONS__INCLUDE__EXCEPTIONS__FILE_EXCEPTIONS_HPP__

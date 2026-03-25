@@ -1,5 +1,5 @@
-#ifndef __UI__COMMANDS__COMMANDS_TPP__
-#define __UI__COMMANDS__COMMANDS_TPP__
+#ifndef __COMMANDS__INCLUDE__COMMANDS__COMMANDS_TPP__
+#define __COMMANDS__INCLUDE__COMMANDS__COMMANDS_TPP__
 
 #include "commands.hpp"
 
@@ -33,4 +33,4 @@ namespace cmd
     }
 }   // namespace cmd
 
-#endif   // __UI__COMMANDS__COMMANDS_TPP__
+#endif   // __COMMANDS__INCLUDE__COMMANDS__COMMANDS_TPP__

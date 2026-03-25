@@ -1,5 +1,5 @@
-#ifndef __DB__TRANSACTION_HPP__
-#define __DB__TRANSACTION_HPP__
+#ifndef __DB__INCLUDE__DB__TRANSACTION_HPP__
+#define __DB__INCLUDE__DB__TRANSACTION_HPP__
 
 #include <memory>
 
@@ -41,4 +41,4 @@ namespace db
     };
 }   // namespace db
 
-#endif   // __DB__TRANSACTION_HPP__
+#endif   // __DB__INCLUDE__DB__TRANSACTION_HPP__

@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__PARAM_CORE_HPP__
-#define __SETTINGS__PARAMS__PARAM_CORE_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_HPP__
 
 #include <optional>
 #include <string>
@@ -163,8 +163,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAMS__PARAM_CORE_TPP__
-#include "param_core.tpp"   // IWYU pragma: export
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_TPP__
+#include "param_core.tpp"
 #endif
 
-#endif   // __SETTINGS__PARAMS__PARAM_CORE_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CORE_HPP__

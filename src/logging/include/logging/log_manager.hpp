@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOG_MANAGER_HPP__
-#define __LOGGING__LOG_MANAGER_HPP__
+#ifndef __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__
+#define __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__
 
 #include <filesystem>
 #include <string>
@@ -83,4 +83,4 @@ namespace logging
 
 }   // namespace logging
 
-#endif   // __LOGGING__LOG_MANAGER_HPP__
+#endif   // __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__

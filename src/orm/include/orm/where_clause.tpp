@@ -1,5 +1,5 @@
-#ifndef __ORM__WHERE_CLAUSE_TPP__
-#define __ORM__WHERE_CLAUSE_TPP__
+#ifndef __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__
+#define __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__
 
 #include "orm/index.hpp"
 #include "orm/orm_exception.hpp"
@@ -146,4 +146,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__WHERE_CLAUSE_TPP__
+#endif   // __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__

@@ -1,5 +1,5 @@
-#ifndef __UI__COMMANDS__COMMAND_ERROR_HPP__
-#define __UI__COMMANDS__COMMAND_ERROR_HPP__
+#ifndef __COMMANDS__INCLUDE__COMMANDS__COMMAND_ERROR_HPP__
+#define __COMMANDS__INCLUDE__COMMANDS__COMMAND_ERROR_HPP__
 
 #include <memory>
 #include <mstd/enum.hpp>
@@ -72,4 +72,4 @@ namespace cmd
 
 }   // namespace cmd
 
-#endif   // __UI__COMMANDS__COMMAND_ERROR_HPP__
+#endif   // __COMMANDS__INCLUDE__COMMANDS__COMMAND_ERROR_HPP__

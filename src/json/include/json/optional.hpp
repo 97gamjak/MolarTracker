@@ -1,5 +1,5 @@
-#ifndef __JSON__OPTIONAL_HPP__
-#define __JSON__OPTIONAL_HPP__
+#ifndef __JSON__INCLUDE__JSON__OPTIONAL_HPP__
+#define __JSON__INCLUDE__JSON__OPTIONAL_HPP__
 
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -45,4 +45,4 @@ struct adl_serializer<std::optional<T>>
 };
 NLOHMANN_JSON_NAMESPACE_END
 
-#endif   // __JSON__OPTIONAL_HPP__
+#endif   // __JSON__INCLUDE__JSON__OPTIONAL_HPP__

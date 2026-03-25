@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOG_CATEGORIES_HPP__
-#define __LOGGING__LOG_CATEGORIES_HPP__
+#ifndef __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_HPP__
+#define __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_HPP__
 
 #include <optional>
 #include <set>
@@ -94,8 +94,8 @@ namespace logging
 
 }   // namespace logging
 
-#ifndef __LOGGING__LOG_CATEGORIES_TPP__
+#ifndef __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_TPP__
 #include "log_categories.tpp"
-#endif   // __LOGGING__LOG_CATEGORIES_TPP__
+#endif   // __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_TPP__
 
-#endif   // __LOGGING__LOG_CATEGORIES_HPP__
+#endif   // __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_HPP__

@@ -1,5 +1,5 @@
-#ifndef __APP__FACTORIES__PROFILE_FACTORY_HPP__
-#define __APP__FACTORIES__PROFILE_FACTORY_HPP__
+#ifndef __APP__SRC__APP__FACTORIES__PROFILE_FACTORY_HPP__
+#define __APP__SRC__APP__FACTORIES__PROFILE_FACTORY_HPP__
 
 #include <vector>
 
@@ -26,4 +26,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__FACTORIES__PROFILE_FACTORY_HPP__
+#endif   // __APP__SRC__APP__FACTORIES__PROFILE_FACTORY_HPP__

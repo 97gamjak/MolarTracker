@@ -1,5 +1,5 @@
-#ifndef __ORM__CONCEPTS_HPP__
-#define __ORM__CONCEPTS_HPP__
+#ifndef __ORM__INCLUDE__ORM__CONCEPTS_HPP__
+#define __ORM__INCLUDE__ORM__CONCEPTS_HPP__
 
 #include <concepts>
 #include <cstdint>
@@ -189,4 +189,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__CONCEPTS_HPP__
+#endif   // __ORM__INCLUDE__ORM__CONCEPTS_HPP__

@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__PARAM_UTILS_HPP__
-#define __SETTINGS__PARAMS__PARAM_UTILS_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_UTILS_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_UTILS_HPP__
 
 #include <nlohmann/json.hpp>
 #include <utility>
@@ -116,4 +116,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS__PARAM_UTILS_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_UTILS_HPP__

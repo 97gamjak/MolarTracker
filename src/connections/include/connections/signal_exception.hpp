@@ -1,5 +1,5 @@
-#ifndef __CONNECTIONS__SIGNAL_EXCEPTION_HPP__
-#define __CONNECTIONS__SIGNAL_EXCEPTION_HPP__
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_EXCEPTION_HPP__
+#define __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_EXCEPTION_HPP__
 
 #include <string>
 
@@ -18,4 +18,4 @@ class SignalException : public MolarTrackerException
     [[nodiscard]] const char* what() const noexcept override;
 };
 
-#endif   // __CONNECTIONS__SIGNAL_EXCEPTION_HPP__
+#endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__SIGNAL_EXCEPTION_HPP__

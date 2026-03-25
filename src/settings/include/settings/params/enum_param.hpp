@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__ENUM_PARAM_HPP__
-#define __SETTINGS__PARAMS__ENUM_PARAM_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__ENUM_PARAM_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__ENUM_PARAM_HPP__
 
 #include <expected>
 #include <mstd/type_traits.hpp>
@@ -49,8 +49,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAMS__ENUM_PARAM_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__ENUM_PARAM_TPP__
 #include "enum_param.tpp"   // IWYU pragma: export
 #endif
 
-#endif   // __SETTINGS__PARAMS__ENUM_PARAM_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__ENUM_PARAM_HPP__

@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__VALIDATORS__NAME_LINE_EDIT_HPP__
-#define __UI__WIDGETS__VALIDATORS__NAME_LINE_EDIT_HPP__
+#ifndef __UI__INCLUDE__UI__VALIDATORS__NAME_LINE_EDIT_HPP__
+#define __UI__INCLUDE__UI__VALIDATORS__NAME_LINE_EDIT_HPP__
 
 #include <QMetaType>
 #include <QRegularExpression>
@@ -46,4 +46,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__VALIDATORS__NAME_LINE_EDIT_HPP__
+#endif   // __UI__INCLUDE__UI__VALIDATORS__NAME_LINE_EDIT_HPP__

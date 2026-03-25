@@ -1,5 +1,5 @@
-#ifndef __EXCEPTIONS__BASE_HPP__
-#define __EXCEPTIONS__BASE_HPP__
+#ifndef __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__
+#define __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__
 
 #include <exception>
 #include <string>
@@ -26,4 +26,4 @@ class MolarTrackerException : public std::exception
     [[nodiscard]] const char* what() const noexcept override;
 };
 
-#endif   // __EXCEPTIONS__BASE_HPP__
+#endif   // __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__

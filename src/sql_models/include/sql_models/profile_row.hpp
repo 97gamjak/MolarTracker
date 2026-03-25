@@ -1,5 +1,5 @@
-#ifndef __SQL_MODELS__PROFILE_ROW_HPP__
-#define __SQL_MODELS__PROFILE_ROW_HPP__
+#ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__PROFILE_ROW_HPP__
+#define __SQL_MODELS__INCLUDE__SQL_MODELS__PROFILE_ROW_HPP__
 
 #include <optional>
 #include <string>
@@ -34,4 +34,4 @@ struct ProfileRow final
     ORM_FIELDS(ProfileRow, id, name, email)
 };
 
-#endif   // __SQL_MODELS__PROFILE_ROW_HPP__
+#endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__PROFILE_ROW_HPP__

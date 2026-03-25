@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__VALIDATORS__LINE_VALIDATOR_HPP__
-#define __UI__WIDGETS__VALIDATORS__LINE_VALIDATOR_HPP__
+#ifndef __UI__INCLUDE__UI__VALIDATORS__LINE_VALIDATOR_HPP__
+#define __UI__INCLUDE__UI__VALIDATORS__LINE_VALIDATOR_HPP__
 
 #include <QLineEdit>
 #include <QMetaType>
@@ -105,4 +105,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__VALIDATORS__LINE_VALIDATOR_HPP__
+#endif   // __UI__INCLUDE__UI__VALIDATORS__LINE_VALIDATOR_HPP__

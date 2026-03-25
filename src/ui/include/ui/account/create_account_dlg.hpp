@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
-#define __UI__WIDGETS__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
+#ifndef __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
+#define __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
 
 #include <QDialog>
 
@@ -68,4 +68,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
+#endif   // __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__

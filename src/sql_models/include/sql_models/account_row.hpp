@@ -1,5 +1,5 @@
-#ifndef __SQL_MODELS__ACCOUNT_ROW_HPP__
-#define __SQL_MODELS__ACCOUNT_ROW_HPP__
+#ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__
+#define __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__
 
 #include <string>
 
@@ -89,4 +89,4 @@ struct CashAccountRow final
     ORM_FIELDS(CashAccountRow, id)
 };
 
-#endif   // __SQL_MODELS__ACCOUNT_ROW_HPP__
+#endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__

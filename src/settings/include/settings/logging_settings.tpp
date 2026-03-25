@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__LOGGING_SETTINGS_TPP__
-#define __SETTINGS__LOGGING_SETTINGS_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__LOGGING_SETTINGS_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__LOGGING_SETTINGS_TPP__
 
 #include "logging_settings.hpp"
 
@@ -43,4 +43,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__LOGGING_SETTINGS_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__LOGGING_SETTINGS_TPP__

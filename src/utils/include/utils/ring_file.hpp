@@ -1,5 +1,5 @@
-#ifndef __UTILS__RING_FILE_HPP__
-#define __UTILS__RING_FILE_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__RING_FILE_HPP__
+#define __UTILS__INCLUDE__UTILS__RING_FILE_HPP__
 
 #include <cstddef>
 #include <cstdint>
@@ -77,4 +77,4 @@ class RingFile
     std::filesystem::path _pathForIndex(std::size_t index) const;
 };
 
-#endif   // __UTILS__RING_FILE_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__RING_FILE_HPP__

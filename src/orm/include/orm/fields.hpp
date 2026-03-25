@@ -1,5 +1,5 @@
-#ifndef __ORM__FIELDS_HPP__
-#define __ORM__FIELDS_HPP__
+#ifndef __ORM__INCLUDE__ORM__FIELDS_HPP__
+#define __ORM__INCLUDE__ORM__FIELDS_HPP__
 
 #include <vector>
 
@@ -37,8 +37,8 @@ namespace orm
 
 }   // namespace orm
 
-#ifndef __ORM__FIELDS_TPP__
+#ifndef __ORM__INCLUDE__ORM__FIELDS_TPP__
 #include "fields.tpp"
 #endif
 
-#endif   // __ORM__FIELDS_HPP__
+#endif   // __ORM__INCLUDE__ORM__FIELDS_HPP__

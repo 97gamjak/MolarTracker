@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOG_CATEGORIES_TPP__
-#define __LOGGING__LOG_CATEGORIES_TPP__
+#ifndef __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_TPP__
+#define __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_TPP__
 
 #include "log_categories.hpp"
 
@@ -24,7 +24,7 @@ namespace logging
             const auto dot = fullName.find('.', pos);
             const auto end = (dot == std::string::npos) ? fullName.size() : dot;
 
-            func(fullName.substr(pos, end - pos));
+            std::forward<Fn>(func)(fullName.substr(pos, end - pos));
 
             pos = end + 1;
         }
@@ -32,4 +32,4 @@ namespace logging
 
 }   // namespace logging
 
-#endif   // __LOGGING__LOG_CATEGORIES_TPP__
+#endif   // __LOGGING__INCLUDE__LOGGING__LOG_CATEGORIES_TPP__

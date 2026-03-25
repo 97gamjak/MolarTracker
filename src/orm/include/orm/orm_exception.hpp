@@ -1,5 +1,5 @@
-#ifndef __ORM__ORM_EXCEPTION_HPP__
-#define __ORM__ORM_EXCEPTION_HPP__
+#ifndef __ORM__INCLUDE__ORM__ORM_EXCEPTION_HPP__
+#define __ORM__INCLUDE__ORM__ORM_EXCEPTION_HPP__
 
 #include <string>
 
@@ -19,4 +19,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__ORM_EXCEPTION_HPP__
+#endif   // __ORM__INCLUDE__ORM__ORM_EXCEPTION_HPP__

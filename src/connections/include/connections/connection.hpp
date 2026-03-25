@@ -1,5 +1,5 @@
-#ifndef __CONNECTIONS__CONNECTION_HPP__
-#define __CONNECTIONS__CONNECTION_HPP__
+#ifndef __CONNECTIONS__INCLUDE__CONNECTIONS__CONNECTION_HPP__
+#define __CONNECTIONS__INCLUDE__CONNECTIONS__CONNECTION_HPP__
 
 #include <cstddef>
 #include <optional>
@@ -81,4 +81,4 @@ class Connection
     );
 };
 
-#endif   // __CONNECTIONS__CONNECTION_HPP__
+#endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__CONNECTION_HPP__

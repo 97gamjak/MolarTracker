@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__BASE__BASE_STORE_TPP__
-#define __APP__STORE__BASE__BASE_STORE_TPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
+#define __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
 
 #include <algorithm>
 
@@ -360,4 +360,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__STORE__BASE__BASE_STORE_TPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__

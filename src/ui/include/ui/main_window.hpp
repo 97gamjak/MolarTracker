@@ -1,5 +1,5 @@
-#ifndef __UI__MAIN_WINDOW_HPP__
-#define __UI__MAIN_WINDOW_HPP__
+#ifndef __UI__INCLUDE__UI__MAIN_WINDOW_HPP__
+#define __UI__INCLUDE__UI__MAIN_WINDOW_HPP__
 
 #include <QMainWindow>
 
@@ -50,4 +50,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__MAIN_WINDOW_HPP__
+#endif   // __UI__INCLUDE__UI__MAIN_WINDOW_HPP__

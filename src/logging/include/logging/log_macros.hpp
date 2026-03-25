@@ -1,5 +1,5 @@
-#ifndef __LOGGING__LOG_MACROS_HPP__
-#define __LOGGING__LOG_MACROS_HPP__
+#ifndef __LOGGING__INCLUDE__LOGGING__LOG_MACROS_HPP__
+#define __LOGGING__INCLUDE__LOGGING__LOG_MACROS_HPP__
 
 #include <iostream>   // IWYU pragma: keep
 #include <map>
@@ -128,4 +128,4 @@ namespace logging::detail
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
-#endif   // __LOGGING__LOG_MACROS_HPP__
+#endif   // __LOGGING__INCLUDE__LOGGING__LOG_MACROS_HPP__

@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__LOGGING__DEBUG_SLOTS_MODEL_HPP__
-#define __UI__WIDGETS__LOGGING__DEBUG_SLOTS_MODEL_HPP__
+#ifndef __UI__INCLUDE__UI__LOGGING__DEBUG_SLOTS_MODEL_HPP__
+#define __UI__INCLUDE__UI__LOGGING__DEBUG_SLOTS_MODEL_HPP__
 
 #include <QAbstractItemModel>
 
@@ -106,4 +106,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__LOGGING__DEBUG_SLOTS_MODEL_HPP__
+#endif   // __UI__INCLUDE__UI__LOGGING__DEBUG_SLOTS_MODEL_HPP__

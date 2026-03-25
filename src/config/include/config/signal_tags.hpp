@@ -1,5 +1,5 @@
-#ifndef __CONFIG__SIGNAL_TAGS_HPP__
-#define __CONFIG__SIGNAL_TAGS_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__SIGNAL_TAGS_HPP__
+#define __CONFIG__INCLUDE__CONFIG__SIGNAL_TAGS_HPP__
 
 #include <optional>
 
@@ -38,4 +38,4 @@ struct OnProfileChanged
     using func = void (*)(void*, const TagType& profileId);
 };
 
-#endif   // __CONFIG__SIGNAL_TAGS_HPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__SIGNAL_TAGS_HPP__

@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__GENERAL_SETTINGS_HPP__
-#define __SETTINGS__GENERAL_SETTINGS_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__GENERAL_SETTINGS_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__GENERAL_SETTINGS_HPP__
 
 #include <optional>
 #include <string>
@@ -117,8 +117,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__GENERAL_SETTINGS_TPP__
-#include "general_settings.tpp"   // IWYU pragma: keep
+#ifndef __SETTINGS__INCLUDE__SETTINGS__GENERAL_SETTINGS_TPP__
+#include "general_settings.tpp"
 #endif
 
-#endif   // __SETTINGS__GENERAL_SETTINGS_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__GENERAL_SETTINGS_HPP__

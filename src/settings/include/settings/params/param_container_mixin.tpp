@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
-#define __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
 
 #include "connections/connection.hpp"
 #include "param_container_mixin.hpp"
@@ -199,4 +199,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_CONTAINER_MIXIN_TPP__

@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__BASE__BASE_STORE_HPP__
-#define __APP__STORE__BASE__BASE_STORE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__
+#define __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__
 
 #include <optional>
 #include <unordered_map>
@@ -125,8 +125,8 @@ namespace app
 
 }   // namespace app
 
-#ifndef __APP__STORE__BASE__BASE_STORE_TPP__
+#ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
 #include "base_store.tpp"
-#endif   // __APP__STORE__BASE__BASE_STORE_TPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
 
-#endif   // __APP__STORE__BASE__BASE_STORE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__

@@ -1,5 +1,5 @@
-#ifndef __FINANCE__CURRENCY_EXCEPTION_HPP__
-#define __FINANCE__CURRENCY_EXCEPTION_HPP__
+#ifndef __FINANCE__SRC__FINANCE__CURRENCY_EXCEPTION_HPP__
+#define __FINANCE__SRC__FINANCE__CURRENCY_EXCEPTION_HPP__
 
 #include <string>
 
@@ -26,4 +26,4 @@ namespace finance
 
 }   // namespace finance
 
-#endif   // __FINANCE__CURRENCY_EXCEPTION_HPP__
+#endif   // __FINANCE__SRC__FINANCE__CURRENCY_EXCEPTION_HPP__

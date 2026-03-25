@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__SETTINGS_TPP__
-#define __SETTINGS__SETTINGS_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__SETTINGS_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__SETTINGS_TPP__
 
 #include "settings.hpp"
 
@@ -37,4 +37,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__SETTINGS_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__SETTINGS_TPP__

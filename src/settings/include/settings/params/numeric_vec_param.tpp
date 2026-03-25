@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
-#define __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
 
 #include "numeric_vec_param.hpp"
 
@@ -336,4 +336,4 @@ namespace settings
 
 }   // namespace settings
 
-#endif   // __SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__

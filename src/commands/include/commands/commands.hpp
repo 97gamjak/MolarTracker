@@ -1,5 +1,5 @@
-#ifndef __UI__COMMANDS__COMMANDS_HPP__
-#define __UI__COMMANDS__COMMANDS_HPP__
+#ifndef __COMMANDS__INCLUDE__COMMANDS__COMMANDS_HPP__
+#define __COMMANDS__INCLUDE__COMMANDS__COMMANDS_HPP__
 
 #include <memory>
 #include <vector>
@@ -69,8 +69,8 @@ namespace cmd
 
 }   // namespace cmd
 
-#ifndef __UI__COMMANDS__COMMANDS_TPP__
+#ifndef __COMMANDS__INCLUDE__COMMANDS__COMMANDS_TPP__
 #include "commands.tpp"
-#endif   // __UI__COMMANDS__COMMANDS_TPP__
+#endif   // __COMMANDS__INCLUDE__COMMANDS__COMMANDS_TPP__
 
-#endif   // __UI__COMMANDS__COMMANDS_HPP__
+#endif   // __COMMANDS__INCLUDE__COMMANDS__COMMANDS_HPP__

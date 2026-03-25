@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PROFILE_UI_SETTINGS_HPP__
-#define __SETTINGS__PROFILE_UI_SETTINGS_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PROFILE_UI_SETTINGS_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PROFILE_UI_SETTINGS_HPP__
 
 #include <string>
 #include <utility>
@@ -90,8 +90,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PROFILE_UI_SETTINGS_TPP__
-#include "profile_ui_settings.tpp"   // IWYU pragma: keep
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PROFILE_UI_SETTINGS_TPP__
+#include "profile_ui_settings.tpp"
 #endif
 
-#endif   // __SETTINGS__PROFILE_UI_SETTINGS_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PROFILE_UI_SETTINGS_HPP__

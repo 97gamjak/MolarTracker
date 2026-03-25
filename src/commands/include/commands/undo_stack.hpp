@@ -1,5 +1,7 @@
-#ifndef __UI__COMMANDS__UNDO_STACK_HPP__
-#define __UI__COMMANDS__UNDO_STACK_HPP__
+#ifndef __COMMANDS__INCLUDE__COMMANDS__UNDO_STACK_HPP__
+
+#define __COMMANDS__INCLUDE__COMMANDS__UNDO_STACK_HPP__
+
 
 #include <QObject>
 #include <vector>
@@ -47,4 +49,5 @@ namespace cmd
 
 }   // namespace cmd
 
-#endif   // __UI__COMMANDS__UNDO_STACK_HPP__
+#endif   // __COMMANDS__INCLUDE__COMMANDS__UNDO_STACK_HPP__
+

@@ -1,5 +1,5 @@
-#ifndef __CONFIG__LOGGING_BASE_HPP__
-#define __CONFIG__LOGGING_BASE_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__LOGGING_BASE_HPP__
+#define __CONFIG__INCLUDE__CONFIG__LOGGING_BASE_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -16,4 +16,4 @@
 // cppcheck-suppress syntaxError
 MSTD_ENUM(LogLevel, std::int8_t, LOG_LEVEL);
 
-#endif   // __CONFIG__LOGGING_BASE_HPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__LOGGING_BASE_HPP__

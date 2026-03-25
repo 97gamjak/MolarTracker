@@ -1,5 +1,5 @@
-#ifndef __UI__WIDGETS__SIDE_BAR__ACCOUNT_ITEM_HPP__
-#define __UI__WIDGETS__SIDE_BAR__ACCOUNT_ITEM_HPP__
+#ifndef __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_ITEM_HPP__
+#define __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_ITEM_HPP__
 
 #include "config/id_types.hpp"
 #include "side_bar_item.hpp"
@@ -38,4 +38,4 @@ namespace ui
     };
 }   // namespace ui
 
-#endif   // __UI__WIDGETS__SIDE_BAR__ACCOUNT_ITEM_HPP__
+#endif   // __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_ITEM_HPP__

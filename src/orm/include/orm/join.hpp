@@ -1,5 +1,5 @@
-#ifndef __ORM__JOIN_HPP__
-#define __ORM__JOIN_HPP__
+#ifndef __ORM__INCLUDE__ORM__JOIN_HPP__
+#define __ORM__INCLUDE__ORM__JOIN_HPP__
 
 #include <string>
 #include <utility>
@@ -65,4 +65,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__JOIN_HPP__
+#endif   // __ORM__INCLUDE__ORM__JOIN_HPP__

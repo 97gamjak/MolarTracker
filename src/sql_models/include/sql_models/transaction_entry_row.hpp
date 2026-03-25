@@ -1,5 +1,5 @@
-#ifndef __SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
-#define __SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
+#ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
+#define __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
 
 #include "account_row.hpp"
 #include "config/id_types.hpp"
@@ -81,8 +81,4 @@ struct TransactionEntryRow final
     [[nodiscard]] constexpr auto fields() const;
 };
 
-#ifndef __SQL_MODELS__TRANSACTION_ENTRY_ROW_IMPL_HPP__
-#include "transaction_entry_row.impl.hpp"   // IWYU pragma: keep
-#endif
-
-#endif   // __SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
+#endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__

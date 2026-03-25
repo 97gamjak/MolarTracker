@@ -1,5 +1,5 @@
-#ifndef __UTILS__QT_HELPERS_HPP__
-#define __UTILS__QT_HELPERS_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
+#define __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
 
 #include <QtContainerFwd>
 #include <span>
@@ -19,8 +19,8 @@ namespace utils
 
 }   // namespace utils
 
-#ifndef __UTILS__QT_HELPERS_TPP__
-#include "qt_helpers.tpp"   // IWYU pragma: export
+#ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
+#include "qt_helpers.tpp"
 #endif
 
-#endif   // __UTILS__QT_HELPERS_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__

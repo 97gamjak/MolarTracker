@@ -1,5 +1,5 @@
-#ifndef __APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
-#define __APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
+#ifndef __APP__INCLUDE__APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
+#define __APP__INCLUDE__APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
 
 #include <optional>
 #include <string>
@@ -81,4 +81,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
+#endif   // __APP__INCLUDE__APP__SERVICES_API__I_PROFILE_SERVICE_HPP__

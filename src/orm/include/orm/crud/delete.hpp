@@ -1,5 +1,5 @@
-#ifndef __ORM__CRUD__DELETE_HPP__
-#define __ORM__CRUD__DELETE_HPP__
+#ifndef __ORM__INCLUDE__ORM__CRUD__DELETE_HPP__
+#define __ORM__INCLUDE__ORM__CRUD__DELETE_HPP__
 
 #include "crud_error.hpp"
 #include "db/database.hpp"
@@ -74,4 +74,4 @@ namespace orm::details
     }
 }   // namespace orm::details
 
-#endif   // __ORM__CRUD__DELETE_HPP__
+#endif   // __ORM__INCLUDE__ORM__CRUD__DELETE_HPP__

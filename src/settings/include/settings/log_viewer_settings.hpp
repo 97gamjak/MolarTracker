@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
-#define __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_HPP__
 
 #include <cstddef>
 #include <string>
@@ -211,8 +211,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__LOG_VIEWER_SETTINGS_TPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_TPP__
 #include "log_viewer_settings.tpp"   // IWYU pragma: keep
 #endif
 
-#endif   // __SETTINGS__LOG_VIEWER_SETTINGS_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__LOG_VIEWER_SETTINGS_HPP__

@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__PROFILE__PREDICATES_HPP__
-#define __APP__STORE__PROFILE__PREDICATES_HPP__
+#ifndef __APP__SRC__APP__STORE__PROFILE__PREDICATES_HPP__
+#define __APP__SRC__APP__STORE__PROFILE__PREDICATES_HPP__
 
 #include "app/domain/profile.hpp"
 #include "app/store/base/base_store.hpp"
@@ -16,4 +16,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__STORE__PROFILE__PREDICATES_HPP__
+#endif   // __APP__SRC__APP__STORE__PROFILE__PREDICATES_HPP__

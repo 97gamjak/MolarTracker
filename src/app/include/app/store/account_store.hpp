@@ -1,5 +1,5 @@
-#ifndef __APP__STORE__ACCOUNT_STORE_HPP__
-#define __APP__STORE__ACCOUNT_STORE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
+#define __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
 
 #include <memory>
 
@@ -74,4 +74,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__STORE__ACCOUNT_STORE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__

@@ -1,5 +1,5 @@
-#ifndef __ORM__FIXED_STRING_TPP__
-#define __ORM__FIXED_STRING_TPP__
+#ifndef __ORM__INCLUDE__ORM__FIXED_STRING_TPP__
+#define __ORM__INCLUDE__ORM__FIXED_STRING_TPP__
 
 #include <array>
 #include <cstddef>
@@ -50,4 +50,4 @@ namespace orm
 
 }   // namespace orm
 
-#endif   // __ORM__FIXED_STRING_TPP__
+#endif   // __ORM__INCLUDE__ORM__FIXED_STRING_TPP__

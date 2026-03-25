@@ -1,5 +1,5 @@
-#ifndef __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
-#define __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
+#define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
 
 #include <expected>
 #include <optional>
@@ -96,8 +96,8 @@ namespace settings
 
 }   // namespace settings
 
-#ifndef __SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
-#include "numeric_param.tpp"   // IWYU pragma: export
+#ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_PARAM_TPP__
+#include "numeric_param.tpp"
 #endif
 
-#endif   // __SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
+#endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_PARAM_HPP__

@@ -1,5 +1,5 @@
-#ifndef __FINANCE__CASH_TRANSACTION_HPP__
-#define __FINANCE__CASH_TRANSACTION_HPP__
+#ifndef __FINANCE__SRC__FINANCE__CASH_TRANSACTION_HPP__
+#define __FINANCE__SRC__FINANCE__CASH_TRANSACTION_HPP__
 
 #include "cash.hpp"
 #include "config/id_types.hpp"
@@ -33,4 +33,4 @@ namespace finance
     };
 }   // namespace finance
 
-#endif   // __FINANCE__CASH_TRANSACTION_HPP__
+#endif   // __FINANCE__SRC__FINANCE__CASH_TRANSACTION_HPP__

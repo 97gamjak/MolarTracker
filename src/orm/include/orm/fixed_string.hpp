@@ -1,5 +1,5 @@
-#ifndef __ORM__FIXED_STRING_HPP__
-#define __ORM__FIXED_STRING_HPP__
+#ifndef __ORM__INCLUDE__ORM__FIXED_STRING_HPP__
+#define __ORM__INCLUDE__ORM__FIXED_STRING_HPP__
 
 #include <array>
 #include <cstddef>
@@ -36,8 +36,8 @@ namespace orm
     fixed_string(char const (&)[Size]) -> fixed_string<Size>;
 }   // namespace orm
 
-#ifndef __ORM__FIXED_STRING_TPP__
+#ifndef __ORM__INCLUDE__ORM__FIXED_STRING_TPP__
 #include "fixed_string.tpp"
-#endif   // __ORM__FIXED_STRING_TPP__
+#endif   // __ORM__INCLUDE__ORM__FIXED_STRING_TPP__
 
-#endif   // __ORM__FIXED_STRING_HPP__
+#endif   // __ORM__INCLUDE__ORM__FIXED_STRING_HPP__
