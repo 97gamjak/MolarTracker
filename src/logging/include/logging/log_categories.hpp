@@ -89,7 +89,7 @@ namespace logging
         );
 
         template <typename Fn>
-        static void _forEachSegment(const std::string& fullName, Fn&& func);
+        static void _forEachSegment(const std::string& fullName, Fn func);
     };
 
 }   // namespace logging

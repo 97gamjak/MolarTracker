@@ -15,7 +15,7 @@ namespace logging
      * @param func
      */
     template <typename Fn>
-    void LogCategories::_forEachSegment(const std::string& fullName, Fn&& func)
+    void LogCategories::_forEachSegment(const std::string& fullName, Fn func)
     {
         std::size_t pos = 0;
 
@@ -24,7 +24,7 @@ namespace logging
             const auto dot = fullName.find('.', pos);
             const auto end = (dot == std::string::npos) ? fullName.size() : dot;
 
-            std::forward<Fn>(func)(fullName.substr(pos, end - pos));
+            func(fullName.substr(pos, end - pos));
 
             pos = end + 1;
         }

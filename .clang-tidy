@@ -1,6 +1,7 @@
 ---
 # -altera-unroll-loops:             wants to use everywhere #pragma unroll
 # -abseil-string-find-str-contains: strange string library
+# -bugprone-suspicious-include:     to be able to include .tpp and still use it as impl file types
 
 # TO BE REMOVED:
 # -misc-include-cleaner:            problems with QT < 6.8
@@ -22,8 +23,11 @@ Checks:
   -llvmlibc-restrict-system-libc-headers,
   -modernize-use-trailing-return-type,
   -readability-redundant-access-specifiers,
-  -bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,
-  -misc-include-cleaner
+  -bugprone-reserved-identifier,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
+  -misc-include-cleaner,
+  -bugprone-suspicious-include
   '
 WarningsAsErrors: ''
 HeaderFileExtensions:
