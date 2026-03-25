@@ -6,7 +6,7 @@
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 #include "ui/application.hpp"
-#include "ui/widgets/exceptions/exception_dialog.hpp"
+#include "ui/exceptions/exception_dialog.hpp"
 
 REGISTER_LOG_CATEGORY("Application");
 

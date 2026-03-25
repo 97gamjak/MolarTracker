@@ -1,13 +1,15 @@
 add_library(molartracker_finance STATIC
-    cash.cpp
-    cash_account.cpp
-    currency_exception.cpp
-    transaction.cpp
+    src/finance/cash.cpp
+    src/finance/cash_account.cpp
+    src/finance/currency_exception.cpp
+    src/finance/transaction.cpp
 )
 
 target_include_directories(molartracker_finance
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(molartracker_finance
@@ -15,4 +17,6 @@ target_link_libraries(molartracker_finance
     mstd
     PRIVATE
     molartracker_config
+    molartracker_exceptions
+    molartracker_utils
 )

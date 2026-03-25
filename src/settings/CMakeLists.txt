@@ -1,22 +1,30 @@
 add_library(molartracker_settings STATIC
-    settings.cpp
-    ui_settings.cpp
-    log_viewer_settings.cpp
-    debug_slots_settings.cpp
-    profile_ui_settings.cpp
-    general_settings.cpp
-    logging_settings.cpp
-)
+    src/settings/settings.cpp
+    src/settings/ui_settings.cpp
+    src/settings/log_viewer_settings.cpp
+    src/settings/debug_slots_settings.cpp
+    src/settings/profile_ui_settings.cpp
+    src/settings/general_settings.cpp
+    src/settings/logging_settings.cpp
 
-add_subdirectory(params)
+    src/settings/params/param_container.cpp
+    src/settings/params/param_error.cpp
+)
 
 target_include_directories(molartracker_settings
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(molartracker_settings
     PUBLIC
+    json
+    molartracker_json
+    molartracker_connections
     molartracker_config
-    molartracker_settings_params
+    PRIVATE
+    molartracker_exceptions
+    molartracker_utils
 )
