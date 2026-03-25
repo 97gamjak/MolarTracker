@@ -131,36 +131,45 @@ TEST(OrmBinder, Int64BindAndRead)
 {
     FakeStatement statement;
 
+    const auto value  = 123456789LL;
+    const auto index  = 7;
+    const auto result = -42LL;
+
     orm::binder<FakeStatement, std::int64_t>::bind(
         statement,
         orm::BindIndex{3},
-        123456789LL
+        value
     );
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->index, 3);
-    EXPECT_EQ(statement.last_int64_bind->value, 123456789LL);
+    EXPECT_EQ(statement.last_int64_bind->value, value);
 
-    statement.col_i64[7] = -42LL;
-    const auto result    = orm::binder<FakeStatement, std::int64_t>::read(
+    statement.col_i64[index] = result;
+    const auto result_read   = orm::binder<FakeStatement, std::int64_t>::read(
         statement,
-        orm::ColumnIndex{7}
+        orm::ColumnIndex{index}
     );
-    EXPECT_EQ(result, -42LL);
+    EXPECT_EQ(result_read, result);
 }
 
 TEST(OrmBinder, IntBindCastsToInt64AndReadCastsBack)
 {
     FakeStatement statement;
+    const auto    value  = 42;
+    const auto    result = 99;
 
-    orm::binder<FakeStatement, int>::bind(statement, orm::BindIndex{1}, 42);
+    orm::binder<FakeStatement, int>::bind(statement, orm::BindIndex{1}, value);
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->index, 1);
-    EXPECT_EQ(statement.last_int64_bind->value, static_cast<std::int64_t>(42));
+    EXPECT_EQ(
+        statement.last_int64_bind->value,
+        static_cast<std::int64_t>(value)
+    );
 
-    statement.col_i64[0] = 99;
-    const auto result =
+    statement.col_i64[0] = result;
+    const auto result_read =
         orm::binder<FakeStatement, int>::read(statement, orm::ColumnIndex{0});
-    EXPECT_EQ(result, 99);
+    EXPECT_EQ(result_read, result);
 }
 
 TEST(OrmBinder, BoolBindAs0or1AndReadNonZeroAsTrue)
@@ -176,14 +185,20 @@ TEST(OrmBinder, BoolBindAs0or1AndReadNonZeroAsTrue)
     ASSERT_TRUE(statement.last_int64_bind.has_value());
     EXPECT_EQ(statement.last_int64_bind->value, 0);
 
-    statement.col_i64[5] = 0;
-    const auto false_result =
-        orm::binder<FakeStatement, bool>::read(statement, orm::ColumnIndex{5});
+    const auto index         = 5;
+    statement.col_i64[index] = 0;
+    const auto false_result  = orm::binder<FakeStatement, bool>::read(
+        statement,
+        orm::ColumnIndex{index}
+    );
     EXPECT_FALSE(false_result);
 
-    statement.col_i64[6] = 2;
-    const auto true_result =
-        orm::binder<FakeStatement, bool>::read(statement, orm::ColumnIndex{6});
+    const auto index2         = 6;
+    statement.col_i64[index2] = 2;
+    const auto true_result    = orm::binder<FakeStatement, bool>::read(
+        statement,
+        orm::ColumnIndex{index2}
+    );
     EXPECT_TRUE(true_result);
 }
 
@@ -191,14 +206,12 @@ TEST(OrmBinder, DoubleBindAndRead)
 {
     FakeStatement statement;
 
-    orm::binder<FakeStatement, double>::bind(
-        statement,
-        orm::BindIndex{4},
-        3.14159
-    );
+    const auto pi = 3.14159;
+
+    orm::binder<FakeStatement, double>::bind(statement, orm::BindIndex{4}, pi);
     ASSERT_TRUE(statement.last_double_bind.has_value());
     EXPECT_EQ(statement.last_double_bind->index, 4);
-    EXPECT_DOUBLE_EQ(statement.last_double_bind->value, 3.14159);
+    EXPECT_DOUBLE_EQ(statement.last_double_bind->value, pi);
 
     statement.col_dbl[9] = -0.25;
     const auto result    = orm::binder<FakeStatement, double>::read(
