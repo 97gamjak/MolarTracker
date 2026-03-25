@@ -20,7 +20,7 @@ namespace utils
 }   // namespace utils
 
 #ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
-#include "qt_helpers.tpp"
+#include "qt_helpers.tpp"   // IWYU pragma: export
 #endif
 
 #endif   // __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__

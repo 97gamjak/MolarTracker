@@ -12,7 +12,7 @@ namespace settings
      * parameters. It defines a pure virtual function to get the parameters as a
      * tuple, which derived classes must implement.
      */
-    class ParamContainer final
+    class ParamContainer
     {
        private:
         /// The key for the parameter container

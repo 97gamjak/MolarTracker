@@ -61,6 +61,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Cleanup entire code base to be able to use `clangd-tidy` (not to be confused with `clang-tidy`)
 - Cleanup NOLINT for new qt parent/child system
+- Restructure project structure to reduce compile time dependencies
 
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22

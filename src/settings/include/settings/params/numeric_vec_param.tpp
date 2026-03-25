@@ -25,11 +25,14 @@ namespace settings
     {
         for (std::size_t i = 0; i < N; ++i)
         {
+            auto titlePrefixCopy       = titlePrefix;
+            auto descriptionPrefixCopy = descriptionPrefix;
+
             std::string indexSuffix = std::to_string(i);
             _params.emplace_back(
                 keyPrefix + indexSuffix,
-                titlePrefix + " " + indexSuffix,
-                descriptionPrefix + " (index " + indexSuffix + ")"
+                titlePrefixCopy.append(" " + indexSuffix),
+                descriptionPrefixCopy.append(" (index " + indexSuffix + ")")
             );
         }
     }
