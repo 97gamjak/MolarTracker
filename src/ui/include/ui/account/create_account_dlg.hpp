@@ -8,7 +8,7 @@ class QComboBox;     // Forward declaration
 
 namespace drafts
 {
-    class AccountDraft;   // Forward declaration
+    struct AccountDraft;   // Forward declaration
 }   // namespace drafts
 
 namespace ui
