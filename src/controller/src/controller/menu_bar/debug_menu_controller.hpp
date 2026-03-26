@@ -3,9 +3,6 @@
 
 #include <QObject>
 
-#include "ui/logging/debug_slots_dialog.hpp"
-#include "ui/logging/log_viewer_dialog.hpp"
-
 class QMainWindow;   // Forward declaration
 
 namespace app
@@ -20,7 +17,9 @@ namespace logging
 
 namespace ui
 {
-    class DebugMenu;   // Forward declaration
+    class DebugMenu;          // Forward declaration
+    class DebugSlotsDialog;   // Forward declaration
+    class LogViewerDialog;    // Forward declaration
 }   // namespace ui
 
 namespace cmd
@@ -51,15 +50,10 @@ namespace controller
         /// Settings for the log viewer dialog
         std::shared_ptr<ui::LogViewerDialog::Settings> _logViewerSettings;
 
-        /// Pointer to the debug slots dialog, this is a QPointer to ensure that
-        /// we do not have a dangling pointer if the dialog is closed outside of
-        /// this controller
-        QPointer<ui::DebugSlotsDialog> _debugSlotsDialog;
-
-        /// Pointer to the log viewer dialog, this is a QPointer to ensure that
-        /// we do not have a dangling pointer if the dialog is closed outside of
-        /// this controller
-        QPointer<ui::LogViewerDialog> _logViewerDialog;
+        /// Pointer to the debug slots dialog
+        ui::DebugSlotsDialog* _debugSlotsDialog = nullptr;
+        /// Pointer to the log viewer dialog
+        ui::LogViewerDialog* _logViewerDialog = nullptr;
 
        private slots:
         void _onRequestDebugSlots();
