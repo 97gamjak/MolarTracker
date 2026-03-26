@@ -1,6 +1,8 @@
 #ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 #define __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 
+#include <string>
+
 #include "config/strong_id.hpp"
 
 /**
