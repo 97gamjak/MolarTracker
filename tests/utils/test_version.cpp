@@ -9,7 +9,8 @@
 //  - getMajor / getMinor / getPatch accessors
 //  - toString round-trip
 //  - getInvalidVersion returns an invalid (equal-to-invalid) instance
-//  - operator==: equal versions compare equal; different versions compare not equal
+//  - operator==: equal versions compare equal; different versions compare not
+//  equal
 //  - operator==: two invalid versions compare equal
 //  - Build metadata suffix (+...) is accepted and ignored
 

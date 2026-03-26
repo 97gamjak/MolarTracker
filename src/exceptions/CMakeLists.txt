@@ -1,9 +1,11 @@
 add_library(molartracker_exceptions STATIC
-    base.cpp
-    file_exceptions.cpp
+    src/exceptions/base.cpp
+    src/exceptions/file_exceptions.cpp
 )
 
 target_include_directories(molartracker_exceptions
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )

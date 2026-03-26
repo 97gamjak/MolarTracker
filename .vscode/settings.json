@@ -125,10 +125,20 @@
         "shared_mutex": "cpp"
     },
     "cSpell.words": [
+        "bugprone",
         "googletest",
         "insertable",
         "MOLTRACK",
-        "MSTD"
+        "MSTD",
+        "NOMINMAX"
     ],
+    "files.watcherExclude": {
+        "**/.build/**": true,
+        "**/.cache/**": true
+    },
+    "files.exclude": {
+        "**/.build": true,
+        "**/.cache": true
+    },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

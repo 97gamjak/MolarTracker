@@ -28,12 +28,12 @@ namespace
             base = fs::current_path();
         }
 
-        std::random_device rd;
-        const auto         r1 = static_cast<unsigned>(rd());
-        const auto         r2 = static_cast<unsigned>(rd());
+        std::random_device random;
+        const auto         random1 = static_cast<unsigned>(random());
+        const auto         random2 = static_cast<unsigned>(random());
 
-        return base / ("molartracker_test_" + std::to_string(r1) + "_" +
-                       std::to_string(r2) + ".sqlite");
+        return base / ("molartracker_test_" + std::to_string(random1) + "_" +
+                       std::to_string(random2) + ".sqlite");
     }
 
     class TempDbFile
@@ -41,10 +41,15 @@ namespace
        public:
         TempDbFile() : _path(unique_db_file_path()) {}
 
+        TempDbFile(TempDbFile const&)                      = delete;
+        TempDbFile& operator=(TempDbFile const&)           = delete;
+        TempDbFile(TempDbFile&& other) noexcept            = default;
+        TempDbFile& operator=(TempDbFile&& other) noexcept = default;
+
         ~TempDbFile()
         {
-            std::error_code ec;
-            std::filesystem::remove(_path, ec);
+            std::error_code errorCode;
+            std::filesystem::remove(_path, errorCode);
         }
 
         const std::filesystem::path& path() const noexcept { return _path; }
@@ -72,15 +77,15 @@ namespace
     )
     {
         // Adjust if your Database API differs (e.g. prepare_statement()).
-        auto st = db->prepare(sql);
+        auto stmt = db->prepare(sql);
 
-        const auto r1 = st.step();
-        EXPECT_EQ(r1, db::StepResult::RowAvailable);
+        const auto resultStep1 = stmt.step();
+        EXPECT_EQ(resultStep1, db::StepResult::RowAvailable);
 
-        const auto value = st.columnInt64(0);
+        const auto value = stmt.columnInt64(0);
 
-        const auto r2 = st.step();
-        EXPECT_EQ(r2, db::StepResult::Done);
+        const auto resultStep2 = stmt.step();
+        EXPECT_EQ(resultStep2, db::StepResult::Done);
 
         return value;
     }
@@ -100,14 +105,14 @@ TEST(TransactionTest, CommitPersistsChanges)
     create_schema(db);
 
     {
-        db::Transaction tx{db, false};
-        EXPECT_TRUE(tx.isActive());
+        db::Transaction transaction{db, false};
+        EXPECT_TRUE(transaction.isActive());
 
         db->execute("INSERT INTO t(v) VALUES(1);");
         db->execute("INSERT INTO t(v) VALUES(2);");
 
-        tx.commit();
-        EXPECT_FALSE(tx.isActive());
+        transaction.commit();
+        EXPECT_FALSE(transaction.isActive());
     }
 
     EXPECT_EQ(count_rows(db), 2);
@@ -122,14 +127,14 @@ TEST(TransactionTest, RollbackDiscardsChanges)
     create_schema(db);
 
     {
-        db::Transaction tx{db, false};
-        EXPECT_TRUE(tx.isActive());
+        db::Transaction transaction{db, false};
+        EXPECT_TRUE(transaction.isActive());
 
         db->execute("INSERT INTO t(v) VALUES(1);");
         db->execute("INSERT INTO t(v) VALUES(2);");
 
-        tx.rollback();
-        EXPECT_FALSE(tx.isActive());
+        transaction.rollback();
+        EXPECT_FALSE(transaction.isActive());
     }
 
     EXPECT_EQ(count_rows(db), 0);
@@ -144,8 +149,8 @@ TEST(TransactionTest, DestructorRollsBackIfStillActive)
     create_schema(db);
 
     {
-        db::Transaction tx{db, false};
-        EXPECT_TRUE(tx.isActive());
+        db::Transaction transaction{db, false};
+        EXPECT_TRUE(transaction.isActive());
 
         db->execute("INSERT INTO t(v) VALUES(123);");
         // no commit/rollback -> destructor should rollback
@@ -162,16 +167,16 @@ TEST(TransactionTest, CommitIsIdempotentAfterFirstCommit)
 
     create_schema(db);
 
-    db::Transaction tx{db, false};
-    EXPECT_TRUE(tx.isActive());
+    db::Transaction transaction{db, false};
+    EXPECT_TRUE(transaction.isActive());
 
     db->execute("INSERT INTO t(v) VALUES(1);");
 
-    tx.commit();
-    EXPECT_FALSE(tx.isActive());
+    transaction.commit();
+    EXPECT_FALSE(transaction.isActive());
 
-    EXPECT_NO_THROW(tx.commit());     // no-op
-    EXPECT_NO_THROW(tx.rollback());   // no-op
+    EXPECT_NO_THROW(transaction.commit());     // no-op
+    EXPECT_NO_THROW(transaction.rollback());   // no-op
 
     EXPECT_EQ(count_rows(db), 1);
 }
@@ -184,16 +189,16 @@ TEST(TransactionTest, RollbackIsIdempotentAfterFirstRollback)
 
     create_schema(db);
 
-    db::Transaction tx{db, false};
-    EXPECT_TRUE(tx.isActive());
+    db::Transaction transaction{db, false};
+    EXPECT_TRUE(transaction.isActive());
 
     db->execute("INSERT INTO t(v) VALUES(1);");
 
-    tx.rollback();
-    EXPECT_FALSE(tx.isActive());
+    transaction.rollback();
+    EXPECT_FALSE(transaction.isActive());
 
-    EXPECT_NO_THROW(tx.rollback());   // no-op
-    EXPECT_NO_THROW(tx.commit());     // no-op
+    EXPECT_NO_THROW(transaction.rollback());   // no-op
+    EXPECT_NO_THROW(transaction.commit());     // no-op
 
     EXPECT_EQ(count_rows(db), 0);
 }
@@ -206,17 +211,17 @@ TEST(TransactionTest, MoveConstructorTransfersActivityAndDisarmsSource)
 
     create_schema(db);
 
-    db::Transaction a{db, false};
-    EXPECT_TRUE(a.isActive());
+    db::Transaction transactionA{db, false};
+    EXPECT_TRUE(transactionA.isActive());
 
     db->execute("INSERT INTO t(v) VALUES(7);");
 
-    db::Transaction b{std::move(a)};
-    EXPECT_TRUE(b.isActive());
-    EXPECT_FALSE(a.isActive());
+    db::Transaction transactionB{std::move(transactionA)};
+    EXPECT_TRUE(transactionB.isActive());
+    EXPECT_FALSE(transactionA.isActive());
 
-    b.commit();
-    EXPECT_FALSE(b.isActive());
+    transactionB.commit();
+    EXPECT_FALSE(transactionB.isActive());
 
     EXPECT_EQ(count_rows(db), 1);
 }
@@ -231,22 +236,22 @@ TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
 
     // b must be inactive before move-assign (and must not start while a is
     // active)
-    db::Transaction b{db, false};
-    b.rollback();
-    EXPECT_FALSE(b.isActive());
+    db::Transaction transactionB{db, false};
+    transactionB.rollback();
+    EXPECT_FALSE(transactionB.isActive());
 
-    db::Transaction a{db, false};
-    EXPECT_TRUE(a.isActive());
+    db::Transaction transactionA{db, false};
+    EXPECT_TRUE(transactionA.isActive());
 
     db->execute("INSERT INTO t(v) VALUES(9);");
 
-    b = std::move(a);
+    transactionB = std::move(transactionA);
 
-    EXPECT_TRUE(b.isActive());
-    EXPECT_FALSE(a.isActive());
+    EXPECT_TRUE(transactionB.isActive());
+    EXPECT_FALSE(transactionA.isActive());
 
-    b.rollback();
-    EXPECT_FALSE(b.isActive());
+    transactionB.rollback();
+    EXPECT_FALSE(transactionB.isActive());
 
     EXPECT_EQ(count_rows(db), 0);
 }
@@ -260,13 +265,13 @@ TEST(TransactionTest, ImmediateTransactionBehavesLikeTransaction)
     create_schema(db);
 
     {
-        db::Transaction tx{db, true};   // BEGIN IMMEDIATE
-        EXPECT_TRUE(tx.isActive());
+        db::Transaction transaction{db, true};   // BEGIN IMMEDIATE
+        EXPECT_TRUE(transaction.isActive());
 
         db->execute("INSERT INTO t(v) VALUES(1);");
 
-        tx.rollback();
-        EXPECT_FALSE(tx.isActive());
+        transaction.rollback();
+        EXPECT_FALSE(transaction.isActive());
     }
 
     EXPECT_EQ(count_rows(db), 0);
