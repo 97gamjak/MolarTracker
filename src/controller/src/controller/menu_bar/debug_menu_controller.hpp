@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+#include "ui/logging/debug_slots_dialog.hpp"
+#include "ui/logging/log_viewer_dialog.hpp"
+
 class QMainWindow;   // Forward declaration
 
 namespace app
@@ -17,9 +20,7 @@ namespace logging
 
 namespace ui
 {
-    class DebugMenu;          // Forward declaration
-    class DebugSlotsDialog;   // Forward declaration
-    class LogViewerDialog;    // Forward declaration
+    class DebugMenu;   // Forward declaration
 }   // namespace ui
 
 namespace cmd
