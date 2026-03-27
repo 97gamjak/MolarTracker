@@ -3,20 +3,56 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QObject>
+#include <string>
 
 #include "app/app_context.hpp"
+#include "app/store/account_store.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
+#include "ui/side_bar/account_item.hpp"
 #include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
 
 namespace controller
 {
+    AccountController::AccountController(
+        cmd::UndoStack&           undoStack,
+        app::AppContext&          appContext,
+        AccountSideBarController& sideBarController
+    )
+        : _undoStack(undoStack), _appContext(appContext)
+    {
+        connect(
+            &sideBarController,
+            &AccountSideBarController::accountSelected,
+            this,
+            &AccountController::_onAccountSelected
+        );
+    }
+
+    void AccountController::_onAccountSelected(AccountId id)
+    {
+        LOG_ENTRY;
+
+        const auto account =
+            _appContext.getStore().getAccountStore().getAccount(id);
+
+        if (!account.has_value())
+        {
+            LOG_WARNING(
+                std::format("Account with ID {} not found", id.value())
+            );
+            return;
+        }
+
+        // build account details view
+    }
+
     /**
      * @brief Construct a new Account Side Bar Controller:: Account Side Bar
      * Controller object
@@ -171,6 +207,11 @@ namespace controller
         }
 
         refresh();
+    }
+
+    void AccountSideBarController::onAccountSelected(AccountId id)
+    {
+        emit accountSelected(id);
     }
 
 }   // namespace controller

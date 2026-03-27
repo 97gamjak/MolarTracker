@@ -1,12 +1,15 @@
 #ifndef __CONTROLLER__SRC__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 #define __CONTROLLER__SRC__CONTROLLER__ACCOUNT_CONTROLLER_HPP__
 
+#include <qtmetamacros.h>
+
+#include <QPointer>
+
+#include "config/id_types.hpp"
 #include "side_bar_category_controller.hpp"
 
 class QAction;       // Forward declaration
 class QMainWindow;   // Forward declaration
-
-#include <QPointer>
 
 namespace drafts
 {
@@ -31,12 +34,15 @@ namespace cmd
 
 namespace controller
 {
+
     /**
      * @brief Controller for the account category in the side bar
      *
      */
     class AccountSideBarController : public SideBarCategoryController
     {
+        Q_OBJECT
+
        private:
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
@@ -68,10 +74,36 @@ namespace controller
             const QAction*             action
         );
 
+       public slots:
+        void onAccountSelected(AccountId id);
+
+       signals:
+        void accountSelected(AccountId id);
+
        private slots:
         void _onCreateAccountRequested(const drafts::AccountDraft& account);
     };
 
+    class AccountController : public QObject
+    {
+        Q_OBJECT
+
+       private:
+        /// Reference to the undo stack
+        cmd::UndoStack& _undoStack;
+        /// Reference to the application context
+        app::AppContext& _appContext;
+
+       public:
+        AccountController(
+            cmd::UndoStack&           undoStack,
+            app::AppContext&          appContext,
+            AccountSideBarController& sideBarController
+        );
+
+       private slots:
+        void _onAccountSelected(AccountId id);
+    };
 }   // namespace controller
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__ACCOUNT_CONTROLLER_HPP__

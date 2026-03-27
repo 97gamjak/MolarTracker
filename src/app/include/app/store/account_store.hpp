@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "base/base_store.hpp"
+#include "config/id_types.hpp"
 #include "exceptions/base.hpp"
 #include "finance/cash_account.hpp"
 
@@ -57,6 +58,9 @@ namespace app
             const drafts::AccountDraft& accountDraft
         );
 
+        [[nodiscard]] std::optional<finance::AccountVariant> getAccount(
+            AccountId id
+        );
         [[nodiscard]] std::vector<const finance::Account*> getAllAccounts(
         ) const;
 

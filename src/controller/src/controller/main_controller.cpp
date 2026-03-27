@@ -40,6 +40,9 @@ namespace controller
         /// controller for managing the side bar
         controller::SideBarController _sideBarController;
 
+        /// controller for managing the account
+        controller::AccountController _accountController;
+
         /**
          * @brief Construct a new Impl object
          *
@@ -60,6 +63,11 @@ namespace controller
                   &_mainWindow,
                   &_mainWindow.getSideBar(),
                   _mainWindow.getCentralWidget()
+              ),
+              _accountController(
+                  _undoStack,
+                  _appContext,
+                  _sideBarController.getAccountSideBarController()
               )
         {
             _handlers.getDirtyStateHandler().subscribe(

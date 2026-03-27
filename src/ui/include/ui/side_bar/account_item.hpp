@@ -1,6 +1,8 @@
 #ifndef __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_ITEM_HPP__
 #define __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_ITEM_HPP__
 
+#include <qtmetamacros.h>
+
 #include "config/id_types.hpp"
 #include "side_bar_item.hpp"
 
@@ -19,7 +21,7 @@ namespace ui
     {
        private:
         /// The ID of the account this item represents
-        AccountId _id;
+        AccountId _accountId;
 
         /// action to open the account
         QAction* _openAction;
