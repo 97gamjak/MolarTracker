@@ -23,10 +23,7 @@ namespace app
      *
      * @param db
      */
-    ProfileRepo::ProfileRepo(const std::shared_ptr<db::Database>& db) : _db{db}
-    {
-        _ensureSchema();
-    }
+    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} { _ensureSchema(); }
 
     /**
      * @brief Ensure the database schema for profiles exists

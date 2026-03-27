@@ -1,6 +1,7 @@
 #ifndef __APP__INCLUDE__APP__APP_CONTEXT_HPP__
 #define __APP__INCLUDE__APP__APP_CONTEXT_HPP__
 
+#include "app/migration/migration_runner.hpp"
 #include "app/repo_container.hpp"
 #include "app/service_container.hpp"
 #include "app/store_container.hpp"
@@ -23,7 +24,9 @@ namespace app
         settings::Settings& _settings;
 
         /// The database instance for the application
-        std::shared_ptr<db::Database> _database;
+        db::Database _database;
+
+        MigrationRunner _migrationRunner;
 
         /// The repository container for the application
         RepoContainer _repos;

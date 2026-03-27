@@ -287,6 +287,22 @@ namespace db
             execute("PRAGMA foreign_keys = OFF;");
     }
 
+    int Database::queryInt(std::string_view sql)
+    {
+        auto       statement = prepare(sql);
+        const auto result    = statement.step();
+
+        if (result != StepResult::RowAvailable)
+        {
+            throw SqliteError(
+                "queryInt: expected a row but got none | sql: " +
+                std::string(sql)
+            );
+        }
+
+        return static_cast<int>(statement.columnInt64(0));
+    }
+
     //
     //
     // PRIVATE HELPER METHODS

@@ -1,6 +1,7 @@
 #include "db/transaction.hpp"
 
 #include <iostream>
+#include <memory>
 
 #include "db/database.hpp"
 
@@ -13,8 +14,8 @@ namespace db
      * @param db
      * @param immediate
      */
-    Transaction::Transaction(std::shared_ptr<Database> db, bool immediate)
-        : _db(std::move(db)), _isActive(true)
+    Transaction::Transaction(Database& db, bool immediate)
+        : _db(&db), _isActive(true)
     {
         if (immediate)
             _db->execute("BEGIN IMMEDIATE;");
@@ -28,10 +29,7 @@ namespace db
      *
      * @param db
      */
-    Transaction::Transaction(std::shared_ptr<Database> db)
-        : Transaction(std::move(db), true)
-    {
-    }
+    Transaction::Transaction(Database& db) : Transaction(db, true) {}
 
     /**
      * @brief Destroy the Transaction:: Transaction object
@@ -59,6 +57,7 @@ namespace db
      * @param other
      */
     Transaction::Transaction(Transaction&& other) noexcept
+        : _db(other._db), _isActive(other._isActive)
     {
         _moveFrom(std::move(other));
     }

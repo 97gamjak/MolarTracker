@@ -21,10 +21,16 @@ namespace app
     {
        private:
         /// reference to the database instance
-        std::shared_ptr<db::Database> _db;
+        db::Database& _db;
 
        public:
-        explicit AccountRepo(const std::shared_ptr<db::Database>& db);
+        explicit AccountRepo(db::Database& db);
+
+        ~AccountRepo() override                    = default;
+        AccountRepo(const AccountRepo&)            = delete;
+        AccountRepo& operator=(const AccountRepo&) = delete;
+        AccountRepo(AccountRepo&&)                 = delete;
+        AccountRepo& operator=(AccountRepo&&)      = delete;
 
         void ensureSchema() override;
 

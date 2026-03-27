@@ -19,10 +19,7 @@ namespace orm::details
      * @param model
      */
     template <db_model Model>
-    void deleteByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
-    )
+    void deleteByPk(db::Database& database, const Model& model)
     {
         const auto numberOfPkFields = getNumberOfPkFields<Model>();
 
@@ -56,9 +53,6 @@ namespace orm::details
         sqlText += whereClauses.getDBOperations();
         sqlText += ";";
 
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
         LOG_DEBUG(
             std::format(
                 "Deleting from table '{}' with SQL: {}",
@@ -67,7 +61,7 @@ namespace orm::details
             )
         );
 
-        db::Statement statement = database->prepare(sqlText);
+        db::Statement statement = database.prepare(sqlText);
         whereClauses.bind(statement);
 
         statement.executeToCompletion();

@@ -27,7 +27,7 @@ namespace app
         std::shared_ptr<IAccountRepo> _accountRepo;
 
        public:
-        explicit RepoContainer(const std::shared_ptr<db::Database>& db);
+        explicit RepoContainer(db::Database& db);
 
         [[nodiscard]] std::shared_ptr<IProfileRepo>       getProfileRepo();
         [[nodiscard]] std::shared_ptr<const IProfileRepo> getProfileRepo(

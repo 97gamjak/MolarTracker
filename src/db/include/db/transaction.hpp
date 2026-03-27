@@ -15,14 +15,14 @@ namespace db
     {
        private:
         /// Pointer to the Database instance
-        std::shared_ptr<Database> _db;
+        Database* _db;
 
         /// Flag to indicate whether the transaction is currently active
         bool _isActive{false};
 
        public:
-        explicit Transaction(std::shared_ptr<Database> db, bool immediate);
-        explicit Transaction(std::shared_ptr<Database> db);
+        explicit Transaction(db::Database& db, bool immediate);
+        explicit Transaction(db::Database& db);
         ~Transaction();
 
         Transaction(Transaction const&)            = delete;

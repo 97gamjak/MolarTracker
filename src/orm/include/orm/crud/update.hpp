@@ -28,8 +28,8 @@ namespace orm::details
      */
     template <db_model Model>
     std::expected<void, CrudError> update(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         row
+        db::Database& database,
+        const Model&  row
     )
     {
         std::string sqlText;
@@ -64,9 +64,6 @@ namespace orm::details
         sqlText += whereClauses.getDBOperations();
         sqlText += ";";
 
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
         LOG_DEBUG(
             std::format(
                 "Updating table '{}' with SQL: {}",
@@ -74,7 +71,7 @@ namespace orm::details
                 sqlText
             )
         );
-        db::Statement statement = database->prepare(sqlText);
+        db::Statement statement = database.prepare(sqlText);
 
         std::size_t index = 0;
         row.forEachField(
@@ -92,7 +89,7 @@ namespace orm::details
 
         statement.executeToCompletion();
 
-        const auto changes = database->getNumberOfLastChanges();
+        const auto changes = database.getNumberOfLastChanges();
 
         if (changes == 0)
         {

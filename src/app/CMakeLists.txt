@@ -21,6 +21,10 @@ add_library(molartracker_app STATIC
     src/app/factories/profile_factory.cpp
 
     src/app/domain/profile.cpp
+
+    src/app/migration/migration_runner.cpp
+    src/app/migration/migration.cpp
+    src/app/migration/migration_state.cpp
 )
 
 target_include_directories(molartracker_app

@@ -54,6 +54,8 @@ namespace db
         void setBusyTimeout(int timeout_milliseconds);
         void enableForeignKeys(bool enabled);
 
+        [[nodiscard]] int queryInt(std::string_view sql);
+
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;
         [[nodiscard]] std::string _sqliteErrorMessage() const;
