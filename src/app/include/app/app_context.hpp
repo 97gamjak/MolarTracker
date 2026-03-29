@@ -26,6 +26,7 @@ namespace app
         /// The database instance for the application
         db::Database _database;
 
+        /// The migration runner for the application
         MigrationRunner _migrationRunner;
 
         /// The repository container for the application

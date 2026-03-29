@@ -287,6 +287,12 @@ namespace db
             execute("PRAGMA foreign_keys = OFF;");
     }
 
+    /**
+     * @brief Query a single integer value from the database
+     *
+     * @param sql The SQL query to execute
+     * @return int The queried integer value
+     */
     int Database::queryInt(std::string_view sql)
     {
         auto       statement = prepare(sql);

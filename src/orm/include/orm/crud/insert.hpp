@@ -107,7 +107,7 @@ namespace orm::details
         std::vector<std::int64_t> insertedIds;
         insertedIds.reserve(sizeof...(Models) + 1);
 
-        db::Transaction transaction{std::make_shared<db::Database>(database)};
+        db::Transaction transaction{database};
 
         std::expected<void, CrudError> batchResult;
 

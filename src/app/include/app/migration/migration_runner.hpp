@@ -1,7 +1,7 @@
 #ifndef __APP__INCLUDE__APP__MIGRATION__MIGRATION_RUNNER_HPP__
 #define __APP__INCLUDE__APP__MIGRATION__MIGRATION_RUNNER_HPP__
 
-#include "app/migration/migration_state.hpp"
+#include "app/migration/migration.hpp"
 
 namespace db
 {
@@ -10,13 +10,21 @@ namespace db
 
 namespace app
 {
+    /**
+     * @brief Class responsible for running database migrations
+     */
     class MigrationRunner
     {
        private:
-        MigrationStates _migrationStates;
+        constexpr static std::size_t DB_VERSION = 1;
+        /// The migration states for the application
+        Migrations _migrations;
 
        public:
         explicit MigrationRunner(db::Database& db);
+
+       private:
+        void migrate(db::Database& db);
     };
 }   // namespace app
 

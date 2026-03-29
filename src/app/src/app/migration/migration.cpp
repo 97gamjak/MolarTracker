@@ -1,43 +1,65 @@
 #include "app/migration/migration.hpp"
 
-#include <cstddef>
-#include <memory>
+#include <cassert>
 
-#include "app/migration/migration_state.hpp"
+#include "app/migration/single_migration.hpp"
 #include "db/database.hpp"
-#include "db/transaction.hpp"
+#include "sql_models/account_row.hpp"
+#include "sql_models/profile_row.hpp"
 
 namespace app
 {
-    Migration::Migration()
+
+    /**
+     * @brief Construct a new Migration object
+     *
+     * @param fromVersion The version the migration is being applied from
+     */
+    Migration::Migration(std::size_t fromVersion) : _fromVersion(fromVersion) {}
+
+    void Migration::migrate(db::Database& db)
     {
-        static_assert(
-            _migrations.size() + 1 == MigrationVersion,
-            "Migration version mismatch"
-        );
+        for (const auto& migration : _migrations)
+            migration->applyMigration(db);
     }
 
-    MigrationStates Migration::migrate(db::Database& db)
+    void Migration::addMigration(std::unique_ptr<SingleMigration> migration)
     {
-        const auto currentVersion =
-            static_cast<size_t>(db.queryInt("PRAGMA user_version"));
+        _migrations.push_back(std::move(migration));
+    }
 
-        MigrationStates migrationStates{currentVersion, MigrationVersion};
+    /**
+     * @brief Construct a new Migrations object
+     *
+     * @param fromVersion The version the migration is being applied from
+     * @param toVersion The version the migration is being applied to
+     */
+    Migrations::Migrations(std::size_t fromVersion, std::size_t toVersion)
+        : _fromVersion(fromVersion), _toVersion(toVersion)
+    {
+        assert(fromVersion < toVersion);
+        assert(_migrations.empty());
 
-        db::Transaction transaction{db};
+        // add migrations
+        Migration migration(0);
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<ProfileRow>>()
+        );
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<AccountRow>>()
+        );
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<CashAccountRow>>()
+        );
+        _migrations.push_back(std::move(migration));
 
-        for (std::size_t i = currentVersion + 1; i < MigrationVersion; ++i)
-        {
-            _migrations[i](db);
-            MigrationState state{i};
-            migrationStates.addMigration(state);
-        }
+        assert(_migrations.size() == toVersion);
+    }
 
-        db.execute("PRAGMA user_version = " + std::to_string(MigrationVersion));
-
-        transaction.commit();
-
-        return migrationStates;
+    void Migrations::migrate(db::Database& db)
+    {
+        for (std::size_t i = _fromVersion; i < _toVersion; ++i)
+            _migrations[i].migrate(db);
     }
 
 }   // namespace app

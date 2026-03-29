@@ -1,37 +1,56 @@
 #ifndef __APP__INCLUDE__APP__MIGRATION__MIGRATION_HPP__
 #define __APP__INCLUDE__APP__MIGRATION__MIGRATION_HPP__
 
-#include <functional>
+#include <cstddef>
+#include <memory>
+#include <mstd/enum.hpp>
 #include <vector>
 
-#include "app/migration/migration_state.hpp"
+#include "app/migration/single_migration.hpp"
 
 namespace db
 {
-    class Database;   // Forward declaration
+    class Database;
 }   // namespace db
 
 namespace app
 {
-    class MigrationStates;
-
     /**
-     * @brief Class for handling database migrations
-     *
+     * @brief Represents one version of a database migration
      */
     class Migration
     {
        private:
-        static constexpr int MigrationVersion = 1;
+        /// The version the migration is being applied from
+        std::size_t _fromVersion;
 
-        using MigrationFunc = std::function<void(db::Database& db)>;
-
-        static constexpr std::vector<MigrationFunc> _migrations{};
+        std::vector<std::unique_ptr<SingleMigration>> _migrations;
 
        public:
-        Migration();
+        explicit Migration(std::size_t fromVersion);
 
-        static MigrationStates migrate(db::Database& db);
+        void migrate(db::Database& db);
+        void addMigration(std::unique_ptr<SingleMigration> migration);
+    };
+
+    /**
+     * @brief Represents a collection of database migrations
+     */
+    class Migrations
+    {
+       private:
+        /// The version the migration is being applied from
+        std::size_t _fromVersion;
+        /// The version the migration is being applied to
+        std::size_t _toVersion;
+
+        /// The list of individual migrations
+        std::vector<Migration> _migrations;
+
+       public:
+        Migrations(std::size_t fromVersion, std::size_t toVersion);
+
+        void migrate(db::Database& db);
     };
 
 }   // namespace app
