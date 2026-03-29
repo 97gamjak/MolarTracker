@@ -32,7 +32,7 @@ namespace orm
      * @param database
      */
     template <db_model Model>
-    void createTable(const std::shared_ptr<db::Database>& database)
+    void createTable(db::Database& database)
     {
         details::createTable<Model>(database);
     }
@@ -53,8 +53,8 @@ namespace orm
     template <db_model Model>
     requires is_freely_insertable_v<Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         row
+        db::Database& database,
+        const Model&  row
     )
     {
         db::Transaction transaction{database};
@@ -83,7 +83,7 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        const std::shared_ptr<db::Database>& database,
+        db::Database& database,
         const db::Transaction& /*transaction*/,
         const Model& row
     )
@@ -100,7 +100,7 @@ namespace orm
     template <typename... Models>
     requires(db_model<Models> && ...)
     [[nodiscard]] std::expected<std::vector<std::int64_t>, CrudError> batchInsert(
-        const std::shared_ptr<db::Database>& database,
+        db::Database& database,
         const Models&... rows
     )
     {
@@ -122,8 +122,8 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::expected<void, CrudError> update(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         row
+        db::Database& database,
+        const Model&  row
     )
     {
         return details::update(database, row);
@@ -144,8 +144,8 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::optional<Model> getByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
+        db::Database& database,
+        const Model&  model
     )
     {
         return details::_getByPk<Model>(database, model);
@@ -166,9 +166,9 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database,
-        const Joins&                         joins,
-        const WhereClauses&                  whereClauses
+        db::Database&       database,
+        const Joins&        joins,
+        const WhereClauses& whereClauses
     )
     {
         return details::_getAll<Model>(database, joins, whereClauses);
@@ -184,8 +184,8 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database,
-        const WhereClauses&                  whereClauses
+        db::Database&       database,
+        const WhereClauses& whereClauses
     )
     {
         return getAll<Model>(database, Joins{}, whereClauses);
@@ -199,9 +199,7 @@ namespace orm
      * @return std::vector<Model>
      */
     template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database
-    )
+    [[nodiscard]] std::vector<Model> getAll(db::Database& database)
     {
         return getAll<Model>(database, WhereClauses{});
     }
@@ -217,8 +215,8 @@ namespace orm
      */
     template <db_model Model>
     [[nodiscard]] std::expected<Model, CrudError> getUnique(
-        const std::shared_ptr<db::Database>& database,
-        const WhereClauses&                  whereClauses
+        db::Database&       database,
+        const WhereClauses& whereClauses
     )
     {
         const auto results = getAll<Model>(database, whereClauses);
@@ -257,10 +255,7 @@ namespace orm
      * @param model
      */
     template <db_model Model>
-    void deleteByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
-    )
+    void deleteByPk(db::Database& database, const Model& model)
     {
         details::deleteByPk<Model>(database, model);
     }

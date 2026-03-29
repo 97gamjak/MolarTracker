@@ -29,8 +29,8 @@ namespace orm::details
      */
     template <db_model Model>
     [[nodiscard]] std::expected<std::int64_t, CrudError> _insert(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         row
+        db::Database& database,
+        const Model&  row
     )
     {
         auto sqlText = "INSERT INTO " + Model::tableName + " (";
@@ -54,9 +54,6 @@ namespace orm::details
 
         sqlText += ");";
 
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
         LOG_DEBUG(
             std::format(
                 "Inserting into table '{}' with SQL: {}",
@@ -65,7 +62,7 @@ namespace orm::details
             )
         );
 
-        auto statement = database->prepare(sqlText);
+        auto statement = database.prepare(sqlText);
 
         std::size_t counter = 0;
 
@@ -82,7 +79,7 @@ namespace orm::details
 
         statement.executeToCompletion();
 
-        const auto lastInsertId = database->getLastInsertRowid();
+        const auto lastInsertId = database.getLastInsertRowid();
         if (lastInsertId.has_value())
             return lastInsertId.value();
 
@@ -103,13 +100,10 @@ namespace orm::details
     template <typename... Models>
     requires(db_model<Models> && ...)
     [[nodiscard]] std::expected<std::vector<std::int64_t>, CrudError> batchInsert(
-        const std::shared_ptr<db::Database>& database,
+        db::Database& database,
         const Models&... rows
     )
     {
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
         std::vector<std::int64_t> insertedIds;
         insertedIds.reserve(sizeof...(Models) + 1);
 

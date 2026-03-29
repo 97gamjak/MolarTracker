@@ -65,19 +65,16 @@ namespace
 
     // ---------- schema + query helpers ----------
 
-    void create_schema(std::shared_ptr<db::Database>& db)
+    void create_schema(db::Database& db)
     {
-        db->execute("CREATE TABLE IF NOT EXISTS t(v INTEGER NOT NULL);");
-        db->execute("DELETE FROM t;");
+        db.execute("CREATE TABLE IF NOT EXISTS t(v INTEGER NOT NULL);");
+        db.execute("DELETE FROM t;");
     }
 
-    std::int64_t scalar_int64(
-        std::shared_ptr<db::Database>& db,
-        const std::string&             sql
-    )
+    std::int64_t scalar_int64(db::Database& db, const std::string& sql)
     {
         // Adjust if your Database API differs (e.g. prepare_statement()).
-        auto stmt = db->prepare(sql);
+        auto stmt = db.prepare(sql);
 
         const auto resultStep1 = stmt.step();
         EXPECT_EQ(resultStep1, db::StepResult::RowAvailable);
@@ -90,7 +87,7 @@ namespace
         return value;
     }
 
-    std::int64_t count_rows(std::shared_ptr<db::Database>& db)
+    std::int64_t count_rows(db::Database& db)
     {
         return scalar_int64(db, "SELECT COUNT(*) FROM t;");
     }
@@ -99,8 +96,7 @@ namespace
 TEST(TransactionTest, CommitPersistsChanges)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
@@ -108,8 +104,8 @@ TEST(TransactionTest, CommitPersistsChanges)
         db::Transaction transaction{db, false};
         EXPECT_TRUE(transaction.isActive());
 
-        db->execute("INSERT INTO t(v) VALUES(1);");
-        db->execute("INSERT INTO t(v) VALUES(2);");
+        db.execute("INSERT INTO t(v) VALUES(1);");
+        db.execute("INSERT INTO t(v) VALUES(2);");
 
         transaction.commit();
         EXPECT_FALSE(transaction.isActive());
@@ -121,8 +117,7 @@ TEST(TransactionTest, CommitPersistsChanges)
 TEST(TransactionTest, RollbackDiscardsChanges)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
@@ -130,8 +125,8 @@ TEST(TransactionTest, RollbackDiscardsChanges)
         db::Transaction transaction{db, false};
         EXPECT_TRUE(transaction.isActive());
 
-        db->execute("INSERT INTO t(v) VALUES(1);");
-        db->execute("INSERT INTO t(v) VALUES(2);");
+        db.execute("INSERT INTO t(v) VALUES(1);");
+        db.execute("INSERT INTO t(v) VALUES(2);");
 
         transaction.rollback();
         EXPECT_FALSE(transaction.isActive());
@@ -143,8 +138,7 @@ TEST(TransactionTest, RollbackDiscardsChanges)
 TEST(TransactionTest, DestructorRollsBackIfStillActive)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
@@ -152,7 +146,7 @@ TEST(TransactionTest, DestructorRollsBackIfStillActive)
         db::Transaction transaction{db, false};
         EXPECT_TRUE(transaction.isActive());
 
-        db->execute("INSERT INTO t(v) VALUES(123);");
+        db.execute("INSERT INTO t(v) VALUES(123);");
         // no commit/rollback -> destructor should rollback
     }
 
@@ -162,15 +156,14 @@ TEST(TransactionTest, DestructorRollsBackIfStillActive)
 TEST(TransactionTest, CommitIsIdempotentAfterFirstCommit)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
     db::Transaction transaction{db, false};
     EXPECT_TRUE(transaction.isActive());
 
-    db->execute("INSERT INTO t(v) VALUES(1);");
+    db.execute("INSERT INTO t(v) VALUES(1);");
 
     transaction.commit();
     EXPECT_FALSE(transaction.isActive());
@@ -184,15 +177,14 @@ TEST(TransactionTest, CommitIsIdempotentAfterFirstCommit)
 TEST(TransactionTest, RollbackIsIdempotentAfterFirstRollback)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
     db::Transaction transaction{db, false};
     EXPECT_TRUE(transaction.isActive());
 
-    db->execute("INSERT INTO t(v) VALUES(1);");
+    db.execute("INSERT INTO t(v) VALUES(1);");
 
     transaction.rollback();
     EXPECT_FALSE(transaction.isActive());
@@ -206,15 +198,14 @@ TEST(TransactionTest, RollbackIsIdempotentAfterFirstRollback)
 TEST(TransactionTest, MoveConstructorTransfersActivityAndDisarmsSource)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
     db::Transaction transactionA{db, false};
     EXPECT_TRUE(transactionA.isActive());
 
-    db->execute("INSERT INTO t(v) VALUES(7);");
+    db.execute("INSERT INTO t(v) VALUES(7);");
 
     db::Transaction transactionB{std::move(transactionA)};
     EXPECT_TRUE(transactionB.isActive());
@@ -229,8 +220,7 @@ TEST(TransactionTest, MoveConstructorTransfersActivityAndDisarmsSource)
 TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
@@ -243,7 +233,7 @@ TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
     db::Transaction transactionA{db, false};
     EXPECT_TRUE(transactionA.isActive());
 
-    db->execute("INSERT INTO t(v) VALUES(9);");
+    db.execute("INSERT INTO t(v) VALUES(9);");
 
     transactionB = std::move(transactionA);
 
@@ -259,8 +249,7 @@ TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
 TEST(TransactionTest, ImmediateTransactionBehavesLikeTransaction)
 {
     TempDbFile file;
-    auto       _db = make_test_db(file);
-    auto       db  = std::make_shared<db::Database>(std::move(_db));
+    auto       db = make_test_db(file);
 
     create_schema(db);
 
@@ -268,7 +257,7 @@ TEST(TransactionTest, ImmediateTransactionBehavesLikeTransaction)
         db::Transaction transaction{db, true};   // BEGIN IMMEDIATE
         EXPECT_TRUE(transaction.isActive());
 
-        db->execute("INSERT INTO t(v) VALUES(1);");
+        db.execute("INSERT INTO t(v) VALUES(1);");
 
         transaction.rollback();
         EXPECT_FALSE(transaction.isActive());

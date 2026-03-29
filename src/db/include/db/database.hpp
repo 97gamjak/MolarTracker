@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 struct sqlite3;   // Forward declaration
 
@@ -25,6 +26,9 @@ namespace db
 
         /// The path to the database file
         std::string _dbPath;
+
+        /// Log of executed SQL statements for debugging or auditing purposes
+        std::vector<std::string> _executions;
 
        public:
         Database() = delete;
@@ -53,6 +57,8 @@ namespace db
 
         void setBusyTimeout(int timeout_milliseconds);
         void enableForeignKeys(bool enabled);
+
+        [[nodiscard]] int queryInt(std::string_view sql);
 
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;

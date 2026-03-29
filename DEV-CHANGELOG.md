@@ -40,6 +40,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Introduce general base class `BaseStore` and interface `IStore`
 
+#### Database
+
+- Implement database version and corresponding migration backbone
+
 ### Bugfix
 
 - Make GNU compiler flags to be actually applied

@@ -29,9 +29,9 @@ namespace orm::details
      */
     template <db_model Model>
     [[nodiscard]] std::vector<Model> _getAll(
-        const std::shared_ptr<db::Database>& database,
-        const Joins&                         joins,
-        const WhereClauses&                  whereClauses
+        db::Database&       database,
+        const Joins&        joins,
+        const WhereClauses& whereClauses
     )
     {
         std::string sqlText;
@@ -41,9 +41,6 @@ namespace orm::details
         sqlText += joins.getDBOperations(Model::tableName) + " ";
         sqlText += whereClauses.getDBOperations() + ";";
 
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
         LOG_DEBUG(
             std::format(
                 "Getting from table '{}' with SQL: {}",
@@ -52,7 +49,7 @@ namespace orm::details
             )
         );
 
-        db::Statement statement = database->prepare(sqlText);
+        db::Statement statement = database.prepare(sqlText);
 
         whereClauses.bind(statement);
 
@@ -77,8 +74,8 @@ namespace orm::details
      */
     template <db_model Model>
     [[nodiscard]] std::optional<Model> _getByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
+        db::Database& database,
+        const Model&  model
     )
     {
         const auto numberOfPkFields = getNumberOfPkFields<Model>();

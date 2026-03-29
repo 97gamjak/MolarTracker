@@ -15,23 +15,11 @@ namespace app
     /**
      * @brief Construct a new Account Repo object
      *
-     * @param db A shared pointer to the database instance that the repository
+     * @param db A reference to the database instance that the repository
      * will use to perform database operations, this allows the repository to
      * interact with the database to store and retrieve account data as needed.
      */
-    AccountRepo::AccountRepo(const std::shared_ptr<db::Database>& db) : _db(db)
-    {
-        _ensureSchema();
-    }
-
-    /**
-     * @brief Ensure the database schema for accounts exists, this method should
-     * create the necessary tables and relationships in the database to store
-     * and manage account data, it should be called before using any other
-     * methods of the repository to ensure that the database is properly set up.
-     *
-     */
-    void AccountRepo::ensureSchema() { _ensureSchema(); }
+    AccountRepo::AccountRepo(db::Database& db) : _db(db) {}
 
     /**
      * @brief Create a new cash account in the database, this method should
@@ -137,21 +125,6 @@ namespace app
         );
 
         return AccountFactory::toCashAccountDomains(cashAccountRows);
-    }
-
-    /**
-     * @brief Ensure the database schema for accounts exists, this is a private
-     * helper method that is called by the virtual overriding method
-     * ensureSchema() to not use virtual dispatch in constructor, this method
-     * should create the necessary tables and relationships in the database to
-     * store and manage account data, it should be called before using any other
-     * methods of the repository to ensure that the database is properly set up.
-     *
-     */
-    void AccountRepo::_ensureSchema() const
-    {
-        orm::createTable<AccountRow>(_db);
-        orm::createTable<CashAccountRow>(_db);
     }
 
 }   // namespace app

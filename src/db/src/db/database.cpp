@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <format>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -72,8 +73,9 @@ namespace db
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Database::_moveFrom(Database&& other)
     {
-        _db     = std::exchange(other._db, nullptr);
-        _dbPath = std::move(other._dbPath);
+        _db         = std::exchange(other._db, nullptr);
+        _dbPath     = std::move(other._dbPath);
+        _executions = std::move(other._executions);
 
         other._dbPath.clear();
     }
@@ -192,6 +194,20 @@ namespace db
 
             throw SqliteError(msg);
         }
+
+        constexpr size_t MAX_EXECUTIONS_HISTORY = 1000;
+        _executions.emplace_back(sql);
+        if (_executions.size() > MAX_EXECUTIONS_HISTORY)
+        {
+            _executions.erase(
+                _executions.begin(),
+                _executions.begin() +
+                    (static_cast<
+                        std::ranges::range_difference_t<decltype(_executions)>>(
+                        _executions.size() - MAX_EXECUTIONS_HISTORY
+                    ))
+            );
+        }
     }
 
     /**
@@ -285,6 +301,28 @@ namespace db
             execute("PRAGMA foreign_keys = ON;");
         else
             execute("PRAGMA foreign_keys = OFF;");
+    }
+
+    /**
+     * @brief Query a single integer value from the database
+     *
+     * @param sql The SQL query to execute
+     * @return int The queried integer value
+     */
+    int Database::queryInt(std::string_view sql)
+    {
+        auto       statement = prepare(sql);
+        const auto result    = statement.step();
+
+        if (result != StepResult::RowAvailable)
+        {
+            throw SqliteError(
+                "queryInt: expected a row but got none | sql: " +
+                std::string(sql)
+            );
+        }
+
+        return static_cast<int>(statement.columnInt64(0));
     }
 
     //

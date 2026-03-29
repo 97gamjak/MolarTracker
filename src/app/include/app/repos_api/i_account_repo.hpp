@@ -23,14 +23,6 @@ namespace app
         virtual ~IAccountRepo() = default;
 
         /**
-         * @brief Ensure that the necessary database schema for the Account
-         * repository exists, this should be called before using any other
-         * methods of the repository to ensure that the database is properly set
-         *
-         */
-        virtual void ensureSchema() = 0;
-
-        /**
          * @brief Create a new cash account in the repository, this method takes
          * a CashAccount domain object as input and creates a corresponding
          * entry in the database, it returns the ID of the newly created cash

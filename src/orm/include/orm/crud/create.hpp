@@ -3,7 +3,6 @@
 
 #include <mstd/string.hpp>
 
-#include "crud_error.hpp"
 #include "db/database.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/fields.hpp"
@@ -20,7 +19,7 @@ namespace orm::details
      * @param database
      */
     template <db_model Model>
-    void createTable(const std::shared_ptr<db::Database>& database)
+    void createTable(db::Database& database)
     {
         std::string sqlText  = "CREATE TABLE IF NOT EXISTS ";
         sqlText             += Model::tableName;
@@ -38,9 +37,6 @@ namespace orm::details
 
         sqlText += ");";
 
-        if (database == nullptr)
-            throw CrudException("Database pointer is null");
-
         LOG_DEBUG(
             std::format(
                 "Creating table '{}' with SQL: {}",
@@ -49,7 +45,7 @@ namespace orm::details
             )
         );
 
-        database->execute(sqlText);
+        database.execute(sqlText);
     }
 }   // namespace orm::details
 

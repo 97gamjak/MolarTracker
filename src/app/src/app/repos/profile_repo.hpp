@@ -1,7 +1,6 @@
 #ifndef __APP__SRC__APP__REPOS__PROFILE_REPO_HPP__
 #define __APP__SRC__APP__REPOS__PROFILE_REPO_HPP__
 
-#include <memory>
 #include <optional>
 #include <vector>
 
@@ -23,12 +22,19 @@ namespace app
     {
        private:
         /// reference to the database instance
-        std::shared_ptr<db::Database> _db;
+        db::Database& _db;
 
        public:
-        explicit ProfileRepo(const std::shared_ptr<db::Database>& db);
+        explicit ProfileRepo(db::Database& db);
 
-        void ensureSchema() override;
+        ~ProfileRepo() override = default;
+        /// Move operations are deleted because this class holds a reference
+        /// member (_db), and references cannot be rebound, so moving is not
+        /// allowed.
+        ProfileRepo(const ProfileRepo&)            = delete;
+        ProfileRepo& operator=(const ProfileRepo&) = delete;
+        ProfileRepo(ProfileRepo&&)                 = delete;
+        ProfileRepo& operator=(ProfileRepo&&)      = delete;
 
         [[nodiscard]] std::vector<Profile>   getAll() const override;
         [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
@@ -48,9 +54,6 @@ namespace app
         ) override;
 
         void remove(ProfileId id) override;
-
-       private:
-        void _ensureSchema() const;
     };
 
 }   // namespace app
