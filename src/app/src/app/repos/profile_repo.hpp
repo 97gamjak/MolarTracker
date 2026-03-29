@@ -1,7 +1,6 @@
 #ifndef __APP__SRC__APP__REPOS__PROFILE_REPO_HPP__
 #define __APP__SRC__APP__REPOS__PROFILE_REPO_HPP__
 
-#include <memory>
 #include <optional>
 #include <vector>
 
@@ -34,8 +33,6 @@ namespace app
         ProfileRepo(ProfileRepo&&)                 = delete;
         ProfileRepo& operator=(ProfileRepo&&)      = delete;
 
-        void ensureSchema() override;
-
         [[nodiscard]] std::vector<Profile>   getAll() const override;
         [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
         [[nodiscard]] std::optional<Profile> get(
@@ -54,9 +51,6 @@ namespace app
         ) override;
 
         void remove(ProfileId id) override;
-
-       private:
-        void _ensureSchema() const;
     };
 
 }   // namespace app

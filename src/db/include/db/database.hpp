@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 struct sqlite3;   // Forward declaration
 
@@ -25,6 +26,9 @@ namespace db
 
         /// The path to the database file
         std::string _dbPath;
+
+        /// executions that were made by the db
+        std::vector<std::string> _executions;
 
        public:
         Database() = delete;

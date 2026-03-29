@@ -24,12 +24,13 @@ namespace app
         /// The version the migration is being applied from
         std::size_t _fromVersion;
 
+        /// collection of single migrations
         std::vector<std::unique_ptr<SingleMigration>> _migrations;
 
        public:
         explicit Migration(std::size_t fromVersion);
 
-        void migrate(db::Database& db);
+        void migrate(db::Database& db) const;
         void addMigration(std::unique_ptr<SingleMigration> migration);
     };
 

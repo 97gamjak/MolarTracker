@@ -22,15 +22,6 @@ namespace app
         virtual ~IProfileRepo() = default;
 
         /**
-         * @brief Ensure that the necessary database schema for the Profile
-         * repository exists, this should be called before using any other
-         * methods of the repository to ensure that the database is properly set
-         * up to store and manage Profile data.
-         *
-         */
-        virtual void ensureSchema() = 0;
-
-        /**
          * @brief Get all profiles from the repository
          *
          * @return std::vector<Profile>

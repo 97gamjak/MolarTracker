@@ -16,6 +16,7 @@ namespace app
     class MigrationRunner
     {
        private:
+        /// current db version
         constexpr static std::size_t DB_VERSION = 1;
         /// The migration states for the application
         Migrations _migrations;

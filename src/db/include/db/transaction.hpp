@@ -1,8 +1,6 @@
 #ifndef __DB__INCLUDE__DB__TRANSACTION_HPP__
 #define __DB__INCLUDE__DB__TRANSACTION_HPP__
 
-#include <memory>
-
 namespace db
 {
     class Database;

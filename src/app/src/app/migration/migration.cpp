@@ -17,12 +17,23 @@ namespace app
      */
     Migration::Migration(std::size_t fromVersion) : _fromVersion(fromVersion) {}
 
-    void Migration::migrate(db::Database& db)
+    /**
+     * @brief apply all single migrations that are part of this Migration
+     * container
+     *
+     * @param db
+     */
+    void Migration::migrate(db::Database& db) const
     {
         for (const auto& migration : _migrations)
             migration->applyMigration(db);
     }
 
+    /**
+     * @brief add a single migration to the migration container
+     *
+     * @param migration
+     */
     void Migration::addMigration(std::unique_ptr<SingleMigration> migration)
     {
         _migrations.push_back(std::move(migration));
@@ -56,6 +67,11 @@ namespace app
         assert(_migrations.size() == toVersion);
     }
 
+    /**
+     * @brief apply all migration steps
+     *
+     * @param db
+     */
     void Migrations::migrate(db::Database& db)
     {
         for (std::size_t i = _fromVersion; i < _toVersion; ++i)

@@ -3,7 +3,6 @@
 
 #include <mstd/string.hpp>
 
-#include "crud_error.hpp"
 #include "db/database.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/fields.hpp"

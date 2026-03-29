@@ -17,6 +17,11 @@ namespace app
         migrate(db);
     }
 
+    /**
+     * @brief determine last db version and apply all migrations needed
+     *
+     * @param db
+     */
     void MigrationRunner::migrate(db::Database& db)
     {
         const auto dbVersion =

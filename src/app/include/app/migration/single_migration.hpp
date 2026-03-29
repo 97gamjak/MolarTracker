@@ -12,24 +12,44 @@ namespace db
 
 namespace app
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define MIGRATION_TYPE_LIST(X) X(AddTable)
 
     MSTD_ENUM(MigrationType, std::uint8_t, MIGRATION_TYPE_LIST);
 
+    /**
+     * @brief Base class for a single migration, this is used to represent a
+     * single migration that can be applied to the database, such as creating a
+     * table for a specific model
+     *
+     */
     class SingleMigration
     {
        private:
+        /// the type of the migration
         MigrationType _type;
-        std::string   _description;
+
+        /// the description of the migration
+        std::string _description;
 
        public:
         explicit SingleMigration(MigrationType type);
         virtual ~SingleMigration() = default;
 
+        /**
+         * @brief pure virtual function to apply a single migration that needs
+         * to be implemented by all concrete single migrations
+         *
+         * @param db
+         */
         virtual void applyMigration(db::Database& db) = 0;
     };
 
-    // TODO(97gamjak): use db_model concept
+    /**
+     * @brief Migration to create a table for a specific model
+     *
+     * TODO(97gamjak): use db_model concept
+     */
     template <typename Model>
     class CreateTableMigration : public SingleMigration
     {

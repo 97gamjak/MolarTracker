@@ -23,24 +23,7 @@ namespace app
      *
      * @param db
      */
-    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} { _ensureSchema(); }
-
-    /**
-     * @brief Ensure the database schema for profiles exists
-     *
-     */
-    void ProfileRepo::ensureSchema() { _ensureSchema(); }
-
-    /**
-     * @brief Ensure the database schema for profiles exists, this is a private
-     * helper method that is called by the virtual overriding method
-     * ensureSchema() to not use virtual dispatch in constructor
-     *
-     */
-    void ProfileRepo::_ensureSchema() const
-    {
-        orm::createTable<ProfileRow>(_db);
-    }
+    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} {}
 
     /**
      * @brief Get all profiles from the database

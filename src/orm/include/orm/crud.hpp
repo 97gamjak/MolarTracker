@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <expected>
-#include <memory>
 #include <mstd/error.hpp>
 #include <optional>
 #include <vector>

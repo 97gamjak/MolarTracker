@@ -1,8 +1,6 @@
 #ifndef __APP__SRC__APP__REPOS__ACCOUNT_REPO_HPP__
 #define __APP__SRC__APP__REPOS__ACCOUNT_REPO_HPP__
 
-#include <memory>
-
 #include "app/repos_api/i_account_repo.hpp"
 
 namespace db
@@ -32,8 +30,6 @@ namespace app
         AccountRepo(AccountRepo&&)                 = delete;
         AccountRepo& operator=(AccountRepo&&)      = delete;
 
-        void ensureSchema() override;
-
         [[nodiscard]] std::vector<finance::CashAccount> getAllCashAccounts(
             const ProfileId& profileId
         ) const override;
@@ -42,9 +38,6 @@ namespace app
             const finance::CashAccount& account,
             const ProfileId&            profileId
         ) override;
-
-       private:
-        void _ensureSchema() const;
     };
 
 }   // namespace app

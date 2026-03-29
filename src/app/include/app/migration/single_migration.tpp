@@ -7,6 +7,10 @@
 namespace app
 {
 
+    /**
+     * @brief construct a CreateTableMigration object
+     *
+     */
     // TODO(97gamjak): use db_model concept
     template <typename Model>
     CreateTableMigration<Model>::CreateTableMigration()
@@ -14,6 +18,12 @@ namespace app
     {
     }
 
+    /**
+     * @brief apply migration to create a table from Model
+     *
+     * @tparam Model
+     * @param db
+     */
     template <typename Model>
     void CreateTableMigration<Model>::applyMigration(db::Database& db)
     {
