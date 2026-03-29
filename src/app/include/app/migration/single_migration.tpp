@@ -27,7 +27,10 @@ namespace app
     template <orm::db_model Model>
     void CreateTableMigration<Model>::applyMigration(db::Database& db)
     {
-        orm::createTable<Model>(db);
+        orm::Crud crud;
+        crud.createTable<Model>(db);
+
+        setSQLStatements(crud.getExecutedSQL());
     }
 
 }   // namespace app

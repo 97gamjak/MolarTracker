@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <mstd/enum.hpp>
 #include <string>
+#include <vector>
 
 #include "orm/type_traits.hpp"
 
@@ -34,9 +35,14 @@ namespace app
         /// the description of the migration
         std::string _description;
 
+        /// the SQL statements executed by this migration
+        std::vector<std::string> _sqlStatements;
+
        public:
         explicit SingleMigration(MigrationType type);
         virtual ~SingleMigration() = default;
+
+        void setSQLStatements(const std::vector<std::string>& sqlStatements);
 
         /**
          * @brief pure virtual function to apply a single migration that needs

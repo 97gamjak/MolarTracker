@@ -10,4 +10,11 @@ namespace app
      */
     SingleMigration::SingleMigration(MigrationType type) : _type(type) {}
 
+    void SingleMigration::setSQLStatements(
+        const std::vector<std::string>& sqlStatements
+    )
+    {
+        _sqlStatements = sqlStatements;
+    }
+
 }   // namespace app
