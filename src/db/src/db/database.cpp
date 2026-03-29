@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <format>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -74,7 +75,7 @@ namespace db
     {
         _db         = std::exchange(other._db, nullptr);
         _dbPath     = std::move(other._dbPath);
-        _executions = other._executions;
+        _executions = std::move(other._executions);
 
         other._dbPath.clear();
     }
@@ -194,7 +195,19 @@ namespace db
             throw SqliteError(msg);
         }
 
+        constexpr size_t MAX_EXECUTIONS_HISTORY = 1000;
         _executions.emplace_back(sql);
+        if (_executions.size() > MAX_EXECUTIONS_HISTORY)
+        {
+            _executions.erase(
+                _executions.begin(),
+                _executions.begin() +
+                    (static_cast<
+                        std::ranges::range_difference_t<decltype(_executions)>>(
+                        _executions.size() - MAX_EXECUTIONS_HISTORY
+                    ))
+            );
+        }
     }
 
     /**

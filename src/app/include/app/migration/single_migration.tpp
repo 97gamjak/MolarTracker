@@ -3,6 +3,7 @@
 
 #include "app/migration/single_migration.hpp"
 #include "orm/crud.hpp"
+#include "orm/type_traits.hpp"
 
 namespace app
 {
@@ -11,8 +12,7 @@ namespace app
      * @brief construct a CreateTableMigration object
      *
      */
-    // TODO(97gamjak): use db_model concept
-    template <typename Model>
+    template <orm::db_model Model>
     CreateTableMigration<Model>::CreateTableMigration()
         : SingleMigration(MigrationType::AddTable)
     {
@@ -24,7 +24,7 @@ namespace app
      * @tparam Model
      * @param db
      */
-    template <typename Model>
+    template <orm::db_model Model>
     void CreateTableMigration<Model>::applyMigration(db::Database& db)
     {
         orm::createTable<Model>(db);

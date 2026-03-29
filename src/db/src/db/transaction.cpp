@@ -1,7 +1,6 @@
 #include "db/transaction.hpp"
 
 #include <iostream>
-#include <memory>
 
 #include "db/database.hpp"
 

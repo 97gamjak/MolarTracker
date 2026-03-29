@@ -27,7 +27,10 @@ namespace app
        public:
         explicit ProfileRepo(db::Database& db);
 
-        ~ProfileRepo() override                    = default;
+        ~ProfileRepo() override = default;
+        /// Move operations are deleted because this class holds a reference
+        /// member (_db), and references cannot be rebound, so moving is not
+        /// allowed.
         ProfileRepo(const ProfileRepo&)            = delete;
         ProfileRepo& operator=(const ProfileRepo&) = delete;
         ProfileRepo(ProfileRepo&&)                 = delete;

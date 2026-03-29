@@ -5,6 +5,8 @@
 #include <mstd/enum.hpp>
 #include <string>
 
+#include "orm/type_traits.hpp"
+
 namespace db
 {
     class Database;
@@ -48,9 +50,8 @@ namespace app
     /**
      * @brief Migration to create a table for a specific model
      *
-     * TODO(97gamjak): use db_model concept
      */
-    template <typename Model>
+    template <orm::db_model Model>
     class CreateTableMigration : public SingleMigration
     {
        public:

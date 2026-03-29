@@ -27,7 +27,7 @@ namespace db
         /// The path to the database file
         std::string _dbPath;
 
-        /// executions that were made by the db
+        /// Log of executed SQL statements for debugging or auditing purposes
         std::vector<std::string> _executions;
 
        public:

@@ -48,7 +48,7 @@ namespace app
     Migrations::Migrations(std::size_t fromVersion, std::size_t toVersion)
         : _fromVersion(fromVersion), _toVersion(toVersion)
     {
-        assert(fromVersion < toVersion);
+        assert(fromVersion <= toVersion);
         assert(_migrations.empty());
 
         // add migrations
