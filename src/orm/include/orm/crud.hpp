@@ -34,7 +34,20 @@ namespace orm
     template <db_model Model>
     void createTable(db::Database& database)
     {
-        details::createTable<Model>(database);
+        details::createTable<Model>(database, Model::tableName);
+    }
+
+    /**
+     * @brief Create a table for the specified model in the database
+     *
+     * @tparam Model
+     * @param database
+     * @param tableName
+     */
+    template <db_model Model>
+    void createTable(db::Database& database, std::string_view tableName)
+    {
+        details::createTable<Model>(database, tableName);
     }
 
     /******************

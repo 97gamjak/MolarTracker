@@ -17,12 +17,13 @@ namespace orm::details
      *
      * @tparam Model
      * @param database
+     * @param tableName
      */
     template <db_model Model>
-    void createTable(db::Database& database)
+    void createTable(db::Database& database, std::string_view tableName)
     {
         std::string sqlText  = "CREATE TABLE IF NOT EXISTS ";
-        sqlText             += Model::tableName;
+        sqlText             += tableName;
         sqlText             += " (";
 
         const auto ddl  = getDDl<Model>();
