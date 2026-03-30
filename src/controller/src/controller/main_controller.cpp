@@ -43,9 +43,10 @@ namespace controller
         /**
          * @brief Construct a new Impl object
          *
+         * @param settings
          */
-        Impl()
-            : _settings(Constants::getInstance().getConfigPath()),
+        explicit Impl(settings::Settings&& settings)
+            : _settings(std::move(settings)),
               _appContext(_settings),
               _handlers(_settings),
               _menuBarController(
@@ -77,10 +78,14 @@ namespace controller
      * application.
      *
      */
-    MainController::MainController() : _impl{std::make_unique<Impl>()}
+    MainController::MainController() : _impl{nullptr}
     {
+        // NOTE: _impl is initialized with nullptr in order to have logging
+        // already initialized while constructing AppContext
+
+        settings::Settings settings{Constants::getInstance().getConfigPath()};
         // initialize settings
-        auto& loggingSettings = _impl->_settings.getLoggingSettings();
+        auto& loggingSettings = settings.getLoggingSettings();
 
         // initialize ring file buffered logger
         logging::LogManager::getInstance().initializeCategories();
@@ -88,6 +93,8 @@ namespace controller
             loggingSettings,
             Constants::getInstance().getDataPath()
         );
+
+        _impl = std::make_unique<Impl>(std::move(settings));
     }
 
     /**

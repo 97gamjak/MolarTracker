@@ -60,10 +60,14 @@ namespace db
 
         [[nodiscard]] int queryInt(std::string_view sql);
 
+        void makeBackup();
+
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;
         [[nodiscard]] std::string _sqliteErrorMessage() const;
         void                      _moveFrom(Database&& other);
+
+        [[nodiscard]] static sqlite3* _open(const std::string& path);
     };
 }   // namespace db
 

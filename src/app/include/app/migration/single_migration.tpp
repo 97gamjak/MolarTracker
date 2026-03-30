@@ -14,7 +14,19 @@ namespace app
      */
     template <orm::db_model Model>
     CreateTableMigration<Model>::CreateTableMigration()
-        : SingleMigration(MigrationType::AddTable)
+        : SingleMigration(MigrationType::AddTable), _tableName(Model::tableName)
+    {
+    }
+
+    /**
+     * @brief Construct a new Create Table Migration object
+     *
+     * @param tableName
+     */
+    template <orm::db_model Model>
+    CreateTableMigration<Model>::CreateTableMigration(std::string tableName)
+        : SingleMigration(MigrationType::AddTable),
+          _tableName(std::move(tableName))
     {
     }
 
@@ -27,7 +39,10 @@ namespace app
     template <orm::db_model Model>
     void CreateTableMigration<Model>::applyMigration(db::Database& db)
     {
-        orm::createTable<Model>(db);
+        orm::Crud crud;
+        crud.createTable<Model>(db, _tableName);
+
+        setSQLStatements(crud.getExecutedSQL());
     }
 
 }   // namespace app

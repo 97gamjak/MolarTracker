@@ -3,6 +3,9 @@
 #include "app/migration/migration.hpp"
 #include "db/database.hpp"
 #include "db/transaction.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("App.Migration");
 
 namespace app
 {
@@ -26,6 +29,13 @@ namespace app
     {
         const auto dbVersion =
             static_cast<size_t>(db.queryInt("PRAGMA user_version"));
+
+        LOG_INFO(
+            "Applying migrations: " + std::to_string(dbVersion) + " -> " +
+            std::to_string(DB_VERSION)
+        );
+
+        db.makeBackup();
 
         _migrations = Migrations{dbVersion, DB_VERSION};
 

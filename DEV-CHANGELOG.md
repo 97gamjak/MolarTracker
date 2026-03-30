@@ -43,6 +43,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Database
 
 - Implement database version and corresponding migration backbone
+- Implement migration for Account to have unique constraints for name + kind
 
 ### Bugfix
 

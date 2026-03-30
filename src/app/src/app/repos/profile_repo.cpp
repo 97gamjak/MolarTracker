@@ -32,7 +32,7 @@ namespace app
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return ProfileFactory::toDomains(orm::getAll<ProfileRow>(_db));
+        return ProfileFactory::toDomains(orm::Crud().getAll<ProfileRow>(_db));
     }
 
     /**
@@ -44,7 +44,7 @@ namespace app
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
         const auto row     = ProfileRow{id};
-        const auto profile = orm::getByPk(_db, row);
+        const auto profile = orm::Crud().getByPk(_db, row);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -67,7 +67,7 @@ namespace app
             orm::UniqueClause(model.name, ProfileRow::tableName);
 
         const auto profile =
-            orm::getUnique<ProfileRow>(_db, orm::WhereClauses{clause});
+            orm::Crud().getUnique<ProfileRow>(_db, orm::WhereClauses{clause});
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -98,7 +98,8 @@ namespace app
     )
     {
         const auto profile = Profile{ProfileId::from(0), name, email};
-        const auto rowId   = orm::insert(_db, ProfileFactory::toRow(profile));
+        const auto rowId =
+            orm::Crud().insert(_db, ProfileFactory::toRow(profile));
 
         if (rowId.has_value())
             return ProfileId::from(rowId.value());
@@ -137,7 +138,7 @@ namespace app
         Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
         const auto result =
-            orm::update(_db, ProfileFactory::toRow(updatedProfile));
+            orm::Crud().update(_db, ProfileFactory::toRow(updatedProfile));
 
         if (!result)
         {
@@ -159,7 +160,7 @@ namespace app
      */
     void ProfileRepo::remove(ProfileId id)
     {
-        orm::deleteByPk(_db, ProfileRow{id});
+        orm::Crud().deleteByPk(_db, ProfileRow{id});
     }
 
 }   // namespace app

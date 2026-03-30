@@ -53,7 +53,7 @@ namespace app
 
         db::Transaction transaction{_db};
 
-        const auto result = orm::insert(_db, transaction, accountRow);
+        const auto result = orm::Crud().insert(_db, transaction, accountRow);
 
         if (!result.has_value())
         {
@@ -71,7 +71,8 @@ namespace app
 
         cashAccountRow.id = AccountId(result.value());
 
-        const auto cashResult = orm::insert(_db, transaction, cashAccountRow);
+        const auto cashResult =
+            orm::Crud().insert(_db, transaction, cashAccountRow);
 
         if (!cashResult.has_value())
         {
@@ -119,7 +120,7 @@ namespace app
             orm::WhereOperator::Equal
         );
 
-        const auto cashAccountRows = orm::getAll<AccountRow>(
+        const auto cashAccountRows = orm::Crud().getAll<AccountRow>(
             _db,
             orm::WhereClauses{kindClause, profileClause}
         );
