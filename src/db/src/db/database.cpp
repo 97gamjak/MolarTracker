@@ -297,6 +297,10 @@ namespace db
         return static_cast<int>(statement.columnInt64(0));
     }
 
+    /**
+     * @brief Create a backup copy of the database
+     *
+     */
     void Database::make_backup()
     {
         _ensureOpen();
@@ -355,6 +359,12 @@ namespace db
         return std::string{msg};
     }
 
+    /**
+     * @brief Open a SQLite database connection
+     *
+     * @param path The path to the database file
+     * @return sqlite3* The opened database handle
+     */
     sqlite3* Database::_open(const std::string& path)
     {
         sqlite3* openedHandle = nullptr;

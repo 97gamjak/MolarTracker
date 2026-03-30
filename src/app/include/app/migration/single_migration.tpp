@@ -18,6 +18,11 @@ namespace app
     {
     }
 
+    /**
+     * @brief Construct a new Create Table Migration object
+     *
+     * @param tableName
+     */
     template <orm::db_model Model>
     CreateTableMigration<Model>::CreateTableMigration(std::string tableName)
         : SingleMigration(MigrationType::AddTable),

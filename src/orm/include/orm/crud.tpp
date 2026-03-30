@@ -110,7 +110,7 @@ namespace orm
      *
      * @tparam Model
      * @param database
-     * @param transaction An active transaction to use for the insert
+     * @param - transaction An active transaction to use for the insert
      * operation, this is used to ensure that the caller has control over
      * the transaction scope and can manage it as needed (e.g., commit,
      * rollback, etc.), the method will not manage the transaction itself,
@@ -190,8 +190,11 @@ namespace orm
     /**
      * @brief Insert multiple rows into the database
      *
-     * @tparam Model1
      * @tparam Models
+     * @param database
+     * @param rows
+     *
+     * @return std::expected<std::vector<std::int64_t>, CrudError>
      */
     template <typename... Models>
     requires(db_model<Models> && ...)

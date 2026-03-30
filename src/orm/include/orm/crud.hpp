@@ -17,9 +17,14 @@
 
 namespace orm
 {
+    /**
+     * @brief Class for handling CRUD operations
+     *
+     */
     class Crud
     {
        private:
+        /// A vector to store executed SQL statements
         std::vector<std::string> _sqlExecutions;
 
        public:

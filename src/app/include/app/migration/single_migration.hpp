@@ -68,6 +68,7 @@ namespace app
     class CreateTableMigration : public SingleMigration
     {
        private:
+        /// the name of the table to create
         std::string _tableName;
 
        public:
@@ -77,9 +78,14 @@ namespace app
         void applyMigration(db::Database& db) override;
     };
 
+    /**
+     * @brief Migration to create a custom SQL migration
+     *
+     */
     class CustomMigration : public SingleMigration
     {
        private:
+        /// the SQL statement to execute
         std::string _sql;
 
        public:
@@ -96,6 +102,7 @@ namespace app
     class ChangeForeignKeyPragma : public SingleMigration
     {
        private:
+        /// the SQL statement to execute
         bool _enable;
 
        public:
@@ -104,9 +111,14 @@ namespace app
         void applyMigration(db::Database& db) override;
     };
 
+    /**
+     * @brief Migration to drop a table
+     *
+     */
     class DropTableMigration : public SingleMigration
     {
        private:
+        /// the name of the table to drop
         std::string _tableName;
 
        public:
@@ -115,10 +127,17 @@ namespace app
         void applyMigration(db::Database& db) override;
     };
 
+    /**
+     * @brief Migration to copy a table
+     *
+     */
     class CopyTableMigration : public SingleMigration
     {
        private:
+        /// the name of the source table
         std::string _sourceTable;
+
+        /// the name of the destination table
         std::string _destinationTable;
 
        public:
@@ -130,10 +149,17 @@ namespace app
         void applyMigration(db::Database& db) override;
     };
 
+    /**
+     * @brief Migration to rename a table
+     *
+     */
     class RenameTableMigration : public SingleMigration
     {
        private:
+        /// the name of the table to rename
         std::string _oldName;
+
+        /// the name of the table to rename to
         std::string _newName;
 
        public:

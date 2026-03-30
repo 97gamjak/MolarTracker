@@ -69,6 +69,13 @@ namespace app
             _migrations[i].migrate(db);
     }
 
+    /**
+     * @brief Migrate from version 1
+     *
+     * @details This handles the migration from v0 to v1. It creates the initial
+     * profile, account, and cash account tables.
+     *
+     */
     void Migrations::_migrateV1()
     {
         Migration migration(0);
@@ -84,6 +91,12 @@ namespace app
         _migrations.push_back(std::move(migration));
     }
 
+    /**
+     * @brief Migrate from version 2
+     *
+     * @details This handles the migration from v1 to v2. It introduces a unique
+     * constraint on the account name and account kind field combination.
+     */
     void Migrations::_migrateV2()
     {
         Migration migration(1);

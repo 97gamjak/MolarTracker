@@ -57,6 +57,11 @@ struct AccountRow
 
     ORM_FIELDS(AccountRow, id, kind, profileId, name, status, currency)
 
+    /**
+     * @brief Get the Unique Groups object
+     *
+     * @return auto
+     */
     static auto getUniqueGroups()
     {
         return orm::unique_set(
