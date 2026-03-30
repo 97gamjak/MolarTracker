@@ -7,264 +7,122 @@
 #include <optional>
 #include <vector>
 
-#include "crud/create.hpp"
 #include "crud/crud_error.hpp"
-#include "crud/delete.hpp"
-#include "crud/get.hpp"
-#include "crud/insert.hpp"
-#include "crud/update.hpp"
 #include "db/database.hpp"
 #include "db/transaction.hpp"
+#include "join.hpp"
 #include "orm/constraints.hpp"
 #include "orm/type_traits.hpp"
 #include "where_clause.hpp"
 
 namespace orm
 {
-    /******************
-     * CREATE METHODS *
-     ******************/
-
     /**
-     * @brief Create a table for the specified model in the database
+     * @brief Class for handling CRUD operations
      *
-     * @tparam Model
-     * @param database
      */
-    template <db_model Model>
-    void createTable(const std::shared_ptr<db::Database>& database)
+    class Crud
     {
-        details::createTable<Model>(database);
-    }
+       private:
+        /// A vector to store executed SQL statements
+        std::vector<std::string> _sqlExecutions;
 
-    /******************
-     * INSERT METHODS *
-     ******************/
+       public:
+        [[nodiscard]] const std::vector<std::string>& getExecutedSQL() const;
 
-    /**
-     * @brief Insert a row into the database
-     *
-     * @tparam Model
-     * @param database
-     * @param row
-     * @return std::expected<std::int64_t, CrudError> The ID of the inserted row
-     * or an error
-     */
-    template <db_model Model>
-    requires is_freely_insertable_v<Model>
-    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         row
-    )
-    {
-        db::Transaction transaction{database};
-        auto            result = details::_insert(database, row);
+        /******************
+         * CREATE METHODS *
+         ******************/
 
-        if (result.has_value())
-            transaction.commit();
+        template <db_model Model>
+        void createTable(db::Database& database);
 
-        return result;
-    }
+        template <db_model Model>
+        void createTable(db::Database& database, std::string_view tableName);
 
-    /**
-     * @brief Insert a row into the database
-     *
-     * @tparam Model
-     * @param database
-     * @param transaction An active transaction to use for the insert operation,
-     * this is used to ensure that the caller has control over the transaction
-     * scope and can manage it as needed (e.g., commit, rollback, etc.), the
-     * method will not manage the transaction itself, it will only use it to
-     * ensure that the insert operation is performed within the context of the
-     * provided transaction.
-     * @param row
-     * @return std::expected<std::int64_t, CrudError> The ID of the inserted row
-     * or an error
-     */
-    template <db_model Model>
-    [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
-        const std::shared_ptr<db::Database>& database,
-        const db::Transaction& /*transaction*/,
-        const Model& row
-    )
-    {
-        return details::_insert(database, row);
-    }
+        /******************
+         * INSERT METHODS *
+         ******************/
 
-    /**
-     * @brief Insert multiple rows into the database
-     *
-     * @tparam Model1
-     * @tparam Models
-     */
-    template <typename... Models>
-    requires(db_model<Models> && ...)
-    [[nodiscard]] std::expected<std::vector<std::int64_t>, CrudError> batchInsert(
-        const std::shared_ptr<db::Database>& database,
-        const Models&... rows
-    )
-    {
-        return details::batchInsert(database, rows...);
-    }
+        template <db_model Model>
+        requires is_freely_insertable_v<Model>
+        [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
+            db::Database& database,
+            const Model&  row
+        );
 
-    /******************
-     * UPDATE METHODS *
-     ******************/
+        template <db_model Model>
+        [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
+            db::Database& database,
+            const db::Transaction& /*transaction*/,
+            const Model& row
+        );
 
-    /**
-     * @brief Update a row in the database
-     *
-     * @tparam Model
-     * @param database
-     * @param row
-     * @return std::expected<void, CrudError> An empty expected on success, or
-     * an error on failure
-     */
-    template <db_model Model>
-    [[nodiscard]] std::expected<void, CrudError> update(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         row
-    )
-    {
-        return details::update(database, row);
-    }
+        template <typename... Models>
+        requires(db_model<Models> && ...)
+        [[nodiscard]] std::expected<std::vector<std::int64_t>, CrudError> batchInsert(
+            db::Database& database,
+            const Models&... rows
+        );
 
-    /***************
-     * GET METHODS *
-     ***************/
+        /******************
+         * UPDATE METHODS *
+         ******************/
 
-    /**
-     * @brief Get the By Pk object
-     *
-     * @tparam Model
-     * @param database
-     * @param model A model instance with the primary key fields set to the
-     * desired values
-     * @return std::optional<Model>
-     */
-    template <db_model Model>
-    [[nodiscard]] std::optional<Model> getByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
-    )
-    {
-        return details::_getByPk<Model>(database, model);
-    }
+        template <db_model Model>
+        [[nodiscard]] std::expected<void, CrudError> update(
+            db::Database& database,
+            const Model&  row
+        );
 
-    /*******************
-     * GET ALL METHODS *
-     *******************/
+        /***************
+         * GET METHODS *
+         ***************/
 
-    /**
-     * @brief Get all rows matching the specified where clauses
-     *
-     * @tparam Model
-     * @param database
-     * @param joins
-     * @param whereClauses
-     * @return std::vector<Model>
-     */
-    template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database,
-        const Joins&                         joins,
-        const WhereClauses&                  whereClauses
-    )
-    {
-        return details::_getAll<Model>(database, joins, whereClauses);
-    }
+        template <db_model Model>
+        [[nodiscard]] std::optional<Model> getByPk(
+            db::Database& database,
+            const Model&  model
+        );
 
-    /**
-     * @brief Get all rows matching the specified where clauses
-     *
-     * @tparam Model
-     * @param database
-     * @param whereClauses
-     * @return std::vector<Model>
-     */
-    template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database,
-        const WhereClauses&                  whereClauses
-    )
-    {
-        return getAll<Model>(database, Joins{}, whereClauses);
-    }
+        /*******************
+         * GET ALL METHODS *
+         *******************/
 
-    /**
-     * @brief Get all rows matching the specified where clauses
-     *
-     * @tparam Model
-     * @param database
-     * @return std::vector<Model>
-     */
-    template <db_model Model>
-    [[nodiscard]] std::vector<Model> getAll(
-        const std::shared_ptr<db::Database>& database
-    )
-    {
-        return getAll<Model>(database, WhereClauses{});
-    }
+        template <db_model Model>
+        [[nodiscard]] std::vector<Model> getAll(
+            db::Database&       database,
+            const Joins&        joins,
+            const WhereClauses& whereClauses
+        );
 
-    /**
-     * @brief Get a unique row matching the specified where clause
-     *
-     * @tparam Model
-     * @param database
-     * @param whereClauses
-     * @return std::expected<Model, CrudError> The unique model matching the
-     * where clause, or an error if no results or multiple results are found
-     */
-    template <db_model Model>
-    [[nodiscard]] std::expected<Model, CrudError> getUnique(
-        const std::shared_ptr<db::Database>& database,
-        const WhereClauses&                  whereClauses
-    )
-    {
-        const auto results = getAll<Model>(database, whereClauses);
+        template <db_model Model>
+        [[nodiscard]] std::vector<Model> getAll(
+            db::Database&       database,
+            const WhereClauses& whereClauses
+        );
 
-        if (results.empty())
-        {
-            const auto msg =
-                "No results found for getUnique with where clause: " +
-                whereClauses.getDBOperations();
+        template <db_model Model>
+        [[nodiscard]] std::vector<Model> getAll(db::Database& database);
 
-            return std::unexpected(CrudError{CrudErrorType::NotFound, msg});
-        }
+        template <db_model Model>
+        [[nodiscard]] std::expected<Model, CrudError> getUnique(
+            db::Database&       database,
+            const WhereClauses& whereClauses
+        );
 
-        if (results.size() > 1)
-        {
-            const auto msg = "Expected unique result for getUnique but got " +
-                             std::to_string(results.size());
+        /******************
+         * DELETE METHODS *
+         ******************/
 
-            return std::unexpected(
-                CrudError{CrudErrorType::MultipleResults, msg}
-            );
-        }
-
-        return results.front();
-    }
-
-    /******************
-     * DELETE METHODS *
-     ******************/
-
-    /**
-     * @brief Delete a row by primary keys
-     *
-     * @tparam Model
-     * @param database
-     * @param model
-     */
-    template <db_model Model>
-    void deleteByPk(
-        const std::shared_ptr<db::Database>& database,
-        const Model&                         model
-    )
-    {
-        details::deleteByPk<Model>(database, model);
-    }
+        template <db_model Model>
+        void deleteByPk(db::Database& database, const Model& model);
+    };
 
 }   // namespace orm
+
+#ifndef __ORM__INCLUDE__ORM__CRUD_TPP__
+#include "orm/crud.tpp"
+#endif
 
 #endif   // __ORM__INCLUDE__ORM__CRUD_HPP__

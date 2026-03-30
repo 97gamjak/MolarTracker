@@ -1,5 +1,6 @@
 #include "app/app_context.hpp"
 
+#include "app/migration/migration_runner.hpp"
 #include "config/constants.hpp"
 #include "db/database.hpp"
 
@@ -13,9 +14,8 @@ namespace app
      */
     AppContext::AppContext(settings::Settings& settings)
         : _settings{settings},
-          _database{std::make_shared<db::Database>(
-              Constants::getInstance().getDatabasePath()
-          )},
+          _database{Constants::getInstance().getDatabasePath()},
+          _migrationRunner{_database},
           _repos{_database},
           _services{_repos},
           _store{_services}

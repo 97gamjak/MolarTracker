@@ -22,6 +22,10 @@ add_library(molartracker_app STATIC
     src/app/factories/profile_factory.cpp
 
     src/app/domain/profile.cpp
+
+    src/app/migration/migration_runner.cpp
+    src/app/migration/migration.cpp
+    src/app/migration/single_migration.cpp
 )
 
 target_include_directories(molartracker_app
@@ -35,10 +39,10 @@ target_link_libraries(molartracker_app
     PUBLIC
     molartracker_finance
     molartracker_connections
+    molartracker_orm # needs to be public because of singlemigration templates! TODO: resolve this
     PRIVATE
     molartracker_db
     molartracker_logging
-    molartracker_orm
     molartracker_settings
     molartracker_config
     molartracker_sql_models

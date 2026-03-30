@@ -12,7 +12,7 @@ namespace app
      *
      * @param db
      */
-    RepoContainer::RepoContainer(const std::shared_ptr<db::Database>& db)
+    RepoContainer::RepoContainer(db::Database& db)
         : _profileRepo{std::make_shared<ProfileRepo>(db)},
           _accountRepo{std::make_shared<AccountRepo>(db)}
     {

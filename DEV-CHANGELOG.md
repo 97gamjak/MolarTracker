@@ -40,6 +40,11 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Introduce general base class `BaseStore` and interface `IStore`
 
+#### Database
+
+- Implement database version and corresponding migration backbone
+- Implement migration for Account to have unique constraints for name + kind
+
 ### Bugfix
 
 - Make GNU compiler flags to be actually applied

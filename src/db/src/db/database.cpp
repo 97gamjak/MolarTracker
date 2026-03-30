@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <format>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -72,8 +73,9 @@ namespace db
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Database::_moveFrom(Database&& other)
     {
-        _db     = std::exchange(other._db, nullptr);
-        _dbPath = std::move(other._dbPath);
+        _db         = std::exchange(other._db, nullptr);
+        _dbPath     = std::move(other._dbPath);
+        _executions = std::move(other._executions);
 
         other._dbPath.clear();
     }
@@ -87,35 +89,7 @@ namespace db
     {
         close();
 
-        sqlite3* openedHandle = nullptr;
-
-        const auto result = sqlite3_open_v2(
-            dbPath.c_str(),
-            &openedHandle,
-            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
-            nullptr
-        );
-
-        if (result != SQLITE_OK)
-        {
-            std::string msg  = "Failed to open sqlite database ";
-            msg             += '"' + dbPath + '"';
-
-            if (openedHandle != nullptr)
-            {
-                char const* openMsg = sqlite3_errmsg(openedHandle);
-                if (openMsg != nullptr)
-                {
-                    msg += " : ";
-                    msg += openMsg;
-                }
-                sqlite3_close(openedHandle);
-            }
-
-            throw SqliteError(msg);
-        }
-
-        _db     = openedHandle;
+        _db     = _open(dbPath);
         _dbPath = dbPath;
 
         enableForeignKeys(true);
@@ -191,6 +165,20 @@ namespace db
             msg += std::string(sql);
 
             throw SqliteError(msg);
+        }
+
+        constexpr size_t MAX_EXECUTIONS_HISTORY = 1000;
+        _executions.emplace_back(sql);
+        if (_executions.size() > MAX_EXECUTIONS_HISTORY)
+        {
+            _executions.erase(
+                _executions.begin(),
+                _executions.begin() +
+                    (static_cast<
+                        std::ranges::range_difference_t<decltype(_executions)>>(
+                        _executions.size() - MAX_EXECUTIONS_HISTORY
+                    ))
+            );
         }
     }
 
@@ -287,6 +275,56 @@ namespace db
             execute("PRAGMA foreign_keys = OFF;");
     }
 
+    /**
+     * @brief Query a single integer value from the database
+     *
+     * @param sql The SQL query to execute
+     * @return int The queried integer value
+     */
+    int Database::queryInt(std::string_view sql)
+    {
+        auto       statement = prepare(sql);
+        const auto result    = statement.step();
+
+        if (result != StepResult::RowAvailable)
+        {
+            throw SqliteError(
+                "queryInt: expected a row but got none | sql: " +
+                std::string(sql)
+            );
+        }
+
+        return static_cast<int>(statement.columnInt64(0));
+    }
+
+    /**
+     * @brief Create a backup copy of the database
+     *
+     */
+    void Database::makeBackup()
+    {
+        _ensureOpen();
+
+        sqlite3* backupDb = _open(_dbPath + ".bck");
+
+        // Use SQLite's backup API to create a backup copy of the database
+        sqlite3_backup* backup =
+            sqlite3_backup_init(backupDb, "main", _db, "main");
+
+        if (backup == nullptr)
+        {
+            throw SqliteError(
+                "Failed to initialize backup: " + _sqliteErrorMessage()
+            );
+        }
+
+        // Perform the backup
+        sqlite3_backup_step(backup, -1);
+        sqlite3_backup_finish(backup);
+
+        sqlite3_close(backupDb);
+    }
+
     //
     //
     // PRIVATE HELPER METHODS
@@ -319,6 +357,45 @@ namespace db
             return "sqlite error: sqlite3_errmsg returned null";
 
         return std::string{msg};
+    }
+
+    /**
+     * @brief Open a SQLite database connection
+     *
+     * @param path The path to the database file
+     * @return sqlite3* The opened database handle
+     */
+    sqlite3* Database::_open(const std::string& path)
+    {
+        sqlite3* openedHandle = nullptr;
+
+        const auto result = sqlite3_open_v2(
+            path.c_str(),
+            &openedHandle,
+            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+            nullptr
+        );
+
+        if (result != SQLITE_OK)
+        {
+            std::string msg  = "Failed to open sqlite database ";
+            msg             += '"' + path + '"';
+
+            if (openedHandle != nullptr)
+            {
+                char const* openMsg = sqlite3_errmsg(openedHandle);
+                if (openMsg != nullptr)
+                {
+                    msg += " : ";
+                    msg += openMsg;
+                }
+                sqlite3_close(openedHandle);
+            }
+
+            throw SqliteError(msg);
+        }
+
+        return openedHandle;
     }
 
 }   // namespace db
