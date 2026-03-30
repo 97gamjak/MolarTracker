@@ -35,6 +35,8 @@ namespace app
             std::to_string(DB_VERSION)
         );
 
+        db.make_backup();
+
         _migrations = Migrations{dbVersion, DB_VERSION};
 
         db::Transaction transaction{db};

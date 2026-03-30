@@ -89,35 +89,7 @@ namespace db
     {
         close();
 
-        sqlite3* openedHandle = nullptr;
-
-        const auto result = sqlite3_open_v2(
-            dbPath.c_str(),
-            &openedHandle,
-            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
-            nullptr
-        );
-
-        if (result != SQLITE_OK)
-        {
-            std::string msg  = "Failed to open sqlite database ";
-            msg             += '"' + dbPath + '"';
-
-            if (openedHandle != nullptr)
-            {
-                char const* openMsg = sqlite3_errmsg(openedHandle);
-                if (openMsg != nullptr)
-                {
-                    msg += " : ";
-                    msg += openMsg;
-                }
-                sqlite3_close(openedHandle);
-            }
-
-            throw SqliteError(msg);
-        }
-
-        _db     = openedHandle;
+        _db     = _open(dbPath);
         _dbPath = dbPath;
 
         enableForeignKeys(true);
@@ -325,6 +297,30 @@ namespace db
         return static_cast<int>(statement.columnInt64(0));
     }
 
+    void Database::make_backup()
+    {
+        _ensureOpen();
+
+        sqlite3* backupDb = _open(_dbPath + ".bck");
+
+        // Use SQLite's backup API to create a backup copy of the database
+        sqlite3_backup* backup =
+            sqlite3_backup_init(backupDb, "main", _db, "main");
+
+        if (backup == nullptr)
+        {
+            throw SqliteError(
+                "Failed to initialize backup: " + _sqliteErrorMessage()
+            );
+        }
+
+        // Perform the backup
+        sqlite3_backup_step(backup, -1);
+        sqlite3_backup_finish(backup);
+
+        sqlite3_close(backupDb);
+    }
+
     //
     //
     // PRIVATE HELPER METHODS
@@ -357,6 +353,39 @@ namespace db
             return "sqlite error: sqlite3_errmsg returned null";
 
         return std::string{msg};
+    }
+
+    sqlite3* Database::_open(const std::string& path)
+    {
+        sqlite3* openedHandle = nullptr;
+
+        const auto result = sqlite3_open_v2(
+            path.c_str(),
+            &openedHandle,
+            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+            nullptr
+        );
+
+        if (result != SQLITE_OK)
+        {
+            std::string msg  = "Failed to open sqlite database ";
+            msg             += '"' + path + '"';
+
+            if (openedHandle != nullptr)
+            {
+                char const* openMsg = sqlite3_errmsg(openedHandle);
+                if (openMsg != nullptr)
+                {
+                    msg += " : ";
+                    msg += openMsg;
+                }
+                sqlite3_close(openedHandle);
+            }
+
+            throw SqliteError(msg);
+        }
+
+        return openedHandle;
     }
 
 }   // namespace db
