@@ -19,6 +19,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Add possibility to create CashAccounts
 
+### BugFix
+
+- Fix arrangement of text and buttons in log file viewer
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
