@@ -52,6 +52,10 @@ namespace app
         Migrations(std::size_t fromVersion, std::size_t toVersion);
 
         void migrate(db::Database& db);
+
+       private:
+        void _migrateV1();
+        void _migrateV2();
     };
 
 }   // namespace app

@@ -30,7 +30,7 @@ namespace orm
                     sql += ", ";
                 first = false;
 
-                sql += (Model{}.*member).getColumnName().toString();
+                sql += (Model{}.*member).getColumnName();
             };
 
             auto const& members = Group::members;
@@ -98,7 +98,7 @@ namespace orm
     {
         const auto     groups = Model::getUniqueGroups();
         constexpr auto size   = std::tuple_size_v<decltype(groups)>;
-        appendAllUniqueGroups<Model>(
+        details::appendAllUniqueGroups<Model>(
             sql,
             groups,
             std::make_index_sequence<size>{}

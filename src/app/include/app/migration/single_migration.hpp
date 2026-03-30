@@ -16,7 +16,14 @@ namespace db
 namespace app
 {
     // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define MIGRATION_TYPE_LIST(X) X(AddTable)
+#define MIGRATION_TYPE_LIST(X) \
+    X(AddTable)                \
+    X(UpdateTable)             \
+    X(ChangeForeignKey)        \
+    X(Custom)                  \
+    X(DropTable)               \
+    X(CopyTable)               \
+    X(RenameTable)
 
     MSTD_ENUM(MigrationType, std::uint8_t, MIGRATION_TYPE_LIST);
 
@@ -60,11 +67,81 @@ namespace app
     template <orm::db_model Model>
     class CreateTableMigration : public SingleMigration
     {
+       private:
+        std::string _tableName;
+
        public:
         explicit CreateTableMigration();
+        explicit CreateTableMigration(std::string tableName);
 
         void applyMigration(db::Database& db) override;
     };
+
+    class CustomMigration : public SingleMigration
+    {
+       private:
+        std::string _sql;
+
+       public:
+        explicit CustomMigration(std::string sql);
+        explicit CustomMigration(std::string sql, MigrationType type);
+
+        void applyMigration(db::Database& db) override;
+    };
+
+    /**
+     * @brief Migration to change the foreign key constraints
+     *
+     */
+    class ChangeForeignKeyPragma : public SingleMigration
+    {
+       private:
+        bool _enable;
+
+       public:
+        explicit ChangeForeignKeyPragma(bool enable);
+
+        void applyMigration(db::Database& db) override;
+    };
+
+    class DropTableMigration : public SingleMigration
+    {
+       private:
+        std::string _tableName;
+
+       public:
+        explicit DropTableMigration(std::string tableName);
+
+        void applyMigration(db::Database& db) override;
+    };
+
+    class CopyTableMigration : public SingleMigration
+    {
+       private:
+        std::string _sourceTable;
+        std::string _destinationTable;
+
+       public:
+        CopyTableMigration(
+            std::string sourceTable,
+            std::string destinationTable
+        );
+
+        void applyMigration(db::Database& db) override;
+    };
+
+    class RenameTableMigration : public SingleMigration
+    {
+       private:
+        std::string _oldName;
+        std::string _newName;
+
+       public:
+        RenameTableMigration(std::string oldName, std::string newName);
+
+        void applyMigration(db::Database& db) override;
+    };
+
 }   // namespace app
 
 #ifndef __APP__INCLUDE__APP__MIGRATION__SINGLE_MIGRATION_TPP__

@@ -7,6 +7,7 @@
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "orm/type_traits.hpp"
 #include "profile_row.hpp"
 
 /**
@@ -55,6 +56,13 @@ struct AccountRow
     orm::Field<"currency", Currency, orm::not_null_t> currency;
 
     ORM_FIELDS(AccountRow, id, kind, profileId, name, status, currency)
+
+    static auto getUniqueGroups()
+    {
+        return orm::unique_set(
+            orm::unique_group<&AccountRow::kind, &AccountRow::name>()
+        );
+    }
 };
 
 /**
