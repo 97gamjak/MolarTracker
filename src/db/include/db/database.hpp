@@ -60,7 +60,7 @@ namespace db
 
         [[nodiscard]] int queryInt(std::string_view sql);
 
-        void make_backup();
+        void makeBackup();
 
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;

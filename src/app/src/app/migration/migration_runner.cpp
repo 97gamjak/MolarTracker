@@ -35,7 +35,7 @@ namespace app
             std::to_string(DB_VERSION)
         );
 
-        db.make_backup();
+        db.makeBackup();
 
         _migrations = Migrations{dbVersion, DB_VERSION};
 

@@ -301,7 +301,7 @@ namespace db
      * @brief Create a backup copy of the database
      *
      */
-    void Database::make_backup()
+    void Database::makeBackup()
     {
         _ensureOpen();
 

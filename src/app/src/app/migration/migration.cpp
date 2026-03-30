@@ -136,7 +136,7 @@ namespace app
             std::make_unique<CreateTableMigration<AccountRow>>(newName)
         );
 
-        // 4. Next we can insert everything form old account to temp account
+        // 4. Next we can insert everything from old account to temp account
         migration.addMigration(
             std::make_unique<CopyTableMigration>(AccountRow::tableName, newName)
         );
