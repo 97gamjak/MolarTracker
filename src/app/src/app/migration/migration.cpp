@@ -74,7 +74,7 @@ namespace app
     }
 
     /**
-     * @brief Migrate from version 1
+     * @brief Migrate to version 1
      *
      * @details This handles the migration from v0 to v1.
      * It creates the initial tables:
@@ -99,7 +99,7 @@ namespace app
     }
 
     /**
-     * @brief Migrate from version 2
+     * @brief Migrate to version 2
      *
      * @details This handles the migration from v1 to v2. It introduces a unique
      * constraint on the account name and account kind field combination.
@@ -168,7 +168,7 @@ namespace app
     }
 
     /**
-     * @brief Migrate from version 3
+     * @brief Migrate to version 3
      *
      * @details This handles the migration from v2 to v3.
      * Creating tables:
@@ -180,7 +180,7 @@ namespace app
     {
         Migration migration(2);
 
-        // For adding a new column to the account table
+        // Creating new tables: instrument, transaction, transaction_entry
         migration.addMigration(
             std::make_unique<CreateTableMigration<InstrumentRow>>()
         );
