@@ -44,6 +44,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Implement database version and corresponding migration backbone
 - Implement migration for Account to have unique constraints for name + kind
+- Add transaction, transaction_entry and instrument tables to migration
 
 ### Bugfix
 

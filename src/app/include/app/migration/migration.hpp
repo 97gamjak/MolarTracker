@@ -56,6 +56,7 @@ namespace app
        private:
         void _migrateV1();
         void _migrateV2();
+        void _migrateV3();
     };
 
 }   // namespace app

@@ -1,7 +1,7 @@
 #ifndef __ORM__INCLUDE__ORM__SQL_TYPE_HPP__
 #define __ORM__INCLUDE__ORM__SQL_TYPE_HPP__
 
-#include <cstdint>
+#include <concepts>
 #include <mstd/type_traits.hpp>
 #include <string>
 #include <string_view>
@@ -24,27 +24,14 @@ namespace orm
     struct sql_type;
 
     /**
-     * @brief Specialization of sql_type for std::int64_t
+     * @brief Specialization of sql_type for integral types
      *
-     * @tparam std::int64_t The C++ type to specialize for, which is
-     * std::int64_t in this case.
+     * @tparam T The integral type to specialize for.
      */
-    template <>
-    struct sql_type<std::int64_t>
+    template <std::integral T>
+    struct sql_type<T>
     {
-        /// SQLITE mapping for 64-bit integers is INTEGER
-        static constexpr std::string_view name = "INTEGER";
-    };
-
-    /**
-     * @brief Specialization of sql_type for int.
-     *
-     * @tparam int The C++ type to specialize for, which is int in this case.
-     */
-    template <>
-    struct sql_type<int>
-    {
-        /// SQLITE mapping for integers is INTEGER
+        /// SQLITE mapping for integral types is INTEGER
         static constexpr std::string_view name = "INTEGER";
     };
 

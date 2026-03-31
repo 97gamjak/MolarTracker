@@ -5,7 +5,10 @@
 #include "app/migration/single_migration.hpp"
 #include "db/database.hpp"
 #include "sql_models/account_row.hpp"
+#include "sql_models/instrument_row.hpp"
 #include "sql_models/profile_row.hpp"
+#include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_row.hpp"
 
 namespace app
 {
@@ -54,6 +57,7 @@ namespace app
         // add migrations
         _migrateV1();
         _migrateV2();
+        _migrateV3();
 
         assert(_migrations.size() == toVersion);
     }
@@ -72,8 +76,11 @@ namespace app
     /**
      * @brief Migrate from version 1
      *
-     * @details This handles the migration from v0 to v1. It creates the initial
-     * profile, account, and cash account tables.
+     * @details This handles the migration from v0 to v1.
+     * It creates the initial tables:
+     *  - profile
+     *  - account
+     *  - cash account
      *
      */
     void Migrations::_migrateV1()
@@ -156,6 +163,33 @@ namespace app
 
         // 7. finally turn foreign key constraints back on
         migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate from version 3
+     *
+     * @details This handles the migration from v2 to v3.
+     * Creating tables:
+     *  - instrument
+     *  - transaction
+     *  - transaction_entry
+     */
+    void Migrations::_migrateV3()
+    {
+        Migration migration(2);
+
+        // For adding a new column to the account table
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<InstrumentRow>>()
+        );
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<TransactionRow>>()
+        );
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<TransactionEntryRow>>()
+        );
 
         _migrations.push_back(std::move(migration));
     }
