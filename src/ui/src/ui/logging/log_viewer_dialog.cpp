@@ -46,7 +46,7 @@ namespace ui
         _autoReloadCheckBox->setChecked(_settings->autoReload);
         _reloadTimer->setInterval(_settings->reloadIntervalMs);
 
-        auto* buttonLayout = utils::makeQChild<QHBoxLayout>(this);
+        auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
         buttonLayout->addWidget(_reloadButton);
         buttonLayout->addStretch(1);
         buttonLayout->addWidget(_autoReloadCheckBox);
