@@ -263,11 +263,6 @@ namespace app
     )
     {
         auto account = _get(HasAccountId(id));
-        if (!account.has_value())
-            LOG_WARNING(
-                std::format("Account with ID {} not found", id.value())
-            );
-
         return account;
     }
 

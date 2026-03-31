@@ -28,7 +28,6 @@ namespace ui
 
        private:
         void _setupUi();
-        void _updateUi();
     };
 
 }   // namespace ui
