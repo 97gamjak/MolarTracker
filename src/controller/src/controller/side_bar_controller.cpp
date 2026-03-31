@@ -84,7 +84,7 @@ namespace controller
         {
             case ui::SideBarItemType::AccountsItem:
             {
-                auto* account = dynamic_cast<ui::AccountItem*>(item);
+                const auto* account = dynamic_cast<ui::AccountItem*>(item);
 
                 if (account != nullptr)
                     _accountSideBarController.onAccountSelected(account->getId()
@@ -157,12 +157,24 @@ namespace controller
         }
     }
 
+    /**
+     * @brief Get the account side bar controller
+     *
+     * @return AccountSideBarController& Reference to the account side bar
+     * controller
+     */
     AccountSideBarController& SideBarController::getAccountSideBarController()
     {
         return _accountSideBarController;
     }
 
-    [[nodiscard]] const AccountSideBarController& SideBarController::
+    /**
+     * @brief Get the account side bar controller
+     *
+     * @return const AccountSideBarController& Reference to the account side bar
+     * controller
+     */
+    const AccountSideBarController& SideBarController::
         getAccountSideBarController() const
     {
         return _accountSideBarController;

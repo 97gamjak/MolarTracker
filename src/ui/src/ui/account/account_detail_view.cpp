@@ -11,20 +11,40 @@ namespace ui
 {
     using drafts::AccountDraft;
 
+    /**
+     * @brief UI elements for the account detail view
+     *
+     */
     struct AccountDetailView::UIElements
     {
+        /// The title label
         QLabel* titleLabel;
+        /// The name label
         QLabel* nameLabel;
+        /// The balance label
         QLabel* balanceLabel;
     };
 
+    /**
+     * @brief Construct a new Account Detail View object
+     *
+     * @param parent The parent widget
+     */
     AccountDetailView::AccountDetailView(QWidget* parent) : QWidget(parent)
     {
         _setupUi();
     }
 
+    /**
+     * @brief Destroy the Account Detail View object
+     *
+     */
     AccountDetailView::~AccountDetailView() = default;
 
+    /**
+     * @brief Setup the UI elements for the account detail view
+     *
+     */
     void AccountDetailView::_setupUi()
     {
         auto* layout = utils::makeQChild<QVBoxLayout>(this);
@@ -41,6 +61,11 @@ namespace ui
         layout->addWidget(_uiElements->balanceLabel);
     }
 
+    /**
+     * @brief Update the account details displayed in the view
+     *
+     * @param account The account data to display
+     */
     void AccountDetailView::updateAccount(const AccountDraft& account)
     {
         _account = account;

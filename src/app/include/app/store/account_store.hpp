@@ -60,7 +60,7 @@ namespace app
 
         [[nodiscard]] std::optional<finance::AccountVariant> getAccount(
             AccountId id
-        );
+        ) const;
         [[nodiscard]] std::vector<const finance::Account*> getAllAccounts(
         ) const;
 

@@ -258,9 +258,16 @@ namespace app
         return accounts;
     }
 
+    /**
+     * @brief Get an account by its ID
+     *
+     * @param id The ID of the account to retrieve
+     * @return std::optional<finance::AccountVariant> The account if found, or
+     * an empty optional if not found
+     */
     std::optional<finance::AccountVariant> AccountStore::getAccount(
         AccountId id
-    )
+    ) const
     {
         auto account = _get(HasAccountId(id));
         return account;

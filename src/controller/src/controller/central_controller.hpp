@@ -9,11 +9,16 @@
 
 namespace controller
 {
+    /**
+     * @brief Controller for managing the central view of the application
+     *
+     */
     class CentralController : public QObject
     {
         Q_OBJECT
 
        private:
+        /// Controller for managing account-related actions
         AccountController _accountController;
 
        public:

@@ -9,15 +9,20 @@
 namespace ui
 {
 
+    /**
+     * @brief View for displaying account details
+     *
+     */
     class AccountDetailView : public QWidget
     {
         Q_OBJECT
 
        private:
+        /// The account draft being displayed
         drafts::AccountDraft _account;
 
-        // PIMPL
         struct UIElements;
+        /// PIMPL
         std::unique_ptr<UIElements> _uiElements;
 
        public:

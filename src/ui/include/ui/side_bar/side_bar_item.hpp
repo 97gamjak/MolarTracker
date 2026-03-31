@@ -12,6 +12,7 @@ namespace ui
 {
     class SideBar;
 
+    // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define SIDE_BAR_ITEM_TYPE_LIST(X) \
     X(AccountCategory)             \
     X(OverviewCategory)            \

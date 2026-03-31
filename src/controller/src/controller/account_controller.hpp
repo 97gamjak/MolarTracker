@@ -80,12 +80,21 @@ namespace controller
         void onAccountSelected(AccountId id);
 
        signals:
+        /**
+         * @brief Signal emitted when an account is selected in the side bar
+         *
+         * @param id The ID of the selected account
+         */
         void accountSelected(AccountId id);
 
        private slots:
         void _onCreateAccountRequested(const drafts::AccountDraft& account);
     };
 
+    /**
+     * @brief Controller for managing account details
+     *
+     */
     class AccountController : public QObject
     {
         Q_OBJECT
