@@ -2,7 +2,6 @@
 #define __APP__INCLUDE__APP__STORE__BASE__I_STORE_HPP__
 
 #include "config/signal_tags.hpp"
-#include "connections/observable.hpp"
 
 class Connection;   // Forward declaration
 

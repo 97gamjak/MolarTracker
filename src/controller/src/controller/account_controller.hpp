@@ -8,8 +8,9 @@
 #include "config/id_types.hpp"
 #include "side_bar_category_controller.hpp"
 
-class QAction;       // Forward declaration
-class QMainWindow;   // Forward declaration
+class QAction;          // Forward declaration
+class QMainWindow;      // Forward declaration
+class QStackedWidget;   // Forward declaration
 
 namespace drafts
 {
@@ -25,6 +26,7 @@ namespace ui
 {
     class AccountCategory;       // Forward declaration
     class CreateAccountDialog;   // Forward declaration
+    class AccountDetailView;     // Forward declaration
 }   // namespace ui
 
 namespace cmd
@@ -93,12 +95,17 @@ namespace controller
         cmd::UndoStack& _undoStack;
         /// Reference to the application context
         app::AppContext& _appContext;
+        /// Pointer to the stacked widget
+        QStackedWidget* _stackedWidget;
+        /// Pointer to the account detail view
+        QPointer<ui::AccountDetailView> _accountDetailView;
 
        public:
         AccountController(
             cmd::UndoStack&           undoStack,
             app::AppContext&          appContext,
-            AccountSideBarController& sideBarController
+            AccountSideBarController& sideBarController,
+            QStackedWidget*           stackedWidget
         );
 
        private slots:

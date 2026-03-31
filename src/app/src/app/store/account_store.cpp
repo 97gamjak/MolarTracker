@@ -1,5 +1,6 @@
 #include "app/store/account_store.hpp"
 
+#include <cassert>
 #include <format>
 
 #include "app/services_api/i_account_service.hpp"
@@ -169,6 +170,9 @@ namespace app
         );
 
         _activeProfileId = profileId;
+
+        assert(!isDirty());
+        _refresh();
     }
 
     /**

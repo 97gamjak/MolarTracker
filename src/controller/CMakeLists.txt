@@ -12,6 +12,8 @@ qt_add_library(molartracker_controller STATIC
     src/controller/side_bar_category_controller.cpp
     src/controller/account_controller.cpp
 
+    src/controller/central_controller.cpp
+
     src/controller/handlers/handlers.cpp
     src/controller/handlers/logging_handler.cpp
     src/controller/handlers/dirty_handler.cpp

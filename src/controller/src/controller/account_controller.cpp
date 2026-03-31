@@ -1,5 +1,7 @@
 #include "account_controller.hpp"
 
+#include <qstackedwidget.h>
+
 #include <QAction>
 #include <QMainWindow>
 #include <QObject>
@@ -9,8 +11,10 @@
 #include "app/store/account_store.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
+#include "config/finance_enums.hpp"
 #include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "ui/account/account_detail_view.hpp"
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
@@ -23,9 +27,13 @@ namespace controller
     AccountController::AccountController(
         cmd::UndoStack&           undoStack,
         app::AppContext&          appContext,
-        AccountSideBarController& sideBarController
+        AccountSideBarController& sideBarController,
+        QStackedWidget*           stackedWidget
     )
-        : _undoStack(undoStack), _appContext(appContext)
+        : _undoStack(undoStack),
+          _appContext(appContext),
+          _stackedWidget(stackedWidget),
+          _accountDetailView(new ui::AccountDetailView(_stackedWidget))
     {
         connect(
             &sideBarController,
@@ -33,6 +41,8 @@ namespace controller
             this,
             &AccountController::_onAccountSelected
         );
+
+        _stackedWidget->addWidget(_accountDetailView);
     }
 
     void AccountController::_onAccountSelected(AccountId id)
@@ -50,7 +60,16 @@ namespace controller
             return;
         }
 
-        // build account details view
+        const auto accountDraft = drafts::AccountDraft{
+            .id   = std::get<finance::CashAccount>(account.value()).getId(),
+            .name = std::get<finance::CashAccount>(account.value()).getName(),
+            .kind = AccountKind::Cash,
+            .currency =
+                std::get<finance::CashAccount>(account.value()).getCurrency()
+        };
+
+        _accountDetailView->updateAccount(accountDraft);
+        _stackedWidget->setCurrentWidget(_accountDetailView);
     }
 
     /**
