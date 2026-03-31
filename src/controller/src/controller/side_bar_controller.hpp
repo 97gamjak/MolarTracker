@@ -60,8 +60,12 @@ namespace controller
 
         void refresh();
 
+        [[nodiscard]] AccountSideBarController& getAccountSideBarController();
+        [[nodiscard]] const AccountSideBarController& getAccountSideBarController(
+        ) const;
+
        private:
-        static void _onItemClicked(ui::SideBarItem* item);
+        void _onItemClicked(ui::SideBarItem* item);
         void _onContextMenuRequested(ui::SideBarItem* item, QAction* action);
     };
 

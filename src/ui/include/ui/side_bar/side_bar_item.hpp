@@ -3,6 +3,7 @@
 
 #include <QStandardItem>
 #include <cstdint>
+#include <mstd/enum.hpp>
 
 class QString;   // Forward declaration
 class QMenu;     // Forward declaration
@@ -11,18 +12,13 @@ namespace ui
 {
     class SideBar;
 
-    /**
-     * @brief Enum for the different types of items in the side bar, this is
-     * used to identify which item is selected when the itemSelected signal is
-     * emitted
-     *
-     */
-    enum class SideBarItemType : std::uint8_t
-    {
-        AccountCategory,
-        OverviewCategory,
-        AccountsItem,
-    };
+    // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define SIDE_BAR_ITEM_TYPE_LIST(X) \
+    X(AccountCategory)             \
+    X(OverviewCategory)            \
+    X(AccountsItem)
+
+    MSTD_ENUM(SideBarItemType, std::uint8_t, SIDE_BAR_ITEM_TYPE_LIST);
 
     /**
      * @brief Base class for items in the side bar, this is used to identify

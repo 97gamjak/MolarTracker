@@ -18,6 +18,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Finance
 
 - Add possibility to create CashAccounts
+- Adding first draft of Single Account Pages
 
 ### BugFix
 

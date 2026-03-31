@@ -3,6 +3,7 @@
 #include "app/app_context.hpp"
 #include "commands/undo_stack.hpp"
 #include "config/constants.hpp"
+#include "controller/central_controller.hpp"
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
@@ -40,6 +41,9 @@ namespace controller
         /// controller for managing the side bar
         controller::SideBarController _sideBarController;
 
+        /// controller for managing the account
+        controller::CentralController _centralController;
+
         /**
          * @brief Construct a new Impl object
          *
@@ -60,6 +64,12 @@ namespace controller
                   _appContext,
                   &_mainWindow,
                   &_mainWindow.getSideBar(),
+                  _mainWindow.getCentralWidget()
+              ),
+              _centralController(
+                  _undoStack,
+                  _appContext,
+                  _sideBarController.getAccountSideBarController(),
                   _mainWindow.getCentralWidget()
               )
         {
@@ -122,6 +132,8 @@ namespace controller
         };
 
         controller.ensureProfileExists();
+
+        _impl->_sideBarController.refresh();
     }
 
 }   // namespace controller

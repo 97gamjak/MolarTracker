@@ -1,6 +1,10 @@
 #include "app/store/account_store.hpp"
 
+#include <cassert>
+#include <format>
+
 #include "app/services_api/i_account_service.hpp"
+#include "app/store/predicates.hpp"
 #include "config/finance_enums.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
@@ -166,6 +170,9 @@ namespace app
         );
 
         _activeProfileId = profileId;
+
+        assert(!isDirty());
+        _refresh();
     }
 
     /**
@@ -182,7 +189,7 @@ namespace app
      * successfully or if there was an error, and provides information about
      * what went wrong if the addition failed.
      */
-    [[nodiscard]] AccountStoreResult AccountStore::_addCashAccount(
+    AccountStoreResult AccountStore::_addCashAccount(
         const drafts::AccountDraft& accountDraft
     )
     {
@@ -228,8 +235,7 @@ namespace app
      * that is managed by the store, and the caller can use these pointers to
      * access the account data and perform operations on the accounts as needed.
      */
-    [[nodiscard]] std::vector<const finance::Account*> AccountStore::
-        getAllAccounts() const
+    std::vector<const finance::Account*> AccountStore::getAllAccounts() const
     {
         std::vector<const finance::Account*> accounts;
 
@@ -250,6 +256,21 @@ namespace app
         }
 
         return accounts;
+    }
+
+    /**
+     * @brief Get an account by its ID
+     *
+     * @param id The ID of the account to retrieve
+     * @return std::optional<finance::AccountVariant> The account if found, or
+     * an empty optional if not found
+     */
+    std::optional<finance::AccountVariant> AccountStore::getAccount(
+        AccountId id
+    ) const
+    {
+        auto account = _get(HasAccountId(id));
+        return account;
     }
 
 }   // namespace app

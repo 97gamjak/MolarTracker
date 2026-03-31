@@ -15,7 +15,7 @@ namespace ui
      */
     AccountItem::AccountItem(AccountId id, const QString& name)
         : SideBarItem(name, SideBarItemType::AccountsItem),
-          _id(id),
+          _accountId(id),
           _openAction(nullptr),
           _deleteAction(nullptr)
     {
@@ -27,7 +27,7 @@ namespace ui
      *
      * @return AccountId The id of the account
      */
-    AccountId AccountItem::getId() const { return _id; }
+    AccountId AccountItem::getId() const { return _accountId; }
 
     /**
      * @brief Get the open action of the account item, this is used to connect

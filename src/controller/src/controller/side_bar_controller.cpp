@@ -75,11 +75,23 @@ namespace controller
      */
     void SideBarController::_onItemClicked(ui::SideBarItem* item)
     {
+        LOG_TRACE(
+            "Side bar item with type " +
+            ui::SideBarItemTypeMeta::toString(item->getType())
+        );
+
         switch (item->getType())
         {
             case ui::SideBarItemType::AccountsItem:
             {
-                // open the account page for the selected account
+                const auto* account = dynamic_cast<ui::AccountItem*>(item);
+
+                if (account != nullptr)
+                    _accountSideBarController.onAccountSelected(account->getId()
+                    );
+                else
+                    LOG_ERROR("Account item clicked but not found");
+
                 break;
             }
             case ui::SideBarItemType::OverviewCategory:
@@ -143,6 +155,29 @@ namespace controller
                 );
                 break;
         }
+    }
+
+    /**
+     * @brief Get the account side bar controller
+     *
+     * @return AccountSideBarController& Reference to the account side bar
+     * controller
+     */
+    AccountSideBarController& SideBarController::getAccountSideBarController()
+    {
+        return _accountSideBarController;
+    }
+
+    /**
+     * @brief Get the account side bar controller
+     *
+     * @return const AccountSideBarController& Reference to the account side bar
+     * controller
+     */
+    const AccountSideBarController& SideBarController::
+        getAccountSideBarController() const
+    {
+        return _accountSideBarController;
     }
 
 }   // namespace controller
