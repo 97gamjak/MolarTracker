@@ -30,13 +30,13 @@ namespace app
         AccountRepo(AccountRepo&&)                 = delete;
         AccountRepo& operator=(AccountRepo&&)      = delete;
 
-        [[nodiscard]] std::vector<finance::CashAccount> getAllCashAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllCashAccounts(
             const ProfileId& profileId
         ) const override;
 
         [[nodiscard]] AccountId createCashAccount(
-            const finance::CashAccount& account,
-            const ProfileId&            profileId
+            const finance::Account& account,
+            const ProfileId&        profileId
         ) override;
     };
 

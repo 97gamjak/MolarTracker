@@ -86,11 +86,10 @@ namespace controller
         }
 
         const auto accountDraft = drafts::AccountDraft{
-            .id   = std::get<finance::CashAccount>(account.value()).getId(),
-            .name = std::get<finance::CashAccount>(account.value()).getName(),
-            .kind = AccountKind::Cash,
-            .currency =
-                std::get<finance::CashAccount>(account.value()).getCurrency()
+            .id       = account.value().getId(),
+            .name     = account.value().getName(),
+            .kind     = AccountKind::Cash,
+            .currency = account.value().getCurrency()
         };
 
         _accountDetailView->updateAccount(accountDraft);

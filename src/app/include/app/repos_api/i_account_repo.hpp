@@ -7,7 +7,7 @@
 
 namespace finance
 {
-    class CashAccount;   // forward declaration
+    class Account;   // forward declaration
 }   // namespace finance
 
 namespace app
@@ -35,8 +35,8 @@ namespace app
          * @return AccountId The ID of the newly created cash account
          */
         [[nodiscard]] virtual AccountId createCashAccount(
-            const finance::CashAccount& cashAccount,
-            const ProfileId&            profileId
+            const finance::Account& cashAccount,
+            const ProfileId&        profileId
         ) = 0;
 
         /**
@@ -48,10 +48,10 @@ namespace app
          * @param profileId The ID of the profile whose cash accounts are to
          be
          * retrieved
-         * @return std::vector<finance::CashAccount> A vector containing all
+         * @return std::vector<finance::Account> A vector containing all
          * cash accounts in the repository
          */
-        [[nodiscard]] virtual std::vector<finance::CashAccount> getAllCashAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getAllCashAccounts(
             const ProfileId& profileId
         ) const = 0;
     };

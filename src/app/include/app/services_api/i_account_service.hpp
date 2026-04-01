@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 
 namespace app
 {
@@ -18,20 +18,15 @@ namespace app
         virtual ~IAccountService() = default;
 
         /**
-         * @brief Get all accounts, this method retrieves all account entries
-         * from the underlying data source and returns them as a vector of
-         * AccountVariant domain objects, this allows for retrieving all types
-         * of accounts (e.g., cash accounts, security accounts, etc.) in a
-         * single method call, and the specific type of each account can be
-         * determined using std::visit or std::get_if on the returned variants.
+         * @brief Get all accounts
          *
          * @param profileId The ID of the profile whose accounts are to be
          * retrieved
          *
-         * @return std::vector<finance::AccountVariant> A vector containing all
-         * accounts as AccountVariant objects
+         * @return std::vector<finance::Account> A vector containing all
+         * accounts
          */
-        [[nodiscard]] virtual std::vector<finance::AccountVariant> getAllAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const = 0;
 
@@ -46,7 +41,7 @@ namespace app
          * @return std::vector<finance::CashAccount> A vector containing all
          * cash accounts
          */
-        [[nodiscard]] virtual std::vector<finance::CashAccount> getAllCashAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getAllCashAccounts(
             const ProfileId& profileId
         ) const = 0;
 
@@ -64,8 +59,8 @@ namespace app
          */
         [[nodiscard]]
         virtual AccountId createCashAccount(
-            const finance::CashAccount& cashAccount,
-            const ProfileId&            profileId
+            const finance::Account& cashAccount,
+            const ProfileId&        profileId
         ) = 0;
     };
 

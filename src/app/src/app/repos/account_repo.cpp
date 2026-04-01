@@ -1,7 +1,7 @@
 #include "account_repo.hpp"
 
 #include "app/factories/account_factory.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "repo_errors.hpp"
@@ -44,12 +44,14 @@ namespace app
      * failure.
      */
     AccountId AccountRepo::createCashAccount(
-        const finance::CashAccount& account,
-        const ProfileId&            profileId
+        const finance::Account& account,
+        const ProfileId&        profileId
     )
     {
-        auto [accountRow, cashAccountRow] =
-            AccountFactory::toCashAccountRow(account, profileId);
+        auto [accountRow, cashAccountRowVar] =
+            AccountFactory::toAccountRow(account, profileId);
+
+        auto cashAccountRow = std::get<CashAccountRow>(cashAccountRowVar);
 
         db::Transaction transaction{_db};
 
@@ -102,8 +104,9 @@ namespace app
      * @param profileId
      * @return std::vector<finance::CashAccount>
      */
-    [[nodiscard]] std::vector<finance::CashAccount> AccountRepo::
-        getAllCashAccounts(const ProfileId& profileId) const
+    [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllCashAccounts(
+        const ProfileId& profileId
+    ) const
     {
         auto dummyAccountRow      = AccountRow{};
         dummyAccountRow.kind      = AccountKind::Cash;
@@ -125,7 +128,7 @@ namespace app
             orm::WhereClauses{kindClause, profileClause}
         );
 
-        return AccountFactory::toCashAccountDomains(cashAccountRows);
+        return AccountFactory::toAccountDomains(cashAccountRows);
     }
 
 }   // namespace app

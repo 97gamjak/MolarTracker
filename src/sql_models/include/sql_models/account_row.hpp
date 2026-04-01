@@ -2,6 +2,7 @@
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__
 
 #include <string>
+#include <variant>
 
 #include "config/finance_enums.hpp"
 #include "config/id_types.hpp"
@@ -101,5 +102,9 @@ struct CashAccountRow final
 
     ORM_FIELDS(CashAccountRow, id)
 };
+
+/// Represents a variant for different types of account details
+/// these details depend on the type of the account
+using AccountDetailRow = std::variant<CashAccountRow>;
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__

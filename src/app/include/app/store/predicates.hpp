@@ -3,11 +3,11 @@
 
 #include "app/store/base/base_store.hpp"
 #include "app/store/base/predicate.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 
 namespace app
 {
-    Predicate<BaseStore<finance::AccountVariant, AccountId>::Entry> HasAccountId(
+    Predicate<BaseStore<finance::Account, AccountId>::Entry> HasAccountId(
         AccountId id
     );
 

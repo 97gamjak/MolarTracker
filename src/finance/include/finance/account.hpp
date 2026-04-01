@@ -1,9 +1,8 @@
-#ifndef __FINANCE__INCLUDE__FINANCE__CASH_ACCOUNT_HPP__
-#define __FINANCE__INCLUDE__FINANCE__CASH_ACCOUNT_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
+#define __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
 
 #include <cstdint>
 #include <string>
-#include <variant>
 
 #include "config/id_types.hpp"
 
@@ -51,32 +50,6 @@ namespace finance
         [[nodiscard]] Currency      getCurrency() const;
     };
 
-    /**
-     * @brief A class representing a cash account, which holds a certain amount
-     * of cash in a specific currency. This class provides basic operations for
-     * managing the cash balance, such as deposits and withdrawals.
-     *
-     */
-    class CashAccount final : public Account
-    {
-       public:
-        /**
-         * @brief Inherit constructors from Account
-         *
-         * @param id the unique identifier for the cash account
-         * @param status the status of the account (e.g., Active, Closed)
-         * @param name the current name of the account
-         * @param currency the current currency of the account
-         */
-        using Account::Account;
-    };
-
-    /// A variant type that can hold any type of account, this allows for
-    /// managing different types of accounts in a single collection or
-    /// interface, and the specific type of each account can be determined using
-    /// std::visit or std::get_if on the variants.
-    using AccountVariant = std::variant<CashAccount>;
-
 }   // namespace finance
 
-#endif   // __FINANCE__INCLUDE__FINANCE__CASH_ACCOUNT_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__

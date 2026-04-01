@@ -1,4 +1,4 @@
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 
 #include <utility>
 
