@@ -58,7 +58,7 @@ namespace logging
         RingFileConfig config;
 
         config.directory = directory / settings.getLogDirectory();
-        config.baseName  = settings.getLogFilePrefix() + Timestamp::fileSafe();
+        config.baseName  = settings.getLogFilePrefix() + Timestamp().fileSafe();
         config.extension = settings.getLogFileSuffix();
         config.maxFiles  = settings.getMaxLogFiles();
         config.maxSizeMB = settings.getMaxLogFileSizeMB();
@@ -187,7 +187,7 @@ namespace logging
         std::string buffer;
 
         buffer += _logLevelToString(logObject.level);
-        buffer += " [" + Timestamp::iso8601TimeMs() + "] ";
+        buffer += " [" + Timestamp().iso8601TimeMs() + "] ";
         buffer += logObject.message;
         if (logObject.level >= LogLevel::Debug ||
             logObject.level == LogLevel::Error)

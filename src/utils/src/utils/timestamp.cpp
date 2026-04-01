@@ -9,16 +9,14 @@ using std::chrono::milliseconds;
 using std::chrono::seconds;
 using std::chrono::zoned_time;
 
-using Clock     = std::chrono::system_clock;
-using Duration  = Clock::duration;
-using TimePoint = std::chrono::local_time<Duration>;
+Timestamp::Timestamp() : _timePoint(_now()) {}
 
 /**
  * @brief Returns the current time point from the system clock
  *
  * @return TimePoint
  */
-TimePoint Timestamp::now()
+TimePoint Timestamp::_now()
 {
     const auto now = Clock::now();
 
@@ -38,7 +36,7 @@ TimePoint Timestamp::now()
  */
 std::string Timestamp::iso8601()
 {
-    return std::format("{:%FT%T}", floor<seconds>(now()));
+    return std::format("{:%FT%T}", floor<seconds>(_timePoint));
 }
 
 /**
@@ -51,7 +49,7 @@ std::string Timestamp::iso8601()
  */
 std::string Timestamp::iso8601TimeMs()
 {
-    return std::format("{:%T}", floor<milliseconds>(now()));
+    return std::format("{:%T}", floor<milliseconds>(_timePoint));
 }
 
 /**
@@ -63,7 +61,7 @@ std::string Timestamp::iso8601TimeMs()
  */
 std::string Timestamp::humanReadable()
 {
-    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(now()));
+    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(_timePoint));
 }
 
 /**
@@ -75,5 +73,5 @@ std::string Timestamp::humanReadable()
  */
 std::string Timestamp::fileSafe()
 {
-    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(now()));
+    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(_timePoint));
 }
