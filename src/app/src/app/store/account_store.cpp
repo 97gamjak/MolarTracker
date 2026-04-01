@@ -8,7 +8,7 @@
 #include "config/finance_enums.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.AccountStore");
@@ -88,34 +88,20 @@ namespace app
         {
             if (entry.state == StoreState::New)
             {
-                if (!std::holds_alternative<finance::CashAccount>(entry.value))
-                {
-                    auto msg =
-                        "Unsupported account type in commit: " +
-                        std::string(
-                            entry.value.index() == 0 ? "CashAccount" : "Unknown"
-                        );
-                    LOG_ERROR(msg);
-                    throw AccountStoreException(msg);
-                }
-
-                auto& cashAccount = std::get<finance::CashAccount>(entry.value);
-                const auto oldId  = cashAccount.getId();
-                auto       id     = _accountService->createCashAccount(
-                    cashAccount,
+                auto&      account = entry.value;
+                const auto oldId   = account.getId();
+                auto       id      = _accountService->createCashAccount(
+                    account,
                     _activeProfileId
                 );
-                cashAccount.setId(id);
+                account.setId(id);
                 _appendChangedIds(oldId, id);
                 entry.state = StoreState::Clean;
 
                 LOG_INFO(
                     std::format(
                         "Account '{}' added to database",
-                        std::visit(
-                            [](const auto& acc) { return acc.getName(); },
-                            entry.value
-                        )
+                        account.getName()
                     )
                 );
             }
@@ -193,7 +179,7 @@ namespace app
         const drafts::AccountDraft& accountDraft
     )
     {
-        const auto account = finance::CashAccount{
+        const auto account = finance::Account{
             _generateNewId(),
             AccountStatus::Active,
             accountDraft.name,
@@ -241,18 +227,7 @@ namespace app
 
         for (const auto& entry : _getEntries())
         {
-            if (std::holds_alternative<finance::CashAccount>(entry.value))
-            {
-                accounts.push_back(&std::get<finance::CashAccount>(entry.value)
-                );
-            }
-            else
-            {
-                LOG_WARNING(
-                    "Encountered unsupported account type in getAllAccounts, "
-                    "skipping"
-                );
-            }
+            accounts.push_back(&entry.value);
         }
 
         return accounts;
@@ -265,12 +240,9 @@ namespace app
      * @return std::optional<finance::AccountVariant> The account if found, or
      * an empty optional if not found
      */
-    std::optional<finance::AccountVariant> AccountStore::getAccount(
-        AccountId id
-    ) const
+    std::optional<finance::Account> AccountStore::getAccount(AccountId id) const
     {
-        auto account = _get(HasAccountId(id));
-        return account;
+        return _get(HasAccountId(id));
     }
 
 }   // namespace app

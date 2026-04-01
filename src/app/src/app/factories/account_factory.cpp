@@ -1,7 +1,7 @@
 #include "account_factory.hpp"
 
 #include "config/id_types.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 #include "sql_models/account_row.hpp"
 
 namespace app
@@ -14,7 +14,7 @@ namespace app
      * @param accountRow
      * @return finance::CashAccount
      */
-    finance::CashAccount AccountFactory::toCashAccountDomain(
+    finance::Account AccountFactory::toAccountDomain(
         const AccountRow& accountRow
     )
     {
@@ -33,15 +33,15 @@ namespace app
      * @param accountRows
      * @return std::vector<finance::CashAccount>
      */
-    std::vector<finance::CashAccount> AccountFactory::toCashAccountDomains(
+    std::vector<finance::Account> AccountFactory::toAccountDomains(
         const std::vector<AccountRow>& accountRows
     )
     {
-        std::vector<finance::CashAccount> accounts;
+        std::vector<finance::Account> accounts;
         accounts.reserve(accountRows.size());
 
         for (const auto& row : accountRows)
-            accounts.push_back(toCashAccountDomain(row));
+            accounts.push_back(toAccountDomain(row));
 
         return accounts;
     }
@@ -54,11 +54,11 @@ namespace app
      *
      * @param account
      * @param profileId
-     * @return std::pair<AccountRow, CashAccountRow>
+     * @return std::pair<AccountRow, AccountDetailRow>
      */
-    std::pair<AccountRow, CashAccountRow> AccountFactory::toCashAccountRow(
-        const finance::CashAccount& account,
-        const ProfileId&            profileId
+    std::pair<AccountRow, AccountDetailRow> AccountFactory::toAccountRow(
+        const finance::Account& account,
+        const ProfileId&        profileId
     )
     {
         AccountRow     accountRow;

@@ -1,7 +1,7 @@
 #include "account_service.hpp"
 
 #include "app/repos_api/i_account_repo.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 
 namespace app
 {
@@ -25,13 +25,13 @@ namespace app
      *
      * @return std::vector<finance::AccountVariant>
      */
-    std::vector<finance::AccountVariant> AccountService::getAllAccounts(
+    std::vector<finance::Account> AccountService::getAllAccounts(
         const ProfileId& profileId
     ) const
     {
         const auto cashAccounts = _accountRepo->getAllCashAccounts(profileId);
 
-        std::vector<finance::AccountVariant> accounts;
+        std::vector<finance::Account> accounts;
         accounts.reserve(cashAccounts.size());
 
         for (const auto& account : cashAccounts)
@@ -48,7 +48,7 @@ namespace app
      *
      * @return std::vector<finance::CashAccount>
      */
-    std::vector<finance::CashAccount> AccountService::getAllCashAccounts(
+    std::vector<finance::Account> AccountService::getAllCashAccounts(
         const ProfileId& profileId
     ) const
     {
@@ -65,8 +65,8 @@ namespace app
      * @return AccountId
      */
     AccountId AccountService::createCashAccount(
-        const finance::CashAccount& cashAccount,
-        const ProfileId&            profileId
+        const finance::Account& cashAccount,
+        const ProfileId&        profileId
     )
     {
         return _accountRepo->createCashAccount(cashAccount, profileId);

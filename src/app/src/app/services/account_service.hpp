@@ -26,17 +26,17 @@ namespace app
             const std::shared_ptr<IAccountRepo>& accountRepo
         );
 
-        [[nodiscard]] std::vector<finance::AccountVariant> getAllAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const override;
 
-        [[nodiscard]] std::vector<finance::CashAccount> getAllCashAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllCashAccounts(
             const ProfileId& profileId
         ) const override;
 
         [[nodiscard]] AccountId createCashAccount(
-            const finance::CashAccount& cashAccount,
-            const ProfileId&            profileId
+            const finance::Account& cashAccount,
+            const ProfileId&        profileId
         ) override;
     };
 

@@ -7,7 +7,7 @@
 
 namespace finance
 {
-    class CashAccount;   // Forward declaration
+    class Account;   // Forward declaration
 }   // namespace finance
 
 namespace app
@@ -22,17 +22,15 @@ namespace app
     class AccountFactory
     {
        public:
-        static finance::CashAccount toCashAccountDomain(
-            const AccountRow& accountRow
-        );
+        static finance::Account toAccountDomain(const AccountRow& accountRow);
 
-        static std::vector<finance::CashAccount> toCashAccountDomains(
+        static std::vector<finance::Account> toAccountDomains(
             const std::vector<AccountRow>& accountRows
         );
 
-        static std::pair<AccountRow, CashAccountRow> toCashAccountRow(
-            const finance::CashAccount& account,
-            const ProfileId&            profileId
+        static std::pair<AccountRow, AccountDetailRow> toAccountRow(
+            const finance::Account& account,
+            const ProfileId&        profileId
         );
     };
 

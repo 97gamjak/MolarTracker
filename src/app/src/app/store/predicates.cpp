@@ -2,11 +2,11 @@
 
 namespace app
 {
-    Predicate<BaseStore<finance::AccountVariant, AccountId>::Entry> HasAccountId(
+    Predicate<BaseStore<finance::Account, AccountId>::Entry> HasAccountId(
         AccountId id
     )
     {
-        return Predicate<BaseStore<finance::AccountVariant, AccountId>::Entry>(
+        return Predicate<BaseStore<finance::Account, AccountId>::Entry>(
             [id](const auto& entry) { return getId(entry.value) == id; }
         );
     }

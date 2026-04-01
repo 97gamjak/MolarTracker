@@ -6,7 +6,7 @@
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "exceptions/base.hpp"
-#include "finance/cash_account.hpp"
+#include "finance/account.hpp"
 
 namespace drafts
 {
@@ -39,7 +39,7 @@ namespace app
      * @brief Store for managing accounts
      *
      */
-    class AccountStore : public BaseStore<finance::AccountVariant, AccountId>
+    class AccountStore : public BaseStore<finance::Account, AccountId>
     {
        private:
         /// reference to the account service
@@ -58,7 +58,7 @@ namespace app
             const drafts::AccountDraft& accountDraft
         );
 
-        [[nodiscard]] std::optional<finance::AccountVariant> getAccount(
+        [[nodiscard]] std::optional<finance::Account> getAccount(
             AccountId id
         ) const;
         [[nodiscard]] std::vector<const finance::Account*> getAllAccounts(
