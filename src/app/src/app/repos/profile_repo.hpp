@@ -17,6 +17,8 @@ namespace app
     class ProfileRepo : public IProfileRepo, public BaseRepo
     {
        public:
+        using BaseRepo::BaseRepo;
+
         [[nodiscard]] std::vector<Profile>   getAll() const override;
         [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
         [[nodiscard]] std::optional<Profile> get(

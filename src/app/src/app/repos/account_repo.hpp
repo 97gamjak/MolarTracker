@@ -14,6 +14,8 @@ namespace app
     class AccountRepo : public IAccountRepo, public BaseRepo
     {
        public:
+        using BaseRepo::BaseRepo;
+
         [[nodiscard]] std::vector<finance::Account> getAllCashAccounts(
             const ProfileId& profileId
         ) const override;
