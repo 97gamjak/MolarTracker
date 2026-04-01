@@ -9,6 +9,7 @@ add_library(molartracker_app STATIC
 
     src/app/repos/account_repo.cpp
     src/app/repos/profile_repo.cpp
+    src/app/repos/base_repo.cpp
     src/app/repos/repo_errors.cpp
 
     src/app/store/account_store.cpp

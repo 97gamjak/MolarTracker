@@ -4,12 +4,8 @@
 #include <optional>
 #include <vector>
 
+#include "app/repos/base_repo.hpp"
 #include "app/repos_api/i_profile_repo.hpp"
-
-namespace db
-{
-    class Database;   // Forward declaration
-}   // namespace db
 
 namespace app
 {
@@ -18,24 +14,9 @@ namespace app
      * @brief Database implementation of Profile repository
      *
      */
-    class ProfileRepo : public IProfileRepo
+    class ProfileRepo : public IProfileRepo, public BaseRepo
     {
-       private:
-        /// reference to the database instance
-        db::Database& _db;
-
        public:
-        explicit ProfileRepo(db::Database& db);
-
-        ~ProfileRepo() override = default;
-        /// Move operations are deleted because this class holds a reference
-        /// member (_db), and references cannot be rebound, so moving is not
-        /// allowed.
-        ProfileRepo(const ProfileRepo&)            = delete;
-        ProfileRepo& operator=(const ProfileRepo&) = delete;
-        ProfileRepo(ProfileRepo&&)                 = delete;
-        ProfileRepo& operator=(ProfileRepo&&)      = delete;
-
         [[nodiscard]] std::vector<Profile>   getAll() const override;
         [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
         [[nodiscard]] std::optional<Profile> get(

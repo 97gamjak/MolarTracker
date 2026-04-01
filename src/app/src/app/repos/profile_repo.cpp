@@ -6,7 +6,6 @@
 
 #include "app/domain/profile.hpp"
 #include "app/factories/profile_factory.hpp"
-#include "db/database.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/where_clause.hpp"
@@ -19,20 +18,15 @@ namespace app
 {
 
     /**
-     * @brief Construct a new Profile Repo object
-     *
-     * @param db
-     */
-    ProfileRepo::ProfileRepo(db::Database& db) : _db{db} {}
-
-    /**
      * @brief Get all profiles from the database
      *
      * @return std::vector<Profile>
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return ProfileFactory::toDomains(orm::Crud().getAll<ProfileRow>(_db));
+        return ProfileFactory::toDomains(
+            orm::Crud().getAll<ProfileRow>(_getDb())
+        );
     }
 
     /**
@@ -44,7 +38,7 @@ namespace app
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
         const auto row     = ProfileRow{id};
-        const auto profile = orm::Crud().getByPk(_db, row);
+        const auto profile = orm::Crud().getByPk(_getDb(), row);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -66,8 +60,10 @@ namespace app
         const auto clause =
             orm::UniqueClause(model.name, ProfileRow::tableName);
 
-        const auto profile =
-            orm::Crud().getUnique<ProfileRow>(_db, orm::WhereClauses{clause});
+        const auto profile = orm::Crud().getUnique<ProfileRow>(
+            _getDb(),
+            orm::WhereClauses{clause}
+        );
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
@@ -99,7 +95,7 @@ namespace app
     {
         const auto profile = Profile{ProfileId::from(0), name, email};
         const auto rowId =
-            orm::Crud().insert(_db, ProfileFactory::toRow(profile));
+            orm::Crud().insert(_getDb(), ProfileFactory::toRow(profile));
 
         if (rowId.has_value())
             return ProfileId::from(rowId.value());
@@ -138,7 +134,7 @@ namespace app
         Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
 
         const auto result =
-            orm::Crud().update(_db, ProfileFactory::toRow(updatedProfile));
+            orm::Crud().update(_getDb(), ProfileFactory::toRow(updatedProfile));
 
         if (!result)
         {
@@ -160,7 +156,7 @@ namespace app
      */
     void ProfileRepo::remove(ProfileId id)
     {
-        orm::Crud().deleteByPk(_db, ProfileRow{id});
+        orm::Crud().deleteByPk(_getDb(), ProfileRow{id});
     }
 
 }   // namespace app

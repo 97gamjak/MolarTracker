@@ -13,15 +13,6 @@ namespace app
 {
 
     /**
-     * @brief Construct a new Account Repo object
-     *
-     * @param db A reference to the database instance that the repository
-     * will use to perform database operations, this allows the repository to
-     * interact with the database to store and retrieve account data as needed.
-     */
-    AccountRepo::AccountRepo(db::Database& db) : _db(db) {}
-
-    /**
      * @brief Create a new cash account in the database, this method should
      * insert a new row into the accounts table and a corresponding row into the
      * cash_accounts table to create a new cash account, it should return the ID
@@ -53,9 +44,10 @@ namespace app
 
         auto cashAccountRow = std::get<CashAccountRow>(cashAccountRowVar);
 
-        db::Transaction transaction{_db};
+        db::Transaction transaction{_getDb()};
 
-        const auto result = orm::Crud().insert(_db, transaction, accountRow);
+        const auto result =
+            orm::Crud().insert(_getDb(), transaction, accountRow);
 
         if (!result.has_value())
         {
@@ -74,7 +66,7 @@ namespace app
         cashAccountRow.id = AccountId(result.value());
 
         const auto cashResult =
-            orm::Crud().insert(_db, transaction, cashAccountRow);
+            orm::Crud().insert(_getDb(), transaction, cashAccountRow);
 
         if (!cashResult.has_value())
         {
@@ -124,7 +116,7 @@ namespace app
         );
 
         const auto cashAccountRows = orm::Crud().getAll<AccountRow>(
-            _db,
+            _getDb(),
             orm::WhereClauses{kindClause, profileClause}
         );
 
