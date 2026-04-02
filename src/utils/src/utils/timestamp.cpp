@@ -4,25 +4,24 @@
 #include <format>
 
 using std::chrono::current_zone;
+using std::chrono::duration_cast;
 using std::chrono::floor;
 using std::chrono::milliseconds;
 using std::chrono::seconds;
 using std::chrono::zoned_time;
 
-Timestamp::Timestamp() : _timePoint(_now()) {}
+Timestamp::Timestamp() : _timePoint(Clock::now()) {}
 
 /**
  * @brief Returns the current time point from the system clock
  *
  * @return TimePoint
  */
-TimePoint Timestamp::_now()
+LocalTimePoint Timestamp::_toLocalTime() const
 {
-    const auto now = Clock::now();
-
     const auto* timeZone = current_zone();
 
-    zoned_time local_time{timeZone, now};
+    zoned_time local_time{timeZone, _timePoint};
 
     return local_time.get_local_time();
 }
@@ -34,9 +33,9 @@ TimePoint Timestamp::_now()
  *
  * @return std::string
  */
-std::string Timestamp::iso8601()
+std::string Timestamp::iso8601() const
 {
-    return std::format("{:%FT%T}", floor<seconds>(_timePoint));
+    return std::format("{:%FT%T}", floor<seconds>(_toLocalTime()));
 }
 
 /**
@@ -47,9 +46,9 @@ std::string Timestamp::iso8601()
  *
  * @return std::string
  */
-std::string Timestamp::iso8601TimeMs()
+std::string Timestamp::iso8601TimeMs() const
 {
-    return std::format("{:%T}", floor<milliseconds>(_timePoint));
+    return std::format("{:%T}", floor<milliseconds>(_toLocalTime()));
 }
 
 /**
@@ -59,9 +58,9 @@ std::string Timestamp::iso8601TimeMs()
  *
  * @return std::string
  */
-std::string Timestamp::humanReadable()
+std::string Timestamp::humanReadable() const
 {
-    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(_timePoint));
+    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(_toLocalTime()));
 }
 
 /**
@@ -71,7 +70,13 @@ std::string Timestamp::humanReadable()
  *
  * @return std::string
  */
-std::string Timestamp::fileSafe()
+std::string Timestamp::fileSafe() const
 {
-    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(_timePoint));
+    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(_toLocalTime()));
+}
+
+[[nodiscard]] int64_t Timestamp::toInt64() const
+{
+    return duration_cast<milliseconds>(_toLocalTime().time_since_epoch())
+        .count();
 }
