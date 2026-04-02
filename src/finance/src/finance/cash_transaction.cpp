@@ -1,21 +1,17 @@
-#include "cash_transaction.hpp"
+#include "finance/cash_transaction.hpp"
 
 namespace finance
 {
     /**
      * @brief Construct a new Cash Transaction:: Cash Transaction object
      *
-     * @param id
-     * @param accountId
      * @param cash
      */
-    CashTransaction::CashTransaction(
-        TransactionEntryId id,
-        AccountId          accountId,
-        Cash               cash
-    )
-        : _id(id), _accountId(accountId), _cash(cash)
+    CashTransaction::CashTransaction(Cash cash) : _cash(cash) {}
+
+    [[nodiscard]] micro_units CashTransaction::getAmount() const
     {
+        return _cash.getAmount();
     }
 
 }   // namespace finance

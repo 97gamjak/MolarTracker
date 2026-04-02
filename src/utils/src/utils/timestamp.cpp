@@ -12,6 +12,8 @@ using std::chrono::zoned_time;
 
 Timestamp::Timestamp() : _timePoint(Clock::now()) {}
 
+Timestamp::Timestamp(const TimePoint& timePoint) : _timePoint(timePoint) {}
+
 /**
  * @brief Returns the current time point from the system clock
  *
@@ -79,4 +81,9 @@ std::string Timestamp::fileSafe() const
 {
     return duration_cast<milliseconds>(_toLocalTime().time_since_epoch())
         .count();
+}
+
+[[nodiscard]] Timestamp Timestamp::fromInt64(int64_t value)
+{
+    return Timestamp{Clock::time_point{milliseconds{value}}};
 }

@@ -6,6 +6,7 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "utils/timestamp.hpp"
 
 /**
  * @brief Represents a row in the "transaction" database table
@@ -23,7 +24,7 @@ struct TransactionRow final
     orm::IdField<TransactionId> id;
 
     /// The timestamp field, this is a required field
-    orm::Field<"timestamp", std::uint64_t, orm::not_null_t> timestamp;
+    orm::Field<"timestamp", Timestamp, orm::not_null_t> timestamp;
 
     /// The status field, this is a required field
     orm::Field<"status", TransactionStatus, orm::not_null_t> status;

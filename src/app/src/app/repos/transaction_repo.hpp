@@ -1,0 +1,18 @@
+#ifndef __APP__SRC__APP__REPOS__TRANSACTION_REPO_HPP__
+#define __APP__SRC__APP__REPOS__TRANSACTION_REPO_HPP__
+
+#include "app/repos_api/i_transaction_repo.hpp"
+#include "base_repo.hpp"
+
+namespace app
+{
+    class TransactionRepo : public ITransactionRepo, public BaseRepo
+    {
+       public:
+        using BaseRepo::BaseRepo;
+
+        void addTransaction(const finance::Transaction& transaction) override;
+    };
+}   // namespace app
+
+#endif   // __APP__SRC__APP__REPOS__TRANSACTION_REPO_HPP__

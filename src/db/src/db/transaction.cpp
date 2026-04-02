@@ -13,13 +13,17 @@ namespace db
      * @param db
      * @param immediate
      */
-    Transaction::Transaction(Database& db, bool immediate)
-        : _db(&db), _isActive(true)
+    Transaction::Transaction(Database& db, bool immediate) : _db(&db)
     {
-        if (immediate)
-            _db->execute("BEGIN IMMEDIATE;");
+        if (!_db->isTransactionStarted())
+        {
+            _db->begin(immediate);
+            _isActive = true;
+        }
         else
-            _db->execute("BEGIN;");
+        {
+            _isActive = false;
+        }
     }
 
     /**

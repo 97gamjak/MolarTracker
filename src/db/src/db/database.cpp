@@ -182,6 +182,18 @@ namespace db
         }
     }
 
+    void Database::begin(bool immediate)
+    {
+        if (immediate)
+            execute("BEGIN IMMEDIATE;");
+        else
+            execute("BEGIN;");
+
+        _transactionStarted = true;
+    }
+
+    bool Database::isTransactionStarted() const { return _transactionStarted; }
+
     /**
      * @brief prepare a SQL statement for execution
      *

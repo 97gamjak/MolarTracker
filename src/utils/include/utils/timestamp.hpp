@@ -29,6 +29,7 @@ class Timestamp
    public:
     // Delete default constructor to prevent instantiation
     Timestamp();
+    Timestamp(const TimePoint& timePoint);
 
     // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] std::string iso8601() const;
@@ -43,6 +44,8 @@ class Timestamp
     [[nodiscard]] std::string fileSafe() const;
 
     [[nodiscard]] int64_t toInt64() const;
+
+    [[nodiscard]] static Timestamp fromInt64(int64_t value);
 
    private:
     [[nodiscard]] LocalTimePoint _toLocalTime() const;

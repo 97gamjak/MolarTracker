@@ -3,6 +3,7 @@
 
 #include "account_row.hpp"
 #include "config/id_types.hpp"
+#include "finance/cash.hpp"
 #include "instrument_row.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
@@ -20,7 +21,7 @@
 struct TransactionEntryRow final
 {
     /// The name of the database table this struct represents
-    static constexpr auto tableName = "transaction_entry";
+    static constexpr std::string tableName = "tx_entry";
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
@@ -75,7 +76,7 @@ struct TransactionEntryRow final
     /// the transaction for the associated account and instrument, it is stored
     /// as an integer representing the amount as micro-units (e.g., 0.001 cents
     /// for USD) to avoid floating-point precision issues
-    orm::Field<"amount", std::int64_t, orm::not_null_t> amount;
+    orm::Field<"amount", finance::micro_units, orm::not_null_t> amount;
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(
