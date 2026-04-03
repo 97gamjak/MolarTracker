@@ -73,9 +73,10 @@ namespace db
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Database::_moveFrom(Database&& other)
     {
-        _db         = std::exchange(other._db, nullptr);
-        _dbPath     = std::move(other._dbPath);
-        _executions = std::move(other._executions);
+        _db                 = std::exchange(other._db, nullptr);
+        _dbPath             = std::move(other._dbPath);
+        _executions         = std::move(other._executions);
+        _transactionStarted = other._transactionStarted;
 
         other._dbPath.clear();
     }
