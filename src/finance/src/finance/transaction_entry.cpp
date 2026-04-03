@@ -15,8 +15,5 @@ namespace finance
 
     AccountId TransactionEntry::getAccountId() const { return _accountId; }
 
-    std::variant<CashTransaction> TransactionEntry::getDetails() const
-    {
-        return _details;
-    }
+    TransactionDetail TransactionEntry::getDetails() const { return _details; }
 }   // namespace finance

@@ -113,4 +113,6 @@ namespace finance
         return Cash(cash._currency, -cash._amount);
     }
 
+    micro_units Cash::getAmount() const { return _amount; }
+
 }   // namespace finance

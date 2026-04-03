@@ -29,7 +29,7 @@ class Timestamp
    public:
     // Delete default constructor to prevent instantiation
     Timestamp();
-    Timestamp(const TimePoint& timePoint);
+    explicit Timestamp(const TimePoint& timePoint);
 
     // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] std::string iso8601() const;

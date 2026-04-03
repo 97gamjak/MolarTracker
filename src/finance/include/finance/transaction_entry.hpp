@@ -3,6 +3,7 @@
 
 #include <variant>
 
+#include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "finance/cash_transaction.hpp"
 

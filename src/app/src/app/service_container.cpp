@@ -3,6 +3,7 @@
 #include "app/repo_container.hpp"
 #include "services/account_service.hpp"
 #include "services/profile_service.hpp"
+#include "services/transaction_service.hpp"
 
 namespace app
 {
@@ -16,7 +17,10 @@ namespace app
         : _profileService{std::make_shared<ProfileService>(repos.getProfileRepo(
           ))},
           _accountService{std::make_shared<AccountService>(repos.getAccountRepo(
-          ))}
+          ))},
+          _transactionService{
+              std::make_shared<TransactionService>(repos.getTransactionRepo())
+          }
     {
     }
 
@@ -60,6 +64,28 @@ namespace app
     ) const
     {
         return _accountService;
+    }
+
+    /**
+     * @brief Get the Transaction Service
+     *
+     * @return std::shared_ptr<ITransactionService>
+     */
+    std::shared_ptr<ITransactionService> ServiceContainer::
+        getTransactionService()
+    {
+        return _transactionService;
+    }
+
+    /**
+     * @brief Get the Transaction Service (const version)
+     *
+     * @return std::shared_ptr<const ITransactionService>
+     */
+    std::shared_ptr<const ITransactionService> ServiceContainer::
+        getTransactionService() const
+    {
+        return _transactionService;
     }
 
 }   // namespace app

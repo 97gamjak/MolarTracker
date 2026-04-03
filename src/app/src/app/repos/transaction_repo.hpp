@@ -3,6 +3,7 @@
 
 #include "app/repos_api/i_transaction_repo.hpp"
 #include "base_repo.hpp"
+#include "config/id_types.hpp"
 
 namespace app
 {
@@ -11,7 +12,9 @@ namespace app
        public:
         using BaseRepo::BaseRepo;
 
-        void addTransaction(const finance::Transaction& transaction) override;
+        [[nodiscard]] TransactionId addTransaction(
+            const finance::Transaction& transaction
+        ) override;
     };
 }   // namespace app
 

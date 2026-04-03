@@ -3,21 +3,20 @@
 #include "app/factories/transaction_factory.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
+#include "finance/transaction.hpp"
 #include "orm/crud.hpp"
 #include "repo_errors.hpp"
 
 namespace app
 {
-    void TransactionRepo::addTransaction(
+    TransactionId TransactionRepo::addTransaction(
         const finance::Transaction& transaction
     )
     {
-        db::Transaction dbTransaction{_getDb()};
+        db::Transaction dbTx{_getDb()};
+        auto txRow = TransactionFactory::toTransactionRow(transaction);
 
-        const auto transactionResult = orm::Crud().insert(
-            _getDb(),
-            TransactionFactory::toTransactionRow(transaction)
-        );
+        const auto transactionResult = orm::Crud().insert(_getDb(), txRow);
 
         if (!transactionResult.has_value())
         {
@@ -28,11 +27,13 @@ namespace app
             throw orm::CrudException(msg);
         }
 
+        const auto txId = TransactionId(transactionResult.value());
+
         for (const auto& entry : transaction.getEntries())
         {
             const auto instrumentResult = orm::Crud().insert(
                 _getDb(),
-                dbTransaction,
+                dbTx,
                 TransactionFactory::toInstrumentRow(entry.getDetails())
             );
 
@@ -47,12 +48,12 @@ namespace app
 
             const auto entryRow = TransactionFactory::toTransactionEntryRow(
                 entry,
-                TransactionId(transactionResult.value()),
+                txId,
                 InstrumentId(instrumentResult.value())
             );
 
             const auto entryResult =
-                orm::Crud().insert(_getDb(), dbTransaction, entryRow);
+                orm::Crud().insert(_getDb(), dbTx, entryRow);
 
             if (!entryResult.has_value())
             {
@@ -64,7 +65,9 @@ namespace app
             }
         }
 
-        dbTransaction.commit();
+        dbTx.commit();
+
+        return TransactionId(transactionResult.value());
     }
 
 }   // namespace app

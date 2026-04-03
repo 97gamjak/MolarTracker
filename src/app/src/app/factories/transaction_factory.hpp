@@ -30,6 +30,10 @@ namespace app
         static InstrumentRow toInstrumentRow(
             const finance::TransactionDetail& detail
         );
+
+        static finance::TransactionDetail createTransactionDetail(
+            const InstrumentRow& row
+        );
     };
 
 }   // namespace app

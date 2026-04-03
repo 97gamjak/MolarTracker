@@ -2,7 +2,6 @@
 #define __FINANCE__INCLUDE__FINANCE__CASH_TRANSACTION_HPP__
 
 #include "cash.hpp"
-#include "config/id_types.hpp"
 
 namespace finance
 {
