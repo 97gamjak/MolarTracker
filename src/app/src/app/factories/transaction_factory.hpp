@@ -10,6 +10,11 @@
 namespace app
 {
 
+    /**
+     * @brief A factory class for creating and converting transaction-related
+     * objects
+     *
+     */
     class TransactionFactory
     {
        public:
@@ -29,10 +34,6 @@ namespace app
 
         static InstrumentRow toInstrumentRow(
             const finance::TransactionDetail& detail
-        );
-
-        static finance::TransactionDetail createTransactionDetail(
-            const InstrumentRow& row
         );
     };
 

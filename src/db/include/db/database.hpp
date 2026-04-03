@@ -30,6 +30,7 @@ namespace db
         /// Log of executed SQL statements for debugging or auditing purposes
         std::vector<std::string> _executions;
 
+        /// Indicates whether a database transaction is currently active
         bool _transactionStarted = false;
 
        public:

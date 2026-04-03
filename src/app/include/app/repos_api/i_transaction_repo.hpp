@@ -10,6 +10,10 @@ namespace finance
 
 namespace app
 {
+    /**
+     * @brief Interface for transaction repository
+     *
+     */
     class ITransactionRepo
     {
        public:

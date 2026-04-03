@@ -8,9 +8,14 @@ namespace db
 
 namespace app
 {
+    /**
+     * @brief A base repository class for database operations
+     *
+     */
     class BaseRepo
     {
        private:
+        /// Reference to the database instance
         db::Database& _db;
 
        public:

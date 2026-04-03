@@ -7,6 +7,10 @@
 
 namespace app
 {
+    /**
+     * @brief Repository for managing transactions.
+     *
+     */
     class TransactionRepo : public ITransactionRepo, public BaseRepo
     {
        public:

@@ -11,6 +11,10 @@ namespace finance
 {
     using TransactionDetail = std::variant<CashTransaction>;
 
+    /**
+     * @brief Represents a single entry in a financial transaction.
+     *
+     */
     class TransactionEntry
     {
        private:
@@ -35,11 +39,21 @@ namespace finance
         [[nodiscard]] std::variant<CashTransaction> getDetails() const;
     };
 
+    /**
+     * @brief Visitor for extracting the amount from a TransactionDetail.
+     *
+     */
     struct AmountVisitor
     {
-        micro_units operator()(const CashTransaction& transaction) const
+        /**
+         * @brief Extracts the amount from a TransactionDetail.
+         *
+         * @param detail The TransactionDetail to extract the amount from.
+         * @return The extracted amount in micro_units.
+         */
+        micro_units operator()(const CashTransaction& detail) const
         {
-            return transaction.getAmount();
+            return detail.getAmount();
         }
     };
 

@@ -5,11 +5,22 @@
 
 namespace app
 {
+    /**
+     * @brief Interface for transaction service
+     *
+     */
     class ITransactionService
     {
        public:
         virtual ~ITransactionService() = default;
 
+        /**
+         * @brief Adds a transaction to the service.
+         *
+         * @param transaction The transaction to add.
+         *
+         * @return The ID of the added transaction.
+         */
         virtual TransactionId addTransaction(
             const finance::Transaction& transaction
         ) = 0;

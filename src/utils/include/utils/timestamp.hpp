@@ -22,12 +22,13 @@ using LocalTimePoint = std::chrono::local_time<Duration>;
 class Timestamp
 {
    private:
+    /// The underlying time point representing the timestamp.
     TimePoint _timePoint;
 
+    /// Indicates whether the return timestamp should be converted to local time
     bool _localTime = true;
 
    public:
-    // Delete default constructor to prevent instantiation
     Timestamp();
     explicit Timestamp(const TimePoint& timePoint);
 

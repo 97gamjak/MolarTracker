@@ -2,6 +2,11 @@
 
 namespace app
 {
+    /**
+     * @brief Constructs a TransactionService.
+     *
+     * @param transactionRepo The transaction repository to use.
+     */
     TransactionService::TransactionService(
         std::shared_ptr<ITransactionRepo> transactionRepo
     )
@@ -9,6 +14,12 @@ namespace app
     {
     }
 
+    /**
+     * @brief Adds a transaction to the repository.
+     *
+     * @param transaction The transaction to add.
+     * @return TransactionId The ID of the added transaction.
+     */
     [[nodiscard]] TransactionId TransactionService::addTransaction(
         const finance::Transaction& transaction
     )

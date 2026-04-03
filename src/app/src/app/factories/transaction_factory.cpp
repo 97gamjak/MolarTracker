@@ -7,6 +7,12 @@
 
 namespace app
 {
+    /**
+     * @brief Converts a Transaction object to a TransactionRow object.
+     *
+     * @param transaction The Transaction object to convert.
+     * @return The converted TransactionRow object.
+     */
     TransactionRow TransactionFactory::toTransactionRow(
         const finance::Transaction &transaction
     )
@@ -21,6 +27,12 @@ namespace app
         return row;
     }
 
+    /**
+     * @brief Converts a TransactionRow object to a Transaction object.
+     *
+     * @param row The TransactionRow object to convert.
+     * @return The converted Transaction object.
+     */
     finance::Transaction TransactionFactory::fromTransactionRow(
         const TransactionRow &row
     )
@@ -34,6 +46,15 @@ namespace app
         return transaction;
     }
 
+    /**
+     * @brief Converts a TransactionEntry object to a TransactionEntryRow
+     * object.
+     *
+     * @param entry The TransactionEntry object to convert.
+     * @param transactionId The ID of the associated transaction.
+     * @param instrumentId The ID of the associated instrument.
+     * @return The converted TransactionEntryRow object.
+     */
     TransactionEntryRow TransactionFactory::toTransactionEntryRow(
         const finance::TransactionEntry &entry,
         TransactionId                    transactionId,
@@ -52,10 +73,20 @@ namespace app
         return row;
     }
 
+    /**
+     * @brief Converts a TransactionDetail object to an InstrumentRow object.
+     *
+     * @param detail The TransactionDetail object to convert.
+     * @return The converted InstrumentRow object.
+     */
     InstrumentRow TransactionFactory::toInstrumentRow(
         const finance::TransactionDetail &detail
     )
     {
+        /**
+         * @brief Visitor for converting TransactionDetail to InstrumentRow.
+         *
+         */
         struct InstrumentRowVisitor
         {
             InstrumentRow operator()(const finance::CashTransaction

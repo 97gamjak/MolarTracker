@@ -274,6 +274,11 @@ namespace orm
         }
     };
 
+    /**
+     * @brief Binder for Timestamp type
+     *
+     * @tparam Statement
+     */
     template <typename Statement>
     struct binder<Statement, Timestamp>
     {

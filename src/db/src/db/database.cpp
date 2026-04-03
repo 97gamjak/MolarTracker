@@ -182,6 +182,11 @@ namespace db
         }
     }
 
+    /**
+     * @brief Begins a database transaction.
+     *
+     * @param immediate If true, starts an immediate transaction.
+     */
     void Database::begin(bool immediate)
     {
         if (immediate)
@@ -192,6 +197,11 @@ namespace db
         _transactionStarted = true;
     }
 
+    /**
+     * @brief Checks if a database transaction is currently active.
+     *
+     * @return true if a transaction is active, false otherwise.
+     */
     bool Database::isTransactionStarted() const { return _transactionStarted; }
 
     /**

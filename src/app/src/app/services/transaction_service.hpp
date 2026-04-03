@@ -7,9 +7,14 @@
 
 namespace app
 {
+    /**
+     * @brief Service for managing transactions.
+     *
+     */
     class TransactionService : public ITransactionService
     {
        private:
+        /// Pointer to the transaction repository.
         std::shared_ptr<ITransactionRepo> _transactionRepo;
 
        public:
