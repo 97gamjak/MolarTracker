@@ -135,10 +135,11 @@ namespace app
                             account.getName()
                         )
                     );
+                    break;
                 }
                 case StoreState::Clean:
                 {
-                    continue;
+                    break;
                 }
                 case StoreState::Modified:
                 case StoreState::Deleted:
