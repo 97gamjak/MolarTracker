@@ -312,7 +312,7 @@ namespace orm
         }
         else if constexpr (std::is_same_v<Value, Timestamp>)
         {
-            return value.iso8601TimeMs();
+            return std::to_string(value.toInt64());
         }
         else
         {

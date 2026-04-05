@@ -37,14 +37,14 @@ namespace orm
     };
 
     /**
-     * @brief Specialization of sql_type for integral types
+     * @brief Specialization of sql_type for Timestamp
      *
-     * @tparam T The integral type to specialize for.
+     * @tparam T
      */
     template <>
     struct sql_type<Timestamp>
     {
-        /// SQLITE mapping for integral types is INTEGER
+        /// SQLITE mapping for Timestamps is INTEGER
         static constexpr std::string_view name = "INTEGER";
     };
 
