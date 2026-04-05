@@ -96,7 +96,7 @@ namespace db
         if (!_isActive || _db == nullptr)
             return;
 
-        _db->execute("COMMIT;");
+        _db->commit();
         _isActive = false;
     }
 
@@ -109,7 +109,7 @@ namespace db
         if (!_isActive || _db == nullptr)
             return;
 
-        _db->execute("ROLLBACK;");
+        _db->rollback();
         _isActive = false;
     }
 

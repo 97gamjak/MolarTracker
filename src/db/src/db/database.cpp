@@ -199,6 +199,24 @@ namespace db
     }
 
     /**
+     * @brief Commits the current transaction.
+     */
+    void Database::commit()
+    {
+        execute("COMMIT;");
+        _transactionStarted = false;
+    }
+
+    /**
+     * @brief Rolls back the current transaction.
+     */
+    void Database::rollback()
+    {
+        execute("ROLLBACK;");
+        _transactionStarted = false;
+    }
+
+    /**
      * @brief Checks if a database transaction is currently active.
      *
      * @return true if a transaction is active, false otherwise.

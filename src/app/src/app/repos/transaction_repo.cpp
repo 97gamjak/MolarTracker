@@ -102,6 +102,9 @@ namespace app
                     "Stock instruments are not supported yet"
                 );
         }
+
+        // can not happen in theory
+        throw std::runtime_error("Unknown instrument kind");
     }
 
     InstrumentId TransactionRepo::_insertInstrument(const InstrumentRow& row)

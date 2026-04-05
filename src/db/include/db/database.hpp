@@ -68,6 +68,8 @@ namespace db
         void begin(bool immediate);
 
         [[nodiscard]] bool isTransactionStarted() const;
+        void               commit();
+        void               rollback();
 
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;
