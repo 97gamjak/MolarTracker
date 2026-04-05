@@ -103,7 +103,7 @@ namespace app
                 if (instruments.size() == 1)
                     return instruments.front().id.value();
 
-                if (instruments.size() == 0)
+                if (instruments.empty())
                     return std::nullopt;
 
                 throw std::runtime_error("Multiple instruments found");

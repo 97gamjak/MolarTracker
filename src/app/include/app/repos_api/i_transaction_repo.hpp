@@ -3,8 +3,6 @@
 
 #include "config/id_types.hpp"
 
-class InstrumentRow;
-
 namespace finance
 {
     class Transaction;
