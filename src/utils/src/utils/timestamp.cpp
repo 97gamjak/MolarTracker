@@ -92,8 +92,7 @@ std::string Timestamp::fileSafe() const
  */
 [[nodiscard]] int64_t Timestamp::toInt64() const
 {
-    return duration_cast<milliseconds>(_toLocalTime().time_since_epoch())
-        .count();
+    return duration_cast<milliseconds>(_timePoint.time_since_epoch()).count();
 }
 
 /**
