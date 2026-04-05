@@ -64,6 +64,7 @@ namespace finance
         [[nodiscard]] AccountStatus getStatus() const;
         [[nodiscard]] std::string   getName() const;
         [[nodiscard]] Currency      getCurrency() const;
+        [[nodiscard]] AccountKind   getKind() const;
         [[nodiscard]] bool          isExternal() const;
     };
 

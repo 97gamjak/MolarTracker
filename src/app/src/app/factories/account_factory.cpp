@@ -62,7 +62,7 @@ namespace app
         AccountRow accountRow;
 
         accountRow.id        = account.getId();
-        accountRow.kind      = AccountKind::Cash;
+        accountRow.kind      = account.getKind();
         accountRow.status    = account.getStatus();
         accountRow.name      = account.getName();
         accountRow.currency  = account.getCurrency();

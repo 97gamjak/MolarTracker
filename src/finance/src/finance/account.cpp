@@ -73,6 +73,22 @@ namespace finance
      */
     std::string Account::getName() const { return _name; }
 
+    AccountKind Account::getKind() const
+    {
+        struct Visitor
+        {
+            AccountKind operator()(const CashAccount& /*details*/) const
+            {
+                return AccountKind::Cash;
+            }
+            AccountKind operator()(const ExternalAccount& /*details*/) const
+            {
+                return AccountKind::External;
+            }
+        };
+        return std::visit(Visitor{}, _details);
+    }
+
     /**
      * @brief Check if the account is an external account
      *
@@ -80,7 +96,7 @@ namespace finance
      */
     bool Account::isExternal() const
     {
-        return std::holds_alternative<ExternalAccount>(_details);
+        return getKind() == AccountKind::External;
     }
 
 }   // namespace finance
