@@ -1,4 +1,4 @@
-#include "cash.hpp"
+#include "finance/cash.hpp"
 
 #include <string>
 
@@ -112,5 +112,12 @@ namespace finance
     {
         return Cash(cash._currency, -cash._amount);
     }
+
+    /**
+     * @brief Gets the amount of cash in micro_units.
+     *
+     * @return micro_units The amount of cash.
+     */
+    micro_units Cash::getAmount() const { return _amount; }
 
 }   // namespace finance

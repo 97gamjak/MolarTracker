@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include "orm/concepts.hpp"
+#include "utils/timestamp.hpp"
 
 namespace orm
 {
@@ -32,6 +33,18 @@ namespace orm
     struct sql_type<T>
     {
         /// SQLITE mapping for integral types is INTEGER
+        static constexpr std::string_view name = "INTEGER";
+    };
+
+    /**
+     * @brief Specialization of sql_type for Timestamp
+     *
+     * @tparam T
+     */
+    template <>
+    struct sql_type<Timestamp>
+    {
+        /// SQLITE mapping for Timestamps is INTEGER
         static constexpr std::string_view name = "INTEGER";
     };
 

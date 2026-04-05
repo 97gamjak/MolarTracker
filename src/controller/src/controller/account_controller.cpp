@@ -11,7 +11,7 @@
 #include "app/store/account_store.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/account/account_detail_view.hpp"

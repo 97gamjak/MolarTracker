@@ -1,8 +1,10 @@
-#ifndef __FINANCE__SRC__FINANCE__CASH_HPP__
-#define __FINANCE__SRC__FINANCE__CASH_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__CASH_HPP__
+#define __FINANCE__INCLUDE__FINANCE__CASH_HPP__
 
 #include <compare>
 #include <cstdint>
+
+#include "config/finance.hpp"
 
 namespace finance
 {
@@ -11,9 +13,6 @@ namespace finance
 
 namespace finance
 {
-    /// Type alias for micro units (e.g., millionths of a currency unit)
-    using micro_units = std::int64_t;
-
     /**
      * @brief A class representing a cash amount in a specific currency.
      *
@@ -43,8 +42,10 @@ namespace finance
         friend Cash operator+(const Cash& lhs, const Cash& rhs);
         friend Cash operator-(const Cash& lhs, const Cash& rhs);
         friend Cash operator-(const Cash& cash);
+
+        [[nodiscard]] micro_units getAmount() const;
     };
 
 }   // namespace finance
 
-#endif   // __FINANCE__SRC__FINANCE__CASH_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__CASH_HPP__

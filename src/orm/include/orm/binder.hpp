@@ -8,6 +8,7 @@
 #include "concepts.hpp"
 #include "index.hpp"
 #include "orm_exception.hpp"
+#include "utils/timestamp.hpp"
 
 namespace orm
 {
@@ -270,6 +271,43 @@ namespace orm
             }
 
             return value.value();
+        }
+    };
+
+    /**
+     * @brief Binder for Timestamp type
+     *
+     * @tparam Statement
+     */
+    template <typename Statement>
+    struct binder<Statement, Timestamp>
+    {
+        /**
+         * @brief Bind a Timestamp value to the specified parameter index
+         *
+         * @param statement
+         * @param index
+         * @param value
+         */
+        static void bind(
+            Statement&       statement,
+            BindIndex        index,
+            Timestamp const& value
+        )
+        {
+            statement.bindInt64(index.value(), value.toInt64());
+        }
+
+        /**
+         * @brief Read a Timestamp value from the specified column
+         *
+         * @param statement
+         * @param col
+         * @return Timestamp
+         */
+        static Timestamp read(Statement const& statement, ColumnIndex col)
+        {
+            return Timestamp::fromInt64(statement.columnInt64(col.value()));
         }
     };
 }   // namespace orm

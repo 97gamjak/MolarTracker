@@ -4,27 +4,34 @@
 #include <format>
 
 using std::chrono::current_zone;
+using std::chrono::duration_cast;
 using std::chrono::floor;
 using std::chrono::milliseconds;
 using std::chrono::seconds;
 using std::chrono::zoned_time;
 
-using Clock     = std::chrono::system_clock;
-using Duration  = Clock::duration;
-using TimePoint = std::chrono::local_time<Duration>;
+/**
+ * @brief Constructs a Timestamp object representing the current time.
+ */
+Timestamp::Timestamp() : _timePoint(Clock::now()) {}
+
+/**
+ * @brief Constructs a Timestamp object from a specific time point.
+ *
+ * @param timePoint The time point to use for the Timestamp.
+ */
+Timestamp::Timestamp(const TimePoint& timePoint) : _timePoint(timePoint) {}
 
 /**
  * @brief Returns the current time point from the system clock
  *
  * @return TimePoint
  */
-TimePoint Timestamp::now()
+LocalTimePoint Timestamp::_toLocalTime() const
 {
-    const auto now = Clock::now();
-
     const auto* timeZone = current_zone();
 
-    zoned_time local_time{timeZone, now};
+    zoned_time local_time{timeZone, _timePoint};
 
     return local_time.get_local_time();
 }
@@ -36,9 +43,9 @@ TimePoint Timestamp::now()
  *
  * @return std::string
  */
-std::string Timestamp::iso8601()
+std::string Timestamp::iso8601() const
 {
-    return std::format("{:%FT%T}", floor<seconds>(now()));
+    return std::format("{:%FT%T}", floor<seconds>(_toLocalTime()));
 }
 
 /**
@@ -49,9 +56,9 @@ std::string Timestamp::iso8601()
  *
  * @return std::string
  */
-std::string Timestamp::iso8601TimeMs()
+std::string Timestamp::iso8601TimeMs() const
 {
-    return std::format("{:%T}", floor<milliseconds>(now()));
+    return std::format("{:%T}", floor<milliseconds>(_toLocalTime()));
 }
 
 /**
@@ -61,9 +68,9 @@ std::string Timestamp::iso8601TimeMs()
  *
  * @return std::string
  */
-std::string Timestamp::humanReadable()
+std::string Timestamp::humanReadable() const
 {
-    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(now()));
+    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(_toLocalTime()));
 }
 
 /**
@@ -73,7 +80,28 @@ std::string Timestamp::humanReadable()
  *
  * @return std::string
  */
-std::string Timestamp::fileSafe()
+std::string Timestamp::fileSafe() const
 {
-    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(now()));
+    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(_toLocalTime()));
+}
+
+/**
+ * @brief Converts the Timestamp to an int64 representation.
+ *
+ * @return int64_t
+ */
+[[nodiscard]] int64_t Timestamp::toInt64() const
+{
+    return duration_cast<milliseconds>(_timePoint.time_since_epoch()).count();
+}
+
+/**
+ * @brief Constructs a Timestamp object from an int64 representation.
+ *
+ * @param value The int64 representation of the Timestamp.
+ * @return Timestamp
+ */
+[[nodiscard]] Timestamp Timestamp::fromInt64(int64_t value)
+{
+    return Timestamp{Clock::time_point{milliseconds{value}}};
 }

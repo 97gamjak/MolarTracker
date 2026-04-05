@@ -12,7 +12,6 @@
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
-#include "orm/constraints.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
@@ -90,7 +89,6 @@ namespace orm
      * row or an error
      */
     template <db_model Model>
-    requires is_freely_insertable_v<Model>
     std::expected<std::int64_t, CrudError> Crud::insert(
         db::Database& database,
         const Model&  row

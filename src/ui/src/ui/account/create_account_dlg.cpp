@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <string>
 
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/validators/name_line_edit.hpp"
 #include "utils/qt_helpers.hpp"

@@ -73,9 +73,10 @@ namespace db
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     void Database::_moveFrom(Database&& other)
     {
-        _db         = std::exchange(other._db, nullptr);
-        _dbPath     = std::move(other._dbPath);
-        _executions = std::move(other._executions);
+        _db                 = std::exchange(other._db, nullptr);
+        _dbPath             = std::move(other._dbPath);
+        _executions         = std::move(other._executions);
+        _transactionStarted = other._transactionStarted;
 
         other._dbPath.clear();
     }
@@ -181,6 +182,46 @@ namespace db
             );
         }
     }
+
+    /**
+     * @brief Begins a database transaction.
+     *
+     * @param immediate If true, starts an immediate transaction.
+     */
+    void Database::begin(bool immediate)
+    {
+        if (immediate)
+            execute("BEGIN IMMEDIATE;");
+        else
+            execute("BEGIN;");
+
+        _transactionStarted = true;
+    }
+
+    /**
+     * @brief Commits the current transaction.
+     */
+    void Database::commit()
+    {
+        execute("COMMIT;");
+        _transactionStarted = false;
+    }
+
+    /**
+     * @brief Rolls back the current transaction.
+     */
+    void Database::rollback()
+    {
+        execute("ROLLBACK;");
+        _transactionStarted = false;
+    }
+
+    /**
+     * @brief Checks if a database transaction is currently active.
+     *
+     * @return true if a transaction is active, false otherwise.
+     */
+    bool Database::isTransactionStarted() const { return _transactionStarted; }
 
     /**
      * @brief prepare a SQL statement for execution

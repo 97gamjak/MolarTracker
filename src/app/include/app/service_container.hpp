@@ -6,9 +6,10 @@
 namespace app
 {
 
-    class RepoContainer;     // Forward declaration
-    class IProfileService;   // Forward declaration
-    class IAccountService;   // Forward declaration
+    class RepoContainer;         // Forward declaration
+    class IProfileService;       // Forward declaration
+    class IAccountService;       // Forward declaration
+    class ITransactionService;   // Forward declaration
 
     /**
      * @brief Container for all services
@@ -21,6 +22,8 @@ namespace app
         std::shared_ptr<IProfileService> _profileService;
         /// The Account service
         std::shared_ptr<IAccountService> _accountService;
+        /// The Transaction service
+        std::shared_ptr<ITransactionService> _transactionService;
 
        public:
         explicit ServiceContainer(RepoContainer& repos);
@@ -31,6 +34,11 @@ namespace app
 
         [[nodiscard]] std::shared_ptr<IAccountService> getAccountService();
         [[nodiscard]] std::shared_ptr<const IAccountService> getAccountService(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<ITransactionService> getTransactionService(
+        );
+        [[nodiscard]] std::shared_ptr<const ITransactionService> getTransactionService(
         ) const;
     };
 

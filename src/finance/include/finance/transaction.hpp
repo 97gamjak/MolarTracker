@@ -1,5 +1,5 @@
-#ifndef __FINANCE__SRC__FINANCE__TRANSACTION_HPP__
-#define __FINANCE__SRC__FINANCE__TRANSACTION_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
+#define __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 
 #include <cstdint>
 #include <optional>
@@ -10,10 +10,7 @@
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
 
-namespace finance
-{
-    enum class TransactionStatus : std::uint8_t;   // Forward declaration
-}   // namespace finance
+enum class TransactionStatus : std::uint8_t;   // Forward declaration
 
 namespace finance
 {
@@ -53,12 +50,25 @@ namespace finance
         );
 
         explicit Transaction(
+            TransactionId              id,
+            Timestamp                  timestamp,
+            TransactionStatus          status,
+            std::optional<std::string> comment
+        );
+
+        explicit Transaction(
             TransactionId     id,
             Timestamp         timestamp,
             TransactionStatus status
         );
+
+        [[nodiscard]] TransactionId                        getId() const;
+        [[nodiscard]] Timestamp                            getTimestamp() const;
+        [[nodiscard]] TransactionStatus                    getStatus() const;
+        [[nodiscard]] std::optional<std::string>           getComment() const;
+        [[nodiscard]] const std::vector<TransactionEntry>& getEntries() const;
     };
 
 }   // namespace finance
 
-#endif   // __FINANCE__SRC__FINANCE__TRANSACTION_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__

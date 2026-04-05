@@ -5,7 +5,7 @@
 
 #include "app/services_api/i_account_service.hpp"
 #include "app/store/predicates.hpp"
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
 #include "finance/account.hpp"

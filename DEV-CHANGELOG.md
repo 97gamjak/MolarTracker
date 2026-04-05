@@ -22,6 +22,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add first draft of `AccountStore`
 - Include proper handling of `ProfileId` on `Account` database side
 - Make `CashAccount` to general `Account` with `std::variant` details
+- Add `TransactionRepo` and `TransactionService` with related factory methods
 
 #### Profile
 

@@ -16,7 +16,7 @@ namespace db
         Database* _db;
 
         /// Flag to indicate whether the transaction is currently active
-        bool _isActive{false};
+        bool _isActive = false;
 
        public:
         explicit Transaction(db::Database& db, bool immediate);

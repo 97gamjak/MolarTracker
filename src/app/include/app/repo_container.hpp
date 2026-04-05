@@ -11,8 +11,9 @@ namespace db
 namespace app
 {
 
-    class IProfileRepo;   // Forward declaration
-    class IAccountRepo;   // Forward declaration
+    class IProfileRepo;       // Forward declaration
+    class IAccountRepo;       // Forward declaration
+    class ITransactionRepo;   // Forward declaration
 
     /**
      * @brief Container for all repositories
@@ -25,6 +26,8 @@ namespace app
         std::shared_ptr<IProfileRepo> _profileRepo;
         /// The Account repository
         std::shared_ptr<IAccountRepo> _accountRepo;
+        /// The Transaction repository
+        std::shared_ptr<ITransactionRepo> _transactionRepo;
 
        public:
         explicit RepoContainer(db::Database& db);
@@ -35,6 +38,10 @@ namespace app
 
         [[nodiscard]] std::shared_ptr<IAccountRepo>       getAccountRepo();
         [[nodiscard]] std::shared_ptr<const IAccountRepo> getAccountRepo(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<ITransactionRepo> getTransactionRepo();
+        [[nodiscard]] std::shared_ptr<const ITransactionRepo> getTransactionRepo(
         ) const;
     };
 

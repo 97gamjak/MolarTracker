@@ -11,7 +11,6 @@
 #include "db/database.hpp"
 #include "db/transaction.hpp"
 #include "join.hpp"
-#include "orm/constraints.hpp"
 #include "orm/type_traits.hpp"
 #include "where_clause.hpp"
 
@@ -45,7 +44,6 @@ namespace orm
          ******************/
 
         template <db_model Model>
-        requires is_freely_insertable_v<Model>
         [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
             db::Database& database,
             const Model&  row

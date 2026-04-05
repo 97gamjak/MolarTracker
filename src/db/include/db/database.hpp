@@ -30,6 +30,9 @@ namespace db
         /// Log of executed SQL statements for debugging or auditing purposes
         std::vector<std::string> _executions;
 
+        /// Indicates whether a database transaction is currently active
+        bool _transactionStarted = false;
+
        public:
         Database() = delete;
         explicit Database(const std::filesystem::path& dbPath);
@@ -61,6 +64,12 @@ namespace db
         [[nodiscard]] int queryInt(std::string_view sql);
 
         void makeBackup();
+
+        void begin(bool immediate);
+
+        [[nodiscard]] bool isTransactionStarted() const;
+        void               commit();
+        void               rollback();
 
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;

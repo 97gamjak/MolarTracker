@@ -6,10 +6,13 @@ add_library(molartracker_app STATIC
 
     src/app/services/account_service.cpp
     src/app/services/profile_service.cpp
+    src/app/services/transaction_service.cpp
 
     src/app/repos/account_repo.cpp
     src/app/repos/profile_repo.cpp
+    src/app/repos/base_repo.cpp
     src/app/repos/repo_errors.cpp
+    src/app/repos/transaction_repo.cpp
 
     src/app/store/account_store.cpp
     src/app/store/predicates.cpp
@@ -20,6 +23,7 @@ add_library(molartracker_app STATIC
 
     src/app/factories/account_factory.cpp
     src/app/factories/profile_factory.cpp
+    src/app/factories/transaction_factory.cpp
 
     src/app/domain/profile.cpp
 

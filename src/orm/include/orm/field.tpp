@@ -15,6 +15,7 @@
 #include "orm/fixed_string.hpp"
 #include "orm/index.hpp"
 #include "orm/sql_type.hpp"
+#include "utils/timestamp.hpp"
 
 namespace orm
 {
@@ -308,6 +309,10 @@ namespace orm
         else if constexpr (std::is_same_v<Value, std::string>)
         {
             return "\"" + value + "\"";
+        }
+        else if constexpr (std::is_same_v<Value, Timestamp>)
+        {
+            return std::to_string(value.toInt64());
         }
         else
         {
