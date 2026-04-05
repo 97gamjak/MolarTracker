@@ -12,7 +12,6 @@
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
-#include "orm/constraints.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"

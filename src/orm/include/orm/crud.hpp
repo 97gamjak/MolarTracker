@@ -11,7 +11,6 @@
 #include "db/database.hpp"
 #include "db/transaction.hpp"
 #include "join.hpp"
-#include "orm/constraints.hpp"
 #include "orm/type_traits.hpp"
 #include "where_clause.hpp"
 

@@ -6,12 +6,17 @@
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
-#include "orm/fields.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/instrument_row.hpp"
 
 namespace app
 {
+    /**
+     * @brief add a transaction to the database
+     *
+     * @param transaction
+     * @return TransactionId
+     */
     TransactionId TransactionRepo::addTransaction(
         const finance::Transaction& transaction
     )
@@ -70,6 +75,12 @@ namespace app
         return TransactionId(transactionResult.value());
     }
 
+    /**
+     * @brief get an instrument from the database
+     *
+     * @param row
+     * @return std::optional<InstrumentId>
+     */
     std::optional<InstrumentId> TransactionRepo::_getInstrument(
         const InstrumentRow& row
     )
@@ -107,7 +118,15 @@ namespace app
         throw std::runtime_error("Unknown instrument kind");
     }
 
-    InstrumentId TransactionRepo::_insertInstrument(const InstrumentRow& row)
+    /**
+     * @brief insert an instrument to the database
+     *
+     * @param row
+     * @return InstrumentId
+     */
+    InstrumentId TransactionRepo::_insertInstrument(
+        const InstrumentRow& row
+    ) const
     {
         const auto result = orm::Crud().insert(_getDb(), row);
 

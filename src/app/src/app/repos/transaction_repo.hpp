@@ -26,7 +26,9 @@ namespace app
             const InstrumentRow& row
         );
 
-        [[nodiscard]] InstrumentId _insertInstrument(const InstrumentRow& row);
+        [[nodiscard]] InstrumentId _insertInstrument(
+            const InstrumentRow& row
+        ) const;
     };
 }   // namespace app
 
