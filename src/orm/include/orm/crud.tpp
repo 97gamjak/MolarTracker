@@ -90,7 +90,6 @@ namespace orm
      * row or an error
      */
     template <db_model Model>
-    requires is_freely_insertable_v<Model>
     std::expected<std::int64_t, CrudError> Crud::insert(
         db::Database& database,
         const Model&  row

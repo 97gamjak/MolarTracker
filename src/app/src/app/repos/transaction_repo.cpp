@@ -1,11 +1,14 @@
 #include "transaction_repo.hpp"
 
 #include "app/factories/transaction_factory.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
+#include "orm/fields.hpp"
 #include "repo_errors.hpp"
+#include "sql_models/instrument_row.hpp"
 
 namespace app
 {
@@ -31,25 +34,22 @@ namespace app
 
         for (const auto& entry : transaction.getEntries())
         {
-            const auto instrumentResult = orm::Crud().insert(
-                _getDb(),
-                dbTx,
-                TransactionFactory::toInstrumentRow(entry.getDetails())
-            );
+            // 1. check if instrument exists -> if not create it
+            const auto instrument =
+                TransactionFactory::toInstrumentRow(entry.getDetails());
 
-            if (!instrumentResult.has_value())
-            {
-                const auto msg =
-                    getInsertError(instrumentResult.error(), "instrument");
+            const auto idOpt = _getInstrument(instrument);
 
-                LOG_ERROR(msg);
-                throw orm::CrudException(msg);
-            }
+            InstrumentId instrumentId;
+            if (idOpt.has_value())
+                instrumentId = idOpt.value();
+            else
+                instrumentId = _insertInstrument(instrument);
 
             const auto entryRow = TransactionFactory::toTransactionEntryRow(
                 entry,
                 txId,
-                InstrumentId(instrumentResult.value())
+                instrumentId
             );
 
             const auto entryResult =
@@ -68,6 +68,54 @@ namespace app
         dbTx.commit();
 
         return TransactionId(transactionResult.value());
+    }
+
+    std::optional<InstrumentId> TransactionRepo::_getInstrument(
+        const InstrumentRow& row
+    )
+    {
+        switch (row.kind.value())
+        {
+            case InstrumentKind::Cash:
+            {
+                orm::WhereClause clause{
+                    row.kind,
+                    InstrumentRow::tableName,
+                    orm::WhereOperator::Equal
+                };
+
+                const auto instruments = orm::Crud().getAll<InstrumentRow>(
+                    _getDb(),
+                    orm::WhereClauses{clause}
+                );
+
+                if (instruments.size() == 1)
+                    return instruments.front().id.value();
+
+                if (instruments.size() == 0)
+                    return std::nullopt;
+
+                throw std::runtime_error("Multiple instruments found");
+            }
+            case InstrumentKind::Stock:
+                throw std::runtime_error(
+                    "Stock instruments are not supported yet"
+                );
+        }
+    }
+
+    InstrumentId TransactionRepo::_insertInstrument(const InstrumentRow& row)
+    {
+        const auto result = orm::Crud().insert(_getDb(), row);
+
+        if (!result.has_value())
+        {
+            const auto msg = getInsertError(result.error(), "instrument");
+            LOG_ERROR(msg);
+            throw orm::CrudException(msg);
+        }
+
+        return InstrumentId(result.value());
     }
 
 }   // namespace app

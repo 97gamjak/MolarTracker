@@ -4,6 +4,7 @@
 #include "app/repos_api/i_transaction_repo.hpp"
 #include "base_repo.hpp"
 #include "config/id_types.hpp"
+#include "sql_models/instrument_row.hpp"
 
 namespace app
 {
@@ -19,6 +20,13 @@ namespace app
         [[nodiscard]] TransactionId addTransaction(
             const finance::Transaction& transaction
         ) override;
+
+       private:
+        [[nodiscard]] std::optional<InstrumentId> _getInstrument(
+            const InstrumentRow& row
+        );
+
+        [[nodiscard]] InstrumentId _insertInstrument(const InstrumentRow& row);
     };
 }   // namespace app
 

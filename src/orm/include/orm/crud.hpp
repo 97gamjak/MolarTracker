@@ -45,7 +45,6 @@ namespace orm
          ******************/
 
         template <db_model Model>
-        requires is_freely_insertable_v<Model>
         [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
             db::Database& database,
             const Model&  row
