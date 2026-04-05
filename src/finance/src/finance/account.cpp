@@ -73,6 +73,11 @@ namespace finance
      */
     std::string Account::getName() const { return _name; }
 
+    /**
+     * @brief Get the kind of the account
+     *
+     * @return AccountKind
+     */
     AccountKind Account::getKind() const
     {
         struct Visitor
