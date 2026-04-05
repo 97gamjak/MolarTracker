@@ -4,6 +4,7 @@
 
 #include "app/migration/single_migration.hpp"
 #include "db/database.hpp"
+#include "orm/type_traits.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/profile_row.hpp"
@@ -58,6 +59,7 @@ namespace app
         _migrateV1();
         _migrateV2();
         _migrateV3();
+        _migrateV4();
 
         assert(_migrations.size() == toVersion);
     }
@@ -74,13 +76,40 @@ namespace app
     }
 
     /**
+     * @brief Copy, drop and rename a table
+     *
+     * @tparam Model The model representing the table
+     * @param migration The migration to add the steps to
+     */
+    template <orm::db_model Model>
+    void Migrations::_copyDropRename(Migration& migration)
+    {
+        migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
+
+        std::string newName = Model::tableName + "_tmp";
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<Model>>(newName)
+        );
+        migration.addMigration(
+            std::make_unique<CopyTableMigration>(Model::tableName, newName)
+        );
+        migration.addMigration(
+            std::make_unique<DropTableMigration>(Model::tableName)
+        );
+        migration.addMigration(
+            std::make_unique<RenameTableMigration>(newName, Model::tableName)
+        );
+
+        migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+    }
+
+    /**
      * @brief Migrate to version 1
      *
      * @details This handles the migration from v0 to v1.
      * It creates the initial tables:
      *  - profile
      *  - account
-     *  - cash account
      *
      */
     void Migrations::_migrateV1()
@@ -91,9 +120,6 @@ namespace app
         );
         migration.addMigration(
             std::make_unique<CreateTableMigration<AccountRow>>()
-        );
-        migration.addMigration(
-            std::make_unique<CreateTableMigration<CashAccountRow>>()
         );
         _migrations.push_back(std::move(migration));
     }
@@ -133,36 +159,7 @@ namespace app
             )
         );
 
-        // 2. we need to turn off foreign key constraints
-        migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
-
-        // 3. we can create the new account table with the constraints with a
-        // temporary name
-        const auto newName = std::format("{}_tmp", AccountRow::tableName);
-        migration.addMigration(
-            std::make_unique<CreateTableMigration<AccountRow>>(newName)
-        );
-
-        // 4. Next we can insert everything from old account to temp account
-        migration.addMigration(
-            std::make_unique<CopyTableMigration>(AccountRow::tableName, newName)
-        );
-
-        // 5. now we can drop the old account table
-        migration.addMigration(
-            std::make_unique<DropTableMigration>(AccountRow::tableName)
-        );
-
-        // 6. now we can alter the new account table
-        migration.addMigration(
-            std::make_unique<RenameTableMigration>(
-                newName,
-                AccountRow::tableName
-            )
-        );
-
-        // 7. finally turn foreign key constraints back on
-        migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+        _copyDropRename<AccountRow>(migration);
 
         _migrations.push_back(std::move(migration));
     }
@@ -190,6 +187,24 @@ namespace app
         migration.addMigration(
             std::make_unique<CreateTableMigration<TransactionEntryRow>>()
         );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 4
+     *
+     * @details This handles the migration from v3 to v4.
+     */
+    void Migrations::_migrateV4()
+    {
+        Migration migration(3);
+
+        // Apply new constraints to account table...
+        // here the unique constraint on (name, kind) gets extended to
+        // (profileId, name, kind) which makes the migration straight forward as
+        // the constraints only loosen up so we can just copy, drop, and rename
+        _copyDropRename<AccountRow>(migration);
 
         _migrations.push_back(std::move(migration));
     }

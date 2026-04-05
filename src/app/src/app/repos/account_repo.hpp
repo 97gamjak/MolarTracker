@@ -16,11 +16,11 @@ namespace app
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] std::vector<finance::Account> getAllCashAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const override;
 
-        [[nodiscard]] AccountId createCashAccount(
+        [[nodiscard]] AccountId createAccount(
             const finance::Account& account,
             const ProfileId&        profileId
         ) override;

@@ -11,6 +11,12 @@ namespace app
         AccountId id
     );
 
+    Predicate<BaseStore<finance::Account, AccountId>::Entry> IsExternal();
+
+    Predicate<BaseStore<finance::Account, AccountId>::Entry> hasCurrency(
+        Currency currency
+    );
+
 }   // namespace app
 
 #endif   // __APP__INCLUDE__APP__STORE__PREDICATES_HPP__

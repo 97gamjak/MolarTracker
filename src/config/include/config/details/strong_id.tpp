@@ -78,6 +78,17 @@ constexpr std::string StrongId<Tag, Rep>::toString() const
 }
 
 /**
+ * @brief Check if the StrongId is valid
+ *
+ * @return true if the StrongId is valid, false otherwise
+ */
+template <class Tag, class Rep>
+constexpr bool StrongId<Tag, Rep>::isValid() const
+{
+    return _value >= static_cast<Rep>(0);
+}
+
+/**
  * @brief Output stream operator for StrongId
  *
  * @param output

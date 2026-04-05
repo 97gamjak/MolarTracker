@@ -23,35 +23,32 @@ namespace app
         virtual ~IAccountRepo() = default;
 
         /**
-         * @brief Create a new cash account in the repository, this method takes
-         * a CashAccount domain object as input and creates a corresponding
-         * entry in the database, it returns the ID of the newly created cash
-         * account
+         * @brief Create a new account in the repository, this method takes
+         * an Account domain object as input and creates a corresponding
+         * entry in the database, it returns the ID of the newly created account
          *
-         * @param cashAccount The CashAccount domain object containing the
-         * details of the cash account to be created
-         * @param profileId The ID of the profile to which the cash account
+         * @param account The Account domain object containing the
+         * details of the account to be created
+         * @param profileId The ID of the profile to which the account
          * belongs
-         * @return AccountId The ID of the newly created cash account
+         * @return AccountId The ID of the newly created account
          */
-        [[nodiscard]] virtual AccountId createCashAccount(
-            const finance::Account& cashAccount,
+        [[nodiscard]] virtual AccountId createAccount(
+            const finance::Account& account,
             const ProfileId&        profileId
         ) = 0;
 
         /**
-         * @brief Get all cash accounts from the repository, this method
-         * retrieves all cash account entries from the database and returns
-         them
-         * as a vector of CashAccount domain objects
+         * @brief Get all accounts from the repository, this method
+         * retrieves all account entries from the database and returns
+         * them as a vector of Account domain objects
          *
-         * @param profileId The ID of the profile whose cash accounts are to
-         be
-         * retrieved
+         * @param profileId The ID of the profile whose accounts are to
+         * be retrieved
          * @return std::vector<finance::Account> A vector containing all
-         * cash accounts in the repository
+         * accounts in the repository
          */
-        [[nodiscard]] virtual std::vector<finance::Account> getAllCashAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const = 0;
     };
