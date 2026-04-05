@@ -77,11 +77,10 @@ namespace app
         // special case for cash accounts
         if (accountDraft.kind == AccountKind::Cash)
         {
-            // check if we have already an external account for this profile id
-            // and
-            // currency
+            // check if we already have an external account for this profile id
+            // and currency
             const auto existingEntry =
-                _get(IsExternal() && hasCurrency(accountDraft.currency));
+                _get(IsExternal() && HasCurrency(accountDraft.currency));
 
             if (!existingEntry.has_value())
             {

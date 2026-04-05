@@ -13,7 +13,7 @@ namespace app
 
     Predicate<BaseStore<finance::Account, AccountId>::Entry> IsExternal();
 
-    Predicate<BaseStore<finance::Account, AccountId>::Entry> hasCurrency(
+    Predicate<BaseStore<finance::Account, AccountId>::Entry> HasCurrency(
         Currency currency
     );
 

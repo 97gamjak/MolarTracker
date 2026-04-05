@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <variant>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
