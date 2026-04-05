@@ -1,7 +1,7 @@
 #ifndef __FINANCE__SRC__FINANCE__CURRENCY_HPP__
 #define __FINANCE__SRC__FINANCE__CURRENCY_HPP__
 
-#include <config/finance_enums.hpp>
+#include <config/finance.hpp>
 #include <mstd/error.hpp>
 
 namespace finance

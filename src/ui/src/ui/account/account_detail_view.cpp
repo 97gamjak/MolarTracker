@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "utils/qt_helpers.hpp"
 

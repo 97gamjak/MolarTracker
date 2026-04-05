@@ -4,6 +4,8 @@
 #include <compare>
 #include <cstdint>
 
+#include "config/finance.hpp"
+
 namespace finance
 {
     enum class Currency : std::uint8_t;   // Forward declaration
@@ -11,9 +13,6 @@ namespace finance
 
 namespace finance
 {
-    /// Type alias for micro units (e.g., millionths of a currency unit)
-    using micro_units = std::int64_t;
-
     /**
      * @brief A class representing a cash amount in a specific currency.
      *

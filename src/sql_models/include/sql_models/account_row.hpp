@@ -4,7 +4,7 @@
 #include <string>
 #include <variant>
 
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"

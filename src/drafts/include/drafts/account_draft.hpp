@@ -4,7 +4,7 @@
 #include <optional>
 #include <string>
 
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 
 namespace drafts

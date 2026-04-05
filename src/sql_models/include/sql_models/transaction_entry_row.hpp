@@ -2,8 +2,8 @@
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
 
 #include "account_row.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/cash.hpp"
 #include "instrument_row.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
@@ -76,7 +76,7 @@ struct TransactionEntryRow final
     /// the transaction for the associated account and instrument, it is stored
     /// as an integer representing the amount as micro-units (e.g., 0.001 cents
     /// for USD) to avoid floating-point precision issues
-    orm::Field<"amount", finance::micro_units, orm::not_null_t> amount;
+    orm::Field<"amount", micro_units, orm::not_null_t> amount;
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(

@@ -1,5 +1,5 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__FINANCE_ENUMS_HPP__
-#define __CONFIG__INCLUDE__CONFIG__FINANCE_ENUMS_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
+#define __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -41,4 +41,6 @@ MSTD_ENUM(InstrumentKind, std::uint8_t, INSTRUMENT_KIND_LIST);
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
-#endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_ENUMS_HPP__
+using micro_units = std::int64_t;
+
+#endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__

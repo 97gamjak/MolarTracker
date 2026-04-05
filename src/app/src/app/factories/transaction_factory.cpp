@@ -1,6 +1,6 @@
 #include "transaction_factory.hpp"
 
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "finance/transaction_entry.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/transaction_row.hpp"

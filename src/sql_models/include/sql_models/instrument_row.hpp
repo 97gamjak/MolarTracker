@@ -1,7 +1,7 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 
-#include "config/finance_enums.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 
