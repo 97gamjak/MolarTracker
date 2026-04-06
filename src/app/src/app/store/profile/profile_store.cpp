@@ -5,6 +5,7 @@
 
 #include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
+#include "app/store/base/base_store.hpp"
 #include "app/store/profile/exception.hpp"
 #include "app/store/profile/predicates.hpp"
 #include "drafts/profile_draft.hpp"
@@ -129,7 +130,7 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(ProfileId id) const
     {
-        auto profile = _get(HasProfileId(id) && !IsDeleted<Entry>());
+        auto profile = _get(HasProfileId(id));
 
         if (!profile.has_value())
             return std::nullopt;
@@ -147,7 +148,7 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
     {
-        auto profile = _get(HasProfileName(name) && !IsDeleted<Entry>());
+        auto profile = _get(HasProfileName(name));
 
         if (profile.has_value())
             return profile;
@@ -200,7 +201,10 @@ namespace app
     {
         _markPotentiallyDirty();
 
-        auto* entry = _findEntry(HasProfileName(draft.name));
+        auto* entry = _findEntry(
+            HasProfileName(draft.name),
+            DeletionPolicy::IncludeDelete
+        );
 
         if (entry != nullptr)
         {
@@ -235,7 +239,10 @@ namespace app
     {
         _markPotentiallyDirty();
 
-        auto* const entry = _findEntry(HasProfileName(draft.name));
+        auto* const entry = _findEntry(
+            HasProfileName(draft.name),
+            DeletionPolicy::IncludeDelete
+        );
 
         if (entry == nullptr)
             return ProfileStoreResult::ProfileNotFound;

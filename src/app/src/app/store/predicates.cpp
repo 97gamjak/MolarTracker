@@ -7,41 +7,35 @@ namespace app
      * ID
      *
      * @param id The account ID to check for
-     * @return Predicate<BaseStore<finance::Account, AccountId>::Entry>
+     * @return Predicate<finance::Account>
      */
-    Predicate<BaseStore<finance::Account, AccountId>::Entry> HasAccountId(
-        AccountId id
-    )
+    Predicate<finance::Account> HasAccountId(AccountId id)
     {
-        return Predicate<BaseStore<finance::Account, AccountId>::Entry>(
-            [id](const auto& entry) { return getId(entry.value) == id; }
-        );
+        return Predicate<finance::Account>([id](const auto& entry)
+                                           { return getId(entry) == id; });
     }
 
     /**
      * @brief Create a predicate that checks if an entry is an external account
      *
-     * @return Predicate<BaseStore<finance::Account, AccountId>::Entry>
+     * @return Predicate<finance::Account>
      */
-    Predicate<BaseStore<finance::Account, AccountId>::Entry> IsExternal()
+    Predicate<finance::Account> IsExternal()
     {
-        return Predicate<BaseStore<finance::Account, AccountId>::Entry>(
-            [](const auto& entry) { return entry.value.isExternal(); }
-        );
+        return Predicate<finance::Account>([](const auto& entry)
+                                           { return entry.isExternal(); });
     }
 
     /**
      * @brief Create a predicate that checks if an entry has a specific currency
      *
-     * @return Predicate<BaseStore<finance::Account, AccountId>::Entry>
+     * @return Predicate<finance::Account>
      */
-    Predicate<BaseStore<finance::Account, AccountId>::Entry> HasCurrency(
-        Currency currency
-    )
+    Predicate<finance::Account> HasCurrency(Currency currency)
     {
-        return Predicate<BaseStore<finance::Account, AccountId>::Entry>(
+        return Predicate<finance::Account>(
             [currency](const auto& entry)
-            { return entry.value.getCurrency() == currency; }
+            { return entry.getCurrency() == currency; }
         );
     }
 
