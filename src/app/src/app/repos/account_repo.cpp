@@ -13,49 +13,34 @@ namespace app
 {
 
     /**
-     * @brief Create a new cash account in the database, this method should
-     * insert a new row into the accounts table and a corresponding row into the
-     * cash_accounts table to create a new cash account, it should return the ID
-     * of the newly created account on success, or throw an exception if the
-     * operation fails for any reason (e.g., database error, validation error,
-     * etc.).
+     * @brief Create a new account in the repository
      *
-     * @param account The CashAccount object containing the details of the cash
-     * account to create, this should include all necessary information such as
-     * the account name, initial balance, etc., and the method should validate
-     * this information before attempting to create the account in the database.
-     * @param profileId The ID of the profile to which the cash account belongs,
-     * this is necessary to associate the account with the correct user profile
-     * in the database, and should be validated to ensure that it corresponds to
-     * an existing profile before creating the account.
+     * This method takes an Account domain object as input and creates a
+     * corresponding entry in the database, it returns the ID of the newly
+     * created account
      *
-     * @return AccountId The ID of the newly created cash account, this can be
-     * used to retrieve or manage the account later on, if the account creation
-     * fails, the method should throw an exception with details about the
-     * failure.
+     * @param account The Account domain object containing the details of the
+     * account to be created
+     * @param profileId The ID of the profile to which the account belongs
+     * @return AccountId The ID of the newly created account
      */
-    AccountId AccountRepo::createCashAccount(
+    AccountId AccountRepo::createAccount(
         const finance::Account& account,
         const ProfileId&        profileId
     )
     {
-        auto [accountRow, cashAccountRowVar] =
-            AccountFactory::toAccountRow(account, profileId);
-
-        auto cashAccountRow = std::get<CashAccountRow>(cashAccountRowVar);
+        auto accountRow = AccountFactory::toAccountRow(account, profileId);
 
         db::Transaction transaction{_getDb()};
 
-        const auto result =
-            orm::Crud().insert(_getDb(), transaction, accountRow);
+        const auto result = orm::Crud().insert(_getDb(), accountRow);
 
         if (!result.has_value())
         {
             transaction.rollback();
 
-            const auto whatFailed =
-                "account entry for cash account with name '" +
-                account.getName() + "'";
+            const auto whatFailed = "account entry for account with name '" +
+                                    account.getName() + "'";
 
             const auto msg = getInsertError(result.error(), whatFailed);
 
@@ -63,64 +48,36 @@ namespace app
             throw orm::CrudException(msg);
         }
 
-        cashAccountRow.id = AccountId(result.value());
-
-        const auto cashResult =
-            orm::Crud().insert(_getDb(), transaction, cashAccountRow);
-
-        if (!cashResult.has_value())
-        {
-            transaction.rollback();
-
-            const auto whatFailed = "cash account details for account ID " +
-                                    accountRow.id.value().toString() +
-                                    " with name '" + account.getName() + "'";
-
-            const auto msg = getInsertError(cashResult.error(), whatFailed);
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
-        }
-
         transaction.commit();
 
-        return cashAccountRow.id.value();
+        return AccountId(result.value());
     }
 
     /**
-     * @brief Get the All Cash Accounts
-     *
-     * @details This implementation at the moment works only because the
-     * CashAccountRow does not contain any additional fields yet
+     * @brief Get the All Accounts
      *
      * @param profileId
-     * @return std::vector<finance::CashAccount>
+     * @return std::vector<finance::Account>
      */
-    [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllCashAccounts(
+    [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllAccounts(
         const ProfileId& profileId
     ) const
     {
         auto dummyAccountRow      = AccountRow{};
-        dummyAccountRow.kind      = AccountKind::Cash;
         dummyAccountRow.profileId = profileId;
 
-        const auto kindClause = orm::WhereClause(
-            dummyAccountRow.kind,
-            AccountRow::tableName,
-            orm::WhereOperator::Equal
-        );
         const auto profileClause = orm::WhereClause(
             dummyAccountRow.profileId,
             AccountRow::tableName,
             orm::WhereOperator::Equal
         );
 
-        const auto cashAccountRows = orm::Crud().getAll<AccountRow>(
+        const auto accountRows = orm::Crud().getAll<AccountRow>(
             _getDb(),
-            orm::WhereClauses{kindClause, profileClause}
+            orm::WhereClauses{profileClause}
         );
 
-        return AccountFactory::toAccountDomains(cashAccountRows);
+        return AccountFactory::toAccountDomains(accountRows);
     }
 
 }   // namespace app

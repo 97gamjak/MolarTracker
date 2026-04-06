@@ -3,7 +3,9 @@
 
 #include <cstdint>
 #include <string>
+#include <variant>
 
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 
 enum class Currency : std::uint8_t;        // Forward declaration
@@ -11,6 +13,16 @@ enum class AccountStatus : std::uint8_t;   // Forward declaration
 
 namespace finance
 {
+
+    class CashAccount
+    {
+    };
+
+    class ExternalAccount
+    {
+    };
+
+    using AccountDetails = std::variant<CashAccount, ExternalAccount>;
 
     /**
      * @brief A base class representing a financial account, which can be
@@ -34,12 +46,17 @@ namespace finance
         /// The current currency of the account
         Currency _currency;
 
+        /// The details of the account (e.g., cash account details, external
+        /// account details, etc.)
+        AccountDetails _details;
+
        public:
         Account(
             AccountId     id,
             AccountStatus status,
             std::string   name,
-            Currency      currency
+            Currency      currency,
+            AccountKind   kind
         );
 
         void setId(AccountId id);
@@ -48,6 +65,8 @@ namespace finance
         [[nodiscard]] AccountStatus getStatus() const;
         [[nodiscard]] std::string   getName() const;
         [[nodiscard]] Currency      getCurrency() const;
+        [[nodiscard]] AccountKind   getKind() const;
+        [[nodiscard]] bool          isExternal() const;
     };
 
 }   // namespace finance

@@ -69,10 +69,6 @@ namespace app
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);
 
        private:
-        [[nodiscard]] AccountStoreResult _addCashAccount(
-            const drafts::AccountDraft& accountDraft
-        );
-
         void _refresh();
     };
 

@@ -12,15 +12,30 @@ namespace finance
      * @param status the status of the account (e.g., Active, Closed)
      * @param currency the current currency of the account
      * @param name the current name of the account
+     * @param kind the kind of the account (e.g., Cash, External, Security)
      */
     Account::Account(
         AccountId     id,
         AccountStatus status,
         std::string   name,
-        Currency      currency
+        Currency      currency,
+        AccountKind   kind
     )
-        : _id(id), _status(status), _name(std::move(name)), _currency(currency)
+        : _id(id),
+          _status(status),
+          _name(std::move(name)),
+          _currency(currency),
+          _details(ExternalAccount{})
     {
+        switch (kind)
+        {
+            case AccountKind::Cash:
+                _details = CashAccount{};
+                break;
+            case AccountKind::External:
+                _details = ExternalAccount{};
+                break;
+        }
     }
 
     /**
@@ -57,5 +72,36 @@ namespace finance
      * @return std::string
      */
     std::string Account::getName() const { return _name; }
+
+    /**
+     * @brief Get the kind of the account
+     *
+     * @return AccountKind
+     */
+    AccountKind Account::getKind() const
+    {
+        struct Visitor
+        {
+            AccountKind operator()(const CashAccount& /*details*/) const
+            {
+                return AccountKind::Cash;
+            }
+            AccountKind operator()(const ExternalAccount& /*details*/) const
+            {
+                return AccountKind::External;
+            }
+        };
+        return std::visit(Visitor{}, _details);
+    }
+
+    /**
+     * @brief Check if the account is an external account
+     *
+     * @return true if the account is an external account, false otherwise
+     */
+    bool Account::isExternal() const
+    {
+        return getKind() == AccountKind::External;
+    }
 
 }   // namespace finance

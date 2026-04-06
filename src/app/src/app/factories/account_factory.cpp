@@ -22,16 +22,17 @@ namespace app
             accountRow.id.value(),
             accountRow.status.value(),
             accountRow.name.value(),
-            accountRow.currency.value()
+            accountRow.currency.value(),
+            accountRow.kind.value()
         };
     }
 
     /**
      * @brief Convert a vector of AccountRow database models to a vector of
-     * CashAccount domain models
+     * Account domain models
      *
      * @param accountRows
-     * @return std::vector<finance::CashAccount>
+     * @return std::vector<finance::Account>
      */
     std::vector<finance::Account> AccountFactory::toAccountDomains(
         const std::vector<AccountRow>& accountRows
@@ -47,32 +48,27 @@ namespace app
     }
 
     /**
-     * @brief Convert a CashAccount domain model to a pair of AccountRow and
-     * CashAccountRow database models, this method takes a CashAccount object as
-     * input and extracts the relevant information to populate an AccountRow and
-     * a CashAccountRow, it returns a pair containing both rows.
+     * @brief Convert an account domain model to a database row
      *
      * @param account
      * @param profileId
-     * @return std::pair<AccountRow, AccountDetailRow>
+     * @return AccountRow
      */
-    std::pair<AccountRow, AccountDetailRow> AccountFactory::toAccountRow(
+    AccountRow AccountFactory::toAccountRow(
         const finance::Account& account,
         const ProfileId&        profileId
     )
     {
-        AccountRow     accountRow;
-        CashAccountRow cashAccountRow;
+        AccountRow accountRow;
 
         accountRow.id        = account.getId();
-        accountRow.kind      = AccountKind::Cash;
+        accountRow.kind      = account.getKind();
         accountRow.status    = account.getStatus();
         accountRow.name      = account.getName();
         accountRow.currency  = account.getCurrency();
         accountRow.profileId = profileId;
 
-        cashAccountRow.id = account.getId();
-        return {accountRow, cashAccountRow};
+        return accountRow;
     }
 
 }   // namespace app

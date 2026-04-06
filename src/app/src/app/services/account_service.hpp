@@ -30,12 +30,8 @@ namespace app
             const ProfileId& profileId
         ) const override;
 
-        [[nodiscard]] std::vector<finance::Account> getAllCashAccounts(
-            const ProfileId& profileId
-        ) const override;
-
-        [[nodiscard]] AccountId createCashAccount(
-            const finance::Account& cashAccount,
+        [[nodiscard]] AccountId createAccount(
+            const finance::Account& account,
             const ProfileId&        profileId
         ) override;
     };

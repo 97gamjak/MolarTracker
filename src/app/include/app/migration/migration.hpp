@@ -57,6 +57,10 @@ namespace app
         void _migrateV1();
         void _migrateV2();
         void _migrateV3();
+        void _migrateV4();
+
+        template <orm::db_model Model>
+        void _copyDropRename(Migration& migration);
     };
 
 }   // namespace app

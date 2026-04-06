@@ -64,14 +64,41 @@ namespace app
             )
         );
 
+        const auto account = finance::Account{
+            _generateNewId(),
+            AccountStatus::Active,
+            accountDraft.name,
+            accountDraft.currency,
+            accountDraft.kind
+        };
+
+        _addEntry(account, StoreState::New);
+
+        // special case for cash accounts
         if (accountDraft.kind == AccountKind::Cash)
-            return _addCashAccount(accountDraft);
+        {
+            // check if we already have an external account for this profile id
+            // and currency
+            const auto existingEntry =
+                _get(IsExternal() && HasCurrency(accountDraft.currency));
 
-        const auto msg = "Unsupported account kind: " +
-                         AccountKindMeta::toString(accountDraft.kind);
+            if (!existingEntry.has_value())
+            {
+                // If no existing entry is found, we can create a new external
+                // account
+                const auto externalAccount = finance::Account{
+                    _generateNewId(),
+                    AccountStatus::Active,
+                    "External " + CurrencyMeta::toString(accountDraft.currency),
+                    accountDraft.currency,
+                    AccountKind::External
+                };
 
-        LOG_ERROR(msg);
-        throw AccountStoreException(msg);
+                _addEntry(externalAccount, StoreState::New);
+            }
+        }
+
+        return AccountStoreResult::Ok;
     }
 
     /**
@@ -86,48 +113,57 @@ namespace app
 
         for (auto& entry : _getEntries())
         {
-            if (entry.state == StoreState::New)
+            switch (entry.state)
             {
-                auto&      account = entry.value;
-                const auto oldId   = account.getId();
-                auto       id      = _accountService->createCashAccount(
-                    account,
-                    _activeProfileId
-                );
-                account.setId(id);
-                _appendChangedIds(oldId, id);
-                entry.state = StoreState::Clean;
+                case StoreState::New:
+                {
+                    auto&      account = entry.value;
+                    const auto oldId   = account.getId();
+                    auto       id      = _accountService->createAccount(
+                        account,
+                        _activeProfileId
+                    );
 
-                LOG_INFO(
-                    std::format(
-                        "Account '{}' added to database",
-                        account.getName()
-                    )
-                );
-            }
-            else if (entry.state == StoreState::Clean)
-            {
-                continue;
-            }
-            else
-            {
-                throw AccountStoreException(
-                    "Commit called with unsupported entry state: " +
-                    std::to_string(static_cast<int>(entry.state))
-                );
+                    account.setId(id);
+                    _appendChangedIds(oldId, id);
+                    entry.state = StoreState::Clean;
+
+                    LOG_INFO(
+                        std::format(
+                            "Account '{}' added to database",
+                            account.getName()
+                        )
+                    );
+                    break;
+                }
+                case StoreState::Clean:
+                {
+                    break;
+                }
+                case StoreState::Modified:
+                case StoreState::Deleted:
+                {
+                    throw AccountStoreException(
+                        "Store state " +
+                        std::to_string(static_cast<int>(entry.state)) +
+                        " not supported yet"
+                    );
+                }
             }
         }
     }
 
     /**
-     * @brief Update the active profile for the store, this will determine which
-     * accounts are loaded and managed in the store, and should be called
-     * whenever the active profile changes to ensure that the store is managing
-     * the correct set of accounts for the current profile.
+     * @brief Update the active profile for the store, this will
+     * determine which accounts are loaded and managed in the store, and
+     * should be called whenever the active profile changes to ensure
+     * that the store is managing the correct set of accounts for the
+     * current profile.
      *
-     * @param profileIdOpt An optional containing the ID of the new active
-     * profile, if std::nullopt is passed, it indicates that there is no active
-     * profile, and the store should clear its data and not manage any accounts.
+     * @param profileIdOpt An optional containing the ID of the new
+     * active profile, if std::nullopt is passed, it indicates that
+     * there is no active profile, and the store should clear its data
+     * and not manage any accounts.
      */
     void AccountStore::updateActiveProfile(
         const std::optional<ProfileId>& profileIdOpt
@@ -136,7 +172,8 @@ namespace app
         if (!profileIdOpt.has_value())
         {
             LOG_WARNING(
-                "No active profile set, ignoring updateActiveProfile call"
+                "No active profile set, ignoring updateActiveProfile "
+                "call"
             );
             _activeProfileId = ProfileId::invalid();
             _clearEntries();
@@ -162,64 +199,39 @@ namespace app
     }
 
     /**
-     * @brief Add a new cash account based on the given account draft
-     *
-     * @param accountDraft A draft containing the necessary information to
-     * create a new cash account, this allows the store to take the user
-     * input and convert it into a format that can be used to create a new
-     * cash account in the underlying service, and ensures that the store
-     * can validate and process the input before attempting to create the
-     * account.
-     * @return AccountStoreResult The result of the add operation, this
-     * allows the caller to understand whether the account was added
-     * successfully or if there was an error, and provides information about
-     * what went wrong if the addition failed.
-     */
-    AccountStoreResult AccountStore::_addCashAccount(
-        const drafts::AccountDraft& accountDraft
-    )
-    {
-        const auto account = finance::Account{
-            _generateNewId(),
-            AccountStatus::Active,
-            accountDraft.name,
-            accountDraft.currency
-        };
-
-        _addEntry(account, StoreState::New);
-
-        return AccountStoreResult::Ok;
-    }
-
-    /**
-     * @brief Refresh the store's data by clearing existing entries and loading
-     * accounts from the underlying service for the active profile, this should
-     * be called whenever the active profile changes or when the store needs to
-     * ensure that it has the most up-to-date data from the service, and will
-     * repopulate the store with accounts that are relevant to the current
-     * active profile.
+     * @brief Refresh the store's data by clearing existing entries and
+     * loading accounts from the underlying service for the active
+     * profile, this should be called whenever the active profile
+     * changes or when the store needs to ensure that it has the most
+     * up-to-date data from the service, and will repopulate the store
+     * with accounts that are relevant to the current active profile.
      *
      */
     void AccountStore::_refresh()
     {
         _clearEntries();
 
-        const auto accounts = _accountService->getAllAccounts(_activeProfileId);
+        if (_activeProfileId.isValid())
+        {
+            const auto accounts =
+                _accountService->getAllAccounts(_activeProfileId);
 
-        for (const auto& account : accounts)
-            _addEntry(account, StoreState::Clean);
+            for (const auto& account : accounts)
+                _addEntry(account, StoreState::Clean);
+        }
     }
 
     /**
-     * @brief Retrieves a vector of pointers to all accounts currently in the
-     * store, this allows callers to access the accounts managed by the store,
-     * and provides a way to retrieve the account data for display or further
-     * processing.
+     * @brief Retrieves a vector of pointers to all accounts currently
+     * in the store, this allows callers to access the accounts managed
+     * by the store, and provides a way to retrieve the account data for
+     * display or further processing.
      *
-     * @return std::vector<const finance::Account*> A vector of pointers to all
-     * accounts currently in the store, each pointer points to an account object
-     * that is managed by the store, and the caller can use these pointers to
-     * access the account data and perform operations on the accounts as needed.
+     * @return std::vector<const finance::Account*> A vector of pointers
+     * to all accounts currently in the store, each pointer points to an
+     * account object that is managed by the store, and the caller can
+     * use these pointers to access the account data and perform
+     * operations on the accounts as needed.
      */
     std::vector<const finance::Account*> AccountStore::getAllAccounts() const
     {
@@ -227,7 +239,8 @@ namespace app
 
         for (const auto& entry : _getEntries())
         {
-            accounts.push_back(&entry.value);
+            if (!entry.value.isExternal())
+                accounts.push_back(&entry.value);
         }
 
         return accounts;
@@ -237,8 +250,8 @@ namespace app
      * @brief Get an account by its ID
      *
      * @param id The ID of the account to retrieve
-     * @return std::optional<finance::AccountVariant> The account if found, or
-     * an empty optional if not found
+     * @return std::optional<finance::AccountVariant> The account if
+     * found, or an empty optional if not found
      */
     std::optional<finance::Account> AccountStore::getAccount(AccountId id) const
     {
