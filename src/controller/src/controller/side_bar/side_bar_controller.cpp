@@ -33,10 +33,12 @@ namespace controller
         : _sideBar(sideBar),
           _centralStack(centralStack),
           _accountSideBarController(undoStack, appContext, mainWindow),
+          _transactionSideBarController(undoStack, appContext, mainWindow),
           _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
         _sideBar->addCategory(_accountSideBarController.getCategory());
+        _sideBar->addCategory(_transactionSideBarController.getCategory());
 
         connect(
             _sideBar,
@@ -62,7 +64,11 @@ namespace controller
      * reflect those changes
      *
      */
-    void SideBarController::refresh() { _accountSideBarController.refresh(); }
+    void SideBarController::refresh()
+    {
+        _accountSideBarController.refresh();
+        _transactionSideBarController.refresh();
+    }
 
     /**
      * @brief Handle an item being clicked in the side bar, this will determine
@@ -96,6 +102,7 @@ namespace controller
             }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
+            case ui::SideBarItemType::TransactionCategory:
                 break;
         }
     }
@@ -147,12 +154,16 @@ namespace controller
                 // Handle overview item click
                 break;
             case ui::SideBarItemType::AccountCategory:
+            {
                 const auto* accountCategory =
                     dynamic_cast<ui::AccountCategory*>(item);
                 _accountSideBarController.handleContextMenuAction(
                     accountCategory,
                     action
                 );
+                break;
+            }
+            case ui::SideBarItemType::TransactionCategory:
                 break;
         }
     }

@@ -8,8 +8,11 @@ qt_add_library(molartracker_controller STATIC
 
     src/controller/ensure_profile_controller.cpp
 
-    src/controller/side_bar_controller.cpp
-    src/controller/side_bar_category_controller.cpp
+    src/controller/side_bar/side_bar_controller.cpp
+    src/controller/side_bar/side_bar_category_controller.cpp
+    src/controller/side_bar/account_controller.cpp
+    src/controller/side_bar/transaction_controller.cpp
+
     src/controller/account_controller.cpp
 
     src/controller/central_controller.cpp

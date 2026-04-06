@@ -1,9 +1,10 @@
-#ifndef __CONTROLLER__SRC__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
-#define __CONTROLLER__SRC__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__SIDE_BAR__SIDE_BAR_CONTROLLER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__SIDE_BAR__SIDE_BAR_CONTROLLER_HPP__
 
 #include <QObject>
 
 #include "account_controller.hpp"
+#include "transaction_controller.hpp"
 
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
@@ -46,6 +47,8 @@ namespace controller
 
         /// Controller for the accounts category in the side bar
         AccountSideBarController _accountSideBarController;
+        /// Controller for the transactions category in the side bar
+        TransactionSideBarController _transactionSideBarController;
         /// Pointer to the overview category in the side bar
         ui::OverviewCategory* _overviewCategory;
 
@@ -71,4 +74,4 @@ namespace controller
 
 }   // namespace controller
 
-#endif   // __CONTROLLER__SRC__CONTROLLER__SIDE_BAR_CONTROLLER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__SIDE_BAR__SIDE_BAR_CONTROLLER_HPP__
