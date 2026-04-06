@@ -25,6 +25,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `TransactionRepo` and `TransactionService` with related factory methods
 - Automatically add external accounts for cash accounts
 - Add profileId as a uniqueness constraint for account names as two different profiles should be allowed to have the same name.
+- Include `Transaction` category as side bar element
 
 #### Profile
 

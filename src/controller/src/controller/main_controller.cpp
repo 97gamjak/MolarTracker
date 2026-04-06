@@ -7,7 +7,7 @@
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
-#include "controller/side_bar_controller.hpp"
+#include "controller/side_bar/side_bar_controller.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "ui/main_window.hpp"

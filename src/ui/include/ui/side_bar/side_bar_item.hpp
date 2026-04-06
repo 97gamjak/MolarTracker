@@ -16,6 +16,7 @@ namespace ui
 #define SIDE_BAR_ITEM_TYPE_LIST(X) \
     X(AccountCategory)             \
     X(OverviewCategory)            \
+    X(TransactionCategory)         \
     X(AccountsItem)
 
     MSTD_ENUM(SideBarItemType, std::uint8_t, SIDE_BAR_ITEM_TYPE_LIST);
