@@ -5,6 +5,7 @@
 
 #include "fields.hpp"
 #include "logging/log_macros.hpp"
+#include "orm/where_expr.hpp"
 
 REGISTER_LOG_CATEGORY("Orm.Fields");
 
@@ -88,32 +89,30 @@ namespace orm
     }
 
     /**
-     * @brief Get the Pk Where Clauses
+     * @brief Get the Pk Where
      *
      * @tparam Model
      * @param model
-     * @return WhereClauses
+     * @return WhereExpr
      */
     template <db_model Model>
-    WhereClauses getPkWhereClauses(const Model& model)
+    WhereExpr getPkWhere(const Model& model)
     {
-        WhereClauses whereClauses;
+        auto where = makeEmptyWhere();
         model.forEachField(
             [&](const auto& field)
             {
                 if (field.isPk)
                 {
-                    whereClauses.addClause(
-                        WhereClause{
-                            field,
-                            Model::tableName,
-                            WhereOperator::Equal
-                        }
+                    where &= makeWhere(
+                        field,
+                        Model::tableName,
+                        filter::Operator::Equal
                     );
                 }
             }
         );
-        return whereClauses;
+        return where;
     }
 
     /**

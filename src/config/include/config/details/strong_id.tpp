@@ -89,6 +89,31 @@ constexpr bool StrongId<Tag, Rep>::isValid() const
 }
 
 /**
+ * @brief Prefix increment operator for StrongId
+ *
+ * @return StrongId&
+ */
+template <class Tag, class Rep>
+constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++()
+{
+    _value++;
+    return *this;
+}
+
+/**
+ * @brief Postfix increment operator for StrongId
+ *
+ * @return StrongId
+ */
+template <class Tag, class Rep>
+constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++(int)
+{
+    StrongId<Tag, Rep> temp = *this;
+    _value++;
+    return temp;
+}
+
+/**
  * @brief Output stream operator for StrongId
  *
  * @param output

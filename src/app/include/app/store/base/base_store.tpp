@@ -82,6 +82,16 @@ namespace app
         return _findEntry(pred, DeletionPolicy::ExcludeDelete);
     }
 
+    /**
+     * @brief Finds an entry in the store that matches the given predicate and
+     * returns a pointer to it, or nullptr if not found.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param pred
+     * @param policy
+     * @return BaseStore<T, IdType>::Entry*
+     */
     template <typename T, typename IdType>
     typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
         Predicate<T>   pred,
@@ -117,6 +127,17 @@ namespace app
         return _get(pred, DeletionPolicy::ExcludeDelete);
     }
 
+    /**
+     * @brief Retrieves the value of an entry that matches the given predicate,
+     * returning it as an optional. If no matching entry is found, returns
+     * std::nullopt.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param pred
+     * @param policy
+     * @return std::optional<T>
+     */
     template <typename T, typename IdType>
     std::optional<T> BaseStore<T, IdType>::_get(
         Predicate<T>   pred,

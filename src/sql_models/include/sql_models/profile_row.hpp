@@ -20,13 +20,16 @@ struct ProfileRow final
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<ProfileId> id;
+    ORM_FIELD(id, orm::IdField<ProfileId>)
 
     /// The name field, this is a required and unique field
-    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name;
+    ORM_FIELD(
+        name,
+        orm::Field<"name", std::string, orm::not_null_t, orm::unique_t>
+    )
 
     /// The email field, this is an optional field
-    orm::Field<"email", std::optional<std::string>> email;
+    ORM_FIELD(email, orm::Field<"email", std::optional<std::string>>)
 
     explicit ProfileRow() = default;
     explicit ProfileRow(ProfileId _id);

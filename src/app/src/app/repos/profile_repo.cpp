@@ -8,7 +8,7 @@
 #include "app/factories/profile_factory.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
-#include "orm/where_clause.hpp"
+#include "orm/where_expr.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/profile_row.hpp"
 
@@ -54,16 +54,13 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(const std::string& name) const
     {
-        auto model = ProfileRow{};
-        model.name = name;
-
-        const auto clause =
-            orm::UniqueClause(model.name, ProfileRow::tableName);
-
-        const auto profile = orm::Crud().getUnique<ProfileRow>(
-            _getDb(),
-            orm::WhereClauses{clause}
+        const auto where = orm::makeWhere(
+            ProfileRow::nameField{name},
+            ProfileRow::tableName,
+            filter::Operator::Equal
         );
+
+        const auto profile = orm::Crud().getUnique<ProfileRow>(_getDb(), where);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());

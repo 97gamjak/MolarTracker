@@ -12,7 +12,7 @@
 #include "db/transaction.hpp"
 #include "join.hpp"
 #include "orm/type_traits.hpp"
-#include "where_clause.hpp"
+#include "where_expr.hpp"
 
 namespace orm
 {
@@ -89,15 +89,15 @@ namespace orm
 
         template <db_model Model>
         [[nodiscard]] std::vector<Model> getAll(
-            db::Database&       database,
-            const Joins&        joins,
-            const WhereClauses& whereClauses
+            db::Database&    database,
+            const Joins&     joins,
+            const WhereExpr& where
         );
 
         template <db_model Model>
         [[nodiscard]] std::vector<Model> getAll(
-            db::Database&       database,
-            const WhereClauses& whereClauses
+            db::Database&    database,
+            const WhereExpr& where
         );
 
         template <db_model Model>
@@ -105,8 +105,8 @@ namespace orm
 
         template <db_model Model>
         [[nodiscard]] std::expected<Model, CrudError> getUnique(
-            db::Database&       database,
-            const WhereClauses& whereClauses
+            db::Database&    database,
+            const WhereExpr& where
         );
 
         /******************

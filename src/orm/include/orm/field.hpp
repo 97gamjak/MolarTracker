@@ -90,6 +90,10 @@ namespace orm
     using IdField =
         Field<"id", Value, primary_key_t, auto_increment_t, unique_t>;
 
+#define ORM_FIELD(Name, ...) \
+    __VA_ARGS__ Name;        \
+    using Name##Field = __VA_ARGS__;
+
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ORM_FIELDS(Self, ...)                                                \
     constexpr auto fields() { return std::tie(__VA_ARGS__); }                \

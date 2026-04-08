@@ -1,6 +1,7 @@
 #include "account_repo.hpp"
 
 #include "app/factories/account_factory.hpp"
+#include "filter/operators.hpp"
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
@@ -63,19 +64,14 @@ namespace app
         const ProfileId& profileId
     ) const
     {
-        auto dummyAccountRow      = AccountRow{};
-        dummyAccountRow.profileId = profileId;
-
-        const auto profileClause = orm::WhereClause(
-            dummyAccountRow.profileId,
+        const auto where = orm::makeWhere(
+            AccountRow::profileIdField{profileId},
             AccountRow::tableName,
-            orm::WhereOperator::Equal
+            filter::Operator::Equal
         );
 
-        const auto accountRows = orm::Crud().getAll<AccountRow>(
-            _getDb(),
-            orm::WhereClauses{profileClause}
-        );
+        const auto accountRows =
+            orm::Crud().getAll<AccountRow>(_getDb(), where);
 
         return AccountFactory::toAccountDomains(accountRows);
     }

@@ -1,5 +1,6 @@
 add_library(molartracker_orm STATIC
     src/orm/orm_exception.cpp
+    src/orm/where_expr.cpp
     src/orm/where_clause.cpp
     src/orm/join.cpp
     src/orm/crud.cpp
@@ -19,6 +20,7 @@ target_link_libraries(molartracker_orm
     molartracker_exceptions
     molartracker_config
     molartracker_logging
+    molartracker_filter
     PRIVATE
     molartracker_db
     mstd

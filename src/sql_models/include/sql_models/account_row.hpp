@@ -29,31 +29,33 @@ struct AccountRow
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<AccountId> id;
+    ORM_FIELD(id, orm::IdField<AccountId>)
 
     /// The kind field, this indicates the type of account (e.g., cash,
     /// security, etc.) and is a required field
-    orm::Field<"kind", AccountKind, orm::not_null_t> kind;
+    ORM_FIELD(kind, orm::Field<"kind", AccountKind, orm::not_null_t>)
 
     /// The profile_id field, this is a required field and is a foreign key
     /// referencing the profile table
-    orm::Field<
-        "profile_id",
-        ProfileId,
-        orm::foreign_key_t<
-            orm::RestrictDelete,
-            ProfileRow,
-            decltype(ProfileRow::id)>>
-        profileId;
+    ORM_FIELD(
+        profileId,
+        orm::Field<
+            "profile_id",
+            ProfileId,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                ProfileRow,
+                decltype(ProfileRow::id)>>
+    )
 
     /// The name field, this is a required field
-    orm::Field<"name", std::string, orm::not_null_t> name;
+    ORM_FIELD(name, orm::Field<"name", std::string, orm::not_null_t>)
 
     /// The status field, this is a required field
-    orm::Field<"status", AccountStatus, orm::not_null_t> status;
+    ORM_FIELD(status, orm::Field<"status", AccountStatus, orm::not_null_t>)
 
     /// The currency field, this is a required field
-    orm::Field<"currency", Currency, orm::not_null_t> currency;
+    ORM_FIELD(currency, orm::Field<"currency", Currency, orm::not_null_t>)
 
     ORM_FIELDS(AccountRow, id, kind, profileId, name, status, currency)
 

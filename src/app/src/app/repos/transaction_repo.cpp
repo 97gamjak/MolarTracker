@@ -6,6 +6,7 @@
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
+#include "orm/where_expr.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/instrument_row.hpp"
 
@@ -89,16 +90,14 @@ namespace app
         {
             case InstrumentKind::Cash:
             {
-                orm::WhereClause clause{
+                const auto where = orm::makeWhere(
                     row.kind,
                     InstrumentRow::tableName,
-                    orm::WhereOperator::Equal
-                };
-
-                const auto instruments = orm::Crud().getAll<InstrumentRow>(
-                    _getDb(),
-                    orm::WhereClauses{clause}
+                    filter::Operator::Equal
                 );
+
+                const auto instruments =
+                    orm::Crud().getAll<InstrumentRow>(_getDb(), where);
 
                 if (instruments.size() == 1)
                     return instruments.front().id.value();

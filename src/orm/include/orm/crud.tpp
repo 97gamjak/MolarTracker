@@ -12,10 +12,13 @@
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
+#include "filter/expr_node.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
+#include "orm/index.hpp"
 #include "orm/type_traits.hpp"
+#include "orm/where_expr.hpp"
 #include "where_clause.hpp"
 
 namespace orm
@@ -270,9 +273,9 @@ namespace orm
 
         sqlText += mstd::join(columnNames, ", ");
 
-        const auto whereClauses = getPkWhereClauses(row);
+        const auto where = getPkWhere(row);
 
-        if (whereClauses.empty())
+        if (filter::isEmpty(where))
         {
             return std::unexpected(CrudError(
                 CrudErrorType::NoPrimaryKey,
@@ -281,7 +284,7 @@ namespace orm
             ));
         }
 
-        sqlText += whereClauses.getDBOperations();
+        sqlText += getDBOperations(where);
         sqlText += ";";
 
         LOG_DEBUG(
@@ -307,7 +310,7 @@ namespace orm
             }
         );
 
-        whereClauses.bind(statement);
+        bind(where, statement);
 
         statement.executeToCompletion();
 
@@ -355,24 +358,23 @@ namespace orm
     {
         const auto numberOfPkFields = getNumberOfPkFields<Model>();
 
-        const auto whereClauses = getPkWhereClauses<Model>(model);
+        const auto where = getPkWhere<Model>(model);
 
-        if (whereClauses.empty())
+        if (filter::isEmpty(where))
         {
             throw CrudException(
                 "orm::getByPk requires at least one primary key field"
             );
         }
 
-        if (whereClauses.size() != numberOfPkFields)
+        if (filter::getSize(where) != numberOfPkFields)
         {
             throw CrudException(
                 "orm::getByPk requires all primary key fields to be set"
             );
         }
 
-        const auto returnedModels =
-            getAll<Model>(database, Joins{}, whereClauses);
+        const auto returnedModels = getAll<Model>(database, Joins{}, where);
 
         if (returnedModels.size() > 1)
         {
@@ -398,14 +400,14 @@ namespace orm
      * @tparam Model
      * @param database
      * @param joins
-     * @param whereClauses
+     * @param where
      * @return std::vector<Model>
      */
     template <db_model Model>
     std::vector<Model> Crud::getAll(
-        db::Database&       database,
-        const Joins&        joins,
-        const WhereClauses& whereClauses
+        db::Database&    database,
+        const Joins&     joins,
+        const WhereExpr& where
     )
     {
         std::string sqlText;
@@ -413,7 +415,7 @@ namespace orm
 
         sqlText += getColumnNames<Model>(", ") + " ";
         sqlText += joins.getDBOperations(Model::tableName) + " ";
-        sqlText += whereClauses.getDBOperations() + ";";
+        sqlText += getDBOperations(where) + ";";
 
         LOG_DEBUG(
             std::format(
@@ -427,7 +429,7 @@ namespace orm
 
         _sqlExecutions.push_back(sqlText);
 
-        whereClauses.bind(statement);
+        bind(where, statement);
 
         std::vector<Model> results;
 
@@ -444,16 +446,16 @@ namespace orm
      *
      * @tparam Model
      * @param database
-     * @param whereClauses
+     * @param where
      * @return std::vector<Model>
      */
     template <db_model Model>
     std::vector<Model> Crud::getAll(
-        db::Database&       database,
-        const WhereClauses& whereClauses
+        db::Database&    database,
+        const WhereExpr& where
     )
     {
-        return getAll<Model>(database, Joins{}, whereClauses);
+        return getAll<Model>(database, Joins{}, where);
     }
 
     /**
@@ -466,7 +468,7 @@ namespace orm
     template <db_model Model>
     std::vector<Model> Crud::getAll(db::Database& database)
     {
-        return getAll<Model>(database, WhereClauses{});
+        return getAll<Model>(database, makeEmptyWhere());
     }
 
     /**
@@ -474,23 +476,23 @@ namespace orm
      *
      * @tparam Model
      * @param database
-     * @param whereClauses
+     * @param where
      * @return std::expected<Model, CrudError> The unique model matching the
      * where clause, or an error if no results or multiple results are found
      */
     template <db_model Model>
     std::expected<Model, CrudError> Crud::getUnique(
-        db::Database&       database,
-        const WhereClauses& whereClauses
+        db::Database&    database,
+        const WhereExpr& where
     )
     {
-        const auto results = getAll<Model>(database, whereClauses);
+        const auto results = getAll<Model>(database, where);
 
         if (results.empty())
         {
             const auto msg =
                 "No results found for getUnique with where clause: " +
-                whereClauses.getDBOperations();
+                getDBOperations(where);
 
             return std::unexpected(CrudError{CrudErrorType::NotFound, msg});
         }
@@ -537,21 +539,21 @@ namespace orm
         sqlText += Model::tableName;
         sqlText += " WHERE ";
 
-        const auto whereClauses = getPkWhereClauses<Model>(model);
+        const auto where = getPkWhere(model);
 
-        if (whereClauses.empty())
+        if (filter::isEmpty(where))
         {
             throw CrudException("orm::deleteByPk requires a primary key field");
         }
 
-        if (whereClauses.size() != numberOfPkFields)
+        if (filter::getSize(where) != numberOfPkFields)
         {
             throw CrudException(
                 "orm::deleteByPk requires all primary key fields to be set"
             );
         }
 
-        sqlText += whereClauses.getDBOperations();
+        sqlText += getDBOperations(where);
         sqlText += ";";
 
         LOG_DEBUG(
@@ -566,7 +568,7 @@ namespace orm
 
         _sqlExecutions.push_back(sqlText);
 
-        whereClauses.bind(statement);
+        bind(where, statement);
 
         statement.executeToCompletion();
     }
