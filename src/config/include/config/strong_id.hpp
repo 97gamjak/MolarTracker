@@ -52,7 +52,7 @@ class StrongId final
     [[nodiscard]] constexpr bool            isValid() const;
 
     constexpr StrongId& operator++();
-    constexpr StrongId& operator++(int);
+    constexpr StrongId  operator++(int);
 
     /// @cond DOXYGEN_IGNORE
     bool operator==(const StrongId&) const  = default;

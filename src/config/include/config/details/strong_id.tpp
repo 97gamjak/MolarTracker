@@ -96,7 +96,7 @@ constexpr bool StrongId<Tag, Rep>::isValid() const
 template <class Tag, class Rep>
 constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++()
 {
-    _value++;
+    ++_value;
     return *this;
 }
 
@@ -106,10 +106,10 @@ constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++()
  * @return StrongId
  */
 template <class Tag, class Rep>
-constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++(int)
+constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator++(int)
 {
     StrongId<Tag, Rep> temp = *this;
-    _value++;
+    ++_value;
     return temp;
 }
 
