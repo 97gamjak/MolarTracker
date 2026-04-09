@@ -27,7 +27,7 @@ namespace orm
          * @param expr The filter expression.
          * @return The generated database operations.
          */
-        std::string operator()(const IWhereClausePtr& expr)
+        std::string operator()(const IWhereClausePtr& expr) const
         {
             return expr->getDBOperations();
         }
@@ -39,7 +39,7 @@ namespace orm
          * @param expr The conjunction (AND) filter expression.
          * @return The generated database operations.
          */
-        std::string operator()(const AndIWhereClausePtr& expr)
+        std::string operator()(const AndIWhereClausePtr& expr) const
         {
             return "(" + getDBOperations(*expr.left) + ") AND (" +
                    getDBOperations(*expr.right) + ")";
@@ -52,7 +52,7 @@ namespace orm
          * @param expr The disjunction (OR) filter expression.
          * @return The generated database operations.
          */
-        std::string operator()(const OrIWhereClausePtr& expr)
+        std::string operator()(const OrIWhereClausePtr& expr) const
         {
             return "(" + getDBOperations(*expr.left) + ") OR (" +
                    getDBOperations(*expr.right) + ")";
@@ -65,7 +65,7 @@ namespace orm
          * @param expr The negation (NOT) filter expression.
          * @return The generated database operations.
          */
-        std::string operator()(const NotIWhereClausePtr& expr)
+        std::string operator()(const NotIWhereClausePtr& expr) const
         {
             return "NOT (" + getDBOperations(*expr.value) + ")";
         }
@@ -75,7 +75,7 @@ namespace orm
          *
          * @return The generated database operations.
          */
-        std::string operator()(const EmptyIWhereClausePtr& /*expr*/)
+        std::string operator()(const EmptyIWhereClausePtr& /*expr*/) const
         {
             return "";
         }
@@ -141,7 +141,7 @@ namespace orm
          * @brief Bind an empty filter expression to a database statement.
          *
          */
-        void operator()(const EmptyIWhereClausePtr& /*expr*/) {}
+        void operator()(const EmptyIWhereClausePtr& /*expr*/) const {}
 
         /**
          * @brief Construct a BindVisitor.
