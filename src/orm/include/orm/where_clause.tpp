@@ -2,8 +2,8 @@
 #define __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__
 
 #include "filter/operators.hpp"
-#include "orm/index.hpp"
-#include "orm/orm_exception.hpp"
+#include "index.hpp"
+#include "orm_exception.hpp"
 #include "where_clause.hpp"
 
 namespace orm
@@ -13,18 +13,11 @@ namespace orm
      *
      * @tparam Field
      * @param field
-     * @param tableName
      * @param operator_
      */
     template <typename Field>
-    WhereClause<Field>::WhereClause(
-        Field            field,
-        std::string      tableName,
-        filter::Operator operator_
-    )
-        : _field(std::move(field)),
-          _tableName(std::move(tableName)),
-          _operator(operator_)
+    WhereClause<Field>::WhereClause(Field field, filter::Operator operator_)
+        : _field(std::move(field)), _operator(operator_)
     {
     }
 
@@ -42,11 +35,7 @@ namespace orm
         if (operatorStr.empty())
             throw ORMError("Invalid WhereOperator value");
 
-        if (!_tableName.empty())
-            return _tableName + "." + _field.getColumnName() + " " +
-                   operatorStr;
-
-        return _field.getColumnName() + " " + operatorStr;
+        return _field.getFullColumnName() + " " + operatorStr;
     }
 
     /**

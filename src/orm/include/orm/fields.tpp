@@ -83,7 +83,8 @@ namespace orm
         std::vector<std::string> columnNames;
 
         Model::forEachColumn([&](auto& field)
-                             { columnNames.push_back(field.getColumnName()); });
+                             { columnNames.push_back(std::string(field.name)); }
+        );
 
         return mstd::join(columnNames, delimiter);
     }
@@ -103,13 +104,7 @@ namespace orm
             [&](const auto& field)
             {
                 if (field.isPk)
-                {
-                    where &= makeWhere(
-                        field,
-                        Model::tableName,
-                        filter::Operator::Equal
-                    );
-                }
+                    where &= makeWhere(field, filter::Operator::Equal);
             }
         );
         return where;

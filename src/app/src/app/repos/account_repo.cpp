@@ -66,7 +66,6 @@ namespace app
     {
         const auto where = orm::makeWhere(
             AccountRow::profileIdField{profileId},
-            AccountRow::tableName,
             filter::Operator::Equal
         );
 

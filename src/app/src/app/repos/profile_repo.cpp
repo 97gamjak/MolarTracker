@@ -55,7 +55,6 @@ namespace app
     {
         const auto where = orm::makeWhere(
             ProfileRow::nameField{name},
-            ProfileRow::tableName,
             filter::Operator::Equal
         );
 

@@ -56,18 +56,11 @@ namespace orm
         /// compare against
         Field _field;
 
-        /// table name for joins
-        std::string _tableName;
-
         /// the operator to use for the comparison
         filter::Operator _operator;
 
        public:
-        explicit WhereClause(
-            Field            field,
-            std::string      tableName,
-            filter::Operator operator_
-        );
+        explicit WhereClause(Field field, filter::Operator operator_);
 
         [[nodiscard]] std::string getDBOperations() const override;
 

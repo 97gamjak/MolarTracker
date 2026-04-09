@@ -30,7 +30,7 @@ namespace orm
                     sql += ", ";
                 first = false;
 
-                sql += (Model{}.*member).getColumnName();
+                sql += (Model{}.*member).name;
             };
 
             auto const& members = Group::members;

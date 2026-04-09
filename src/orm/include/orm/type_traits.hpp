@@ -1,7 +1,6 @@
 #ifndef __ORM__INCLUDE__ORM__TYPE_TRAITS_HPP__
 #define __ORM__INCLUDE__ORM__TYPE_TRAITS_HPP__
 
-#include <concepts>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -25,7 +24,7 @@ namespace orm
      */
     template <typename T>
     concept db_model = requires(T instance) {
-        { T::tableName } -> std::convertible_to<std::string>;
+        { std::string{T::tableName} };
         { instance.fields() } -> tuple_like;
         { std::as_const(instance).fields() } -> tuple_like;
     };

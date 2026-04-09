@@ -30,11 +30,7 @@ namespace orm
     WhereExpr makeEmptyWhere();
 
     template <typename Field>
-    WhereExpr makeWhere(
-        Field            field,
-        std::string      tableName,
-        filter::Operator operator_
-    );
+    WhereExpr makeWhere(Field field, filter::Operator operator_);
 
 }   // namespace orm
 

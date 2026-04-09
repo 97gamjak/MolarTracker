@@ -137,7 +137,7 @@ namespace orm
                 if (field.isAutoIncrementPk)
                     return;
 
-                columnNames.push_back(field.getColumnName());
+                columnNames.push_back(std::string(field.name));
             }
         );
 
@@ -267,7 +267,7 @@ namespace orm
                 if (field.isPk)
                     return;
 
-                columnNames.push_back(field.getColumnName() + "=?");
+                columnNames.push_back(field.name + "=?");
             }
         );
 
@@ -414,7 +414,8 @@ namespace orm
         sqlText += "SELECT ";
 
         sqlText += getColumnNames<Model>(", ") + " ";
-        sqlText += joins.getDBOperations(Model::tableName) + " ";
+        // TODO(97gamjak): make joins field aware
+        sqlText += joins.getDBOperations(std::string(Model::tableName)) + " ";
         sqlText += getDBOperations(where) + ";";
 
         LOG_DEBUG(

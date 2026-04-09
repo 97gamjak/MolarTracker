@@ -89,11 +89,8 @@ namespace app
         {
             case InstrumentKind::Cash:
             {
-                const auto where = orm::makeWhere(
-                    row.kind,
-                    InstrumentRow::tableName,
-                    filter::Operator::Equal
-                );
+                const auto where =
+                    orm::makeWhere(row.kind, filter::Operator::Equal);
 
                 const auto instruments =
                     orm::Crud().getAll<InstrumentRow>(_getDb(), where);

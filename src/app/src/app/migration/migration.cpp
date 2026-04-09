@@ -86,18 +86,18 @@ namespace app
     {
         migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
 
+        const auto tableName = std::string(Model::tableName);
+
         std::string newName = Model::tableName + "_tmp";
         migration.addMigration(
             std::make_unique<CreateTableMigration<Model>>(newName)
         );
         migration.addMigration(
-            std::make_unique<CopyTableMigration>(Model::tableName, newName)
+            std::make_unique<CopyTableMigration>(tableName, newName)
         );
+        migration.addMigration(std::make_unique<DropTableMigration>(tableName));
         migration.addMigration(
-            std::make_unique<DropTableMigration>(Model::tableName)
-        );
-        migration.addMigration(
-            std::make_unique<RenameTableMigration>(newName, Model::tableName)
+            std::make_unique<RenameTableMigration>(newName, tableName)
         );
 
         migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
@@ -147,9 +147,9 @@ namespace app
                 );
             )",
             AccountRow::tableName,
-            decltype(AccountRow::name)::getColumnName(),
-            decltype(AccountRow::id)::getColumnName(),
-            decltype(AccountRow::kind)::getColumnName()
+            AccountRow::nameField::name,
+            AccountRow::idField::name,
+            AccountRow::kindField::name
         );
 
         migration.addMigration(

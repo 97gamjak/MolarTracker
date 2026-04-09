@@ -3,7 +3,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "orm/field.hpp"
+#include "orm/orm_model.hpp"
 
 /**
  * @brief Represents a row in the "instrument" database table, which serves as a
@@ -14,11 +14,8 @@
  * tables that reference this base table through foreign key relationships.
  *
  */
-struct InstrumentRow
+struct InstrumentRow : public orm::ORMModel<"instrument">
 {
-    /// The name of the database table this struct represents
-    static constexpr std::string tableName = "instrument";
-
     /// as we have a 1:1 relationship between InstrumentRow and
     /// CashInstrumentRow, we disallow inserting an InstrumentRow without a
     /// corresponding CashInstrumentRow
@@ -26,11 +23,11 @@ struct InstrumentRow
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<InstrumentId> id;
+    ORM_FIELD(id, IdField<InstrumentId>)
 
     /// The kind field, this indicates the type of instrument (e.g., cash,
     /// stock, bond, etc.) and is a required field
-    orm::Field<"kind", InstrumentKind, orm::not_null_t> kind;
+    ORM_FIELD(kind, Field<"kind", InstrumentKind, orm::not_null_t>)
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(InstrumentRow, id, kind);
@@ -44,11 +41,8 @@ struct InstrumentRow
  * instrument entry.
  *
  */
-struct CashInstrumentRow
+struct CashInstrumentRow : public orm::ORMModel<"cash_instrument">
 {
-    /// The name of the database table this struct represents
-    static constexpr std::string tableName = "cash_instrument";
-
     /// as we have a 1:1 relationship between InstrumentRow and
     /// CashInstrumentRow, we disallow inserting a CashInstrumentRow without a
     /// corresponding InstrumentRow
@@ -60,21 +54,26 @@ struct CashInstrumentRow
     /// entry, and the deletion behavior is set to cascade, meaning that if an
     /// instrument entry is deleted, the associated cash instrument entry will
     /// also be deleted
-    orm::Field<
-        "id",
-        InstrumentId,
-        orm::primary_key_t,
-        orm::foreign_key_t<
-            orm::CascadeDelete,
-            InstrumentRow,
-            decltype(InstrumentRow::id)>>
-        id;
+    ORM_FIELD(
+        id,
+        Field<
+            "id",
+            InstrumentId,
+            orm::primary_key_t,
+            orm::foreign_key_t<
+                orm::CascadeDelete,
+                InstrumentRow,
+                decltype(InstrumentRow::id)>>
+    )
 
     /// The currency field, this indicates the currency of the cash instrument
     /// and is a required field, it is also unique because we want to ensure
     /// that there is only one cash instrument per currency, this allows us to
     /// easily query for the cash instrument of a specific currency
-    orm::Field<"currency", Currency, orm::not_null_t, orm::unique_t> currency;
+    ORM_FIELD(
+        currency,
+        Field<"currency", Currency, orm::not_null_t, orm::unique_t>
+    )
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(CashInstrumentRow, id, currency);

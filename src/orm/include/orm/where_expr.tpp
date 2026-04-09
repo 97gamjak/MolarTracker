@@ -6,15 +6,10 @@
 namespace orm
 {
     template <typename Field>
-    WhereExpr makeWhere(
-        Field            field,
-        std::string      tableName,
-        filter::Operator operator_
-    )
+    WhereExpr makeWhere(Field field, filter::Operator operator_)
     {
         return std::make_shared<WhereClause<Field>>(
             std::move(field),
-            std::move(tableName),
             operator_
         );
     }

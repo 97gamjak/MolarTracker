@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstddef>
+#include <format>
 #include <string_view>
 
 namespace orm
@@ -22,8 +23,8 @@ namespace orm
         // NOLINTNEXTLINE
         constexpr fixed_string(char const (&text)[Size]);
 
-        [[nodiscard]] constexpr std::string_view view() const;
-        [[nodiscard]] std::string                toString() const;
+        explicit operator std::string() const;
+        explicit operator std::string_view() const;
     };
 
     /**
@@ -34,7 +35,50 @@ namespace orm
     template <std::size_t Size>
     // NOLINTNEXTLINE
     fixed_string(char const (&)[Size]) -> fixed_string<Size>;
+
+    template <std::size_t N>
+    inline std::string operator+(
+        const std::string&          lhs,
+        const orm::fixed_string<N>& rhs
+    )
+    {
+        return lhs + std::string(rhs);
+    }
+
+    template <std::size_t N>
+    inline std::string operator+(
+        const orm::fixed_string<N>& lhs,
+        const std::string&          rhs
+    )
+    {
+        return std::string(lhs) + rhs;
+    }
+
+    template <std::size_t N>
+    std::string& operator+=(std::string& lhs, const orm::fixed_string<N>& rhs)
+    {
+        lhs.append(rhs._data.data(), N);
+        return lhs;
+    }
+
 }   // namespace orm
+
+// NOLINTBEGIN(cert-dcl58-cpp)
+template <size_t N>
+struct std::formatter<orm::fixed_string<N>> : std::formatter<std::string_view>
+{
+    auto format(
+        const orm::fixed_string<N>& string,
+        std::format_context&        ctx
+    ) const
+    {
+        return std::formatter<std::string_view>::format(
+            std::string_view(string),
+            ctx
+        );
+    }
+};
+// NOLINTEND(cert-dcl58-cpp)
 
 #ifndef __ORM__INCLUDE__ORM__FIXED_STRING_TPP__
 #include "fixed_string.tpp"
