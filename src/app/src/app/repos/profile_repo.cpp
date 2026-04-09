@@ -8,7 +8,6 @@
 #include "app/factories/profile_factory.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
-#include "orm/where_expr.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/profile_row.hpp"
 

@@ -6,6 +6,7 @@
 
 namespace filter
 {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define COMPARE_OPERATOR_LIST(X) \
     X(Equal)                     \
     X(NotEqual)                  \

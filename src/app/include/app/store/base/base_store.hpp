@@ -16,6 +16,7 @@
 namespace app
 {
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define STATE_POLICY_LIST(X) \
     X(IncludeDelete)         \
     X(ExcludeDelete)

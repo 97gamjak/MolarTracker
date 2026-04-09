@@ -1,7 +1,6 @@
 #ifndef __ORM__INCLUDE__ORM__WHERE_CLAUSE_HPP__
 #define __ORM__INCLUDE__ORM__WHERE_CLAUSE_HPP__
 
-#include <cstdint>
 #include <mstd/enum.hpp>
 
 #include "filter/operators.hpp"
