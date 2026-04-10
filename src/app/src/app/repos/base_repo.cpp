@@ -15,4 +15,11 @@ namespace app
      * @return db::Database&
      */
     db::Database& BaseRepo::_getDb() const { return _db; }
+
+    /**
+     * @brief Gets the Crud instance associated with the repository.
+     *
+     * @return orm::Crud&
+     */
+    orm::Crud& BaseRepo::_getCrud() { return _crud; }
 }   // namespace app

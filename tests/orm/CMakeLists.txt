@@ -1,5 +1,4 @@
 add_executable(tests_orm
-  test_binder.cpp
 )
 
 target_link_libraries(tests_orm

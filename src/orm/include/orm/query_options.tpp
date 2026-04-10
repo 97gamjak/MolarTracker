@@ -6,6 +6,13 @@
 
 namespace orm
 {
+    /**
+     * @brief Add an order by clause for the specified field
+     *
+     * @tparam Field
+     * @param ascending
+     * @return QueryOptions&
+     */
     template <typename Field>
     QueryOptions& QueryOptions::orderBy(bool ascending)
     {
@@ -13,6 +20,13 @@ namespace orm
         return *this;
     }
 
+    /**
+     * @brief set a WHERE expression for the query
+     *
+     * @param field
+     * @param operator_
+     * @return QueryOptions&
+     */
     template <typename Field>
     QueryOptions& QueryOptions::where(
         const Field&     field,

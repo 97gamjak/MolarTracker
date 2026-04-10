@@ -4,6 +4,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 
 /**
  * @brief Represents a row in the "instrument" database table, which serves as a
@@ -31,6 +32,9 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(InstrumentRow, id, kind);
+
+    [[nodiscard]]
+    static orm::WhereExpr hasKind(InstrumentKind kind);
 };
 
 /**
@@ -76,7 +80,7 @@ struct CashInstrumentRow : public orm::ORMModel<"cash_instrument">
     )
 
     /// auto generate the fields() function using the ORM_FIELDS macro
-    ORM_FIELDS(CashInstrumentRow, id, currency);
+    ORM_FIELDS(CashInstrumentRow, id, currency)
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__

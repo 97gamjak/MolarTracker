@@ -30,6 +30,7 @@ namespace orm
         Value _value{};
 
        public:
+        /// The name of the field as a fixed string
         static constexpr fixed_string tableName = TableName;
 
         /// Type alias for the field's value type

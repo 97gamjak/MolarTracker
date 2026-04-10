@@ -237,10 +237,6 @@ namespace orm
         return insertedIds;
     }
 
-    /******************
-     * UPDATE METHODS *
-     ******************/
-
     /**
      * @brief Update a row in the database
      *
@@ -338,83 +334,28 @@ namespace orm
         return {};
     }
 
-    /***************
-     * GET METHODS *
-     ***************/
-
-    /**
-     * @brief Get the By Pk object
-     *
-     * @tparam Model
-     * @param database
-     * @param model A model instance with the primary key fields set to the
-     * desired values
-     * @return std::optional<Model>
-     */
-    template <db_model Model>
-    std::optional<Model> Crud::getByPk(
-        db::Database& database,
-        const Model&  model
-    )
-    {
-        const auto numberOfPkFields = getNumberOfPkFields<Model>();
-
-        const auto where = getPkWhere<Model>(model);
-
-        if (filter::isEmpty(where))
-        {
-            throw CrudException(
-                "orm::getByPk requires at least one primary key field"
-            );
-        }
-
-        if (filter::getSize(where) != numberOfPkFields)
-        {
-            throw CrudException(
-                "orm::getByPk requires all primary key fields to be set"
-            );
-        }
-
-        const auto returnedModels = getAll<Model>(database, Joins{}, where);
-
-        if (returnedModels.size() > 1)
-        {
-            throw CrudException(
-                "orm::getByPk expected to find at most one row matching the "
-                "primary key value, but found multiple rows"
-            );
-        }
-
-        if (returnedModels.empty())
-            return std::nullopt;
-
-        return returnedModels.front();
-    }
-
     /*******************
      * GET ALL METHODS *
      *******************/
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get all rows matching the specified query options
      *
      * @tparam Model
      * @param database
      * @param joins
-     * @param where
+     * @param query
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::getAll(
+    std::vector<Model> Crud::get(
         db::Database&       database,
         const Joins&        joins,
         const QueryOptions& query
     )
     {
         std::string sqlText;
-        sqlText += "SELECT ";
-
-        sqlText += getColumnNames<Model>(", ") + " ";
+        sqlText += getDBSelectionQuery<Model>() + " ";
         sqlText += joins.getDBOperations(std::string(Model::tableName)) + " ";
         sqlText += query.getDBOperations() + ";";
 
@@ -441,69 +382,65 @@ namespace orm
     }
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get all rows matching the specified query options
      *
      * @tparam Model
      * @param database
-     * @param where
+     * @param query
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::getAll(
+    std::vector<Model> Crud::get(
         db::Database&       database,
         const QueryOptions& query
     )
     {
-        return getAll<Model>(database, Joins{}, query);
+        return get<Model>(database, Joins{}, query);
     }
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get all rows
      *
      * @tparam Model
      * @param database
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::getAll(db::Database& database)
+    std::vector<Model> Crud::get(db::Database& database)
     {
-        return getAll<Model>(database, Joins{}, QueryOptions{});
+        return get<Model>(database, Joins{}, QueryOptions{});
     }
 
     /**
-     * @brief Get a unique row matching the specified where clause
+     * @brief Get a unique row matching the specified where clauses
      *
      * @tparam Model
      * @param database
-     * @param where
-     * @return std::expected<Model, CrudError> The unique model matching the
-     * where clause, or an error if no results or multiple results are found
+     * @param query
+     * @return std::optional<Model>
      */
     template <db_model Model>
-    std::expected<Model, CrudError> Crud::getUnique(
+    std::optional<Model> Crud::getUnique(
         db::Database&       database,
         const QueryOptions& query
     )
     {
-        const auto results = getAll<Model>(database, Joins{}, query);
+        const auto results = get<Model>(database, query);
 
         if (results.empty())
-        {
-            const auto msg =
-                "No results found for getUnique with where clause: " +
-                query.getWhereDBOperations();
-
-            return std::unexpected(CrudError{CrudErrorType::NotFound, msg});
-        }
+            return std::nullopt;
 
         if (results.size() > 1)
         {
-            const auto msg = "Expected unique result for getUnique but got " +
-                             std::to_string(results.size());
-
-            return std::unexpected(
-                CrudError{CrudErrorType::MultipleResults, msg}
+            const auto msg = std::format(
+                "Expected to get a unique result for query, but got {} "
+                "results. "
+                "This indicates a data integrity issue.",
+                results.size()
             );
+
+            LOG_ERROR(msg);
+            throw CrudException(msg);
         }
 
         return results.front();

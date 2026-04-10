@@ -12,12 +12,24 @@
 
 namespace orm
 {
+    /**
+     * @brief Class representing options for database queries, such as ordering,
+     * limiting results, and filtering with where expressions
+     *
+     */
     class QueryOptions
     {
        private:
+        /// A vector of pairs representing fields to order by and their sort
+        /// direction (true for ascending, false for descending)
         std::vector<std::pair<std::string, bool>> _orderFields;
-        std::optional<std::size_t>                _limit;
-        WhereExpr                                 _whereExpr = makeEmptyWhere();
+
+        /// An optional limit on the number of results to return
+        std::optional<std::size_t> _limit;
+
+        /// A where expression representing the filtering conditions for the
+        /// query
+        WhereExpr _whereExpr = makeEmptyWhere();
 
        public:
         template <typename Field>
@@ -39,5 +51,9 @@ namespace orm
         void bind(db::Statement& statement) const;
     };
 }   // namespace orm
+
+#ifndef __ORM__INCLUDE__ORM__QUERY_OPTIONS_TPP__
+#include "query_options.tpp"
+#endif
 
 #endif   // __ORM__INCLUDE__ORM__QUERY_OPTIONS_HPP__

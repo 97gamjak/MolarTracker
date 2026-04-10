@@ -73,38 +73,28 @@ namespace orm
             const Model&  row
         );
 
-        /***************
-         * GET METHODS *
-         ***************/
-
-        template <db_model Model>
-        [[nodiscard]] std::optional<Model> getByPk(
-            db::Database& database,
-            const Model&  model
-        );
-
         /*******************
          * GET ALL METHODS *
          *******************/
 
         template <db_model Model>
-        [[nodiscard]] std::vector<Model> getAll(
+        [[nodiscard]] std::vector<Model> get(
             db::Database&       database,
             const Joins&        joins,
             const QueryOptions& query
         );
 
         template <db_model Model>
-        [[nodiscard]] std::vector<Model> getAll(
+        [[nodiscard]] std::vector<Model> get(
             db::Database&       database,
             const QueryOptions& query
         );
 
         template <db_model Model>
-        [[nodiscard]] std::vector<Model> getAll(db::Database& database);
+        [[nodiscard]] std::vector<Model> get(db::Database& database);
 
         template <db_model Model>
-        [[nodiscard]] std::expected<Model, CrudError> getUnique(
+        [[nodiscard]] std::optional<Model> getUnique(
             db::Database&       database,
             const QueryOptions& query
         );

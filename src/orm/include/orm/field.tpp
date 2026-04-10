@@ -245,11 +245,11 @@ namespace orm
             }
 
             using inner_type = optional_inner_t<Value>;
-            binder<Statement, inner_type>::bind(statement, index, *_value);
+            binder<inner_type>::bind(statement, index, *_value);
         }
         else
         {
-            binder<Statement, Value>::bind(statement, index, _value);
+            binder<Value>::bind(statement, index, _value);
         }
     }
 
@@ -285,14 +285,23 @@ namespace orm
                 return;
             }
 
-            _value = binder<Statement, inner_type>::read(statement, col);
+            _value = binder<inner_type>::read(statement, col);
         }
         else
         {
-            _value = binder<Statement, Value>::read(statement, col);
+            _value = binder<Value>::read(statement, col);
         }
     }
 
+    /**
+     * @brief Get the full column name in the format "TableName.ColumnName"
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return std::string
+     */
     template <
         fixed_string Name,
         typename Value,

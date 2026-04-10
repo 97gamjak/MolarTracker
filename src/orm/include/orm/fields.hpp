@@ -35,6 +35,9 @@ namespace orm
     template <typename Model>
     Model loadModelFromStatement(db::Statement const& statement);
 
+    template <typename Model>
+    std::string getDBSelectionQuery();
+
 }   // namespace orm
 
 #ifndef __ORM__INCLUDE__ORM__FIELDS_TPP__

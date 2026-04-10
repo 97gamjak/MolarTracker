@@ -17,18 +17,17 @@ namespace app
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] TransactionId addTransaction(
+        [[nodiscard]]
+        TransactionId addTransaction(
             const finance::Transaction& transaction
         ) override;
 
        private:
-        [[nodiscard]] std::optional<InstrumentId> _getInstrument(
-            const InstrumentRow& row
-        );
+        [[nodiscard]]
+        std::optional<InstrumentId> _getInstrument(const InstrumentRow& row);
 
-        [[nodiscard]] InstrumentId _insertInstrument(
-            const InstrumentRow& row
-        ) const;
+        [[nodiscard]]
+        InstrumentId _insertInstrument(const InstrumentRow& row);
     };
 }   // namespace app
 

@@ -82,7 +82,7 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
     /// for USD) to avoid floating-point precision issues
     ORM_FIELD(amount, Field<"amount", micro_units, orm::not_null_t>)
 
-    /// auto generate the fields() function using the ORM_FIELDS macro
+    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
         TransactionEntryRow,
         id,
@@ -90,7 +90,8 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
         accountId,
         instrumentId,
         amount
-    );
+    )
+    /// @endcond
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__

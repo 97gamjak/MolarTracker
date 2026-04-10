@@ -74,6 +74,25 @@ namespace orm
      * @brief Get the Column Names
      *
      * @tparam Model
+     * @return std::vector<std::string>
+     */
+    template <db_model Model>
+    std::vector<std::string> getFullColumnNames()
+    {
+        std::vector<std::string> columnNames;
+
+        Model::forEachColumn(
+            [&](auto& field)
+            { columnNames.push_back(field.getFullColumnName()); }
+        );
+
+        return columnNames;
+    }
+
+    /**
+     * @brief Get the Column Names
+     *
+     * @tparam Model
      * @param delimiter The delimiter to use between column names
      * @return std::string
      */
@@ -198,6 +217,16 @@ namespace orm
         LOG_DEBUG(std::format("Loaded model {}", loadedModel.toString()));
 
         return loadedModel;
+    }
+
+    template <typename Model>
+    std::string getDBSelectionQuery()
+    {
+        std::string sqlText;
+        sqlText += "SELECT ";
+        sqlText += mstd::join(getFullColumnNames<Model>(), ", ") + " ";
+        sqlText += "FROM " + std::string(Model::tableName);
+        return sqlText;
     }
 
 }   // namespace orm

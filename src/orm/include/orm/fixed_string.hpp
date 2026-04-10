@@ -64,6 +64,13 @@ namespace orm
 }   // namespace orm
 
 // NOLINTBEGIN(cert-dcl58-cpp)
+/**
+ * @brief Specialization of std::formatter for orm::fixed_string to allow
+ * formatting fixed_string with std::format
+ *
+ * @tparam N
+ */
+/// @cond DOXYGEN_IGNORE
 template <size_t N>
 struct std::formatter<orm::fixed_string<N>> : std::formatter<std::string_view>
 {
@@ -78,6 +85,7 @@ struct std::formatter<orm::fixed_string<N>> : std::formatter<std::string_view>
         );
     }
 };
+/// @endcond
 // NOLINTEND(cert-dcl58-cpp)
 
 #ifndef __ORM__INCLUDE__ORM__FIXED_STRING_TPP__

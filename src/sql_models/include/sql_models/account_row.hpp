@@ -9,6 +9,7 @@
 #include "orm/fixed_string.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/type_traits.hpp"
+#include "orm/where_expr.hpp"
 #include "profile_row.hpp"
 
 /**
@@ -71,6 +72,10 @@ struct AccountRow : orm::ORMModel<"account">
                 &AccountRow::name>()
         );
     }
+
+    [[nodiscard]] static orm::WhereExpr hasProfileId(
+        const ProfileId& profileId
+    );
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__

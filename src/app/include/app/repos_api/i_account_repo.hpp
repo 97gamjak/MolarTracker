@@ -50,7 +50,7 @@ namespace app
          */
         [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
-        ) const = 0;
+        ) = 0;
     };
 
 }   // namespace app

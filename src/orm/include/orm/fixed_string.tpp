@@ -24,12 +24,24 @@ namespace orm
             _data[index] = text[index];
     }
 
+    /**
+     * @brief Convert the fixed_string to a std::string
+     *
+     * @tparam Size
+     * @return std::string
+     */
     template <std::size_t Size>
     fixed_string<Size>::operator std::string() const
     {
         return std::string{_data.data(), Size - 1};
     }
 
+    /**
+     * @brief Convert the fixed_string to a std::string_view
+     *
+     * @tparam Size
+     * @return std::string_view
+     */
     template <std::size_t Size>
     fixed_string<Size>::operator std::string_view() const
     {

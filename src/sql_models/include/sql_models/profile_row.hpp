@@ -9,6 +9,7 @@
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 
 /**
  * @brief Represents a row in the "profile" database table
@@ -26,10 +27,12 @@ struct ProfileRow : public orm::ORMModel<"profile">
     /// The email field, this is an optional field
     ORM_FIELD(email, Field<"email", std::optional<std::string>>)
 
+    ORM_FIELDS(ProfileRow, id, name, email)
+
     explicit ProfileRow() = default;
     explicit ProfileRow(ProfileId _id);
 
-    ORM_FIELDS(ProfileRow, id, name, email)
+    [[nodiscard]] static orm::WhereExpr hasName(const std::string& name);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__PROFILE_ROW_HPP__

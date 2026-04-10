@@ -24,7 +24,7 @@ namespace app
         db::Transaction dbTx{_getDb()};
         auto txRow = TransactionFactory::toTransactionRow(transaction);
 
-        const auto transactionResult = orm::Crud().insert(_getDb(), txRow);
+        const auto transactionResult = _getCrud().insert(_getDb(), txRow);
 
         if (!transactionResult.has_value())
         {
@@ -58,7 +58,7 @@ namespace app
             );
 
             const auto entryResult =
-                orm::Crud().insert(_getDb(), dbTx, entryRow);
+                _getCrud().insert(_getDb(), dbTx, entryRow);
 
             if (!entryResult.has_value())
             {
@@ -89,19 +89,17 @@ namespace app
         {
             case InstrumentKind::Cash:
             {
-                const auto where =
-                    orm::makeWhere(row.kind, filter::Operator::Equal);
+                const auto query = orm::QueryOptions{}.where(
+                    InstrumentRow::hasKind(InstrumentKind::Cash)
+                );
 
-                const auto instruments =
-                    orm::Crud().getAll<InstrumentRow>(_getDb(), where);
+                const auto instrument =
+                    _getCrud().getUnique<InstrumentRow>(_getDb(), query);
 
-                if (instruments.size() == 1)
-                    return instruments.front().id.value();
+                if (instrument.has_value())
+                    return instrument->id.value();
 
-                if (instruments.empty())
-                    return std::nullopt;
-
-                throw std::runtime_error("Multiple instruments found");
+                return std::nullopt;
             }
             case InstrumentKind::Stock:
                 throw std::runtime_error(
@@ -119,11 +117,9 @@ namespace app
      * @param row
      * @return InstrumentId
      */
-    InstrumentId TransactionRepo::_insertInstrument(
-        const InstrumentRow& row
-    ) const
+    InstrumentId TransactionRepo::_insertInstrument(const InstrumentRow& row)
     {
-        const auto result = orm::Crud().insert(_getDb(), row);
+        const auto result = _getCrud().insert(_getDb(), row);
 
         if (!result.has_value())
         {

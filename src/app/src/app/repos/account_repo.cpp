@@ -1,7 +1,6 @@
 #include "account_repo.hpp"
 
 #include "app/factories/account_factory.hpp"
-#include "filter/operators.hpp"
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
@@ -31,11 +30,12 @@ namespace app
         const ProfileId&        profileId
     )
     {
-        auto accountRow = AccountFactory::toAccountRow(account, profileId);
-
         db::Transaction transaction{_getDb()};
 
-        const auto result = orm::Crud().insert(_getDb(), accountRow);
+        const auto result = _getCrud().insert(
+            _getDb(),
+            AccountFactory::toAccountRow(account, profileId)
+        );
 
         if (!result.has_value())
         {
@@ -63,15 +63,12 @@ namespace app
      */
     [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllAccounts(
         const ProfileId& profileId
-    ) const
+    )
     {
-        auto query = orm::QueryOptions{}.where(
-            AccountRow::profileIdField{profileId},
-            filter::Operator::Equal
-        );
+        auto query =
+            orm::QueryOptions{}.where(AccountRow::hasProfileId(profileId));
 
-        const auto accountRows =
-            orm::Crud().getAll<AccountRow>(_getDb(), query);
+        const auto accountRows = _getCrud().get<AccountRow>(_getDb(), query);
 
         return AccountFactory::toAccountDomains(accountRows);
     }
