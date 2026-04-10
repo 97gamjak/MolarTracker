@@ -17,6 +17,7 @@
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
 #include "orm/index.hpp"
+#include "orm/query_options.hpp"
 #include "orm/type_traits.hpp"
 #include "orm/where_expr.hpp"
 #include "where_clause.hpp"
@@ -405,18 +406,17 @@ namespace orm
      */
     template <db_model Model>
     std::vector<Model> Crud::getAll(
-        db::Database&    database,
-        const Joins&     joins,
-        const WhereExpr& where
+        db::Database&       database,
+        const Joins&        joins,
+        const QueryOptions& query
     )
     {
         std::string sqlText;
         sqlText += "SELECT ";
 
         sqlText += getColumnNames<Model>(", ") + " ";
-        // TODO(97gamjak): make joins field aware
         sqlText += joins.getDBOperations(std::string(Model::tableName)) + " ";
-        sqlText += getDBOperations(where) + ";";
+        sqlText += query.getDBOperations() + ";";
 
         LOG_DEBUG(
             std::format(
@@ -430,14 +430,12 @@ namespace orm
 
         _sqlExecutions.push_back(sqlText);
 
-        bind(where, statement);
+        query.bind(statement);
 
         std::vector<Model> results;
 
         while (statement.step() == db::StepResult::RowAvailable)
-        {
             results.push_back(loadModelFromStatement<Model>(statement));
-        }
 
         return results;
     }
@@ -452,11 +450,11 @@ namespace orm
      */
     template <db_model Model>
     std::vector<Model> Crud::getAll(
-        db::Database&    database,
-        const WhereExpr& where
+        db::Database&       database,
+        const QueryOptions& query
     )
     {
-        return getAll<Model>(database, Joins{}, where);
+        return getAll<Model>(database, Joins{}, query);
     }
 
     /**
@@ -469,7 +467,7 @@ namespace orm
     template <db_model Model>
     std::vector<Model> Crud::getAll(db::Database& database)
     {
-        return getAll<Model>(database, makeEmptyWhere());
+        return getAll<Model>(database, Joins{}, QueryOptions{});
     }
 
     /**
@@ -483,17 +481,17 @@ namespace orm
      */
     template <db_model Model>
     std::expected<Model, CrudError> Crud::getUnique(
-        db::Database&    database,
-        const WhereExpr& where
+        db::Database&       database,
+        const QueryOptions& query
     )
     {
-        const auto results = getAll<Model>(database, where);
+        const auto results = getAll<Model>(database, Joins{}, query);
 
         if (results.empty())
         {
             const auto msg =
                 "No results found for getUnique with where clause: " +
-                getDBOperations(where);
+                query.getWhereDBOperations();
 
             return std::unexpected(CrudError{CrudErrorType::NotFound, msg});
         }

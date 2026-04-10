@@ -5,6 +5,7 @@
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "orm/query_options.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/account_row.hpp"
 
@@ -64,13 +65,13 @@ namespace app
         const ProfileId& profileId
     ) const
     {
-        const auto where = orm::makeWhere(
+        auto query = orm::QueryOptions{}.where(
             AccountRow::profileIdField{profileId},
             filter::Operator::Equal
         );
 
         const auto accountRows =
-            orm::Crud().getAll<AccountRow>(_getDb(), where);
+            orm::Crud().getAll<AccountRow>(_getDb(), query);
 
         return AccountFactory::toAccountDomains(accountRows);
     }

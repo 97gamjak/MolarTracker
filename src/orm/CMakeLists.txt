@@ -1,9 +1,10 @@
 add_library(molartracker_orm STATIC
-    src/orm/orm_exception.cpp
-    src/orm/where_expr.cpp
-    src/orm/where_clause.cpp
-    src/orm/join.cpp
     src/orm/crud.cpp
+    src/orm/join.cpp
+    src/orm/orm_exception.cpp
+    src/orm/query_options.cpp
+    src/orm/where_clause.cpp
+    src/orm/where_expr.cpp
 
     src/orm/crud/crud_error.cpp
 )
