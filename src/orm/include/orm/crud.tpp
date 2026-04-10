@@ -349,9 +349,9 @@ namespace orm
      */
     template <db_model Model>
     std::vector<Model> Crud::get(
-        db::Database&       database,
-        const Joins&        joins,
-        const QueryOptions& query
+        db::Database& database,
+        const Joins&  joins,
+        const Query&  query
     )
     {
         std::string sqlText;
@@ -390,10 +390,7 @@ namespace orm
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::get(
-        db::Database&       database,
-        const QueryOptions& query
-    )
+    std::vector<Model> Crud::get(db::Database& database, const Query& query)
     {
         return get<Model>(database, Joins{}, query);
     }
@@ -408,7 +405,7 @@ namespace orm
     template <db_model Model>
     std::vector<Model> Crud::get(db::Database& database)
     {
-        return get<Model>(database, Joins{}, QueryOptions{});
+        return get<Model>(database, Joins{}, Query{});
     }
 
     /**
@@ -421,8 +418,8 @@ namespace orm
      */
     template <db_model Model>
     std::optional<Model> Crud::getUnique(
-        db::Database&       database,
-        const QueryOptions& query
+        db::Database& database,
+        const Query&  query
     )
     {
         const auto results = get<Model>(database, query);

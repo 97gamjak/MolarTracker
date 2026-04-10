@@ -79,15 +79,15 @@ namespace orm
 
         template <db_model Model>
         [[nodiscard]] std::vector<Model> get(
-            db::Database&       database,
-            const Joins&        joins,
-            const QueryOptions& query
+            db::Database& database,
+            const Joins&  joins,
+            const Query&  query
         );
 
         template <db_model Model>
         [[nodiscard]] std::vector<Model> get(
-            db::Database&       database,
-            const QueryOptions& query
+            db::Database& database,
+            const Query&  query
         );
 
         template <db_model Model>
@@ -95,8 +95,8 @@ namespace orm
 
         template <db_model Model>
         [[nodiscard]] std::optional<Model> getUnique(
-            db::Database&       database,
-            const QueryOptions& query
+            db::Database& database,
+            const Query&  query
         );
 
         /******************

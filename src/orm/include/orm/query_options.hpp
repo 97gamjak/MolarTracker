@@ -17,7 +17,7 @@ namespace orm
      * limiting results, and filtering with where expressions
      *
      */
-    class QueryOptions
+    class Query
     {
        private:
         /// A vector of pairs representing fields to order by and their sort
@@ -33,14 +33,14 @@ namespace orm
 
        public:
         template <typename Field>
-        [[nodiscard]] QueryOptions& orderBy(bool ascending);
+        [[nodiscard]] Query& orderBy(bool ascending);
 
-        [[nodiscard]] QueryOptions& limit(std::size_t limit);
+        [[nodiscard]] Query& limit(std::size_t limit);
 
-        [[nodiscard]] QueryOptions& where(const WhereExpr& whereExpr);
+        [[nodiscard]] Query& where(const WhereExpr& whereExpr);
 
         template <typename Field>
-        [[nodiscard]] QueryOptions& where(
+        [[nodiscard]] Query& where(
             const Field&     field,
             filter::Operator operator_
         );

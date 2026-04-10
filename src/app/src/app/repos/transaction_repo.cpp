@@ -89,7 +89,7 @@ namespace app
         {
             case InstrumentKind::Cash:
             {
-                const auto query = orm::QueryOptions{}.where(
+                const auto query = orm::Query{}.where(
                     InstrumentRow::hasKind(InstrumentKind::Cash)
                 );
 

@@ -11,10 +11,10 @@ namespace orm
      *
      * @tparam Field
      * @param ascending
-     * @return QueryOptions&
+     * @return Query&
      */
     template <typename Field>
-    QueryOptions& QueryOptions::orderBy(bool ascending)
+    Query& Query::orderBy(bool ascending)
     {
         _orderFields.push_back({Field::name, ascending});
         return *this;
@@ -25,13 +25,10 @@ namespace orm
      *
      * @param field
      * @param operator_
-     * @return QueryOptions&
+     * @return Query&
      */
     template <typename Field>
-    QueryOptions& QueryOptions::where(
-        const Field&     field,
-        filter::Operator operator_
-    )
+    Query& Query::where(const Field& field, filter::Operator operator_)
     {
         _whereExpr &= makeWhere(field, operator_);
         return *this;

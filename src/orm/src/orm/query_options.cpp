@@ -10,9 +10,9 @@ namespace orm
      * @brief set a limit on the number of results to return
      *
      * @param limit
-     * @return QueryOptions&
+     * @return Query&
      */
-    QueryOptions& QueryOptions::limit(std::size_t limit)
+    Query& Query::limit(std::size_t limit)
     {
         _limit = limit;
         return *this;
@@ -22,9 +22,9 @@ namespace orm
      * @brief set a WHERE expression for the query
      *
      * @param whereExpr
-     * @return QueryOptions&
+     * @return Query&
      */
-    QueryOptions& QueryOptions::where(const WhereExpr& whereExpr)
+    Query& Query::where(const WhereExpr& whereExpr)
     {
         _whereExpr &= whereExpr;
         return *this;
@@ -35,7 +35,7 @@ namespace orm
      *
      * @return std::string
      */
-    std::string QueryOptions::getWhereDBOperations() const
+    std::string Query::getWhereDBOperations() const
     {
         return orm::getDBOperations(_whereExpr);
     }
@@ -46,7 +46,7 @@ namespace orm
      *
      * @return std::string
      */
-    std::string QueryOptions::getDBOperations() const
+    std::string Query::getDBOperations() const
     {
         auto sql = getWhereDBOperations();
 
@@ -72,7 +72,7 @@ namespace orm
      *
      * @param statement
      */
-    void QueryOptions::bind(db::Statement& statement) const
+    void Query::bind(db::Statement& statement) const
     {
         orm::bind(_whereExpr, statement);
     }

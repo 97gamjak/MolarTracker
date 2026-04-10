@@ -65,8 +65,7 @@ namespace app
         const ProfileId& profileId
     )
     {
-        auto query =
-            orm::QueryOptions{}.where(AccountRow::hasProfileId(profileId));
+        auto query = orm::Query{}.where(AccountRow::hasProfileId(profileId));
 
         const auto accountRows = _getCrud().get<AccountRow>(_getDb(), query);
 
