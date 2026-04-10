@@ -76,6 +76,35 @@ namespace app
     }
 
     /**
+     * @brief get all transactions from the database
+     *
+     * @return std::vector<finance::Transaction>
+     */
+    std::vector<finance::Transaction> TransactionRepo::getTransactions()
+    {
+        const auto query  = orm::Query{};
+        const auto txRows = _getCrud().get<TransactionRow>(_getDb(), query);
+
+        std::vector<finance::Transaction> results;
+        results.reserve(txRows.size());
+
+        for (const auto& txRow : txRows)
+        {
+            const auto entryQuery = orm::Query{}.where(
+                TransactionEntryRow::hasTransactionId(txRow.id.value())
+            );
+
+            const auto entryRows =
+                _getCrud().get<TransactionEntryRow>(_getDb(), entryQuery);
+
+            auto transaction = TransactionFactory::fromTransactionRow(txRow);
+            transaction.
+        }
+
+        return results;
+    }
+
+    /**
      * @brief get an instrument from the database
      *
      * @param row

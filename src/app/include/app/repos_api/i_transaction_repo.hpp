@@ -1,6 +1,8 @@
 #ifndef __APP__INCLUDE__APP__REPOS_API__I_TRANSACTION_REPO_HPP__
 #define __APP__INCLUDE__APP__REPOS_API__I_TRANSACTION_REPO_HPP__
 
+#include <vector>
+
 #include "config/id_types.hpp"
 
 namespace finance
@@ -28,6 +30,14 @@ namespace app
          */
         [[nodiscard]] virtual TransactionId addTransaction(
             const finance::Transaction& transaction
+        ) = 0;
+
+        /**
+         * @brief Retrieves all transactions from the repository.
+         *
+         * @return A vector of all transactions.
+         */
+        [[nodiscard]] virtual std::vector<finance::Transaction> getTransactions(
         ) = 0;
     };
 }   // namespace app

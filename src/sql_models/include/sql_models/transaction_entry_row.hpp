@@ -92,6 +92,9 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
         amount
     )
     /// @endcond
+
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__

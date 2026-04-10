@@ -27,15 +27,17 @@ namespace finance
         TransactionDetail _details;
 
        public:
+        TransactionEntry(TransactionEntryId id, AccountId accountId);
+
         TransactionEntry(
-            TransactionEntryId            id,
-            AccountId                     accountId,
-            std::variant<CashTransaction> details
+            TransactionEntryId id,
+            AccountId          accountId,
+            TransactionDetail  details
         );
 
-        [[nodiscard]] TransactionEntryId            getId() const;
-        [[nodiscard]] AccountId                     getAccountId() const;
-        [[nodiscard]] std::variant<CashTransaction> getDetails() const;
+        [[nodiscard]] TransactionEntryId getId() const;
+        [[nodiscard]] AccountId          getAccountId() const;
+        [[nodiscard]] TransactionDetail  getDetails() const;
     };
 
     /**

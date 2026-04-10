@@ -22,6 +22,9 @@ namespace app
             const finance::Transaction& transaction
         ) override;
 
+        [[nodiscard]]
+        std::vector<finance::Transaction> getTransactions() override;
+
        private:
         [[nodiscard]]
         std::optional<InstrumentId> _getInstrument(const InstrumentRow& row);

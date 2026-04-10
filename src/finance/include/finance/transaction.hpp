@@ -67,6 +67,8 @@ namespace finance
         [[nodiscard]] TransactionStatus                    getStatus() const;
         [[nodiscard]] std::optional<std::string>           getComment() const;
         [[nodiscard]] const std::vector<TransactionEntry>& getEntries() const;
+
+        void addEntry(const TransactionEntry& entry);
     };
 
 }   // namespace finance

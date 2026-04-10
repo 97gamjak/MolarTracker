@@ -46,9 +46,40 @@ namespace app
         return transaction;
     }
 
+    finance::TransactionEntry TransactionFactory::fromTransactionEntryRow(
+        const TransactionEntryRow &entryRow
+    )
+    {
+        switch (entryRow.instrumentId.value())
+        {
+            case InstrumentKind::Cash:
+                detail = finance::CashTransaction{entryRow.amount.value()};
+                break;
+        }
+
+        return finance::TransactionEntry{
+            entryRow.id.value(),
+            entryRow.accountId.value(),
+            detail
+        };
+    }
+
+    finance::CashTransaction TransactionFactory::fromInstrumentRow(
+        const InstrumentRow &row
+    )
+    {
+        switch (row.kind.value())
+        {
+            case InstrumentKind::Cash:
+                return finance::CashTransaction{};
+        }
+
+        throw std::runtime_error("Unknown instrument kind");
+    }
+
     /**
-     * @brief Converts a TransactionEntry object to a TransactionEntryRow
-     * object.
+     * @brief Converts a TransactionEntry object to a
+     * TransactionEntryRow object.
      *
      * @param entry The TransactionEntry object to convert.
      * @param transactionId The ID of the associated transaction.
@@ -74,7 +105,8 @@ namespace app
     }
 
     /**
-     * @brief Converts a TransactionDetail object to an InstrumentRow object.
+     * @brief Converts a TransactionDetail object to an
+     * InstrumentRow object.
      *
      * @param detail The TransactionDetail object to convert.
      * @return The converted InstrumentRow object.
@@ -84,7 +116,8 @@ namespace app
     )
     {
         /**
-         * @brief Visitor for converting TransactionDetail to InstrumentRow.
+         * @brief Visitor for converting TransactionDetail to
+         * InstrumentRow.
          *
          */
         struct InstrumentRowVisitor
@@ -96,8 +129,6 @@ namespace app
                 row.kind = InstrumentKind::Cash;
                 return row;
             }
-
-            // Add more visit methods for other transaction types as needed
         };
 
         return std::visit(InstrumentRowVisitor{}, detail);
