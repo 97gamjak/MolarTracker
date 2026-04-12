@@ -46,36 +46,36 @@ namespace app
         return transaction;
     }
 
-    finance::TransactionEntry TransactionFactory::fromTransactionEntryRow(
-        const TransactionEntryRow &entryRow
-    )
-    {
-        switch (entryRow.instrumentId.value())
-        {
-            case InstrumentKind::Cash:
-                detail = finance::CashTransaction{entryRow.amount.value()};
-                break;
-        }
+    // finance::TransactionEntry TransactionFactory::fromTransactionEntryRow(
+    //     const TransactionEntryRow &entryRow
+    // )
+    // {
+    //     switch (entryRow.instrumentId.value())
+    //     {
+    //         case InstrumentKind::Cash:
+    //             detail = finance::CashTransaction{entryRow.amount.value()};
+    //             break;
+    //     }
 
-        return finance::TransactionEntry{
-            entryRow.id.value(),
-            entryRow.accountId.value(),
-            detail
-        };
-    }
+    //     return finance::TransactionEntry{
+    //         entryRow.id.value(),
+    //         entryRow.accountId.value(),
+    //         detail
+    //     };
+    // }
 
-    finance::CashTransaction TransactionFactory::fromInstrumentRow(
-        const InstrumentRow &row
-    )
-    {
-        switch (row.kind.value())
-        {
-            case InstrumentKind::Cash:
-                return finance::CashTransaction{};
-        }
+    // finance::CashTransaction TransactionFactory::fromInstrumentRow(
+    //     const InstrumentRow &row
+    // )
+    // {
+    //     switch (row.kind.value())
+    //     {
+    //         case InstrumentKind::Cash:
+    //             return finance::CashTransaction{};
+    //     }
 
-        throw std::runtime_error("Unknown instrument kind");
-    }
+    //     throw std::runtime_error("Unknown instrument kind");
+    // }
 
     /**
      * @brief Converts a TransactionEntry object to a

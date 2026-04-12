@@ -82,24 +82,24 @@ namespace app
      */
     std::vector<finance::Transaction> TransactionRepo::getTransactions()
     {
-        const auto query  = orm::Query{};
-        const auto txRows = _getCrud().get<TransactionRow>(_getDb(), query);
+        // const auto query  = orm::Query{};
+        // const auto txRows = _getCrud().get<TransactionRow>(_getDb(), query);
 
         std::vector<finance::Transaction> results;
-        results.reserve(txRows.size());
+        // results.reserve(txRows.size());
 
-        for (const auto& txRow : txRows)
-        {
-            const auto entryQuery = orm::Query{}.where(
-                TransactionEntryRow::hasTransactionId(txRow.id.value())
-            );
+        // for (const auto& txRow : txRows)
+        // {
+        //     const auto entryQuery = orm::Query{}.where(
+        //         TransactionEntryRow::hasTransactionId(txRow.id.value())
+        //     );
 
-            const auto entryRows =
-                _getCrud().get<TransactionEntryRow>(_getDb(), entryQuery);
+        //     const auto entryRows =
+        //         _getCrud().get<TransactionEntryRow>(_getDb(), entryQuery);
 
-            auto transaction = TransactionFactory::fromTransactionRow(txRow);
-            transaction.
-        }
+        //     auto transaction = TransactionFactory::fromTransactionRow(txRow);
+        //     transaction.
+        // }
 
         return results;
     }

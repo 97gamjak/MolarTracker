@@ -356,7 +356,7 @@ namespace orm
     {
         std::string sqlText;
         sqlText += getDBSelectionQuery<Model>() + " ";
-        sqlText += joins.getDBOperations(std::string(Model::tableName)) + " ";
+        sqlText += joins.toSQL() + " ";
         sqlText += query.getDBOperations() + ";";
 
         LOG_DEBUG(
