@@ -57,7 +57,7 @@ namespace orm
     template <std::size_t N>
     std::string& operator+=(std::string& lhs, const orm::fixed_string<N>& rhs)
     {
-        lhs.append(rhs._data.data(), N);
+        lhs.append(rhs._data.data(), N - 1);
         return lhs;
     }
 
