@@ -25,6 +25,12 @@ namespace orm
 
         explicit operator std::string() const;
         explicit operator std::string_view() const;
+
+        template <std::size_t SizeLHS, std::size_t SizeRHS>
+        friend constexpr bool operator==(
+            const fixed_string<SizeLHS>& lhs,
+            const char (&rhs)[SizeRHS]
+        );
     };
 
     /**

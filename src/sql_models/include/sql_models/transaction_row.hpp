@@ -13,8 +13,13 @@
  * @brief Represents a row in the "transaction" database table
  *
  */
-struct TransactionRow : public orm::ORMModel<"transaction">
+struct TransactionRow : public orm::ORMModel<"transaction_">
 {
+    static_assert(
+        tableName != "transaction",
+        "Table name must not be 'transaction', this is a reserved key in SQL"
+    );
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     ORM_FIELD(id, IdField<TransactionId>)

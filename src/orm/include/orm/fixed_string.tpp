@@ -48,6 +48,18 @@ namespace orm
         return std::string_view{_data.data(), Size - 1};
     }
 
+    template <std::size_t SizeLHS, std::size_t SizeRHS>
+    constexpr bool operator==(
+        const fixed_string<SizeLHS>& lhs,
+        const char (&rhs)[SizeRHS]
+    )
+    {
+        if constexpr (SizeLHS == SizeRHS)
+            return lhs._data == std::to_array(rhs);
+        else
+            return false;
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__INCLUDE__ORM__FIXED_STRING_TPP__
