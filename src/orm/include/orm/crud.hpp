@@ -93,6 +93,13 @@ namespace orm
         template <db_model Model>
         [[nodiscard]] std::vector<Model> get(db::Database& database);
 
+        template <db_model... Models>
+        std::vector<std::tuple<Models...>> getJoined(
+            db::Database&     database,
+            const orm::Joins& joins,
+            const Query&      query
+        );
+
         template <db_model Model>
         [[nodiscard]] std::optional<Model> getUnique(
             db::Database& database,

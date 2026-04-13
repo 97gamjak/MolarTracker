@@ -8,10 +8,10 @@ namespace orm
     template <typename FromField, typename ToField>
     Join innerJoin()
     {
-        Join join;
-        join._type = JoinType::INNER;
-        _fromFields<FromField, ToField>(join);
-        return join;
+        Join join_;
+        join_._type = JoinType::INNER;
+        _fromFields<FromField, ToField>(join_);
+        return join_;
     }
 
     template <typename FromField, typename ToField>
@@ -23,28 +23,28 @@ namespace orm
     template <typename FromField, typename ToField>
     Join leftJoin()
     {
-        Join join;
-        join._type = JoinType::LEFT;
-        _fromFields<FromField, ToField>(join);
-        return join;
+        Join join_;
+        join_._type = JoinType::LEFT;
+        _fromFields<FromField, ToField>(join_);
+        return join_;
     }
 
     template <typename FromField, typename ToField>
     Join rightJoin()
     {
-        Join join;
-        join._type = JoinType::RIGHT;
-        _fromFields<FromField, ToField>(join);
-        return join;
+        Join join_;
+        join_._type = JoinType::RIGHT;
+        _fromFields<FromField, ToField>(join_);
+        return join_;
     }
 
     template <typename FromField, typename ToField>
-    void _fromFields(Join& join)
+    void _fromFields(Join& join_)
     {
-        join._fromTable = FromField::tableName;
-        join._fromField = FromField::name;
-        join._toTable   = ToField::tableName;
-        join._toField   = ToField::name;
+        join_._fromTable = std::string(FromField::tableName);
+        join_._fromField = std::string(FromField::name);
+        join_._toTable   = std::string(ToField::tableName);
+        join_._toField   = std::string(ToField::name);
     }
 }   // namespace orm
 

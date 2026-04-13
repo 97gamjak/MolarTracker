@@ -6,6 +6,8 @@
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
+#include "orm/join.hpp"
+#include "orm/optional.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/instrument_row.hpp"
 
@@ -22,7 +24,7 @@ namespace app
     )
     {
         db::Transaction dbTx{_getDb()};
-        auto txRow = TransactionFactory::toTransactionRow(transaction);
+        auto            txRow = TransactionFactory::toRow(transaction);
 
         const auto transactionResult = _getCrud().insert(_getDb(), txRow);
 
@@ -51,11 +53,8 @@ namespace app
             else
                 instrumentId = _insertInstrument(instrument);
 
-            const auto entryRow = TransactionFactory::toTransactionEntryRow(
-                entry,
-                txId,
-                instrumentId
-            );
+            const auto entryRow =
+                TransactionFactory::toEntryRow(entry, txId, instrumentId);
 
             const auto entryResult =
                 _getCrud().insert(_getDb(), dbTx, entryRow);
@@ -82,24 +81,46 @@ namespace app
      */
     std::vector<finance::Transaction> TransactionRepo::getTransactions()
     {
-        // const auto query  = orm::Query{};
-        // const auto txRows = _getCrud().get<TransactionRow>(_getDb(), query);
+        const auto txRows = _getCrud().get<TransactionRow>(_getDb());
 
         std::vector<finance::Transaction> results;
-        // results.reserve(txRows.size());
+        results.reserve(txRows.size());
 
-        // for (const auto& txRow : txRows)
-        // {
-        //     const auto entryQuery = orm::Query{}.where(
-        //         TransactionEntryRow::hasTransactionId(txRow.id.value())
-        //     );
+        for (const auto& txRow : txRows)
+        {
+            const auto joins =
+                orm::Joins{}
+                    .add(
+                        orm::join<
+                            TransactionEntryRow::transactionIdField,
+                            TransactionRow::idField>()
+                    )
+                    .add(
+                        orm::join<
+                            TransactionEntryRow::instrumentIdField,
+                            InstrumentRow::idField>()
+                    );
 
-        //     const auto entryRows =
-        //         _getCrud().get<TransactionEntryRow>(_getDb(), entryQuery);
+            const auto query = orm::Query{}.where(
+                TransactionEntryRow::hasTransactionId(txRow.id.value())
+            );
 
-        //     auto transaction = TransactionFactory::fromTransactionRow(txRow);
-        //     transaction.
-        // }
+            const auto entryRows =
+                _getCrud().getJoined<TransactionEntryRow, InstrumentRow>(
+                    _getDb(),
+                    joins,
+                    query
+                );
+
+            auto transaction = TransactionFactory::fromRow(txRow);
+
+            for (const auto& [entryRow, instrumentRow] : entryRows)
+                transaction.addEntry(
+                    TransactionFactory::fromEntryRow(entryRow, instrumentRow)
+                );
+
+            results.push_back(std::move(transaction));
+        }
 
         return results;
     }

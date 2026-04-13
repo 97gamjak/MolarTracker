@@ -30,8 +30,11 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     /// stock, bond, etc.) and is a required field
     ORM_FIELD(kind, Field<"kind", InstrumentKind, orm::not_null_t>)
 
+    /// The currency field, this indicates the currency of the instrument
+    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
+
     /// auto generate the fields() function using the ORM_FIELDS macro
-    ORM_FIELDS(InstrumentRow, id, kind);
+    ORM_FIELDS(InstrumentRow, id, kind, currency);
 
     [[nodiscard]]
     static orm::WhereExpr hasKind(InstrumentKind kind);

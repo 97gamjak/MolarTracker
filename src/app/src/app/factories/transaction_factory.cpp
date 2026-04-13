@@ -13,7 +13,7 @@ namespace app
      * @param transaction The Transaction object to convert.
      * @return The converted TransactionRow object.
      */
-    TransactionRow TransactionFactory::toTransactionRow(
+    TransactionRow TransactionFactory::toRow(
         const finance::Transaction &transaction
     )
     {
@@ -33,9 +33,7 @@ namespace app
      * @param row The TransactionRow object to convert.
      * @return The converted Transaction object.
      */
-    finance::Transaction TransactionFactory::fromTransactionRow(
-        const TransactionRow &row
-    )
+    finance::Transaction TransactionFactory::fromRow(const TransactionRow &row)
     {
         finance::Transaction transaction{
             row.id.value(),
@@ -86,7 +84,7 @@ namespace app
      * @param instrumentId The ID of the associated instrument.
      * @return The converted TransactionEntryRow object.
      */
-    TransactionEntryRow TransactionFactory::toTransactionEntryRow(
+    TransactionEntryRow TransactionFactory::toEntryRow(
         const finance::TransactionEntry &entry,
         TransactionId                    transactionId,
         InstrumentId                     instrumentId
@@ -102,6 +100,22 @@ namespace app
         row.amount = std::visit(finance::AmountVisitor{}, entry.getDetails());
 
         return row;
+    }
+
+    finance::TransactionEntry TransactionFactory::fromEntryRow(
+        const TransactionEntryRow &row,
+        const InstrumentRow       &instrumentRow
+    )
+    {
+        finance::TransactionEntry entry{
+            row.id.value(),
+            row.accountId.value(),
+            finance::AmountVisitor::fromRow(row.amount)
+        };
+
+        entry.setInstrument(instrumentRow);
+
+        return entry;
     }
 
     /**

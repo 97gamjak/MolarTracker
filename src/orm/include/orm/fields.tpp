@@ -197,14 +197,17 @@ namespace orm
      * @param statement
      * @return Model
      */
-    template <typename Model>
-    Model loadModelFromStatement(db::Statement const& statement)
+    template <db_model Model>
+    Model loadModelFromStatement(
+        db::Statement const& statement,
+        std::size_t          offset
+    )
     {
         LOG_ENTRY;
 
         Model loadedModel{};
 
-        std::size_t col = 0;
+        std::size_t col = offset;
 
         loadedModel.forEachField(
             [&](auto& field)
@@ -219,14 +222,57 @@ namespace orm
         return loadedModel;
     }
 
-    template <typename Model>
-    std::string getDBSelectionQuery()
+    template <db_model Model>
+    Model loadModelFromStatement(db::Statement const& statement)
     {
-        std::string sqlText;
-        sqlText += "SELECT ";
-        sqlText += mstd::join(getFullColumnNames<Model>(), ", ") + " ";
-        sqlText += "FROM " + std::string(Model::tableName);
-        return sqlText;
+        return loadModelFromStatement<Model>(statement, 0);
+    }
+
+    template <typename Model>
+    auto loadAnyFromStatement(
+        const db::Statement& statement,
+        std::size_t          offset
+    )
+    {
+        if constexpr (optional_model<Model>)
+        {
+            return loadOptionalFromStatement<typename Model::value_type>(
+                statement,
+                offset
+            );
+        }
+
+        return loadModelFromStatement<Model>(statement, offset);
+    }
+
+    template <db_model... Models>
+    std::tuple<Models...> loadTupleFromStatement(const db::Statement& statement)
+    {
+        std::size_t offset = 0;
+        return std::tuple<Models...>{
+            [&]()
+            {
+                auto model  = loadAnyFromStatement<Models>(statement, offset);
+                offset     += getNumberOfFields<Models>();
+                return model;
+            }()...
+        };
+    }
+
+    template <db_model... Models>
+    std::string getSelection()
+    {
+        using BaseModel = std::tuple_element_t<0, std::tuple<Models...>>;
+
+        std::vector<std::string> tables;
+        (tables.push_back(std::string(Models::tableName) + ".*"), ...);
+
+        std::string sql  = "SELECT ";
+        sql             += mstd::join(tables, ", ");
+        sql             += " FROM ";
+        sql             += BaseModel::tableName;
+
+        return sql;
     }
 
 }   // namespace orm

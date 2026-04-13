@@ -16,6 +16,20 @@ namespace orm
 
     MSTD_ENUM(JoinType, std::uint8_t, JOIN_TYPES_LIST)
 
+    class Join;
+
+    template <typename FromField, typename ToField>
+    Join innerJoin();
+
+    template <typename FromField, typename ToField>
+    Join join();
+
+    template <typename FromField, typename ToField>
+    Join leftJoin();
+
+    template <typename FromField, typename ToField>
+    Join rightJoin();
+
     class Join
     {
        private:
@@ -60,5 +74,9 @@ namespace orm
     };
 
 }   // namespace orm
+
+#ifndef __ORM__INCLUDE__ORM__JOIN_TPP__
+#include "join.tpp"
+#endif
 
 #endif   // __ORM__INCLUDE__ORM__JOIN_HPP__

@@ -355,7 +355,7 @@ namespace orm
     )
     {
         std::string sqlText;
-        sqlText += getDBSelectionQuery<Model>() + " ";
+        sqlText += getSelection<Model>() + " ";
         sqlText += joins.toSQL() + " ";
         sqlText += query.getDBOperations() + ";";
 
@@ -406,6 +406,32 @@ namespace orm
     std::vector<Model> Crud::get(db::Database& database)
     {
         return get<Model>(database, Joins{}, Query{});
+    }
+
+    template <db_model... Models>
+    std::vector<std::tuple<Models...>> Crud::getJoined(
+        db::Database&     database,
+        const orm::Joins& joins,
+        const Query&      query
+    )
+    {
+        std::string sql;
+        sql += getSelection<Models...>();
+        sql += joins.toSQL() + " ";
+        sql += query.getDBOperations() + ";";
+
+        LOG_DEBUG(std::format("Getting joined with SQL: {}", sql));
+
+        db::Statement statement = database.prepare(sql);
+        _sqlExecutions.push_back(sql);
+        query.bind(statement);
+
+        std::vector<std::tuple<Models...>> results;
+
+        while (statement.step() == db::StepResult::RowAvailable)
+            results.push_back(loadTupleFromStatement<Models...>(statement));
+
+        return results;
     }
 
     /**

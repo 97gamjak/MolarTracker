@@ -32,11 +32,16 @@ namespace orm
     template <db_model Model>
     std::size_t getNumberOfFields();
 
-    template <typename Model>
-    Model loadModelFromStatement(db::Statement const& statement);
+    template <db_model Model>
+    Model loadModelFromStatement(const db::Statement& statement);
 
-    template <typename Model>
-    std::string getDBSelectionQuery();
+    template <db_model... Models>
+    std::tuple<Models...> loadTupleFromStatement(
+        const db::Statement& statement
+    );
+
+    template <db_model... Models>
+    std::string getSelection();
 
 }   // namespace orm
 

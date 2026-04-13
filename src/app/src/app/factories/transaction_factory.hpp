@@ -18,20 +18,26 @@ namespace app
     class TransactionFactory
     {
        public:
-        static TransactionRow toTransactionRow(
-            const finance::Transaction& transaction
-        );
+        [[nodiscard]]
+        static TransactionRow toRow(const finance::Transaction& transaction);
 
-        static finance::Transaction fromTransactionRow(
-            const TransactionRow& row
-        );
+        [[nodiscard]]
+        static finance::Transaction fromRow(const TransactionRow& row);
 
-        static TransactionEntryRow toTransactionEntryRow(
+        [[nodiscard]]
+        static TransactionEntryRow toEntryRow(
             const finance::TransactionEntry& entry,
             TransactionId                    transactionId,
             InstrumentId                     instrumentId
         );
 
+        [[nodiscard]]
+        static finance::TransactionEntry fromEntryRow(
+            const TransactionEntryRow& row,
+            const InstrumentRow&       instrumentRow
+        );
+
+        [[nodiscard]]
         static InstrumentRow toInstrumentRow(
             const finance::TransactionDetail& detail
         );

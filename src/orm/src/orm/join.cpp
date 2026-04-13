@@ -39,10 +39,10 @@ namespace orm
     std::string Joins::toSQL() const
     {
         std::string sql;
-        for (const auto& join : _joins)
+        for (const auto& join_ : _joins)
         {
             sql += " ";
-            sql += join.toSQL();
+            sql += join_.toSQL();
         }
         return sql;
     }

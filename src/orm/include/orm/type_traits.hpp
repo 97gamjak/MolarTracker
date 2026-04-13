@@ -29,6 +29,10 @@ namespace orm
         { std::as_const(instance).fields() } -> tuple_like;
     };
 
+    template <typename T>
+    concept optional_model = requires { typename T::value_type; } &&
+                             db_model<typename T::value_type>;
+
     /**
      * @brief Concept for checking if a model has unique groups
      *
