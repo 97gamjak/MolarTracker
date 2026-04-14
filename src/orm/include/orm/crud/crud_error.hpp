@@ -16,7 +16,8 @@ namespace orm
     X(MultipleRowsUpdated) \
     X(InsertFailed)        \
     X(NotFound)            \
-    X(MultipleResults)
+    X(MultipleResults)     \
+    X(ColumnAlreadyExists)
 
     // cppcheck-suppress syntaxError
     MSTD_ENUM(CrudErrorType, uint8_t, CRUD_ERROR_LIST);

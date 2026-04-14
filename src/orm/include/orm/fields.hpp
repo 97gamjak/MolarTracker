@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "orm/type_traits.hpp"
-#include "where_clause.hpp"
+#include "where_expr.hpp"
 
 namespace orm
 {
@@ -21,7 +21,7 @@ namespace orm
     std::string getColumnNames(const std::string& delimiter);
 
     template <db_model Model>
-    WhereClauses getPkWhereClauses(const Model& model);
+    WhereExpr getPkWhere(const Model& model);
 
     template <db_model Model>
     std::size_t getNumberOfPkFields();
@@ -32,8 +32,16 @@ namespace orm
     template <db_model Model>
     std::size_t getNumberOfFields();
 
-    template <typename Model>
-    Model loadModelFromStatement(db::Statement const& statement);
+    template <db_model Model>
+    Model loadModelFromStatement(const db::Statement& statement);
+
+    template <db_model... Models>
+    std::tuple<Models...> loadTupleFromStatement(
+        const db::Statement& statement
+    );
+
+    template <db_model... Models>
+    std::string getSelection();
 
 }   // namespace orm
 

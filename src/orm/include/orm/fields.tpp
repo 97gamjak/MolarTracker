@@ -5,6 +5,7 @@
 
 #include "fields.hpp"
 #include "logging/log_macros.hpp"
+#include "orm/where_expr.hpp"
 
 REGISTER_LOG_CATEGORY("Orm.Fields");
 
@@ -73,6 +74,25 @@ namespace orm
      * @brief Get the Column Names
      *
      * @tparam Model
+     * @return std::vector<std::string>
+     */
+    template <db_model Model>
+    std::vector<std::string> getFullColumnNames()
+    {
+        std::vector<std::string> columnNames;
+
+        Model::forEachColumn(
+            [&](auto& field)
+            { columnNames.push_back(field.getFullColumnName()); }
+        );
+
+        return columnNames;
+    }
+
+    /**
+     * @brief Get the Column Names
+     *
+     * @tparam Model
      * @param delimiter The delimiter to use between column names
      * @return std::string
      */
@@ -82,38 +102,31 @@ namespace orm
         std::vector<std::string> columnNames;
 
         Model::forEachColumn([&](auto& field)
-                             { columnNames.push_back(field.getColumnName()); });
+                             { columnNames.push_back(std::string(field.name)); }
+        );
 
         return mstd::join(columnNames, delimiter);
     }
 
     /**
-     * @brief Get the Pk Where Clauses
+     * @brief Get the Pk Where
      *
      * @tparam Model
      * @param model
-     * @return WhereClauses
+     * @return WhereExpr
      */
     template <db_model Model>
-    WhereClauses getPkWhereClauses(const Model& model)
+    WhereExpr getPkWhere(const Model& model)
     {
-        WhereClauses whereClauses;
+        auto where = makeEmptyWhere();
         model.forEachField(
             [&](const auto& field)
             {
                 if (field.isPk)
-                {
-                    whereClauses.addClause(
-                        WhereClause{
-                            field,
-                            Model::tableName,
-                            WhereOperator::Equal
-                        }
-                    );
-                }
+                    where &= makeWhere(field, filter::Operator::Equal);
             }
         );
-        return whereClauses;
+        return where;
     }
 
     /**
@@ -184,14 +197,17 @@ namespace orm
      * @param statement
      * @return Model
      */
-    template <typename Model>
-    Model loadModelFromStatement(db::Statement const& statement)
+    template <db_model Model>
+    Model loadModelFromStatement(
+        db::Statement const& statement,
+        std::size_t          offset
+    )
     {
         LOG_ENTRY;
 
         Model loadedModel{};
 
-        std::size_t col = 0;
+        std::size_t col = offset;
 
         loadedModel.forEachField(
             [&](auto& field)
@@ -204,6 +220,59 @@ namespace orm
         LOG_DEBUG(std::format("Loaded model {}", loadedModel.toString()));
 
         return loadedModel;
+    }
+
+    template <db_model Model>
+    Model loadModelFromStatement(db::Statement const& statement)
+    {
+        return loadModelFromStatement<Model>(statement, 0);
+    }
+
+    template <typename Model>
+    auto loadAnyFromStatement(
+        const db::Statement& statement,
+        std::size_t          offset
+    )
+    {
+        if constexpr (optional_model<Model>)
+        {
+            return loadOptionalFromStatement<typename Model::value_type>(
+                statement,
+                offset
+            );
+        }
+
+        return loadModelFromStatement<Model>(statement, offset);
+    }
+
+    template <db_model... Models>
+    std::tuple<Models...> loadTupleFromStatement(const db::Statement& statement)
+    {
+        std::size_t offset = 0;
+        return std::tuple<Models...>{
+            [&]()
+            {
+                auto model  = loadAnyFromStatement<Models>(statement, offset);
+                offset     += getNumberOfFields<Models>();
+                return model;
+            }()...
+        };
+    }
+
+    template <db_model... Models>
+    std::string getSelection()
+    {
+        using BaseModel = std::tuple_element_t<0, std::tuple<Models...>>;
+
+        std::vector<std::string> tables;
+        (tables.push_back(std::string(Models::tableName) + ".*"), ...);
+
+        std::string sql  = "SELECT ";
+        sql             += mstd::join(tables, ", ");
+        sql             += " FROM ";
+        sql             += BaseModel::tableName;
+
+        return sql;
     }
 
 }   // namespace orm

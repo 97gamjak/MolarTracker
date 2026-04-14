@@ -14,6 +14,7 @@ target_link_libraries(molartracker_config
     molartracker_utils
     molartracker_exceptions
     PUBLIC
+    json
     mstd    # for exposing mstd types in the public header
 )
 

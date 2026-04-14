@@ -6,6 +6,7 @@
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
+#include "orm/join.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/instrument_row.hpp"
 
@@ -22,9 +23,9 @@ namespace app
     )
     {
         db::Transaction dbTx{_getDb()};
-        auto txRow = TransactionFactory::toTransactionRow(transaction);
+        auto            txRow = TransactionFactory::toRow(transaction);
 
-        const auto transactionResult = orm::Crud().insert(_getDb(), txRow);
+        const auto transactionResult = _getCrud().insert(_getDb(), txRow);
 
         if (!transactionResult.has_value())
         {
@@ -51,14 +52,11 @@ namespace app
             else
                 instrumentId = _insertInstrument(instrument);
 
-            const auto entryRow = TransactionFactory::toTransactionEntryRow(
-                entry,
-                txId,
-                instrumentId
-            );
+            const auto entryRow =
+                TransactionFactory::toEntryRow(entry, txId, instrumentId);
 
             const auto entryResult =
-                orm::Crud().insert(_getDb(), dbTx, entryRow);
+                _getCrud().insert(_getDb(), dbTx, entryRow);
 
             if (!entryResult.has_value())
             {
@@ -76,6 +74,57 @@ namespace app
     }
 
     /**
+     * @brief get all transactions from the database
+     *
+     * @return std::vector<finance::Transaction>
+     */
+    std::vector<finance::Transaction> TransactionRepo::getTransactions()
+    {
+        const auto txRows = _getCrud().get<TransactionRow>(_getDb());
+
+        std::vector<finance::Transaction> results;
+        results.reserve(txRows.size());
+
+        for (const auto& txRow : txRows)
+        {
+            const auto joins =
+                orm::Joins{}
+                    .add(
+                        orm::join<
+                            TransactionEntryRow::transactionIdField,
+                            TransactionRow::idField>()
+                    )
+                    .add(
+                        orm::join<
+                            TransactionEntryRow::instrumentIdField,
+                            InstrumentRow::idField>()
+                    );
+
+            const auto query = orm::Query{}.where(
+                TransactionEntryRow::hasTransactionId(txRow.id.value())
+            );
+
+            const auto entryRows =
+                _getCrud().getJoined<TransactionEntryRow, InstrumentRow>(
+                    _getDb(),
+                    joins,
+                    query
+                );
+
+            auto transaction = TransactionFactory::fromRow(txRow);
+
+            for (const auto& [entryRow, instrumentRow] : entryRows)
+                transaction.addEntry(
+                    TransactionFactory::fromEntryRow(entryRow, instrumentRow)
+                );
+
+            results.push_back(std::move(transaction));
+        }
+
+        return results;
+    }
+
+    /**
      * @brief get an instrument from the database
      *
      * @param row
@@ -89,24 +138,17 @@ namespace app
         {
             case InstrumentKind::Cash:
             {
-                orm::WhereClause clause{
-                    row.kind,
-                    InstrumentRow::tableName,
-                    orm::WhereOperator::Equal
-                };
-
-                const auto instruments = orm::Crud().getAll<InstrumentRow>(
-                    _getDb(),
-                    orm::WhereClauses{clause}
+                const auto query = orm::Query{}.where(
+                    InstrumentRow::hasKind(InstrumentKind::Cash)
                 );
 
-                if (instruments.size() == 1)
-                    return instruments.front().id.value();
+                const auto instrument =
+                    _getCrud().getUnique<InstrumentRow>(_getDb(), query);
 
-                if (instruments.empty())
-                    return std::nullopt;
+                if (instrument.has_value())
+                    return instrument->id.value();
 
-                throw std::runtime_error("Multiple instruments found");
+                return std::nullopt;
             }
             case InstrumentKind::Stock:
                 throw std::runtime_error(
@@ -124,11 +166,9 @@ namespace app
      * @param row
      * @return InstrumentId
      */
-    InstrumentId TransactionRepo::_insertInstrument(
-        const InstrumentRow& row
-    ) const
+    InstrumentId TransactionRepo::_insertInstrument(const InstrumentRow& row)
     {
-        const auto result = orm::Crud().insert(_getDb(), row);
+        const auto result = _getCrud().insert(_getDb(), row);
 
         if (!result.has_value())
         {

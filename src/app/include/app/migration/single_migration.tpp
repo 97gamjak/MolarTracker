@@ -2,6 +2,8 @@
 #define __APP__INCLUDE__APP__MIGRATION__SINGLE_MIGRATION_TPP__
 
 #include "app/migration/single_migration.hpp"
+#include "db/statement.hpp"
+#include "orm/constraints.hpp"
 #include "orm/crud.hpp"
 #include "orm/type_traits.hpp"
 
@@ -41,6 +43,34 @@ namespace app
     {
         orm::Crud crud;
         crud.createTable<Model>(db, _tableName);
+
+        setSQLStatements(crud.getExecutedSQL());
+    }
+
+    /**
+     * @brief Construct a new Add Column Migration< Field>:: Add Column
+     * Migration object
+     *
+     * @tparam Field
+     * @param defaultValue
+     */
+    template <typename Field>
+    AddColumnMigration<Field>::AddColumnMigration(Field defaultValue)
+        : SingleMigration(MigrationType::AddColumn), _defaultValue(defaultValue)
+    {
+    }
+
+    /**
+     * @brief Apply the migration to add a column to the database
+     *
+     * @param db The database to apply the migration to
+     */
+    template <typename Field>
+    void AddColumnMigration<Field>::applyMigration(db::Database& db)
+    {
+        orm::Crud crud;
+
+        crud.addColumn(db, _defaultValue);
 
         setSQLStatements(crud.getExecutedSQL());
     }

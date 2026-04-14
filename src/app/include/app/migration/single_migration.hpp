@@ -23,7 +23,8 @@ namespace app
     X(Custom)                  \
     X(DropTable)               \
     X(CopyTable)               \
-    X(RenameTable)
+    X(RenameTable)             \
+    X(AddColumn)
 
     MSTD_ENUM(MigrationType, std::uint8_t, MIGRATION_TYPE_LIST);
 
@@ -50,6 +51,7 @@ namespace app
         virtual ~SingleMigration() = default;
 
         void setSQLStatements(const std::vector<std::string>& sqlStatements);
+        void setSQLStatements(const std::string& sqlStatement);
 
         /**
          * @brief pure virtual function to apply a single migration that needs
@@ -164,6 +166,23 @@ namespace app
 
        public:
         RenameTableMigration(std::string oldName, std::string newName);
+
+        void applyMigration(db::Database& db) override;
+    };
+
+    /**
+     * @brief Migration to add a column to a table
+     *
+     */
+    template <typename Field>
+    class AddColumnMigration : public SingleMigration
+    {
+       private:
+        /// the default value to insert
+        Field _defaultValue;
+
+       public:
+        explicit AddColumnMigration(Field defaultValue);
 
         void applyMigration(db::Database& db) override;
     };

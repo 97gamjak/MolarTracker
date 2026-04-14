@@ -18,7 +18,7 @@ jobs:
 
     env:
       QT_VERSION: "6.8.3"
-      BUILD_TYPE: "Release"
+      BUILD_TYPE: "Debug"
 
     steps:
       - name: Checkout

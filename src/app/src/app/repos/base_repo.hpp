@@ -1,6 +1,7 @@
 #ifndef __APP__SRC__APP__REPOS__BASE_REPO_HPP__
 #define __APP__SRC__APP__REPOS__BASE_REPO_HPP__
 
+#include "orm/crud.hpp"
 namespace db
 {
     class Database;
@@ -18,6 +19,9 @@ namespace app
         /// Reference to the database instance
         db::Database& _db;
 
+        /// Instance of the Crud class for performing CRUD operations
+        orm::Crud _crud;
+
        public:
         explicit BaseRepo(db::Database& database);
 
@@ -29,6 +33,7 @@ namespace app
 
        protected:
         [[nodiscard]] db::Database& _getDb() const;
+        [[nodiscard]] orm::Crud&    _getCrud();
     };
 }   // namespace app
 

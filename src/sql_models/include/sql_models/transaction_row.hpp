@@ -6,31 +6,32 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "orm/orm_model.hpp"
 #include "utils/timestamp.hpp"
 
 /**
  * @brief Represents a row in the "transaction" database table
  *
  */
-struct TransactionRow final
+struct TransactionRow : public orm::ORMModel<"transaction_">
 {
-   public:   // fields
-    /// The name of the database table this struct represents
-    /// The "_" is needed because transaction is a reserved keyword in SQLite
-    static constexpr std::string tableName = "transaction_";
+    static_assert(
+        tableName != "transaction",
+        "Table name must not be 'transaction', this is a reserved key in SQL"
+    );
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<TransactionId> id;
+    ORM_FIELD(id, IdField<TransactionId>)
 
     /// The timestamp field, this is a required field
-    orm::Field<"timestamp", Timestamp, orm::not_null_t> timestamp;
+    ORM_FIELD(timestamp, Field<"timestamp", Timestamp, orm::not_null_t>)
 
     /// The status field, this is a required field
-    orm::Field<"status", TransactionStatus, orm::not_null_t> status;
+    ORM_FIELD(status, Field<"status", TransactionStatus, orm::not_null_t>)
 
     /// The comment field, this is an optional field
-    orm::Field<"comment", std::optional<std::string>> comment;
+    ORM_FIELD(comment, Field<"comment", std::optional<std::string>>)
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(TransactionRow, id, timestamp, status, comment);

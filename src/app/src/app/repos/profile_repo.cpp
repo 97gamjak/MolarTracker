@@ -8,7 +8,8 @@
 #include "app/factories/profile_factory.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
-#include "orm/where_clause.hpp"
+#include "orm/crud/crud_error.hpp"
+#include "orm/query_options.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/profile_row.hpp"
 
@@ -24,9 +25,7 @@ namespace app
      */
     std::vector<Profile> ProfileRepo::getAll() const
     {
-        return ProfileFactory::toDomains(
-            orm::Crud().getAll<ProfileRow>(_getDb())
-        );
+        return ProfileFactory::toDomains(orm::Crud().get<ProfileRow>(_getDb()));
     }
 
     /**
@@ -37,11 +36,21 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
-        const auto row     = ProfileRow{id};
-        const auto profile = orm::Crud().getByPk(_getDb(), row);
+        const auto query = orm::Query{}.where(
+            ProfileRow::idField{id},
+            filter::Operator::Equal
+        );
+        const auto profile = orm::Crud().getUnique<ProfileRow>(_getDb(), query);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
+
+        LOG_INFO(
+            std::format(
+                "Profile with ID '{}' not found in database",
+                id.value()
+            )
+        );
 
         return std::nullopt;
     }
@@ -54,28 +63,15 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(const std::string& name) const
     {
-        auto model = ProfileRow{};
-        model.name = name;
+        const auto query = orm::Query{}.where(ProfileRow::hasName(name));
 
-        const auto clause =
-            orm::UniqueClause(model.name, ProfileRow::tableName);
-
-        const auto profile = orm::Crud().getUnique<ProfileRow>(
-            _getDb(),
-            orm::WhereClauses{clause}
-        );
+        const auto profile = orm::Crud().getUnique<ProfileRow>(_getDb(), query);
 
         if (profile.has_value())
             return ProfileFactory::toDomain(profile.value());
 
         LOG_INFO(
-            std::format(
-                "Profile with name '{}' not found in database due to: {} "
-                "(type: {})",
-                name,
-                profile.error().getMessage(),
-                orm::CrudErrorTypeMeta::toString(profile.error().getType())
-            )
+            std::format("Profile with name '{}' not found in database", name)
         );
 
         return std::nullopt;

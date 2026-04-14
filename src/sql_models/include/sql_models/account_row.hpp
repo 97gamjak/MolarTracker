@@ -7,7 +7,9 @@
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "orm/orm_model.hpp"
 #include "orm/type_traits.hpp"
+#include "orm/where_expr.hpp"
 #include "profile_row.hpp"
 
 /**
@@ -18,42 +20,41 @@
  * specific details of each account type can be stored in separate tables that
  * extend this base table.
  */
-struct AccountRow
+struct AccountRow : orm::ORMModel<"account">
 {
-    /// The name of the database table this struct represents
-    static constexpr std::string tableName = "account";
-
     /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
     /// disallow inserting an AccountRow without a corresponding CashAccountRow
     using insert_policy = orm::requires_paired_insert_t;
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<AccountId> id;
+    ORM_FIELD(id, IdField<AccountId>)
 
     /// The kind field, this indicates the type of account (e.g., cash,
     /// security, etc.) and is a required field
-    orm::Field<"kind", AccountKind, orm::not_null_t> kind;
+    ORM_FIELD(kind, Field<"kind", AccountKind, orm::not_null_t>)
 
     /// The profile_id field, this is a required field and is a foreign key
     /// referencing the profile table
-    orm::Field<
-        "profile_id",
-        ProfileId,
-        orm::foreign_key_t<
-            orm::RestrictDelete,
-            ProfileRow,
-            decltype(ProfileRow::id)>>
-        profileId;
+    ORM_FIELD(
+        profileId,
+        Field<
+            "profile_id",
+            ProfileId,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                ProfileRow,
+                decltype(ProfileRow::id)>>
+    )
 
     /// The name field, this is a required field
-    orm::Field<"name", std::string, orm::not_null_t> name;
+    ORM_FIELD(name, Field<"name", std::string, orm::not_null_t>)
 
     /// The status field, this is a required field
-    orm::Field<"status", AccountStatus, orm::not_null_t> status;
+    ORM_FIELD(status, Field<"status", AccountStatus, orm::not_null_t>)
 
     /// The currency field, this is a required field
-    orm::Field<"currency", Currency, orm::not_null_t> currency;
+    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
     ORM_FIELDS(AccountRow, id, kind, profileId, name, status, currency)
 
@@ -71,6 +72,10 @@ struct AccountRow
                 &AccountRow::name>()
         );
     }
+
+    [[nodiscard]] static orm::WhereExpr hasProfileId(
+        const ProfileId& profileId
+    );
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__

@@ -8,30 +8,31 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
+#include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 
 /**
  * @brief Represents a row in the "profile" database table
  *
  */
-struct ProfileRow final
+struct ProfileRow : public orm::ORMModel<"profile">
 {
-    /// The name of the database table this struct represents
-    static constexpr std::string tableName = "profile";
-
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
-    orm::IdField<ProfileId> id;
+    ORM_FIELD(id, IdField<ProfileId>)
 
     /// The name field, this is a required and unique field
-    orm::Field<"name", std::string, orm::not_null_t, orm::unique_t> name;
+    ORM_FIELD(name, Field<"name", std::string, orm::not_null_t, orm::unique_t>)
 
     /// The email field, this is an optional field
-    orm::Field<"email", std::optional<std::string>> email;
+    ORM_FIELD(email, Field<"email", std::optional<std::string>>)
+
+    ORM_FIELDS(ProfileRow, id, name, email)
 
     explicit ProfileRow() = default;
     explicit ProfileRow(ProfileId _id);
 
-    ORM_FIELDS(ProfileRow, id, name, email)
+    [[nodiscard]] static orm::WhereExpr hasName(const std::string& name);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__PROFILE_ROW_HPP__

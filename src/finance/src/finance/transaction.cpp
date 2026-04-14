@@ -106,4 +106,14 @@ namespace finance
         return _entries;
     }
 
+    /**
+     * @brief Adds an entry to the transaction.
+     *
+     * @param entry The TransactionEntry to add.
+     */
+    void Transaction::addEntry(const TransactionEntry& entry)
+    {
+        _entries.push_back(entry);
+    }
+
 }   // namespace finance

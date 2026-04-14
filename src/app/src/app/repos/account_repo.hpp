@@ -18,7 +18,7 @@ namespace app
 
         [[nodiscard]] std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
-        ) const override;
+        ) override;
 
         [[nodiscard]] AccountId createAccount(
             const finance::Account& account,

@@ -1,15 +1,19 @@
 #include "app/migration/migration.hpp"
 
 #include <cassert>
+#include <memory>
 
+#include "app/migration/multi_migration.hpp"
 #include "app/migration/single_migration.hpp"
+#include "config/constants.hpp"
+#include "config/finance.hpp"
 #include "db/database.hpp"
-#include "orm/type_traits.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/profile_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "utils/version.hpp"
 
 namespace app
 {
@@ -18,8 +22,12 @@ namespace app
      * @brief Construct a new Migration object
      *
      * @param fromVersion The version the migration is being applied from
+     * @param version The release version this migration is targeting
      */
-    Migration::Migration(std::size_t fromVersion) : _fromVersion(fromVersion) {}
+    Migration::Migration(std::size_t fromVersion, utils::SemVer version)
+        : _fromVersion(fromVersion), _version(version)
+    {
+    }
 
     /**
      * @brief apply all single migrations that are part of this Migration
@@ -40,6 +48,18 @@ namespace app
      */
     void Migration::addMigration(std::unique_ptr<SingleMigration> migration)
     {
+        _migrations.push_back(
+            std::make_unique<MultiMigration>(std::move(migration))
+        );
+    }
+
+    /**
+     * @brief add a multi migration to the migration container
+     *
+     * @param migration
+     */
+    void Migration::addMigration(std::unique_ptr<MultiMigration> migration)
+    {
         _migrations.push_back(std::move(migration));
     }
 
@@ -56,11 +76,9 @@ namespace app
         assert(_migrations.empty());
 
         // add migrations
-        _migrateV1();
-        _migrateV2();
-        _migrateV3();
-        _migrateV4();
+        _migrate_0_0_3();
 
+        assert(Constants::getSemVer() == _lastReleaseVersion);
         assert(_migrations.size() == toVersion);
     }
 
@@ -76,31 +94,17 @@ namespace app
     }
 
     /**
-     * @brief Copy, drop and rename a table
-     *
-     * @tparam Model The model representing the table
-     * @param migration The migration to add the steps to
+     * @brief Migrate from version 0.0.3
      */
-    template <orm::db_model Model>
-    void Migrations::_copyDropRename(Migration& migration)
+    void Migrations::_migrate_0_0_3()
     {
-        migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
+        _lastReleaseVersion = utils::SemVer(0, 0, 3);
 
-        std::string newName = Model::tableName + "_tmp";
-        migration.addMigration(
-            std::make_unique<CreateTableMigration<Model>>(newName)
-        );
-        migration.addMigration(
-            std::make_unique<CopyTableMigration>(Model::tableName, newName)
-        );
-        migration.addMigration(
-            std::make_unique<DropTableMigration>(Model::tableName)
-        );
-        migration.addMigration(
-            std::make_unique<RenameTableMigration>(newName, Model::tableName)
-        );
-
-        migration.addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+        _migrateV1();
+        _migrateV2();
+        _migrateV3();
+        _migrateV4();
+        _migrateV5();
     }
 
     /**
@@ -114,7 +118,7 @@ namespace app
      */
     void Migrations::_migrateV1()
     {
-        Migration migration(0);
+        Migration migration(0, _lastReleaseVersion);
         migration.addMigration(
             std::make_unique<CreateTableMigration<ProfileRow>>()
         );
@@ -132,7 +136,7 @@ namespace app
      */
     void Migrations::_migrateV2()
     {
-        Migration migration(1);
+        Migration migration(1, _lastReleaseVersion);
 
         // For introducing unique constraints of account name and account kind
 
@@ -147,9 +151,9 @@ namespace app
                 );
             )",
             AccountRow::tableName,
-            decltype(AccountRow::name)::getColumnName(),
-            decltype(AccountRow::id)::getColumnName(),
-            decltype(AccountRow::kind)::getColumnName()
+            AccountRow::nameField::name,
+            AccountRow::idField::name,
+            AccountRow::kindField::name
         );
 
         migration.addMigration(
@@ -159,7 +163,9 @@ namespace app
             )
         );
 
-        _copyDropRename<AccountRow>(migration);
+        migration.addMigration(
+            std::make_unique<CopyDropRenameMigration<AccountRow>>()
+        );
 
         _migrations.push_back(std::move(migration));
     }
@@ -175,7 +181,7 @@ namespace app
      */
     void Migrations::_migrateV3()
     {
-        Migration migration(2);
+        Migration migration(2, _lastReleaseVersion);
 
         // Creating new tables: instrument, transaction, transaction_entry
         migration.addMigration(
@@ -198,13 +204,39 @@ namespace app
      */
     void Migrations::_migrateV4()
     {
-        Migration migration(3);
+        Migration migration(3, _lastReleaseVersion);
 
         // Apply new constraints to account table...
         // here the unique constraint on (name, kind) gets extended to
         // (profileId, name, kind) which makes the migration straight forward as
         // the constraints only loosen up so we can just copy, drop, and rename
-        _copyDropRename<AccountRow>(migration);
+        migration.addMigration(
+            std::make_unique<CopyDropRenameMigration<AccountRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 5
+     *
+     * @details This handles the migration from v4 to v5.
+     */
+    void Migrations::_migrateV5()
+    {
+        Migration migration(4, _lastReleaseVersion);
+
+        // Add currency field to instrument table
+        // ATTENTION: could be
+        // problematic when migrating existing data as the currency could be out
+        // of line, but as before this migration it was not possible to add
+        // instruments to the database via the app this should be safe unless
+        // someone decided to mess around with the db manually!!!
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<InstrumentRow::currencyField>>(
+                InstrumentRow::currencyField{Currency::USD}
+            )
+        );
 
         _migrations.push_back(std::move(migration));
     }

@@ -1,6 +1,8 @@
 #ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__
 #define __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__
 
+#include <cstdint>
+#include <mstd/enum.hpp>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -13,6 +15,13 @@
 
 namespace app
 {
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define STATE_POLICY_LIST(X) \
+    X(IncludeDelete)         \
+    X(ExcludeDelete)
+
+    MSTD_ENUM(DeletionPolicy, std::int8_t, STATE_POLICY_LIST);
 
     /**
      * @brief BaseStore is a base class for stores that manage a collection of
@@ -84,9 +93,16 @@ namespace app
         [[nodiscard]] const std::vector<Entry>& _getEntries() const;
         [[nodiscard]] std::vector<Entry>&       _getEntries();
 
-        [[nodiscard]] Entry*           _findEntry(IdType id);
-        [[nodiscard]] Entry*           _findEntry(Predicate<Entry> pred);
-        [[nodiscard]] std::optional<T> _get(Predicate<Entry> pred) const;
+        [[nodiscard]] Entry* _findEntry(Predicate<T> pred);
+        [[nodiscard]] Entry* _findEntry(
+            Predicate<T>   pred,
+            DeletionPolicy policy
+        );
+        [[nodiscard]] std::optional<T> _get(Predicate<T> pred) const;
+        [[nodiscard]] std::optional<T> _get(
+            Predicate<T>   pred,
+            DeletionPolicy policy
+        ) const;
 
         void _addEntry(const T& value, StoreState state);
         void _removeEntry(IdType id);

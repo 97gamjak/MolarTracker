@@ -1,68 +1,98 @@
 #ifndef __ORM__INCLUDE__ORM__JOIN_HPP__
 #define __ORM__INCLUDE__ORM__JOIN_HPP__
 
+#include <cstdint>
+#include <mstd/enum.hpp>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace orm
 {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define JOIN_TYPES_LIST(X) \
+    X(INNER)               \
+    X(LEFT)                \
+    X(RIGHT)
+
+    MSTD_ENUM(JoinType, std::uint8_t, JOIN_TYPES_LIST)
+
+    class Join;
+
+    template <typename FromField, typename ToField>
+    Join innerJoin();
+
+    template <typename FromField, typename ToField>
+    Join join();
+
+    template <typename FromField, typename ToField>
+    Join leftJoin();
+
+    template <typename FromField, typename ToField>
+    Join rightJoin();
+
     /**
-     * @brief Represents a SQL JOIN between two tables, including the fields to
-     * join on
+     * @brief Class representing a SQL JOIN clause
      *
      */
     class Join
     {
        private:
-        /// Allow Joins to access private members of Join for constructing SQL
-        friend class Joins;
-
-        /// the name of the base table (the one being joined from)
-        std::string _baseTable;
-
-        /// the name of the table to join with
-        std::string _joinTable;
-
-        /// the fields to join on, e.g. (this_table.field, other_table.field)
-        std::vector<std::pair<std::string, std::string>> _fields;
+        /// the type of the JOIN
+        JoinType _type;
+        /// the name of the table to join
+        std::string _fromTable;
+        /// the name of the field to join on
+        std::string _fromField;
+        /// the name of the table to join to
+        std::string _toTable;
+        /// the name of the field to join to
+        std::string _toField;
 
        public:
-        explicit Join(
-            std::string                                      baseTable,
-            std::string                                      joinTable,
-            std::vector<std::pair<std::string, std::string>> fields
-        );
-        explicit Join(
-            std::string                         baseTable,
-            std::string                         joinTable,
-            std::pair<std::string, std::string> fieldPair
-        );
+        explicit Join(JoinType type);
 
-        [[nodiscard]] std::string getDBOperations() const;
+        [[nodiscard]]
+        std::string toSQL() const;
+
+        template <typename FromField, typename ToField>
+        friend Join innerJoin();
+
+        template <typename FromField, typename ToField>
+        friend Join join();
+
+        template <typename FromField, typename ToField>
+        friend Join leftJoin();
+
+        template <typename FromField, typename ToField>
+        friend Join rightJoin();
+
+       private:
+        template <typename FromField, typename ToField>
+        friend void _fromFields(Join& join_);
     };
 
     /**
-     * @brief A collection of Joins that can be used to generate the JOIN
-     * clauses for a SQL query
+     * @brief Class representing a collection of SQL JOIN clauses
      *
      */
     class Joins
     {
        private:
-        /// the individual joins that make up this collection
+        /// the list of JOIN clauses
         std::vector<Join> _joins;
 
        public:
-        Joins() = default;
+        [[nodiscard]]
+        Joins& add(const Join& join);
 
-        void addJoin(const Join& join);
-
-        [[nodiscard]] std::string getDBOperations(
-            const std::string& baseTable
-        ) const;
+        [[nodiscard]]
+        std::string toSQL() const;
     };
 
 }   // namespace orm
+
+#ifndef __ORM__INCLUDE__ORM__JOIN_TPP__
+#include "join.tpp"
+#endif
 
 #endif   // __ORM__INCLUDE__ORM__JOIN_HPP__

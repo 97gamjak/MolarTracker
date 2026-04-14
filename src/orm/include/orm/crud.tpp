@@ -12,10 +12,15 @@
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
+#include "filter/expr_node.hpp"
+#include "orm/concepts.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
+#include "orm/index.hpp"
+#include "orm/query_options.hpp"
 #include "orm/type_traits.hpp"
+#include "orm/where_expr.hpp"
 #include "where_clause.hpp"
 
 namespace orm
@@ -134,7 +139,7 @@ namespace orm
                 if (field.isAutoIncrementPk)
                     return;
 
-                columnNames.push_back(field.getColumnName());
+                columnNames.push_back(std::string(field.name));
             }
         );
 
@@ -233,10 +238,6 @@ namespace orm
         return insertedIds;
     }
 
-    /******************
-     * UPDATE METHODS *
-     ******************/
-
     /**
      * @brief Update a row in the database
      *
@@ -264,15 +265,15 @@ namespace orm
                 if (field.isPk)
                     return;
 
-                columnNames.push_back(field.getColumnName() + "=?");
+                columnNames.push_back(field.name + "=?");
             }
         );
 
         sqlText += mstd::join(columnNames, ", ");
 
-        const auto whereClauses = getPkWhereClauses(row);
+        const auto where = getPkWhere(row);
 
-        if (whereClauses.empty())
+        if (filter::isEmpty(where))
         {
             return std::unexpected(CrudError(
                 CrudErrorType::NoPrimaryKey,
@@ -281,7 +282,7 @@ namespace orm
             ));
         }
 
-        sqlText += whereClauses.getDBOperations();
+        sqlText += getDBOperations(where);
         sqlText += ";";
 
         LOG_DEBUG(
@@ -307,7 +308,7 @@ namespace orm
             }
         );
 
-        whereClauses.bind(statement);
+        bind(where, statement);
 
         statement.executeToCompletion();
 
@@ -334,58 +335,65 @@ namespace orm
         return {};
     }
 
-    /***************
-     * GET METHODS *
-     ***************/
-
     /**
-     * @brief Get the By Pk object
+     * @brief Update a single field in the database
      *
-     * @tparam Model
+     * @tparam Field
      * @param database
-     * @param model A model instance with the primary key fields set to the
-     * desired values
-     * @return std::optional<Model>
+     * @param field
+     * @return std::expected<void, CrudError> An empty expected on success,
+     * or an error on failure
      */
-    template <db_model Model>
-    std::optional<Model> Crud::getByPk(
+    template <typename Field>
+    std::expected<void, CrudError> Crud::updateField(
         db::Database& database,
-        const Model&  model
+        const Field&  field
     )
     {
-        const auto numberOfPkFields = getNumberOfPkFields<Model>();
+        std::string sqlText;
+        sqlText += "UPDATE ";
+        sqlText += Field::tableName;
+        sqlText += " SET ";
 
-        const auto whereClauses = getPkWhereClauses<Model>(model);
+        sqlText += field.name + "=?";
+        sqlText += ";";
 
-        if (whereClauses.empty())
+        LOG_DEBUG(
+            std::format(
+                "Updating table '{}' with SQL: {}",
+                Field::tableName,
+                sqlText
+            )
+        );
+        db::Statement statement = database.prepare(sqlText);
+
+        _sqlExecutions.push_back(sqlText);
+
+        field.bind(statement, bindIndex(0));
+
+        statement.executeToCompletion();
+
+        const auto changes = database.getNumberOfLastChanges();
+
+        if (changes == 0)
         {
-            throw CrudException(
-                "orm::getByPk requires at least one primary key field"
-            );
+            return std::unexpected(CrudError(
+                CrudErrorType::NoRowsUpdated,
+                "orm::update did not update any rows. This may be because the "
+                "primary key value(s) did not match any existing row."
+            ));
         }
 
-        if (whereClauses.size() != numberOfPkFields)
+        if (changes > 1)
         {
-            throw CrudException(
-                "orm::getByPk requires all primary key fields to be set"
-            );
+            return std::unexpected(CrudError(
+                CrudErrorType::MultipleRowsUpdated,
+                "orm::update updated multiple rows. This should never happen, "
+                "as updates are performed by matching primary key values."
+            ));
         }
 
-        const auto returnedModels =
-            getAll<Model>(database, Joins{}, whereClauses);
-
-        if (returnedModels.size() > 1)
-        {
-            throw CrudException(
-                "orm::getByPk expected to find at most one row matching the "
-                "primary key value, but found multiple rows"
-            );
-        }
-
-        if (returnedModels.empty())
-            return std::nullopt;
-
-        return returnedModels.front();
+        return {};
     }
 
     /*******************
@@ -393,27 +401,25 @@ namespace orm
      *******************/
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get all rows matching the specified query options
      *
      * @tparam Model
      * @param database
      * @param joins
-     * @param whereClauses
+     * @param query
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::getAll(
-        db::Database&       database,
-        const Joins&        joins,
-        const WhereClauses& whereClauses
+    std::vector<Model> Crud::get(
+        db::Database& database,
+        const Joins&  joins,
+        const Query&  query
     )
     {
         std::string sqlText;
-        sqlText += "SELECT ";
-
-        sqlText += getColumnNames<Model>(", ") + " ";
-        sqlText += joins.getDBOperations(Model::tableName) + " ";
-        sqlText += whereClauses.getDBOperations() + ";";
+        sqlText += getSelection<Model>() + " ";
+        sqlText += joins.toSQL() + " ";
+        sqlText += query.getDBOperations() + ";";
 
         LOG_DEBUG(
             std::format(
@@ -427,82 +433,108 @@ namespace orm
 
         _sqlExecutions.push_back(sqlText);
 
-        whereClauses.bind(statement);
+        query.bind(statement);
 
         std::vector<Model> results;
 
         while (statement.step() == db::StepResult::RowAvailable)
-        {
             results.push_back(loadModelFromStatement<Model>(statement));
-        }
 
         return results;
     }
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get all rows matching the specified query options
      *
      * @tparam Model
      * @param database
-     * @param whereClauses
+     * @param query
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::getAll(
-        db::Database&       database,
-        const WhereClauses& whereClauses
-    )
+    std::vector<Model> Crud::get(db::Database& database, const Query& query)
     {
-        return getAll<Model>(database, Joins{}, whereClauses);
+        return get<Model>(database, Joins{}, query);
     }
 
     /**
-     * @brief Get all rows matching the specified where clauses
+     * @brief Get all rows
      *
      * @tparam Model
      * @param database
      * @return std::vector<Model>
      */
     template <db_model Model>
-    std::vector<Model> Crud::getAll(db::Database& database)
+    std::vector<Model> Crud::get(db::Database& database)
     {
-        return getAll<Model>(database, WhereClauses{});
+        return get<Model>(database, Joins{}, Query{});
     }
 
     /**
-     * @brief Get a unique row matching the specified where clause
+     * @brief Get all rows matching the specified query options
      *
      * @tparam Model
      * @param database
-     * @param whereClauses
-     * @return std::expected<Model, CrudError> The unique model matching the
-     * where clause, or an error if no results or multiple results are found
+     * @param joins
+     * @param query
+     * @return std::vector<Model>
      */
-    template <db_model Model>
-    std::expected<Model, CrudError> Crud::getUnique(
-        db::Database&       database,
-        const WhereClauses& whereClauses
+    template <db_model... Models>
+    std::vector<std::tuple<Models...>> Crud::getJoined(
+        db::Database&     database,
+        const orm::Joins& joins,
+        const Query&      query
     )
     {
-        const auto results = getAll<Model>(database, whereClauses);
+        std::string sql;
+        sql += getSelection<Models...>();
+        sql += joins.toSQL() + " ";
+        sql += query.getDBOperations() + ";";
+
+        LOG_DEBUG(std::format("Getting joined with SQL: {}", sql));
+
+        db::Statement statement = database.prepare(sql);
+        _sqlExecutions.push_back(sql);
+        query.bind(statement);
+
+        std::vector<std::tuple<Models...>> results;
+
+        while (statement.step() == db::StepResult::RowAvailable)
+            results.push_back(loadTupleFromStatement<Models...>(statement));
+
+        return results;
+    }
+
+    /**
+     * @brief Get a unique row matching the specified where clauses
+     *
+     * @tparam Model
+     * @param database
+     * @param query
+     * @return std::optional<Model>
+     */
+    template <db_model Model>
+    std::optional<Model> Crud::getUnique(
+        db::Database& database,
+        const Query&  query
+    )
+    {
+        const auto results = get<Model>(database, query);
 
         if (results.empty())
-        {
-            const auto msg =
-                "No results found for getUnique with where clause: " +
-                whereClauses.getDBOperations();
-
-            return std::unexpected(CrudError{CrudErrorType::NotFound, msg});
-        }
+            return std::nullopt;
 
         if (results.size() > 1)
         {
-            const auto msg = "Expected unique result for getUnique but got " +
-                             std::to_string(results.size());
-
-            return std::unexpected(
-                CrudError{CrudErrorType::MultipleResults, msg}
+            const auto msg = std::format(
+                "Expected to get a unique result for query, but got {} "
+                "results. "
+                "This indicates a data integrity issue.",
+                results.size()
             );
+
+            LOG_ERROR(msg);
+            throw CrudException(msg);
         }
 
         return results.front();
@@ -537,21 +569,21 @@ namespace orm
         sqlText += Model::tableName;
         sqlText += " WHERE ";
 
-        const auto whereClauses = getPkWhereClauses<Model>(model);
+        const auto where = getPkWhere(model);
 
-        if (whereClauses.empty())
+        if (filter::isEmpty(where))
         {
             throw CrudException("orm::deleteByPk requires a primary key field");
         }
 
-        if (whereClauses.size() != numberOfPkFields)
+        if (filter::getSize(where) != numberOfPkFields)
         {
             throw CrudException(
                 "orm::deleteByPk requires all primary key fields to be set"
             );
         }
 
-        sqlText += whereClauses.getDBOperations();
+        sqlText += getDBOperations(where);
         sqlText += ";";
 
         LOG_DEBUG(
@@ -566,9 +598,86 @@ namespace orm
 
         _sqlExecutions.push_back(sqlText);
 
-        whereClauses.bind(statement);
+        bind(where, statement);
 
         statement.executeToCompletion();
+    }
+
+    /***************
+     * ADD METHODS *
+     ***************/
+
+    /**
+     * @brief Add a new column to the database
+     *
+     * @tparam Field
+     * @param database
+     * @param field
+     * @return std::expected<void, CrudError> An empty expected on success,
+     * or an error on failure
+     */
+    template <typename Field>
+    std::expected<void, CrudError> Crud::addColumn(
+        db::Database& database,
+        const Field&  field
+    )
+    {
+        const auto columnExist = _columnExists<Field>(database);
+        if (columnExist)
+        {
+            return std::unexpected(CrudError(
+                CrudErrorType::ColumnAlreadyExists,
+                "Column already exists"
+            ));
+        }
+
+        std::string sql;
+        sql += "ALTER TABLE ";
+        sql += Field::tableName;
+        sql += " ADD COLUMN ";
+        sql += Field::ddl();
+
+        if (Field::isNotNull)
+        {
+            sql += " DEFAULT ";
+            sql += field.valueAsString();
+        }
+
+        LOG_DEBUG(std::format("Adding column with SQL: {}", sql));
+
+        db::Statement statement = database.prepare(sql);
+
+        _sqlExecutions.push_back(sql);
+
+        statement.executeToCompletion();
+
+        return {};
+    }
+
+    /**
+     * @brief Check if a column exists in the database
+     *
+     * @tparam Field
+     * @param database
+     * @return true if the column exists, false otherwise
+     */
+    template <typename Field>
+    bool Crud::_columnExists(db::Database& database)
+    {
+        std::string sql;
+        sql += "SELECT COUNT(*) FROM PRAGMA_TABLE_INFO('";
+        sql += Field::tableName;
+        sql += "') WHERE name = '";
+        sql += Field::name + "'";
+
+        db::Statement statement = database.prepare(sql);
+
+        _sqlExecutions.push_back(sql);
+
+        if (statement.step() == db::StepResult::RowAvailable)
+            return statement.columnInt64(0) > 0;
+
+        throw orm::CrudException("Failed to check if column exists");
     }
 
 }   // namespace orm

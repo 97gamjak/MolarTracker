@@ -6,24 +6,20 @@ namespace app
      * @brief Predicate for finding a profile by its ID
      *
      */
-    Predicate<BaseStore<Profile, ProfileId>::Entry> HasProfileId(ProfileId id)
+    Predicate<Profile> HasProfileId(ProfileId id)
     {
-        return Predicate<BaseStore<Profile, ProfileId>::Entry>{
-            [id](const auto& entry) { return entry.value.getId() == id; }
-        };
+        return Predicate<Profile>{[id](const auto& entry)
+                                  { return entry.getId() == id; }};
     }
 
     /**
      * @brief Predicate for finding a profile by its name
      *
      */
-    Predicate<BaseStore<Profile, ProfileId>::Entry> HasProfileName(
-        std::string_view name
-    )
+    Predicate<Profile> HasProfileName(std::string_view name)
     {
-        return Predicate<BaseStore<Profile, ProfileId>::Entry>{
-            [name](const auto& entry) { return entry.value.getName() == name; }
-        };
+        return Predicate<Profile>{[name](const auto& entry)
+                                  { return entry.getName() == name; }};
     }
 
 }   // namespace app

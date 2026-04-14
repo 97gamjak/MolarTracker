@@ -12,7 +12,7 @@
 #include "db/transaction.hpp"
 #include "join.hpp"
 #include "orm/type_traits.hpp"
-#include "where_clause.hpp"
+#include "query_options.hpp"
 
 namespace orm
 {
@@ -73,14 +73,10 @@ namespace orm
             const Model&  row
         );
 
-        /***************
-         * GET METHODS *
-         ***************/
-
-        template <db_model Model>
-        [[nodiscard]] std::optional<Model> getByPk(
+        template <typename Field>
+        [[nodiscard]] std::expected<void, CrudError> updateField(
             db::Database& database,
-            const Model&  model
+            const Field&  field
         );
 
         /*******************
@@ -88,25 +84,32 @@ namespace orm
          *******************/
 
         template <db_model Model>
-        [[nodiscard]] std::vector<Model> getAll(
-            db::Database&       database,
-            const Joins&        joins,
-            const WhereClauses& whereClauses
+        [[nodiscard]] std::vector<Model> get(
+            db::Database& database,
+            const Joins&  joins,
+            const Query&  query
         );
 
         template <db_model Model>
-        [[nodiscard]] std::vector<Model> getAll(
-            db::Database&       database,
-            const WhereClauses& whereClauses
+        [[nodiscard]] std::vector<Model> get(
+            db::Database& database,
+            const Query&  query
         );
 
         template <db_model Model>
-        [[nodiscard]] std::vector<Model> getAll(db::Database& database);
+        [[nodiscard]] std::vector<Model> get(db::Database& database);
+
+        template <db_model... Models>
+        std::vector<std::tuple<Models...>> getJoined(
+            db::Database&     database,
+            const orm::Joins& joins,
+            const Query&      query
+        );
 
         template <db_model Model>
-        [[nodiscard]] std::expected<Model, CrudError> getUnique(
-            db::Database&       database,
-            const WhereClauses& whereClauses
+        [[nodiscard]] std::optional<Model> getUnique(
+            db::Database& database,
+            const Query&  query
         );
 
         /******************
@@ -115,6 +118,20 @@ namespace orm
 
         template <db_model Model>
         void deleteByPk(db::Database& database, const Model& model);
+
+        /***************
+         * ADD METHODS *
+         ***************/
+
+        template <typename Field>
+        std::expected<void, CrudError> addColumn(
+            db::Database& database,
+            const Field&  field
+        );
+
+       private:
+        template <typename Field>
+        bool _columnExists(db::Database& database);
     };
 
 }   // namespace orm

@@ -25,7 +25,7 @@ namespace app
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::_isDeleted(IdType id) const
     {
-        const auto* entry = _findEntry(id);
+        const auto* entry = _findEntry(id, DeletionPolicy::IncludeDelete);
         return entry != nullptr && entry->state == StoreState::Deleted;
     }
 
@@ -66,24 +66,6 @@ namespace app
     }
 
     /**
-     * @brief Finds an entry in the store by its ID and returns a pointer to it,
-     * or nullptr if not found.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param id
-     * @return BaseStore<T, IdType>::Entry*
-     */
-    template <typename T, typename IdType>
-    typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
-        IdType id
-    )
-    {
-        return _findEntry([id](const auto& entry)
-                          { return getId(entry.value) == id; });
-    }
-
-    /**
      * @brief Finds an entry in the store that matches the given predicate and
      * returns a pointer to it, or nullptr if not found.
      *
@@ -94,12 +76,36 @@ namespace app
      */
     template <typename T, typename IdType>
     typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
-        Predicate<Entry> pred
+        Predicate<T> pred
+    )
+    {
+        return _findEntry(pred, DeletionPolicy::ExcludeDelete);
+    }
+
+    /**
+     * @brief Finds an entry in the store that matches the given predicate and
+     * returns a pointer to it, or nullptr if not found.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param pred
+     * @param policy
+     * @return BaseStore<T, IdType>::Entry*
+     */
+    template <typename T, typename IdType>
+    typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
+        Predicate<T>   pred,
+        DeletionPolicy policy
     )
     {
         auto it = std::ranges::find_if(
             _entries,
-            [&pred](const auto& entry) { return pred(entry); }
+            [&pred, policy](const auto& entry)
+            {
+                return pred(entry.value) &&
+                       (policy == DeletionPolicy::IncludeDelete ||
+                        entry.state != StoreState::Deleted);
+            }
         );
 
         return it != _entries.end() ? &(*it) : nullptr;
@@ -116,11 +122,36 @@ namespace app
      * @return std::optional<T>
      */
     template <typename T, typename IdType>
-    std::optional<T> BaseStore<T, IdType>::_get(Predicate<Entry> pred) const
+    std::optional<T> BaseStore<T, IdType>::_get(Predicate<T> pred) const
+    {
+        return _get(pred, DeletionPolicy::ExcludeDelete);
+    }
+
+    /**
+     * @brief Retrieves the value of an entry that matches the given predicate,
+     * returning it as an optional. If no matching entry is found, returns
+     * std::nullopt.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param pred
+     * @param policy
+     * @return std::optional<T>
+     */
+    template <typename T, typename IdType>
+    std::optional<T> BaseStore<T, IdType>::_get(
+        Predicate<T>   pred,
+        DeletionPolicy policy
+    ) const
     {
         auto it = std::ranges::find_if(
             _entries,
-            [&pred](const auto& entry) { return pred(entry); }
+            [&pred, policy](const auto& entry)
+            {
+                return pred(entry.value) &&
+                       (policy == DeletionPolicy::IncludeDelete ||
+                        entry.state != StoreState::Deleted);
+            }
         );
 
         return it != _entries.end() ? std::optional<T>{it->value}
@@ -135,8 +166,9 @@ namespace app
      * @tparam IdType
      * @return const std::vector<typename BaseStore<T, IdType>::Entry>&
      */
+
     template <typename T, typename IdType>
-    [[nodiscard]] const std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<
+    const std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<
         T,
         IdType>::_getEntries() const
     {
@@ -150,10 +182,10 @@ namespace app
      * @tparam IdType
      * @return std::vector<typename BaseStore<T, IdType>::Entry>&
      */
+
     template <typename T, typename IdType>
-    [[nodiscard]] std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<
-        T,
-        IdType>::_getEntries()
+    std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<T, IdType>::
+        _getEntries()
     {
         return _entries;
     }
@@ -300,8 +332,9 @@ namespace app
      * @param user
      * @return Connection
      */
+
     template <typename T, typename IdType>
-    [[nodiscard]] Connection BaseStore<T, IdType>::subscribeToDirty(
+    Connection BaseStore<T, IdType>::subscribeToDirty(
         OnDirtyChanged::func func,
         void*                user
     )
@@ -350,10 +383,10 @@ namespace app
      * @tparam IdType
      * @return const std::unordered_map<IdType, IdType>&
      */
+
     template <typename T, typename IdType>
-    [[nodiscard]] const std::unordered_map<IdType, IdType>& BaseStore<
-        T,
-        IdType>::getChangedIds() const
+    const std::unordered_map<IdType, IdType>& BaseStore<T, IdType>::
+        getChangedIds() const
     {
         return _changedIds;
     }

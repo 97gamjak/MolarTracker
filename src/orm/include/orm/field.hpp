@@ -18,7 +18,11 @@ namespace orm
      * @tparam Value The type of the field's value
      * @tparam Options Additional constraints or options for the field
      */
-    template <fixed_string Name, typename Value, typename... Options>
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
     class Field
     {
        private:
@@ -26,6 +30,9 @@ namespace orm
         Value _value{};
 
        public:
+        /// The name of the field as a fixed string
+        static constexpr fixed_string tableName = TableName;
+
         /// Type alias for the field's value type
         using value_type = Value;
 
@@ -51,6 +58,9 @@ namespace orm
         /// Compile-time flag indicating whether this field is nullable
         static constexpr bool isNullable = is_nullable_v<Value, Options...>;
 
+        /// Compile-time flag indicating whether this field is not null
+        static constexpr bool isNotNull = has_option_v<not_null_t, Options...>;
+
        public:
         Field() = default;
         explicit Field(Value value);
@@ -71,7 +81,7 @@ namespace orm
         template <typename Statement>
         void readFrom(Statement const& statement, ColumnIndex col);
 
-        [[nodiscard]] static constexpr std::string   getColumnName();
+        [[nodiscard]] static constexpr std::string   getFullColumnName();
         [[nodiscard]] static constexpr ORMConstraint getConstraints();
 
        private:
@@ -80,15 +90,25 @@ namespace orm
         template <
             fixed_string NewName,
             typename NewValueType,
+            fixed_string NewTableName,
             typename... NewOptions>
         friend class Field;
 
         [[nodiscard]] static std::string _valueAsString(Value value);
     };
 
-    template <typename Value>
-    using IdField =
-        Field<"id", Value, primary_key_t, auto_increment_t, unique_t>;
+    template <typename Value, fixed_string TableName>
+    using IdField = Field<
+        "id",
+        Value,
+        TableName,
+        primary_key_t,
+        auto_increment_t,
+        unique_t>;
+
+#define ORM_FIELD(Name, ...) \
+    __VA_ARGS__ Name;        \
+    using Name##Field = __VA_ARGS__;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ORM_FIELDS(Self, ...)                                                \
@@ -131,9 +151,8 @@ namespace orm
             {                                                                \
                 if (!first)                                                  \
                     result += ", ";                                          \
-                first = false;                                               \
-                result +=                                                    \
-                    field.getColumnName() + ": " + field.valueAsString();    \
+                first   = false;                                             \
+                result += field.name + ": " + field.valueAsString();         \
             }                                                                \
         );                                                                   \
         result += " }";                                                      \

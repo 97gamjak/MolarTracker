@@ -4,6 +4,7 @@
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "orm/query_options.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/account_row.hpp"
 
@@ -29,11 +30,12 @@ namespace app
         const ProfileId&        profileId
     )
     {
-        auto accountRow = AccountFactory::toAccountRow(account, profileId);
-
         db::Transaction transaction{_getDb()};
 
-        const auto result = orm::Crud().insert(_getDb(), accountRow);
+        const auto result = _getCrud().insert(
+            _getDb(),
+            AccountFactory::toAccountRow(account, profileId)
+        );
 
         if (!result.has_value())
         {
@@ -61,21 +63,11 @@ namespace app
      */
     [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllAccounts(
         const ProfileId& profileId
-    ) const
+    )
     {
-        auto dummyAccountRow      = AccountRow{};
-        dummyAccountRow.profileId = profileId;
+        auto query = orm::Query{}.where(AccountRow::hasProfileId(profileId));
 
-        const auto profileClause = orm::WhereClause(
-            dummyAccountRow.profileId,
-            AccountRow::tableName,
-            orm::WhereOperator::Equal
-        );
-
-        const auto accountRows = orm::Crud().getAll<AccountRow>(
-            _getDb(),
-            orm::WhereClauses{profileClause}
-        );
+        const auto accountRows = _getCrud().get<AccountRow>(_getDb(), query);
 
         return AccountFactory::toAccountDomains(accountRows);
     }

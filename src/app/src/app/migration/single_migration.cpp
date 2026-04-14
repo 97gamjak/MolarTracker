@@ -23,6 +23,16 @@ namespace app
     }
 
     /**
+     * @brief Set the SQL statements for this migration
+     *
+     * @param sqlStatement
+     */
+    void SingleMigration::setSQLStatements(const std::string& sqlStatement)
+    {
+        _sqlStatements = std::vector<std::string>{sqlStatement};
+    }
+
+    /**
      * @brief Construct a new Custom Migration object
      *
      * @param sql

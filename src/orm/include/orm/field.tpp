@@ -24,11 +24,16 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @param value
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    Field<Name, Value, Options...>::Field(Value value)
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Field<Name, Value, TableName, Options...>::Field(Value value)
         : _value(std::move(value))
     {
     }
@@ -38,11 +43,16 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @return Value&
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    Value& Field<Name, Value, Options...>::value()
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Value& Field<Name, Value, TableName, Options...>::value()
     {
         return _value;
     }
@@ -52,11 +62,16 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @return Value const&
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    Value const& Field<Name, Value, Options...>::value() const
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Value const& Field<Name, Value, TableName, Options...>::value() const
     {
         return _value;
     }
@@ -66,11 +81,16 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @return std::string
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    std::string Field<Name, Value, Options...>::valueAsString() const
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::valueAsString() const
     {
         return _valueAsString(_value);
     }
@@ -80,14 +100,21 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @param value
      * @return Field&
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    Field<Name, Value, Options...>& Field<Name, Value, Options...>::operator=(
-        Value value
-    )
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Field<Name, Value, TableName, Options...>& Field<
+        Name,
+        Value,
+        TableName,
+        Options...>::operator=(Value value)
     {
         _value = std::move(value);
         return *this;
@@ -98,18 +125,23 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @return std::string
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    std::string Field<Name, Value, Options...>::ddl()
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::ddl()
     {
         using storage_type = std::
             conditional_t<is_optional_v<Value>, optional_inner_t<Value>, Value>;
 
         std::string definition;
 
-        definition += name.toString();
+        definition += name;
         definition += " ";
         definition += std::string{sql_type<storage_type>::name};
 
@@ -143,18 +175,23 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @return std::string
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    std::string Field<Name, Value, Options...>::getFkConstraints()
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::getFkConstraints()
     {
         std::string definition;
 
         if constexpr (isFk)
         {
             definition             += "FOREIGN KEY (";
-            definition             += name.toString();
+            definition             += name;
             definition             += ") REFERENCES";
             using foreignKeyInfo    = find_foreign_key_t<Value, Options...>;
             using field             = typename foreignKeyInfo::Field;
@@ -162,7 +199,7 @@ namespace orm
             using DeletionBehavior  = typename foreignKeyInfo::DeletionBehavior;
 
             definition += " " + table::tableName;
-            definition += "(" + field::getColumnName() + ")";
+            definition += "(" + field::name + ")";
 
             if constexpr (std::same_as<DeletionBehavior, CascadeDelete>)
                 definition += " ON DELETE CASCADE";
@@ -182,14 +219,19 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @tparam Statement
      * @param statement
      * @param index
      */
-    template <fixed_string Name, typename Value, typename... Options>
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
     template <typename Statement>
-    void Field<Name, Value, Options...>::bind(
+    void Field<Name, Value, TableName, Options...>::bind(
         Statement& statement,
         BindIndex  index
     ) const
@@ -203,11 +245,11 @@ namespace orm
             }
 
             using inner_type = optional_inner_t<Value>;
-            binder<Statement, inner_type>::bind(statement, index, *_value);
+            binder<inner_type>::bind(statement, index, *_value);
         }
         else
         {
-            binder<Statement, Value>::bind(statement, index, _value);
+            binder<Value>::bind(statement, index, _value);
         }
     }
 
@@ -216,14 +258,19 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @tparam Statement
      * @param statement
      * @param col
      */
-    template <fixed_string Name, typename Value, typename... Options>
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
     template <typename Statement>
-    void Field<Name, Value, Options...>::readFrom(
+    void Field<Name, Value, TableName, Options...>::readFrom(
         Statement const& statement,
         ColumnIndex      col
     )
@@ -238,26 +285,32 @@ namespace orm
                 return;
             }
 
-            _value = binder<Statement, inner_type>::read(statement, col);
+            _value = binder<inner_type>::read(statement, col);
         }
         else
         {
-            _value = binder<Statement, Value>::read(statement, col);
+            _value = binder<Value>::read(statement, col);
         }
     }
 
     /**
-     * @brief Get the column name for the field
+     * @brief Get the full column name in the format "TableName.ColumnName"
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
-     * @return std::string_view
+     * @return std::string
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    constexpr std::string Field<Name, Value, Options...>::getColumnName()
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    constexpr std::string Field<Name, Value, TableName, Options...>::
+        getFullColumnName()
     {
-        return name.toString();
+        return TableName + "." + name;
     }
 
     /**
@@ -265,11 +318,17 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @return ORMConstraint
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    constexpr ORMConstraint Field<Name, Value, Options...>::getConstraints()
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    constexpr ORMConstraint Field<Name, Value, TableName, Options...>::
+        getConstraints()
     {
         return (ORMConstraint{} | ... | Options::value);
     }
@@ -280,12 +339,19 @@ namespace orm
      *
      * @tparam Name
      * @tparam Value
+     * @tparam TableName
      * @tparam Options
      * @param value
      * @return std::string
      */
-    template <fixed_string Name, typename Value, typename... Options>
-    std::string Field<Name, Value, Options...>::_valueAsString(Value value)
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::_valueAsString(
+        Value value
+    )
     {
         if constexpr (is_optional_v<Value>)
         {
@@ -293,9 +359,8 @@ namespace orm
                 return "null";
 
             using InnerType = optional_inner_t<Value>;
-            return Field<Name, InnerType, Options...>::_valueAsString(
-                value.value()
-            );
+            return Field<Name, InnerType, TableName, Options...>::
+                _valueAsString(value.value());
         }
         else if constexpr (isStrongId_v<Value>)
         {

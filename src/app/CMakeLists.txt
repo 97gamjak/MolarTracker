@@ -30,6 +30,7 @@ add_library(molartracker_app STATIC
     src/app/migration/migration_runner.cpp
     src/app/migration/migration.cpp
     src/app/migration/single_migration.cpp
+    src/app/migration/multi_migration.cpp
 )
 
 target_include_directories(molartracker_app

@@ -1,5 +1,7 @@
 #include "finance/transaction_entry.hpp"
 
+#include "config/id_types.hpp"
+
 namespace finance
 {
     /**
@@ -10,9 +12,9 @@ namespace finance
      * @param details
      */
     TransactionEntry::TransactionEntry(
-        TransactionEntryId            id,
-        AccountId                     accountId,
-        std::variant<CashTransaction> details
+        TransactionEntryId id,
+        AccountId          accountId,
+        TransactionDetail  details
     )
         : _id(id), _accountId(accountId), _details(details)
     {

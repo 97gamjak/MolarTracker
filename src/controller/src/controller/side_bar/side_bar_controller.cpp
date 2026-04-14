@@ -103,7 +103,8 @@ namespace controller
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
             case ui::SideBarItemType::TransactionCategory:
-                // TODO: Implement context menu handling for TransactionCategory
+                // TODO(97gamjak): Implement context menu handling for
+                // TransactionCategory
                 break;
         }
     }

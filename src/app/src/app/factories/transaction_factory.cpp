@@ -1,8 +1,11 @@
 #include "transaction_factory.hpp"
 
 #include "config/finance.hpp"
+#include "config/id_types.hpp"
+#include "finance/cash.hpp"
 #include "finance/transaction_entry.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
 namespace app
@@ -13,7 +16,7 @@ namespace app
      * @param transaction The Transaction object to convert.
      * @return The converted TransactionRow object.
      */
-    TransactionRow TransactionFactory::toTransactionRow(
+    TransactionRow TransactionFactory::toRow(
         const finance::Transaction &transaction
     )
     {
@@ -33,9 +36,7 @@ namespace app
      * @param row The TransactionRow object to convert.
      * @return The converted Transaction object.
      */
-    finance::Transaction TransactionFactory::fromTransactionRow(
-        const TransactionRow &row
-    )
+    finance::Transaction TransactionFactory::fromRow(const TransactionRow &row)
     {
         finance::Transaction transaction{
             row.id.value(),
@@ -47,15 +48,15 @@ namespace app
     }
 
     /**
-     * @brief Converts a TransactionEntry object to a TransactionEntryRow
-     * object.
+     * @brief Converts a TransactionEntry object to a
+     * TransactionEntryRow object.
      *
      * @param entry The TransactionEntry object to convert.
      * @param transactionId The ID of the associated transaction.
      * @param instrumentId The ID of the associated instrument.
      * @return The converted TransactionEntryRow object.
      */
-    TransactionEntryRow TransactionFactory::toTransactionEntryRow(
+    TransactionEntryRow TransactionFactory::toEntryRow(
         const finance::TransactionEntry &entry,
         TransactionId                    transactionId,
         InstrumentId                     instrumentId
@@ -74,7 +75,38 @@ namespace app
     }
 
     /**
-     * @brief Converts a TransactionDetail object to an InstrumentRow object.
+     * @brief Converts a TransactionEntryRow object to a TransactionEntry
+     * object.
+     *
+     * @param row The TransactionEntryRow object to convert.
+     * @param instrumentRow The associated InstrumentRow object.
+     * @return The converted TransactionEntry object.
+     */
+    finance::TransactionEntry TransactionFactory::fromEntryRow(
+        const TransactionEntryRow &row,
+        const InstrumentRow       &instrumentRow
+    )
+    {
+        switch (instrumentRow.kind.value())
+        {
+            case InstrumentKind::Cash:
+                return {
+                    row.id.value(),
+                    row.accountId.value(),
+                    _toCashTransaction(row, instrumentRow)
+                };
+            case InstrumentKind::Stock:
+                throw std::runtime_error(
+                    "Stock transactions are not supported"
+                );
+        }
+
+        throw std::runtime_error("Unknown instrument kind");
+    }
+
+    /**
+     * @brief Converts a TransactionDetail object to an
+     * InstrumentRow object.
      *
      * @param detail The TransactionDetail object to convert.
      * @return The converted InstrumentRow object.
@@ -84,7 +116,8 @@ namespace app
     )
     {
         /**
-         * @brief Visitor for converting TransactionDetail to InstrumentRow.
+         * @brief Visitor for converting TransactionDetail to
+         * InstrumentRow.
          *
          */
         struct InstrumentRowVisitor
@@ -96,11 +129,31 @@ namespace app
                 row.kind = InstrumentKind::Cash;
                 return row;
             }
-
-            // Add more visit methods for other transaction types as needed
         };
 
         return std::visit(InstrumentRowVisitor{}, detail);
     }
 
+    /**
+     * @brief Converts a TransactionEntryRow object and an InstrumentRow
+     * object to a CashTransaction object.
+     *
+     * @param row The TransactionEntryRow object to convert.
+     * @param instrumentRow The associated InstrumentRow object.
+     * @return The converted CashTransaction object.
+     */
+    finance::CashTransaction TransactionFactory::_toCashTransaction(
+        const TransactionEntryRow &row,
+        const InstrumentRow       &instrumentRow
+    )
+    {
+        if (instrumentRow.kind.value() != InstrumentKind::Cash)
+        {
+            throw std::runtime_error("Invalid instrument kind");
+        }
+
+        return finance::CashTransaction(
+            finance::Cash(instrumentRow.currency.value(), row.amount.value())
+        );
+    }
 }   // namespace app
