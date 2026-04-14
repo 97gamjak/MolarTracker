@@ -26,6 +26,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Automatically add external accounts for cash accounts
 - Add profileId as a uniqueness constraint for account names as two different profiles should be allowed to have the same name.
 - Include `Transaction` category as side bar element
+- Implement `getTransactions` in repo and a lot of preparing for future orm obstacles
 
 #### Profile
 
