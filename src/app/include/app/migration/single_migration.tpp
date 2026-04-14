@@ -47,36 +47,24 @@ namespace app
         setSQLStatements(crud.getExecutedSQL());
     }
 
-    template <typename Field>
-    InsertDefaultValuesMigration<Field>::InsertDefaultValuesMigration(
-        Field defaultValue
-    )
-        : SingleMigration(MigrationType::Custom), _defaultValue(defaultValue)
-    {
-    }
-
-    template <typename Field>
-    void InsertDefaultValuesMigration<Field>::applyMigration(db::Database& db)
-    {
-        orm::Crud crud;
-
-        const auto result = crud.update(db, _defaultValue);
-
-        setSQLStatements(crud.getExecutedSQL());
-
-        if (!result)
-        {
-            // TODO(97gamjak): introduce specific exception
-            throw std::runtime_error("Failed to insert default values");
-        }
-    }
-
+    /**
+     * @brief Construct a new Add Column Migration< Field>:: Add Column
+     * Migration object
+     *
+     * @tparam Field
+     * @param defaultValue
+     */
     template <typename Field>
     AddColumnMigration<Field>::AddColumnMigration(Field defaultValue)
         : SingleMigration(MigrationType::AddColumn), _defaultValue(defaultValue)
     {
     }
 
+    /**
+     * @brief Apply the migration to add a column to the database
+     *
+     * @param db The database to apply the migration to
+     */
     template <typename Field>
     void AddColumnMigration<Field>::applyMigration(db::Database& db)
     {

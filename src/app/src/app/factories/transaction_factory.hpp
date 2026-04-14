@@ -1,6 +1,7 @@
 #ifndef __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 #define __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 
+#include "finance/cash_transaction.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
 #include "sql_models/instrument_row.hpp"
@@ -40,6 +41,13 @@ namespace app
         [[nodiscard]]
         static InstrumentRow toInstrumentRow(
             const finance::TransactionDetail& detail
+        );
+
+       private:
+        [[nodiscard]]
+        static finance::CashTransaction _toCashTransaction(
+            const TransactionEntryRow& row,
+            const InstrumentRow&       instrumentRow
         );
     };
 

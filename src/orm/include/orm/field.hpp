@@ -58,6 +58,7 @@ namespace orm
         /// Compile-time flag indicating whether this field is nullable
         static constexpr bool isNullable = is_nullable_v<Value, Options...>;
 
+        /// Compile-time flag indicating whether this field is not null
         static constexpr bool isNotNull = has_option_v<not_null_t, Options...>;
 
        public:

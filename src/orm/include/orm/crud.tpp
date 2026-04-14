@@ -335,8 +335,17 @@ namespace orm
         return {};
     }
 
+    /**
+     * @brief Update a single field in the database
+     *
+     * @tparam Field
+     * @param database
+     * @param field
+     * @return std::expected<void, CrudError> An empty expected on success,
+     * or an error on failure
+     */
     template <typename Field>
-    [[nodiscard]] std::expected<void, CrudError> Crud::update(
+    std::expected<void, CrudError> Crud::updateField(
         db::Database& database,
         const Field&  field
     )
@@ -461,6 +470,15 @@ namespace orm
         return get<Model>(database, Joins{}, Query{});
     }
 
+    /**
+     * @brief Get all rows matching the specified query options
+     *
+     * @tparam Model
+     * @param database
+     * @param joins
+     * @param query
+     * @return std::vector<Model>
+     */
     template <db_model... Models>
     std::vector<std::tuple<Models...>> Crud::getJoined(
         db::Database&     database,
@@ -589,6 +607,15 @@ namespace orm
      * ADD METHODS *
      ***************/
 
+    /**
+     * @brief Add a new column to the database
+     *
+     * @tparam Field
+     * @param database
+     * @param field
+     * @return std::expected<void, CrudError> An empty expected on success,
+     * or an error on failure
+     */
     template <typename Field>
     std::expected<void, CrudError> Crud::addColumn(
         db::Database& database,
@@ -627,6 +654,13 @@ namespace orm
         return {};
     }
 
+    /**
+     * @brief Check if a column exists in the database
+     *
+     * @tparam Field
+     * @param database
+     * @return true if the column exists, false otherwise
+     */
     template <typename Field>
     bool Crud::_columnExists(db::Database& database)
     {
@@ -637,6 +671,8 @@ namespace orm
         sql += Field::name + "'";
 
         db::Statement statement = database.prepare(sql);
+
+        _sqlExecutions.push_back(sql);
 
         if (statement.step() == db::StepResult::RowAvailable)
             return statement.columnInt64(0) > 0;

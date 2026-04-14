@@ -1,9 +1,11 @@
 #include "transaction_factory.hpp"
 
 #include "config/finance.hpp"
+#include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction_entry.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
 namespace app
@@ -45,37 +47,6 @@ namespace app
         return transaction;
     }
 
-    // finance::TransactionEntry TransactionFactory::fromTransactionEntryRow(
-    //     const TransactionEntryRow &entryRow
-    // )
-    // {
-    //     switch (entryRow.instrumentId.value())
-    //     {
-    //         case InstrumentKind::Cash:
-    //             detail = finance::CashTransaction{entryRow.amount.value()};
-    //             break;
-    //     }
-
-    //     return finance::TransactionEntry{
-    //         entryRow.id.value(),
-    //         entryRow.accountId.value(),
-    //         detail
-    //     };
-    // }
-
-    // finance::CashTransaction TransactionFactory::fromInstrumentRow(
-    //     const InstrumentRow &row
-    // )
-    // {
-    //     switch (row.kind.value())
-    //     {
-    //         case InstrumentKind::Cash:
-    //             return finance::CashTransaction{};
-    //     }
-
-    //     throw std::runtime_error("Unknown instrument kind");
-    // }
-
     /**
      * @brief Converts a TransactionEntry object to a
      * TransactionEntryRow object.
@@ -103,22 +74,34 @@ namespace app
         return row;
     }
 
+    /**
+     * @brief Converts a TransactionEntryRow object to a TransactionEntry
+     * object.
+     *
+     * @param row The TransactionEntryRow object to convert.
+     * @param instrumentRow The associated InstrumentRow object.
+     * @return The converted TransactionEntry object.
+     */
     finance::TransactionEntry TransactionFactory::fromEntryRow(
         const TransactionEntryRow &row,
-        const InstrumentRow & /*instrumentRow*/
+        const InstrumentRow       &instrumentRow
     )
     {
-        finance::TransactionEntry entry{
-            row.id.value(),
-            row.accountId.value(),
-            finance::CashTransaction(
-                finance::Cash(Currency::USD, row.amount.value())
-            )
-        };
+        switch (instrumentRow.kind.value())
+        {
+            case InstrumentKind::Cash:
+                return {
+                    row.id.value(),
+                    row.accountId.value(),
+                    _toCashTransaction(row, instrumentRow)
+                };
+            case InstrumentKind::Stock:
+                throw std::runtime_error(
+                    "Stock transactions are not supported"
+                );
+        }
 
-        // entry.setInstrument(instrumentRow);
-
-        return entry;
+        throw std::runtime_error("Unknown instrument kind");
     }
 
     /**
@@ -151,4 +134,26 @@ namespace app
         return std::visit(InstrumentRowVisitor{}, detail);
     }
 
+    /**
+     * @brief Converts a TransactionEntryRow object and an InstrumentRow
+     * object to a CashTransaction object.
+     *
+     * @param row The TransactionEntryRow object to convert.
+     * @param instrumentRow The associated InstrumentRow object.
+     * @return The converted CashTransaction object.
+     */
+    finance::CashTransaction TransactionFactory::_toCashTransaction(
+        const TransactionEntryRow &row,
+        const InstrumentRow       &instrumentRow
+    )
+    {
+        if (instrumentRow.kind.value() != InstrumentKind::Cash)
+        {
+            throw std::runtime_error("Invalid instrument kind");
+        }
+
+        return finance::CashTransaction(
+            finance::Cash(instrumentRow.currency.value(), row.amount.value())
+        );
+    }
 }   // namespace app

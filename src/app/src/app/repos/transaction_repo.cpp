@@ -7,7 +7,6 @@
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
-#include "orm/optional.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/instrument_row.hpp"
 

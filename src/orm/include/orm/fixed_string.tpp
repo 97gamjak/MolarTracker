@@ -48,6 +48,15 @@ namespace orm
         return std::string_view{_data.data(), Size - 1};
     }
 
+    /**
+     * @brief Compare two fixed_string objects for equality
+     *
+     * @tparam SizeLHS
+     * @tparam SizeRHS
+     * @param lhs
+     * @param rhs
+     * @return true if the strings are equal, false otherwise
+     */
     template <std::size_t SizeLHS, std::size_t SizeRHS>
     constexpr bool operator==(
         const fixed_string<SizeLHS>& lhs,

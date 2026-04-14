@@ -1,9 +1,19 @@
 #include "orm/join.hpp"
 
-#include "orm/orm_exception.hpp"
-
 namespace orm
 {
+    /**
+     * @brief Construct a new Join object
+     *
+     * @param type The type of join
+     */
+    Join::Join(JoinType type) : _type(type) {}
+
+    /**
+     * @brief Convert the Join object to an SQL string.
+     *
+     * @return The SQL string representation of the join.
+     */
     std::string Join::toSQL() const
     {
         std::string sqlText;
@@ -30,12 +40,23 @@ namespace orm
         return sqlText;
     }
 
+    /**
+     * @brief Add a new join to the collection.
+     *
+     * @param join The join to add.
+     * @return Joins& A reference to this Joins object.
+     */
     Joins& Joins::add(const Join& join)
     {
         _joins.push_back(join);
         return *this;
     }
 
+    /**
+     * @brief Convert the Joins object to an SQL string.
+     *
+     * @return The SQL string representation of the joins.
+     */
     std::string Joins::toSQL() const
     {
         std::string sql;

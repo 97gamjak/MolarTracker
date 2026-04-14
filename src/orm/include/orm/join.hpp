@@ -30,16 +30,27 @@ namespace orm
     template <typename FromField, typename ToField>
     Join rightJoin();
 
+    /**
+     * @brief Class representing a SQL JOIN clause
+     *
+     */
     class Join
     {
        private:
-        JoinType    _type;
+        /// the type of the JOIN
+        JoinType _type;
+        /// the name of the table to join
         std::string _fromTable;
+        /// the name of the field to join on
         std::string _fromField;
+        /// the name of the table to join to
         std::string _toTable;
+        /// the name of the field to join to
         std::string _toField;
 
        public:
+        explicit Join(JoinType type);
+
         [[nodiscard]]
         std::string toSQL() const;
 
@@ -57,12 +68,17 @@ namespace orm
 
        private:
         template <typename FromField, typename ToField>
-        friend void _fromFields(Join& join);
+        friend void _fromFields(Join& join_);
     };
 
+    /**
+     * @brief Class representing a collection of SQL JOIN clauses
+     *
+     */
     class Joins
     {
        private:
+        /// the list of JOIN clauses
         std::vector<Join> _joins;
 
        public:

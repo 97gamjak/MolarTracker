@@ -74,7 +74,7 @@ namespace orm
         );
 
         template <typename Field>
-        [[nodiscard]] std::expected<void, CrudError> update(
+        [[nodiscard]] std::expected<void, CrudError> updateField(
             db::Database& database,
             const Field&  field
         );

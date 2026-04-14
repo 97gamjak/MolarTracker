@@ -170,19 +170,10 @@ namespace app
         void applyMigration(db::Database& db) override;
     };
 
-    template <typename Field>
-    class InsertDefaultValuesMigration : public SingleMigration
-    {
-       private:
-        /// the default value to insert
-        Field _defaultValue;
-
-       public:
-        explicit InsertDefaultValuesMigration(Field defaultValue);
-
-        void applyMigration(db::Database& db) override;
-    };
-
+    /**
+     * @brief Migration to add a column to a table
+     *
+     */
     template <typename Field>
     class AddColumnMigration : public SingleMigration
     {

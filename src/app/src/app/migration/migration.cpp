@@ -22,6 +22,7 @@ namespace app
      * @brief Construct a new Migration object
      *
      * @param fromVersion The version the migration is being applied from
+     * @param version The release version this migration is targeting
      */
     Migration::Migration(std::size_t fromVersion, utils::SemVer version)
         : _fromVersion(fromVersion), _version(version)
@@ -52,6 +53,11 @@ namespace app
         );
     }
 
+    /**
+     * @brief add a multi migration to the migration container
+     *
+     * @param migration
+     */
     void Migration::addMigration(std::unique_ptr<MultiMigration> migration)
     {
         _migrations.push_back(std::move(migration));
@@ -87,6 +93,9 @@ namespace app
             _migrations[i].migrate(db);
     }
 
+    /**
+     * @brief Migrate from version 0.0.3
+     */
     void Migrations::_migrate_0_0_3()
     {
         _lastReleaseVersion = utils::SemVer(0, 0, 3);

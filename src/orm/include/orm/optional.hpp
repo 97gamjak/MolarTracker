@@ -7,10 +7,17 @@
 
 namespace orm
 {
+    /**
+     * @brief Class representing an optional Model value
+     *
+     */
     template <db_model Model>
     struct Optional
     {
+        /// the type of the Model
         using value_type = Model;
+
+        /// the actual optional Model object
         std::optional<Model> value;
     };
 

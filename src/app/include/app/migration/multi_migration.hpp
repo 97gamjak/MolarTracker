@@ -25,9 +25,13 @@ namespace app
 
         void addMigration(std::unique_ptr<SingleMigration> migration);
 
-        void applyMigration(db::Database& db);
+        void applyMigration(db::Database& db) const;
     };
 
+    /**
+     * @brief Migration to copy, drop, and rename a table
+     *
+     */
     template <orm::db_model Model>
     class CopyDropRenameMigration : public MultiMigration
     {

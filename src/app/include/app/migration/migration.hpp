@@ -28,6 +28,7 @@ namespace app
         /// collection of single migrations
         std::vector<std::unique_ptr<MultiMigration>> _migrations;
 
+        /// The release version this migration is targeting
         utils::SemVer _version;
 
        public:
@@ -52,6 +53,7 @@ namespace app
         /// The list of individual migrations
         std::vector<Migration> _migrations;
 
+        /// The last release version
         utils::SemVer _lastReleaseVersion = utils::SemVer::getInvalidVersion();
 
        public:

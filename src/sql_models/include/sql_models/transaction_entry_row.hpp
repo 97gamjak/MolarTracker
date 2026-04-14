@@ -21,6 +21,9 @@
  */
 struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     ORM_FIELD(id, IdField<TransactionEntryId>)
@@ -92,9 +95,6 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
         amount
     )
     /// @endcond
-
-    [[nodiscard]]
-    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
