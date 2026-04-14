@@ -15,6 +15,7 @@ add_library(molartracker_app STATIC
     src/app/repos/transaction_repo.cpp
 
     src/app/store/account_store.cpp
+    src/app/store/transaction_store.cpp
     src/app/store/predicates.cpp
     src/app/store/profile/profile_store.cpp
     src/app/store/profile/active_profile.cpp

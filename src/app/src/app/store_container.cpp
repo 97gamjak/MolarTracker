@@ -15,10 +15,12 @@ namespace app
      */
     StoreContainer::StoreContainer(ServiceContainer& services)
         : _profileStore{services.getProfileService()},
-          _accountStore{services.getAccountService()}
+          _accountStore{services.getAccountService()},
+          _transactionStore{services.getTransactionService()}
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
+        _allStores.push_back(&_transactionStore);
 
         auto connectProfileIdUpdate =
             [](void* user, const std::optional<ProfileId>& profileId)
