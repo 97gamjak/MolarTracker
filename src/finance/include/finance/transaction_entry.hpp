@@ -27,8 +27,6 @@ namespace finance
         TransactionDetail _details;
 
        public:
-        TransactionEntry(TransactionEntryId id, AccountId accountId);
-
         TransactionEntry(
             TransactionEntryId id,
             AccountId          accountId,

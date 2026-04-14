@@ -4,7 +4,6 @@
 #include "connections/observable.hpp"   // IWYU pragma: keep
 #include "connections/signal.hpp"       // IWYU pragma: keep
 #include "settings/params/params.hpp"
-#include "utils/version.hpp"
 
 namespace settings
 {
@@ -14,9 +13,9 @@ namespace settings
      */
     GeneralSettings::GeneralSettings()
         : _core{Schema::GENERAL_SETTINGS_KEY, Schema::GENERAL_SETTINGS_TITLE, Schema::GENERAL_SETTINGS_DESCRIPTION},
-          _currentVersion(utils::SemVer(Constants::getVersion()))
+          _currentVersion(Constants::getSemVer())
     {
-        _version.set(utils::SemVer(Constants::getVersion()));
+        _version.set(Constants::getSemVer());
     }
 
     /**

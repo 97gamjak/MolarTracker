@@ -13,6 +13,7 @@
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "filter/expr_node.hpp"
+#include "orm/concepts.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
@@ -334,6 +335,58 @@ namespace orm
         return {};
     }
 
+    template <typename Field>
+    [[nodiscard]] std::expected<void, CrudError> Crud::update(
+        db::Database& database,
+        const Field&  field
+    )
+    {
+        std::string sqlText;
+        sqlText += "UPDATE ";
+        sqlText += Field::tableName;
+        sqlText += " SET ";
+
+        sqlText += field.name + "=?";
+        sqlText += ";";
+
+        LOG_DEBUG(
+            std::format(
+                "Updating table '{}' with SQL: {}",
+                Field::tableName,
+                sqlText
+            )
+        );
+        db::Statement statement = database.prepare(sqlText);
+
+        _sqlExecutions.push_back(sqlText);
+
+        field.bind(statement, bindIndex(0));
+
+        statement.executeToCompletion();
+
+        const auto changes = database.getNumberOfLastChanges();
+
+        if (changes == 0)
+        {
+            return std::unexpected(CrudError(
+                CrudErrorType::NoRowsUpdated,
+                "orm::update did not update any rows. This may be because the "
+                "primary key value(s) did not match any existing row."
+            ));
+        }
+
+        if (changes > 1)
+        {
+            return std::unexpected(CrudError(
+                CrudErrorType::MultipleRowsUpdated,
+                "orm::update updated multiple rows. This should never happen, "
+                "as updates are performed by matching primary key values."
+            ));
+        }
+
+        return {};
+    }
+
     /*******************
      * GET ALL METHODS *
      *******************/
@@ -530,6 +583,65 @@ namespace orm
         bind(where, statement);
 
         statement.executeToCompletion();
+    }
+
+    /***************
+     * ADD METHODS *
+     ***************/
+
+    template <typename Field>
+    std::expected<void, CrudError> Crud::addColumn(
+        db::Database& database,
+        const Field&  field
+    )
+    {
+        const auto columnExist = _columnExists<Field>(database);
+        if (columnExist)
+        {
+            return std::unexpected(CrudError(
+                CrudErrorType::ColumnAlreadyExists,
+                "Column already exists"
+            ));
+        }
+
+        std::string sql;
+        sql += "ALTER TABLE ";
+        sql += Field::tableName;
+        sql += " ADD COLUMN ";
+        sql += Field::ddl();
+
+        if (Field::isNotNull)
+        {
+            sql += " DEFAULT ";
+            sql += field.valueAsString();
+        }
+
+        LOG_DEBUG(std::format("Adding column with SQL: {}", sql));
+
+        db::Statement statement = database.prepare(sql);
+
+        _sqlExecutions.push_back(sql);
+
+        statement.executeToCompletion();
+
+        return {};
+    }
+
+    template <typename Field>
+    bool Crud::_columnExists(db::Database& database)
+    {
+        std::string sql;
+        sql += "SELECT COUNT(*) FROM PRAGMA_TABLE_INFO('";
+        sql += Field::tableName;
+        sql += "') WHERE name = '";
+        sql += Field::name + "'";
+
+        db::Statement statement = database.prepare(sql);
+
+        if (statement.step() == db::StepResult::RowAvailable)
+            return statement.columnInt64(0) > 0;
+
+        throw orm::CrudException("Failed to check if column exists");
     }
 
 }   // namespace orm

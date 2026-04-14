@@ -2,14 +2,8 @@
 #define __FINANCE__INCLUDE__FINANCE__CASH_HPP__
 
 #include <compare>
-#include <cstdint>
 
 #include "config/finance.hpp"
-
-namespace finance
-{
-    enum class Currency : std::uint8_t;   // Forward declaration
-}   // namespace finance
 
 namespace finance
 {

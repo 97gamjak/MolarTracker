@@ -73,6 +73,12 @@ namespace orm
             const Model&  row
         );
 
+        template <typename Field>
+        [[nodiscard]] std::expected<void, CrudError> update(
+            db::Database& database,
+            const Field&  field
+        );
+
         /*******************
          * GET ALL METHODS *
          *******************/
@@ -112,6 +118,20 @@ namespace orm
 
         template <db_model Model>
         void deleteByPk(db::Database& database, const Model& model);
+
+        /***************
+         * ADD METHODS *
+         ***************/
+
+        template <typename Field>
+        std::expected<void, CrudError> addColumn(
+            db::Database& database,
+            const Field&  field
+        );
+
+       private:
+        template <typename Field>
+        bool _columnExists(db::Database& database);
     };
 
 }   // namespace orm

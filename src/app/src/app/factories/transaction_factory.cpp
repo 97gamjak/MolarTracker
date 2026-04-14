@@ -1,6 +1,7 @@
 #include "transaction_factory.hpp"
 
 #include "config/finance.hpp"
+#include "finance/cash.hpp"
 #include "finance/transaction_entry.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/transaction_row.hpp"
@@ -104,16 +105,18 @@ namespace app
 
     finance::TransactionEntry TransactionFactory::fromEntryRow(
         const TransactionEntryRow &row,
-        const InstrumentRow       &instrumentRow
+        const InstrumentRow & /*instrumentRow*/
     )
     {
         finance::TransactionEntry entry{
             row.id.value(),
             row.accountId.value(),
-            finance::AmountVisitor::fromRow(row.amount)
+            finance::CashTransaction(
+                finance::Cash(Currency::USD, row.amount.value())
+            )
         };
 
-        entry.setInstrument(instrumentRow);
+        // entry.setInstrument(instrumentRow);
 
         return entry;
     }

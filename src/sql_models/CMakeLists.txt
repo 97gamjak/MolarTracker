@@ -2,6 +2,7 @@ add_library(molartracker_sql_models STATIC
     src/sql_models/account_row.cpp
     src/sql_models/instrument_row.cpp
     src/sql_models/profile_row.cpp
+    src/sql_models/transaction_entry_row.cpp
 )
 
 target_include_directories(molartracker_sql_models

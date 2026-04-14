@@ -6,6 +6,8 @@
 #include <tuple>
 #include <utility>
 
+#include "utils/version.hpp"
+
 /**
  * @brief Class containing compile-time constants for the application, these
  * are typically set during build time and are used throughout the application
@@ -98,8 +100,9 @@ class Constants
     [[nodiscard]] static std::string getGithubRepoUrl();
     [[nodiscard]] static std::string getGithubIssuesUrl();
 
-    [[nodiscard]] static std::string getVersion();
-    [[nodiscard]] static std::string getGitTag();
+    [[nodiscard]] static std::string   getVersion();
+    [[nodiscard]] static std::string   getGitTag();
+    [[nodiscard]] static utils::SemVer getSemVer();
 
     [[nodiscard]] static int getDbBusyTimeoutMs();
 

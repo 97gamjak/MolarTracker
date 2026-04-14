@@ -2,6 +2,8 @@
 #define __APP__INCLUDE__APP__MIGRATION__SINGLE_MIGRATION_TPP__
 
 #include "app/migration/single_migration.hpp"
+#include "db/statement.hpp"
+#include "orm/constraints.hpp"
 #include "orm/crud.hpp"
 #include "orm/type_traits.hpp"
 
@@ -41,6 +43,46 @@ namespace app
     {
         orm::Crud crud;
         crud.createTable<Model>(db, _tableName);
+
+        setSQLStatements(crud.getExecutedSQL());
+    }
+
+    template <typename Field>
+    InsertDefaultValuesMigration<Field>::InsertDefaultValuesMigration(
+        Field defaultValue
+    )
+        : SingleMigration(MigrationType::Custom), _defaultValue(defaultValue)
+    {
+    }
+
+    template <typename Field>
+    void InsertDefaultValuesMigration<Field>::applyMigration(db::Database& db)
+    {
+        orm::Crud crud;
+
+        const auto result = crud.update(db, _defaultValue);
+
+        setSQLStatements(crud.getExecutedSQL());
+
+        if (!result)
+        {
+            // TODO(97gamjak): introduce specific exception
+            throw std::runtime_error("Failed to insert default values");
+        }
+    }
+
+    template <typename Field>
+    AddColumnMigration<Field>::AddColumnMigration(Field defaultValue)
+        : SingleMigration(MigrationType::AddColumn), _defaultValue(defaultValue)
+    {
+    }
+
+    template <typename Field>
+    void AddColumnMigration<Field>::applyMigration(db::Database& db)
+    {
+        orm::Crud crud;
+
+        crud.addColumn(db, _defaultValue);
 
         setSQLStatements(crud.getExecutedSQL());
     }

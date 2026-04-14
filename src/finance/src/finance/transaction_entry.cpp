@@ -1,5 +1,10 @@
 #include "finance/transaction_entry.hpp"
 
+#include "config/finance.hpp"
+#include "config/id_types.hpp"
+#include "finance/account.hpp"
+#include "finance/cash.hpp"
+
 namespace finance
 {
     /**

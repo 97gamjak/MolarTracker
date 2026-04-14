@@ -131,6 +131,13 @@ std::string Constants::getGithubIssuesUrl()
 std::string Constants::getVersion() { return ConstantsSchema::_version; }
 
 /**
+ * @brief Get the semantic version of the application
+ *
+ * @return utils::SemVer
+ */
+utils::SemVer Constants::getSemVer() { return utils::SemVer(getVersion()); }
+
+/**
  * @brief Get the Git tag corresponding to the current version
  *
  * @return const std::string

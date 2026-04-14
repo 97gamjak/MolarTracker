@@ -22,6 +22,11 @@ namespace app
         _sqlStatements = sqlStatements;
     }
 
+    void SingleMigration::setSQLStatements(const std::string& sqlStatement)
+    {
+        _sqlStatements = std::vector<std::string>{sqlStatement};
+    }
+
     /**
      * @brief Construct a new Custom Migration object
      *
