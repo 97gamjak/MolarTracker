@@ -57,6 +57,7 @@ namespace orm
      * @param rhs
      * @return true if the strings are equal, false otherwise
      */
+    // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
     template <std::size_t SizeLHS, std::size_t SizeRHS>
     constexpr bool operator==(
         const fixed_string<SizeLHS>& lhs,
@@ -68,6 +69,7 @@ namespace orm
         else
             return false;
     }
+    // NOLINTEND(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
 
 }   // namespace orm
 

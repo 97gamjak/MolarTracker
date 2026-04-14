@@ -2,6 +2,7 @@
 # -altera-unroll-loops:             wants to use everywhere #pragma unroll
 # -abseil-string-find-str-contains: strange string library
 # -bugprone-suspicious-include:     to be able to include .tpp and still use it as impl file types
+# -hicpp-avoid-c-arrays:            does the same thing as cppcoreguidelines-avoid-c-arrays
 
 # TO BE REMOVED:
 # -misc-include-cleaner:            problems with QT < 6.8
@@ -27,7 +28,8 @@ Checks:
   -cert-dcl37-c,
   -cert-dcl51-cpp,
   -misc-include-cleaner,
-  -bugprone-suspicious-include
+  -bugprone-suspicious-include,
+  -hicpp-avoid-c-arrays
   '
 WarningsAsErrors: ''
 HeaderFileExtensions:
