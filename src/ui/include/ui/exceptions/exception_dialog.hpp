@@ -1,7 +1,7 @@
 #ifndef __UI__INCLUDE__UI__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
 #define __UI__INCLUDE__UI__EXCEPTIONS__EXCEPTION_DIALOG_HPP__
 
-#include <QDialog>
+#include "ui/base/dialog.hpp"
 
 namespace logging
 {
@@ -15,7 +15,7 @@ namespace ui
     /**
      * @brief A dialog for displaying exceptions
      */
-    class ExceptionDialog final : public QDialog
+    class ExceptionDialog final : public Dialog
     {
         Q_OBJECT
 

@@ -49,6 +49,9 @@ namespace app
         /// Helper type for the dirty state change signal.
         using DirtyObservable = Observable<OnDirtyChanged>;
 
+        /// Type alias for a map of IDs.
+        using IdMap = std::unordered_map<IdType, IdType, typename IdType::Hash>;
+
         /// struct representing an entry in the store, containing a value and
         /// its state.
         struct Entry;
@@ -58,7 +61,7 @@ namespace app
         std::vector<Entry> _entries;
 
         /// A mapping of old IDs to new IDs for entries that have been updated
-        std::unordered_map<IdType, IdType, typename IdType::Hash> _changedIds;
+        IdMap _changedIds;
 
         /// Flag indicating whether the store is potentially dirty (i.e., has
         /// unsaved changes).
@@ -83,8 +86,7 @@ namespace app
 
         void clearPotentiallyDirty() override;
 
-        [[nodiscard]] const std::unordered_map<IdType, IdType>& getChangedIds(
-        ) const;
+        [[nodiscard]] const IdMap& getChangedIds() const;
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;

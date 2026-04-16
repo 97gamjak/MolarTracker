@@ -21,6 +21,7 @@ namespace app
          *
          * @return The ID of the added transaction.
          */
+        [[nodiscard]]
         virtual TransactionId addTransaction(
             const finance::Transaction& transaction
         ) = 0;

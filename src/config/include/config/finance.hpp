@@ -32,6 +32,12 @@ MSTD_ENUM(AccountStatus, uint8_t, ACCOUNT_STATUS_LIST);
 
 MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST);
 
+#define TRANSACTION_TYPE_LIST(X) \
+    X(Deposit)                   \
+    X(Withdrawal)
+
+MSTD_ENUM(TransactionType, std::uint8_t, TRANSACTION_TYPE_LIST);
+
 #define INSTRUMENT_KIND_LIST(X) \
     X(Stock)                    \
     X(Cash)

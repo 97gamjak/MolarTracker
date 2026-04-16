@@ -1,7 +1,9 @@
 #include "transaction_controller.hpp"
 
+#include "config/finance.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
@@ -51,9 +53,30 @@ namespace controller
             return;
         }
 
-        if (action == item->getCreateAction())
+        if (action == item->getCreateAction() ||
+            action == item->getCreateDepositAction() ||
+            action == item->getCreateWithdrawalAction())
         {
             LOG_DEBUG("Create action triggered for transaction category");
+
+            if (action == item->getCreateAction())
+            {
+                _createTransactionDialog =
+                    utils::makeQChild<ui::CreateTransactionDialog>(
+                        getMainWindow()
+                    );
+            }
+            else
+            {
+                _createTransactionDialog =
+                    utils::makeQChild<ui::CreateTransactionDialog>(
+                        getMainWindow(),
+                        action->data().value<TransactionType>()
+                    );
+            }
+
+            if (auto* dialog = _createTransactionDialog.data())
+                dialog->exec();
         }
     }
 }   // namespace controller

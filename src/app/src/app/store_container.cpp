@@ -40,8 +40,12 @@ namespace app
     {
         LOG_INFO("Saving all temporary changes to database");
 
-        for (auto* store : _allStores)
-            store->commit();
+        _profileStore.commit();
+        // here the id of the active profile store was already updated via the
+        // observer in account store
+        _accountStore.commit();
+
+        _transactionStore.commit(_accountStore.getChangedIds());
     }
 
     /**

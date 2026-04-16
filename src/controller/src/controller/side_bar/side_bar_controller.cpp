@@ -9,6 +9,7 @@
 #include "ui/side_bar/overview_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
+#include "ui/side_bar/transaction_category.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.SideBarController");
 
@@ -157,15 +158,19 @@ namespace controller
                 break;
             case ui::SideBarItemType::AccountCategory:
             {
-                const auto* accountCategory =
-                    dynamic_cast<ui::AccountCategory*>(item);
-                _accountSideBarController.handleContextMenuAction(
-                    accountCategory,
-                    action
-                );
+                const auto* acc = dynamic_cast<ui::AccountCategory*>(item);
+
+                _accountSideBarController.handleContextMenuAction(acc, action);
+
                 break;
             }
             case ui::SideBarItemType::TransactionCategory:
+                const auto* transaction =
+                    dynamic_cast<ui::TransactionCategory*>(item);
+                _transactionSideBarController.handleContextMenuAction(
+                    transaction,
+                    action
+                );
                 break;
         }
     }

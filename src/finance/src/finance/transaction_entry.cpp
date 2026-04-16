@@ -40,4 +40,14 @@ namespace finance
      * @return TransactionDetail The details of the transaction entry.
      */
     TransactionDetail TransactionEntry::getDetails() const { return _details; }
+
+    /**
+     * @brief Sets the account ID associated with the transaction entry.
+     *
+     * @param accountId The account ID to associate with the transaction entry.
+     */
+    void TransactionEntry::setAccountId(AccountId accountId)
+    {
+        _accountId = accountId;
+    }
 }   // namespace finance

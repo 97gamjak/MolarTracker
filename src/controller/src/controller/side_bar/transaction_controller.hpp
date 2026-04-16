@@ -5,8 +5,10 @@
 #include <qtmetamacros.h>
 
 #include <QObject>
+#include <QPointer>
 
 #include "side_bar_category_controller.hpp"
+#include "ui/transaction/create_transaction_dlg.hpp"
 
 namespace app
 {
@@ -39,6 +41,8 @@ namespace controller
         /// The application context
         app::AppContext& _appContext;
 
+        QPointer<ui::CreateTransactionDialog> _createTransactionDialog;
+
        public:
         TransactionSideBarController(
             cmd::UndoStack&  undoStack,
@@ -48,7 +52,7 @@ namespace controller
 
         void refresh() override;
 
-        static void handleContextMenuAction(
+        void handleContextMenuAction(
             const ui::TransactionCategory* item,
             const QAction*                 action
         );

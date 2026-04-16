@@ -28,7 +28,7 @@ namespace ui
         bool                      canBeClosed,
         QWidget*                  parent
     )
-        : QDialog{parent},
+        : Dialog{parent},
           _settings{std::move(settings)},
           _canBeClosed{canBeClosed}
     {

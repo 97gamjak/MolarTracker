@@ -1,7 +1,6 @@
 #include "ui/main_window.hpp"
 
 #include <QApplication>
-#include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QStackedWidget>

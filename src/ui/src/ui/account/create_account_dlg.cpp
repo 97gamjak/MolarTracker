@@ -19,7 +19,7 @@ namespace ui
      *
      * @param parent The parent widget of the dialog
      */
-    CreateAccountDialog::CreateAccountDialog(QWidget* parent) : QDialog(parent)
+    CreateAccountDialog::CreateAccountDialog(QWidget* parent) : Dialog(parent)
     {
         setWindowTitle("Create Account");
 

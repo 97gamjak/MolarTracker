@@ -381,12 +381,12 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
-     * @return const std::unordered_map<IdType, IdType>&
+     * @return const IdMap
      */
 
     template <typename T, typename IdType>
-    const std::unordered_map<IdType, IdType>& BaseStore<T, IdType>::
-        getChangedIds() const
+    const BaseStore<T, IdType>::IdMap& BaseStore<T, IdType>::getChangedIds(
+    ) const
     {
         return _changedIds;
     }

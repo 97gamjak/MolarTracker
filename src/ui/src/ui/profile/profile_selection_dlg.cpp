@@ -28,7 +28,7 @@ namespace ui
         const std::vector<std::string>& profiles,
         bool                            canBeClosed
     )
-        : QDialog{parent}, _canBeClosed{canBeClosed}
+        : Dialog{parent}, _canBeClosed{canBeClosed}
     {
         setWindowTitle("Select Profile");
         utils::moveDialogToParentScreenCenter(this, parent);

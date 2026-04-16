@@ -36,6 +36,8 @@ namespace finance
         [[nodiscard]] TransactionEntryId getId() const;
         [[nodiscard]] AccountId          getAccountId() const;
         [[nodiscard]] TransactionDetail  getDetails() const;
+
+        void setAccountId(AccountId accountId);
     };
 
     /**

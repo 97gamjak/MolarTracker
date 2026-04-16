@@ -107,6 +107,24 @@ namespace finance
     }
 
     /**
+     * @brief Gets the entries associated with the transaction.
+     *
+     * @return std::vector<TransactionEntry>& The entries of the
+     * transaction.
+     */
+    std::vector<TransactionEntry>& Transaction::getEntries()
+    {
+        return _entries;
+    }
+
+    /**
+     * @brief Sets the ID of the transaction.
+     *
+     * @param id The new ID to set.
+     */
+    void Transaction::setId(TransactionId id) { _id = id; }
+
+    /**
      * @brief Adds an entry to the transaction.
      *
      * @param entry The TransactionEntry to add.

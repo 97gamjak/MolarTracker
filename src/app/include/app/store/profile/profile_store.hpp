@@ -80,7 +80,7 @@ namespace app
             const drafts::ProfileDraft& draft
         );
 
-        void commit() override;
+        void commit();
 
         Connection subscribeToProfileChange(
             OnProfileChanged::func func,

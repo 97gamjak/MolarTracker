@@ -1,8 +1,7 @@
 #ifndef __UI__INCLUDE__UI__PROFILE__ADD_PROFILE_DLG_HPP__
 #define __UI__INCLUDE__UI__PROFILE__ADD_PROFILE_DLG_HPP__
 
-#include <QDialog>
-
+#include "ui/base/dialog.hpp"
 #include "ui/validators/email_line_edit.hpp"
 #include "ui/validators/name_line_edit.hpp"
 
@@ -22,7 +21,7 @@ namespace ui
      * @brief Dialog for adding a new profile.
      *
      */
-    class AddProfileDialog : public QDialog
+    class AddProfileDialog : public Dialog
     {
         Q_OBJECT
 
