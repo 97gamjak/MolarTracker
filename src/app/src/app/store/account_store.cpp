@@ -233,9 +233,9 @@ namespace app
      * use these pointers to access the account data and perform
      * operations on the accounts as needed.
      */
-    std::vector<const finance::Account*> AccountStore::getAllAccounts() const
+    std::vector<drafts::AccountDraft> AccountStore::getAllAccounts() const
     {
-        std::vector<const finance::Account*> accounts;
+        std::vector<drafts::AccountDraft> accounts;
 
         for (const auto& entry : _getEntries())
         {
