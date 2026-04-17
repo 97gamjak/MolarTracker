@@ -4,7 +4,7 @@
 #include "config/finance.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
-#include "utils/qt_helpers.hpp"
+#include "ui/transaction/create_transaction_dlg.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
@@ -25,7 +25,8 @@ namespace controller
     )
         : SideBarCategoryController(new ui::TransactionCategory(), mainWindow),
           _undoStack(undoStack),
-          _accountStore(accountStore)
+          _accountStore(accountStore),
+          _createDlg(new ui::CreateTransactionDialog(mainWindow))
     {
     }
 
@@ -60,26 +61,44 @@ namespace controller
         {
             LOG_DEBUG("Create action triggered for transaction category");
 
-            if (action == item->getCreateAction())
-            {
-                _createTransactionDialog =
-                    utils::makeQChild<ui::CreateTransactionDialog>(
-                        getMainWindow(),
-                        _accountStore.getAllAccounts()
-                    );
-            }
+            using enum TransactionType;
+            if (action == item->getCreateDepositAction())
+                _createDlg->setTransactionType(Deposit);
+            else if (action == item->getCreateWithdrawalAction())
+                _createDlg->setTransactionType(Withdrawal);
             else
-            {
-                _createTransactionDialog =
-                    utils::makeQChild<ui::CreateTransactionDialog>(
-                        getMainWindow(),
-                        _accountStore.getAllAccounts(),
-                        action->data().value<TransactionType>()
-                    );
-            }
+                _createDlg->setTransactionType(std::nullopt);
 
-            if (auto* dialog = _createTransactionDialog.data())
+            if (auto* dialog = _createDlg.data())
                 dialog->exec();
         }
     }
+
+    void TransactionSideBarController::_onTransactionTypeChanged(
+        TransactionType type
+    )
+    {
+        LOG_DEBUG(
+            std::format(
+                "Transaction type changed to '{}'",
+                TransactionTypeMeta::toString(type)
+            )
+        );
+
+        if (_createDlg != nullptr)
+        {
+            std::vector<drafts::AccountDraft> accounts;
+
+            switch (type)
+            {
+                case TransactionType::Deposit:
+                case TransactionType::Withdrawal:
+                    accounts = _accountStore.getCashAccounts();
+                    break;
+            }
+
+            _createDlg->setWidget(type, accounts);
+        }
+    }
+
 }   // namespace controller

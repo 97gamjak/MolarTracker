@@ -3,39 +3,26 @@
 #include <qvariant.h>
 
 #include "config/finance.hpp"
+#include "logging/log_macros.hpp"
+#include "ui/transaction/create_transaction_details.hpp"
 #include "utils/qt_helpers.hpp"
+
+REGISTER_LOG_CATEGORY("UI.Transaction.CreateTransactionDialog");
+
+using utils::makeQChild;
 
 namespace ui
 {
-    CreateTransactionWidget::CreateTransactionWidget(QWidget* parent)
-        : QWidget(parent)
+
+    CreateTransactionDialog::CreateTransactionDialog(QWidget* parent)
+        : Dialog(parent)
     {
+        _buildUI();
     }
 
-    CreateTransactionDialog::CreateTransactionDialog(
-        QWidget*                          parent,
-        std::vector<drafts::AccountDraft> accounts
-    )
-        : Dialog(parent), _accounts(std::move(accounts))
+    void CreateTransactionDialog::_buildUI()
     {
-        _buildUI(std::nullopt);
-    }
-
-    CreateTransactionDialog::CreateTransactionDialog(
-        QWidget*                          parent,
-        std::vector<drafts::AccountDraft> accounts,
-        TransactionType                   type
-    )
-        : Dialog(parent),
-          _accounts(std::move(accounts)),
-          _createTransactionWidget(new EmptyTransactionWidget(this))
-    {
-        _buildUI(type);
-    }
-
-    void CreateTransactionDialog::_buildUI(std::optional<TransactionType> type)
-    {
-        _transactionType = utils::makeQChild<QComboBox>(this);
+        _transactionType = makeQChild<QComboBox>(this);
         _transactionType->setPlaceholderText("Select Transaction Type");
         _transactionType->setCurrentIndex(-1);
 
@@ -49,16 +36,7 @@ namespace ui
                 _transactionType->count() - 1,
                 QVariant::fromValue(enumType)
             );
-
-            if (type && type.value() == enumType)
-            {
-                _transactionType->setCurrentIndex(
-                    _transactionType->count() - 1
-                );
-            }
         }
-
-        _onTransactionTypeChanged(_transactionType->currentIndex());
 
         connect(
             _transactionType,
@@ -72,26 +50,82 @@ namespace ui
     {
         if (index < 0)
         {
-            _createTransactionWidget =
-                utils::makeQChild<CreateTransactionWidget>(this);
-            setWindowTitle("New Transaction");
+            _detailsWidget = makeQChild<CreateTransactionWidget>(this);
+            _setWindowTitle(std::nullopt);
             return;
         }
 
         const auto type =
             _transactionType->itemData(index).value<TransactionType>();
 
-        setWindowTitle(
-            "New " + QString::fromStdString(TransactionTypeMeta::toString(type))
-        );
+        _setWindowTitle(type);
 
-        switch (type)
+        emit transactionTypeChanged(type);
+    }
+
+    void CreateTransactionDialog::setWidget(
+        TransactionType                   type,
+        std::vector<drafts::AccountDraft> accounts
+    )
+    {
+        if (_detailsWidget == nullptr ||
+            !_detailsWidget->getTransactionType().has_value() ||
+            _detailsWidget->getTransactionType().value() != type)
+        {
+            _detailsWidget = makeTransactionWidget(this, type);
+            _detailsWidget->setAccounts(std::move(accounts));
+        }
+
+        setWindowTitle(_detailsWidget->windowTitle());
+    }
+
+    void CreateTransactionDialog::setTransactionType(
+        std::optional<TransactionType> type
+    )
+    {
+        int index = -1;
+
+        if (type.has_value())
+        {
+            index =
+                _transactionType->findData(QVariant::fromValue(type.value()));
+
+            if (index == -1)
+            {
+                LOG_WARNING(
+                    "Invalid transaction type set in "
+                    "CreateTransactionDialog: " +
+                    TransactionTypeMeta::toString(type.value())
+                );
+            }
+        }
+        _transactionType->setCurrentIndex(index);
+        _onTransactionTypeChanged(index);
+    }
+
+    void CreateTransactionDialog::_setWindowTitle(
+        std::optional<TransactionType> type
+    )
+    {
+        if (!type.has_value())
+        {
+            setWindowTitle("New Transaction");
+            return;
+        }
+
+        switch (type.value())
         {
             case TransactionType::Deposit:
+                setWindowTitle("New Deposit");
+                return;
             case TransactionType::Withdrawal:
-                _createTransactionWidget =
-                    utils::makeQChild<DepositWithdrawalWidget>(this);
-                break;
+                setWindowTitle("New Withdrawal");
+                return;
         }
+
+        throw std::logic_error(
+            "Unhandled transaction type: " +
+            std::to_string(static_cast<int>(type.value()))
+        );
     }
 }   // namespace ui

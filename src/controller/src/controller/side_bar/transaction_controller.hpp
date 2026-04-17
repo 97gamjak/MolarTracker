@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QPointer>
 
+#include "config/finance.hpp"
 #include "side_bar_category_controller.hpp"
 #include "ui/transaction/create_transaction_dlg.hpp"
 
@@ -41,7 +42,7 @@ namespace controller
         /// The account store for the application
         app::AccountStore& _accountStore;
 
-        QPointer<ui::CreateTransactionDialog> _createTransactionDialog;
+        QPointer<ui::CreateTransactionDialog> _createDlg;
 
        public:
         TransactionSideBarController(
@@ -56,6 +57,9 @@ namespace controller
             const ui::TransactionCategory* item,
             const QAction*                 action
         );
+
+       private slots:
+        void _onTransactionTypeChanged(TransactionType type);
     };
 }   // namespace controller
 

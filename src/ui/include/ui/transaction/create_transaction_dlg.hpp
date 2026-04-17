@@ -2,6 +2,7 @@
 #define __UI__INCLUDE__UI__TRANSACTION__CREATE_TRANSACTION_DLG_HPP__
 
 #include <QComboBox>
+#include <optional>
 
 #include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
@@ -9,23 +10,8 @@
 
 namespace ui
 {
-    class CreateTransactionWidget : public QWidget
-    {
-        Q_OBJECT
 
-       public:
-        explicit CreateTransactionWidget(QWidget* parent);
-    };
-
-    class EmptyTransactionWidget : public CreateTransactionWidget
-    {
-        using CreateTransactionWidget::CreateTransactionWidget;
-    };
-
-    class DepositWithdrawalWidget : public CreateTransactionWidget
-    {
-        using CreateTransactionWidget::CreateTransactionWidget;
-    };
+    class CreateTransactionWidget;
 
     /**
      * @brief Dialog for creating a new transaction
@@ -35,27 +21,26 @@ namespace ui
     {
         Q_OBJECT
 
-        std::vector<drafts::AccountDraft> _accounts;
-
        private:
         QComboBox* _transactionType = nullptr;
 
-        CreateTransactionWidget* _createTransactionWidget = nullptr;
+        CreateTransactionWidget* _detailsWidget = nullptr;
 
        public:
-        explicit CreateTransactionDialog(
-            QWidget*                          parent,
+        explicit CreateTransactionDialog(QWidget* parent);
+        void setTransactionType(std::optional<TransactionType> type);
+        void setWidget(
+            TransactionType                   type,
             std::vector<drafts::AccountDraft> accounts
         );
-        explicit CreateTransactionDialog(
-            QWidget*                          parent,
-            std::vector<drafts::AccountDraft> accounts,
-            TransactionType                   type
-        );
+
+       signals:
+        void transactionTypeChanged(TransactionType type);
 
        private:
-        void _buildUI(std::optional<TransactionType> type);
+        void _buildUI();
         void _onTransactionTypeChanged(int index);
+        void _setWindowTitle(std::optional<TransactionType> type);
     };
 }   // namespace ui
 
