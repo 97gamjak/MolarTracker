@@ -51,6 +51,8 @@ namespace app
         /// loaded when the application starts.
         ActiveProfile _activeProfile;
 
+        using Base = BaseStore<Profile, ProfileId>;
+
        public:
         explicit ProfileStore(
             const std::shared_ptr<IProfileService>& profileService

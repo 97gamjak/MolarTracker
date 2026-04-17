@@ -4,14 +4,22 @@
 #include <format>
 
 #include "app/services_api/i_account_service.hpp"
-#include "app/store/predicates.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
+#include "drafts/account_mapper.hpp"
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.AccountStore");
+
+using finance::Account;
+using finance::HasAccountId;
+using finance::HasCurrency;
+using finance::IsAccountActive;
+using finance::IsAccountType;
+using finance::IsExternal;
+using std::vector;
 
 namespace app
 {
@@ -36,7 +44,7 @@ namespace app
     /**
      * @brief Create a new account based on the given account draft
      *
-     * @param accountDraft A draft containing the necessary information to
+     * @param account A draft containing the necessary information to
      * create a new account, this allows the store to take the user input and
      * convert it into a format that can be used to create a new account in the
      * underlying service, and ensures that the store can validate and process
@@ -47,7 +55,7 @@ namespace app
      * what went wrong if the creation failed.
      */
     [[nodiscard]] AccountStoreResult AccountStore::createAccount(
-        const drafts::AccountDraft& accountDraft
+        const drafts::AccountDraft& account
     )
     {
         if (_activeProfileId == ProfileId::invalid())
@@ -59,38 +67,40 @@ namespace app
         LOG_DEBUG(
             std::format(
                 "Creating account with name '{}' and currency '{}'",
-                accountDraft.name,
-                CurrencyMeta::toString(accountDraft.currency)
+                account.name,
+                CurrencyMeta::toString(account.currency)
             )
         );
 
-        const auto account = finance::Account{
+        const auto newAccount = Account{
             _generateNewId(),
             AccountStatus::Active,
-            accountDraft.name,
-            accountDraft.currency,
-            accountDraft.kind
+            account.name,
+            account.currency,
+            account.kind
         };
 
-        _addEntry(account, StoreState::New);
+        _addEntry(newAccount, StoreState::New);
 
         // special case for cash accounts
-        if (accountDraft.kind == AccountKind::Cash)
+        if (account.kind == AccountKind::Cash)
         {
             // check if we already have an external account for this profile id
             // and currency
-            const auto existingEntry =
-                _get(IsExternal() && HasCurrency(accountDraft.currency));
+            const auto existingEntry = _get(
+                {.filter   = IsExternal() && HasCurrency(account.currency),
+                 .deletion = DeletionPolicy::ExcludeDelete}
+            );
 
             if (!existingEntry.has_value())
             {
                 // If no existing entry is found, we can create a new external
                 // account
-                const auto externalAccount = finance::Account{
+                const auto externalAccount = Account{
                     _generateNewId(),
                     AccountStatus::Active,
-                    "External " + CurrencyMeta::toString(accountDraft.currency),
-                    accountDraft.currency,
+                    "External " + CurrencyMeta::toString(account.currency),
+                    account.currency,
                     AccountKind::External
                 };
 
@@ -227,7 +237,7 @@ namespace app
      * by the store, and provides a way to retrieve the account data for
      * display or further processing.
      *
-     * @return std::vector<const finance::Account*> A vector of pointers
+     * @return std::vector<const Account*> A vector of pointers
      * to all accounts currently in the store, each pointer points to an
      * account object that is managed by the store, and the caller can
      * use these pointers to access the account data and perform
@@ -235,27 +245,52 @@ namespace app
      */
     std::vector<drafts::AccountDraft> AccountStore::getAllAccounts() const
     {
-        std::vector<drafts::AccountDraft> accounts;
+        const auto options = Options{
+            .filter   = !IsExternal() && IsAccountActive(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
 
-        for (const auto& entry : _getEntries())
-        {
-            if (!entry.value.isExternal())
-                accounts.push_back(&entry.value);
-        }
+        auto accounts = _getValues(options) |
+                        std::views::transform(drafts::AccountMapper::toDraft);
 
-        return accounts;
+        return {accounts.begin(), accounts.end()};
+    }
+
+    std::vector<drafts::AccountDraft> AccountStore::getCashAccounts() const
+    {
+        const auto options = Options{
+            .filter   = IsAccountType(AccountKind::Cash) && IsAccountActive(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        auto accounts = _getValues(options) |
+                        std::views::transform(drafts::AccountMapper::toDraft);
+
+        return {accounts.begin(), accounts.end()};
     }
 
     /**
      * @brief Get an account by its ID
      *
      * @param id The ID of the account to retrieve
-     * @return std::optional<finance::AccountVariant> The account if
+     * @return std::optional<drafts::AccountDraft> The account if
      * found, or an empty optional if not found
      */
-    std::optional<finance::Account> AccountStore::getAccount(AccountId id) const
+    std::optional<drafts::AccountDraft> AccountStore::getAccount(
+        AccountId id
+    ) const
     {
-        return _get(HasAccountId(id));
+        const auto options = Options{
+            .filter   = HasAccountId(id) && IsAccountActive(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        const auto account = _get(options);
+
+        if (account.has_value())
+            return drafts::AccountMapper::toDraft(account.value());
+
+        return std::nullopt;
     }
 
 }   // namespace app

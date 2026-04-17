@@ -12,7 +12,7 @@
 
 namespace app
 {
-    class AppContext;   // Forward declaration
+    class AccountStore;   // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -38,16 +38,16 @@ namespace controller
        private:
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
-        /// The application context
-        app::AppContext& _appContext;
+        /// The account store for the application
+        app::AccountStore& _accountStore;
 
         QPointer<ui::CreateTransactionDialog> _createTransactionDialog;
 
        public:
         TransactionSideBarController(
-            cmd::UndoStack&  undoStack,
-            app::AppContext& appContext,
-            QMainWindow*     mainWindow
+            cmd::UndoStack&    undoStack,
+            app::AccountStore& accountStore,
+            QMainWindow*       mainWindow
         );
 
         void refresh() override;

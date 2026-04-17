@@ -64,11 +64,11 @@ namespace controller
         const auto accounts =
             _appContext.getStore().getAccountStore().getAllAccounts();
 
-        for (const auto* account : accounts)
+        for (const auto& account : accounts)
         {
             category->addAccount(
-                account->getId(),
-                QString::fromStdString(account->getName())
+                account.id,
+                QString::fromStdString(account.name)
             );
         }
     }

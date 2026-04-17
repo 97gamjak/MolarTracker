@@ -17,7 +17,7 @@ namespace drafts
     {
         /// The ID of the account, this is optional because it may not be set
         /// when creating a new account
-        std::optional<AccountId> id = AccountId::invalid();
+        AccountId id = AccountId::invalid();
 
         /// The name of the account (required)
         std::string name;
@@ -27,6 +27,10 @@ namespace drafts
 
         /// The currency of the account (required)
         Currency currency;
+
+        /// The status of the account, this is optional because it may not be
+        /// set
+        std::optional<AccountStatus> status = std::nullopt;
     };
 }   // namespace drafts
 

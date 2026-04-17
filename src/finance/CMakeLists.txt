@@ -18,6 +18,7 @@ target_include_directories(molartracker_finance
 target_link_libraries(molartracker_finance
     PUBLIC
     mstd
+    molartracker_filter
     PRIVATE
     molartracker_config
     molartracker_exceptions

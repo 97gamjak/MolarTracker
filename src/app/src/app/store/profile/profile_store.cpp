@@ -2,12 +2,12 @@
 
 #include <cctype>
 #include <format>
+#include <ranges>
 
 #include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
 #include "app/store/base/base_store.hpp"
 #include "app/store/profile/exception.hpp"
-#include "app/store/profile/predicates.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
 
@@ -54,17 +54,13 @@ namespace app
      */
     std::vector<std::string> ProfileStore::getAllProfileNames() const
     {
-        std::vector<std::string> names;
+        const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
-        for (const auto& entr : _getEntries())
-        {
-            if (entr.state == StoreState::Deleted)
-                continue;
+        auto profiles = _getValues(options) |
+                        std::views::transform([](const auto& profile)
+                                              { return profile.getName(); });
 
-            names.push_back(entr.value.getName());
-        }
-
-        return names;
+        return {profiles.begin(), profiles.end()};
     }
 
     /**
@@ -75,6 +71,7 @@ namespace app
     void ProfileStore::setActiveProfile(std::string_view name)
     {
         const auto profile = getProfile(name);
+
         if (!profile)
         {
             throw ProfileStoreException(
@@ -114,6 +111,7 @@ namespace app
     std::optional<std::string> ProfileStore::getActiveProfileName() const
     {
         const auto profile = getActiveProfile();
+
         if (profile.has_value())
             return profile->getName();
 
@@ -130,7 +128,10 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(ProfileId id) const
     {
-        auto profile = _get(HasProfileId(id));
+        auto profile = _get(
+            {.filter   = HasProfileId(id),
+             .deletion = DeletionPolicy::ExcludeDelete}
+        );
 
         if (!profile.has_value())
             return std::nullopt;
@@ -148,7 +149,10 @@ namespace app
      */
     std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
     {
-        auto profile = _get(HasProfileName(name));
+        auto profile = _get(
+            {.filter   = HasProfileName(name),
+             .deletion = DeletionPolicy::ExcludeDelete}
+        );
 
         if (profile.has_value())
             return profile;
@@ -202,8 +206,8 @@ namespace app
         _markPotentiallyDirty();
 
         auto* entry = _findEntry(
-            HasProfileName(draft.name),
-            DeletionPolicy::IncludeDelete
+            {.filter   = HasProfileName(draft.name),
+             .deletion = DeletionPolicy::IncludeDelete}
         );
 
         if (entry != nullptr)
@@ -240,8 +244,8 @@ namespace app
         _markPotentiallyDirty();
 
         auto* const entry = _findEntry(
-            HasProfileName(draft.name),
-            DeletionPolicy::IncludeDelete
+            {.filter   = HasProfileName(draft.name),
+             .deletion = DeletionPolicy::IncludeDelete}
         );
 
         if (entry == nullptr)

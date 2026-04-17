@@ -3,6 +3,7 @@
 #include <QMainWindow>
 
 #include "account_controller.hpp"
+#include "app/app_context.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
@@ -34,7 +35,11 @@ namespace controller
         : _sideBar(sideBar),
           _centralStack(centralStack),
           _accountSideBarController(undoStack, appContext, mainWindow),
-          _transactionSideBarController(undoStack, appContext, mainWindow),
+          _transactionSideBarController(
+              undoStack,
+              appContext.getStore().getAccountStore(),
+              mainWindow
+          ),
           _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);

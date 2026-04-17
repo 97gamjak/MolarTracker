@@ -12,17 +12,22 @@ namespace ui
     {
     }
 
-    CreateTransactionDialog::CreateTransactionDialog(QWidget* parent)
-        : Dialog(parent)
+    CreateTransactionDialog::CreateTransactionDialog(
+        QWidget*                          parent,
+        std::vector<drafts::AccountDraft> accounts
+    )
+        : Dialog(parent), _accounts(std::move(accounts))
     {
         _buildUI(std::nullopt);
     }
 
     CreateTransactionDialog::CreateTransactionDialog(
-        QWidget*        parent,
-        TransactionType type
+        QWidget*                          parent,
+        std::vector<drafts::AccountDraft> accounts,
+        TransactionType                   type
     )
         : Dialog(parent),
+          _accounts(std::move(accounts)),
           _createTransactionWidget(new EmptyTransactionWidget(this))
     {
         _buildUI(type);

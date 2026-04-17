@@ -1,5 +1,6 @@
 #include "transaction_controller.hpp"
 
+#include "app/store/account_store.hpp"
 #include "config/finance.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
@@ -14,17 +15,17 @@ namespace controller
      * Bar Controller object
      *
      * @param undoStack The undo stack for the application
-     * @param appContext The application context
+     * @param accountStore The account store for the application
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&  undoStack,
-        app::AppContext& appContext,
-        QMainWindow*     mainWindow
+        cmd::UndoStack&    undoStack,
+        app::AccountStore& accountStore,
+        QMainWindow*       mainWindow
     )
         : SideBarCategoryController(new ui::TransactionCategory(), mainWindow),
           _undoStack(undoStack),
-          _appContext(appContext)
+          _accountStore(accountStore)
     {
     }
 
@@ -63,7 +64,8 @@ namespace controller
             {
                 _createTransactionDialog =
                     utils::makeQChild<ui::CreateTransactionDialog>(
-                        getMainWindow()
+                        getMainWindow(),
+                        _accountStore.getAllAccounts()
                     );
             }
             else
@@ -71,6 +73,7 @@ namespace controller
                 _createTransactionDialog =
                     utils::makeQChild<ui::CreateTransactionDialog>(
                         getMainWindow(),
+                        _accountStore.getAllAccounts(),
                         action->data().value<TransactionType>()
                     );
             }

@@ -9,8 +9,8 @@
 
 #include "config/signal_tags.hpp"
 #include "connections/observable.hpp"
+#include "filter/predicate.hpp"
 #include "i_store.hpp"
-#include "predicate.hpp"
 #include "store_state.hpp"
 
 namespace app
@@ -22,6 +22,29 @@ namespace app
     X(ExcludeDelete)
 
     MSTD_ENUM(DeletionPolicy, std::int8_t, STATE_POLICY_LIST);
+
+    /**
+     * @brief Struct representing filter options for querying entries in the
+     * store. This can be extended in the future to include additional options
+     * for filtering entries based on specific criteria.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    struct FilterOptions
+    {
+        filter::Predicate<T> filter   = filter::Predicate<T>();
+        DeletionPolicy       deletion = DeletionPolicy::IncludeDelete;
+
+        template <typename U>
+        bool eval(const U& entry) const
+        {
+            return filter::evaluatePredicate(filter, entry.value) &&
+                   (deletion == DeletionPolicy::IncludeDelete ||
+                    entry.state != StoreState::Deleted);
+        }
+    };
 
     /**
      * @brief BaseStore is a base class for stores that manage a collection of
@@ -51,6 +74,8 @@ namespace app
 
         /// Type alias for a map of IDs.
         using IdMap = std::unordered_map<IdType, IdType, typename IdType::Hash>;
+
+        using Options = FilterOptions<T, IdType>;
 
         /// struct representing an entry in the store, containing a value and
         /// its state.
@@ -92,19 +117,19 @@ namespace app
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
 
-        [[nodiscard]] const std::vector<Entry>& _getEntries() const;
-        [[nodiscard]] std::vector<Entry>&       _getEntries();
+        // NOLINTBEGIN(fuchsia-default-arguments-declarations)
+        [[nodiscard]]
+        auto _getEntries(Options options = Options()) const;
+        [[nodiscard]]
+        auto _getEntries(Options options = Options());
+        [[nodiscard]]
+        auto _getValues(Options options = Options()) const;
 
-        [[nodiscard]] Entry* _findEntry(Predicate<T> pred);
-        [[nodiscard]] Entry* _findEntry(
-            Predicate<T>   pred,
-            DeletionPolicy policy
-        );
-        [[nodiscard]] std::optional<T> _get(Predicate<T> pred) const;
-        [[nodiscard]] std::optional<T> _get(
-            Predicate<T>   pred,
-            DeletionPolicy policy
-        ) const;
+        [[nodiscard]]
+        Entry* _findEntry(Options options = Options());
+        [[nodiscard]]
+        std::optional<T> _get(Options options = Options()) const;
+        // NOLINTEND(fuchsia-default-arguments-declarations)
 
         void _addEntry(const T& value, StoreState state);
         void _removeEntry(IdType id);
@@ -122,6 +147,12 @@ namespace app
             OnDirtyChanged::func func,
             void*                user
         ) override;
+
+       private:
+        static bool _evalDeletionPolicy(
+            const Entry&   entry,
+            DeletionPolicy policy
+        );
     };
 
     /**
@@ -145,6 +176,6 @@ namespace app
 
 #ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
 #include "base_store.tpp"
-#endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
+#endif
 
 #endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__

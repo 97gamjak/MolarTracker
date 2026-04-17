@@ -82,14 +82,7 @@ namespace controller
             return;
         }
 
-        const auto accountDraft = drafts::AccountDraft{
-            .id       = account.value().getId(),
-            .name     = account.value().getName(),
-            .kind     = AccountKind::Cash,
-            .currency = account.value().getCurrency()
-        };
-
-        _accountDetailView->updateAccount(accountDraft);
+        _accountDetailView->updateAccount(account.value());
         _stackedWidget->setCurrentWidget(_accountDetailView);
     }
 

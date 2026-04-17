@@ -4,6 +4,7 @@
 #include <QComboBox>
 
 #include "config/finance.hpp"
+#include "drafts/account_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 namespace ui
@@ -34,14 +35,23 @@ namespace ui
     {
         Q_OBJECT
 
+        std::vector<drafts::AccountDraft> _accounts;
+
        private:
         QComboBox* _transactionType = nullptr;
 
         CreateTransactionWidget* _createTransactionWidget = nullptr;
 
        public:
-        explicit CreateTransactionDialog(QWidget* parent);
-        explicit CreateTransactionDialog(QWidget* parent, TransactionType type);
+        explicit CreateTransactionDialog(
+            QWidget*                          parent,
+            std::vector<drafts::AccountDraft> accounts
+        );
+        explicit CreateTransactionDialog(
+            QWidget*                          parent,
+            std::vector<drafts::AccountDraft> accounts,
+            TransactionType                   type
+        );
 
        private:
         void _buildUI(std::optional<TransactionType> type);
