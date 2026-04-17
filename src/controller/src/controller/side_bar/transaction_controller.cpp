@@ -28,6 +28,12 @@ namespace controller
           _accountStore(accountStore),
           _createDlg(new ui::CreateTransactionDialog(mainWindow))
     {
+        connect(
+            _createDlg,
+            &ui::CreateTransactionDialog::transactionTypeChanged,
+            this,
+            &TransactionSideBarController::_onTransactionTypeChanged
+        );
     }
 
     /**
@@ -59,15 +65,23 @@ namespace controller
             action == item->getCreateDepositAction() ||
             action == item->getCreateWithdrawalAction())
         {
-            LOG_DEBUG("Create action triggered for transaction category");
+            std::optional<TransactionType> type;
 
-            using enum TransactionType;
             if (action == item->getCreateDepositAction())
-                _createDlg->setTransactionType(Deposit);
+                type = TransactionType::Deposit;
             else if (action == item->getCreateWithdrawalAction())
-                _createDlg->setTransactionType(Withdrawal);
+                type = TransactionType::Withdrawal;
             else
-                _createDlg->setTransactionType(std::nullopt);
+                type = std::nullopt;
+
+            LOG_DEBUG(
+                "Create action triggered for transaction category with type: " +
+                (type.has_value() ? TransactionTypeMeta::toString(type.value())
+                                  : "None")
+            );
+
+            if (type.has_value())
+                _onTransactionTypeChanged(type.value());
 
             if (auto* dialog = _createDlg.data())
                 dialog->exec();

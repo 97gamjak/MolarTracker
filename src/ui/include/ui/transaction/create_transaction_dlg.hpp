@@ -1,17 +1,17 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__CREATE_TRANSACTION_DLG_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__CREATE_TRANSACTION_DLG_HPP__
 
+#include <qstackedwidget.h>
+
 #include <QComboBox>
-#include <optional>
 
 #include "config/finance.hpp"
+#include "create_transaction_details.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 namespace ui
 {
-
-    class CreateTransactionWidget;
 
     /**
      * @brief Dialog for creating a new transaction
@@ -24,11 +24,13 @@ namespace ui
        private:
         QComboBox* _transactionType = nullptr;
 
-        CreateTransactionWidget* _detailsWidget = nullptr;
+        std::unordered_map<TransactionType, CreateTransactionWidget*>
+            _widgetMap;
+
+        QStackedWidget* _stack = nullptr;
 
        public:
         explicit CreateTransactionDialog(QWidget* parent);
-        void setTransactionType(std::optional<TransactionType> type);
         void setWidget(
             TransactionType                   type,
             std::vector<drafts::AccountDraft> accounts
@@ -40,7 +42,7 @@ namespace ui
        private:
         void _buildUI();
         void _onTransactionTypeChanged(int index);
-        void _setWindowTitle(std::optional<TransactionType> type);
+        void _setWindowTitle(TransactionType type);
     };
 }   // namespace ui
 

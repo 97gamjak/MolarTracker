@@ -5,6 +5,10 @@
 
 #include "drafts/account_draft.hpp"
 
+class QComboBox;   // Forward declaration
+class QLabel;      // Forward declaration
+class QLayout;     // Forward declaration
+
 namespace ui
 {
     class CreateTransactionWidget : public QWidget
@@ -14,20 +18,30 @@ namespace ui
        private:
         std::vector<drafts::AccountDraft> _accounts;
 
-        std::optional<TransactionType> _transactionType;
+        QComboBox* _accountsSelection = nullptr;
+        QLabel*    _currencyLabel     = nullptr;
+
+        QLayout* _layout = nullptr;
 
        public:
-        explicit CreateTransactionWidget(QWidget* parent);
-
-        void setAccounts(std::vector<drafts::AccountDraft> accounts);
+        explicit CreateTransactionWidget(
+            QWidget*                          parent,
+            std::vector<drafts::AccountDraft> accounts
+        );
 
         [[nodiscard]]
         std::optional<TransactionType> getTransactionType() const;
+
+       private:
+        void _setAccounts();
+        void _buildUI();
+        void _onAccountSelected(int index);
     };
 
     class EmptyTransactionWidget : public CreateTransactionWidget
     {
-        using CreateTransactionWidget::CreateTransactionWidget;
+       public:
+        explicit EmptyTransactionWidget(QWidget* parent);
     };
 
     class DepositWithdrawalWidget : public CreateTransactionWidget
@@ -36,8 +50,9 @@ namespace ui
     };
 
     CreateTransactionWidget* makeTransactionWidget(
-        QWidget*                       parent,
-        std::optional<TransactionType> type
+        QWidget*                          parent,
+        TransactionType                   type,
+        std::vector<drafts::AccountDraft> accounts
     );
 
 }   // namespace ui
