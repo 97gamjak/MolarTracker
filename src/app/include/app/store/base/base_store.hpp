@@ -127,6 +127,7 @@ namespace app
         BaseStore& operator=(const BaseStore&) = delete;
 
         [[nodiscard]] bool isDirty() const override;
+        [[nodiscard]] bool allDirty() const;
 
         void clearPotentiallyDirty() override;
 

@@ -151,16 +151,30 @@ namespace ui
             case Column::Type:
                 return QString::fromStdString("");
             case Column::Account:
+            {
+                if (!_accountIdToName.contains(
+                        transaction.entries.front().accountId
+                    ))
+                    return "";
+
                 return QString::fromStdString(
                     _accountIdToName.at(transaction.entries.front().accountId)
                 );
+            }
             case Column::ReferenceAccount:
+            {
+                if (!_accountIdToName.contains(
+                        transaction.entries.back().accountId
+                    ))
+                    return "";
+
                 return QString::fromStdString(
                     _accountIdToName.at(transaction.entries.back().accountId)
                 );
+            }
             case Column::Amount:
                 return QString::fromStdString(
-                    transaction.entries.front().cash.toString()
+                    transaction.entries.front().cash.toString(2)
                 );
         }
         return {};

@@ -1,6 +1,7 @@
 #ifndef __UI__INCLUDE__UI__VALIDATORS__AMOUNT_LINE_EDIT_HPP__
 #define __UI__INCLUDE__UI__VALIDATORS__AMOUNT_LINE_EDIT_HPP__
 
+#include "config/finance.hpp"
 #include "line_validator.hpp"
 
 namespace ui
@@ -32,11 +33,18 @@ namespace ui
         void setNDecimalPlaces(std::uint8_t numberOfDecimalPlaces);
         void setOnlyPositive(bool onlyPositive);
 
+        [[nodiscard]] micro_units getAmount() const;
+
        protected:
         [[nodiscard]] QString _getRequiredErrorMessage() const override;
         [[nodiscard]] std::pair<bool, QString> _validateNonEmpty(
             QStringView trimmedText
         ) const override;
+
+       private slots:
+        QString _removeLeadingZeros(const QString& text);
+        void    _removeTrailingZeros();
+        void    _removeExceedingDecimals(const QString& text);
     };
 
 }   // namespace ui
