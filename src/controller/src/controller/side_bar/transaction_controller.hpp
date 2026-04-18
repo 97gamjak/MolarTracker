@@ -70,9 +70,7 @@ namespace controller
 
        private slots:
         void _onTransactionTypeChanged(TransactionType type);
-        void _onCreateTransactionRequested(
-            const drafts::TransactionDraft& draft
-        );
+        void _onCreateTransactionRequested(drafts::TransactionDraft draft);
     };
 }   // namespace controller
 

@@ -288,6 +288,24 @@ namespace app
         return accountIdToName;
     }
 
+    AccountId AccountStore::getExternalAccount(Currency currency) const
+    {
+        const auto options = Options{
+            .filter   = IsExternal() && HasCurrency(currency),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        const auto account = _get(options);
+
+        if (account.has_value())
+            return account->getId();
+
+        throw AccountStoreException(
+            "No external account found for currency " +
+            CurrencyMeta::toString(currency)
+        );
+    }
+
     /**
      * @brief Get an account by its ID
      *

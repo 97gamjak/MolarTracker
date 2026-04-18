@@ -70,6 +70,9 @@ namespace app
             std::string,
             AccountId::Hash> getAccountIdToNameMap() const;
 
+        [[nodiscard]]
+        AccountId getExternalAccount(Currency currency) const;
+
         void commit();
 
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);

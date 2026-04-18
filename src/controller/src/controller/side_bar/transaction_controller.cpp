@@ -3,6 +3,7 @@
 #include "app/store/account_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
+#include "drafts/transaction_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/create_transaction_dlg.hpp"
@@ -128,9 +129,26 @@ namespace controller
     }
 
     void TransactionSideBarController::_onCreateTransactionRequested(
-        const drafts::TransactionDraft& draft
+        drafts::TransactionDraft draft
     )
     {
+        std::vector<drafts::TransactionEntryDraft> additionalEntries;
+
+        for (auto entry : draft.entries)
+        {
+            if (entry.needsExternal)
+            {
+                entry.accountId =
+                    _accountStore.getExternalAccount(entry.cash.getCurrency());
+                additionalEntries.push_back(entry);
+            }
+        }
+
+        for (const auto& entry : additionalEntries)
+        {
+            draft.entries.push_back(entry);
+        }
+
         _transactionStore.addTransaction(draft);
         // TODO(97gamjak): add here commands and also error handling
         _createDlg->close();
