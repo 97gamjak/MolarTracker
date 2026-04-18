@@ -84,7 +84,7 @@ namespace ui
             )
         );
 
-        if (!amountRegex.match(trimmedText).hasMatch())
+        if (!amountRegex.matchView(trimmedText).hasMatch())
         {
             return {false, "Invalid amount format"};
         }
