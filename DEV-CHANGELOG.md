@@ -5,6 +5,8 @@ All changes and updates, that are relevant for developers will be documented her
 ## Next Release
 
 <!-- insertion marker -->
+## [0.0.5](https://github.com/repo/owner/releases/tag/0.0.5) - 2026-04-18
+
 ## [0.0.4](https://github.com/repo/owner/releases/tag/0.0.4) - 2026-04-18
 
 ### Features
@@ -193,6 +195,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 

@@ -4,6 +4,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.0.5](https://github.com/repo/owner/releases/tag/0.0.5) - 2026-04-18
+
 ### Features
 
 #### Transactions
@@ -18,7 +21,6 @@ All changes and updates, that are relevant for a user will be documented here
 - Fixed: having same transaction multiple times in table view when saving after creating
 - Fixed: make it possible to have decimal numbers for transaction amounts
 
-<!-- insertion marker -->
 ## [0.0.4](https://github.com/repo/owner/releases/tag/0.0.4) - 2026-04-18
 
 ### Feature
@@ -92,6 +94,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 
