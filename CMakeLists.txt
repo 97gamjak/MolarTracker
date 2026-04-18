@@ -19,6 +19,7 @@ message(STATUS "CMAKE_CXX_COMPILER_ID   = ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "CMAKE_CXX_COMPILER      = ${CMAKE_CXX_COMPILER}")
 message(STATUS "MSVC                    = ${MSVC}")
 message(STATUS "WIN32                   = ${WIN32}")
+message(STATUS "QT_VERSION              = ${Qt6_VERSION}")
 
 qt_standard_project_setup()
 

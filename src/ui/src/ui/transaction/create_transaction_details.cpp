@@ -140,19 +140,6 @@ namespace ui
     }
 
     /**
-     * @brief get the amount entered in the amount field, this will return the
-     * amount as a micro unit value, allowing the caller to use the amount for
-     * creating a transaction draft or performing other operations that require
-     * the amount in micro units.
-     *
-     * @return micro_units
-     */
-    micro_units NonEmptyTransactionWidget::_getAmount() const
-    {
-        return _amountField->text().toLongLong();
-    }
-
-    /**
      * @brief set the accounts for the accounts selection combo box
      */
     void NonEmptyTransactionWidget::_setAccounts()
@@ -264,9 +251,10 @@ namespace ui
             throw std::runtime_error("No account selected");
         }
 
-        const auto amount = _getTransactionType() == TransactionType::Deposit
-                                ? _getAmount()
-                                : -_getAmount();
+        const auto amountTmp = _getAmountField()->getAmount();
+        const auto amount    = _getTransactionType() == TransactionType::Deposit
+                                   ? amountTmp
+                                   : -amountTmp;
 
         auto entry = drafts::TransactionEntryDraft{
             selectedAccount->id,
@@ -304,9 +292,19 @@ namespace ui
     {
         const auto isValid = _getSelectedAccount().has_value() &&
                              _amountField->isValid() &&
-                             _amountField->text().toLongLong() != 0;
+                             _amountField->getAmount() != 0;
 
         _addButton->setEnabled(isValid);
+    }
+
+    /**
+     * @brief get the amount field
+     *
+     * @return AmountLineEdit*
+     */
+    AmountLineEdit* NonEmptyTransactionWidget::_getAmountField() const
+    {
+        return _amountField;
     }
 
 }   // namespace ui

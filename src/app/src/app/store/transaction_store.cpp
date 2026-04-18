@@ -68,6 +68,8 @@ namespace app
                     break;
             }
         }
+
+        _cleanEntries();
     }
 
     /**

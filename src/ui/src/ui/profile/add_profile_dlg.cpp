@@ -82,7 +82,7 @@ namespace ui
      */
     void AddProfileDialog::_buildFormSection(QVBoxLayout* parent)
     {
-        auto* formLayout = utils::makeQChild<QFormLayout>(this);
+        auto* formLayout = utils::makeQChild<QFormLayout>();
 
         auto [nameLineEdit, nameContainer] =
             createLineEditWithLabel<NameLineEdit>(this);
@@ -91,12 +91,12 @@ namespace ui
         _nameLineEdit = nameLineEdit;
         formLayout->addRow(utils::makeQChild<QLabel>("Name*:"), nameContainer);
 
-        auto* emailErrorLabel = utils::makeQChild<QLabel>(this);
+        auto* emailErrorLabel = utils::makeQChild<QLabel>();
 
         _emailLineEdit = utils::makeQChild<EmailLineEdit>(this);
         _emailLineEdit->attachErrorLabel(emailErrorLabel);
 
-        auto* emailContainer = utils::makeQChild<QWidget>(this);
+        auto* emailContainer = utils::makeQChild<QWidget>();
         auto* emailLayout    = utils::makeQChild<QVBoxLayout>(emailContainer);
         emailLayout->setContentsMargins(0, 0, 0, 0);
         emailLayout->setSpacing(2);
@@ -115,14 +115,14 @@ namespace ui
      */
     void AddProfileDialog::_buildToggleSection(QVBoxLayout* parent)
     {
-        auto* toggleLayout = utils::makeQChild<QHBoxLayout>(this);
+        auto* toggleLayout = utils::makeQChild<QHBoxLayout>();
 
         _setActiveCheckBox =
-            utils::makeQChild<QCheckBox>("Set as Active Profile", this);
+            utils::makeQChild<QCheckBox>("Set as Active Profile");
         toggleLayout->addWidget(_setActiveCheckBox);
 
         _setAsDefaultCheckBox =
-            utils::makeQChild<QCheckBox>("Set as Default Profile", this);
+            utils::makeQChild<QCheckBox>("Set as Default Profile");
         toggleLayout->addWidget(_setAsDefaultCheckBox);
 
         _setActiveCheckBox->setChecked(false);
@@ -140,9 +140,9 @@ namespace ui
      */
     void AddProfileDialog::_buildButtonSection(QVBoxLayout* parent)
     {
-        auto* buttonLayout = utils::makeQChild<QHBoxLayout>(this);
+        auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
 
-        _addButton = utils::makeQChild<QPushButton>("Add Profile", this);
+        _addButton = utils::makeQChild<QPushButton>("Add Profile");
 
         // check the validity of the input to enable or disable the add button
         _addButton->setEnabled(false);
@@ -165,7 +165,7 @@ namespace ui
 
         if (_canBeClosed)
         {
-            _cancelButton = utils::makeQChild<QPushButton>("Cancel", this);
+            _cancelButton = utils::makeQChild<QPushButton>("Cancel");
             buttonLayout->addWidget(_cancelButton);
             connect(
                 _cancelButton,
