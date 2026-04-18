@@ -85,8 +85,14 @@ namespace ui
      */
     void CreateTransactionDialog::reset()
     {
+        _widgetMap.clear();
         _transactionType->setCurrentIndex(-1);
-        _stack->setCurrentIndex(0);
+        for (int i = 1; i < _stack->count(); ++i)
+        {
+            auto* widget = _stack->widget(i);
+            _stack->removeWidget(widget);
+            widget->deleteLater();
+        }
     }
 
     /**
