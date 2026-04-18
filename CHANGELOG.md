@@ -19,6 +19,7 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Add possibility to create CashAccounts
 - Adding first draft of Single Account Pages
+- Add possibility to add first Transactions and see an overview (cash transactions only)
 
 ### BugFix
 

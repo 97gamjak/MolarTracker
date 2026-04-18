@@ -23,3 +23,9 @@ target_link_libraries(molartracker_utils
 set_property(TARGET molartracker_utils APPEND PROPERTY
     AUTOGEN_TARGET_DEPENDS generate_log_categories
 )
+
+# add qt enabled to compile time flags for timestamp
+target_compile_definitions(molartracker_utils
+    PRIVATE
+    __QT_ENABLED__
+)

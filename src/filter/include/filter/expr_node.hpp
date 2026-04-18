@@ -28,15 +28,17 @@ namespace filter
     /**
      * @brief A node representing a filter expression.
      *
+     * @details ATTENTION: empty node needs to be the first alternative here!!!
+     *
      * @tparam Leaf The type of the leaf nodes.
      */
     template <typename Leaf>
     using Node = std::variant<
+        EmptyNode<Leaf>,
         Leaf,
         AndNode<Leaf>,
         OrNode<Leaf>,
-        NotNode<Leaf>,
-        EmptyNode<Leaf>>;
+        NotNode<Leaf>>;
 
     /**
      * @brief A pointer to a filter expression node.
@@ -115,7 +117,7 @@ namespace filter
     Node<Leaf> operator&&(Node<Leaf> left, Node<Leaf> right);
 
     template <typename Leaf>
-    Node<Leaf> operator&=(Node<Leaf> left, Node<Leaf> right);
+    Node<Leaf>& operator&=(Node<Leaf>& left, const Node<Leaf>& right);
 
     template <typename Leaf>
     Node<Leaf> operator||(Node<Leaf> left, Node<Leaf> right);

@@ -2,9 +2,11 @@
 #define __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
 
 #include <algorithm>
+#include <ranges>
 
 #include "base_store.hpp"
 #include "config/id_types.hpp"
+#include "filter/predicate.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.BaseStore");
@@ -25,7 +27,7 @@ namespace app
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::_isDeleted(IdType id) const
     {
-        const auto* entry = _findEntry(id, DeletionPolicy::IncludeDelete);
+        const auto* entry = _findEntry(id);
         return entry != nullptr && entry->state == StoreState::Deleted;
     }
 
@@ -71,87 +73,36 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
-     * @param pred
+     * @param options
      * @return BaseStore<T, IdType>::Entry*
      */
     template <typename T, typename IdType>
-    typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
-        Predicate<T> pred
-    )
-    {
-        return _findEntry(pred, DeletionPolicy::ExcludeDelete);
-    }
-
-    /**
-     * @brief Finds an entry in the store that matches the given predicate and
-     * returns a pointer to it, or nullptr if not found.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param pred
-     * @param policy
-     * @return BaseStore<T, IdType>::Entry*
-     */
-    template <typename T, typename IdType>
-    typename BaseStore<T, IdType>::Entry* BaseStore<T, IdType>::_findEntry(
-        Predicate<T>   pred,
-        DeletionPolicy policy
-    )
+    auto BaseStore<T, IdType>::_findEntry(Options options) -> Entry*
     {
         auto it = std::ranges::find_if(
             _entries,
-            [&pred, policy](const auto& entry)
-            {
-                return pred(entry.value) &&
-                       (policy == DeletionPolicy::IncludeDelete ||
-                        entry.state != StoreState::Deleted);
-            }
+            [&options](const auto& entry) { return options.eval(entry); }
         );
 
         return it != _entries.end() ? &(*it) : nullptr;
     }
 
     /**
-     * @brief Retrieves the value of an entry that matches the given predicate,
+     * @brief Retrieves the value of an entry that matches the given options,
      * returning it as an optional. If no matching entry is found, returns
      * std::nullopt.
      *
      * @tparam T
      * @tparam IdType
-     * @param pred
+     * @param options
      * @return std::optional<T>
      */
     template <typename T, typename IdType>
-    std::optional<T> BaseStore<T, IdType>::_get(Predicate<T> pred) const
-    {
-        return _get(pred, DeletionPolicy::ExcludeDelete);
-    }
-
-    /**
-     * @brief Retrieves the value of an entry that matches the given predicate,
-     * returning it as an optional. If no matching entry is found, returns
-     * std::nullopt.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param pred
-     * @param policy
-     * @return std::optional<T>
-     */
-    template <typename T, typename IdType>
-    std::optional<T> BaseStore<T, IdType>::_get(
-        Predicate<T>   pred,
-        DeletionPolicy policy
-    ) const
+    std::optional<T> BaseStore<T, IdType>::_get(Options options) const
     {
         auto it = std::ranges::find_if(
             _entries,
-            [&pred, policy](const auto& entry)
-            {
-                return pred(entry.value) &&
-                       (policy == DeletionPolicy::IncludeDelete ||
-                        entry.state != StoreState::Deleted);
-            }
+            [&options](const auto& entry) { return options.eval(entry); }
         );
 
         return it != _entries.end() ? std::optional<T>{it->value}
@@ -164,15 +115,18 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
+     * @param options
      * @return const std::vector<typename BaseStore<T, IdType>::Entry>&
      */
-
     template <typename T, typename IdType>
-    const std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<
-        T,
-        IdType>::_getEntries() const
+    auto BaseStore<T, IdType>::_getEntries(Options options) const
     {
-        return _entries;
+        // pipe operator not working here due _Partial adaptor invocable
+        // constraints -- NO IDEA WHY
+        return std::ranges::filter_view(
+            _entries,
+            [options](const auto& entry) { return options.eval(entry); }
+        );
     }
 
     /**
@@ -180,14 +134,35 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
+     * @param options
      * @return std::vector<typename BaseStore<T, IdType>::Entry>&
      */
-
     template <typename T, typename IdType>
-    std::vector<typename BaseStore<T, IdType>::Entry>& BaseStore<T, IdType>::
-        _getEntries()
+    auto BaseStore<T, IdType>::_getEntries(Options options)
     {
-        return _entries;
+        // pipe operator not working here due _Partial adaptor invocable
+        // constraints -- NO IDEA WHY
+        return std::ranges::filter_view(
+            _entries,
+            [options](const auto& entry) { return options.eval(entry); }
+        );
+    }
+
+    /**
+     * @brief Retrieves a collection of values from the entries in the store
+     * that match the given options, returning them as a vector.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param options
+     * @return std::vector<T>
+     */
+    template <typename T, typename IdType>
+    auto BaseStore<T, IdType>::_getValues(Options options) const
+    {
+        return _getEntries(options) |
+               std::views::transform([](const auto& entry)
+                                     { return entry.value; });
     }
 
     /**
@@ -381,14 +356,37 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
-     * @return const std::unordered_map<IdType, IdType>&
+     * @return const IdMap
      */
 
     template <typename T, typename IdType>
-    const std::unordered_map<IdType, IdType>& BaseStore<T, IdType>::
-        getChangedIds() const
+    const BaseStore<T, IdType>::IdMap& BaseStore<T, IdType>::getChangedIds(
+    ) const
     {
         return _changedIds;
+    }
+
+    /**
+     * @brief Evaluates whether an entry should be included based on the given
+     * deletion policy. This is used to determine whether entries that are
+     * marked as deleted should be included in certain operations, such as
+     * retrieval or display.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param entry
+     * @param policy
+     * @return true if the entry should be included based on the deletion
+     * policy, false otherwise.
+     */
+    template <typename T, typename IdType>
+    bool BaseStore<T, IdType>::_evalDeletionPolicy(
+        const Entry&   entry,
+        DeletionPolicy policy
+    )
+    {
+        return policy == DeletionPolicy::IncludeDelete ||
+               entry.state != StoreState::Deleted;
     }
 
 }   // namespace app

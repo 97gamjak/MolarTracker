@@ -3,6 +3,7 @@
 
 #include <variant>
 
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash_transaction.hpp"
 
@@ -36,6 +37,10 @@ namespace finance
         [[nodiscard]] TransactionEntryId getId() const;
         [[nodiscard]] AccountId          getAccountId() const;
         [[nodiscard]] TransactionDetail  getDetails() const;
+        [[nodiscard]] micro_units        getAmount() const;
+        [[nodiscard]] Currency           getCurrency() const;
+
+        void setAccountId(AccountId accountId);
     };
 
     /**

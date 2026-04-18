@@ -15,10 +15,12 @@ namespace app
      */
     StoreContainer::StoreContainer(ServiceContainer& services)
         : _profileStore{services.getProfileService()},
-          _accountStore{services.getAccountService()}
+          _accountStore{services.getAccountService()},
+          _transactionStore{services.getTransactionService()}
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
+        _allStores.push_back(&_transactionStore);
 
         auto connectProfileIdUpdate =
             [](void* user, const std::optional<ProfileId>& profileId)
@@ -38,8 +40,12 @@ namespace app
     {
         LOG_INFO("Saving all temporary changes to database");
 
-        for (auto* store : _allStores)
-            store->commit();
+        _profileStore.commit();
+        // here the id of the active profile store was already updated via
+        // the observer in account store
+        _accountStore.commit();
+
+        _transactionStore.commit(_accountStore.getChangedIds());
     }
 
     /**
@@ -116,6 +122,26 @@ namespace app
     const AccountStore& StoreContainer::getAccountStore() const
     {
         return _accountStore;
+    }
+
+    /**
+     * @brief Get the TransactionStore
+     *
+     * @return TransactionStore&
+     */
+    TransactionStore& StoreContainer::getTransactionStore()
+    {
+        return _transactionStore;
+    }
+
+    /**
+     * @brief Get the TransactionStore (const version)
+     *
+     * @return const TransactionStore&
+     */
+    const TransactionStore& StoreContainer::getTransactionStore() const
+    {
+        return _transactionStore;
     }
 
 }   // namespace app

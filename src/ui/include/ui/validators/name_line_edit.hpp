@@ -40,10 +40,6 @@ namespace ui
         ) const override;
     };
 
-    std::pair<NameLineEdit*, QWidget*> createNameLineEditWithLabel(
-        QWidget* parent
-    );
-
 }   // namespace ui
 
 #endif   // __UI__INCLUDE__UI__VALIDATORS__NAME_LINE_EDIT_HPP__

@@ -5,6 +5,7 @@
 #include <string>
 
 #include "config/id_types.hpp"
+#include "filter/predicate.hpp"
 
 namespace app
 {
@@ -40,6 +41,9 @@ namespace app
         void setName(const std::string& newName);
         void setEmail(const std::optional<std::string>& newEmail);
     };
+
+    filter::Predicate<Profile> HasProfileId(ProfileId id);
+    filter::Predicate<Profile> HasProfileName(std::string_view name);
 
 }   // namespace app
 

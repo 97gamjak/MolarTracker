@@ -28,7 +28,7 @@ namespace ui
         std::shared_ptr<Settings> settings,
         QWidget*                  parent
     )
-        : QDialog(parent),
+        : Dialog(parent),
           _settings(std::move(settings)),
           _textEdit(new QPlainTextEdit(this)),
           _reloadButton(new QPushButton(tr("Reload"), this)),

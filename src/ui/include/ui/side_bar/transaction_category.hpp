@@ -16,11 +16,17 @@ namespace ui
        private:
         /// The create action for the transaction category
         QAction* _createAction;
+        /// The create deposit action for the transaction category
+        QAction* _createDepositAction;
+        /// The create withdrawal action for the transaction category
+        QAction* _createWithdrawalAction;
 
        public:
         explicit TransactionCategory();
 
         [[nodiscard]] QAction* getCreateAction() const;
+        [[nodiscard]] QAction* getCreateDepositAction() const;
+        [[nodiscard]] QAction* getCreateWithdrawalAction() const;
 
         void populateContextMenu(QMenu& menu) override;
     };

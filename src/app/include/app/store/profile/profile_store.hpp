@@ -51,6 +51,9 @@ namespace app
         /// loaded when the application starts.
         ActiveProfile _activeProfile;
 
+        /// alias for the base store type
+        using Base = BaseStore<Profile, ProfileId>;
+
        public:
         explicit ProfileStore(
             const std::shared_ptr<IProfileService>& profileService
@@ -80,7 +83,7 @@ namespace app
             const drafts::ProfileDraft& draft
         );
 
-        void commit() override;
+        void commit();
 
         Connection subscribeToProfileChange(
             OnProfileChanged::func func,

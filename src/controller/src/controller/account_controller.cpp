@@ -6,16 +6,12 @@
 #include <QMainWindow>
 #include <QObject>
 
-#include "app/app_context.hpp"
 #include "app/store/account_store.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "config/finance.hpp"
-#include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
 #include "ui/account/account_detail_view.hpp"
-#include "ui/account/create_account_dlg.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
 
@@ -24,41 +20,20 @@ namespace controller
     /**
      * @brief Controller for managing account-related actions
      *
-     * @param undoStack A reference to the undo stack, this is used to push
-     * commands that are created as a result of actions in the account category
-     * (e.g. creating a new account), this allows the user to undo and redo
-     * actions related to accounts using the undo stack.
-     * @param appContext A reference to the application context, this is used to
-     * access the stores and services needed to perform operations related to
-     * accounts (e.g. creating a new account), this allows the controller to
-     * interact with the underlying data and business logic for accounts, and
-     * ensures that the controller can perform the necessary operations to
-     * manage accounts effectively.
-     * @param sideBarController A reference to the account side bar controller,
-     * this is used to manage the account selection and display in the side bar,
-     * and allows the controller to respond to account selection events.
-     * @param stackedWidget A pointer to the stacked widget, this is used to
-     * manage the different views for account details and other related
-     * information, allowing the controller to switch between views as needed.
+     * @param undoStack
+     * @param accountStore
+     * @param stackedWidget
      */
     AccountController::AccountController(
-        cmd::UndoStack&           undoStack,
-        app::AppContext&          appContext,
-        AccountSideBarController& sideBarController,
-        QStackedWidget*           stackedWidget
+        cmd::UndoStack&    undoStack,
+        app::AccountStore& accountStore,
+        QStackedWidget*    stackedWidget
     )
         : _undoStack(undoStack),
-          _appContext(appContext),
+          _accountStore(accountStore),
           _stackedWidget(stackedWidget),
           _accountDetailView(new ui::AccountDetailView(_stackedWidget))
     {
-        connect(
-            &sideBarController,
-            &AccountSideBarController::accountSelected,
-            this,
-            &AccountController::_onAccountSelected
-        );
-
         _stackedWidget->addWidget(_accountDetailView);
     }
 
@@ -67,12 +42,11 @@ namespace controller
      *
      * @param id The ID of the selected account
      */
-    void AccountController::_onAccountSelected(AccountId id)
+    void AccountController::accountSelected(AccountId id)
     {
         LOG_ENTRY;
 
-        const auto account =
-            _appContext.getStore().getAccountStore().getAccount(id);
+        const auto account = _accountStore.getAccount(id);
 
         if (!account.has_value())
         {
@@ -82,14 +56,7 @@ namespace controller
             return;
         }
 
-        const auto accountDraft = drafts::AccountDraft{
-            .id       = account.value().getId(),
-            .name     = account.value().getName(),
-            .kind     = AccountKind::Cash,
-            .currency = account.value().getCurrency()
-        };
-
-        _accountDetailView->updateAccount(accountDraft);
+        _accountDetailView->updateAccount(account.value());
         _stackedWidget->setCurrentWidget(_accountDetailView);
     }
 

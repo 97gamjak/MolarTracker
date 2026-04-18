@@ -1,7 +1,6 @@
 #include "ui/main_window.hpp"
 
 #include <QApplication>
-#include <QDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QStackedWidget>
@@ -22,6 +21,9 @@ namespace ui
      * @brief Construct a new Main Window:: Main Window object
      */
     MainWindow::MainWindow()
+        : _menuBar(new MenuBar(this)),
+          _sideBar(new SideBar(this)),
+          _centralWidget(new CentralWidget(this))
     {
         setWindowTitle(false);
 
@@ -37,7 +39,7 @@ namespace ui
      */
     void MainWindow::_buildUI()
     {
-        _buildMenuBar();
+        setMenuBar(_menuBar);
 
         auto* root = utils::makeQChild<QWidget>(this);
         setCentralWidget(root);
@@ -53,23 +55,10 @@ namespace ui
         );
         layout->setSpacing(0);
 
-        _sideBar = utils::makeQChild<SideBar>(this);
         _sideBar->setFixedWidth(Constants::getSideBarWidth());
 
-        _centralStack = utils::makeQChild<QStackedWidget>(this);
-
         layout->addWidget(_sideBar);
-        layout->addWidget(_centralStack);
-    }
-
-    /**
-     * @brief Build the menu bar and its controllers
-     *
-     */
-    void MainWindow::_buildMenuBar()
-    {
-        _menuBar = utils::makeQChild<MenuBar>(this);
-        setMenuBar(_menuBar);
+        layout->addWidget(_centralWidget);
     }
 
     /**
@@ -107,8 +96,8 @@ namespace ui
     /**
      * @brief getter for the central widget
      *
-     * @return QStackedWidget*
+     * @return CentralWidget*
      */
-    QStackedWidget* MainWindow::getCentralWidget() { return _centralStack; }
+    CentralWidget* MainWindow::getCentralWidget() { return _centralWidget; }
 
 }   // namespace ui

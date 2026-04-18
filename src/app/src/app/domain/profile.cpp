@@ -68,4 +68,18 @@ namespace app
         _email = newEmail;
     }
 
+    filter::Predicate<Profile> HasProfileId(ProfileId id)
+    {
+        return filter::makePredicate<Profile>([id](const Profile& profile)
+                                              { return profile.getId() == id; }
+        );
+    }
+
+    filter::Predicate<Profile> HasProfileName(std::string_view name)
+    {
+        return filter::makePredicate<Profile>(
+            [name](const Profile& profile) { return profile.getName() == name; }
+        );
+    }
+
 }   // namespace app

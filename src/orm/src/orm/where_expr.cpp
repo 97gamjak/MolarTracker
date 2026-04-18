@@ -92,6 +92,13 @@ namespace orm
         /// The bind index to use.
         BindIndex& index;
 
+        ~BindVisitor() = default;
+        // delete constructor and assignment operator
+        BindVisitor(const BindVisitor&)            = delete;
+        BindVisitor& operator=(const BindVisitor&) = delete;
+        BindVisitor(BindVisitor&&)                 = delete;
+        BindVisitor& operator=(BindVisitor&&)      = delete;
+
         /**
          * @brief Bind a filter expression to a database statement.
          *
@@ -153,13 +160,6 @@ namespace orm
             : statement(_statement), index(_index)
         {
         }
-
-        ~BindVisitor() = default;
-        // delete constructor and assignment operator
-        BindVisitor(const BindVisitor&)            = delete;
-        BindVisitor& operator=(const BindVisitor&) = delete;
-        BindVisitor(BindVisitor&&)                 = delete;
-        BindVisitor& operator=(BindVisitor&&)      = delete;
     };
 
     /**

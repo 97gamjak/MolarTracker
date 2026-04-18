@@ -3,12 +3,15 @@
 #include <QMainWindow>
 
 #include "account_controller.hpp"
+#include "app/app_context.hpp"
+#include "controller/account_controller.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
 #include "ui/side_bar/overview_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
+#include "ui/side_bar/transaction_category.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.SideBarController");
 
@@ -22,18 +25,33 @@ namespace controller
      * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
+     * @param accountController
+     * @param transactionController
      */
     SideBarController::SideBarController(
-        cmd::UndoStack&  undoStack,
-        app::AppContext& appContext,
-        QMainWindow*     mainWindow,
-        ui::SideBar*     sideBar,
-        QStackedWidget*  centralStack
+        cmd::UndoStack&        undoStack,
+        app::AppContext&       appContext,
+        QMainWindow*           mainWindow,
+        ui::SideBar*           sideBar,
+        QStackedWidget*        centralStack,
+        AccountController&     accountController,
+        TransactionController& transactionController
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
-          _accountSideBarController(undoStack, appContext, mainWindow),
-          _transactionSideBarController(undoStack, appContext, mainWindow),
+          _accountSideBarController(
+              undoStack,
+              appContext,
+              accountController,
+              mainWindow
+          ),
+          _transactionSideBarController(
+              undoStack,
+              appContext.getStore().getAccountStore(),
+              appContext.getStore().getTransactionStore(),
+              transactionController,
+              mainWindow
+          ),
           _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
@@ -100,11 +118,14 @@ namespace controller
 
                 break;
             }
+            case ui::SideBarItemType::TransactionCategory:
+            {
+                _transactionSideBarController.onTransactionsSelected();
+                break;
+            }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
-            case ui::SideBarItemType::TransactionCategory:
-                // TODO(97gamjak): Implement context menu handling for
-                // TransactionCategory
+                // Handle overview and account category clicks if needed
                 break;
         }
     }
@@ -157,15 +178,19 @@ namespace controller
                 break;
             case ui::SideBarItemType::AccountCategory:
             {
-                const auto* accountCategory =
-                    dynamic_cast<ui::AccountCategory*>(item);
-                _accountSideBarController.handleContextMenuAction(
-                    accountCategory,
-                    action
-                );
+                const auto* acc = dynamic_cast<ui::AccountCategory*>(item);
+
+                _accountSideBarController.handleContextMenuAction(acc, action);
+
                 break;
             }
             case ui::SideBarItemType::TransactionCategory:
+                const auto* transaction =
+                    dynamic_cast<ui::TransactionCategory*>(item);
+                _transactionSideBarController.handleContextMenuAction(
+                    transaction,
+                    action
+                );
                 break;
         }
     }

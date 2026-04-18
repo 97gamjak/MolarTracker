@@ -9,6 +9,7 @@
 #include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/validators/name_line_edit.hpp"
+#include "ui/validators/validators.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -19,7 +20,7 @@ namespace ui
      *
      * @param parent The parent widget of the dialog
      */
-    CreateAccountDialog::CreateAccountDialog(QWidget* parent) : QDialog(parent)
+    CreateAccountDialog::CreateAccountDialog(QWidget* parent) : Dialog(parent)
     {
         setWindowTitle("Create Account");
 
@@ -64,7 +65,8 @@ namespace ui
         }
         formLayout->addRow("Account Type:", _accountType);
 
-        auto [nameLineEdit, nameContainer] = createNameLineEditWithLabel(this);
+        auto [nameLineEdit, nameContainer] =
+            createLineEditWithLabel<NameLineEdit>(this);
 
         _nameLineEdit = nameLineEdit;
         _nameLineEdit->setRequired(true);

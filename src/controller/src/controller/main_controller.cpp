@@ -3,11 +3,13 @@
 #include "app/app_context.hpp"
 #include "commands/undo_stack.hpp"
 #include "config/constants.hpp"
+#include "controller/account_controller.hpp"
 #include "controller/central_controller.hpp"
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
 #include "controller/side_bar/side_bar_controller.hpp"
+#include "controller/transaction_controller.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "ui/main_window.hpp"
@@ -34,15 +36,20 @@ namespace controller
         /// undo stack for managing commands
         cmd::UndoStack _undoStack;
 
-        /// handlers for managing interactions no QT signals
-        controller::Handlers _handlers;
-        /// controller for managing the menu bar
-        controller::MenuBarController _menuBarController;
-        /// controller for managing the side bar
-        controller::SideBarController _sideBarController;
-
         /// controller for managing the account
-        controller::CentralController _centralController;
+        CentralController _centralController;
+
+        /// handlers for managing interactions no QT signals
+        Handlers _handlers;
+        /// controller for managing accounts
+        AccountController _accountController;
+        /// controller for managing transactions
+        TransactionController _transactionController;
+
+        /// controller for managing the menu bar
+        MenuBarController _menuBarController;
+        /// controller for managing the side bar
+        SideBarController _sideBarController;
 
         /**
          * @brief Construct a new Impl object
@@ -52,7 +59,19 @@ namespace controller
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
               _appContext(_settings),
+              _centralController(_mainWindow.getCentralWidget()),
               _handlers(_settings),
+              _accountController(
+                  _undoStack,
+                  _appContext.getStore().getAccountStore(),
+                  _mainWindow.getCentralWidget()
+              ),
+              _transactionController(
+                  _undoStack,
+                  _appContext.getStore().getTransactionStore(),
+                  _appContext.getStore().getAccountStore(),
+                  _mainWindow.getCentralWidget()
+              ),
               _menuBarController(
                   &_mainWindow,
                   _mainWindow.getMenuBar(),
@@ -64,13 +83,9 @@ namespace controller
                   _appContext,
                   &_mainWindow,
                   &_mainWindow.getSideBar(),
-                  _mainWindow.getCentralWidget()
-              ),
-              _centralController(
-                  _undoStack,
-                  _appContext,
-                  _sideBarController.getAccountSideBarController(),
-                  _mainWindow.getCentralWidget()
+                  _mainWindow.getCentralWidget(),
+                  _accountController,
+                  _transactionController
               )
         {
             _handlers.getDirtyStateHandler().subscribe(

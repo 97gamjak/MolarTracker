@@ -1,9 +1,8 @@
 #ifndef __UI__INCLUDE__UI__LOGGING__DEBUG_SLOTS_DIALOG_HPP__
 #define __UI__INCLUDE__UI__LOGGING__DEBUG_SLOTS_DIALOG_HPP__
 
-#include <QDialog>
-
 #include "debug_slots_model.hpp"
+#include "ui/base/dialog.hpp"
 
 class QCheckBox;          // Forward declaration
 class QPushButton;        // Forward declaration
@@ -18,7 +17,7 @@ namespace ui
      * @brief Dialog for managing debug flag categories
      *
      */
-    class DebugSlotsDialog final : public QDialog
+    class DebugSlotsDialog final : public Dialog
     {
         Q_OBJECT
 

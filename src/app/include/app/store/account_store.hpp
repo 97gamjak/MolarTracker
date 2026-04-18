@@ -2,6 +2,7 @@
 #define __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
 
 #include <memory>
+#include <vector>
 
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
@@ -54,17 +55,25 @@ namespace app
             const std::shared_ptr<IAccountService>& accountService
         );
 
-        [[nodiscard]] AccountStoreResult createAccount(
-            const drafts::AccountDraft& accountDraft
-        );
+        [[nodiscard]]
+        AccountStoreResult createAccount(const drafts::AccountDraft& account);
 
-        [[nodiscard]] std::optional<finance::Account> getAccount(
-            AccountId id
-        ) const;
-        [[nodiscard]] std::vector<const finance::Account*> getAllAccounts(
-        ) const;
+        [[nodiscard]]
+        std::optional<drafts::AccountDraft> getAccount(AccountId id) const;
+        [[nodiscard]]
+        std::vector<drafts::AccountDraft> getAllAccounts() const;
+        [[nodiscard]]
+        std::vector<drafts::AccountDraft> getCashAccounts() const;
+        [[nodiscard]]
+        std::unordered_map<
+            AccountId,
+            std::string,
+            AccountId::Hash> getAccountIdToNameMap() const;
 
-        void commit() override;
+        [[nodiscard]]
+        AccountId getExternalAccount(Currency currency) const;
+
+        void commit();
 
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);
 

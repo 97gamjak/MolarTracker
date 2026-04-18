@@ -57,7 +57,10 @@ class ConstantsSchema
     /// The global minimum dialog size for all dialogs in the application, this
     /// is used to ensure that all dialogs have a reasonable minimum size and
     /// are not too small to be usable
-    static constexpr const std::pair<int, int> _globalMinDialogSize = {40, 30};
+    static constexpr const std::pair<int, int> _globalMinDialogSize = {
+        400,
+        300
+    };
 
     /// The margins for the core content of dialogs in the application, this is
     /// used to ensure that there is consistent spacing between the edges of the

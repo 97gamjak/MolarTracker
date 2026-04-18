@@ -16,6 +16,8 @@ using LocalTimePoint = std::chrono::local_time<Duration>;
 // TODO(97gamjak): implement this with timezone support
 // https://97gamjak.atlassian.net/browse/MOLTRACK-95
 
+class QDateTime;   // Forward declaration
+
 /**
  * @brief Utility class for handling timestamps
  */
@@ -47,6 +49,8 @@ class Timestamp
     [[nodiscard]] int64_t toInt64() const;
 
     [[nodiscard]] static Timestamp fromInt64(int64_t value);
+
+    [[nodiscard]] QDateTime toQDateTime() const;
 
    private:
     [[nodiscard]] LocalTimePoint _toLocalTime() const;

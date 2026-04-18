@@ -30,11 +30,15 @@ namespace finance
         switch (kind)
         {
             case AccountKind::Cash:
+            {
                 _details = CashAccount{};
                 break;
+            }
             case AccountKind::External:
+            {
                 _details = ExternalAccount{};
                 break;
+            }
         }
     }
 
@@ -102,6 +106,42 @@ namespace finance
     bool Account::isExternal() const
     {
         return getKind() == AccountKind::External;
+    }
+
+    filter::Predicate<Account> IsAccountType(AccountKind kind)
+    {
+        return filter::makePredicate<Account>(
+            [kind](const Account& account) { return account.getKind() == kind; }
+        );
+    }
+
+    filter::Predicate<Account> IsAccountActive()
+    {
+        return filter::makePredicate<Account>(
+            [](const Account& account)
+            { return account.getStatus() != AccountStatus::Closed; }
+        );
+    }
+
+    filter::Predicate<Account> IsExternal()
+    {
+        return filter::makePredicate<Account>([](const Account& account)
+                                              { return account.isExternal(); });
+    }
+
+    filter::Predicate<Account> HasCurrency(Currency currency)
+    {
+        return filter::makePredicate<Account>(
+            [currency](const Account& account)
+            { return account.getCurrency() == currency; }
+        );
+    }
+
+    filter::Predicate<Account> HasAccountId(AccountId id)
+    {
+        return filter::makePredicate<Account>([id](const Account& account)
+                                              { return account.getId() == id; }
+        );
     }
 
 }   // namespace finance

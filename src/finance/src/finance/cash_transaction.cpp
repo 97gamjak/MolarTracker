@@ -19,4 +19,22 @@ namespace finance
         return _cash.getAmount();
     }
 
+    /**
+     * @brief Gets the currency of the cash involved in the transaction.
+     *
+     * @return Currency The currency of the cash.
+     */
+    [[nodiscard]] Currency CashTransaction::getCurrency() const
+    {
+        return _cash.getCurrency();
+    }
+
+    /**
+     * @brief Gets the Cash object representing the cash involved in the
+     * transaction.
+     *
+     * @return Cash The Cash object.
+     */
+    [[nodiscard]] Cash CashTransaction::getCash() const { return _cash; }
+
 }   // namespace finance

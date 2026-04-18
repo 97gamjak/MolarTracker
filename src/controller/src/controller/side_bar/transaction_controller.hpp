@@ -5,12 +5,17 @@
 #include <qtmetamacros.h>
 
 #include <QObject>
+#include <QPointer>
 
+#include "config/finance.hpp"
+#include "controller/transaction_controller.hpp"
 #include "side_bar_category_controller.hpp"
+#include "ui/transaction/create_transaction_dlg.hpp"
 
 namespace app
 {
-    class AppContext;   // Forward declaration
+    class AccountStore;       // Forward declaration
+    class TransactionStore;   // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -36,22 +41,37 @@ namespace controller
        private:
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
-        /// The application context
-        app::AppContext& _appContext;
+        /// The account store for the application
+        app::AccountStore& _accountStore;
+        /// The transaction store for the application
+        app::TransactionStore& _transactionStore;
+
+        /// Pointer to the create transaction dialog
+        QPointer<ui::CreateTransactionDialog> _createDlg;
+        /// Reference to the transaction controller
+        TransactionController& _transactionController;
 
        public:
         TransactionSideBarController(
-            cmd::UndoStack&  undoStack,
-            app::AppContext& appContext,
-            QMainWindow*     mainWindow
+            cmd::UndoStack&        undoStack,
+            app::AccountStore&     accountStore,
+            app::TransactionStore& transactionStore,
+            TransactionController& transactionController,
+            QMainWindow*           mainWindow
         );
 
         void refresh() override;
 
-        static void handleContextMenuAction(
+        void handleContextMenuAction(
             const ui::TransactionCategory* item,
             const QAction*                 action
         );
+
+        void onTransactionsSelected();
+
+       private slots:
+        void _onTransactionTypeChanged(TransactionType type);
+        void _onCreateTransactionRequested(drafts::TransactionDraft draft);
     };
 }   // namespace controller
 

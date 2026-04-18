@@ -32,7 +32,7 @@ namespace ui
         std::shared_ptr<Settings> settings,
         QWidget*                  parent
     )
-        : QDialog(parent), _settings(std::move(settings))
+        : Dialog(parent), _settings(std::move(settings))
     {
         _buildUi();
         _connectButtons();

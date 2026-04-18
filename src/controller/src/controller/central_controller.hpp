@@ -17,17 +17,8 @@ namespace controller
     {
         Q_OBJECT
 
-       private:
-        /// Controller for managing account-related actions
-        AccountController _accountController;
-
        public:
-        CentralController(
-            cmd::UndoStack&           undoStack,
-            app::AppContext&          appContext,
-            AccountSideBarController& accountSideBarController,
-            QStackedWidget*           stackedWidget
-        );
+        explicit CentralController(QStackedWidget* stackedWidget);
     };
 }   // namespace controller
 

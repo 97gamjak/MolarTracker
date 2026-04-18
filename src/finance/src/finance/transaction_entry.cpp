@@ -40,4 +40,40 @@ namespace finance
      * @return TransactionDetail The details of the transaction entry.
      */
     TransactionDetail TransactionEntry::getDetails() const { return _details; }
+
+    /**
+     * @brief Gets the amount of the transaction entry.
+     *
+     * @return micro_units The amount of the transaction entry in micro units.
+     */
+    micro_units TransactionEntry::getAmount() const
+    {
+        return std::visit(
+            [](const auto& detail) { return detail.getAmount(); },
+            _details
+        );
+    }
+
+    /**
+     * @brief Gets the currency of the transaction entry.
+     *
+     * @return Currency The currency of the transaction entry.
+     */
+    Currency TransactionEntry::getCurrency() const
+    {
+        return std::visit(
+            [](const auto& detail) { return detail.getCurrency(); },
+            _details
+        );
+    }
+
+    /**
+     * @brief Sets the account ID associated with the transaction entry.
+     *
+     * @param accountId The account ID to associate with the transaction entry.
+     */
+    void TransactionEntry::setAccountId(AccountId accountId)
+    {
+        _accountId = accountId;
+    }
 }   // namespace finance

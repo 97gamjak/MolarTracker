@@ -26,7 +26,7 @@ namespace ui
         const QString& details,
         QWidget*       parent
     )
-        : QDialog(parent)
+        : Dialog(parent)
     {
         setWindowTitle(title);
         setModal(true);

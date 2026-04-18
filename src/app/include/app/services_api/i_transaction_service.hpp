@@ -21,9 +21,18 @@ namespace app
          *
          * @return The ID of the added transaction.
          */
+        [[nodiscard]]
         virtual TransactionId addTransaction(
             const finance::Transaction& transaction
         ) = 0;
+
+        /**
+         * @brief Retrieves all transactions from the service.
+         *
+         * @return A vector of all transactions.
+         */
+        [[nodiscard]]
+        virtual std::vector<finance::Transaction> getTransactions() const = 0;
     };
 }   // namespace app
 

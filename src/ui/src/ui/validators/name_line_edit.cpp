@@ -76,23 +76,4 @@ namespace ui
         return {true, ""};
     }
 
-    std::pair<NameLineEdit*, QWidget*> createNameLineEditWithLabel(
-        QWidget* parent
-    )
-    {
-        auto* errorLabel = utils::makeQChild<QLabel>(parent);
-        auto* lineEdit   = utils::makeQChild<NameLineEdit>(parent);
-        lineEdit->attachErrorLabel(errorLabel);
-
-        auto* container = utils::makeQChild<QWidget>(parent);
-        auto* layout    = utils::makeQChild<QVBoxLayout>(container);
-
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(2);
-        layout->addWidget(lineEdit);
-        layout->addWidget(errorLabel);
-
-        return {lineEdit, container};
-    }
-
 }   // namespace ui

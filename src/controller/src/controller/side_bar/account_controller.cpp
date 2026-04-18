@@ -29,6 +29,13 @@ namespace controller
      * interact with the underlying data and business logic for accounts, and
      * ensures that the controller can perform the necessary operations to
      * manage accounts effectively.
+     * @param accountController A reference to the account controller, this is
+     * used to delegate account-related actions (e.g. when an account is
+     * selected in the side bar), this allows the account side bar controller to
+     * delegate specific account-related actions to the account controller,
+     * which can handle them in a more focused way, and ensures that the
+     * responsibilities for managing accounts are properly separated between the
+     * side bar controller and the account controller.
      * @param mainWindow A pointer to the main window, this is used as the
      * parent widget for dialogs that are opened as a result of actions in the
      * account category (e.g. the create account dialog), this ensures that the
@@ -37,13 +44,15 @@ namespace controller
      *
      */
     AccountSideBarController::AccountSideBarController(
-        cmd::UndoStack&  undoStack,
-        app::AppContext& appContext,
-        QMainWindow*     mainWindow
+        cmd::UndoStack&    undoStack,
+        app::AppContext&   appContext,
+        AccountController& accountController,
+        QMainWindow*       mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
-          _appContext(appContext)
+          _appContext(appContext),
+          _accountController(accountController)
     {
     }
 
@@ -64,11 +73,11 @@ namespace controller
         const auto accounts =
             _appContext.getStore().getAccountStore().getAllAccounts();
 
-        for (const auto* account : accounts)
+        for (const auto& account : accounts)
         {
             category->addAccount(
-                account->getId(),
-                QString::fromStdString(account->getName())
+                account.id,
+                QString::fromStdString(account.name)
             );
         }
     }
@@ -178,6 +187,8 @@ namespace controller
      */
     void AccountSideBarController::onAccountSelected(AccountId id)
     {
-        emit accountSelected(id);
+        LOG_DEBUG(std::format("Account with ID {} selected", id.value()));
+
+        _accountController.accountSelected(id);
     }
 }   // namespace controller

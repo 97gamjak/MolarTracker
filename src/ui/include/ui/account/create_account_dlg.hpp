@@ -1,7 +1,7 @@
 #ifndef __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
 #define __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
 
-#include <QDialog>
+#include "ui/base/dialog.hpp"
 
 class QVBoxLayout;   // Forward declaration
 class QComboBox;     // Forward declaration
@@ -25,7 +25,7 @@ namespace ui
      * actual account in the store
      *
      */
-    class CreateAccountDialog : public QDialog
+    class CreateAccountDialog : public Dialog
     {
         Q_OBJECT
 

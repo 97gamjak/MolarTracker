@@ -1,10 +1,11 @@
 #ifndef __UI__INCLUDE__UI__LOGGING__LOG_VIEWER_DIALOG_HPP__
 #define __UI__INCLUDE__UI__LOGGING__LOG_VIEWER_DIALOG_HPP__
 
-#include <QDialog>
 #include <QPlainTextEdit>
 #include <memory>
 #include <utility>
+
+#include "ui/base/dialog.hpp"
 
 class QPlainTextEdit;   // Forward declaration
 class QPushButton;      // Forward declaration
@@ -19,7 +20,7 @@ namespace ui
      * @brief Dialog for viewing application log files.
      *
      */
-    class LogViewerDialog final : public QDialog
+    class LogViewerDialog final : public Dialog
     {
         Q_OBJECT
 

@@ -37,7 +37,14 @@ namespace finance
         friend Cash operator-(const Cash& lhs, const Cash& rhs);
         friend Cash operator-(const Cash& cash);
 
+        friend Cash& operator+=(Cash& lhs, const Cash& rhs);
+        friend Cash& operator-=(Cash& lhs, const Cash& rhs);
+
+        [[nodiscard]] bool isZero() const;
+
         [[nodiscard]] micro_units getAmount() const;
+        [[nodiscard]] Currency    getCurrency() const;
+        [[nodiscard]] std::string toString() const;
     };
 
 }   // namespace finance
