@@ -67,6 +67,15 @@ namespace app
         );
     }
 
+    /**
+     * @brief Checks if all entries in the store are dirty, meaning none of
+     * them are in the Clean state.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return true
+     * @return false
+     */
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::allDirty() const
     {

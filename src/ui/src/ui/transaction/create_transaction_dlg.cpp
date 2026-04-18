@@ -71,17 +71,12 @@ namespace ui
     }
 
     /**
-     * @brief Handle the change of the transaction type, this will be called
-     * when the user selects a different transaction type from the combo box,
-     * and should handle updating the UI to display the appropriate transaction
-     * detail form based on the selected transaction type, allowing the user to
-     * fill out the necessary information for creating a transaction of that
-     * type.
+     * @brief reset the dialog to its initial state, this will clear any
+     * existing transaction detail widgets from the stacked widget, reset the
+     * transaction type selector to its default state, and clear the widget map,
+     * allowing the dialog to be reused for creating multiple transactions
+     * without needing to create a new instance of the dialog each time.
      *
-     * @param index The index of the selected transaction type in the combo box,
-     * this can be used to retrieve the corresponding TransactionType enum value
-     * from the item data of the combo box, which can then be used to determine
-     * which transaction detail form to display in the stacked widget.
      */
     void CreateTransactionDialog::reset()
     {

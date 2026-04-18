@@ -121,7 +121,7 @@ namespace ui
         std::optional<drafts::AccountDraft> _getSelectedAccount() const;
 
         [[nodiscard]]
-        micro_units _getAmount() const;
+        AmountLineEdit* _getAmountField() const;
     };
 
     /**

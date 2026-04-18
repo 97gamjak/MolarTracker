@@ -5,7 +5,6 @@
 
 #include "app/migration/multi_migration.hpp"
 #include "app/migration/single_migration.hpp"
-#include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "db/database.hpp"
 #include "sql_models/account_row.hpp"

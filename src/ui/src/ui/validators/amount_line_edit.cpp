@@ -58,6 +58,41 @@ namespace ui
     }
 
     /**
+     * @brief Get the amount entered in the line edit as a micro_units value,
+     * this will convert the text input into a micro_units value that can be
+     * used in the application, ensuring that the amount is properly formatted
+     * and can be processed correctly.
+     *
+     * @return micro_units The amount entered in the line edit, converted to
+     * micro_units for use in the application.
+     */
+    micro_units AmountLineEdit::getAmount() const
+    {
+        const auto text = this->text().trimmed();
+        if (text.isEmpty())
+            return 0;
+
+        const auto sign  = text.startsWith('-') ? -1 : 1;
+        const auto parts = text.mid(sign < 0 ? 1 : 0).split('.');
+
+        const auto scale = static_cast<int64_t>(std::pow(10, _nDecimalPlaces));
+        const auto intPart = parts[0].toLongLong() * scale;
+
+        int64_t fracPart = 0;
+        if (parts.size() > 1)
+        {
+            // Truncate or pad to exactly decimalPlaces digits
+            const QString frac = parts[1]
+                                     .left(_nDecimalPlaces)
+                                     .leftJustified(_nDecimalPlaces, '0');
+
+            fracPart = frac.toLongLong();
+        }
+
+        return static_cast<micro_units>(sign * (intPart + fracPart));
+    }
+
+    /**
      * @brief Validate the non-empty input for the amount line edit, this will
      * check if the input is a valid amount format and optionally if it is
      * positive, providing feedback to the user if the input is invalid.

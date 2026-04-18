@@ -174,7 +174,7 @@ namespace ui
             }
             case Column::Amount:
                 return QString::fromStdString(
-                    transaction.entries.front().cash.toString()
+                    transaction.entries.front().cash.toString(2)
                 );
         }
         return {};
