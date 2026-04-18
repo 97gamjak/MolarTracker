@@ -36,6 +36,11 @@ namespace finance
         static constexpr const char* fullName = "US Dollar";
         /// The number of minor units (e.g., cents) for the currency
         static constexpr std::uint8_t minorUnit = 2;
+        /// The number of micro units (e.g., millionths of a currency unit) for
+        /// the currency, this is used for internal calculations to avoid
+        /// floating-point precision issues, and allows us to represent amounts
+        /// in the smallest possible unit for the currency
+        static constexpr std::uint8_t microUnit = 6;
     };
 
     /**
@@ -52,6 +57,11 @@ namespace finance
         static constexpr const char* fullName = "Euro";
         /// The number of minor units (e.g., cents) for the currency
         static constexpr std::uint8_t minorUnit = 2;
+        /// The number of micro units (e.g., millionths of a currency unit) for
+        /// the currency, this is used for internal calculations to avoid
+        /// floating-point precision issues, and allows us to represent amounts
+        /// in the smallest possible unit for the currency
+        static constexpr std::uint8_t microUnit = 6;
     };
 
     /**
@@ -68,6 +78,11 @@ namespace finance
         static constexpr const char* fullName = "British Pound";
         /// The number of minor units (e.g., cents) for the currency
         static constexpr std::uint8_t minorUnit = 2;
+        /// The number of micro units (e.g., millionths of a currency unit) for
+        /// the currency, this is used for internal calculations to avoid
+        /// floating-point precision issues, and allows us to represent amounts
+        /// in the smallest possible unit for the currency
+        static constexpr std::uint8_t microUnit = 6;
     };
 
     /**
@@ -84,7 +99,15 @@ namespace finance
         static constexpr const char* fullName = "Swiss Franc";
         /// The number of minor units (e.g., cents) for the currency
         static constexpr std::uint8_t minorUnit = 2;
+        /// The number of micro units (e.g., millionths of a currency unit) for
+        /// the currency, this is used for internal calculations to avoid
+        /// floating-point precision issues, and allows us to represent amounts
+        /// in the smallest possible unit for the currency
+        static constexpr std::uint8_t microUnit = 6;
     };
+
+    [[nodiscard]] std::uint8_t getMicroUnit(Currency currency);
+    [[nodiscard]] std::string  getSymbol(Currency currency);
 
 }   // namespace finance
 

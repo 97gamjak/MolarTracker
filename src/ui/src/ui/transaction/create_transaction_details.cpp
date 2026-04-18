@@ -2,37 +2,59 @@
 
 #include <qboxlayout.h>
 #include <qcombobox.h>
+#include <qformlayout.h>
 #include <qlabel.h>
+#include <qlineedit.h>
 
 #include <algorithm>
 
+#include "finance/currency.hpp"
+#include "ui/validators/amount_line_edit.hpp"
+#include "ui/validators/validators.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
 
 namespace ui
 {
-    CreateTransactionWidget::CreateTransactionWidget(
+    ICreateTransactionWidget::ICreateTransactionWidget(QWidget* parent)
+        : QWidget(parent)
+    {
+    }
+
+    NonEmptyTransactionWidget::NonEmptyTransactionWidget(
         QWidget*                          parent,
         std::vector<drafts::AccountDraft> accounts
     )
-        : QWidget(parent),
+        : ICreateTransactionWidget(parent),
           _accounts(std::move(accounts)),
-          _layout(new QVBoxLayout(this))
+          _layout(new QFormLayout(this))
     {
         setLayout(_layout);
-        _currencyLabel = makeQChild<QLabel>(this);
         _setAccounts();
+        auto [amountField, amountContainer] =
+            createLineEditWithLabel<AmountLineEdit>(this);
+
+        _amountField = amountField;
+        _amountField->setRequired(true);
+        _amountField->setOnlyPositive(true);
+        _amountField->setText("0");
+
+        _currencyLabel = makeQChild<QLabel>(this);
+        _currencyLabel->setText("");
+
+        auto* amountRow = makeQChild<QHBoxLayout>(this);
+        amountRow->addWidget(amountContainer);
+        amountRow->addWidget(_currencyLabel);
+
+        _layout->addRow("Amount:", amountRow);
     }
 
-    void CreateTransactionWidget::_setAccounts()
+    void NonEmptyTransactionWidget::_setAccounts()
     {
-        if (_accounts.empty())
-            return;
-
         _accountsSelection = makeQChild<QComboBox>(this);
         _accountsSelection->setPlaceholderText("Select Account");
-        _layout->addWidget(_accountsSelection);
+        _layout->addRow("Account:", _accountsSelection);
 
         for (const auto& account : _accounts)
         {
@@ -46,16 +68,11 @@ namespace ui
             _accountsSelection,
             &QComboBox::activated,
             this,
-            &CreateTransactionWidget::_onAccountSelected
+            &NonEmptyTransactionWidget::_onAccountSelected
         );
-
-        _currencyLabel = makeQChild<QLabel>(this);
-        _layout->addWidget(_currencyLabel);
-
-        _onAccountSelected(_accountsSelection->currentIndex());
     }
 
-    void CreateTransactionWidget::_onAccountSelected(int index)
+    void NonEmptyTransactionWidget::_onAccountSelected(int index)
     {
         const auto accountId =
             _accountsSelection->itemData(index).value<AccountId>();
@@ -69,13 +86,15 @@ namespace ui
 
         if (it != _accounts.end())
         {
-            _currencyLabel->setText(
-                QString::fromStdString(CurrencyMeta::toString(it->currency))
-            );
+            using finance::getMicroUnit;
+            using finance::getSymbol;
+
+            _amountField->setNDecimalPlaces(getMicroUnit(it->currency));
+            _currencyLabel->setText(getSymbol(it->currency).c_str());
         }
     }
 
-    CreateTransactionWidget* makeTransactionWidget(
+    ICreateTransactionWidget* makeTransactionWidget(
         QWidget*                          parent,
         TransactionType                   type,
         std::vector<drafts::AccountDraft> accounts
@@ -93,7 +112,7 @@ namespace ui
     }
 
     EmptyTransactionWidget::EmptyTransactionWidget(QWidget* parent)
-        : CreateTransactionWidget(parent, {})
+        : ICreateTransactionWidget(parent)
     {
     }
 }   // namespace ui

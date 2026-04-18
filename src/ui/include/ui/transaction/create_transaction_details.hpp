@@ -5,32 +5,46 @@
 
 #include "drafts/account_draft.hpp"
 
-class QComboBox;   // Forward declaration
-class QLabel;      // Forward declaration
-class QLayout;     // Forward declaration
+class QComboBox;     // Forward declaration
+class QLabel;        // Forward declaration
+class QLayout;       // Forward declaration
+class QLineEdit;     // Forward declaration
+class QFormLayout;   // Forward declaration
 
 namespace ui
 {
-    class CreateTransactionWidget : public QWidget
+    class AmountLineEdit;   // Forward declaration
+
+    class ICreateTransactionWidget : public QWidget
     {
         Q_OBJECT
 
+       public:
+        explicit ICreateTransactionWidget(QWidget* parent);
+    };
+
+    class EmptyTransactionWidget : public ICreateTransactionWidget
+    {
+       public:
+        explicit EmptyTransactionWidget(QWidget* parent);
+    };
+
+    class NonEmptyTransactionWidget : public ICreateTransactionWidget
+    {
        private:
         std::vector<drafts::AccountDraft> _accounts;
 
-        QComboBox* _accountsSelection = nullptr;
-        QLabel*    _currencyLabel     = nullptr;
+        QComboBox*      _accountsSelection = nullptr;
+        AmountLineEdit* _amountField       = nullptr;
+        QLabel*         _currencyLabel     = nullptr;
 
-        QLayout* _layout = nullptr;
+        QFormLayout* _layout = nullptr;
 
        public:
-        explicit CreateTransactionWidget(
+        explicit NonEmptyTransactionWidget(
             QWidget*                          parent,
             std::vector<drafts::AccountDraft> accounts
         );
-
-        [[nodiscard]]
-        std::optional<TransactionType> getTransactionType() const;
 
        private:
         void _setAccounts();
@@ -38,18 +52,12 @@ namespace ui
         void _onAccountSelected(int index);
     };
 
-    class EmptyTransactionWidget : public CreateTransactionWidget
+    class DepositWithdrawalWidget : public NonEmptyTransactionWidget
     {
-       public:
-        explicit EmptyTransactionWidget(QWidget* parent);
+        using NonEmptyTransactionWidget::NonEmptyTransactionWidget;
     };
 
-    class DepositWithdrawalWidget : public CreateTransactionWidget
-    {
-        using CreateTransactionWidget::CreateTransactionWidget;
-    };
-
-    CreateTransactionWidget* makeTransactionWidget(
+    ICreateTransactionWidget* makeTransactionWidget(
         QWidget*                          parent,
         TransactionType                   type,
         std::vector<drafts::AccountDraft> accounts

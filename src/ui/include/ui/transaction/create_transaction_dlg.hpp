@@ -24,7 +24,7 @@ namespace ui
        private:
         QComboBox* _transactionType = nullptr;
 
-        std::unordered_map<TransactionType, CreateTransactionWidget*>
+        std::unordered_map<TransactionType, ICreateTransactionWidget*>
             _widgetMap;
 
         QStackedWidget* _stack = nullptr;

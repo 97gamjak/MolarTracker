@@ -1,6 +1,7 @@
 add_library(molartracker_finance STATIC
     src/finance/cash.cpp
     src/finance/account.cpp
+    src/finance/currency.cpp
     src/finance/currency_exception.cpp
     
     src/finance/transaction.cpp

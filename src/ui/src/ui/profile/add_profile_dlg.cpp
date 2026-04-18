@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 
 #include "drafts/profile_draft.hpp"
+#include "ui/validators/validators.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -83,7 +84,8 @@ namespace ui
     {
         auto* formLayout = utils::makeQChild<QFormLayout>(this);
 
-        auto [nameLineEdit, nameContainer] = createNameLineEditWithLabel(this);
+        auto [nameLineEdit, nameContainer] =
+            createLineEditWithLabel<NameLineEdit>(this);
         nameLineEdit->setRequired(true);
 
         _nameLineEdit = nameLineEdit;
