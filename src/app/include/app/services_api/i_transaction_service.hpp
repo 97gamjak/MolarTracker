@@ -26,6 +26,11 @@ namespace app
             const finance::Transaction& transaction
         ) = 0;
 
+        /**
+         * @brief Retrieves all transactions from the service.
+         *
+         * @return A vector of all transactions.
+         */
         [[nodiscard]]
         virtual std::vector<finance::Transaction> getTransactions() const = 0;
     };

@@ -18,6 +18,9 @@ namespace controller
      *
      * @param undoStack The undo stack for the application
      * @param accountStore The account store for the application
+     * @param transactionStore The transaction store for the application
+     * @param transactionController The transaction controller for the
+     * application
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
@@ -101,6 +104,15 @@ namespace controller
         }
     }
 
+    /**
+     * @brief Handle the selection of transactions in the side bar, this will
+     * trigger the transaction overview to update with the latest data from the
+     * store, and provides a way for the UI to trigger updates to the
+     * transaction overview when it is selected.
+     *
+     * @param type The type of transactions to show in the overview, this allows
+     * the controller to filter the transactions displayed based on their type.
+     */
     void TransactionSideBarController::_onTransactionTypeChanged(
         TransactionType type
     )
@@ -128,6 +140,20 @@ namespace controller
         }
     }
 
+    /**
+     * @brief Handle the creation of a new transaction, this will take the
+     * transaction draft from the create transaction dialog, convert it to a
+     * transaction model, and add it to the transaction store, this allows the
+     * controller to handle the creation of new transactions based on the input
+     * from the user in the create transaction dialog, and ensures that new
+     * transactions are properly added to the store and can be displayed in the
+     * UI.
+     *
+     * @param draft The transaction draft containing the information needed to
+     * create a new transaction, this includes details such as the type of
+     * transaction, the entries for the transaction, and any other relevant
+     * information needed to create a new transaction in the store.
+     */
     void TransactionSideBarController::_onCreateTransactionRequested(
         drafts::TransactionDraft draft
     )
@@ -156,6 +182,13 @@ namespace controller
         _transactionController.transactionOverviewSelected(false);
     }
 
+    /**
+     * @brief Handle the selection of transactions in the side bar, this will
+     * trigger the transaction overview to update with the latest data from the
+     * store, and provides a way for the UI to trigger updates to the
+     * transaction overview when it is selected.
+     *
+     */
     void TransactionSideBarController::onTransactionsSelected()
     {
         _transactionController.transactionOverviewSelected();

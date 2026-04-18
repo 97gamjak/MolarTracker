@@ -20,11 +20,25 @@ using utils::makeQChild;
 
 namespace ui
 {
+    /**
+     * @brief Construct a new ICreateTransactionWidget::ICreateTransactionWidget
+     * object
+     *
+     * @param parent
+     */
     ICreateTransactionWidget::ICreateTransactionWidget(QWidget* parent)
         : QWidget(parent)
     {
     }
 
+    /**
+     * @brief Construct a new Non Empty Transaction Widget:: Non Empty
+     * Transaction Widget object
+     *
+     * @param parent
+     * @param type
+     * @param accounts
+     */
     NonEmptyTransactionWidget::NonEmptyTransactionWidget(
         QWidget*                          parent,
         TransactionType                   type,
@@ -86,11 +100,25 @@ namespace ui
         _layout->addRow(buttonLayout);
     }
 
+    /**
+     * @brief get the transaction type for this widget
+     *
+     * @return TransactionType
+     */
     TransactionType NonEmptyTransactionWidget::_getTransactionType() const
     {
         return _type;
     }
 
+    /**
+     * @brief get the selected account from the accounts selection combo box,
+     * this will return an optional containing the selected account draft if an
+     * account is selected, or an empty optional if no account is selected,
+     * allowing the caller to handle the case where no account is selected when
+     * trying to get the details for creating a transaction.
+     *
+     * @return std::optional<drafts::AccountDraft>
+     */
     std::optional<drafts::AccountDraft> NonEmptyTransactionWidget::
         _getSelectedAccount() const
     {
@@ -111,11 +139,22 @@ namespace ui
         return std::nullopt;
     }
 
+    /**
+     * @brief get the amount entered in the amount field, this will return the
+     * amount as a micro unit value, allowing the caller to use the amount for
+     * creating a transaction draft or performing other operations that require
+     * the amount in micro units.
+     *
+     * @return micro_units
+     */
     micro_units NonEmptyTransactionWidget::_getAmount() const
     {
         return _amountField->text().toLongLong();
     }
 
+    /**
+     * @brief set the accounts for the accounts selection combo box
+     */
     void NonEmptyTransactionWidget::_setAccounts()
     {
         _accountsSelection = makeQChild<QComboBox>(this);
@@ -138,6 +177,19 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Handle the selection of an account from the accounts combo box,
+     * this will be called when the user selects an account from the combo box,
+     * and should handle updating any relevant UI elements (e.g. currency label)
+     * based on the selected account, allowing the user to see the appropriate
+     * information for the selected account when creating a transaction.
+     *
+     * @param index The index of the selected account in the combo box, this can
+     * be used to retrieve the corresponding AccountDraft from the _accounts
+     * vector based on the data stored in the combo box items, allowing the
+     * method to access the details of the selected account and update the UI
+     * accordingly.
+     */
     void NonEmptyTransactionWidget::_onAccountSelected(int /*index*/)
     {
         const auto account = _getSelectedAccount();
@@ -152,6 +204,16 @@ namespace ui
         }
     }
 
+    /**
+     * @brief factory function to create a transaction widget based on the
+     * transaction type
+     *
+     * @param parent The parent widget
+     * @param type The type of the transaction
+     * @param accounts The list of account drafts to choose from
+     *
+     * @return ICreateTransactionWidget* A pointer to the created transaction
+     */
     ICreateTransactionWidget* makeTransactionWidget(
         QWidget*                          parent,
         TransactionType                   type,
@@ -170,11 +232,22 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Construct a new Empty Transaction Widget:: Empty Transaction
+     * Widget object
+     *
+     * @param parent
+     */
     EmptyTransactionWidget::EmptyTransactionWidget(QWidget* parent)
         : ICreateTransactionWidget(parent)
     {
     }
 
+    /**
+     * @brief get the transaction draft from the empty transaction widget
+     *
+     * @return drafts::TransactionDraft
+     */
     drafts::TransactionDraft DepositWithdrawalWidget::getDraft() const
     {
         drafts::TransactionDraft draft;
@@ -205,12 +278,26 @@ namespace ui
         return draft;
     }
 
+    /**
+     * @brief Emit the createTransactionRequested signal with the transaction
+     * draft
+     *
+     */
     void NonEmptyTransactionWidget::_emitOk()
     {
         const auto draft = getDraft();
         emit       createTransactionRequested(draft);
     }
 
+    /**
+     * @brief Enable or disable the add button based on the validity of the
+     * input, this will check if the selected account is valid and if the amount
+     * entered is valid and not zero, and will enable the add button if the
+     * input is valid, or disable it if the input is invalid, providing feedback
+     * to the user about whether they can submit the form to create a
+     * transaction draft based on the current input values.
+     *
+     */
     void NonEmptyTransactionWidget::_enableAddButtonIfValid()
     {
         const auto isValid = _getSelectedAccount().has_value() &&

@@ -8,14 +8,27 @@
 
 namespace ui
 {
+    /**
+     * @brief Widget for displaying an overview of transactions in a table view
+     *
+     * This widget provides a table view for displaying an overview of
+     * transactions. It uses a TransactionTableModel to manage the data and a
+     * QSortFilterProxyModel to enable sorting and filtering of the
+     * transactions. The widget provides a method to refresh the displayed
+     * transactions based on a list of TransactionDrafts and a mapping of
+     * account IDs to account names for display purposes.
+     */
     class TransactionsOverview : public QWidget
     {
         Q_OBJECT
 
        private:
+        /// The model for the transaction table
         TransactionTableModel* _model;
+        /// The proxy model for sorting and filtering the transaction table
         QSortFilterProxyModel* _proxy;
-        QTableView*            _table;
+        /// The table view for displaying the transactions
+        QTableView* _table;
 
        public:
         explicit TransactionsOverview(QWidget* parent);

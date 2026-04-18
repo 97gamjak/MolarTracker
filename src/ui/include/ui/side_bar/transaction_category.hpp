@@ -16,8 +16,9 @@ namespace ui
        private:
         /// The create action for the transaction category
         QAction* _createAction;
-
+        /// The create deposit action for the transaction category
         QAction* _createDepositAction;
+        /// The create withdrawal action for the transaction category
         QAction* _createWithdrawalAction;
 
        public:

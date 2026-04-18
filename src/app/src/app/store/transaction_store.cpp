@@ -24,6 +24,11 @@ namespace app
     /**
      * @brief Save all temporary changes to the database
      *
+     * @param accountIdMap A map of old account IDs to new account IDs, this is
+     * used to update the account IDs in the transaction entries before
+     * committing them to the database, ensuring that the transactions are
+     * associated with the correct accounts after any changes to account IDs
+     * have been made.
      */
     void TransactionStore::commit(
         const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
@@ -65,6 +70,20 @@ namespace app
         }
     }
 
+    /**
+     * @brief Add a transaction to the store, this will add the transaction as
+     * a new entry in the store and mark it as New, indicating that it has not
+     * yet been committed to the database, and will be included in the next
+     * commit operation.
+     *
+     * @param draft The transaction draft to add to the store, this contains the
+     * details of the transaction to be added, including its entries and other
+     * relevant information needed to create a complete transaction in the
+     * store.
+     * @return TransactionStoreResult The result of the add operation,
+     * indicating whether it was successful or if there were any issues (e.g.,
+     * if the transaction sum is not zero).
+     */
     TransactionStoreResult TransactionStore::addTransaction(
         const drafts::TransactionDraft& draft
     )
@@ -92,6 +111,18 @@ namespace app
         return TransactionStoreResult::Ok;
     }
 
+    /**
+     * @brief Updates the account IDs in the transaction entries based on the
+     * provided account ID map, this is used to ensure that any changes to
+     * account IDs are reflected in the transaction entries before they are
+     * committed to the database, maintaining the integrity of the associations
+     * between transactions and accounts.
+     *
+     * @param accountIdMap A map of old account IDs to new account IDs, this is
+     * used to update the account IDs in the transaction entries, ensuring that
+     * the transactions are associated with the correct accounts after any
+     * changes to account IDs have been made.
+     */
     void TransactionStore::_updateAccountIds(
         const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
             accountIdMap
@@ -123,6 +154,16 @@ namespace app
         }
     }
 
+    /**
+     * @brief Retrieves all transactions from the store, this will return a
+     * vector of transaction drafts representing the transactions currently in
+     * the store, including any new transactions that have been added but not
+     * yet committed to the database, as well as transactions that are already
+     * in the database but may have been modified in the store.
+     *
+     * @return std::vector<drafts::TransactionDraft> A vector of transaction
+     * drafts representing the transactions in the store.
+     */
     std::vector<drafts::TransactionDraft> TransactionStore::getTransactions(
     ) const
     {

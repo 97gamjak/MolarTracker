@@ -42,11 +42,23 @@ namespace ui
         Column getColFromIndex(int index) { return static_cast<Column>(index); }
     }   // namespace
 
+    /**
+     * @brief Construct a new Transaction Table Model:: Transaction Table Model
+     * object
+     *
+     * @param parent
+     */
     TransactionTableModel::TransactionTableModel(QObject* parent)
         : QAbstractTableModel(parent)
     {
     }
 
+    /**
+     * @brief set the transactions to display in the table model
+     *
+     * @param transactions
+     * @param accountIdToName
+     */
     void TransactionTableModel::setTransactions(
         std::vector<drafts::TransactionDraft> transactions,
         IdToNameMap                           accountIdToName
@@ -58,16 +70,35 @@ namespace ui
         endResetModel();
     }
 
+    /**
+     * @brief get the number of rows in the table model
+     *
+     * @param parent
+     * @return int
+     */
     int TransactionTableModel::rowCount(const QModelIndex& parent) const
     {
         return parent.isValid() ? 0 : static_cast<int>(_transactions.size());
     }
 
+    /**
+     * @brief get the number of columns in the table model
+     *
+     * @param parent
+     * @return int
+     */
     int TransactionTableModel::columnCount(const QModelIndex& parent) const
     {
         return parent.isValid() ? 0 : ColumnMeta::size;
     }
 
+    /**
+     * @brief data method for the table model
+     *
+     * @param index
+     * @param role
+     * @return QVariant
+     */
     QVariant TransactionTableModel::data(
         const QModelIndex& index,
         int                role
@@ -94,6 +125,13 @@ namespace ui
         }
     }
 
+    /**
+     * @brief display data for the table model
+     *
+     * @param transaction
+     * @param col
+     * @return QVariant
+     */
     QVariant TransactionTableModel::_displayData(
         const drafts::TransactionDraft& transaction,
         Column                          col
@@ -127,6 +165,13 @@ namespace ui
         return {};
     }
 
+    /**
+     * @brief decoration data for the table model
+     *
+     * @param transaction
+     * @param col
+     * @return QVariant
+     */
     QVariant TransactionTableModel::_decorationData(
         const drafts::TransactionDraft& transaction,
         Column                          col
@@ -139,7 +184,12 @@ namespace ui
                    ? QColor(Qt::GlobalColor::green)
                    : QColor(Qt::GlobalColor::red);
     }
-
+    /**
+     * @brief text alignment data for the table model
+     *
+     * @param col
+     * @return QVariant
+     */
     QVariant TransactionTableModel::_textAlignmentData(Column col) const
     {
         if (col == Column::Amount)
@@ -147,6 +197,14 @@ namespace ui
         return {Qt::AlignLeft | Qt::AlignVCenter};
     }
 
+    /**
+     * @brief header data for the table model
+     *
+     * @param section
+     * @param orientation
+     * @param role
+     * @return QVariant
+     */
     QVariant TransactionTableModel::headerData(
         int             section,
         Qt::Orientation orientation,
@@ -159,6 +217,12 @@ namespace ui
         return getColLabel(section);
     }
 
+    /**
+     * @brief the item flags for the table model
+     *
+     * @param index
+     * @return Qt::ItemFlags
+     */
     Qt::ItemFlags TransactionTableModel::flags(const QModelIndex& index) const
     {
         if (!index.isValid())
@@ -167,11 +231,21 @@ namespace ui
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
 
+    /**
+     * @brief get the index of the description column
+     *
+     * @return int
+     */
     int TransactionTableModel::getDescriptionIndex()
     {
         return static_cast<int>(Column::Description);
     }
 
+    /**
+     * @brief get the index of the date column
+     *
+     * @return int
+     */
     int TransactionTableModel::getDateIndex()
     {
         return static_cast<int>(Column::Date);

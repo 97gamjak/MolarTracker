@@ -46,8 +46,9 @@ namespace controller
         /// The transaction store for the application
         app::TransactionStore& _transactionStore;
 
+        /// Pointer to the create transaction dialog
         QPointer<ui::CreateTransactionDialog> _createDlg;
-
+        /// Reference to the transaction controller
         TransactionController& _transactionController;
 
        public:

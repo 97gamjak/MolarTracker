@@ -25,6 +25,8 @@ namespace controller
      * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
+     * @param accountController
+     * @param transactionController
      */
     SideBarController::SideBarController(
         cmd::UndoStack&        undoStack,

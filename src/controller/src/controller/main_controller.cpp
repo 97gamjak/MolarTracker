@@ -46,7 +46,9 @@ namespace controller
         /// controller for managing the side bar
         SideBarController _sideBarController;
 
-        AccountController     _accountController;
+        /// controller for managing accounts
+        AccountController _accountController;
+        /// controller for managing transactions
         TransactionController _transactionController;
 
         /**

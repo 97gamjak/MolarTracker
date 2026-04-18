@@ -5,13 +5,26 @@
 
 namespace ui
 {
+    /**
+     * @brief A QLineEdit for entering monetary amounts, with validation for
+     * numeric input, optional positivity constraint, and configurable decimal
+     * places.
+     *
+     * This class extends LineValidator to provide specific validation logic for
+     * monetary amounts. It ensures that the input is a valid number, optionally
+     * restricts it to positive values, and allows configuring the number of
+     * decimal places. It also provides appropriate error messages when the
+     * input is invalid.
+     */
     class AmountLineEdit : public LineValidator
     {
         Q_OBJECT
 
        private:
+        /// The number of decimal places allowed in the input
         std::uint8_t _nDecimalPlaces = 2;
-        bool         _onlyPositive   = false;
+        /// A flag indicating whether to restrict the input to positive values
+        bool _onlyPositive = false;
 
        public:
         explicit AmountLineEdit(QWidget* parent);

@@ -34,9 +34,26 @@ namespace app
     template <typename T, typename IdType>
     struct FilterOptions
     {
-        filter::Predicate<T> filter   = filter::Predicate<T>();
-        DeletionPolicy       deletion = DeletionPolicy::IncludeDelete;
+        /// A predicate used to filter entries in the store
+        filter::Predicate<T> filter = filter::Predicate<T>();
 
+        /// A policy for including or excluding deleted entries in the results
+        DeletionPolicy deletion = DeletionPolicy::IncludeDelete;
+
+        /**
+         * @brief evaluates whether an entry matches the filter options, this is
+         * used to determine whether an entry should be included in the results
+         * of a query based on the specified filter predicate and deletion
+         * policy, allowing for flexible querying of entries in the store based
+         * on various criteria defined in the filter and whether deleted entries
+         * should be included or excluded according to the deletion policy.
+         *
+         * @tparam U
+         * @param entry
+         * @return true
+         * @return false
+         */
+        // TODO(97gamjak): move this to the .tpp file
         template <typename U>
         bool eval(const U& entry) const
         {
@@ -75,6 +92,8 @@ namespace app
         /// Type alias for a map of IDs.
         using IdMap = std::unordered_map<IdType, IdType, typename IdType::Hash>;
 
+        /// Type alias for filter options used when querying entries in the
+        /// store.
         using Options = FilterOptions<T, IdType>;
 
         /// struct representing an entry in the store, containing a value and

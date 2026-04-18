@@ -73,8 +73,7 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
-     * @param pred
-     * @param policy
+     * @param options
      * @return BaseStore<T, IdType>::Entry*
      */
     template <typename T, typename IdType>
@@ -89,14 +88,13 @@ namespace app
     }
 
     /**
-     * @brief Retrieves the value of an entry that matches the given predicate,
+     * @brief Retrieves the value of an entry that matches the given options,
      * returning it as an optional. If no matching entry is found, returns
      * std::nullopt.
      *
      * @tparam T
      * @tparam IdType
-     * @param pred
-     * @param policy
+     * @param options
      * @return std::optional<T>
      */
     template <typename T, typename IdType>
@@ -117,6 +115,7 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
+     * @param options
      * @return const std::vector<typename BaseStore<T, IdType>::Entry>&
      */
     template <typename T, typename IdType>
@@ -135,6 +134,7 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
+     * @param options
      * @return std::vector<typename BaseStore<T, IdType>::Entry>&
      */
     template <typename T, typename IdType>
@@ -148,6 +148,15 @@ namespace app
         );
     }
 
+    /**
+     * @brief Retrieves a collection of values from the entries in the store
+     * that match the given options, returning them as a vector.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param options
+     * @return std::vector<T>
+     */
     template <typename T, typename IdType>
     auto BaseStore<T, IdType>::_getValues(Options options) const
     {
@@ -357,6 +366,19 @@ namespace app
         return _changedIds;
     }
 
+    /**
+     * @brief Evaluates whether an entry should be included based on the given
+     * deletion policy. This is used to determine whether entries that are
+     * marked as deleted should be included in certain operations, such as
+     * retrieval or display.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param entry
+     * @param policy
+     * @return true if the entry should be included based on the deletion
+     * policy, false otherwise.
+     */
     template <typename T, typename IdType>
     bool BaseStore<T, IdType>::_evalDeletionPolicy(
         const Entry&   entry,

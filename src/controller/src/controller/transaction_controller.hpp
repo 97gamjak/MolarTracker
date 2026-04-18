@@ -25,15 +25,24 @@ namespace ui
 
 namespace controller
 {
+    /**
+     * @brief Controller for managing transactions and their interactions with
+     * the UI and the stores
+     *
+     */
     class TransactionController : public QObject
     {
         Q_OBJECT
 
        private:
         /// The undo stack for the application
-        cmd::UndoStack&        _undoStack;
+        cmd::UndoStack& _undoStack;
+
+        /// Reference to the transaction store
         app::TransactionStore& _transactionStore;
-        app::AccountStore&     _accountStore;
+        /// Reference to the account store
+        app::AccountStore& _accountStore;
+
         /// Pointer to the central stacked widget
         QStackedWidget* _stackedWidget;
         /// Pointer to the transaction detail view

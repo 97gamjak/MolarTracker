@@ -10,6 +10,12 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Transactions Overview:: Transactions Overview
+     * object
+     *
+     * @param parent
+     */
     TransactionsOverview::TransactionsOverview(QWidget* parent)
         : QWidget(parent),
           _model(utils::makeQChild<TransactionTableModel>(this)),
@@ -37,6 +43,12 @@ namespace ui
         layout->addWidget(_table);
     }
 
+    /**
+     * @brief Refresh the transactions displayed in the overview
+     *
+     * @param transactions
+     * @param accountIdToName
+     */
     void TransactionsOverview::refresh(
         const std::vector<drafts::TransactionDraft>& transactions,
         const std::unordered_map<AccountId, std::string, AccountId::Hash>&
@@ -46,6 +58,14 @@ namespace ui
         _model->setTransactions(transactions, accountIdToName);
     }
 
+    /**
+     * @brief Set up the transaction table view, this will configure the table
+     * view to display the transactions in a user-friendly way, including
+     * setting up sorting, selection behavior, and column resizing to ensure
+     * that the transaction data is presented clearly and is easy to navigate
+     * for the user.
+     *
+     */
     void TransactionsOverview::_setupTable()
     {
         _table->setModel(_proxy);

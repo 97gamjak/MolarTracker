@@ -5,6 +5,11 @@
 
 namespace ui
 {
+    /**
+     * @brief Base class for dialogs in the application, providing common
+     * functionality and styling
+     *
+     */
     class Dialog : public QDialog
     {
         Q_OBJECT

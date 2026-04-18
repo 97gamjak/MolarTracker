@@ -1,13 +1,22 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
-#include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/transaction.hpp"
 
 namespace drafts
 {
 
+    /**
+     * @brief Mapper class for converting between Transaction and
+     * TransactionDraft
+     *
+     * This class provides static methods to convert between the domain model
+     * (finance::Transaction) and the draft model (drafts::TransactionDraft).
+     * This is useful for separating the concerns of the business logic and the
+     * UI, and allows us to have a clear mapping between the two representations
+     * of a transaction.
+     */
     class TransactionMapper
     {
        public:

@@ -232,16 +232,14 @@ namespace app
     }
 
     /**
-     * @brief Retrieves a vector of pointers to all accounts currently
-     * in the store, this allows callers to access the accounts managed
-     * by the store, and provides a way to retrieve the account data for
-     * display or further processing.
+     * @brief Retrieves a vector of account drafts representing all accounts
+     * currently in the store, this allows callers to get a list of all accounts
+     * managed by the store in a format that is suitable for display or further
+     * processing, and provides a way to access the account data in the store as
+     * a collection of drafts that can be used for various purposes such as
+     * populating UI elements or performing operations on the accounts.
      *
-     * @return std::vector<const Account*> A vector of pointers
-     * to all accounts currently in the store, each pointer points to an
-     * account object that is managed by the store, and the caller can
-     * use these pointers to access the account data and perform
-     * operations on the accounts as needed.
+     * @return std::vector<drafts::AccountDraft>
      */
     std::vector<drafts::AccountDraft> AccountStore::getAllAccounts() const
     {
@@ -256,6 +254,19 @@ namespace app
         return {accounts.begin(), accounts.end()};
     }
 
+    /**
+     * @brief get all cash accounts in the store, this allows callers to
+     * retrieve only the cash accounts managed by the store, which can be useful
+     * for display purposes or for operations that specifically involve cash
+     * accounts, and provides a way to filter the accounts based on their type
+     * and status.
+     *
+     * @return std::vector<drafts::AccountDraft> A vector of account drafts
+     * representing the cash accounts currently in the store, each draft
+     * contains the necessary information about a cash account that can be used
+     * for display or further processing, and the caller can use this vector to
+     * access the cash account data as needed.
+     */
     std::vector<drafts::AccountDraft> AccountStore::getCashAccounts() const
     {
         const auto options = Options{
@@ -269,6 +280,20 @@ namespace app
         return {accounts.begin(), accounts.end()};
     }
 
+    /**
+     * @brief Get a mapping of account IDs to account names for all active
+     * accounts in the store, this allows callers to easily look up the name of
+     * an account based on its ID, which can be useful for display purposes or
+     * when performing operations that require referencing accounts by their ID,
+     * and provides a convenient way to access the account names without having
+     * to retrieve the full account data for each account.
+     *
+     * @return std::unordered_map<AccountId, std::string, AccountId::Hash> A
+     * map where the keys are account IDs and the values are the corresponding
+     * account names for all active accounts in the store, this allows for
+     * efficient lookups of account names based on their IDs and can be used in
+     * various parts of the application where such mappings are needed.
+     */
     std::unordered_map<AccountId, std::string, AccountId::Hash> AccountStore::
         getAccountIdToNameMap() const
     {
@@ -288,6 +313,23 @@ namespace app
         return accountIdToName;
     }
 
+    /**
+     * @brief Get the ID of the external account for a given currency, this is
+     * used to find the corresponding external account for a cash account based
+     * on its currency, and allows callers to retrieve the ID of the external
+     * account that is associated with a specific currency, which can be useful
+     * for operations that involve cash accounts and their corresponding
+     * external accounts.
+     *
+     * @param currency The currency for which to find the external account, this
+     * specifies the currency of the cash account for which we want to find the
+     * corresponding external account, and is used as a filter criterion when
+     * searching for the external account in the store.
+     * @return AccountId The ID of the external account associated with the
+     * given currency, if found, this is the identifier of the external account
+     * that corresponds to the specified currency, and can be used for various
+     * operations that require referencing the external account.
+     */
     AccountId AccountStore::getExternalAccount(Currency currency) const
     {
         const auto options = Options{

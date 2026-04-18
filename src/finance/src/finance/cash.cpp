@@ -115,6 +115,14 @@ namespace finance
         return Cash(cash._currency, -cash._amount);
     }
 
+    /**
+     * @brief Compound addition assignment operator for Cash
+     *
+     * @param lhs
+     * @param rhs
+     * @return Cash& the result of adding two Cash objects and assigning the
+     * result to the left-hand side object
+     */
     Cash& operator+=(Cash& lhs, const Cash& rhs)
     {
         if (lhs._currency != rhs._currency)
@@ -128,6 +136,14 @@ namespace finance
         return lhs;
     }
 
+    /**
+     * @brief Compound subtraction assignment operator for Cash
+     *
+     * @param lhs
+     * @param rhs
+     * @return Cash& the result of subtracting two Cash objects and assigning
+     * the result to the left-hand side object
+     */
     Cash& operator-=(Cash& lhs, const Cash& rhs)
     {
         if (lhs._currency != rhs._currency)
@@ -141,6 +157,11 @@ namespace finance
         return lhs;
     }
 
+    /**
+     * @brief Checks if the Cash amount is zero.
+     *
+     * @return true if the amount is zero, false otherwise.
+     */
     bool Cash::isZero() const { return _amount == 0; }
 
     /**

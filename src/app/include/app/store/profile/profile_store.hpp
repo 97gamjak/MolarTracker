@@ -51,6 +51,7 @@ namespace app
         /// loaded when the application starts.
         ActiveProfile _activeProfile;
 
+        /// alias for the base store type
         using Base = BaseStore<Profile, ProfileId>;
 
        public:

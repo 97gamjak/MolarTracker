@@ -29,11 +29,22 @@ namespace ui
         return _createAction;
     }
 
+    /**
+     * @brief Get the create deposit action for the transaction category
+     *
+     * @return QAction* The create deposit action for the transaction category
+     */
     QAction* TransactionCategory::getCreateDepositAction() const
     {
         return _createDepositAction;
     }
 
+    /**
+     * @brief Get the create withdrawal action for the transaction category
+     *
+     * @return QAction* The create withdrawal action for the transaction
+     * category
+     */
     QAction* TransactionCategory::getCreateWithdrawalAction() const
     {
         return _createWithdrawalAction;

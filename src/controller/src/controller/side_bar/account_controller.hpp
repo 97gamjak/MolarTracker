@@ -48,6 +48,7 @@ namespace controller
         /// Reference to the application context
         app::AppContext& _appContext;
 
+        /// Reference to the account controller
         AccountController& _accountController;
 
         /// Pointer to the create account dialog

@@ -27,6 +27,11 @@ namespace app
         return _transactionRepo->addTransaction(transaction);
     }
 
+    /**
+     * @brief Retrieves all transactions from the repository.
+     *
+     * @return std::vector<finance::Transaction> A vector of all transactions.
+     */
     std::vector<finance::Transaction> TransactionService::getTransactions(
     ) const
     {

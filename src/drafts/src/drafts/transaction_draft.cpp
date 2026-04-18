@@ -4,6 +4,14 @@
 
 namespace drafts
 {
+    /**
+     * @brief Construct a new Transaction Entry Draft:: Transaction Entry Draft
+     * object
+     *
+     * @param accountId
+     * @param cash
+     * @param accountKind
+     */
     TransactionEntryDraft::TransactionEntryDraft(
         AccountId     accountId,
         finance::Cash cash,
