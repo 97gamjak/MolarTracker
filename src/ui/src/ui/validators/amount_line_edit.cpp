@@ -1,6 +1,7 @@
 #include "ui/validators/amount_line_edit.hpp"
 
 #include <qboxlayout.h>
+#include <qcontainerfwd.h>
 #include <qlabel.h>
 #include <qregularexpression.h>
 
@@ -16,7 +17,26 @@ namespace ui
      *
      * @param parent
      */
-    AmountLineEdit::AmountLineEdit(QWidget* parent) : LineValidator(parent) {}
+    AmountLineEdit::AmountLineEdit(QWidget* parent) : LineValidator(parent)
+    {
+        connect(
+            this,
+            &QLineEdit::textEdited,
+            this,
+            [this](const QString& text)
+            {
+                auto newText = _removeLeadingZeros(text);
+                _removeExceedingDecimals(newText);
+            }
+        );
+
+        connect(
+            this,
+            &QLineEdit::editingFinished,
+            this,
+            &AmountLineEdit::_removeTrailingZeros
+        );
+    }
 
     /**
      * @brief Get the required error message for the amount line edit, this will
@@ -130,6 +150,80 @@ namespace ui
         }
 
         return {true, ""};
+    }
+
+    /**
+     * @brief remove leading zeros from the input text
+     *
+     * @param text
+     * @return QString
+     */
+    QString AmountLineEdit::_removeLeadingZeros(const QString& text)
+    {
+        static const QRegularExpression leadingZeros{R"(^(-?)0+([1-9]))"};
+        if (text.contains(leadingZeros))
+        {
+            const auto    pos = cursorPosition();
+            const QString fixed =
+                QString(text).replace(leadingZeros, R"(\1\2)");
+            setText(fixed);
+            setCursorPosition(
+                pos - static_cast<int>(text.length() - fixed.length())
+            );
+        }
+
+        return this->text();
+    }
+
+    /**
+     * @brief remove trailing zeros from the input text, this will ensure that
+     * the amount is displayed in a clean format without unnecessary zeros after
+     * the decimal point, improving readability for the user.
+     *
+     */
+    void AmountLineEdit::_removeTrailingZeros()
+    {
+        const auto                      text = this->text();
+        static const QRegularExpression trailingZeros{R"((\.\d*?[1-9])0+$)"};
+        if (text.contains(trailingZeros))
+        {
+            const auto    pos   = cursorPosition();
+            const QString fixed = QString(text).replace(trailingZeros, R"(\1)");
+            setText(fixed);
+            setCursorPosition(
+                pos - static_cast<int>(text.length() - fixed.length())
+            );
+        }
+    }
+
+    /**
+     * @brief remove exceeding decimals from the input text, this will ensure
+     * that the user cannot enter more decimal places than allowed, providing
+     * feedback to the user and maintaining the integrity of the input format.
+     *
+     * @param text The input text to validate and potentially modify, this is
+     * the text from the line edit that may contain more decimal places than
+     * allowed, and this function will check for that and remove any excess
+     * decimal digits if necessary.
+     */
+    void AmountLineEdit::_removeExceedingDecimals(const QString& text)
+    {
+        QString    cleaned  = text;
+        const auto dotIndex = cleaned.indexOf('.');
+
+        if (dotIndex != -1 &&
+            cleaned.length() - dotIndex - 1 > static_cast<int>(_nDecimalPlaces))
+            cleaned =
+                cleaned.left(dotIndex + 1 + static_cast<int>(_nDecimalPlaces));
+
+        if (cleaned != text)
+        {
+            const int pos = cursorPosition();
+            setText(cleaned);
+            setCursorPosition(
+                pos - static_cast<int>(text.length() - cleaned.length())
+            );
+        }
     }
 
 }   // namespace ui

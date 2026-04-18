@@ -40,6 +40,11 @@ namespace ui
         [[nodiscard]] std::pair<bool, QString> _validateNonEmpty(
             QStringView trimmedText
         ) const override;
+
+       private slots:
+        QString _removeLeadingZeros(const QString& text);
+        void    _removeTrailingZeros();
+        void    _removeExceedingDecimals(const QString& text);
     };
 
 }   // namespace ui
