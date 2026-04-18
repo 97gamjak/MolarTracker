@@ -1,8 +1,10 @@
 #include "finance/cash.hpp"
 
+#include <format>
 #include <string>
 
 #include "currency_exception.hpp"
+#include "finance/currency.hpp"
 
 namespace finance
 {
@@ -126,5 +128,15 @@ namespace finance
      * @return Currency The currency of the cash.
      */
     Currency Cash::getCurrency() const { return _currency; }
+
+    /**
+     * @brief Converts the Cash object to a string representation.
+     *
+     * @return std::string The string representation of the Cash object.
+     */
+    std::string Cash::toString() const
+    {
+        return std::format("{} {}", getAmount(), getSymbol(getCurrency()));
+    }
 
 }   // namespace finance

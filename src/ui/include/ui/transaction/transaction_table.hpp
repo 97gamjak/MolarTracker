@@ -10,6 +10,8 @@
 
 namespace ui
 {
+    enum class Column : std::uint8_t;
+
     class TransactionTableModel : public QAbstractTableModel
     {
         Q_OBJECT
@@ -23,18 +25,6 @@ namespace ui
         IdToNameMap _accountIdToName;
 
        public:
-        enum class Column : std::uint8_t
-        {
-            Date,
-            Description,
-            Type,
-            FromAccount,
-            ToAccount,
-            Amount,
-            Currency,
-            Count
-        };
-
         explicit TransactionTableModel(QObject* parent);
 
         void setTransactions(
@@ -54,6 +44,9 @@ namespace ui
         ) const override;
         [[nodiscard]]
         Qt::ItemFlags flags(const QModelIndex& index) const override;
+
+        [[nodiscard]] static int getDescriptionIndex();
+        [[nodiscard]] static int getDateIndex();
 
        private:
         [[nodiscard]]

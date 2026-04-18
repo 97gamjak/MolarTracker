@@ -185,8 +185,7 @@ namespace ui
 
         auto entry = drafts::TransactionEntryDraft{
             selectedAccount->id,
-            _getAmount(),
-            selectedAccount->currency,
+            finance::Cash(selectedAccount->currency, _getAmount()),
             selectedAccount->kind
         };
         entry.needsExternal = true;

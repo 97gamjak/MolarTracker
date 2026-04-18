@@ -1,6 +1,8 @@
 #ifndef __FILTER__INCLUDE__FILTER__EXPR_NODE_TPP__
 #define __FILTER__INCLUDE__FILTER__EXPR_NODE_TPP__
 
+#include <variant>
+
 #include "expr_node.hpp"
 
 namespace filter
@@ -16,6 +18,11 @@ namespace filter
     template <typename Leaf>
     Node<Leaf> makeAnd(Node<Leaf> left, Node<Leaf> right)
     {
+        if (std::holds_alternative<EmptyNode<Leaf>>(left))
+            return right;
+        if (std::holds_alternative<EmptyNode<Leaf>>(right))
+            return left;
+
         return AndNode<Leaf>{
             std::make_shared<Node<Leaf>>(std::move(left)),
             std::make_shared<Node<Leaf>>(std::move(right))
@@ -33,6 +40,11 @@ namespace filter
     template <typename Leaf>
     Node<Leaf> makeOr(Node<Leaf> left, Node<Leaf> right)
     {
+        if (std::holds_alternative<EmptyNode<Leaf>>(left))
+            return right;
+        if (std::holds_alternative<EmptyNode<Leaf>>(right))
+            return left;
+
         return OrNode<Leaf>{
             std::make_shared<Node<Leaf>>(std::move(left)),
             std::make_shared<Node<Leaf>>(std::move(right))
@@ -49,6 +61,9 @@ namespace filter
     template <typename Leaf>
     Node<Leaf> makeNot(Node<Leaf> operand)
     {
+        if (std::holds_alternative<EmptyNode<Leaf>>(operand))
+            return operand;
+
         return NotNode<Leaf>{std::make_shared<Node<Leaf>>(std::move(operand))};
     }
 
@@ -75,9 +90,10 @@ namespace filter
      * @return A new conjunction (AND) filter expression.
      */
     template <typename Leaf>
-    Node<Leaf> operator&=(Node<Leaf> left, Node<Leaf> right)
+    Node<Leaf>& operator&=(Node<Leaf>& left, const Node<Leaf>& right)
     {
-        return makeAnd(left, right);
+        left = makeAnd(left, right);
+        return left;
     }
 
     /**

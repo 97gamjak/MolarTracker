@@ -6,6 +6,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "finance/cash.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
@@ -32,19 +33,16 @@ namespace drafts
     {
         AccountId accountId;
 
-        micro_units amount;
-
-        Currency currency;
+        finance::Cash cash;
 
         AccountKind accountKind;
 
         bool needsExternal = false;
 
         TransactionEntryDraft(
-            AccountId   accountId,
-            micro_units amount,
-            Currency    currency,
-            AccountKind accountKind
+            AccountId     accountId,
+            finance::Cash cash,
+            AccountKind   accountKind
         );
     };
 

@@ -8,6 +8,7 @@
 #include <QColor>
 #include <QDateTime>
 #include <QFont>
+#include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
 #include "finance/currency.hpp"
@@ -16,35 +17,15 @@
 namespace ui
 {
 
-    namespace
-    {
-        constexpr int colCount =
-            static_cast<int>(TransactionTableModel::Column::Count);
+#define COLUMN_LIST(X) \
+    X(Date)            \
+    X(Type)            \
+    X(FromAccount)     \
+    X(ToAccount)       \
+    X(Amount)          \
+    X(Description)
 
-        QString columnLabel(TransactionTableModel::Column col)
-        {
-            switch (col)
-            {
-                case TransactionTableModel::Column::Date:
-                    return "Date";
-                case TransactionTableModel::Column::Description:
-                    return "Description";
-                case TransactionTableModel::Column::Type:
-                    return "Type";
-                case TransactionTableModel::Column::FromAccount:
-                    return "From Account";
-                case TransactionTableModel::Column::ToAccount:
-                    return "To Account";
-                case TransactionTableModel::Column::Amount:
-                    return "Amount";
-                case TransactionTableModel::Column::Currency:
-                    return "Currency";
-                case TransactionTableModel::Column::Count:
-                    break;
-            }
-            return {};
-        }
-    }   // namespace
+    MSTD_ENUM(Column, std::uint8_t, COLUMN_LIST);
 
     TransactionTableModel::TransactionTableModel(QObject* parent)
         : QAbstractTableModel(parent)
@@ -69,7 +50,7 @@ namespace ui
 
     int TransactionTableModel::columnCount(const QModelIndex& parent) const
     {
-        return parent.isValid() ? 0 : colCount;
+        return parent.isValid() ? 0 : ColumnMeta::size;
     }
 
     QVariant TransactionTableModel::data(
@@ -79,8 +60,10 @@ namespace ui
     {
         if (!index.isValid() || index.row() >= rowCount({}))
             return {};
+
         const auto& transaction =
             _transactions[static_cast<std::size_t>(index.row())];
+
         const auto col = static_cast<Column>(index.column());
 
         switch (role)
@@ -122,17 +105,9 @@ namespace ui
                     _accountIdToName.at(transaction.entries.back().accountId)
                 );
             case Column::Amount:
-                return QString::number(
-                    transaction.entries.front().amount / 100,
-                    'f',
-                    2
-                );
-            case Column::Currency:
                 return QString::fromStdString(
-                    finance::getSymbol(transaction.entries.front().currency)
+                    transaction.entries.front().cash.toString()
                 );
-            case Column::Count:
-                break;
         }
         return {};
     }
@@ -145,7 +120,9 @@ namespace ui
         if (col != Column::Amount)
             return {};
         // tint positive green, negative red — purely cosmetic
-        return 100 >= 0.0 ? QColor(59, 109, 17) : QColor(163, 45, 45);
+        return transaction.entries.front().cash.getAmount() >= 0.0
+                   ? QColor(59, 109, 17)
+                   : QColor(163, 45, 45);
     }
 
     QVariant TransactionTableModel::_textAlignmentData(Column col) const
@@ -163,7 +140,10 @@ namespace ui
     {
         if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
             return {};
-        return columnLabel(static_cast<Column>(section));
+
+        return QString::fromStdString(
+            ColumnMeta::toString(static_cast<Column>(section))
+        );
     }
 
     Qt::ItemFlags TransactionTableModel::flags(const QModelIndex& index) const
@@ -171,6 +151,16 @@ namespace ui
         if (!index.isValid())
             return Qt::NoItemFlags;
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
+
+    int TransactionTableModel::getDescriptionIndex()
+    {
+        return static_cast<int>(Column::Description);
+    }
+
+    int TransactionTableModel::getDateIndex()
+    {
+        return static_cast<int>(Column::Date);
     }
 
 }   // namespace ui

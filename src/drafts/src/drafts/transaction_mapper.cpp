@@ -5,6 +5,9 @@
 #include "drafts/transaction_draft.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("Drafts.TransactionMapper");
 
 namespace drafts
 {
@@ -16,8 +19,7 @@ namespace drafts
         {
             return TransactionEntryDraft{
                 AccountId::invalid(),
-                detail.getAmount(),
-                detail.getCurrency(),
+                detail.getCash(),
                 AccountKind::Cash
             };
         }
@@ -64,13 +66,10 @@ namespace drafts
             {
                 case AccountKind::Cash:
                 {
-                    const auto cash =
-                        finance::Cash{entryDraft.currency, entryDraft.amount};
-
                     const auto entry = finance::TransactionEntry{
                         TransactionEntryId::invalid(),
                         entryDraft.accountId,
-                        finance::CashTransaction{cash}
+                        finance::CashTransaction{entryDraft.cash}
                     };
 
                     transaction.addEntry(entry);

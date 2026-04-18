@@ -117,7 +117,7 @@ namespace filter
     Node<Leaf> operator&&(Node<Leaf> left, Node<Leaf> right);
 
     template <typename Leaf>
-    Node<Leaf> operator&=(Node<Leaf> left, Node<Leaf> right);
+    Node<Leaf>& operator&=(Node<Leaf>& left, const Node<Leaf>& right);
 
     template <typename Leaf>
     Node<Leaf> operator||(Node<Leaf> left, Node<Leaf> right);

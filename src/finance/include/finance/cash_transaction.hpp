@@ -26,6 +26,7 @@ namespace finance
 
         [[nodiscard]] micro_units getAmount() const;
         [[nodiscard]] Currency    getCurrency() const;
+        [[nodiscard]] Cash        getCash() const;
     };
 }   // namespace finance
 

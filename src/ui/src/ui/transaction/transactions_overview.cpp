@@ -4,6 +4,7 @@
 #include <qheaderview.h>
 #include <qlineedit.h>
 
+#include "ui/transaction/transaction_table.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -58,14 +59,14 @@ namespace ui
         auto* hdr = _table->horizontalHeader();
         hdr->setStretchLastSection(false);
         hdr->setSectionResizeMode(
-            static_cast<int>(TransactionTableModel::Column::Description),
+            TransactionTableModel::getDescriptionIndex(),
             QHeaderView::Stretch
         );   // description takes remaining space
         hdr->setSortIndicatorShown(true);
 
         // sensible default sort: newest first
         _table->sortByColumn(
-            static_cast<int>(TransactionTableModel::Column::Date),
+            TransactionTableModel::getDateIndex(),
             Qt::DescendingOrder
         );
     }

@@ -39,6 +39,7 @@ namespace finance
 
         [[nodiscard]] micro_units getAmount() const;
         [[nodiscard]] Currency    getCurrency() const;
+        [[nodiscard]] std::string toString() const;
     };
 
 }   // namespace finance

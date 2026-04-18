@@ -47,6 +47,7 @@ namespace controller
             QStackedWidget*        stackedWidget
         );
 
+        void transactionOverviewSelected(bool focus);
         void transactionOverviewSelected();
     };
 }   // namespace controller

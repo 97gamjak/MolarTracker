@@ -132,6 +132,9 @@ namespace controller
     )
     {
         _transactionStore.addTransaction(draft);
+        // TODO(97gamjak): add here commands and also error handling
+        _createDlg->close();
+        _transactionController.transactionOverviewSelected(false);
     }
 
     void TransactionSideBarController::onTransactionsSelected()

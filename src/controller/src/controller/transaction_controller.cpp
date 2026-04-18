@@ -26,7 +26,13 @@ namespace controller
 
     void TransactionController::transactionOverviewSelected()
     {
-        _stackedWidget->setCurrentWidget(_transactionDetailView);
+        transactionOverviewSelected(true);
+    }
+
+    void TransactionController::transactionOverviewSelected(bool focus)
+    {
+        if (focus)
+            _stackedWidget->setCurrentWidget(_transactionDetailView);
 
         _transactionDetailView->refresh(
             _transactionStore.getTransactions(),

@@ -5,15 +5,11 @@
 namespace drafts
 {
     TransactionEntryDraft::TransactionEntryDraft(
-        AccountId   accountId,
-        micro_units amount,
-        Currency    currency,
-        AccountKind accountKind
+        AccountId     accountId,
+        finance::Cash cash,
+        AccountKind   accountKind
     )
-        : accountId(accountId),
-          amount(amount),
-          currency(currency),
-          accountKind(accountKind)
+        : accountId(accountId), cash(cash), accountKind(accountKind)
     {
     }
 }   // namespace drafts
