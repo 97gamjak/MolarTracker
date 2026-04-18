@@ -186,7 +186,6 @@ namespace app
                 "call"
             );
             _activeProfileId = ProfileId::invalid();
-            _clearEntries();
             return;
         }
 
@@ -203,9 +202,6 @@ namespace app
         );
 
         _activeProfileId = profileId;
-
-        assert(!isDirty());
-        _refresh();
     }
 
     /**
