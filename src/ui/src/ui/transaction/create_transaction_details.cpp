@@ -47,9 +47,9 @@ namespace ui
         : ICreateTransactionWidget(parent),
           _accounts(std::move(accounts)),
           _type(type),
-          _layout(new QFormLayout(this)),
           _currencyLabel(new QLabel(this)),
-          _addButton(new QPushButton("Add Transaction"))
+          _addButton(new QPushButton("Add Transaction")),
+          _layout(new QFormLayout(this))
     {
         _layout->setObjectName("transactionDetailsLayout");
         setLayout(_layout);
@@ -230,6 +230,8 @@ namespace ui
                     std::move(accounts)
                 );
         }
+
+        throw std::invalid_argument("Unsupported transaction type");
     }
 
     /**

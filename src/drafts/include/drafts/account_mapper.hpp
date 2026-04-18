@@ -1,5 +1,5 @@
-#ifndef __DRAFTS_ACCOUNT_MAPPER_HPP__
-#define __DRAFTS_ACCOUNT_MAPPER_HPP__
+#ifndef __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
+#define __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
 
 namespace finance
 {
@@ -28,4 +28,4 @@ namespace drafts
 
 }   // namespace drafts
 
-#endif   // __DRAFTS_ACCOUNT_MAPPER_HPP__
+#endif   // __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__

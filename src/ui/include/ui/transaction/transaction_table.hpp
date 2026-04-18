@@ -67,12 +67,12 @@ namespace ui
             Column                          col
         ) const;
         [[nodiscard]]
-        QVariant _decorationData(
+        static QVariant _decorationData(
             const drafts::TransactionDraft& transaction,
             Column                          col
-        ) const;
+        );
         [[nodiscard]]
-        QVariant _textAlignmentData(Column col) const;
+        static QVariant _textAlignmentData(Column col);
     };
 
 }   // namespace ui

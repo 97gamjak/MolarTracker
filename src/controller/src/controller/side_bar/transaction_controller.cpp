@@ -34,8 +34,8 @@ namespace controller
           _undoStack(undoStack),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
-          _transactionController(transactionController),
-          _createDlg(new ui::CreateTransactionDialog(mainWindow))
+          _createDlg(new ui::CreateTransactionDialog(mainWindow)),
+          _transactionController(transactionController)
     {
         connect(
             _createDlg,

@@ -1,5 +1,5 @@
-#ifndef __FINANCE__SRC__FINANCE__CURRENCY_HPP__
-#define __FINANCE__SRC__FINANCE__CURRENCY_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__CURRENCY_HPP__
+#define __FINANCE__INCLUDE__FINANCE__CURRENCY_HPP__
 
 #include <config/finance.hpp>
 #include <mstd/error.hpp>
@@ -111,4 +111,4 @@ namespace finance
 
 }   // namespace finance
 
-#endif   // __FINANCE__SRC__FINANCE__CURRENCY_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__CURRENCY_HPP__

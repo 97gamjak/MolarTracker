@@ -50,9 +50,7 @@ class Timestamp
 
     [[nodiscard]] static Timestamp fromInt64(int64_t value);
 
-#ifdef __QT_ENABLED__
     [[nodiscard]] QDateTime toQDateTime() const;
-#endif
 
    private:
     [[nodiscard]] LocalTimePoint _toLocalTime() const;

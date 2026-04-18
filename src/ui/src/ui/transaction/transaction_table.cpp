@@ -14,6 +14,7 @@
 namespace ui
 {
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define COLUMN_LIST(X)  \
     X(Date)             \
     X(Type)             \
@@ -175,12 +176,12 @@ namespace ui
     QVariant TransactionTableModel::_decorationData(
         const drafts::TransactionDraft& transaction,
         Column                          col
-    ) const
+    )
     {
         if (col != Column::Amount)
             return {};
 
-        return transaction.entries.front().cash.getAmount() >= 0.0
+        return transaction.entries.front().cash.getAmount() >= 0
                    ? QColor(Qt::GlobalColor::green)
                    : QColor(Qt::GlobalColor::red);
     }
@@ -190,7 +191,7 @@ namespace ui
      * @param col
      * @return QVariant
      */
-    QVariant TransactionTableModel::_textAlignmentData(Column col) const
+    QVariant TransactionTableModel::_textAlignmentData(Column col)
     {
         if (col == Column::Amount)
             return {Qt::AlignRight | Qt::AlignVCenter};

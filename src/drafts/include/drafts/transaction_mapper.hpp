@@ -1,11 +1,11 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
-#include "drafts/transaction_draft.hpp"
 #include "finance/transaction.hpp"
 
 namespace drafts
 {
+    struct TransactionDraft;
 
     /**
      * @brief Mapper class for converting between Transaction and
