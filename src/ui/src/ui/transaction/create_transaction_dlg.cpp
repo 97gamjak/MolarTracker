@@ -24,16 +24,7 @@ namespace ui
     CreateTransactionDialog::CreateTransactionDialog(QWidget* parent)
         : Dialog(parent)
     {
-        _stack = makeQChild<QStackedWidget>(this);
-        _stack->addWidget(makeQChild<EmptyTransactionWidget>(_stack));
-        setWindowTitle("New Transaction");
-
         _buildUI();
-
-        auto* layout = makeQChild<QVBoxLayout>(this);
-        setLayout(layout);
-        layout->addWidget(_transactionType);
-        layout->addWidget(_stack);
     }
 
     /**
@@ -46,6 +37,10 @@ namespace ui
      */
     void CreateTransactionDialog::_buildUI()
     {
+        _stack = makeQChild<QStackedWidget>(this);
+        _stack->addWidget(makeQChild<EmptyTransactionWidget>(_stack));
+        setWindowTitle("New Transaction");
+
         _transactionType = makeQChild<QComboBox>(this);
         _transactionType->setPlaceholderText("Select Transaction Type");
         _transactionType->setCurrentIndex(-1);
@@ -68,6 +63,30 @@ namespace ui
             this,
             &CreateTransactionDialog::_onTransactionTypeChanged
         );
+
+        auto* layout = makeQChild<QVBoxLayout>(this);
+        setLayout(layout);
+        layout->addWidget(_transactionType);
+        layout->addWidget(_stack);
+    }
+
+    /**
+     * @brief Handle the change of the transaction type, this will be called
+     * when the user selects a different transaction type from the combo box,
+     * and should handle updating the UI to display the appropriate transaction
+     * detail form based on the selected transaction type, allowing the user to
+     * fill out the necessary information for creating a transaction of that
+     * type.
+     *
+     * @param index The index of the selected transaction type in the combo box,
+     * this can be used to retrieve the corresponding TransactionType enum value
+     * from the item data of the combo box, which can then be used to determine
+     * which transaction detail form to display in the stacked widget.
+     */
+    void CreateTransactionDialog::reset()
+    {
+        _transactionType->setCurrentIndex(-1);
+        _stack->setCurrentIndex(0);
     }
 
     /**

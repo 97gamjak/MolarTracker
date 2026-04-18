@@ -67,6 +67,15 @@ namespace app
         );
     }
 
+    template <typename T, typename IdType>
+    bool BaseStore<T, IdType>::allDirty() const
+    {
+        return std::ranges::all_of(
+            _entries,
+            [](const auto& entry) { return entry.state != StoreState::Clean; }
+        );
+    }
+
     /**
      * @brief Finds an entry in the store that matches the given predicate and
      * returns a pointer to it, or nullptr if not found.

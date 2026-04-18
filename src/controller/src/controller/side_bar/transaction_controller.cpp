@@ -179,6 +179,7 @@ namespace controller
         _transactionStore.addTransaction(draft);
         // TODO(97gamjak): add here commands and also error handling
         _createDlg->close();
+        _createDlg->reset();
         _transactionController.transactionOverviewSelected(false);
     }
 
