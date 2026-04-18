@@ -69,7 +69,7 @@ namespace app
         row.instrumentId  = instrumentId;
         row.accountId     = entry.getAccountId();
 
-        row.amount = std::visit(finance::AmountVisitor{}, entry.getDetails());
+        row.amount = entry.getAmount();
 
         return row;
     }

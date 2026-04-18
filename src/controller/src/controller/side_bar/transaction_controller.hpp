@@ -8,12 +8,14 @@
 #include <QPointer>
 
 #include "config/finance.hpp"
+#include "controller/transaction_controller.hpp"
 #include "side_bar_category_controller.hpp"
 #include "ui/transaction/create_transaction_dlg.hpp"
 
 namespace app
 {
-    class AccountStore;   // Forward declaration
+    class AccountStore;       // Forward declaration
+    class TransactionStore;   // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -41,14 +43,20 @@ namespace controller
         cmd::UndoStack& _undoStack;
         /// The account store for the application
         app::AccountStore& _accountStore;
+        /// The transaction store for the application
+        app::TransactionStore& _transactionStore;
 
         QPointer<ui::CreateTransactionDialog> _createDlg;
 
+        TransactionController& _transactionController;
+
        public:
         TransactionSideBarController(
-            cmd::UndoStack&    undoStack,
-            app::AccountStore& accountStore,
-            QMainWindow*       mainWindow
+            cmd::UndoStack&        undoStack,
+            app::AccountStore&     accountStore,
+            app::TransactionStore& transactionStore,
+            TransactionController& transactionController,
+            QMainWindow*           mainWindow
         );
 
         void refresh() override;
@@ -58,8 +66,13 @@ namespace controller
             const QAction*                 action
         );
 
+        void onTransactionsSelected();
+
        private slots:
         void _onTransactionTypeChanged(TransactionType type);
+        void _onCreateTransactionRequested(
+            const drafts::TransactionDraft& draft
+        );
     };
 }   // namespace controller
 

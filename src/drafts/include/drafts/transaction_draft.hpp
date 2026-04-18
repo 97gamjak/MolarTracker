@@ -4,10 +4,14 @@
 #include <optional>
 #include <string>
 
+#include "config/finance.hpp"
+#include "config/id_types.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
 {
+
+    struct TransactionEntryDraft;   // Forward declaration
 
     /**
      * @brief A draft representation of a transaction
@@ -18,6 +22,28 @@ namespace drafts
         Timestamp timestamp;
 
         std::optional<std::string> comment;
+
+        std::vector<TransactionEntryDraft> entries;
+    };
+
+    struct TransactionEntryDraft
+    {
+        AccountId accountId;
+
+        micro_units amount;
+
+        Currency currency;
+
+        AccountKind accountKind;
+
+        bool needsExternal = false;
+
+        TransactionEntryDraft(
+            AccountId   accountId,
+            micro_units amount,
+            Currency    currency,
+            AccountKind accountKind
+        );
     };
 
 }   // namespace drafts

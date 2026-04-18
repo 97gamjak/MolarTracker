@@ -1,6 +1,7 @@
 #include "transaction_controller.hpp"
 
 #include "app/store/account_store.hpp"
+#include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
@@ -19,13 +20,17 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&    undoStack,
-        app::AccountStore& accountStore,
-        QMainWindow*       mainWindow
+        cmd::UndoStack&        undoStack,
+        app::AccountStore&     accountStore,
+        app::TransactionStore& transactionStore,
+        TransactionController& transactionController,
+        QMainWindow*           mainWindow
     )
         : SideBarCategoryController(new ui::TransactionCategory(), mainWindow),
           _undoStack(undoStack),
           _accountStore(accountStore),
+          _transactionStore(transactionStore),
+          _transactionController(transactionController),
           _createDlg(new ui::CreateTransactionDialog(mainWindow))
     {
         connect(
@@ -33,6 +38,13 @@ namespace controller
             &ui::CreateTransactionDialog::transactionTypeChanged,
             this,
             &TransactionSideBarController::_onTransactionTypeChanged
+        );
+
+        connect(
+            _createDlg,
+            &ui::CreateTransactionDialog::createTransactionRequested,
+            this,
+            &TransactionSideBarController::_onCreateTransactionRequested
         );
     }
 
@@ -113,6 +125,18 @@ namespace controller
 
             _createDlg->setWidget(type, accounts);
         }
+    }
+
+    void TransactionSideBarController::_onCreateTransactionRequested(
+        const drafts::TransactionDraft& draft
+    )
+    {
+        _transactionStore.addTransaction(draft);
+    }
+
+    void TransactionSideBarController::onTransactionsSelected()
+    {
+        _transactionController.transactionOverviewSelected();
     }
 
 }   // namespace controller

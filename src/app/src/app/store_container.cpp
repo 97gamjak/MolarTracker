@@ -41,8 +41,8 @@ namespace app
         LOG_INFO("Saving all temporary changes to database");
 
         _profileStore.commit();
-        // here the id of the active profile store was already updated via the
-        // observer in account store
+        // here the id of the active profile store was already updated via
+        // the observer in account store
         _accountStore.commit();
 
         _transactionStore.commit(_accountStore.getChangedIds());
@@ -122,6 +122,26 @@ namespace app
     const AccountStore& StoreContainer::getAccountStore() const
     {
         return _accountStore;
+    }
+
+    /**
+     * @brief Get the TransactionStore
+     *
+     * @return TransactionStore&
+     */
+    TransactionStore& StoreContainer::getTransactionStore()
+    {
+        return _transactionStore;
+    }
+
+    /**
+     * @brief Get the TransactionStore (const version)
+     *
+     * @return const TransactionStore&
+     */
+    const TransactionStore& StoreContainer::getTransactionStore() const
+    {
+        return _transactionStore;
     }
 
 }   // namespace app

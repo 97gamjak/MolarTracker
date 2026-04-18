@@ -37,13 +37,15 @@ namespace controller
      *
      */
     AccountSideBarController::AccountSideBarController(
-        cmd::UndoStack&  undoStack,
-        app::AppContext& appContext,
-        QMainWindow*     mainWindow
+        cmd::UndoStack&    undoStack,
+        app::AppContext&   appContext,
+        AccountController& accountController,
+        QMainWindow*       mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
-          _appContext(appContext)
+          _appContext(appContext),
+          _accountController(accountController)
     {
     }
 
@@ -178,6 +180,8 @@ namespace controller
      */
     void AccountSideBarController::onAccountSelected(AccountId id)
     {
-        emit accountSelected(id);
+        LOG_DEBUG(std::format("Account with ID {} selected", id.value()));
+
+        _accountController.accountSelected(id);
     }
 }   // namespace controller

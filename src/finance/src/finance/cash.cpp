@@ -120,4 +120,11 @@ namespace finance
      */
     micro_units Cash::getAmount() const { return _amount; }
 
+    /**
+     * @brief Gets the currency of the cash.
+     *
+     * @return Currency The currency of the cash.
+     */
+    Currency Cash::getCurrency() const { return _currency; }
+
 }   // namespace finance

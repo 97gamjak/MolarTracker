@@ -38,6 +38,7 @@ namespace ui
 
        signals:
         void transactionTypeChanged(TransactionType type);
+        void createTransactionRequested(const drafts::TransactionDraft& draft);
 
        private:
         void _buildUI();

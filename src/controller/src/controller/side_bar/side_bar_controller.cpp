@@ -4,6 +4,7 @@
 
 #include "account_controller.hpp"
 #include "app/app_context.hpp"
+#include "controller/account_controller.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
@@ -26,18 +27,27 @@ namespace controller
      * @param centralStack
      */
     SideBarController::SideBarController(
-        cmd::UndoStack&  undoStack,
-        app::AppContext& appContext,
-        QMainWindow*     mainWindow,
-        ui::SideBar*     sideBar,
-        QStackedWidget*  centralStack
+        cmd::UndoStack&        undoStack,
+        app::AppContext&       appContext,
+        QMainWindow*           mainWindow,
+        ui::SideBar*           sideBar,
+        QStackedWidget*        centralStack,
+        AccountController&     accountController,
+        TransactionController& transactionController
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
-          _accountSideBarController(undoStack, appContext, mainWindow),
+          _accountSideBarController(
+              undoStack,
+              appContext,
+              accountController,
+              mainWindow
+          ),
           _transactionSideBarController(
               undoStack,
               appContext.getStore().getAccountStore(),
+              appContext.getStore().getTransactionStore(),
+              transactionController,
               mainWindow
           ),
           _overviewCategory(new ui::OverviewCategory())
@@ -106,11 +116,14 @@ namespace controller
 
                 break;
             }
+            case ui::SideBarItemType::TransactionCategory:
+            {
+                _transactionSideBarController.onTransactionsSelected();
+                break;
+            }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
-            case ui::SideBarItemType::TransactionCategory:
-                // TODO(97gamjak): Implement context menu handling for
-                // TransactionCategory
+                // Handle overview and account category clicks if needed
                 break;
         }
     }

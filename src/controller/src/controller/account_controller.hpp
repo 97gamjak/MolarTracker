@@ -36,8 +36,6 @@ namespace cmd
 
 namespace controller
 {
-    class AccountSideBarController;   // Forward declaration
-
     /**
      * @brief Controller for managing account details
      *
@@ -58,14 +56,12 @@ namespace controller
 
        public:
         AccountController(
-            cmd::UndoStack&           undoStack,
-            app::AppContext&          appContext,
-            AccountSideBarController& sideBarController,
-            QStackedWidget*           stackedWidget
+            cmd::UndoStack&  undoStack,
+            app::AppContext& appContext,
+            QStackedWidget*  stackedWidget
         );
 
-       private slots:
-        void _onAccountSelected(AccountId id);
+        void accountSelected(AccountId id);
     };
 }   // namespace controller
 

@@ -2,7 +2,6 @@
 #define __UI__INCLUDE__UI__SIDE_BAR__TRANSACTION_CATEGORY_HPP__
 
 #include "category.hpp"
-#include "config/finance.hpp"
 
 class QAction;   // Forward declaration
 

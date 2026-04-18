@@ -1,6 +1,7 @@
 #include "app/store/transaction_store.hpp"
 
-#include "config/finance.hpp"
+#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
 
@@ -27,6 +28,8 @@ namespace app
             accountIdMap
     )
     {
+        LOG_ENTRY;
+
         _updateAccountIds(accountIdMap);
 
         if (!isDirty())
@@ -67,11 +70,7 @@ namespace app
         const auto& id = _generateNewId();
 
         _addEntry(
-            finance::Transaction(
-                id,
-                draft.timestamp,
-                TransactionStatus::Completed
-            ),
+            drafts::TransactionMapper::toTransaction(draft, id),
             StoreState::New
         );
 
@@ -107,6 +106,18 @@ namespace app
                 }
             }
         }
+    }
+
+    std::vector<drafts::TransactionDraft> TransactionStore::getTransactions(
+    ) const
+    {
+        const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
+
+        auto transactions =
+            _getValues(options) |
+            std::views::transform(drafts::TransactionMapper::toDraft);
+
+        return {transactions.begin(), transactions.end()};
     }
 
 }   // namespace app

@@ -85,6 +85,13 @@ namespace ui
                 makeTransactionWidget(this, type, std::move(accounts));
             _widgetMap[type] = widget;
             _stack->addWidget(widget);
+
+            connect(
+                widget,
+                &ICreateTransactionWidget::createTransactionRequested,
+                this,
+                &CreateTransactionDialog::createTransactionRequested
+            );
         }
 
         _stack->setCurrentWidget(_widgetMap[type]);

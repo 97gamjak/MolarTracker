@@ -38,6 +38,7 @@ namespace finance
         friend Cash operator-(const Cash& cash);
 
         [[nodiscard]] micro_units getAmount() const;
+        [[nodiscard]] Currency    getCurrency() const;
     };
 
 }   // namespace finance

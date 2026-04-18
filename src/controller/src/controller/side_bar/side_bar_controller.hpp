@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "account_controller.hpp"
-#include "transaction_controller.hpp"
+#include "controller/side_bar/account_controller.hpp"
+#include "controller/side_bar/transaction_controller.hpp"
 
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
@@ -29,6 +29,9 @@ namespace cmd
 
 namespace controller
 {
+
+    class AccountController;       // Forward declaration
+    class TransactionController;   // Forward declaration
     /**
      * @brief Controller for the side bar, this is responsible for managing the
      * state of the side bar and its categories and items, and providing an
@@ -54,11 +57,13 @@ namespace controller
 
        public:
         explicit SideBarController(
-            cmd::UndoStack&  undoStack,
-            app::AppContext& appContext,
-            QMainWindow*     mainWindow,
-            ui::SideBar*     sideBar,
-            QStackedWidget*  centralStack
+            cmd::UndoStack&        undoStack,
+            app::AppContext&       appContext,
+            QMainWindow*           mainWindow,
+            ui::SideBar*           sideBar,
+            QStackedWidget*        centralStack,
+            AccountController&     accountController,
+            TransactionController& transactionController
         );
 
         void refresh();

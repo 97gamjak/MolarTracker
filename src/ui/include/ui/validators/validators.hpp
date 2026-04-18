@@ -11,7 +11,7 @@ namespace ui
 }   // namespace ui
 
 #ifndef __UI__INCLUDE__UI__VALIDATORS__VALIDATORS_TPP__
-#include "validators.tpp"
+#include "validators.tpp"   // IWYU pragma: export
 #endif
 
 #endif   // __UI__INCLUDE__UI__VALIDATORS__VALIDATORS_HPP__

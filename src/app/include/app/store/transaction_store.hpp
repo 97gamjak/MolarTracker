@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include "app/services_api/i_transaction_service.hpp"
 #include "base/base_store.hpp"
@@ -46,6 +47,9 @@ namespace app
         TransactionStoreResult addTransaction(
             const drafts::TransactionDraft& draft
         );
+
+        // TODO (97gamjak): create filter here
+        std::vector<drafts::TransactionDraft> getTransactions() const;
 
        private:
         void _updateAccountIds(

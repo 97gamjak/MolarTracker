@@ -50,6 +50,9 @@ namespace app
 
         [[nodiscard]] AccountStore&       getAccountStore();
         [[nodiscard]] const AccountStore& getAccountStore() const;
+
+        [[nodiscard]] TransactionStore&       getTransactionStore();
+        [[nodiscard]] const TransactionStore& getTransactionStore() const;
     };
 
 }   // namespace app

@@ -4,6 +4,7 @@
 #include <QPointer>
 
 #include "config/id_types.hpp"
+#include "controller/account_controller.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace app
@@ -31,6 +32,7 @@ class QAction;   // Forward declaration
 
 namespace controller
 {
+    class AccountController;   // Forward declaration
 
     /**
      * @brief Controller for the account category in the side bar
@@ -46,14 +48,17 @@ namespace controller
         /// Reference to the application context
         app::AppContext& _appContext;
 
+        AccountController& _accountController;
+
         /// Pointer to the create account dialog
         QPointer<ui::CreateAccountDialog> _createAccountDialog;
 
        public:
         explicit AccountSideBarController(
-            cmd::UndoStack&  undoStack,
-            app::AppContext& appContext,
-            QMainWindow*     mainWindow
+            cmd::UndoStack&    undoStack,
+            app::AppContext&   appContext,
+            AccountController& accountController,
+            QMainWindow*       mainWindow
         );
 
         void refresh() override;
