@@ -19,7 +19,7 @@ namespace drafts
 
 namespace app
 {
-    class AppContext;   // Forward declaration
+    class AccountStore;   // Forward declaration
 }   // namespace app
 
 namespace ui
@@ -47,8 +47,8 @@ namespace controller
        private:
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
-        /// Reference to the application context
-        app::AppContext& _appContext;
+        /// Reference to the account store
+        app::AccountStore& _accountStore;
         /// Pointer to the stacked widget
         QStackedWidget* _stackedWidget;
         /// Pointer to the account detail view
@@ -56,9 +56,9 @@ namespace controller
 
        public:
         AccountController(
-            cmd::UndoStack&  undoStack,
-            app::AppContext& appContext,
-            QStackedWidget*  stackedWidget
+            cmd::UndoStack&    undoStack,
+            app::AccountStore& accountStore,
+            QStackedWidget*    stackedWidget
         );
 
         void accountSelected(AccountId id);

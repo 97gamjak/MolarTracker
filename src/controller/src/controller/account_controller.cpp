@@ -21,27 +21,17 @@ namespace controller
     /**
      * @brief Controller for managing account-related actions
      *
-     * @param undoStack A reference to the undo stack, this is used to push
-     * commands that are created as a result of actions in the account category
-     * (e.g. creating a new account), this allows the user to undo and redo
-     * actions related to accounts using the undo stack.
-     * @param appContext A reference to the application context, this is used to
-     * access the stores and services needed to perform operations related to
-     * accounts (e.g. creating a new account), this allows the controller to
-     * interact with the underlying data and business logic for accounts, and
-     * ensures that the controller can perform the necessary operations to
-     * manage accounts effectively.
-     * @param stackedWidget A pointer to the stacked widget, this is used to
-     * manage the different views for account details and other related
-     * information, allowing the controller to switch between views as needed.
+     * @param undoStack
+     * @param accountStore
+     * @param stackedWidget
      */
     AccountController::AccountController(
-        cmd::UndoStack&  undoStack,
-        app::AppContext& appContext,
-        QStackedWidget*  stackedWidget
+        cmd::UndoStack&    undoStack,
+        app::AccountStore& accountStore,
+        QStackedWidget*    stackedWidget
     )
         : _undoStack(undoStack),
-          _appContext(appContext),
+          _accountStore(accountStore),
           _stackedWidget(stackedWidget),
           _accountDetailView(new ui::AccountDetailView(_stackedWidget))
     {
@@ -57,8 +47,7 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto account =
-            _appContext.getStore().getAccountStore().getAccount(id);
+        const auto account = _accountStore.getAccount(id);
 
         if (!account.has_value())
         {

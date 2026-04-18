@@ -13,12 +13,21 @@ namespace ui
         Q_OBJECT
 
        private:
-        TransactionTable* _transactionTable = nullptr;
+        TransactionTableModel* _model;
+        QSortFilterProxyModel* _proxy;
+        QTableView*            _table;
 
        public:
         explicit TransactionsOverview(QWidget* parent);
 
-        void refresh(const std::vector<drafts::TransactionDraft>& transactions);
+        void refresh(
+            const std::vector<drafts::TransactionDraft>& transactions,
+            const std::unordered_map<AccountId, std::string, AccountId::Hash>&
+                accountIdToName
+        );
+
+       private:
+        void _setupTable();
     };
 }   // namespace ui
 

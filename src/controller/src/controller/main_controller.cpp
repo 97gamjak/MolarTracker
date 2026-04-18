@@ -61,12 +61,13 @@ namespace controller
               _centralController(_mainWindow.getCentralWidget()),
               _accountController(
                   _undoStack,
-                  _appContext,
+                  _appContext.getStore().getAccountStore(),
                   _mainWindow.getCentralWidget()
               ),
               _transactionController(
                   _undoStack,
                   _appContext.getStore().getTransactionStore(),
+                  _appContext.getStore().getAccountStore(),
                   _mainWindow.getCentralWidget()
               ),
               _menuBarController(

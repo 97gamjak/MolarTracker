@@ -22,9 +22,13 @@ namespace app
             std::shared_ptr<ITransactionRepo> transactionRepo
         );
 
-        [[nodiscard]] TransactionId addTransaction(
+        [[nodiscard]]
+        TransactionId addTransaction(
             const finance::Transaction& transaction
         ) override;
+
+        [[nodiscard]]
+        std::vector<finance::Transaction> getTransactions() const override;
     };
 }   // namespace app
 

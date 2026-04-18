@@ -5,6 +5,8 @@
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
 
+using drafts::TransactionMapper;
+
 namespace app
 {
     /**
@@ -69,10 +71,7 @@ namespace app
     {
         const auto& id = _generateNewId();
 
-        _addEntry(
-            drafts::TransactionMapper::toTransaction(draft, id),
-            StoreState::New
-        );
+        _addEntry(TransactionMapper::toTransaction(draft, id), StoreState::New);
 
         return TransactionStoreResult::Ok;
     }
@@ -113,11 +112,43 @@ namespace app
     {
         const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
-        auto transactions =
-            _getValues(options) |
-            std::views::transform(drafts::TransactionMapper::toDraft);
+        auto transactions = _getEntries(options);
 
-        return {transactions.begin(), transactions.end()};
+        auto dbTransactions = _transactionService->getTransactions();
+
+        // Merge transactions from the database with transactions in the store
+        // But check if id is already in the store, if it is, use the one in the
+        // store
+
+        std::unordered_map<
+            TransactionId,
+            drafts::TransactionDraft,
+            TransactionId::Hash>
+            transactionMap;
+
+        std::vector<drafts::TransactionDraft> results;
+
+        for (const auto& transaction : transactions)
+        {
+            // Only include transactions that are new, for all others the id is
+            // already in the database and we will get it from there
+            const auto draft = TransactionMapper::toDraft(transaction.value);
+
+            results.push_back(draft);
+
+            if (transaction.state != StoreState::New)
+            {
+                transactionMap.emplace(transaction.value.getId(), draft);
+            }
+        }
+
+        for (const auto& transaction : dbTransactions)
+        {
+            if (!transactionMap.contains(transaction.getId()))
+                results.push_back(TransactionMapper::toDraft(transaction));
+        }
+
+        return results;
     }
 
 }   // namespace app

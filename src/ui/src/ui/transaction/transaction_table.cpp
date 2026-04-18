@@ -9,35 +9,42 @@
 #include <QDateTime>
 #include <QFont>
 
+#include "config/id_types.hpp"
+#include "finance/currency.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
 {
 
-    constexpr int colCount =
-        static_cast<int>(TransactionTableModel::Column::Count);
-
-    QString columnLabel(TransactionTableModel::Column col)
+    namespace
     {
-        switch (col)
+        constexpr int colCount =
+            static_cast<int>(TransactionTableModel::Column::Count);
+
+        QString columnLabel(TransactionTableModel::Column col)
         {
-            case TransactionTableModel::Column::Date:
-                return "Date";
-            case TransactionTableModel::Column::Description:
-                return "Description";
-            case TransactionTableModel::Column::Type:
-                return "Type";
-            case TransactionTableModel::Column::Account:
-                return "Account";
-            case TransactionTableModel::Column::Amount:
-                return "Amount";
-            case TransactionTableModel::Column::Currency:
-                return "Currency";
-            case TransactionTableModel::Column::Count:
-                break;
+            switch (col)
+            {
+                case TransactionTableModel::Column::Date:
+                    return "Date";
+                case TransactionTableModel::Column::Description:
+                    return "Description";
+                case TransactionTableModel::Column::Type:
+                    return "Type";
+                case TransactionTableModel::Column::FromAccount:
+                    return "From Account";
+                case TransactionTableModel::Column::ToAccount:
+                    return "To Account";
+                case TransactionTableModel::Column::Amount:
+                    return "Amount";
+                case TransactionTableModel::Column::Currency:
+                    return "Currency";
+                case TransactionTableModel::Column::Count:
+                    break;
+            }
+            return {};
         }
-        return {};
-    }
+    }   // namespace
 
     TransactionTableModel::TransactionTableModel(QObject* parent)
         : QAbstractTableModel(parent)
@@ -45,11 +52,13 @@ namespace ui
     }
 
     void TransactionTableModel::setTransactions(
-        std::vector<drafts::TransactionDraft> transactions
+        std::vector<drafts::TransactionDraft> transactions,
+        IdToNameMap                           accountIdToName
     )
     {
         beginResetModel();
-        _transactions = std::move(transactions);
+        _transactions    = std::move(transactions);
+        _accountIdToName = std::move(accountIdToName);
         endResetModel();
     }
 
@@ -96,23 +105,32 @@ namespace ui
         {
             case Column::Date:
             {
-                return QDateTime::fromMSecsSinceEpoch(
-                           transaction.timestamp.toInt64(),
-                           Qt::UTC
-                )
-                    .toLocalTime()
-                    .toString("yyyy-MM-dd");
+                return transaction.timestamp.toQDateTime().toString(
+                    "yyyy-MM-dd"
+                );
             }
             case Column::Description:
-                return QString::fromStdString("");
+                return QString::fromStdString(transaction.comment.value_or(""));
             case Column::Type:
                 return QString::fromStdString("");
-            case Column::Account:
-                return QString::fromStdString("");
+            case Column::FromAccount:
+                return QString::fromStdString(
+                    _accountIdToName.at(transaction.entries.front().accountId)
+                );
+            case Column::ToAccount:
+                return QString::fromStdString(
+                    _accountIdToName.at(transaction.entries.back().accountId)
+                );
             case Column::Amount:
-                return QString::number(0.0, 'f', 2);
+                return QString::number(
+                    transaction.entries.front().amount / 100,
+                    'f',
+                    2
+                );
             case Column::Currency:
-                return QString::fromStdString("");
+                return QString::fromStdString(
+                    finance::getSymbol(transaction.entries.front().currency)
+                );
             case Column::Count:
                 break;
         }
@@ -154,59 +172,5 @@ namespace ui
             return Qt::NoItemFlags;
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
-
-    TransactionTable::TransactionTable(QWidget* parent)
-        : QWidget(parent),
-          _model(utils::makeQChild<TransactionTableModel>(this)),
-          _proxy(utils::makeQChild<QSortFilterProxyModel>(this)),
-          _table(utils::makeQChild<QTableView>(this))
-    {
-        _proxy->setSourceModel(_model);
-        _proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-        _proxy->setFilterKeyColumn(-1);   // search all columns
-
-        auto* search = utils::makeQChild<QLineEdit>(this);
-        search->setPlaceholderText("Search transactions…");
-
-        connect(
-            search,
-            &QLineEdit::textChanged,
-            _proxy,
-            &QSortFilterProxyModel::setFilterFixedString
-        );
-
-        _setupTable();
-
-        auto* layout = new QVBoxLayout(this);
-        layout->addWidget(search);
-        layout->addWidget(_table);
-    }
-
-    void TransactionTable::_setupTable()
-    {
-        _table->setModel(_proxy);
-        _table->setSortingEnabled(true);
-        _table->setSelectionBehavior(QAbstractItemView::SelectRows);
-        _table->setSelectionMode(QAbstractItemView::SingleSelection);
-        _table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        _table->setAlternatingRowColors(true);
-        _table->verticalHeader()->hide();
-
-        auto* hdr = _table->horizontalHeader();
-        hdr->setStretchLastSection(false);
-        hdr->setSectionResizeMode(
-            static_cast<int>(TransactionTableModel::Column::Description),
-            QHeaderView::Stretch
-        );   // description takes remaining space
-        hdr->setSortIndicatorShown(true);
-
-        // sensible default sort: newest first
-        _table->sortByColumn(
-            static_cast<int>(TransactionTableModel::Column::Date),
-            Qt::DescendingOrder
-        );
-    }
-
-    TransactionTableModel* TransactionTable::getModel() { return _model; }
 
 }   // namespace ui

@@ -25,6 +25,9 @@ namespace app
         virtual TransactionId addTransaction(
             const finance::Transaction& transaction
         ) = 0;
+
+        [[nodiscard]]
+        virtual std::vector<finance::Transaction> getTransactions() const = 0;
     };
 }   // namespace app
 

@@ -1,5 +1,9 @@
 #include "utils/timestamp.hpp"
 
+#ifdef __QT_ENABLED__
+#include <qdatetime.h>
+#endif
+
 #include <chrono>
 #include <format>
 
@@ -105,3 +109,17 @@ std::string Timestamp::fileSafe() const
 {
     return Timestamp{Clock::time_point{milliseconds{value}}};
 }
+
+#ifdef __QT_ENABLED__
+/**
+ * @brief Converts the Timestamp to a QDateTime object.
+ *
+ * @return QDateTime
+ */
+[[nodiscard]] QDateTime Timestamp::toQDateTime() const
+{
+    // TODO(97gamjak): implement this with timezone support
+    // https://97gamjak.atlassian.net/browse/MOLTRACK-95
+    return QDateTime::fromMSecsSinceEpoch(toInt64());
+}
+#endif

@@ -8,6 +8,7 @@
 namespace app
 {
     class TransactionStore;   // Forward declaration
+    class AccountStore;       // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -32,6 +33,7 @@ namespace controller
         /// The undo stack for the application
         cmd::UndoStack&        _undoStack;
         app::TransactionStore& _transactionStore;
+        app::AccountStore&     _accountStore;
         /// Pointer to the central stacked widget
         QStackedWidget* _stackedWidget;
         /// Pointer to the transaction detail view
@@ -41,6 +43,7 @@ namespace controller
         TransactionController(
             cmd::UndoStack&        undoStack,
             app::TransactionStore& transactionStore,
+            app::AccountStore&     accountStore,
             QStackedWidget*        stackedWidget
         );
 

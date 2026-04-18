@@ -269,6 +269,25 @@ namespace app
         return {accounts.begin(), accounts.end()};
     }
 
+    std::unordered_map<AccountId, std::string, AccountId::Hash> AccountStore::
+        getAccountIdToNameMap() const
+    {
+        const auto options = Options{
+            .filter   = IsAccountActive(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        std::unordered_map<AccountId, std::string, AccountId::Hash>
+            accountIdToName;
+
+        for (const auto& account : _getValues(options))
+        {
+            accountIdToName.emplace(account.getId(), account.getName());
+        }
+
+        return accountIdToName;
+    }
+
     /**
      * @brief Get an account by its ID
      *

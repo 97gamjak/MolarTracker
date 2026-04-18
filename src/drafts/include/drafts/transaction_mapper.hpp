@@ -1,6 +1,7 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
+#include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/transaction.hpp"
 

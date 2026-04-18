@@ -15,7 +15,12 @@ namespace ui
         Q_OBJECT
 
        private:
+        using IdToNameMap =
+            std::unordered_map<AccountId, std::string, AccountId::Hash>;
+
         std::vector<drafts::TransactionDraft> _transactions;
+
+        IdToNameMap _accountIdToName;
 
        public:
         enum class Column : std::uint8_t
@@ -23,7 +28,8 @@ namespace ui
             Date,
             Description,
             Type,
-            Account,
+            FromAccount,
+            ToAccount,
             Amount,
             Currency,
             Count
@@ -32,7 +38,8 @@ namespace ui
         explicit TransactionTableModel(QObject* parent);
 
         void setTransactions(
-            std::vector<drafts::TransactionDraft> transactions
+            std::vector<drafts::TransactionDraft> transactions,
+            IdToNameMap                           accountIdToName
         );
 
         [[nodiscard]] int rowCount(const QModelIndex& parent) const override;
@@ -61,24 +68,6 @@ namespace ui
         ) const;
         [[nodiscard]]
         QVariant _textAlignmentData(Column col) const;
-    };
-
-    class TransactionTable : public QWidget
-    {
-        Q_OBJECT
-
-       private:
-        TransactionTableModel* _model;
-        QSortFilterProxyModel* _proxy;
-        QTableView*            _table;
-
-       public:
-        explicit TransactionTable(QWidget* parent);
-
-        TransactionTableModel* getModel();
-
-       private:
-        void _setupTable();
     };
 
 }   // namespace ui

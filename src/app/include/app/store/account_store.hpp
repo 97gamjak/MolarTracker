@@ -64,6 +64,11 @@ namespace app
         std::vector<drafts::AccountDraft> getAllAccounts() const;
         [[nodiscard]]
         std::vector<drafts::AccountDraft> getCashAccounts() const;
+        [[nodiscard]]
+        std::unordered_map<
+            AccountId,
+            std::string,
+            AccountId::Hash> getAccountIdToNameMap() const;
 
         void commit();
 

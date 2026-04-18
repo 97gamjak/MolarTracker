@@ -31,6 +31,7 @@ namespace drafts
 
         draft.timestamp = transaction.getTimestamp();
         draft.comment   = transaction.getComment();
+        draft.id        = transaction.getId();
 
         for (const auto& entry : transaction.getEntries())
         {

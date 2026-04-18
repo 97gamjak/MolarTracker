@@ -19,6 +19,8 @@ namespace drafts
      */
     struct TransactionDraft
     {
+        TransactionId id = TransactionId::invalid();
+
         Timestamp timestamp;
 
         std::optional<std::string> comment;
