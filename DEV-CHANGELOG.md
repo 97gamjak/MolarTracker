@@ -4,6 +4,9 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.0.4](https://github.com/repo/owner/releases/tag/0.0.4) - 2026-04-18
+
 ### Features
 
 #### Settings
@@ -75,7 +78,6 @@ All changes and updates, that are relevant for developers will be documented her
 - Cleanup NOLINT for new qt parent/child system
 - Restructure project structure to reduce compile time dependencies
 
-<!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
 ### Bug Fixes
@@ -191,6 +193,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 

@@ -4,6 +4,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.0.4](https://github.com/repo/owner/releases/tag/0.0.4) - 2026-04-18
+
 ### Feature
 
 #### Logging
@@ -25,7 +28,6 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Fix arrangement of text and buttons in log file viewer
 
-<!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
 ### Documentation
@@ -76,6 +78,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 
