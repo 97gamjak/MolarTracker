@@ -1,5 +1,7 @@
 #include "finance/currency.hpp"
 
+#include <stdexcept>
+
 namespace finance
 {
     std::uint8_t getMicroUnit(Currency currency)
@@ -15,6 +17,8 @@ namespace finance
             case Currency::CHF:
                 return CurrencyTraits<Currency::CHF>::microUnit;
         }
+
+        throw std::invalid_argument("Unsupported currency");
     }
 
     std::string getSymbol(Currency currency)
@@ -30,5 +34,7 @@ namespace finance
             case Currency::CHF:
                 return CurrencyTraits<Currency::CHF>::symbol;
         }
+
+        throw std::invalid_argument("Unsupported currency");
     }
 }   // namespace finance

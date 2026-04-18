@@ -8,16 +8,16 @@ namespace drafts
      * @brief Construct a new Transaction Entry Draft:: Transaction Entry Draft
      * object
      *
-     * @param accountId
-     * @param cash
-     * @param accountKind
+     * @param accountId_
+     * @param cash_
+     * @param accountKind_
      */
     TransactionEntryDraft::TransactionEntryDraft(
-        AccountId     accountId,
-        finance::Cash cash,
-        AccountKind   accountKind
+        AccountId     accountId_,
+        finance::Cash cash_,
+        AccountKind   accountKind_
     )
-        : accountId(accountId), cash(cash), accountKind(accountKind)
+        : accountId(accountId_), cash(cash_), accountKind(accountKind_)
     {
     }
 }   // namespace drafts

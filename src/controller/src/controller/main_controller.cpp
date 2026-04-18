@@ -41,15 +41,15 @@ namespace controller
 
         /// handlers for managing interactions no QT signals
         Handlers _handlers;
-        /// controller for managing the menu bar
-        MenuBarController _menuBarController;
-        /// controller for managing the side bar
-        SideBarController _sideBarController;
-
         /// controller for managing accounts
         AccountController _accountController;
         /// controller for managing transactions
         TransactionController _transactionController;
+
+        /// controller for managing the menu bar
+        MenuBarController _menuBarController;
+        /// controller for managing the side bar
+        SideBarController _sideBarController;
 
         /**
          * @brief Construct a new Impl object
@@ -59,8 +59,8 @@ namespace controller
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
               _appContext(_settings),
-              _handlers(_settings),
               _centralController(_mainWindow.getCentralWidget()),
+              _handlers(_settings),
               _accountController(
                   _undoStack,
                   _appContext.getStore().getAccountStore(),

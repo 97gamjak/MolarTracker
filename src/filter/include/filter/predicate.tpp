@@ -27,9 +27,9 @@ namespace filter
         /**
          * @brief Construct a new Predicate Evaluator object
          *
-         * @param input
+         * @param input_
          */
-        explicit PredicateEvaluator(const T& input) : input(input) {}
+        explicit PredicateEvaluator(const T& input_) : input(input_) {}
 
         ~PredicateEvaluator() = default;
         // delete constructor and assignment operator
