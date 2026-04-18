@@ -68,6 +68,7 @@ namespace ui
         void _buildUI();
         void _onAccountSelected(int index);
         void _emitOk();
+        void _enableAddButtonIfValid();
 
        protected:
         [[nodiscard]]

@@ -59,12 +59,18 @@ namespace ui
         auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
 
         // check the validity of the input to enable or disable the add button
-        _addButton->setEnabled(_amountField->isValid());
+        _addButton->setEnabled(false);
         connect(
             _amountField,
             &AmountLineEdit::validityChanged,
-            _addButton,
-            &QPushButton::setEnabled
+            this,
+            &NonEmptyTransactionWidget::_enableAddButtonIfValid
+        );
+        connect(
+            _amountField,
+            &AmountLineEdit::valueChanged,
+            this,
+            &NonEmptyTransactionWidget::_enableAddButtonIfValid
         );
 
         // connect the add button to emit the Ok action with the profile draft
@@ -203,6 +209,15 @@ namespace ui
     {
         const auto draft = getDraft();
         emit       createTransactionRequested(draft);
+    }
+
+    void NonEmptyTransactionWidget::_enableAddButtonIfValid()
+    {
+        const auto isValid = _getSelectedAccount().has_value() &&
+                             _amountField->isValid() &&
+                             _amountField->text().toLongLong() != 0;
+
+        _addButton->setEnabled(isValid);
     }
 
 }   // namespace ui
