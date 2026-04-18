@@ -53,9 +53,9 @@ namespace drafts
         bool needsExternal = false;
 
         TransactionEntryDraft(
-            AccountId     accountId,
-            finance::Cash cash,
-            AccountKind   accountKind
+            AccountId     accountId_,
+            finance::Cash cash_,
+            AccountKind   accountKind_
         );
     };
 
