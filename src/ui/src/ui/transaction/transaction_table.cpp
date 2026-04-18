@@ -3,6 +3,7 @@
 #include <qboxlayout.h>
 #include <qheaderview.h>
 #include <qlineedit.h>
+#include <qnamespace.h>
 #include <qvariant.h>
 
 #include <QColor>
@@ -10,22 +11,36 @@
 #include <QFont>
 #include <mstd/enum.hpp>
 
-#include "config/id_types.hpp"
-#include "finance/currency.hpp"
-#include "utils/qt_helpers.hpp"
-
 namespace ui
 {
 
-#define COLUMN_LIST(X) \
-    X(Date)            \
-    X(Type)            \
-    X(FromAccount)     \
-    X(ToAccount)       \
-    X(Amount)          \
+#define COLUMN_LIST(X)  \
+    X(Date)             \
+    X(Type)             \
+    X(Account)          \
+    X(ReferenceAccount) \
+    X(Amount)           \
     X(Description)
 
     MSTD_ENUM(Column, std::uint8_t, COLUMN_LIST);
+
+    namespace
+    {
+        QString getColLabel(Column col)
+        {
+            if (col == Column::ReferenceAccount)
+                return "Reference Account";
+
+            return QString::fromStdString(ColumnMeta::toString(col));
+        }
+
+        QString getColLabel(int index)
+        {
+            return getColLabel(static_cast<Column>(index));
+        }
+
+        Column getColFromIndex(int index) { return static_cast<Column>(index); }
+    }   // namespace
 
     TransactionTableModel::TransactionTableModel(QObject* parent)
         : QAbstractTableModel(parent)
@@ -64,7 +79,7 @@ namespace ui
         const auto& transaction =
             _transactions[static_cast<std::size_t>(index.row())];
 
-        const auto col = static_cast<Column>(index.column());
+        const auto col = getColFromIndex(index.column());
 
         switch (role)
         {
@@ -96,11 +111,11 @@ namespace ui
                 return QString::fromStdString(transaction.comment.value_or(""));
             case Column::Type:
                 return QString::fromStdString("");
-            case Column::FromAccount:
+            case Column::Account:
                 return QString::fromStdString(
                     _accountIdToName.at(transaction.entries.front().accountId)
                 );
-            case Column::ToAccount:
+            case Column::ReferenceAccount:
                 return QString::fromStdString(
                     _accountIdToName.at(transaction.entries.back().accountId)
                 );
@@ -119,10 +134,10 @@ namespace ui
     {
         if (col != Column::Amount)
             return {};
-        // tint positive green, negative red — purely cosmetic
+
         return transaction.entries.front().cash.getAmount() >= 0.0
-                   ? QColor(59, 109, 17)
-                   : QColor(163, 45, 45);
+                   ? QColor(Qt::GlobalColor::green)
+                   : QColor(Qt::GlobalColor::red);
     }
 
     QVariant TransactionTableModel::_textAlignmentData(Column col) const
@@ -141,15 +156,14 @@ namespace ui
         if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
             return {};
 
-        return QString::fromStdString(
-            ColumnMeta::toString(static_cast<Column>(section))
-        );
+        return getColLabel(section);
     }
 
     Qt::ItemFlags TransactionTableModel::flags(const QModelIndex& index) const
     {
         if (!index.isValid())
             return Qt::NoItemFlags;
+
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
 

@@ -56,13 +56,23 @@ namespace ui
         _table->setAlternatingRowColors(true);
         _table->verticalHeader()->hide();
 
-        auto* hdr = _table->horizontalHeader();
-        hdr->setStretchLastSection(false);
-        hdr->setSectionResizeMode(
+        auto* header = _table->horizontalHeader();
+        header->setStretchLastSection(false);
+        header->setSectionResizeMode(
+
+            QHeaderView::ResizeToContents
+        );
+
+        // resize to content size
+        header->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+        // description takes remaining space
+        header->setSectionResizeMode(
             TransactionTableModel::getDescriptionIndex(),
             QHeaderView::Stretch
-        );   // description takes remaining space
-        hdr->setSortIndicatorShown(true);
+        );
+
+        header->setSortIndicatorShown(true);
 
         // sensible default sort: newest first
         _table->sortByColumn(
