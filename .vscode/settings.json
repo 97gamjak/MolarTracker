@@ -113,10 +113,32 @@
         "__memory": "cpp",
         "__functional_base_03": "cpp",
         "__tuple": "cpp",
-        "qvboxlayout": "cpp"
+        "qvboxlayout": "cpp",
+        "qstring": "cpp",
+        "qmessagebox": "cpp",
+        "__config": "cpp",
+        "qdialog": "cpp",
+        "qkeysequence": "cpp",
+        "qfunctionpointer": "cpp",
+        "qtcore": "cpp",
+        "source_location": "cpp",
+        "shared_mutex": "cpp"
     },
     "cSpell.words": [
-        "MSTD"
+        "bugprone",
+        "googletest",
+        "insertable",
+        "MOLTRACK",
+        "MSTD",
+        "NOMINMAX"
     ],
+    "files.watcherExclude": {
+        "**/.build/**": true,
+        "**/.cache/**": true
+    },
+    "files.exclude": {
+        "**/.build": true,
+        "**/.cache": true
+    },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

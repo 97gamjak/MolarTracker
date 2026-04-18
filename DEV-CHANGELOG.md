@@ -4,6 +4,77 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### Settings
+
+- Add first implementation approach for `ParamGroup` via `NumericVecParam`
+
+#### Finance
+
+- Add `Currency` enum and `CurrencyTraits` for handling different current
+- Add `Cash` class for representing a cash amount together with a currency
+- Add `CashAccount` class
+- Add `Transaction` class
+- Add `TransactionEntry` class
+- Add `AccountRepo` with first `createCashAccount` method
+- Add `AccountService` with first `createCashAccount` method
+- Add first draft of `AccountStore`
+- Include proper handling of `ProfileId` on `Account` database side
+- Make `CashAccount` to general `Account` with `std::variant` details
+- Add `TransactionRepo` and `TransactionService` with related factory methods
+- Automatically add external accounts for cash accounts
+- Add profileId as a uniqueness constraint for account names as two different profiles should be allowed to have the same name.
+- Include `Transaction` category as side bar element
+- Implement `getTransactions` in repo and a lot of preparing for future orm obstacles
+
+#### Profile
+
+- Add Listener to active `ProfileId`
+- Introduce `ActiveProfile` type with Observable base in profile store to globally handle changes in profile
+
+#### ORM
+
+- Introduce `unique_group` to make it possible to have multiple fields as a single unique group
+- Introduce bit-wise `FieldConstraints`
+- Add `foreign_key_t` constraint
+- Add `foreign_key_t` parsing for `ddl` member function of `Field`
+- Implement `insert_policy` with corresponding `requires_paired_insert_t` type for 1:1 relationships
+- Introduce `Joins` and `WhereClauses`
+
+#### Store
+
+- Introduce general base class `BaseStore` and interface `IStore`
+
+#### Database
+
+- Implement database version and corresponding migration backbone
+- Implement migration for Account to have unique constraints for name + kind
+- Add transaction, transaction_entry and instrument tables to migration
+
+### Bugfix
+
+- Make GNU compiler flags to be actually applied
+
+### Testing
+
+- Add test cases for `binder` struct
+- Add test cases for `utils`
+
+### Dependencies
+
+- Upgrade `mstd` to `0.1.0`
+
+### Documentation
+
+- Add Claude Code instructions first version
+
+### Cleanup
+
+- Cleanup entire code base to be able to use `clangd-tidy` (not to be confused with `clang-tidy`)
+- Cleanup NOLINT for new qt parent/child system
+- Restructure project structure to reduce compile time dependencies
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 
@@ -46,13 +117,13 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Introduce `ProfileFactory` for converting between Domain and Row
 
-#### CI
+### CI
 
 - Add doxygen checks
 - Add cpp-checks and devops cpp checks
 - Add first ctest via googletest
 
-#### Testing
+### Testing
 
 - Adding unit tests for `Database` class
 - Adding unit tests for `Statement` class
@@ -98,12 +169,12 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `initGlobalConfig` for all singleton instances
 - Add `UpdateDebugFlagsCommand` for handling undo and redo
 
-#### CI
+### CI
 
 - make checks and updates for both `CHANGELOG.md` and `DEV-CHANGELOG.md` files available
 - introduce nice versioning scheme for artifacts on GitHub
 
-#### Dependencies
+### Dependencies
 
 - Add `mstd 0.0.2`
 

@@ -46,8 +46,8 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "-lc",
-                "set -euo pipefail; find \"${workspaceFolder}/src\" -type f -name '*.cpp' -print0 | xargs -0 clang-tidy --config-file=\"${workspaceFolder}/.clang-tidy\" -checks='*' --warnings-as-errors='*' --header-filter=\"^${workspaceFolder}/(src|include)/\" -p \"${workspaceFolder}/.build\""
+                "-c",
+                "clangd-tidy $(find src/) -j3 -p=.build --tqdm"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -69,6 +69,46 @@
                 }
             ],
             "group": "build"
+        },
+        {
+            "label": "local-CI",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "scripts/local_ci.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "local-CI",
+                    "fileLocation": [
+                        "absolute"
+                    ],
+                    "pattern": {
+                        "regexp": "^(.*?):(\\d+):(\\d+):\\s*(warning|error|note):\\s*(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": "build"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: build",
+            "command": "build",
+            "targets": [
+                "all"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake template build task"
         }
     ]
 }

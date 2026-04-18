@@ -18,7 +18,7 @@ jobs:
 
     env:
       QT_VERSION: "6.8.3"
-      BUILD_TYPE: "Release"
+      BUILD_TYPE: "Debug"
 
     steps:
       - name: Checkout
@@ -69,7 +69,19 @@ jobs:
               pkg-config              \
               libcurl4-openssl-dev    \
               cppcheck                \
-              clang-tidy
+              clangd-20
+          sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install clangd-tidy
 
       # -------------------------
       # Install Qt
@@ -132,15 +144,11 @@ jobs:
               -I src
 
       # -------------------------
-      # Run clang-tidy (also using the compile_commands.json from the build)
+      # Run clangd-tidy (also using the compile_commands.json from the build)
       # -------------------------
-      # - name: Run clang-tidy
-      #   run: |
-      #     clang-tidy \
-      #         --warnings-as-errors=* \
-      #         --compile-commands=build/compile_commands.json \
-      #         $(find src -name '*.cpp')
-      #TODO: in order to activate this we definitely need to clean up code base before
+      - name: Run clangd-tidy
+        run: |
+          clangd-tidy $(find src/) -p=build
 
       # -------------------------
       # Package for Release assets (ONLY on tags)

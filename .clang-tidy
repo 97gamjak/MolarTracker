@@ -1,22 +1,40 @@
 ---
+# -altera-unroll-loops:             wants to use everywhere #pragma unroll
+# -abseil-string-find-str-contains: strange string library
+# -bugprone-suspicious-include:     to be able to include .tpp and still use it as impl file types
+# -hicpp-avoid-c-arrays:            does the same thing as cppcoreguidelines-avoid-c-arrays
+# -fuchsia-trailing-return:         doesn't allow trailing return types, which we use for better readability in some cases
+
+# TO BE REMOVED:
+# -misc-include-cleaner:            problems with QT < 6.8
 Checks:          
   '
   *,
+  -abseil-string-find-str-contains,
   -altera-unroll-loops,
   -altera-struct-pack-align,
+  -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
+  -fuchsia-statically-constructed-objects,
+  -fuchsia-trailing-return,
+  -hicpp-avoid-c-arrays,
+  -llvm-header-guard,
   -llvmlibc-callee-namespace,
   -llvmlibc-implementation-in-namespace,
   -llvmlibc-inline-function-decl,
   -llvmlibc-restrict-system-libc-headers,
   -modernize-use-trailing-return-type,
-  -readability-redundant-access-specifiers
+  -readability-redundant-access-specifiers,
+  -bugprone-reserved-identifier,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
+  -misc-include-cleaner,
+  -bugprone-suspicious-include
   '
 WarningsAsErrors: ''
 HeaderFileExtensions:
-  - ''
   - h
   - hh
   - hpp
@@ -26,8 +44,10 @@ ImplementationFileExtensions:
   - c
   - cc
   - cpp
+  - tpp
   - cxx
-HeaderFilterRegex: '.*\.(hpp|tpp)$'
+HeaderFilterRegex: '.*/MolarTracker/src/.*'
+SystemHeaders: false
 FormatStyle:     google
 User:            jag
 CheckOptions:
@@ -36,9 +56,9 @@ CheckOptions:
 
   ### allow short variable names
   - key:             readability-identifier-length.IgnoredParameterNames
-    value:           '^(id|it)$'
+    value:           '^(id|it|db|x|y|z)$'
   - key:             readability-identifier-length.IgnoredVariableNames
-    value:           '^(id|it)$'
+    value:           '^(id|it|db|x|y|z)$'
   
   ### special member functions
   - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
@@ -48,13 +68,13 @@ CheckOptions:
 
   ### short line statements
   - key:             readability-braces-around-statements.ShortStatementLines
-    value:           2
+    value:           4
   - key:             google-readability-braces-around-statements.ShortStatementLines
-    value:           2
+    value:           4
   - key:             hicpp-braces-around-statements.ShortStatementLines
-    value:           2
+    value:           4
 
-  ### allow std::ranges
+  ### necessary for POD-structs!
   - key:             misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
     value:           true
 ...

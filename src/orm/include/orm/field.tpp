@@ -1,0 +1,390 @@
+#ifndef __ORM__INCLUDE__ORM__FIELD_TPP__
+#define __ORM__INCLUDE__ORM__FIELD_TPP__
+
+#include <mstd/error.hpp>
+#include <mstd/type_traits.hpp>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
+
+#include "config/strong_id.hpp"
+#include "orm/binder.hpp"
+#include "orm/concepts.hpp"
+#include "orm/field.hpp"
+#include "orm/fixed_string.hpp"
+#include "orm/index.hpp"
+#include "orm/sql_type.hpp"
+#include "utils/timestamp.hpp"
+
+namespace orm
+{
+    /**
+     * @brief Construct a Field with the specified value
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @param value
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Field<Name, Value, TableName, Options...>::Field(Value value)
+        : _value(std::move(value))
+    {
+    }
+
+    /**
+     * @brief Get the value of the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return Value&
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Value& Field<Name, Value, TableName, Options...>::value()
+    {
+        return _value;
+    }
+
+    /**
+     * @brief Get the value of the field (const version)
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return Value const&
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Value const& Field<Name, Value, TableName, Options...>::value() const
+    {
+        return _value;
+    }
+
+    /**
+     * @brief Get the string representation of the field's value
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return std::string
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::valueAsString() const
+    {
+        return _valueAsString(_value);
+    }
+
+    /**
+     * @brief Assign a new value to the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @param value
+     * @return Field&
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    Field<Name, Value, TableName, Options...>& Field<
+        Name,
+        Value,
+        TableName,
+        Options...>::operator=(Value value)
+    {
+        _value = std::move(value);
+        return *this;
+    }
+
+    /**
+     * @brief Get the DDL string for the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return std::string
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::ddl()
+    {
+        using storage_type = std::
+            conditional_t<is_optional_v<Value>, optional_inner_t<Value>, Value>;
+
+        std::string definition;
+
+        definition += name;
+        definition += " ";
+        definition += std::string{sql_type<storage_type>::name};
+
+        const auto constraints = getConstraints();
+
+        if ((constraints & ORMConstraint::PrimaryKey) != ORMConstraint::None)
+            definition += " PRIMARY KEY";
+
+        if constexpr (!isFk)
+        {
+            if ((constraints & ORMConstraint::AutoIncrement) !=
+                ORMConstraint::None)
+                definition += " AUTOINCREMENT";
+
+            if ((constraints & ORMConstraint::NotNull) != ORMConstraint::None)
+                definition += " NOT NULL";
+
+            if ((constraints & ORMConstraint::Unique) != ORMConstraint::None)
+                definition += " UNIQUE";
+        }
+
+        return definition;
+    }
+
+    /**
+     * @brief Get the foreign key constraints for the field, if it is a foreign
+     * key, this will return a string containing the SQL definition of the
+     * foreign key constraint for this field, including the referenced table and
+     * column, and any specified deletion behavior (e.g., ON DELETE CASCADE).
+     * If the field is not a foreign key, this will return an empty string.
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return std::string
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::getFkConstraints()
+    {
+        std::string definition;
+
+        if constexpr (isFk)
+        {
+            definition             += "FOREIGN KEY (";
+            definition             += name;
+            definition             += ") REFERENCES";
+            using foreignKeyInfo    = find_foreign_key_t<Value, Options...>;
+            using field             = typename foreignKeyInfo::Field;
+            using table             = typename foreignKeyInfo::Table;
+            using DeletionBehavior  = typename foreignKeyInfo::DeletionBehavior;
+
+            definition += " " + table::tableName;
+            definition += "(" + field::name + ")";
+
+            if constexpr (std::same_as<DeletionBehavior, CascadeDelete>)
+                definition += " ON DELETE CASCADE";
+            else if constexpr (std::same_as<DeletionBehavior, RestrictDelete>)
+                definition += " ON DELETE RESTRICT";
+            else
+                MSTD_COMPILE_FAIL(
+                    "Unsupported deletion behavior for foreign key"
+                );
+        }
+
+        return definition;
+    }
+
+    /**
+     * @brief Bind the field value to the specified parameter index
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @tparam Statement
+     * @param statement
+     * @param index
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    template <typename Statement>
+    void Field<Name, Value, TableName, Options...>::bind(
+        Statement& statement,
+        BindIndex  index
+    ) const
+    {
+        if constexpr (is_optional_v<Value>)
+        {
+            if (!_value.has_value())
+            {
+                statement.bindNull(index.value());
+                return;
+            }
+
+            using inner_type = optional_inner_t<Value>;
+            binder<inner_type>::bind(statement, index, *_value);
+        }
+        else
+        {
+            binder<Value>::bind(statement, index, _value);
+        }
+    }
+
+    /**
+     * @brief Read the field value from the specified column
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @tparam Statement
+     * @param statement
+     * @param col
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    template <typename Statement>
+    void Field<Name, Value, TableName, Options...>::readFrom(
+        Statement const& statement,
+        ColumnIndex      col
+    )
+    {
+        if constexpr (is_optional_v<Value>)
+        {
+            using inner_type = optional_inner_t<Value>;
+
+            if (statement.columnIsNull(col.value()))
+            {
+                _value = std::nullopt;
+                return;
+            }
+
+            _value = binder<inner_type>::read(statement, col);
+        }
+        else
+        {
+            _value = binder<Value>::read(statement, col);
+        }
+    }
+
+    /**
+     * @brief Get the full column name in the format "TableName.ColumnName"
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return std::string
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    constexpr std::string Field<Name, Value, TableName, Options...>::
+        getFullColumnName()
+    {
+        return TableName + "." + name;
+    }
+
+    /**
+     * @brief Get the combined constraints for the field
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @return ORMConstraint
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    constexpr ORMConstraint Field<Name, Value, TableName, Options...>::
+        getConstraints()
+    {
+        return (ORMConstraint{} | ... | Options::value);
+    }
+
+    /**
+     * @brief Get the string representation of a field value, handling special
+     * cases like optional values, strong IDs, and enums
+     *
+     * @tparam Name
+     * @tparam Value
+     * @tparam TableName
+     * @tparam Options
+     * @param value
+     * @return std::string
+     */
+    template <
+        fixed_string Name,
+        typename Value,
+        fixed_string TableName,
+        typename... Options>
+    std::string Field<Name, Value, TableName, Options...>::_valueAsString(
+        Value value
+    )
+    {
+        if constexpr (is_optional_v<Value>)
+        {
+            if (!value.has_value())
+                return "null";
+
+            using InnerType = optional_inner_t<Value>;
+            return Field<Name, InnerType, TableName, Options...>::
+                _valueAsString(value.value());
+        }
+        else if constexpr (isStrongId_v<Value>)
+        {
+            return value.toString();
+        }
+        else if constexpr (mstd::has_enum_meta<Value>)
+        {
+            using enumMeta = mstd::enum_meta_t<Value>;
+            return enumMeta::toString(value);
+        }
+        else if constexpr (std::is_same_v<Value, std::string>)
+        {
+            return "\"" + value + "\"";
+        }
+        else if constexpr (std::is_same_v<Value, Timestamp>)
+        {
+            return std::to_string(value.toInt64());
+        }
+        else
+        {
+            return std::to_string(value);
+        }
+    }
+
+}   // namespace orm
+
+#endif   // __ORM__INCLUDE__ORM__FIELD_TPP__

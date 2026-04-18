@@ -4,6 +4,27 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Feature
+
+#### Logging
+
+- Change debug slots to hierarchical approach -> now also usable in debug slots selection dialog
+- Now a symlink to the latest log file called `molar_tracker_latest.log` is created
+
+#### UI
+
+- Add Sidebar to main window
+
+#### Finance
+
+- Add possibility to create CashAccounts
+- Adding first draft of Single Account Pages
+- Add possibility to add first Transactions and see an overview (cash transactions only)
+
+### BugFix
+
+- Fix arrangement of text and buttons in log file viewer
+
 <!-- insertion marker -->
 ## [0.0.3](https://github.com/repo/owner/releases/tag/0.0.3) - 2026-02-22
 

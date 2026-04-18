@@ -10,7 +10,7 @@ namespace db::test
     {
         Prepared prep{db.native(), "SELECT 1;"};
         auto     stmt = make_statement(db.native(), prep, "SELECT 1;");
-        EXPECT_TRUE(stmt.is_valid());
+        EXPECT_TRUE(stmt.isValid());
     }
 
     TEST_F(StatementFixture, MoveConstructorTransfersOwnership)
@@ -20,8 +20,8 @@ namespace db::test
         db::Statement a = make_statement(db.native(), prep, "SELECT 1;");
         db::Statement b{std::move(a)};
 
-        EXPECT_TRUE(b.is_valid());
-        EXPECT_FALSE(a.is_valid());
+        EXPECT_TRUE(b.isValid());
+        EXPECT_FALSE(a.isValid());
     }
 
     TEST_F(StatementFixture, MoveAssignmentTransfersOwnership)
@@ -34,8 +34,8 @@ namespace db::test
 
         b = std::move(a);
 
-        EXPECT_TRUE(b.is_valid());
-        EXPECT_FALSE(a.is_valid());
+        EXPECT_TRUE(b.isValid());
+        EXPECT_FALSE(a.isValid());
     }
 
     TEST_F(StatementFixture, StepReturnsRowAndDone)
@@ -176,7 +176,7 @@ namespace db::test
     {
         db::Statement stmt{nullptr, nullptr, "SELECT 1;"};
 
-        EXPECT_FALSE(stmt.is_valid());
+        EXPECT_FALSE(stmt.isValid());
         EXPECT_THROW((void) stmt.step(), db::SqliteError);
         EXPECT_THROW(stmt.reset(), db::SqliteError);
         EXPECT_THROW(stmt.bindInt64(1, 1), db::SqliteError);

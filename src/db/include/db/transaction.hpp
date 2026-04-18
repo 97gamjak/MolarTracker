@@ -1,0 +1,42 @@
+#ifndef __DB__INCLUDE__DB__TRANSACTION_HPP__
+#define __DB__INCLUDE__DB__TRANSACTION_HPP__
+
+namespace db
+{
+    class Database;
+
+    /**
+     * @brief A wrapper around an SQLite database transaction
+     *
+     */
+    class Transaction
+    {
+       private:
+        /// Pointer to the Database instance
+        Database* _db;
+
+        /// Flag to indicate whether the transaction is currently active
+        bool _isActive = false;
+
+       public:
+        explicit Transaction(db::Database& db, bool immediate);
+        explicit Transaction(db::Database& db);
+        ~Transaction();
+
+        Transaction(Transaction const&)            = delete;
+        Transaction& operator=(Transaction const&) = delete;
+
+        Transaction(Transaction&& other) noexcept;
+        Transaction& operator=(Transaction&& other) noexcept;
+
+        [[nodiscard]] bool isActive() const;
+
+        void commit();
+        void rollback();
+
+       private:   // PRIVATE HELPER METHODS
+        void _moveFrom(Transaction&& other);
+    };
+}   // namespace db
+
+#endif   // __DB__INCLUDE__DB__TRANSACTION_HPP__

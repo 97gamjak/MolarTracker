@@ -16,31 +16,33 @@ namespace db::test
        public:
         SqliteDb()
         {
-            const int rc = sqlite3_open(":memory:", &_db);
-            EXPECT_EQ(rc, SQLITE_OK);
+            const int dbConnectionResult = sqlite3_open(":memory:", &_db);
+            EXPECT_EQ(dbConnectionResult, SQLITE_OK);
             EXPECT_NE(_db, nullptr);
         }
 
         ~SqliteDb()
         {
-            if (_db)
+            if (_db != nullptr)
                 sqlite3_close(_db);
         }
 
-        SqliteDb(SqliteDb const&)            = delete;
-        SqliteDb& operator=(SqliteDb const&) = delete;
+        SqliteDb(SqliteDb const&)                      = delete;
+        SqliteDb& operator=(SqliteDb const&)           = delete;
+        SqliteDb(SqliteDb&& other) noexcept            = default;
+        SqliteDb& operator=(SqliteDb&& other) noexcept = default;
 
         sqlite3* native() const noexcept { return _db; }
 
         void exec(const std::string& sql) const
         {
             char*     err = nullptr;
-            const int rc =
+            const int resultCode =
                 sqlite3_exec(_db, sql.c_str(), nullptr, nullptr, &err);
 
-            if (rc != SQLITE_OK)
+            if (resultCode != SQLITE_OK)
             {
-                std::string msg = err ? err : "sqlite3_exec failed";
+                std::string msg = err != nullptr ? err : "sqlite3_exec failed";
                 sqlite3_free(err);
                 FAIL() << msg;
             }
@@ -55,15 +57,15 @@ namespace db::test
        public:
         Prepared(sqlite3* db, const std::string& sql)
         {
-            const int rc =
+            const int resultCode =
                 sqlite3_prepare_v2(db, sql.c_str(), -1, &_stmt, nullptr);
-            EXPECT_EQ(rc, SQLITE_OK);
+            EXPECT_EQ(resultCode, SQLITE_OK);
             EXPECT_NE(_stmt, nullptr);
         }
 
         ~Prepared()
         {
-            if (_stmt)
+            if (_stmt != nullptr)
                 sqlite3_finalize(_stmt);
         }
 
@@ -79,7 +81,7 @@ namespace db::test
         {
             if (this != &other)
             {
-                if (_stmt)
+                if (_stmt != nullptr)
                     sqlite3_finalize(_stmt);
                 _stmt       = other._stmt;
                 other._stmt = nullptr;

@@ -1,0 +1,137 @@
+#include "db/transaction.hpp"
+
+#include <iostream>
+
+#include "db/database.hpp"
+
+namespace db
+{
+
+    /**
+     * @brief Construct a new Transaction:: Transaction object
+     *
+     * @param db
+     * @param immediate
+     */
+    Transaction::Transaction(Database& db, bool immediate) : _db(&db)
+    {
+        if (!_db->isTransactionStarted())
+        {
+            _db->begin(immediate);
+            _isActive = true;
+        }
+        else
+        {
+            _isActive = false;
+        }
+    }
+
+    /**
+     * @brief Construct a new Transaction:: Transaction object with immediate
+     * mode by default
+     *
+     * @param db
+     */
+    Transaction::Transaction(Database& db) : Transaction(db, true) {}
+
+    /**
+     * @brief Destroy the Transaction:: Transaction object
+     *
+     */
+    Transaction::~Transaction()
+    {
+        if (_isActive && _db != nullptr)
+        {
+            try
+            {
+                rollback();
+            }
+            catch (const std::exception& e)
+            {
+                std::cerr << "Failed to rollback transaction in destructor: "
+                          << e.what() << "\n";
+            }
+        }
+    }
+
+    /**
+     * @brief Move constructor
+     *
+     * @param other
+     */
+    Transaction::Transaction(Transaction&& other) noexcept
+        : _db(other._db), _isActive(other._isActive)
+    {
+        _moveFrom(std::move(other));
+    }
+
+    /**
+     * @brief Move assignment operator
+     *
+     * @param other
+     * @return Transaction&
+     */
+    Transaction& Transaction::operator=(Transaction&& other) noexcept
+    {
+        if (this != &other)
+            _moveFrom(std::move(other));
+
+        return *this;
+    }
+
+    /**
+     * @brief check if the transaction is active
+     *
+     * @return true
+     * @return false
+     */
+    bool Transaction::isActive() const { return _isActive; }
+
+    /**
+     * @brief commit the transaction
+     *
+     */
+    void Transaction::commit()
+    {
+        if (!_isActive || _db == nullptr)
+            return;
+
+        _db->commit();
+        _isActive = false;
+    }
+
+    /**
+     * @brief rollback the transaction
+     *
+     */
+    void Transaction::rollback()
+    {
+        if (!_isActive || _db == nullptr)
+            return;
+
+        _db->rollback();
+        _isActive = false;
+    }
+
+    //
+    //
+    // PRIVATE HELPER METHODS
+    //
+    //
+
+    /**
+     * @brief Move helper method
+     *
+     * @param other
+     */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+    void Transaction::_moveFrom(Transaction&& other)
+    {
+        _db       = other._db;
+        _isActive = other._isActive;
+
+        other._db       = nullptr;
+        other._isActive = false;
+    }
+
+}   // namespace db

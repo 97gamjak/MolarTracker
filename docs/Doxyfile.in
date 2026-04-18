@@ -32,3 +32,7 @@ EXCLUDE_PATTERNS                     = */build/* */out/* */_deps/* */vcpkg_insta
 
 # If you use markdown pages:
 MARKDOWN_SUPPORT                     = YES
+
+ENABLE_PREPROCESSING = YES
+MACRO_EXPANSION      = YES
+PREDEFINED           = __QT_ENABLED__

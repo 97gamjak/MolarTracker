@@ -2,49 +2,106 @@ qt_add_executable(MolarTracker
     main.cpp
 )
 
+add_executable(logcat_generator ${CMAKE_SOURCE_DIR}/tools/generate_log_categories.cpp)
+
+set(GEN_DIR ${PROJECT_BINARY_DIR}/src/generated)
+set(GEN_HDR ${GEN_DIR}/log_categories.gen.hpp)
+
+file(GLOB_RECURSE LOGCAT_INPUTS CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.tpp
+)
+
+add_custom_command(
+    OUTPUT  ${GEN_HDR}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}
+    COMMAND $<TARGET_FILE:logcat_generator> ${GEN_HDR} ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS logcat_generator ${LOGCAT_INPUTS}
+    VERBATIM
+    COMMENT "Generating log category header: ${GEN_HDR}"
+)
+
+add_custom_target(
+    generate_log_categories
+    DEPENDS ${GEN_HDR}
+)
+
+add_library(molartracker_log_categories_generated INTERFACE)
+target_include_directories(molartracker_log_categories_generated INTERFACE ${GEN_DIR})
+target_sources(molartracker_log_categories_generated INTERFACE ${GEN_HDR})
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnull-dereference")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wdouble-promotion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuseless-cast")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wduplicated-cond")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wduplicated-branches")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmisleading-indentation")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmisleading-indentation")
+    # lifetime / safety
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmaybe-uninitialized")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winit-self")
+
+    # switch needs to check all enum values
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
+
+endif()
+
 add_library(json INTERFACE)
 
 target_include_directories(json
-    INTERFACE
+    SYSTEM INTERFACE
         ${CMAKE_SOURCE_DIR}/external/json/single_include
 )
 
 add_library(mstd INTERFACE)
 
 target_include_directories(mstd
-    INTERFACE
+    SYSTEM INTERFACE
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
 
-add_subdirectory(config)
-add_subdirectory(logging)
-add_subdirectory(utils)
-add_subdirectory(drafts)
-add_subdirectory(sql_models)
-add_subdirectory(db)
-add_subdirectory(orm)
 add_subdirectory(app)
-add_subdirectory(ui)
-add_subdirectory(exceptions)
-add_subdirectory(settings)
-add_subdirectory(json)
+add_subdirectory(commands)
+add_subdirectory(config)
 add_subdirectory(connections)
+add_subdirectory(controller)
+add_subdirectory(db)
+add_subdirectory(drafts)
+add_subdirectory(exceptions)
+add_subdirectory(filter)
+add_subdirectory(finance)
+add_subdirectory(json)
+add_subdirectory(logging)
+add_subdirectory(orm)
+add_subdirectory(settings)
+add_subdirectory(sql_models)
+add_subdirectory(ui)
+add_subdirectory(utils)
 
 target_link_libraries(MolarTracker
     PRIVATE 
+    Qt6::Widgets
+    molartracker_controller
     molartracker_ui
-    molartracker_app
-    molartracker_db
-    molartracker_config
-    molartracker_drafts
-    molartracker_orm
-    molartracker_sql_models
     molartracker_logging
-    molartracker_utils
     molartracker_exceptions
-    molartracker_settings
-    molartracker_json
-    molartracker_connections
 )
 
 set_target_properties(MolarTracker PROPERTIES
@@ -62,40 +119,3 @@ set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
     ${CMAKE_BINARY_DIR}/bin
 )
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(MolarTracker PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Werror
-
-        # correctness
-        -Wshadow
-        -Wconversion
-        -Wsign-conversion
-        -Wcast-align
-        -Wformat=2
-        -Wnull-dereference
-        -Wdouble-promotion
-        -Wimplicit-fallthrough
-        -Woverloaded-virtual
-        -Wnon-virtual-dtor
-        -Wold-style-cast
-        -Wuseless-cast
-        -Wduplicated-cond
-        -Wduplicated-branches
-        -Wlogical-op
-        -Wmisleading-indentation
-
-        # lifetime / safety
-        -Wuninitialized
-        -Wmaybe-uninitialized
-        -Winit-self
-
-        # switch needs to check all enum values
-        -Wswitch-enum
-
-        -Wno-error=deprecated-declarations
-    )
-endif()
