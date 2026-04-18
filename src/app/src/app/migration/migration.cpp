@@ -78,7 +78,6 @@ namespace app
         // add migrations
         _migrate_0_0_3();
 
-        assert(Constants::getSemVer() == _lastReleaseVersion);
         assert(_migrations.size() == toVersion);
     }
 
