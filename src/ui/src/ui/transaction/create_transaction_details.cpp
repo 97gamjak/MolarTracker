@@ -183,9 +183,13 @@ namespace ui
             throw std::runtime_error("No account selected");
         }
 
+        const auto amount = _getTransactionType() == TransactionType::Deposit
+                                ? _getAmount()
+                                : -_getAmount();
+
         auto entry = drafts::TransactionEntryDraft{
             selectedAccount->id,
-            finance::Cash(selectedAccount->currency, _getAmount()),
+            finance::Cash(selectedAccount->currency, amount),
             selectedAccount->kind
         };
         entry.needsExternal = true;

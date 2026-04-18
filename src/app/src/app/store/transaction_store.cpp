@@ -71,6 +71,22 @@ namespace app
     {
         const auto& id = _generateNewId();
 
+        auto cash = finance::Cash(draft.entries.front().cash.getCurrency(), 0);
+
+        for (const auto& entry : draft.entries)
+            cash += entry.cash;
+
+        if (!cash.isZero())
+        {
+            LOG_ERROR(
+                std::format(
+                    "Transaction sum is not zero, cannot add transaction "
+                    "draft"
+                )
+            );
+            return TransactionStoreResult::TransactionSumNotZero;
+        }
+
         _addEntry(TransactionMapper::toTransaction(draft, id), StoreState::New);
 
         return TransactionStoreResult::Ok;

@@ -21,6 +21,7 @@ namespace app
     {
         Ok,
         Error,
+        TransactionSumNotZero,
     };
 
     /**

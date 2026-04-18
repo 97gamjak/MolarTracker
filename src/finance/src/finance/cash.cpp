@@ -115,6 +115,34 @@ namespace finance
         return Cash(cash._currency, -cash._amount);
     }
 
+    Cash& operator+=(Cash& lhs, const Cash& rhs)
+    {
+        if (lhs._currency != rhs._currency)
+        {
+            throw CurrencyMismatchException(
+                "Cannot add Cash objects with different currencies"
+            );
+        }
+
+        lhs._amount += rhs._amount;
+        return lhs;
+    }
+
+    Cash& operator-=(Cash& lhs, const Cash& rhs)
+    {
+        if (lhs._currency != rhs._currency)
+        {
+            throw CurrencyMismatchException(
+                "Cannot subtract Cash objects with different currencies"
+            );
+        }
+
+        lhs._amount -= rhs._amount;
+        return lhs;
+    }
+
+    bool Cash::isZero() const { return _amount == 0; }
+
     /**
      * @brief Gets the amount of cash in micro_units.
      *

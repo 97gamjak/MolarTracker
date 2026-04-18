@@ -140,6 +140,7 @@ namespace controller
             {
                 entry.accountId =
                     _accountStore.getExternalAccount(entry.cash.getCurrency());
+                entry.cash = -entry.cash;
                 additionalEntries.push_back(entry);
             }
         }
