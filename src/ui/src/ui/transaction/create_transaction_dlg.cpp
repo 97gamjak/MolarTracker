@@ -24,16 +24,7 @@ namespace ui
     CreateTransactionDialog::CreateTransactionDialog(QWidget* parent)
         : Dialog(parent)
     {
-        _stack = makeQChild<QStackedWidget>(this);
-        _stack->addWidget(makeQChild<EmptyTransactionWidget>(_stack));
-        setWindowTitle("New Transaction");
-
         _buildUI();
-
-        auto* layout = makeQChild<QVBoxLayout>(this);
-        setLayout(layout);
-        layout->addWidget(_transactionType);
-        layout->addWidget(_stack);
     }
 
     /**
@@ -46,6 +37,10 @@ namespace ui
      */
     void CreateTransactionDialog::_buildUI()
     {
+        _stack = makeQChild<QStackedWidget>(this);
+        _stack->addWidget(makeQChild<EmptyTransactionWidget>(_stack));
+        setWindowTitle("New Transaction");
+
         _transactionType = makeQChild<QComboBox>(this);
         _transactionType->setPlaceholderText("Select Transaction Type");
         _transactionType->setCurrentIndex(-1);
@@ -68,6 +63,31 @@ namespace ui
             this,
             &CreateTransactionDialog::_onTransactionTypeChanged
         );
+
+        auto* layout = makeQChild<QVBoxLayout>(this);
+        setLayout(layout);
+        layout->addWidget(_transactionType);
+        layout->addWidget(_stack);
+    }
+
+    /**
+     * @brief reset the dialog to its initial state, this will clear any
+     * existing transaction detail widgets from the stacked widget, reset the
+     * transaction type selector to its default state, and clear the widget map,
+     * allowing the dialog to be reused for creating multiple transactions
+     * without needing to create a new instance of the dialog each time.
+     *
+     */
+    void CreateTransactionDialog::reset()
+    {
+        _widgetMap.clear();
+        _transactionType->setCurrentIndex(-1);
+        for (int i = 1; i < _stack->count(); ++i)
+        {
+            auto* widget = _stack->widget(i);
+            _stack->removeWidget(widget);
+            widget->deleteLater();
+        }
     }
 
     /**

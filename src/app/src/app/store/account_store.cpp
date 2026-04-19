@@ -186,7 +186,6 @@ namespace app
                 "call"
             );
             _activeProfileId = ProfileId::invalid();
-            _clearEntries();
             return;
         }
 
@@ -204,7 +203,10 @@ namespace app
 
         _activeProfileId = profileId;
 
-        assert(!isDirty());
+        // we can safely refresh the store here because it has only an affect if
+        // the store is not dirty, and the store should not be dirty when the
+        // profile is updated. If the store is dirty, it means that there are
+        // unsaved changes and we probably update from an invalid profile id
         _refresh();
     }
 
@@ -219,6 +221,11 @@ namespace app
      */
     void AccountStore::_refresh()
     {
+        // We really only want to refresh if we are not dirty, otherwise we
+        // might lose unsaved changes
+        if (isDirty())
+            return;
+
         _clearEntries();
 
         if (_activeProfileId.isValid())

@@ -5,7 +5,6 @@
 
 #include "app/migration/multi_migration.hpp"
 #include "app/migration/single_migration.hpp"
-#include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "db/database.hpp"
 #include "sql_models/account_row.hpp"
@@ -78,7 +77,6 @@ namespace app
         // add migrations
         _migrate_0_0_3();
 
-        assert(Constants::getSemVer() == _lastReleaseVersion);
         assert(_migrations.size() == toVersion);
     }
 

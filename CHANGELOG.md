@@ -5,6 +5,22 @@ All changes and updates, that are relevant for a user will be documented here
 ## Next Release
 
 <!-- insertion marker -->
+## [0.0.5](https://github.com/repo/owner/releases/tag/0.0.5) - 2026-04-18
+
+### Features
+
+#### Transactions
+
+- Create transactions is now really only possible with the max amount of decimal places
+- Added some nice formatting for amount input in create transaction dialog
+
+### Bug Fixes
+
+- Fixed: creating new profile without immediate save works now
+- Fixed: `Create Transaction` does not get the last used transaction type for creating transactions
+- Fixed: having same transaction multiple times in table view when saving after creating
+- Fixed: make it possible to have decimal numbers for transaction amounts
+
 ## [0.0.4](https://github.com/repo/owner/releases/tag/0.0.4) - 2026-04-18
 
 ### Feature
@@ -78,6 +94,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 

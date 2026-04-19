@@ -35,10 +35,13 @@ namespace ui
 
        public:
         explicit CreateTransactionDialog(QWidget* parent);
+
         void setWidget(
             TransactionType                   type,
             std::vector<drafts::AccountDraft> accounts
         );
+
+        void reset();
 
        signals:
         /**
