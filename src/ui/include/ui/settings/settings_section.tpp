@@ -13,9 +13,12 @@ namespace ui
 {
 
     template <settings::IsParamContainer TSection>
-    SettingsSection<TSection>::SettingsSection(TSection& section)
+    SettingsSection<TSection>::SettingsSection(
+        TSection&   section,
+        SectionMode mode
+    )
     {
-        _build(section);
+        _build(section, mode);
     }
 
     template <settings::IsParamContainer TSection>
@@ -25,7 +28,7 @@ namespace ui
     }
 
     template <settings::IsParamContainer TSection>
-    void SettingsSection<TSection>::_build(TSection& section)
+    void SettingsSection<TSection>::_build(TSection& section, SectionMode mode)
     {
         auto* outerLayout = utils::makeQChild<QVBoxLayout>(this);
         outerLayout->setContentsMargins(0, 0, 0, 0);
@@ -78,88 +81,7 @@ namespace ui
         // ───────────────────────────────────────
         section.forEachParam(
             [&](auto& param)
-            {
-                // Row container (label + editor + optional reboot warning)
-                auto* rowWidget = utils::makeQChild<QWidget>(formContainer);
-                rowWidget->setObjectName("paramRow");
-                auto* rowLayout = utils::makeQChild<QHBoxLayout>(rowWidget);
-                rowLayout->setContentsMargins(0, 6, 0, 6);
-                rowLayout->setSpacing(8);
-
-                // Dirty indicator stripe
-                auto* dirtyStripe = utils::makeQChild<QWidget>(rowWidget);
-                dirtyStripe->setFixedSize(3, 20);
-                dirtyStripe->setObjectName("dirtyStripe");
-                dirtyStripe->setProperty("dirty", false);
-                rowLayout->addWidget(dirtyStripe);
-
-                // Editor widget — type dispatched at compile time
-                QWidget* editor = makeParamEditor(param);
-                rowLayout->addWidget(editor);
-
-                // Reboot required badge
-                // TODO(97gamjak): make this nicer
-                if constexpr (requires { param.isRebootRequired(); })
-                {
-                    if (param.isRebootRequired())
-                    {
-                        auto* rebootLabel =
-                            utils::makeQChild<QLabel>("⟳ restart required");
-                        rebootLabel->setObjectName("rebootBadge");
-                        rowLayout->addWidget(rebootLabel);
-                    }
-                }
-
-                rowLayout->addStretch();
-
-                // Label for the form row
-                auto* label = utils::makeQChild<QLabel>(
-                    QString::fromStdString(param.getTitle())
-                );
-                label->setObjectName("paramLabel");
-                label->setToolTip(
-                    QString::fromStdString(param.getDescription())
-                );
-
-                formLayout->addRow(label, rowWidget);
-
-                // ── Dirty subscription
-                // ──────────────────────────────────────── NumericVecParam
-                // returns vector<Connection>, others return Connection
-                if constexpr (requires {
-                                  {
-                                      param.subscribeToDirty(nullptr, nullptr)
-                                  } -> std::same_as<Connection>;
-                              })
-                {
-                    _connections.push_back(param.subscribeToDirty(
-                        [](void* userData, const bool& isDirty)
-                        {
-                            auto* stripe = static_cast<QWidget*>(userData);
-                            stripe->setProperty("dirty", isDirty);
-                            // Re-polish to pick up QSS property change
-                            stripe->style()->unpolish(stripe);
-                            stripe->style()->polish(stripe);
-                        },
-                        static_cast<void*>(dirtyStripe)
-                    ));
-                }
-                else
-                {
-                    auto vecConnections = param.subscribeToDirty(
-                        [](void* userData, const bool& isDirty)
-                        {
-                            auto* stripe = static_cast<QWidget*>(userData);
-                            stripe->setProperty("dirty", isDirty);
-                            stripe->style()->unpolish(stripe);
-                            stripe->style()->polish(stripe);
-                        },
-                        static_cast<void*>(dirtyStripe)
-                    );
-                    for (auto& conn : vecConnections)
-                        _connections.push_back(std::move(conn));
-                }
-            }
+            { buildParamRows(param, formLayout, _connections, mode); }
         );
 
         scrollArea->setWidget(formContainer);

@@ -1,66 +1,93 @@
 #include "ui/settings/settings_sidebar.hpp"
 
-#include <qlistwidget.h>
-
-#include <QListWidgetItem>
-
-#include "utils/qt_helpers.hpp"
+#include <QTreeWidget>
 
 namespace ui
 {
 
     SettingsSidebar::SettingsSidebar(QWidget* parent) : QWidget(parent)
     {
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
-        _list = utils::makeQChild<QListWidget>(this);
-        _list->setObjectName("settingsSidebar");
-        _list->setFrameShape(QFrame::NoFrame);
-        _list->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        _list->setSpacing(1);
+        _tree = new QTreeWidget(this);
+        _tree->setObjectName("settingsSidebar");
+        _tree->setHeaderHidden(true);
+        _tree->setFrameShape(QFrame::NoFrame);
+        _tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        _tree->setIndentation(12);
+        _tree->setAnimated(true);
 
         connect(
-            _list,
-            &QListWidget::itemClicked,
-            this,
-            &SettingsSidebar::_onItemClicked
+            _tree,
+            &QTreeWidget::itemClicked,
+            [this](QTreeWidgetItem* item, int column)
+            { _onItemClicked(item, column); }
         );
 
-        layout->addWidget(_list);
+        layout->addWidget(_tree);
     }
 
-    void SettingsSidebar::addSection(const QString& title)
+    void SettingsSidebar::addTopLevel(const QString& title, int stackIndex)
     {
-        auto* item = utils::makeQChild<QListWidgetItem>(title, _list);
-        item->setData(Qt::UserRole, false);   // dirty = false
-        item->setData(
-            Qt::UserRole + 1,
-            title
-        );   // base title for dirty dot suffix
-        item->setSizeHint({_list->width(), 36});
+        auto* item = new QTreeWidgetItem(_tree);
+        item->setText(0, title);
+        item->setData(0, kStackIndexRole, stackIndex);
+        item->setData(0, kBaseTitleRole, title);
+        item->setFlags(
+            item->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled
+        );
     }
 
-    void SettingsSidebar::setSectionDirty(int index, bool dirty)
+    QTreeWidgetItem* SettingsSidebar::addParent(
+        const QString& title,
+        int            stackIndex
+    )
     {
-        if (index < 0 || index >= _list->count())
+        auto* item = new QTreeWidgetItem(_tree);
+        item->setText(0, title);
+        item->setData(0, kStackIndexRole, stackIndex);
+        item->setData(0, kBaseTitleRole, title);
+        item->setFlags(
+            item->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled
+        );
+        item->setExpanded(true);
+        return item;
+    }
+
+    void SettingsSidebar::addChild(
+        QTreeWidgetItem* parent,
+        const QString&   title,
+        int              stackIndex
+    )
+    {
+        auto* item = new QTreeWidgetItem(parent);
+        item->setText(0, title);
+        item->setData(0, kStackIndexRole, stackIndex);
+        item->setData(0, kBaseTitleRole, title);
+        item->setFlags(
+            item->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled
+        );
+    }
+
+    void SettingsSidebar::setSectionDirty(int stackIndex, bool dirty)
+    {
+        auto* item = _findByStackIndex(stackIndex);
+        if (item == nullptr)
             return;
 
-        auto* item = _list->item(index);
-        item->setData(Qt::UserRole, dirty);
-
-        // Append/remove the dot suffix in the label
-        const QString base = item->data(Qt::UserRole + 1).toString();
-        item->setText(dirty ? base + "  ●" : base);
+        const QString base = item->data(0, kBaseTitleRole).toString();
+        item->setText(0, dirty ? base + "  ●" : base);
     }
 
-    void SettingsSidebar::selectSection(int index)
+    void SettingsSidebar::selectByStackIndex(int stackIndex)
     {
-        if (index < 0 || index >= _list->count())
+        auto* item = _findByStackIndex(stackIndex);
+        if (item == nullptr)
             return;
 
-        _list->setCurrentRow(index);
+        _tree->setCurrentItem(item);
     }
 
     void SettingsSidebar::setOnSectionSelected(OnSectionSelected callback)
@@ -68,10 +95,32 @@ namespace ui
         _onSectionSelected = std::move(callback);
     }
 
-    void SettingsSidebar::_onItemClicked(QListWidgetItem* item)
+    int SettingsSidebar::count() const { return _tree->topLevelItemCount(); }
+
+    QTreeWidgetItem* SettingsSidebar::_findByStackIndex(int stackIndex) const
+    {
+        // BFS over all items
+        QList<QTreeWidgetItem*> queue;
+        for (int i = 0; i < _tree->topLevelItemCount(); ++i)
+            queue.append(_tree->topLevelItem(i));
+
+        while (!queue.isEmpty())
+        {
+            auto* item = queue.takeFirst();
+            if (item->data(0, kStackIndexRole).toInt() == stackIndex)
+                return item;
+
+            for (int i = 0; i < item->childCount(); ++i)
+                queue.append(item->child(i));
+        }
+
+        return nullptr;
+    }
+
+    void SettingsSidebar::_onItemClicked(QTreeWidgetItem* item, int /*column*/)
     {
         if (_onSectionSelected)
-            _onSectionSelected(_list->row(item));
+            _onSectionSelected(item->data(0, kStackIndexRole).toInt());
     }
 
 }   // namespace ui

@@ -1,11 +1,12 @@
 #ifndef __UI__INCLUDE__UI__SETTINGS__SETTINGS_SIDEBAR_HPP__
 #define __UI__INCLUDE__UI__SETTINGS__SETTINGS_SIDEBAR_HPP__
 
-#include <QListWidget>
-#include <QListWidgetItem>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+
+class QTreeWidget;
+class QTreeWidgetItem;
 
 namespace ui
 {
@@ -24,19 +25,35 @@ namespace ui
         using OnSectionSelected = std::function<void(int index)>;
 
        private:
-        QListWidget*      _list{nullptr};
+        QTreeWidget*      _tree{nullptr};
         OnSectionSelected _onSectionSelected;
+
+        static constexpr int kStackIndexRole = Qt::UserRole;
+        static constexpr int kBaseTitleRole  = Qt::UserRole + 1;
 
        public:
         explicit SettingsSidebar(QWidget* parent);
 
-        void addSection(const QString& title);
+        void             addTopLevel(const QString& title, int stackIndex);
+        QTreeWidgetItem* addParent(const QString& title, int stackIndex);
+
+        void addChild(
+            QTreeWidgetItem* parent,
+            const QString&   title,
+            int              stackIndex
+        );
+
         void setSectionDirty(int index, bool dirty);
-        void selectSection(int index);
+        void selectByStackIndex(int stackIndex);
         void setOnSectionSelected(OnSectionSelected callback);
+        void _onItemClicked(QTreeWidgetItem* item, int /*column*/);
+
+        [[nodiscard]] int count() const;
 
        private:
-        void _onItemClicked(QListWidgetItem* item);
+        [[nodiscard]]
+        QTreeWidgetItem* _findByStackIndex(int stackIndex) const;
+        void             _onItemClicked(QTreeWidgetItem* item);
     };
 
 }   // namespace ui

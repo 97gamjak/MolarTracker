@@ -39,16 +39,17 @@ namespace settings
     requires(N > 1)
     class NumericVecParam : public Observable<OnDirtyChanged>
     {
+       public:
+        constexpr static std::size_t size = N;
+
+        using value_type = T;
+
        private:
         /// Base class for the observable functionality
         using Base = Observable<OnDirtyChanged>;
 
         /// Schema for the JSON representation of the parameter
         using Schema = NumericVecParamSchema;
-
-        constexpr static std::size_t size = N;
-
-        using value_type = T;
 
        private:
         /// Key for the parameter
@@ -77,6 +78,12 @@ namespace settings
         void setMinValues(const std::pair<T, T>& minValues)
         requires(N == 2);
 
+        const T& get(std::size_t index) const;
+        [[nodiscard]] std::expected<void, ParamError> set(
+            std::size_t index,
+            const T&    value
+        );
+
         void commit();
 
         static void fromJson(
@@ -93,6 +100,10 @@ namespace settings
         );
 
         [[nodiscard]] bool isDirty() const;
+
+        [[nodiscard]] std::string toString() const;
+        [[nodiscard]] std::string getDescription() const;
+        [[nodiscard]] std::string getTitle() const;
 
         const T& x() const
         requires(N <= 3);

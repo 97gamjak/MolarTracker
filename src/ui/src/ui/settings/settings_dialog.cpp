@@ -8,6 +8,8 @@
 
 #include "settings/params/param_utils.hpp"
 #include "settings/settings.hpp"
+#include "ui/settings/param_editor.hpp"
+#include "ui/settings/settings_overview.hpp"
 #include "ui/settings/settings_section.hpp"
 #include "ui/settings/settings_sidebar.hpp"
 #include "utils/qt_helpers.hpp"
@@ -110,55 +112,110 @@ namespace ui
         // widget is templated on its concrete container type. Order here must
         // match kGeneralIndex / kUiIndex / kLoggingIndex constants.
 
-        // Static trampoline — no capture needed
-        static constexpr auto onSectionDirty =
-            [](void* userData, const bool& isDirty)
+        auto addPage = [&](auto& section, SectionMode mode = SectionMode::All)
         {
-            auto* ctx = static_cast<DirtyContext*>(userData);
-            ctx->dialog->_sidebar->setSectionDirty(ctx->index, isDirty);
-            ctx->dialog->_updateUnsavedLabel();
-        };
+            const int stackIndex = _stack->count();
 
-        auto addSection = [&]<settings::IsParamContainer TSection>(
-                              const QString& title,
-                              TSection&      section,
-                              int            index
-                          )
-        {
-            _sidebar->addSection(title);
+            auto* page = utils::makeQChild<
+                SettingsSection<std::remove_cvref_t<decltype(section)>>>(
+                section,
+                mode
+            );
+            _stack->addWidget(page);
 
-            auto* sectionWidget =
-                utils::makeQChild<SettingsSection<TSection>>(section);
-            _stack->addWidget(sectionWidget);
-
-            // Aggregate dirty connections from the section widget
-            for (auto& conn : sectionWidget->getConnections())
+            for (auto& conn : page->getConnections())
                 _connections.push_back(std::move(conn));
 
-            // Heap-allocate context owned by _dirtyContexts
-            auto  ctx    = std::make_unique<DirtyContext>(this, index);
+            auto  ctx    = std::make_unique<DirtyContext>(this, stackIndex);
             auto* ctxPtr = ctx.get();
             _dirtyContexts.push_back(std::move(ctx));
 
             auto containerConnections = section.subscribeToDirty(
-                static_cast<OnDirtyChanged::func>(onSectionDirty),
+                static_cast<OnDirtyChanged::func>(
+                    SettingsDialog::_onSectionDirty
+                ),
                 static_cast<void*>(ctxPtr)
             );
-
             for (auto& conn : containerConnections)
                 _connections.push_back(std::move(conn));
         };
 
-        addSection("General", _settings.getGeneralSettings(), kGeneralIndex);
-        addSection("Interface", _settings.getUISettings(), kUiIndex);
-        addSection("Logging", _settings.getLoggingSettings(), kLoggingIndex);
+        auto addSection = [&](const QString& groupTitle, auto& section)
+        {
+            bool hasLeaves = false;
+            bool hasSubs   = false;
+
+            section.forEachParam(
+                [&](const auto& param)
+                {
+                    using P = std::remove_cvref_t<decltype(param)>;
+                    if constexpr (settings::IsParamContainer<P>)
+                        hasSubs = true;
+                    else
+                        hasLeaves = true;
+                }
+            );
+
+            if (!hasSubs)
+            {
+                const int stackIndex = _stack->count();
+                _sidebar->addTopLevel(groupTitle, stackIndex);
+                addPage(section);
+                return;
+            }
+
+            // Overview page for the parent
+            auto* overview = new SettingsOverview(groupTitle);
+            overview->setOnNavigate(
+                [this](int stackIndex)
+                {
+                    _stack->setCurrentIndex(stackIndex);
+                    _sidebar->selectByStackIndex(stackIndex);
+                }
+            );
+
+            const int overviewStackIndex = _stack->count();
+            auto*     parentItem =
+                _sidebar->addParent(groupTitle, overviewStackIndex);
+            _stack->addWidget(overview);
+
+            if (hasLeaves)
+                addPage(section, SectionMode::LeavesOnly);
+
+            section.forEachParam(
+                [&](auto& param)
+                {
+                    using P = std::remove_cvref_t<decltype(param)>;
+                    if constexpr (settings::IsParamContainer<P>)
+                    {
+                        const int subStackIndex = _stack->count();
+                        _sidebar->addChild(
+                            parentItem,
+                            QString::fromStdString(param.getTitle()),
+                            subStackIndex
+                        );
+                        addPage(param);
+                        overview->addCard(
+                            QString::fromStdString(param.getTitle()),
+                            QString::fromStdString(param.getDescription()),
+                            subStackIndex
+                        );
+                    }
+                }
+            );
+        };
+
+        _settings.forEachParam(
+            [&](auto& param)
+            { addSection(QString::fromStdString(param.getTitle()), param); }
+        );
 
         // ── Sidebar navigation
         // ────────────────────────────────────────────────────
         _sidebar->setOnSectionSelected([this](int index)
                                        { _stack->setCurrentIndex(index); });
 
-        _sidebar->selectSection(kGeneralIndex);
+        _sidebar->selectByStackIndex(0);   // Select first section by default
     }
 
     void SettingsDialog::_updateUnsavedLabel()
@@ -180,7 +237,7 @@ namespace ui
         }
 
         /* ── Sidebar ─────────────────────────────────── */
-        QListWidget#settingsSidebar {
+        QTreeWidget#settingsSidebar {
             background: #111111;
             border: none;
             padding: 8px 0;
@@ -189,18 +246,25 @@ namespace ui
             color: #6a7a8a;
             outline: none;
         }
-        QListWidget#settingsSidebar::item {
-            padding: 8px 16px;
+        QTreeWidget#settingsSidebar::item {
+            padding: 6px 8px;
             border-radius: 0;
+            height: 32px;
         }
-        QListWidget#settingsSidebar::item:selected {
+        QTreeWidget#settingsSidebar::item:selected {
             background: #1a1a1a;
             color: #c8d8ec;
             border-left: 2px solid #4a9eff;
         }
-        QListWidget#settingsSidebar::item:hover:!selected {
+        QTreeWidget#settingsSidebar::item:hover:!selected {
             background: #161616;
             color: #8a9ab0;
+        }
+        QTreeWidget#settingsSidebar::branch {
+            background: #111111;
+        }
+        QTreeWidget#settingsSidebar::branch {
+            background: #111111;
         }
 
         /* ── Body separator ──────────────────────────── */
@@ -395,7 +459,40 @@ namespace ui
             background: #1a1a1a;
             color: #8a9ab0;
         }
+        QPushButton#overviewCard {
+            background: #141414;
+            border: 1px solid #252525;
+            border-radius: 6px;
+            text-align: left;
+        }
+        QPushButton#overviewCard:hover {
+            background: #1a1a1a;
+            border-color: #4a9eff;
+        }
+        QLabel#cardTitle {
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+            font-weight: bold;
+            color: #c8d8ec;
+        }
+        QLabel#cardDesc {
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            color: #4a5a6a;
+        }
+        QLabel#cardArrow {
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            color: #4a9eff;
+        }
     )");
+    }
+
+    void SettingsDialog::_onSectionDirty(void* userData, const bool& isDirty)
+    {
+        auto* ctx = static_cast<DirtyContext*>(userData);
+        ctx->dialog->_sidebar->setSectionDirty(ctx->index, isDirty);
+        ctx->dialog->_updateUnsavedLabel();
     }
 
 }   // namespace ui

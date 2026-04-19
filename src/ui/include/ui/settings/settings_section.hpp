@@ -10,6 +10,7 @@
 
 #include "connections/connection.hpp"
 #include "settings/params/param_utils.hpp"
+#include "ui/settings/param_editor.hpp"
 
 namespace ui
 {
@@ -28,11 +29,11 @@ namespace ui
         std::vector<Connection> _connections;
 
        public:
-        explicit SettingsSection(TSection& section);
+        explicit SettingsSection(TSection& section, SectionMode mode);
 
         [[nodiscard]] std::vector<Connection>& getConnections();
 
-        void _build(TSection& section);
+        void _build(TSection& section, SectionMode mode);
     };
 
 }   // namespace ui

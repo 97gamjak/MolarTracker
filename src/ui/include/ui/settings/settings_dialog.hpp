@@ -66,9 +66,10 @@ namespace ui
         void saveRequested();
 
        private:
-        void _build();
-        void _applyStyleSheet();
-        void _updateUnsavedLabel();
+        void        _build();
+        void        _applyStyleSheet();
+        void        _updateUnsavedLabel();
+        static void _onSectionDirty(void* userData, const bool& isDirty);
     };
 
 }   // namespace ui

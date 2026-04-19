@@ -190,7 +190,6 @@ namespace settings
         [[nodiscard]] std::pair<int, int> getDialogSize() const;
         [[nodiscard]] int                 getMaxBlockCount() const;
 
-       private:
         template <typename Func>
         void forEachParam(Func&& func) const;
         template <typename Func>

@@ -1,7 +1,12 @@
 #ifndef __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_HPP__
 #define __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_HPP__
 
-class QWidget;   // Forward declaration
+#include <vector>
+
+#include "connections/connection.hpp"
+
+class QWidget;       // Forward declaration
+class QFormLayout;   // Forward declaration
 
 namespace ui
 {
@@ -20,6 +25,23 @@ namespace ui
      */
     template <typename TParam>
     [[nodiscard]] QWidget* makeParamEditor(TParam& param);
+
+    void onDirtyStripe(void* userData, const bool& isDirty);
+
+    enum class SectionMode
+    {
+        LeavesOnly,
+        SubContainersOnly,
+        All
+    };
+
+    template <typename TParam>
+    void buildParamRows(
+        TParam&                  param,
+        QFormLayout*             layout,
+        std::vector<Connection>& connections,
+        SectionMode              mode
+    );
 
 }   // namespace ui
 

@@ -4,11 +4,15 @@
 #include <qboxlayout.h>
 #include <qcheckbox.h>
 #include <qcombobox.h>
+#include <qformlayout.h>
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qspinbox.h>
 #include <qwidget.h>
 
+#include <QGroupBox>
+
+#include "param_editor.hpp"
 #include "settings/params/param_utils.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -91,8 +95,13 @@ namespace ui
                     &QDoubleSpinBox::editingFinished,
                     [sb, &param]()
                     {
-                        param.set(static_cast<ValueType>(sb->value()));
-                        param.commit();
+                        const auto result =
+                            param.set(static_cast<ValueType>(sb->value()));
+
+                        if (result.has_value())
+                            param.commit();
+                        else
+                            sb->setValue(static_cast<int>(param.get()));
                     }
                 );
 
@@ -141,8 +150,7 @@ namespace ui
 
             constexpr std::array<const char*, 3> xyzLabels = {"x", "y", "z"};
 
-            auto makeComponentEditor =
-                [&](std::size_t i, auto getter, auto setter)
+            auto makeComponentEditor = [&](std::size_t i, auto getter)
             {
                 const char* labelText = (N <= 3) ? xyzLabels[i] : nullptr;
 
@@ -163,9 +171,23 @@ namespace ui
                     QObject::connect(
                         sb,
                         &QDoubleSpinBox::editingFinished,
-                        [sb, setter, &param]()
+                        [sb, &param, i]()
                         {
-                            setter(static_cast<ValueType>(sb->value()));
+                            const auto result = param.set(
+                                i,
+                                static_cast<ValueType>(sb->value())
+                            );
+                            if constexpr (requires { result.has_value(); })
+                            {
+                                if (!result.has_value())
+                                {
+                                    sb->setValue(
+                                        static_cast<int>(param.get(i))
+                                    );
+                                    return;
+                                }
+                            }
+
                             param.commit();
                         }
                     );
@@ -181,9 +203,23 @@ namespace ui
                     QObject::connect(
                         sb,
                         &QSpinBox::editingFinished,
-                        [sb, setter, &param]()
+                        [sb, &param, i]()
                         {
-                            setter(static_cast<ValueType>(sb->value()));
+                            const auto result = param.set(
+                                i,
+                                static_cast<ValueType>(sb->value())
+                            );
+                            if constexpr (requires { result.has_value(); })
+                            {
+                                if (!result.has_value())
+                                {
+                                    sb->setValue(
+                                        static_cast<int>(param.get(i))
+                                    );
+                                    return;
+                                }
+                            }
+
                             param.commit();
                         }
                     );
@@ -197,8 +233,7 @@ namespace ui
             {
                 (makeComponentEditor(
                      Is,
-                     [&param]() -> const ValueType& { return param.get(Is); },
-                     [&param](ValueType v) { param.set(Is, v); }
+                     [&param]() -> const ValueType& { return param.get(Is); }
                  ),
                  ...);
             }(std::make_index_sequence<N>{});
@@ -251,12 +286,98 @@ namespace ui
 
         else
         {
-            // Fallback for unknown param types — render key as placeholder
-            auto* lbl =
-                new QLabel(QString("[unsupported: %1]")
-                               .arg(QString::fromStdString(param.getKey())));
-            lbl->setStyleSheet("color: #aa4444;");
-            return lbl;
+            static_assert(
+                std::is_same_v<P, void>,
+                "Unsupported param type in makeParamEditor"
+            );
+            return nullptr;   // Unreachable, but silences compiler warning
+        }
+    }
+
+    template <typename TParam>
+    void buildParamRows(
+        TParam&                  param,
+        QFormLayout*             layout,
+        std::vector<Connection>& connections,
+        SectionMode              mode
+    )
+    {
+        if constexpr (settings::IsParamContainer<TParam>)
+        {
+            // Sub-container → group box with its own form layout
+            auto* group =
+                new QGroupBox(QString::fromStdString(param.getTitle()));
+            auto* groupLayout = new QFormLayout(group);
+            groupLayout->setContentsMargins(12, 8, 12, 8);
+            groupLayout->setSpacing(0);
+            groupLayout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+            param.forEachParam(
+                [&](auto& subParam)
+                { buildParamRows(subParam, groupLayout, connections, mode); }
+            );
+
+            // Span the group box across both columns
+            layout->addRow(group);
+        }
+        else
+        {
+            if (mode == SectionMode::SubContainersOnly)
+                return;   // Skip leaf params
+
+            // Leaf param → normal editor row
+            auto* rowWidget = new QWidget();
+            rowWidget->setObjectName("paramRow");
+            auto* rowLayout = new QHBoxLayout(rowWidget);
+            rowLayout->setContentsMargins(0, 6, 0, 6);
+            rowLayout->setSpacing(8);
+
+            auto* dirtyStripe = new QWidget();
+            dirtyStripe->setFixedSize(3, 20);
+            dirtyStripe->setObjectName("dirtyStripe");
+            dirtyStripe->setProperty("dirty", false);
+            rowLayout->addWidget(dirtyStripe);
+
+            QWidget* editor = makeParamEditor(param);
+            rowLayout->addWidget(editor);
+
+            if constexpr (requires { param.isRebootRequired(); })
+            {
+                if (param.isRebootRequired())
+                {
+                    auto* rebootLabel = new QLabel("⟳ restart required");
+                    rebootLabel->setObjectName("rebootBadge");
+                    rowLayout->addWidget(rebootLabel);
+                }
+            }
+
+            rowLayout->addStretch();
+
+            auto* label = new QLabel(QString::fromStdString(param.getTitle()));
+            label->setObjectName("paramLabel");
+            label->setToolTip(QString::fromStdString(param.getDescription()));
+
+            layout->addRow(label, rowWidget);
+
+            // Dirty subscription
+            auto connectDirty = [&](Connection conn)
+            { connections.push_back(std::move(conn)); };
+
+            if constexpr (requires {
+                              {
+                                  param.subscribeToDirty(nullptr, nullptr)
+                              } -> std::same_as<Connection>;
+                          })
+            {
+                connectDirty(param.subscribeToDirty(onDirtyStripe, dirtyStripe)
+                );
+            }
+            else
+            {
+                for (auto& conn :
+                     param.subscribeToDirty(onDirtyStripe, dirtyStripe))
+                    connections.push_back(std::move(conn));
+            }
         }
     }
 

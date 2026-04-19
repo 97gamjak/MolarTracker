@@ -81,7 +81,6 @@ namespace settings
 
         [[nodiscard]] std::pair<int, int> getDialogSize() const;
 
-       private:
         template <typename Func>
         void forEachParam(Func&& func) const;
         template <typename Func>
