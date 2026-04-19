@@ -1,9 +1,12 @@
-#include "ui/settings/settings_section.hpp"
+#ifndef __UI__INCLUDE__UI__SETTINGS__SETTINGS_SECTION_TPP__
+#define __UI__INCLUDE__UI__SETTINGS__SETTINGS_SECTION_TPP__
 
 #include <qlabel.h>
 #include <qstyle.h>
 
 #include "settings/params/param_utils.hpp"
+#include "ui/settings/param_editor.hpp"
+#include "ui/settings/settings_section.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -73,7 +76,7 @@ namespace ui
 
         // ── Build one row per param
         // ───────────────────────────────────────
-        section._forEachParam(
+        section.forEachParam(
             [&](auto& param)
             {
                 // Row container (label + editor + optional reboot warning)
@@ -95,12 +98,16 @@ namespace ui
                 rowLayout->addWidget(editor);
 
                 // Reboot required badge
-                if (param.isRebootRequired())
+                // TODO(97gamjak): make this nicer
+                if constexpr (requires { param.isRebootRequired(); })
                 {
-                    auto* rebootLabel =
-                        utils::makeQChild<QLabel>("⟳ restart required");
-                    rebootLabel->setObjectName("rebootBadge");
-                    rowLayout->addWidget(rebootLabel);
+                    if (param.isRebootRequired())
+                    {
+                        auto* rebootLabel =
+                            utils::makeQChild<QLabel>("⟳ restart required");
+                        rebootLabel->setObjectName("rebootBadge");
+                        rowLayout->addWidget(rebootLabel);
+                    }
                 }
 
                 rowLayout->addStretch();
@@ -126,7 +133,7 @@ namespace ui
                               })
                 {
                     _connections.push_back(param.subscribeToDirty(
-                        [](void* userData, bool isDirty)
+                        [](void* userData, const bool& isDirty)
                         {
                             auto* stripe = static_cast<QWidget*>(userData);
                             stripe->setProperty("dirty", isDirty);
@@ -140,7 +147,7 @@ namespace ui
                 else
                 {
                     auto vecConnections = param.subscribeToDirty(
-                        [](void* userData, bool isDirty)
+                        [](void* userData, const bool& isDirty)
                         {
                             auto* stripe = static_cast<QWidget*>(userData);
                             stripe->setProperty("dirty", isDirty);
@@ -160,3 +167,5 @@ namespace ui
     }
 
 }   // namespace ui
+
+#endif   // __UI__INCLUDE__UI__SETTINGS__SETTINGS_SECTION_TPP__

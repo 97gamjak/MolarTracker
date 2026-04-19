@@ -20,6 +20,9 @@ namespace settings
     template <typename Derived, typename T>
     class ParamMixin
     {
+       public:
+        using value_type = T;
+
        private:
         /// Type alias for the templated change callback function, this is a
         /// function pointer that takes a pointer to the user data and the new

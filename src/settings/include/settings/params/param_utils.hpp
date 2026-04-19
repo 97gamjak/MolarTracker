@@ -122,25 +122,40 @@ namespace settings
     }
 
     template <typename T>
-    constexpr bool is_bool_param = std::derived_from<T, BoolParam>;
+    constexpr bool is_bool_param = false;
+
+    template <>
+    constexpr bool is_bool_param<BoolParam> = true;
 
     template <typename T>
-    constexpr bool is_string_param = std::derived_from<T, StringParam>;
+    constexpr bool is_string_param = false;
+
+    template <>
+    constexpr bool is_string_param<StringParam> = true;
 
     template <typename T>
-    constexpr bool is_numeric_param =
-        std::derived_from<T, NumericParam<typename T::value_type>>;
+    constexpr bool is_numeric_param = false;
 
     template <typename T>
-    constexpr bool is_numeric_vec_param =
-        std::derived_from<T, NumericVecParam<typename T::value_type, T::size>>;
+    constexpr bool is_numeric_param<NumericParam<T>> = true;
 
     template <typename T>
-    constexpr bool is_enum_param =
-        std::derived_from<T, EnumParam<typename T::value_type>>;
+    constexpr bool is_version_param = false;
+
+    template <>
+    constexpr bool is_version_param<VersionParam> = true;
 
     template <typename T>
-    constexpr bool is_version_param = std::derived_from<T, VersionParam>;
+    constexpr bool is_enum_param = false;
+
+    template <typename E>
+    constexpr bool is_enum_param<EnumParam<E>> = true;
+
+    template <typename T>
+    constexpr bool is_numeric_vec_param = false;
+
+    template <typename T, std::size_t N>
+    constexpr bool is_numeric_vec_param<NumericVecParam<T, N>> = true;
 
 }   // namespace settings
 

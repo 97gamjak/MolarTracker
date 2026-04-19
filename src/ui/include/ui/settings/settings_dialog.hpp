@@ -65,6 +65,7 @@ namespace ui
        signals:
         void saveRequested();
 
+       private:
         void _build();
         void _applyStyleSheet();
         void _updateUnsavedLabel();

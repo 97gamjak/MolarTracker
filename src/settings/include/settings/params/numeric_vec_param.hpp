@@ -48,6 +48,8 @@ namespace settings
 
         constexpr static std::size_t size = N;
 
+        using value_type = T;
+
        private:
         /// Key for the parameter
         std::string _key;

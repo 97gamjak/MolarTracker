@@ -37,4 +37,8 @@ namespace ui
 
 }   // namespace ui
 
+#ifndef __UI__INCLUDE__UI__SETTINGS__SETTINGS_SECTION_TPP__
+#include "settings_section.tpp"
+#endif
+
 #endif   // __UI__INCLUDE__UI__SETTINGS__SETTINGS_SECTION_HPP__

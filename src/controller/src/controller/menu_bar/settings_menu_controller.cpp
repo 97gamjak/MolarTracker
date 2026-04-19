@@ -4,6 +4,8 @@
 #include <QMessageBox>
 
 #include "ui/menu_bar/settings_menu.hpp"
+#include "ui/settings/settings_dialog.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace controller
 {
@@ -16,12 +18,14 @@ namespace controller
      * @param settingsMenu
      */
     SettingsMenuController::SettingsMenuController(
-        QMainWindow&      mainWindow,
-        ui::SettingsMenu& settingsMenu
+        QMainWindow&        mainWindow,
+        ui::SettingsMenu&   settingsMenu,
+        settings::Settings& settings
     )
         : QObject{&mainWindow},
           _mainWindow(mainWindow),
-          _settingsMenu(settingsMenu)
+          _settingsMenu(settingsMenu),
+          _settings(settings)
     {
         connect(
             &_settingsMenu,
@@ -37,11 +41,10 @@ namespace controller
      */
     void SettingsMenuController::_onPreferencesRequested()
     {
-        QMessageBox::information(
-            &_mainWindow,
-            "Preferences",
-            "Preferences requested"
-        );
+        auto* settingsDialog =
+            utils::makeQChild<ui::SettingsDialog>(_settings, &_mainWindow);
+
+        settingsDialog->exec();
     }
 
 }   // namespace controller

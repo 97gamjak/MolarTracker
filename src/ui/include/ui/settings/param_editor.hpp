@@ -23,4 +23,8 @@ namespace ui
 
 }   // namespace ui
 
+#ifndef __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_TPP__
+#include "param_editor.tpp"
+#endif
+
 #endif   // __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_HPP__

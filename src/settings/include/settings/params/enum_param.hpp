@@ -22,6 +22,10 @@ namespace settings
     requires std::is_enum_v<E>
     class EnumParam : public ParamMixin<EnumParam<E>, E>
     {
+       public:
+        /// type alias for the enum metadata
+        using EnumMeta = mstd::enum_meta_t<E>;
+
        private:
         /// friend declaration to allow ParamMixin to access private members of
         /// EnumParam, this is necessary because ParamMixin needs to access the
@@ -31,9 +35,6 @@ namespace settings
 
         /// The core implementation of the parameter
         ParamCore<E> _core;
-
-        /// type alias for the enum metadata
-        using EnumMeta = mstd::enum_meta_t<E>;
 
        public:
         EnumParam(std::string key, std::string title, std::string description);

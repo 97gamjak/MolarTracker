@@ -116,8 +116,13 @@ namespace ui
                     &QSpinBox::editingFinished,
                     [sb, &param]()
                     {
-                        param.set(static_cast<ValueType>(sb->value()));
-                        param.commit();
+                        const auto result =
+                            param.set(static_cast<ValueType>(sb->value()));
+
+                        if (result.has_value())
+                            param.commit();
+                        else
+                            sb->setValue(static_cast<int>(param.get()));
                     }
                 );
 
@@ -206,20 +211,18 @@ namespace ui
             auto* cb = utils::makeQChild<QComboBox>();
 
             const auto& entries =
-                P::entries();   // expected static method on EnumParam
+                P::EnumMeta::values;   // expected static method on EnumParam
             for (const auto& entry : entries)
-                cb->addItem(QString::fromStdString(entry.label));
+                cb->addItem(
+                    QString::fromStdString(P::EnumMeta::toString(entry))
+                );
 
             // Set current index from current value
             const auto currentValue = param.get();
-            for (int i = 0; i < static_cast<int>(entries.size()); ++i)
-            {
-                if (entries[static_cast<std::size_t>(i)].value == currentValue)
-                {
-                    cb->setCurrentIndex(i);
-                    break;
-                }
-            }
+            const auto index        = P::EnumMeta::index(currentValue);
+
+            if (index.has_value())
+                cb->setCurrentIndex(static_cast<int>(index.value()));
 
             QObject::connect(
                 cb,
@@ -228,7 +231,7 @@ namespace ui
                 {
                     if (idx >= 0 && idx < static_cast<int>(entries.size()))
                     {
-                        param.set(entries[static_cast<std::size_t>(idx)].value);
+                        param.set(entries[static_cast<std::size_t>(idx)]);
                         param.commit();
                     }
                 }
