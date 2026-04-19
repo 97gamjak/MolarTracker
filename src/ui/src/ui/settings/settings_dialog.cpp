@@ -46,7 +46,7 @@ namespace ui
         bodyLayout->setSpacing(0);
 
         _sidebar = utils::makeQChild<SettingsSidebar>(body);
-        _sidebar->setFixedWidth(160);
+        _sidebar->setFixedWidth(_sideBarWidth);
 
         _stack = utils::makeQChild<QStackedWidget>(body);
 
@@ -108,10 +108,6 @@ namespace ui
         connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
 
         // ── Build sections
-        // ──────────────────────────────────────────────────────── Each section
-        // widget is templated on its concrete container type. Order here must
-        // match kGeneralIndex / kUiIndex / kLoggingIndex constants.
-
         auto addPage = [&](auto& section, SectionMode mode = SectionMode::All)
         {
             const int stackIndex = _stack->count();
@@ -226,6 +222,13 @@ namespace ui
                               _settings.getLoggingSettings().isDirty();
 
         _unsavedLabel->setVisible(anyDirty);
+    }
+
+    void SettingsDialog::_onSectionDirty(void* userData, const bool& isDirty)
+    {
+        auto* ctx = static_cast<DirtyContext*>(userData);
+        ctx->dialog->_sidebar->setSectionDirty(ctx->index, isDirty);
+        ctx->dialog->_updateUnsavedLabel();
     }
 
     void SettingsDialog::_applyStyleSheet()
@@ -486,13 +489,6 @@ namespace ui
             color: #4a9eff;
         }
     )");
-    }
-
-    void SettingsDialog::_onSectionDirty(void* userData, const bool& isDirty)
-    {
-        auto* ctx = static_cast<DirtyContext*>(userData);
-        ctx->dialog->_sidebar->setSectionDirty(ctx->index, isDirty);
-        ctx->dialog->_updateUnsavedLabel();
     }
 
 }   // namespace ui

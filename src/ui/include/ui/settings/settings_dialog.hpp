@@ -37,9 +37,7 @@ namespace ui
         Q_OBJECT
 
        private:
-        static constexpr int kGeneralIndex = 0;
-        static constexpr int kUiIndex      = 1;
-        static constexpr int kLoggingIndex = 2;
+        static constexpr size_t _sideBarWidth = 160;
 
         settings::Settings& _settings;
 
@@ -52,11 +50,7 @@ namespace ui
 
         // Heap-allocated dirty callback contexts — one per section.
         // Freed in destructor after _connections are disconnected.
-        struct DirtyContext
-        {
-            SettingsDialog* dialog;
-            int             index;
-        };
+        struct DirtyContext;
         std::vector<std::unique_ptr<DirtyContext>> _dirtyContexts;
 
        public:
@@ -70,6 +64,12 @@ namespace ui
         void        _applyStyleSheet();
         void        _updateUnsavedLabel();
         static void _onSectionDirty(void* userData, const bool& isDirty);
+    };
+
+    struct SettingsDialog::DirtyContext
+    {
+        SettingsDialog* dialog;
+        int             index;
     };
 
 }   // namespace ui
