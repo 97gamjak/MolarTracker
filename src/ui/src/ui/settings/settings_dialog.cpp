@@ -105,7 +105,7 @@ namespace ui
             }
         );
 
-        connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
+        connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
         // ── Build sections
         auto addPage = [&](auto& section, SectionMode mode = SectionMode::All)
