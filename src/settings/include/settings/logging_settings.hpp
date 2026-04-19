@@ -213,11 +213,10 @@ namespace settings
         [[nodiscard]] const EnumParam<LogLevel>& getDefaultLogLevelParam(
         ) const;
 
-       private:
         template <typename Func>
-        void _forEachParam(Func&& func) const;
+        void forEachParam(Func&& func) const;
         template <typename Func>
-        void _forEachParam(Func&& func);
+        void forEachParam(Func&& func);
     };
 
     /**

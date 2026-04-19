@@ -13,7 +13,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void LoggingSettings::_forEachParam(Func&& func) const
+    void LoggingSettings::forEachParam(Func&& func) const
     {
         std::forward<Func>(func)(_logDirectory);
         std::forward<Func>(func)(_logFilePrefix);
@@ -31,7 +31,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void LoggingSettings::_forEachParam(Func&& func)
+    void LoggingSettings::forEachParam(Func&& func)
     {
         std::forward<Func>(func)(_logDirectory);
         std::forward<Func>(func)(_logFilePrefix);

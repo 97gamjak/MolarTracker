@@ -69,6 +69,8 @@ namespace settings
 
         void commit();
 
+        [[nodiscard]] bool isDirty() const;
+
        private:
         [[nodiscard]] Derived&       _self();
         [[nodiscard]] const Derived& _self() const;

@@ -46,6 +46,8 @@ namespace settings
         /// Schema for the JSON representation of the parameter
         using Schema = NumericVecParamSchema;
 
+        constexpr static std::size_t size = N;
+
        private:
         /// Key for the parameter
         std::string _key;
@@ -87,6 +89,8 @@ namespace settings
             OnDirtyChanged::func func,
             void*                user
         );
+
+        [[nodiscard]] bool isDirty() const;
 
         const T& x() const
         requires(N <= 3);

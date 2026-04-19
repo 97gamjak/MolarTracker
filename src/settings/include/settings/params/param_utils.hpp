@@ -4,6 +4,13 @@
 #include <nlohmann/json.hpp>
 #include <utility>
 
+#include "settings/params/bool_param.hpp"
+#include "settings/params/enum_param.hpp"
+#include "settings/params/numeric_param.hpp"
+#include "settings/params/numeric_vec_param.hpp"
+#include "settings/params/string_param.hpp"
+#include "settings/params/version_param.hpp"
+
 namespace settings
 {
     /**
@@ -57,8 +64,8 @@ namespace settings
      */
     template <class T>
     concept HasForEachParam =
-        (requires(T& param) { param._forEachParam([](auto&&) {}); }) &&
-        requires(const T& param) { param._forEachParam([](auto&&) {}); };
+        (requires(T& param) { param.forEachParam([](auto&&) {}); }) &&
+        requires(const T& param) { param.forEachParam([](auto&&) {}); };
 
     /**
      * @brief Concept for parameter containers
@@ -113,6 +120,27 @@ namespace settings
 
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);
     }
+
+    template <typename T>
+    constexpr bool is_bool_param = std::derived_from<T, BoolParam>;
+
+    template <typename T>
+    constexpr bool is_string_param = std::derived_from<T, StringParam>;
+
+    template <typename T>
+    constexpr bool is_numeric_param =
+        std::derived_from<T, NumericParam<typename T::value_type>>;
+
+    template <typename T>
+    constexpr bool is_numeric_vec_param =
+        std::derived_from<T, NumericVecParam<typename T::value_type, T::size>>;
+
+    template <typename T>
+    constexpr bool is_enum_param =
+        std::derived_from<T, EnumParam<typename T::value_type>>;
+
+    template <typename T>
+    constexpr bool is_version_param = std::derived_from<T, VersionParam>;
 
 }   // namespace settings
 

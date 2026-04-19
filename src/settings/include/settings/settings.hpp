@@ -72,12 +72,12 @@ namespace settings
         [[nodiscard]] LoggingSettings&       getLoggingSettings();
         [[nodiscard]] const LoggingSettings& getLoggingSettings() const;
 
-       private:
         template <typename Func>
-        void _forEachParam(Func&& func) const;
+        void forEachParam(Func&& func) const;
         template <typename Func>
-        void _forEachParam(Func&& func);
+        void forEachParam(Func&& func);
 
+       private:
         void _toJson() const;
         void _fromJson();
     };

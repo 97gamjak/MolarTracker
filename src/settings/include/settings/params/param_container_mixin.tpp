@@ -87,7 +87,7 @@ namespace settings
             }
         };
 
-        _self()._forEachParam(subscribeToDirtyForParam);
+        _self().forEachParam(subscribeToDirtyForParam);
 
         return connections;
     }
@@ -112,7 +112,7 @@ namespace settings
         auto paramToJson = [&](const auto& param)
         { jsonData[param.getKey()] = param.toJson(); };
 
-        _self()._forEachParam(paramToJson);
+        _self().forEachParam(paramToJson);
 
         return jsonData;
     }
@@ -150,7 +150,7 @@ namespace settings
             }
         };
 
-        settings._forEachParam(paramFromJson);
+        settings.forEachParam(paramFromJson);
     }
 
     /**
@@ -168,7 +168,7 @@ namespace settings
     {
         auto commitParam = [&](auto& param) { param.commit(); };
 
-        _self()._forEachParam(commitParam);
+        _self().forEachParam(commitParam);
     }
 
     /**
@@ -195,6 +195,20 @@ namespace settings
     const Derived& ParamContainerMixin<Derived>::_self() const
     {
         return static_cast<const Derived&>(*this);
+    }
+
+    template <typename Derived>
+    bool ParamContainerMixin<Derived>::isDirty() const
+    {
+        bool dirty      = false;
+        auto checkDirty = [&](const auto& param)
+        {
+            if (param.isDirty())
+                dirty = true;
+        };
+
+        _self().forEachParam(checkDirty);
+        return dirty;
     }
 
 }   // namespace settings

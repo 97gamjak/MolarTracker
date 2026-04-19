@@ -337,6 +337,29 @@ namespace settings
         return _params[2].get();
     }
 
+    /**
+     * @brief Check if any of the individual numeric parameters in the vector is
+     * dirty, this function checks the dirty state of each individual numeric
+     * parameter in the vector and returns true if any of them is dirty,
+     * otherwise it returns false
+     *
+     * @tparam T
+     * @tparam N
+     * @return true if any of the individual numeric parameters in the vector is
+     * dirty, false otherwise
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    bool NumericVecParam<T, N>::isDirty() const
+    {
+        for (const auto& param : _params)
+        {
+            if (param.isDirty())
+                return true;
+        }
+        return false;
+    }
+
 }   // namespace settings
 
 #endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__

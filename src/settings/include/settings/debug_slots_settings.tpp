@@ -13,7 +13,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void DebugSlotsSettings::_forEachParam(Func&& func) const
+    void DebugSlotsSettings::forEachParam(Func&& func) const
     {
         std::forward<Func>(func)(_windowSize);
     }
@@ -26,7 +26,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void DebugSlotsSettings::_forEachParam(Func&& func)
+    void DebugSlotsSettings::forEachParam(Func&& func)
     {
         std::forward<Func>(func)(_windowSize);
     }
