@@ -130,7 +130,8 @@
         "insertable",
         "MOLTRACK",
         "MSTD",
-        "NOMINMAX"
+        "NOMINMAX",
+        "unpolish"
     ],
     "files.watcherExclude": {
         "**/.build/**": true,

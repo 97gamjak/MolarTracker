@@ -4,6 +4,12 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Features
+
+#### General Settings
+
+- Add first prototype of settings dialog for a centralized place to set settings
+
 <!-- insertion marker -->
 ## [0.0.5](https://github.com/repo/owner/releases/tag/0.0.5) - 2026-04-18
 

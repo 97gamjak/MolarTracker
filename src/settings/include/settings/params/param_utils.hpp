@@ -4,6 +4,13 @@
 #include <nlohmann/json.hpp>
 #include <utility>
 
+#include "settings/params/bool_param.hpp"
+#include "settings/params/enum_param.hpp"
+#include "settings/params/numeric_param.hpp"
+#include "settings/params/numeric_vec_param.hpp"
+#include "settings/params/string_param.hpp"
+#include "settings/params/version_param.hpp"
+
 namespace settings
 {
     /**
@@ -57,8 +64,8 @@ namespace settings
      */
     template <class T>
     concept HasForEachParam =
-        (requires(T& param) { param._forEachParam([](auto&&) {}); }) &&
-        requires(const T& param) { param._forEachParam([](auto&&) {}); };
+        (requires(T& param) { param.forEachParam([](auto&&) {}); }) &&
+        requires(const T& param) { param.forEachParam([](auto&&) {}); };
 
     /**
      * @brief Concept for parameter containers
@@ -113,6 +120,46 @@ namespace settings
 
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);
     }
+
+    // NOLINTBEGIN(misc-definitions-in-headers)
+
+    template <typename T>
+    constexpr bool is_bool_param = false;
+
+    template <>
+    constexpr bool is_bool_param<BoolParam> = true;
+
+    template <typename T>
+    constexpr bool is_string_param = false;
+
+    template <>
+    constexpr bool is_string_param<StringParam> = true;
+
+    template <typename T>
+    constexpr bool is_numeric_param = false;
+
+    template <typename T>
+    constexpr bool is_numeric_param<NumericParam<T>> = true;
+
+    template <typename T>
+    constexpr bool is_version_param = false;
+
+    template <>
+    constexpr bool is_version_param<VersionParam> = true;
+
+    template <typename T>
+    constexpr bool is_enum_param = false;
+
+    template <typename E>
+    constexpr bool is_enum_param<EnumParam<E>> = true;
+
+    template <typename T>
+    constexpr bool is_numeric_vec_param = false;
+
+    template <typename T, std::size_t N>
+    constexpr bool is_numeric_vec_param<NumericVecParam<T, N>> = true;
+
+    // NOLINTEND(misc-definitions-in-headers)
 
 }   // namespace settings
 

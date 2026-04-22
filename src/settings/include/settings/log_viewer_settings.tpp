@@ -13,7 +13,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void LogViewerSettings::_forEachParam(Func&& func) const
+    void LogViewerSettings::forEachParam(Func&& func) const
     {
         std::forward<Func>(func)(_reloadIntervalSec);
         std::forward<Func>(func)(_autoReload);
@@ -30,7 +30,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void LogViewerSettings::_forEachParam(Func&& func)
+    void LogViewerSettings::forEachParam(Func&& func)
     {
         std::forward<Func>(func)(_reloadIntervalSec);
         std::forward<Func>(func)(_autoReload);

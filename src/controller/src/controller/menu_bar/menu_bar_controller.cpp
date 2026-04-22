@@ -1,5 +1,6 @@
 #include "menu_bar_controller.hpp"
 
+#include "app/app_context.hpp"
 #include "ui/main_window.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 
@@ -61,7 +62,8 @@ namespace controller
 
         _settingsMenuController = std::make_unique<SettingsMenuController>(
             *mainWindow,
-            menuBar.getSettingsMenu()
+            menuBar.getSettingsMenu(),
+            appContext.getSettings()
         );
 
         _helpMenuController = std::make_unique<HelpMenuController>(

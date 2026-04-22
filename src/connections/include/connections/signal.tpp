@@ -10,8 +10,7 @@
  * function to be called whenever the signal is emitted.
  *
  * @tparam Tag
- * @param func The callback function to call when the signal is emitted, it
- * should have the signature void(void* user, const TagType& arg)
+ * @param func The callback function to call when the signal is emitted
  * @param user A user-defined pointer that will be passed to the callback
  * function when it is called, this can be used to provide additional context
  * for the callback function
@@ -44,14 +43,16 @@ Connection Signal<Tag>::connect(CallbackFn func, void* user)
  * the provided argument
  *
  * @tparam Tag
- * @param arg
+ * @tparam Args
+ * @param args
  */
 template <typename Tag>
-void Signal<Tag>::notify(const TagType& arg) const
+template <typename... Args>
+void Signal<Tag>::notify(Args&&... args) const
 {
     const auto copy = _subscribers;
     for (auto const& [_, sub] : copy)
-        sub.func(sub.user, arg);
+        sub.func(sub.user, std::forward<Args>(args)...);
 }
 
 /**

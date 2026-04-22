@@ -329,9 +329,9 @@ namespace settings
     template <typename T>
     void ParamCore<T>::_notifySubscribers()
     {
-        Base::template _emit<OnDirtyChanged>(isDirty());
-        Base::template _emit<ParamValueChanged<T>>(get());
-        Base::template _emit<ParamOptionalChanged<T>>(getOptional());
+        Base::template notify<OnDirtyChanged>(isDirty());
+        Base::template notify<ParamValueChanged<T>>(get());
+        Base::template notify<ParamOptionalChanged<T>>(getOptional());
     }
 
     /**

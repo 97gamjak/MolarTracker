@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include "config/signal_tags.hpp"
 #include "settings/general_settings.hpp"
 #include "settings/logging_settings.hpp"
 #include "settings/params/param_container.hpp"
@@ -41,6 +42,10 @@ namespace settings
         /// functionality for settings
         friend ParamContainerMixin<Settings>;
 
+        /// an observable for the saved signal, this is used to notify
+        /// subscribers when settings are saved
+        Observable<OnSaved> _onSaved;
+
         /// The core container for the settings parameters
         ParamContainer _core;
 
@@ -72,12 +77,16 @@ namespace settings
         [[nodiscard]] LoggingSettings&       getLoggingSettings();
         [[nodiscard]] const LoggingSettings& getLoggingSettings() const;
 
-       private:
         template <typename Func>
-        void _forEachParam(Func&& func) const;
+        void forEachParam(Func&& func) const;
         template <typename Func>
-        void _forEachParam(Func&& func);
+        void forEachParam(Func&& func);
 
+        Connection subscribeToSaved(OnSaved::func func, void* user);
+        void       notifySaved();
+        bool       isDirty() const;
+
+       private:
         void _toJson() const;
         void _fromJson();
     };

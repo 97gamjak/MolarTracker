@@ -57,9 +57,9 @@ const Signal<Tag>& Observable<Tags...>::_getSignal() const
  */
 template <typename... Tags>
 template <typename Tag, typename... Args>
-void Observable<Tags...>::_emit(Args&&... args)
+void Observable<Tags...>::notify(Args&&... args)
 {
-    _getSignal<Tag>().notify(std::forward<Args>(args)...);
+    this->template _getSignal<Tag>().notify(std::forward<Args>(args)...);
 }
 
 /**
@@ -72,8 +72,7 @@ void Observable<Tags...>::_emit(Args&&... args)
  * @tparam Tag The event tag for which to subscribe to the event, this should be
  * one of the tags specified in the template parameter pack of the Observable
  * class
- * @param func The callback function to call when the event is emitted, it
- * should have the signature void(void* user, const typename Tag::TagType& arg)
+ * @param func The callback function to call when the event is emitted
  * @param user A user-defined pointer that will be passed to the callback
  * function when it is called, this can be used to provide additional context
  * for the callback function

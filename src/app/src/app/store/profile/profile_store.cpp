@@ -387,8 +387,8 @@ namespace app
      * @return Connection
      */
     Connection ProfileStore::subscribeToProfileChange(
-        OnProfileChanged::func func,
-        void*                  user
+        const OnProfileChanged::func& func,
+        void*                         user
     )
     {
         return _activeProfile.on<OnProfileChanged>(func, user);

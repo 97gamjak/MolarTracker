@@ -20,14 +20,11 @@ template <typename Tag>
 class Signal
 {
    public:
-    /// Type alias for the type of data that will be passed to the subscribers
-    using TagType = typename Tag::TagType;
-
     /// Type alias for the callback function, this is a function pointer that
     /// takes a pointer to the user data and a const reference to the data
     /// associated with the signal, this is used to define the type of the
     /// callback functions that can be connected to the signal
-    using CallbackFn = void (*)(void*, const TagType&);
+    using CallbackFn = typename Tag::func;
 
    private:
     /**
@@ -51,7 +48,8 @@ class Signal
    public:
     Connection connect(CallbackFn func, void* user);
 
-    void notify(const TagType& arg) const;
+    template <typename... Args>
+    void notify(Args&&... args) const;
 
    private:
     static void _disconnect(void* owner, std::size_t id);
