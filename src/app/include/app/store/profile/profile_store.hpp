@@ -86,8 +86,8 @@ namespace app
         void commit();
 
         Connection subscribeToProfileChange(
-            OnProfileChanged::func func,
-            void*                  user
+            const OnProfileChanged::func& func,
+            void*                         user
         );
 
        private:

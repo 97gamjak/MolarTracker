@@ -1,5 +1,7 @@
 #include "app/store_container.hpp"
 
+#include <algorithm>
+
 #include "app/service_container.hpp"
 #include "logging/log_macros.hpp"
 
@@ -59,6 +61,19 @@ namespace app
     }
 
     /**
+     * @brief Check if any store is dirty
+     *
+     * @return true if any store is dirty, false otherwise
+     */
+    bool StoreContainer::isDirty() const
+    {
+        return std::ranges::any_of(
+            _allStores,
+            [](const auto* store) { return store->isDirty(); }
+        );
+    }
+
+    /**
      * @brief Subscribe to changes in the dirty state of any store, the
      * provided callback function will be called whenever the dirty state of
      * any store changes, the user pointer can be used to pass additional
@@ -77,8 +92,8 @@ namespace app
      * scope
      */
     std::vector<Connection> StoreContainer::subscribeToDirty(
-        OnDirtyChanged::func func,
-        void*                user
+        const OnDirtyChanged::func& func,
+        void*                       user
     )
     {
         std::vector<Connection> connections;

@@ -44,8 +44,11 @@ namespace settings
     template <typename T>
     struct ParamValueChanged
     {
-        /// Type alias for the type of data
-        using TagType = T;
+        /// Type alias for the change callback function for the parameter, this
+        /// is a function pointer that takes a pointer to the user data and the
+        /// new value of the parameter, this is used to notify subscribers when
+        /// the parameter value changes
+        using func = std::function<void(void*, const T& newValue)>;
     };
 
     /**
@@ -59,8 +62,9 @@ namespace settings
     template <typename T>
     struct ParamOptionalChanged
     {
-        /// Type alias for the type of data
-        using TagType = std::optional<T>;
+        /// Type alias for the change callback function for the optional
+        /// parameter
+        using func = std::function<void(void*, const std::optional<T>&)>;
     };
 
     /**

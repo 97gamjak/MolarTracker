@@ -41,6 +41,7 @@ namespace settings
        private:
         /// type alias for NumericParamSchema
         using Schema = NumericParamSchema;
+
         /// friend declaration to allow ParamMixin to access private members of
         /// NumericParam, this is necessary because ParamMixin needs to access
         /// the _core member of NumericParam to implement the functionality for

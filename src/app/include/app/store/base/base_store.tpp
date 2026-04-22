@@ -6,7 +6,6 @@
 
 #include "base_store.hpp"
 #include "config/id_types.hpp"
-#include "filter/predicate.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.BaseStore");
@@ -296,7 +295,7 @@ namespace app
     void BaseStore<T, IdType>::_markPotentiallyDirty()
     {
         _isPotentiallyDirty = true;
-        DirtyObservable::_emit<OnDirtyChanged>(true);
+        DirtyObservable::notify<OnDirtyChanged>(true);
     }
 
     /**
@@ -311,7 +310,7 @@ namespace app
     void BaseStore<T, IdType>::clearPotentiallyDirty()
     {
         _isPotentiallyDirty = false;
-        DirtyObservable::_emit<OnDirtyChanged>(false);
+        DirtyObservable::notify<OnDirtyChanged>(false);
     }
 
     /**

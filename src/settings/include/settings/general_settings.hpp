@@ -108,11 +108,10 @@ namespace settings
         [[nodiscard]] const std::optional<std::string>& getDefaultProfile(
         ) const;
 
-       private:
         template <typename Func>
-        void _forEachParam(Func&& func) const;
+        void forEachParam(Func&& func) const;
         template <typename Func>
-        void _forEachParam(Func&& func);
+        void forEachParam(Func&& func);
     };
 
 }   // namespace settings

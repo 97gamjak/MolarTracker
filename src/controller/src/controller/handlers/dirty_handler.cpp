@@ -41,6 +41,16 @@ namespace controller
 
         _dirtySettingsConnections =
             settings.subscribeToDirty(setTitleDirty, mainWindow);
+
+        _settingsSavedConnection = settings.subscribeToSaved(
+            [&storeContainer](void* user)
+            {
+                if (auto* _mainWindow = static_cast<ui::MainWindow*>(user))
+                    if (!storeContainer.isDirty())
+                        _mainWindow->setWindowTitle(false);
+            },
+            mainWindow
+        );
     }
 
 }   // namespace controller

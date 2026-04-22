@@ -13,7 +13,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void UISettings::_forEachParam(Func&& func) const
+    void UISettings::forEachParam(Func&& func) const
     {
         std::forward<Func>(func)(_logViewerSettings);
         std::forward<Func>(func)(_debugSlotsSettings);
@@ -28,7 +28,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void UISettings::_forEachParam(Func&& func)
+    void UISettings::forEachParam(Func&& func)
     {
         std::forward<Func>(func)(_logViewerSettings);
         std::forward<Func>(func)(_debugSlotsSettings);

@@ -253,6 +253,22 @@ namespace settings
         return static_cast<const Derived&>(*this);
     }
 
+    /**
+     * @brief Check if the parameter has unsaved changes, this can be used to
+     * determine if the user needs to save their changes before exiting the
+     * settings dialog or performing other actions that may discard unsaved
+     * changes
+     *
+     * @tparam Derived
+     * @tparam T
+     * @return true if there are unsaved changes, false otherwise
+     */
+    template <typename Derived, typename T>
+    bool ParamMixin<Derived, T>::isDirty() const
+    {
+        return _self()._core.isDirty();
+    }
+
 }   // namespace settings
 
 #endif   // __SETTINGS__INCLUDE__SETTINGS__PARAMS__PARAM_MIXIN_TPP__

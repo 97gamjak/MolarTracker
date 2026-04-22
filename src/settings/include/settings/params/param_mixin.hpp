@@ -20,6 +20,10 @@ namespace settings
     template <typename Derived, typename T>
     class ParamMixin
     {
+       public:
+        /// alias for the type of the parameter value
+        using value_type = T;
+
        private:
         /// Type alias for the templated change callback function, this is a
         /// function pointer that takes a pointer to the user data and the new
@@ -68,6 +72,8 @@ namespace settings
         void               setRebootRequired(bool required);
 
         void commit();
+
+        [[nodiscard]] bool isDirty() const;
 
        private:
         [[nodiscard]] Derived&       _self();

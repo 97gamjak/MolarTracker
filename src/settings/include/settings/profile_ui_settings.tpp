@@ -13,7 +13,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void ProfileUISettings::_forEachParam(Func&& func) const
+    void ProfileUISettings::forEachParam(Func&& func) const
     {
         std::forward<Func>(func)(_dialogSize);
     }
@@ -26,7 +26,7 @@ namespace settings
      * @param func
      */
     template <typename Func>
-    void ProfileUISettings::_forEachParam(Func&& func)
+    void ProfileUISettings::forEachParam(Func&& func)
     {
         std::forward<Func>(func)(_dialogSize);
     }

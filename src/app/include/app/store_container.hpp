@@ -39,10 +39,11 @@ namespace app
 
         void commit();
         void clearPotentiallyDirty();
+        bool isDirty() const;
 
         std::vector<Connection> subscribeToDirty(
-            OnDirtyChanged::func func,
-            void*                user
+            const OnDirtyChanged::func& func,
+            void*                       user
         );
 
         [[nodiscard]] ProfileStore&       getProfileStore();

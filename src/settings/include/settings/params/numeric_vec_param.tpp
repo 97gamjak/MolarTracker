@@ -2,6 +2,7 @@
 #define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
 
 #include "numeric_vec_param.hpp"
+#include "settings/params/numeric_param.hpp"
 
 namespace settings
 {
@@ -135,6 +136,108 @@ namespace settings
     requires(N == 2)
     {
         setMinValues(std::vector<T>{minValues.first, minValues.second});
+    }
+
+    /**
+     * @brief Get the value of the numeric vector parameter at the specified
+     * index, this function returns the current value of the individual numeric
+     * parameter at the given index in the vector
+     *
+     * @tparam T
+     * @tparam N
+     * @param index The index of the numeric parameter to get the value of
+     * @return T The current value of the numeric parameter at the specified
+     * index
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    const T& NumericVecParam<T, N>::get(std::size_t index) const
+    {
+        if (index >= N)
+            throw ParamException("Index out of range for NumericVecParam");
+
+        return _params[index].get();
+    }
+
+    /**
+     * @brief Get the individual numeric parameter at the specified index, this
+     * function returns a reference to the NumericParam object at the given
+     * index in the vector, this can be used to access additional functionality
+     * of the individual numeric parameters such as setting limits, default
+     * values, etc.
+     *
+     * @tparam T
+     * @tparam N
+     * @param index The index of the numeric parameter to get
+     * @return const NumericParam<T>& A const reference to the NumericParam
+     * object at the specified index
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    const NumericParam<T>& NumericVecParam<T, N>::getParam(
+        std::size_t index
+    ) const
+    {
+        if (index >= N)
+            throw ParamException("Index out of range for NumericVecParam");
+
+        return _params[index];
+    }
+
+    /**
+     * @brief Get the individual numeric parameter at the specified index, this
+     * function returns a reference to the NumericParam object at the given
+     * index in the vector, this can be used to access additional functionality
+     * of the individual numeric parameters such as setting limits, default
+     * values, etc.
+     *
+     * @tparam T
+     * @tparam N
+     * @param index The index of the numeric parameter to get
+     * @return NumericParam<T>& A reference to the NumericParam object at the
+     * specified index
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    NumericParam<T>& NumericVecParam<T, N>::getParam(std::size_t index)
+    {
+        if (index >= N)
+            throw ParamException("Index out of range for NumericVecParam");
+
+        return _params[index];
+    }
+
+    /**
+     * @brief Set the value of the numeric vector parameter at the specified
+     * index, this function sets the value of the individual numeric parameter
+     * at the given index in the vector, it checks if the value is within the
+     * specified range for that parameter before setting it, if the value is out
+     * of range, an error is returned in the std::expected return type
+     *
+     * @tparam T
+     * @tparam N
+     * @param index The index of the numeric parameter to set the value of
+     * @param value The value to set for the numeric parameter at the specified
+     * index
+     * @return std::expected<void, ParamError> An object representing either a
+     * successful operation or an error if the value is out of range or if the
+     * index is invalid
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    std::expected<void, ParamError> NumericVecParam<T, N>::set(
+        std::size_t index,
+        const T&    value
+    )
+    {
+        if (index >= N)
+        {
+            return std::unexpected(
+                ParamError("Index out of range for NumericVecParam")
+            );
+        }
+
+        return _params[index].set(value);
     }
 
     /**
@@ -335,6 +438,91 @@ namespace settings
     requires(N == 3)
     {
         return _params[2].get();
+    }
+
+    /**
+     * @brief Check if any of the individual numeric parameters in the vector is
+     * dirty, this function checks the dirty state of each individual numeric
+     * parameter in the vector and returns true if any of them is dirty,
+     * otherwise it returns false
+     *
+     * @tparam T
+     * @tparam N
+     * @return true if any of the individual numeric parameters in the vector is
+     * dirty, false otherwise
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    bool NumericVecParam<T, N>::isDirty() const
+    {
+        for (const auto& param : _params)
+        {
+            if (param.isDirty())
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * @brief Get the title of the numeric vector parameter, this function
+     * returns the title that was set for the numeric vector parameter, this is
+     * a user-friendly name that can be displayed in the UI to represent this
+     * parameter
+     *
+     * @tparam T
+     * @tparam N
+     * @return std::string The title of the numeric vector parameter
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    std::string NumericVecParam<T, N>::getTitle() const
+    {
+        return _title;
+    }
+
+    /**
+     * @brief Get the description of the numeric vector parameter, this function
+     * returns the description that was set for the numeric vector parameter,
+     * this is a user-friendly string that can be displayed in the UI to provide
+     * more information about what this parameter represents and how it should
+     * be used
+     *
+     * @tparam T
+     * @tparam N
+     * @return std::string The description of the numeric vector
+     * parameter
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    std::string NumericVecParam<T, N>::getDescription() const
+    {
+        return _description;
+    }
+
+    /**
+     * @brief Get a string representation of the numeric vector parameter, this
+     * function creates a string that represents the current state of the
+     * numeric vector parameter, including the values of each individual numeric
+     * parameter in the vector, this can be useful for debugging or logging
+     *
+     * @tparam T
+     * @tparam N
+     * @return std::string A string representation of the numeric vector
+     * parameter
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    std::string NumericVecParam<T, N>::toString() const
+    {
+        std::string result = "NumericVecParam(";
+        for (std::size_t i = 0; i < N; ++i)
+        {
+            result += std::to_string(_params[i].get());
+            if (i < N - 1)
+                result += ", ";
+        }
+        result += ")";
+        return result;
     }
 
 }   // namespace settings

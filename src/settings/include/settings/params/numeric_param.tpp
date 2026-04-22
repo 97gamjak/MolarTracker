@@ -92,13 +92,20 @@ namespace settings
 
         if (!minCheck || !maxCheck)
         {
+            const auto minStr = _minValue.has_value()
+                                    ? std::to_string(_minValue.value())
+                                    : "unbounded";
+            const auto maxStr = _maxValue.has_value()
+                                    ? std::to_string(_maxValue.value())
+                                    : "unbounded";
+
             const auto errorMessage = std::format(
                 "Value {} is out of range for parameter: {}, valid range is "
                 "[{} - {}]",
                 value,
                 _core.getKey(),
-                _minValue,
-                _maxValue
+                minStr,
+                maxStr
             );
             return std::unexpected(ParamError(errorMessage));
         }
