@@ -21,6 +21,7 @@ namespace settings
     class ParamMixin
     {
        public:
+        /// alias for the type of the parameter value
         using value_type = T;
 
        private:

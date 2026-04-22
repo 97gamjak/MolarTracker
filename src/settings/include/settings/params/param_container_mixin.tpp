@@ -197,6 +197,18 @@ namespace settings
         return static_cast<const Derived&>(*this);
     }
 
+    /**
+     * @brief Check if any parameter in the container is dirty, this will check
+     * the dirty state of all parameters in the container and return true if any
+     * parameter is dirty, otherwise it will return false, the exact behavior of
+     * this method will depend on the implementation of the parameters and how
+     * they track their dirty state, but it will generally involve calling an
+     * isDirty() method on each parameter and checking if any of them return
+     * true
+     *
+     * @tparam Derived
+     * @return true if any parameter in the container is dirty, false otherwise
+     */
     template <typename Derived>
     bool ParamContainerMixin<Derived>::isDirty() const
     {

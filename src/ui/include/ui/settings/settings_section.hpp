@@ -26,6 +26,8 @@ namespace ui
     class SettingsSection : public QWidget
     {
        private:
+        /// Connections for all params in this section, used for cleanup on
+        /// section destruction
         std::vector<Connection> _connections;
 
        public:

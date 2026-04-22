@@ -42,6 +42,8 @@ namespace settings
         /// functionality for settings
         friend ParamContainerMixin<Settings>;
 
+        /// an observable for the saved signal, this is used to notify
+        /// subscribers when settings are saved
         Observable<OnSaved> _onSaved;
 
         /// The core container for the settings parameters

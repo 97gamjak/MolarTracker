@@ -22,14 +22,19 @@ namespace ui
     class SettingsSidebar : public QWidget
     {
        public:
+        /// Type alias for the section selected callback function
         using OnSectionSelected = std::function<void(int index)>;
 
        private:
-        QTreeWidget*      _tree{nullptr};
+        /// Pointer to the tree widget that displays the sections in the sidebar
+        QTreeWidget* _tree{nullptr};
+        /// Callback function that is called when a section is selected
         OnSectionSelected _onSectionSelected;
 
+        /// Custom data role for storing the stack index
         static constexpr int kStackIndexRole = Qt::UserRole;
-        static constexpr int kBaseTitleRole  = Qt::UserRole + 1;
+        /// Custom data role for storing the base title (without dirty dot)
+        static constexpr int kBaseTitleRole = Qt::UserRole + 1;
 
        public:
         explicit SettingsSidebar(QWidget* parent);
@@ -46,14 +51,13 @@ namespace ui
         void setSectionDirty(int index, bool dirty);
         void selectByStackIndex(int stackIndex);
         void setOnSectionSelected(OnSectionSelected callback);
-        void _onItemClicked(QTreeWidgetItem* item, int /*column*/);
 
         [[nodiscard]] int count() const;
 
        private:
         [[nodiscard]]
         QTreeWidgetItem* _findByStackIndex(int stackIndex) const;
-        void             _onItemClicked(QTreeWidgetItem* item);
+        void             _onItemClicked(QTreeWidgetItem* item, int /*column*/);
     };
 
 }   // namespace ui

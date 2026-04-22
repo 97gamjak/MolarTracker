@@ -20,8 +20,16 @@ struct OnDirtyChanged
     using func = std::function<void(void*, const bool& isDirty)>;
 };
 
+/**
+ * @brief Signal tag for when settings are saved, this can be used to emit an
+ * event when the settings are saved, allowing other parts of the application to
+ * react to the save event, such as updating the UI or saving changes to the
+ * database.
+ *
+ */
 struct OnSaved
 {
+    /// Type alias for the change callback function for when settings are saved
     using func = std::function<void(void*)>;
 };
 

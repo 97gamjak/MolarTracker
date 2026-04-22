@@ -12,6 +12,14 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Settings Section< T Section>:: Settings Section
+     * object
+     *
+     * @tparam TSection
+     * @param section
+     * @param mode
+     */
     template <settings::IsParamContainer TSection>
     SettingsSection<TSection>::SettingsSection(
         TSection&   section,
@@ -21,12 +29,31 @@ namespace ui
         _build(section, mode);
     }
 
+    /**
+     * @brief get the connections for the section
+     *
+     * @tparam TSection
+     * @return std::vector<Connection>&
+     */
     template <settings::IsParamContainer TSection>
     std::vector<Connection>& SettingsSection<TSection>::getConnections()
     {
         return _connections;
     }
 
+    /**
+     * @brief build the UI for the settings section, this function creates the
+     * header and the form layout for the section, it also builds one row per
+     * parameter in the section by calling buildParamRows for each parameter,
+     * which creates the appropriate editor widget for each parameter type and
+     * adds it to the form layout, the connections for each parameter editor are
+     * stored in the _connections vector for later cleanup
+     *
+     * @tparam TSection
+     * @param section The ParamContainer section to build the UI for
+     * @param mode The SectionMode to determine which parameters to show (leaves
+     * only, subcontainers only, or all)
+     */
     template <settings::IsParamContainer TSection>
     void SettingsSection<TSection>::_build(TSection& section, SectionMode mode)
     {

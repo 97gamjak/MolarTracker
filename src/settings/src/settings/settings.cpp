@@ -127,13 +127,38 @@ namespace settings
         }
     }
 
+    /**
+     * @brief subscribe to settings saved event, this allows subscribers to be
+     * notified when settings are saved, the provided callback function will be
+     * called whenever the settings are saved, the user pointer can be used to
+     * pass additional data to the callback function, the returned Connection
+     * object can be used to unsubscribe from changes
+     *
+     * @param func
+     * @param user
+     * @return Connection
+     */
     Connection Settings::subscribeToSaved(OnSaved::func func, void* user)
     {
         return _onSaved.on<OnSaved>(std::move(func), user);
     }
 
+    /**
+     * @brief Notify subscribers that settings have been saved, this should be
+     * called after saving settings to ensure that subscribers are notified of
+     * the change
+     *
+     */
     void Settings::notifySaved() { _onSaved.notify<OnSaved>(); }
 
+    /**
+     * @brief check if any settings parameter is dirty, this checks the dirty
+     * state of all parameters in the settings, if any parameter is dirty, this
+     * function will return true, otherwise it will return false.
+     *
+     * @return true
+     * @return false
+     */
     bool Settings::isDirty() const
     {
         bool isDirty = false;

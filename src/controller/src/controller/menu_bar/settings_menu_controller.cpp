@@ -17,6 +17,7 @@ namespace controller
      *
      * @param mainWindow
      * @param settingsMenu
+     * @param settings
      */
     SettingsMenuController::SettingsMenuController(
         QMainWindow&        mainWindow,

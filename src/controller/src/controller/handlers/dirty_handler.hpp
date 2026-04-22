@@ -34,6 +34,8 @@ namespace controller
         /// Connections for tracking dirty state changes in settings
         std::vector<Connection> _dirtySettingsConnections;
 
+        /// Connection for tracking when settings are saved, used to update the
+        /// window title when settings are saved and there are no dirty stores
         Connection _settingsSavedConnection;
 
        public:

@@ -37,26 +37,37 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// Fixed width for the sidebar
         static constexpr size_t _sideBarWidth = 160;
 
+        /// Reference to the application settings
         settings::Settings& _settings;
 
+        /// Pointer to the sidebar widget
         SettingsSidebar* _sidebar{nullptr};
-        QStackedWidget*  _stack{nullptr};
-        QLabel*          _unsavedLabel{nullptr};
+        /// Pointer to the stacked widget that holds the settings sections
+        QStackedWidget* _stack{nullptr};
+        /// Pointer to the label that indicates if there are unsaved changes
+        QLabel* _unsavedLabel{nullptr};
 
-        // Connection lifetimes for all dirty subscriptions
+        /// Connection lifetimes for all dirty subscriptions
         std::vector<Connection> _connections;
 
-        // Heap-allocated dirty callback contexts — one per section.
-        // Freed in destructor after _connections are disconnected.
+        /// forward declaration of the dirty callback context struct
         struct DirtyContext;
+        /// Heap-allocated dirty callback contexts — one per section.
+        /// Freed in destructor after _connections are disconnected.
         std::vector<std::unique_ptr<DirtyContext>> _dirtyContexts;
 
        public:
         explicit SettingsDialog(settings::Settings& settings, QWidget* parent);
 
        signals:
+        /**
+         * @brief signal emitted when the user clicks the Save button in the
+         * settings dialog
+         *
+         */
         void saveRequested();
 
        private:
@@ -66,10 +77,22 @@ namespace ui
         static void _onSectionDirty(void* userData, const bool& isDirty);
     };
 
+    /**
+     * @brief Context struct for dirty state callbacks, holds a pointer to the
+     * dialog and the index of the section in the sidebar/stack. This allows the
+     * callback to update the correct section's dirty indicator and the overall
+     * unsaved label when any param in that section changes.
+     */
     struct SettingsDialog::DirtyContext
     {
+        /// Pointer back to the dialog, used to call member functions to update
+        /// the UI when dirty state changes
         SettingsDialog* dialog;
-        int             index;
+
+        /// The index of the section in the sidebar/stack that this context is
+        /// associated with, used to update the correct dirty indicator in the
+        /// sidebar when dirty state changes
+        int index;
     };
 
 }   // namespace ui

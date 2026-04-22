@@ -9,14 +9,24 @@ class QVBoxLayout;
 namespace ui
 {
 
+    /**
+     * @brief Initial overview page for settings, shows cards for each section
+     * with title, description, and navigation button. Clicking a card navigates
+     * to the corresponding section in the sidebar/stack.
+     */
     class SettingsOverview : public QWidget
     {
        public:
+        /// Type alias for the navigation callback function
         using OnNavigate = std::function<void(int stackIndex)>;
 
        private:
+        /// Layout for the section cards
         QVBoxLayout* _cardsLayout{nullptr};
-        OnNavigate   _onNavigate;
+
+        /// Navigation callback function, called when a card is clicked with the
+        /// stack index to navigate to
+        OnNavigate _onNavigate;
 
        public:
         explicit SettingsOverview(const QString& title);

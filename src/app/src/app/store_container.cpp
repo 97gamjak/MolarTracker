@@ -60,6 +60,11 @@ namespace app
             store->clearPotentiallyDirty();
     }
 
+    /**
+     * @brief Check if any store is dirty
+     *
+     * @return true if any store is dirty, false otherwise
+     */
     bool StoreContainer::isDirty() const
     {
         return std::ranges::any_of(

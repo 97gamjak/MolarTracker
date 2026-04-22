@@ -17,6 +17,12 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Settings Dialog:: Settings Dialog object
+     *
+     * @param settings
+     * @param parent
+     */
     SettingsDialog::SettingsDialog(
         settings::Settings& settings,
         QWidget*            parent
@@ -30,6 +36,10 @@ namespace ui
         _applyStyleSheet();
     }
 
+    /**
+     * @brief build the UI for the settings dialog
+     *
+     */
     void SettingsDialog::_build()
     {
         // ── Root layout
@@ -193,7 +203,7 @@ namespace ui
                     if constexpr (settings::IsParamContainer<P>)
                     {
                         const int subStackIndex = _stack->count();
-                        _sidebar->addChild(
+                        ui::SettingsSidebar::addChild(
                             parentItem,
                             QString::fromStdString(param.getTitle()),
                             subStackIndex
@@ -222,6 +232,15 @@ namespace ui
         _sidebar->selectByStackIndex(0);   // Select first section by default
     }
 
+    /**
+     * @brief Update the visibility of the unsaved changes label based on the
+     * dirty state of the settings, this checks if any section in the settings
+     * is dirty (has uncommitted changes), and if so, it shows the unsaved
+     * changes label, otherwise it hides it. This should be called whenever a
+     * section's dirty state changes to ensure that the label accurately
+     * reflects whether there are unsaved changes in any section.
+     *
+     */
     void SettingsDialog::_updateUnsavedLabel()
     {
         // Any section dirty → show the label
@@ -230,6 +249,20 @@ namespace ui
         _unsavedLabel->setVisible(anyDirty);
     }
 
+    /**
+     * @brief Callback function for when a section's dirty state changes, this
+     * is called whenever any parameter in a section changes its dirty state,
+     * it updates the dirty indicator for that section in the sidebar and also
+     * updates the overall unsaved changes label in the bottom bar by calling
+     * _updateUnsavedLabel()
+     *
+     * @param userData A pointer to a DirtyContext struct that contains a
+     * pointer to the dialog and the index of the section that changed, this is
+     * used to update the correct section's dirty indicator in the sidebar and
+     * to call _updateUnsavedLabel() on the dialog
+     * @param isDirty The new dirty state of the section, true if there are
+     * uncommitted changes in that section, false otherwise
+     */
     void SettingsDialog::_onSectionDirty(void* userData, const bool& isDirty)
     {
         auto* ctx = static_cast<DirtyContext*>(userData);
@@ -237,6 +270,10 @@ namespace ui
         ctx->dialog->_updateUnsavedLabel();
     }
 
+    /**
+     * @brief apply the stylesheet for the settings dialog
+     *
+     */
     void SettingsDialog::_applyStyleSheet()
     {
         setStyleSheet(R"(

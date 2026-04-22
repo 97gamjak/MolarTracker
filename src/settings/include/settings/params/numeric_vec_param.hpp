@@ -40,8 +40,10 @@ namespace settings
     class NumericVecParam : public Observable<OnDirtyChanged>
     {
        public:
+        /// The size of the vector
         constexpr static std::size_t size = N;
 
+        /// Alias for the type of the numeric values in the vector
         using value_type = T;
 
        private:

@@ -159,6 +159,19 @@ namespace settings
         return _params[index].get();
     }
 
+    /**
+     * @brief Get the individual numeric parameter at the specified index, this
+     * function returns a reference to the NumericParam object at the given
+     * index in the vector, this can be used to access additional functionality
+     * of the individual numeric parameters such as setting limits, default
+     * values, etc.
+     *
+     * @tparam T
+     * @tparam N
+     * @param index The index of the numeric parameter to get
+     * @return const NumericParam<T>& A const reference to the NumericParam
+     * object at the specified index
+     */
     template <typename T, std::size_t N>
     requires(N > 1)
     const NumericParam<T>& NumericVecParam<T, N>::getParam(
@@ -171,6 +184,19 @@ namespace settings
         return _params[index];
     }
 
+    /**
+     * @brief Get the individual numeric parameter at the specified index, this
+     * function returns a reference to the NumericParam object at the given
+     * index in the vector, this can be used to access additional functionality
+     * of the individual numeric parameters such as setting limits, default
+     * values, etc.
+     *
+     * @tparam T
+     * @tparam N
+     * @param index The index of the numeric parameter to get
+     * @return NumericParam<T>& A reference to the NumericParam object at the
+     * specified index
+     */
     template <typename T, std::size_t N>
     requires(N > 1)
     NumericParam<T>& NumericVecParam<T, N>::getParam(std::size_t index)
