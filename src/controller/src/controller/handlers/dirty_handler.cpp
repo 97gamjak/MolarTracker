@@ -2,7 +2,6 @@
 
 #include "app/app_context.hpp"
 #include "app/store_container.hpp"
-#include "logging/log_macros.hpp"
 #include "settings/settings.hpp"
 #include "ui/main_window.hpp"
 
