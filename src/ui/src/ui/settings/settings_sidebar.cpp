@@ -2,21 +2,25 @@
 
 #include <QTreeWidget>
 
+#include "utils/qt_helpers.hpp"
+
 namespace ui
 {
 
     SettingsSidebar::SettingsSidebar(QWidget* parent) : QWidget(parent)
     {
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = utils::makeQChild<QVBoxLayout>(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
-        _tree = new QTreeWidget(this);
+        _tree = utils::makeQChild<QTreeWidget>(this);
         _tree->setObjectName("settingsSidebar");
         _tree->setHeaderHidden(true);
         _tree->setFrameShape(QFrame::NoFrame);
         _tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        _tree->setIndentation(12);
+
+        constexpr std::size_t indentation = 12;
+        _tree->setIndentation(indentation);
         _tree->setAnimated(true);
 
         connect(
@@ -31,7 +35,7 @@ namespace ui
 
     void SettingsSidebar::addTopLevel(const QString& title, int stackIndex)
     {
-        auto* item = new QTreeWidgetItem(_tree);
+        auto* item = utils::makeQChild<QTreeWidgetItem>(_tree);
         item->setText(0, title);
         item->setData(0, kStackIndexRole, stackIndex);
         item->setData(0, kBaseTitleRole, title);
@@ -45,7 +49,7 @@ namespace ui
         int            stackIndex
     )
     {
-        auto* item = new QTreeWidgetItem(_tree);
+        auto* item = utils::makeQChild<QTreeWidgetItem>(_tree);
         item->setText(0, title);
         item->setData(0, kStackIndexRole, stackIndex);
         item->setData(0, kBaseTitleRole, title);
@@ -62,7 +66,7 @@ namespace ui
         int              stackIndex
     )
     {
-        auto* item = new QTreeWidgetItem(parent);
+        auto* item = utils::makeQChild<QTreeWidgetItem>(parent);
         item->setText(0, title);
         item->setData(0, kStackIndexRole, stackIndex);
         item->setData(0, kBaseTitleRole, title);
@@ -71,9 +75,9 @@ namespace ui
         );
     }
 
-    void SettingsSidebar::setSectionDirty(int stackIndex, bool dirty)
+    void SettingsSidebar::setSectionDirty(int index, bool dirty)
     {
-        auto* item = _findByStackIndex(stackIndex);
+        auto* item = _findByStackIndex(index);
         if (item == nullptr)
             return;
 

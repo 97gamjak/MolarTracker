@@ -1,9 +1,12 @@
 #ifndef __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_HPP__
 #define __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_HPP__
 
+#include <cstdint>
 #include <vector>
 
 #include "connections/connection.hpp"
+#include "settings/params/bool_param.hpp"
+#include "settings/params/string_param.hpp"
 
 class QWidget;       // Forward declaration
 class QFormLayout;   // Forward declaration
@@ -26,9 +29,21 @@ namespace ui
     template <typename TParam>
     [[nodiscard]] QWidget* makeParamEditor(TParam& param);
 
+    [[nodiscard]] QWidget* makeBoolEditor(settings::BoolParam& param);
+    [[nodiscard]] QWidget* makeStringEditor(settings::StringParam& param);
+
+    template <typename T>
+    [[nodiscard]] QWidget* makeNumericEditor(T& param);
+
+    template <typename T>
+    [[nodiscard]] QWidget* makeNumericVecEditor(T& param);
+
+    template <typename T>
+    [[nodiscard]] QWidget* makeEnumEditor(T& param);
+
     void onDirtyStripe(void* userData, const bool& isDirty);
 
-    enum class SectionMode
+    enum class SectionMode : std::uint8_t
     {
         LeavesOnly,
         SubContainersOnly,

@@ -2,6 +2,7 @@
 
 #include "app/app_context.hpp"
 #include "app/store_container.hpp"
+#include "logging/log_macros.hpp"
 #include "settings/settings.hpp"
 #include "ui/main_window.hpp"
 
@@ -41,6 +42,16 @@ namespace controller
 
         _dirtySettingsConnections =
             settings.subscribeToDirty(setTitleDirty, mainWindow);
+
+        _settingsSavedConnection = settings.subscribeToSaved(
+            [&storeContainer](void* user)
+            {
+                if (auto* _mainWindow = static_cast<ui::MainWindow*>(user))
+                    if (!storeContainer.isDirty())
+                        _mainWindow->setWindowTitle(false);
+            },
+            mainWindow
+        );
     }
 
 }   // namespace controller

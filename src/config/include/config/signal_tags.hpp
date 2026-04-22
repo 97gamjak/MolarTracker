@@ -1,6 +1,7 @@
 #ifndef __CONFIG__INCLUDE__CONFIG__SIGNAL_TAGS_HPP__
 #define __CONFIG__INCLUDE__CONFIG__SIGNAL_TAGS_HPP__
 
+#include <functional>
 #include <optional>
 
 #include "config/id_types.hpp"
@@ -15,11 +16,13 @@
  */
 struct OnDirtyChanged
 {
-    /// Type alias for the type of data associated with the event
-    using TagType = bool;
-
     /// Type alias for the change callback function for the dirty state
-    using func = void (*)(void*, const bool& isDirty);
+    using func = std::function<void(void*, const bool& isDirty)>;
+};
+
+struct OnSaved
+{
+    using func = std::function<void(void*)>;
 };
 
 /**
@@ -31,11 +34,9 @@ struct OnDirtyChanged
  */
 struct OnProfileChanged
 {
-    /// Type alias for the type of data associated with the event
-    using TagType = std::optional<ProfileId>;
-
     /// Type alias for the change callback function for the dirty state
-    using func = void (*)(void*, const TagType& profileId);
+    using func =
+        std::function<void(void*, const std::optional<ProfileId>& profileId)>;
 };
 
 #endif   // __CONFIG__INCLUDE__CONFIG__SIGNAL_TAGS_HPP__

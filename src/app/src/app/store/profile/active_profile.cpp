@@ -29,7 +29,7 @@ namespace app
     void ActiveProfile::set(const std::optional<ProfileId>& profileId)
     {
         _value = profileId;
-        _emit<OnProfileChanged>(_value);
+        notify<OnProfileChanged>(_value);
     }
 
     /**
@@ -39,6 +39,6 @@ namespace app
     void ActiveProfile::unset()
     {
         _value.reset();
-        _emit<OnProfileChanged>(std::nullopt);
+        notify<OnProfileChanged>(std::nullopt);
     }
 }   // namespace app

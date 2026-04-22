@@ -2,6 +2,7 @@
 #define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
 
 #include "numeric_vec_param.hpp"
+#include "settings/params/numeric_param.hpp"
 
 namespace settings
 {
@@ -153,10 +154,31 @@ namespace settings
     const T& NumericVecParam<T, N>::get(std::size_t index) const
     {
         if (index >= N)
-        {
             throw ParamException("Index out of range for NumericVecParam");
-        }
+
         return _params[index].get();
+    }
+
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    const NumericParam<T>& NumericVecParam<T, N>::getParam(
+        std::size_t index
+    ) const
+    {
+        if (index >= N)
+            throw ParamException("Index out of range for NumericVecParam");
+
+        return _params[index];
+    }
+
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    NumericParam<T>& NumericVecParam<T, N>::getParam(std::size_t index)
+    {
+        if (index >= N)
+            throw ParamException("Index out of range for NumericVecParam");
+
+        return _params[index];
     }
 
     /**

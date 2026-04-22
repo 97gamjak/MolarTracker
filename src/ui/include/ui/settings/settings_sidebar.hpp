@@ -37,7 +37,7 @@ namespace ui
         void             addTopLevel(const QString& title, int stackIndex);
         QTreeWidgetItem* addParent(const QString& title, int stackIndex);
 
-        void addChild(
+        static void addChild(
             QTreeWidgetItem* parent,
             const QString&   title,
             int              stackIndex

@@ -1,6 +1,7 @@
 #ifndef __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_TPP__
 #define __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_TPP__
 
+#include <qabstractspinbox.h>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
 #include <qcombobox.h>
@@ -18,6 +19,159 @@
 
 namespace ui
 {
+    template <typename TSpinBox, typename T>
+    void makeNumericEditorHelper(TSpinBox* spinBox, const T& param)
+    {
+        using type = std::conditional_t<
+            std::is_floating_point_v<typename T::value_type>,
+            double,
+            int>;
+
+        const auto min = static_cast<type>(
+            param.getMinValue().value_or(std::numeric_limits<type>::lowest())
+        );
+
+        const auto max = static_cast<type>(
+            param.getMaxValue().value_or(std::numeric_limits<type>::max())
+        );
+
+        spinBox->setRange(min, max);
+
+        spinBox->setValue(static_cast<type>(param.get()));
+    }
+
+    template <typename TSpinBox, typename T>
+    void makeNumericEditorEditing(TSpinBox* spinBox, T& param)
+    {
+        QObject::connect(
+            spinBox,
+            &TSpinBox::editingFinished,
+            [spinBox, &param]()
+            {
+                const auto result = param.set(
+                    static_cast<typename T::value_type>(spinBox->value())
+                );
+
+                using type = std::conditional_t<
+                    std::is_floating_point_v<typename T::value_type>,
+                    double,
+                    int>;
+
+                if (!result.has_value())
+                    spinBox->setValue(static_cast<type>(param.get()));
+            }
+        );
+    }
+
+    template <typename T>
+    QWidget* makeNumericEditor(T& param)
+    {
+        using ValueType = T::value_type;
+
+        if constexpr (std::floating_point<ValueType>)
+        {
+            auto* spinBox = utils::makeQChild<QDoubleSpinBox>();
+            spinBox->setDecimals(
+                static_cast<int>(param.getPrecision().value_or(4))
+            );
+            makeNumericEditorHelper(spinBox, param);
+
+            QObject::connect(
+                spinBox,
+                &QDoubleSpinBox::editingFinished,
+                [spinBox, &param]()
+                { makeNumericEditorEditing(spinBox, param); }
+            );
+
+            return spinBox;
+        }
+        else
+        {
+            auto* spinBox = utils::makeQChild<QSpinBox>();
+            makeNumericEditorHelper(spinBox, param);
+
+            QObject::connect(
+                spinBox,
+                &QSpinBox::editingFinished,
+                [spinBox, &param]()
+                { makeNumericEditorEditing(spinBox, param); }
+            );
+
+            return spinBox;
+        }
+    }
+
+    template <typename T>
+    QWidget* makeNumericVecEditor(T& param)
+    {
+        constexpr std::size_t spacing         = 6;
+        constexpr std::size_t numberOfEntries = T::size;
+
+        auto* container = utils::makeQChild<QWidget>();
+        auto* layout    = utils::makeQChild<QHBoxLayout>(container);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(spacing);
+
+        const std::vector<const char*> xyzLabels = {"x", "y", "z"};
+
+        auto makeComponentEditor = [&](std::size_t index)
+        {
+            const char* labelText =
+                (numberOfEntries <= 3) ? xyzLabels[index] : nullptr;
+
+            if (labelText != nullptr)
+            {
+                auto* lbl = new QLabel(QString(labelText));
+                lbl->setStyleSheet("color: #6a7a8a; font-size: 11px;");
+                layout->addWidget(lbl);
+            }
+
+            layout->addWidget(makeNumericEditor(param.getParam(index)));
+        };
+
+        // Unroll compile-time indices
+        [&]<std::size_t... Is>(std::index_sequence<Is...>)
+        {
+            (makeComponentEditor(Is), ...);
+        }(std::make_index_sequence<numberOfEntries>{});
+
+        layout->addStretch();
+        return container;
+    }
+
+    template <typename T>
+    QWidget* makeEnumEditor(T& param)
+    {
+        auto* comboBox = utils::makeQChild<QComboBox>();
+
+        const auto& entries = T::EnumMeta::values;
+
+        for (const auto& entry : entries)
+            comboBox->addItem(
+                QString::fromStdString(T::EnumMeta::toString(entry))
+            );
+
+        // Set current index from current value
+        const auto currentValue = param.get();
+        const auto index        = T::EnumMeta::index(currentValue);
+
+        if (index.has_value())
+            comboBox->setCurrentIndex(static_cast<int>(index.value()));
+
+        QObject::connect(
+            comboBox,
+            &QComboBox::currentIndexChanged,
+            [comboBox, &param, entries](int idx)
+            {
+                if (idx >= 0 && idx < static_cast<int>(entries.size()))
+                {
+                    param.set(entries[static_cast<std::size_t>(idx)]);
+                }
+            }
+        );
+
+        return comboBox;
+    }
 
     /**
      * @brief Creates an editor QWidget for any param type.
@@ -32,252 +186,32 @@ namespace ui
      * labels) EnumParam       → QComboBox VersionParam    → QLabel (read-only)
      */
     template <typename TParam>
-    [[nodiscard]] QWidget* makeParamEditor(TParam& param)
+    QWidget* makeParamEditor(TParam& param)
     {
         using P = std::remove_cvref_t<TParam>;
 
         if constexpr (settings::is_bool_param<P>)
-        {
-            auto* cb = new QCheckBox();
-            cb->setChecked(param.get());
-            cb->setTristate(false);
-
-            QObject::connect(
-                cb,
-                &QCheckBox::toggled,
-                [&param](bool checked)
-                {
-                    param.set(checked);
-                    param.commit();
-                }
-            );
-
-            return cb;
-        }
+            return makeBoolEditor(param);
         else if constexpr (settings::is_string_param<P>)
-        {
-            auto* le = new QLineEdit();
-            le->setText(QString::fromStdString(param.get()));
-            le->setMinimumWidth(200);
-
-            QObject::connect(
-                le,
-                &QLineEdit::editingFinished,
-                [le, &param]()
-                {
-                    param.set(le->text().toStdString());
-                    param.commit();
-                }
-            );
-
-            return le;
-        }
+            return makeStringEditor(param);
         else if constexpr (settings::is_numeric_param<P>)
         {
-            using ValueType = typename P::value_type;
-
-            if constexpr (std::floating_point<ValueType>)
-            {
-                auto* sb = utils::makeQChild<QDoubleSpinBox>();
-                sb->setDecimals(4);
-                sb->setRange(
-                    param.getMinValue().value_or(
-                        std::numeric_limits<ValueType>::lowest()
-                    ),
-                    param.getMaxValue().value_or(
-                        std::numeric_limits<ValueType>::max()
-                    )
-                );
-                sb->setValue(static_cast<double>(param.get()));
-
-                QObject::connect(
-                    sb,
-                    &QDoubleSpinBox::editingFinished,
-                    [sb, &param]()
-                    {
-                        const auto result =
-                            param.set(static_cast<ValueType>(sb->value()));
-
-                        if (result.has_value())
-                            param.commit();
-                        else
-                            sb->setValue(static_cast<int>(param.get()));
-                    }
-                );
-
-                return sb;
-            }
-            else
-            {
-                auto* sb = utils::makeQChild<QSpinBox>();
-                sb->setRange(
-                    static_cast<int>(param.getMinValue().value_or(
-                        std::numeric_limits<int>::lowest()
-                    )),
-                    static_cast<int>(param.getMaxValue().value_or(
-                        std::numeric_limits<int>::max()
-                    ))
-                );
-                sb->setValue(static_cast<int>(param.get()));
-
-                QObject::connect(
-                    sb,
-                    &QSpinBox::editingFinished,
-                    [sb, &param]()
-                    {
-                        const auto result =
-                            param.set(static_cast<ValueType>(sb->value()));
-
-                        if (result.has_value())
-                            param.commit();
-                        else
-                            sb->setValue(static_cast<int>(param.get()));
-                    }
-                );
-
-                return sb;
-            }
+            return makeNumericEditor(param);
         }
         else if constexpr (settings::is_numeric_vec_param<P>)
         {
-            using ValueType         = typename P::value_type;
-            constexpr std::size_t N = P::size;
-
-            auto* container = utils::makeQChild<QWidget>();
-            auto* layout    = utils::makeQChild<QHBoxLayout>(container);
-            layout->setContentsMargins(0, 0, 0, 0);
-            layout->setSpacing(6);
-
-            constexpr std::array<const char*, 3> xyzLabels = {"x", "y", "z"};
-
-            auto makeComponentEditor = [&](std::size_t i, auto getter)
-            {
-                const char* labelText = (N <= 3) ? xyzLabels[i] : nullptr;
-
-                if (labelText != nullptr)
-                {
-                    auto* lbl = new QLabel(QString(labelText));
-                    lbl->setStyleSheet("color: #6a7a8a; font-size: 11px;");
-                    layout->addWidget(lbl);
-                }
-
-                if constexpr (std::floating_point<ValueType>)
-                {
-                    auto* sb = utils::makeQChild<QDoubleSpinBox>();
-                    sb->setDecimals(4);
-                    sb->setFixedWidth(90);
-                    sb->setValue(static_cast<double>(getter()));
-
-                    QObject::connect(
-                        sb,
-                        &QDoubleSpinBox::editingFinished,
-                        [sb, &param, i]()
-                        {
-                            const auto result = param.set(
-                                i,
-                                static_cast<ValueType>(sb->value())
-                            );
-                            if constexpr (requires { result.has_value(); })
-                            {
-                                if (!result.has_value())
-                                {
-                                    sb->setValue(
-                                        static_cast<int>(param.get(i))
-                                    );
-                                    return;
-                                }
-                            }
-
-                            param.commit();
-                        }
-                    );
-
-                    layout->addWidget(sb);
-                }
-                else
-                {
-                    auto* sb = utils::makeQChild<QSpinBox>();
-                    sb->setFixedWidth(80);
-                    sb->setValue(static_cast<int>(getter()));
-
-                    QObject::connect(
-                        sb,
-                        &QSpinBox::editingFinished,
-                        [sb, &param, i]()
-                        {
-                            const auto result = param.set(
-                                i,
-                                static_cast<ValueType>(sb->value())
-                            );
-                            if constexpr (requires { result.has_value(); })
-                            {
-                                if (!result.has_value())
-                                {
-                                    sb->setValue(
-                                        static_cast<int>(param.get(i))
-                                    );
-                                    return;
-                                }
-                            }
-
-                            param.commit();
-                        }
-                    );
-
-                    layout->addWidget(sb);
-                }
-            };
-
-            // Unroll compile-time indices
-            [&]<std::size_t... Is>(std::index_sequence<Is...>)
-            {
-                (makeComponentEditor(
-                     Is,
-                     [&param]() -> const ValueType& { return param.get(Is); }
-                 ),
-                 ...);
-            }(std::make_index_sequence<N>{});
-
-            layout->addStretch();
-            return container;
+            return makeNumericVecEditor(param);
         }
         else if constexpr (settings::is_enum_param<P>)
         {
-            auto* cb = utils::makeQChild<QComboBox>();
-
-            const auto& entries =
-                P::EnumMeta::values;   // expected static method on EnumParam
-            for (const auto& entry : entries)
-                cb->addItem(
-                    QString::fromStdString(P::EnumMeta::toString(entry))
-                );
-
-            // Set current index from current value
-            const auto currentValue = param.get();
-            const auto index        = P::EnumMeta::index(currentValue);
-
-            if (index.has_value())
-                cb->setCurrentIndex(static_cast<int>(index.value()));
-
-            QObject::connect(
-                cb,
-                &QComboBox::currentIndexChanged,
-                [cb, &param, entries](int idx)
-                {
-                    if (idx >= 0 && idx < static_cast<int>(entries.size()))
-                    {
-                        param.set(entries[static_cast<std::size_t>(idx)]);
-                        param.commit();
-                    }
-                }
-            );
-
-            return cb;
+            return makeEnumEditor(param);
         }
         else if constexpr (settings::is_version_param<P>)
         {
-            auto* lbl =
-                new QLabel(QString::fromStdString(param.get().toString()));
+            auto* lbl = utils::makeQChild<QLabel>(
+                QString::fromStdString(param.get().toString())
+            );
+
             lbl->setStyleSheet(
                 "color: #4a5a6a; font-family: monospace; font-size: 12px;"
             );
@@ -305,10 +239,19 @@ namespace ui
         if constexpr (settings::IsParamContainer<TParam>)
         {
             // Sub-container → group box with its own form layout
-            auto* group =
-                new QGroupBox(QString::fromStdString(param.getTitle()));
-            auto* groupLayout = new QFormLayout(group);
-            groupLayout->setContentsMargins(12, 8, 12, 8);
+            auto* group = utils::makeQChild<QGroupBox>(
+                QString::fromStdString(param.getTitle())
+            );
+            auto* groupLayout = utils::makeQChild<QFormLayout>(group);
+
+            constexpr std::array<int, 4> margins = {12, 8, 12, 8};
+
+            groupLayout->setContentsMargins(
+                margins[0],
+                margins[1],
+                margins[2],
+                margins[3]
+            );
             groupLayout->setSpacing(0);
             groupLayout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
@@ -326,14 +269,27 @@ namespace ui
                 return;   // Skip leaf params
 
             // Leaf param → normal editor row
-            auto* rowWidget = new QWidget();
+            auto* rowWidget = utils::makeQChild<QWidget>();
             rowWidget->setObjectName("paramRow");
-            auto* rowLayout = new QHBoxLayout(rowWidget);
-            rowLayout->setContentsMargins(0, 6, 0, 6);
-            rowLayout->setSpacing(8);
+            auto* rowLayout = utils::makeQChild<QHBoxLayout>(rowWidget);
 
-            auto* dirtyStripe = new QWidget();
-            dirtyStripe->setFixedSize(3, 20);
+            constexpr std::array<int, 4> margins = {0, 6, 0, 6};
+            constexpr std::size_t        spacing = 8;
+            rowLayout->setContentsMargins(
+                margins[0],
+                margins[1],
+                margins[2],
+                margins[3]
+            );
+            rowLayout->setSpacing(spacing);
+
+            auto* dirtyStripe = utils::makeQChild<QWidget>();
+
+            constexpr std::pair<int, int> dirtyStripeSize = {3, 20};
+            dirtyStripe->setFixedSize(
+                dirtyStripeSize.first,
+                dirtyStripeSize.second
+            );
             dirtyStripe->setObjectName("dirtyStripe");
             dirtyStripe->setProperty("dirty", false);
             rowLayout->addWidget(dirtyStripe);
@@ -353,7 +309,9 @@ namespace ui
 
             rowLayout->addStretch();
 
-            auto* label = new QLabel(QString::fromStdString(param.getTitle()));
+            auto* label = utils::makeQChild<QLabel>(
+                QString::fromStdString(param.getTitle())
+            );
             label->setObjectName("paramLabel");
             label->setToolTip(QString::fromStdString(param.getDescription()));
 

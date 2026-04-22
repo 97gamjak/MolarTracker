@@ -4,8 +4,11 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <utility>
 
 #include "config/constants.hpp"
+#include "config/signal_tags.hpp"
+#include "connections/connection.hpp"
 #include "settings/params/params.hpp"
 
 namespace settings
@@ -39,6 +42,7 @@ namespace settings
     {
         _toJson();
         commit();
+        notifySaved();
     }
 
     /**
@@ -121,6 +125,23 @@ namespace settings
 
             file.close();
         }
+    }
+
+    Connection Settings::subscribeToSaved(OnSaved::func func, void* user)
+    {
+        return _onSaved.on<OnSaved>(std::move(func), user);
+    }
+
+    void Settings::notifySaved() { _onSaved.notify<OnSaved>(); }
+
+    bool Settings::isDirty() const
+    {
+        bool isDirty = false;
+
+        forEachParam([&isDirty](const auto& param)
+                     { isDirty |= param.isDirty(); });
+
+        return isDirty;
     }
 
 }   // namespace settings

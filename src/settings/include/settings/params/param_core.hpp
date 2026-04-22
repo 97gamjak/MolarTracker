@@ -44,8 +44,7 @@ namespace settings
     template <typename T>
     struct ParamValueChanged
     {
-        /// Type alias for the type of data
-        using TagType = T;
+        using func = void (*)(void*, const T&);
     };
 
     /**
@@ -59,8 +58,7 @@ namespace settings
     template <typename T>
     struct ParamOptionalChanged
     {
-        /// Type alias for the type of data
-        using TagType = std::optional<T>;
+        using func = void (*)(void*, const std::optional<T>&);
     };
 
     /**

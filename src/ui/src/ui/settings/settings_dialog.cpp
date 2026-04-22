@@ -67,8 +67,16 @@ namespace ui
         auto* bottomBar = utils::makeQChild<QWidget>(this);
         bottomBar->setObjectName("bottomBar");
         auto* bottomLayout = utils::makeQChild<QHBoxLayout>(bottomBar);
-        bottomLayout->setContentsMargins(16, 8, 16, 8);
-        bottomLayout->setSpacing(8);
+
+        constexpr std::array<int, 4> margins = {16, 8, 16, 8};
+        constexpr std::size_t        spacing = 8;
+        bottomLayout->setContentsMargins(
+            margins[0],
+            margins[1],
+            margins[2],
+            margins[3]
+        );
+        bottomLayout->setSpacing(spacing);
 
         _unsavedLabel = utils::makeQChild<QLabel>(bottomBar);
         _unsavedLabel->setObjectName("unsavedLabel");
@@ -99,16 +107,16 @@ namespace ui
             this,
             [this]()
             {
-                _settings.save();
                 _updateUnsavedLabel();
                 emit saveRequested();
+                accept();
             }
         );
 
         connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
         // ── Build sections
-        auto addPage = [&](auto& section, SectionMode mode = SectionMode::All)
+        auto addPage = [&](auto& section, SectionMode mode)
         {
             const int stackIndex = _stack->count();
 
@@ -156,12 +164,12 @@ namespace ui
             {
                 const int stackIndex = _stack->count();
                 _sidebar->addTopLevel(groupTitle, stackIndex);
-                addPage(section);
+                addPage(section, SectionMode::All);
                 return;
             }
 
             // Overview page for the parent
-            auto* overview = new SettingsOverview(groupTitle);
+            auto* overview = utils::makeQChild<SettingsOverview>(groupTitle);
             overview->setOnNavigate(
                 [this](int stackIndex)
                 {
@@ -190,7 +198,7 @@ namespace ui
                             QString::fromStdString(param.getTitle()),
                             subStackIndex
                         );
-                        addPage(param);
+                        addPage(param, SectionMode::All);
                         overview->addCard(
                             QString::fromStdString(param.getTitle()),
                             QString::fromStdString(param.getDescription()),
@@ -217,9 +225,7 @@ namespace ui
     void SettingsDialog::_updateUnsavedLabel()
     {
         // Any section dirty → show the label
-        const bool anyDirty = _settings.getGeneralSettings().isDirty() ||
-                              _settings.getUISettings().isDirty() ||
-                              _settings.getLoggingSettings().isDirty();
+        const bool anyDirty = _settings.isDirty();
 
         _unsavedLabel->setVisible(anyDirty);
     }

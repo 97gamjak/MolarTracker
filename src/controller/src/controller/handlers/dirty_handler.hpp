@@ -34,6 +34,8 @@ namespace controller
         /// Connections for tracking dirty state changes in settings
         std::vector<Connection> _dirtySettingsConnections;
 
+        Connection _settingsSavedConnection;
+
        public:
         void subscribe(app::AppContext& appContext, ui::MainWindow* mainWindow);
     };

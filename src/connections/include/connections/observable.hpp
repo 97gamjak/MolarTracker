@@ -16,9 +16,7 @@ class Connection;   // Forward declaration
  * derived class.
  *
  * @tparam Tags A variadic template parameter pack representing the different
- * event tags that the observable object can emit, each tag should have an
- * associated argument type defined as `TagType` that will be passed to the
- * subscribers when the event is emitted.
+ * event tags that the observable object can emit
  */
 template <typename... Tags>
 class Observable
@@ -31,9 +29,8 @@ class Observable
     template <typename Tag>
     Connection on(typename Signal<Tag>::CallbackFn func, void* user);
 
-   protected:
     template <typename Tag, typename... Args>
-    void _emit(Args&&... args);
+    void notify(Args&&... args);
 
    private:
     template <typename Tag>

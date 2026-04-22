@@ -121,6 +121,8 @@ namespace settings
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);
     }
 
+    // NOLINTBEGIN(misc-definitions-in-headers)
+
     template <typename T>
     constexpr bool is_bool_param = false;
 
@@ -156,6 +158,8 @@ namespace settings
 
     template <typename T, std::size_t N>
     constexpr bool is_numeric_vec_param<NumericVecParam<T, N>> = true;
+
+    // NOLINTEND(misc-definitions-in-headers)
 
 }   // namespace settings
 
