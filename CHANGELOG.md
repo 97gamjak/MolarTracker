@@ -4,13 +4,15 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.1.0](https://github.com/repo/owner/releases/tag/0.1.0) - 2026-04-22
+
 ### Features
 
 #### General Settings
 
 - Add first prototype of settings dialog for a centralized place to set settings
 
-<!-- insertion marker -->
 ## [0.0.5](https://github.com/repo/owner/releases/tag/0.0.5) - 2026-04-18
 
 ### Features
@@ -100,6 +102,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 
