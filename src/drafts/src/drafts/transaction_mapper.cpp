@@ -3,6 +3,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_draft.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
@@ -118,6 +119,15 @@ namespace drafts
 
                     transaction.addEntry(entry);
 
+                    break;
+                }
+                case AccountKind::Security:
+                {
+                    // TODO (97gamjak)[MOLTRACK-231]: implement creating
+                    // transaction entry from draft for account kind security
+                    throw NotYetImplementedException(
+                        "Security transactions are not supported"
+                    );
                     break;
                 }
                 case AccountKind::External:

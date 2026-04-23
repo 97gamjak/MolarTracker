@@ -18,4 +18,5 @@ target_link_libraries(molartracker_drafts
     PRIVATE
     molartracker_finance
     molartracker_logging
+    molartracker_exceptions
 )
