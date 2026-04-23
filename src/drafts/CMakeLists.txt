@@ -1,5 +1,7 @@
 add_library(molartracker_drafts STATIC
     src/drafts/account_mapper.cpp
+    src/drafts/account_draft.cpp
+
     src/drafts/transaction_draft.cpp
     src/drafts/transaction_mapper.cpp
 )

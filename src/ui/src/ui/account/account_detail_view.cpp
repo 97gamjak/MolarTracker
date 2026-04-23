@@ -68,16 +68,16 @@ namespace ui
      */
     void AccountDetailView::updateAccount(const AccountDraft& account)
     {
-        _account = account;
+        _account = std::make_unique<AccountDraft>(account);
         // Update the UI with account details
 
         // Update the UI elements with the new account details
         _uiElements->nameLabel->setText(
-            "Name: " + QString::fromStdString(_account.name)
+            "Name: " + QString::fromStdString(_account->name)
         );
         _uiElements->balanceLabel->setText(
             "Balance: " + QString::number(0) + " " +
-            QString::fromStdString(CurrencyMeta::toString(_account.currency))
+            QString::fromStdString(CurrencyMeta::toString(_account->currency))
         );
     }
 

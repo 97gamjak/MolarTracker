@@ -128,7 +128,6 @@ namespace drafts
                     throw NotYetImplementedException(
                         "Security transactions are not supported"
                     );
-                    break;
                 }
                 case AccountKind::External:
                     break;
