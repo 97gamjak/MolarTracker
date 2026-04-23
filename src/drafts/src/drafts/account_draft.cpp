@@ -8,9 +8,9 @@ namespace drafts
     /**
      * @brief Construct a new Account Draft:: Account Draft object
      *
-     * @param name
-     * @param kind
-     * @param currency
+     * @param _name
+     * @param _kind
+     * @param _currency
      */
     AccountDraft::AccountDraft(
         std::string _name,
@@ -24,10 +24,11 @@ namespace drafts
     /**
      * @brief Construct a new Account Draft:: Account Draft object
      *
-     * @param name
-     * @param kind
-     * @param currency
-     * @param status
+     * @param _id
+     * @param _name
+     * @param _kind
+     * @param _currency
+     * @param _status
      */
     AccountDraft::AccountDraft(
         AccountId                    _id,
