@@ -24,8 +24,8 @@ namespace http
 
         CurlGuard(const CurlGuard&)            = delete;
         CurlGuard& operator=(const CurlGuard&) = delete;
-        CurlGuard(CurlGuard&&)                 = default;
-        CurlGuard& operator=(CurlGuard&&)      = default;
+        CurlGuard(CurlGuard&&)                 = delete;
+        CurlGuard& operator=(CurlGuard&&)      = delete;
     };
 
     /**

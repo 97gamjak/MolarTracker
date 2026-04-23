@@ -21,8 +21,11 @@ namespace http
 
         HttpClient(const HttpClient&)            = delete;
         HttpClient& operator=(const HttpClient&) = delete;
-        HttpClient(HttpClient&&)                 = default;
-        HttpClient& operator=(HttpClient&&)      = default;
+
+        /// @cond DOXYGEN_IGNORE
+        HttpClient(HttpClient&&)            = default;
+        HttpClient& operator=(HttpClient&&) = default;
+        /// @endcond
 
         [[nodiscard]]
         static std::expected<HttpResponse, HttpError> get(
