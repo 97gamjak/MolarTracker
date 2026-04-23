@@ -16,6 +16,7 @@ MSTD_ENUM(Currency, std::uint8_t, CURRENCY_LIST);
 
 #define ACCOUNT_KIND_LIST(X) \
     X(Cash)                  \
+    X(Security)              \
     X(External)
 
 MSTD_ENUM(AccountKind, std::uint8_t, ACCOUNT_KIND_LIST);

@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "config/finance.hpp"
+
 namespace finance
 {
 
@@ -21,17 +23,18 @@ namespace finance
         Currency      currency,
         AccountKind   kind
     )
-        : _id(id),
-          _status(status),
-          _name(std::move(name)),
-          _currency(currency),
-          _details(ExternalAccount{})
+        : _id(id), _status(status), _name(std::move(name)), _currency(currency)
     {
         switch (kind)
         {
             case AccountKind::Cash:
             {
                 _details = CashAccount{};
+                break;
+            }
+            case AccountKind::Security:
+            {
+                _details = SecurityAccount{};
                 break;
             }
             case AccountKind::External:
@@ -93,6 +96,10 @@ namespace finance
             AccountKind operator()(const ExternalAccount& /*details*/) const
             {
                 return AccountKind::External;
+            }
+            AccountKind operator()(const SecurityAccount& /*details*/) const
+            {
+                return AccountKind::Security;
             }
         };
         return std::visit(Visitor{}, _details);

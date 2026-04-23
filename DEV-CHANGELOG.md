@@ -6,6 +6,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Features
 
+#### Finance
+
+- Add security account type
+
 #### HTTP
 
 - Add general http client/response/request interface
