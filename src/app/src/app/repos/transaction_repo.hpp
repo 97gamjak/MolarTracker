@@ -1,21 +1,31 @@
 #ifndef __APP__SRC__APP__REPOS__TRANSACTION_REPO_HPP__
 #define __APP__SRC__APP__REPOS__TRANSACTION_REPO_HPP__
 
+#include <memory>
+
 #include "app/repos_api/i_transaction_repo.hpp"
 #include "base_repo.hpp"
 #include "config/id_types.hpp"
-#include "sql_models/instrument_row.hpp"
+#include "db/database.hpp"
 
 namespace app
 {
+    class IInstrumentRepo;
+
     /**
      * @brief Repository for managing transactions.
      *
      */
     class TransactionRepo : public ITransactionRepo, public BaseRepo
     {
+       private:
+        std::shared_ptr<IInstrumentRepo> _instrumentRepo;
+
        public:
-        using BaseRepo::BaseRepo;
+        explicit TransactionRepo(
+            db::Database&                    db,
+            std::shared_ptr<IInstrumentRepo> instrumentRepo
+        );
 
         [[nodiscard]]
         TransactionId addTransaction(
@@ -24,13 +34,6 @@ namespace app
 
         [[nodiscard]]
         std::vector<finance::Transaction> getTransactions() override;
-
-       private:
-        [[nodiscard]]
-        std::optional<InstrumentId> _getInstrument(const InstrumentRow& row);
-
-        [[nodiscard]]
-        InstrumentId _insertInstrument(const InstrumentRow& row);
     };
 }   // namespace app
 

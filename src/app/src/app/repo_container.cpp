@@ -2,6 +2,7 @@
 
 #include "db/database.hpp"
 #include "repos/account_repo.hpp"
+#include "repos/instrument_repo.hpp"
 #include "repos/profile_repo.hpp"
 #include "repos/transaction_repo.hpp"
 
@@ -16,7 +17,10 @@ namespace app
     RepoContainer::RepoContainer(db::Database& db)
         : _profileRepo{std::make_shared<ProfileRepo>(db)},
           _accountRepo{std::make_shared<AccountRepo>(db)},
-          _transactionRepo{std::make_shared<TransactionRepo>(db)}
+          _instrumentRepo{std::make_shared<InstrumentRepo>(db)},
+          _transactionRepo{
+              std::make_shared<TransactionRepo>(db, _instrumentRepo)
+          }
     {
     }
 

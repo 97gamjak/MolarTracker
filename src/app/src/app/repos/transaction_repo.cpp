@@ -1,8 +1,9 @@
 #include "transaction_repo.hpp"
 
 #include "app/factories/transaction_factory.hpp"
-#include "config/finance.hpp"
+#include "app/repos_api/i_instrument_repo.hpp"
 #include "config/id_types.hpp"
+#include "db/database.hpp"
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
@@ -12,6 +13,14 @@
 
 namespace app
 {
+    TransactionRepo::TransactionRepo(
+        db::Database&                    db,
+        std::shared_ptr<IInstrumentRepo> instrumentRepo
+    )
+        : BaseRepo(db), _instrumentRepo(std::move(instrumentRepo))
+    {
+    }
+
     /**
      * @brief add a transaction to the database
      *
@@ -44,16 +53,15 @@ namespace app
             const auto instrument =
                 TransactionFactory::toInstrumentRow(entry.getDetails());
 
-            const auto idOpt = _getInstrument(instrument);
+            const auto idOpt = _instrumentRepo->getInstrumentId(instrument);
 
-            InstrumentId instrumentId;
-            if (idOpt.has_value())
-                instrumentId = idOpt.value();
-            else
-                instrumentId = _insertInstrument(instrument);
+            if (!idOpt.has_value())
+            {
+                throw std::runtime_error("Instrument not found");
+            }
 
             const auto entryRow =
-                TransactionFactory::toEntryRow(entry, txId, instrumentId);
+                TransactionFactory::toEntryRow(entry, txId, idOpt.value());
 
             const auto entryResult =
                 _getCrud().insert(_getDb(), dbTx, entryRow);
@@ -122,62 +130,6 @@ namespace app
         }
 
         return results;
-    }
-
-    /**
-     * @brief get an instrument from the database
-     *
-     * @param row
-     * @return std::optional<InstrumentId>
-     */
-    std::optional<InstrumentId> TransactionRepo::_getInstrument(
-        const InstrumentRow& row
-    )
-    {
-        switch (row.kind.value())
-        {
-            case InstrumentKind::Cash:
-            {
-                const auto query = orm::Query{}.where(
-                    InstrumentRow::hasKind(InstrumentKind::Cash)
-                );
-
-                const auto instrument =
-                    _getCrud().getUnique<InstrumentRow>(_getDb(), query);
-
-                if (instrument.has_value())
-                    return instrument->id.value();
-
-                return std::nullopt;
-            }
-            case InstrumentKind::Stock:
-                throw std::runtime_error(
-                    "Stock instruments are not supported yet"
-                );
-        }
-
-        // can not happen in theory
-        throw std::runtime_error("Unknown instrument kind");
-    }
-
-    /**
-     * @brief insert an instrument to the database
-     *
-     * @param row
-     * @return InstrumentId
-     */
-    InstrumentId TransactionRepo::_insertInstrument(const InstrumentRow& row)
-    {
-        const auto result = _getCrud().insert(_getDb(), row);
-
-        if (!result.has_value())
-        {
-            const auto msg = getInsertError(result.error(), "instrument");
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
-        }
-
-        return InstrumentId(result.value());
     }
 
 }   // namespace app

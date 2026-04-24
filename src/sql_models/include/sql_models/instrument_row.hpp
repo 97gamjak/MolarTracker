@@ -39,6 +39,8 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
 
     [[nodiscard]]
     static orm::WhereExpr hasKind(InstrumentKind kind);
+
+    static InstrumentRow createCashInstrument(Currency currency);
 };
 
 struct StockRow : public orm::ORMModel<"stock">
