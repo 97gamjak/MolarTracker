@@ -2,6 +2,7 @@
 #define __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
 
 #include <QtContainerFwd>
+#include <mstd/type_traits/enum_traits.hpp>
 #include <span>
 #include <string_view>
 
@@ -11,6 +12,9 @@ class QWidget;   // Forward declaration
 namespace utils
 {
     QStringList toQStringList(const std::span<const std::string_view>& vec);
+
+    template <mstd::has_enum_meta EnumMeta>
+    QString toQString(EnumMeta value);
 
     void moveDialogToParentScreenCenter(QDialog* dlg, QWidget* parent);
 

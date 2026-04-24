@@ -10,6 +10,8 @@
 #include <algorithm>
 
 #include "config/finance.hpp"
+#include "drafts/transaction_draft.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "finance/currency.hpp"
 #include "ui/validators/amount_line_edit.hpp"
 #include "ui/validators/validators.hpp"
@@ -165,6 +167,25 @@ namespace ui
     }
 
     /**
+     * @brief Construct a new Security Widget:: Security Widget object
+     *
+     * @param parent
+     * @param type
+     * @param accounts
+     * @param referenceAccounts
+     */
+    SecurityWidget::SecurityWidget(
+        QWidget*                          parent,
+        TransactionType                   type,
+        std::vector<drafts::AccountDraft> accounts,
+        std::vector<drafts::AccountDraft> referenceAccounts
+    )
+        : NonEmptyTransactionWidget(parent, type, std::move(accounts)),
+          _referenceAccounts(std::move(referenceAccounts))
+    {
+    }
+
+    /**
      * @brief Handle the selection of an account from the accounts combo box,
      * this will be called when the user selects an account from the combo box,
      * and should handle updating any relevant UI elements (e.g. currency label)
@@ -207,6 +228,26 @@ namespace ui
         std::vector<drafts::AccountDraft> accounts
     )
     {
+        return makeTransactionWidget(parent, type, std::move(accounts), {});
+    }
+
+    /**
+     * @brief factory function to create a transaction widget based on the
+     * transaction type
+     *
+     * @param parent The parent widget
+     * @param type The type of the transaction
+     * @param accounts The list of account drafts to choose from
+     *
+     * @return ICreateTransactionWidget* A pointer to the created transaction
+     */
+    ICreateTransactionWidget* makeTransactionWidget(
+        QWidget*                          parent,
+        TransactionType                   type,
+        std::vector<drafts::AccountDraft> accounts,
+        std::vector<drafts::AccountDraft> referenceAccounts
+    )
+    {
         switch (type)
         {
             case TransactionType::Deposit:
@@ -215,6 +256,13 @@ namespace ui
                     parent,
                     type,
                     std::move(accounts)
+                );
+            case TransactionType::Stock:
+                return makeQChild<StockWidget>(
+                    parent,
+                    type,
+                    std::move(accounts),
+                    std::move(referenceAccounts)
                 );
         }
 
@@ -266,6 +314,14 @@ namespace ui
         draft.entries.push_back(entry);
 
         return draft;
+    }
+
+    drafts::TransactionDraft StockWidget::getDraft() const
+    {
+        // TODO (97gamjak)[MOLTRACK-233]: implement StockWidget::getDraft()
+        throw NotYetImplementedException(
+            "StockWidget::getDraft() not yet implemented"
+        );
     }
 
     /**

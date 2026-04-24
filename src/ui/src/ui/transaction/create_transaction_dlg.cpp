@@ -133,6 +133,37 @@ namespace ui
         std::vector<drafts::AccountDraft> accounts
     )
     {
+        setWidget(type, std::move(accounts), {});
+    }
+
+    /**
+     * @brief Set the widget for the specified transaction type, this will
+     * update the stacked widget to display the appropriate transaction
+     * detail form based on the provided transaction type, allowing the user
+     * to fill out the necessary information for creating a transaction of
+     * that type.
+     *
+     * @param type The transaction type for which to set the widget, this is
+     * used to determine which transaction detail form to display in the
+     * stacked widget, and should correspond to one of the TransactionType
+     * enum values.
+     * @param accounts A vector of AccountDrafts representing the accounts
+     * that can be selected in the transaction detail form, this is used to
+     * populate any account selection widgets in the transaction detail
+     * form, allowing the user to select from their existing accounts when
+     * creating a new transaction.
+     * @param referenceAccounts A vector of AccountDrafts representing the
+     * reference accounts that can be selected in the transaction detail form,
+     * this is used to populate any reference account selection widgets in the
+     * transaction detail form, allowing the user to select from their existing
+     * reference accounts when creating a new transaction.
+     */
+    void CreateTransactionDialog::setWidget(
+        TransactionType                   type,
+        std::vector<drafts::AccountDraft> accounts,
+        std::vector<drafts::AccountDraft> referenceAccounts
+    )
+    {
         LOG_ENTRY;
 
         _setWindowTitle(type);
@@ -143,8 +174,13 @@ namespace ui
 
         if (!_widgetMap.contains(type))
         {
-            auto* widget =
-                makeTransactionWidget(this, type, std::move(accounts));
+            auto* widget = makeTransactionWidget(
+                this,
+                type,
+                std::move(accounts),
+                std::move(referenceAccounts)
+            );
+
             _widgetMap[type] = widget;
             _stack->addWidget(widget);
 
@@ -178,6 +214,9 @@ namespace ui
                 return;
             case TransactionType::Withdrawal:
                 setWindowTitle("New Withdrawal");
+                return;
+            case TransactionType::Stock:
+                setWindowTitle("New Stock Transaction");
                 return;
         }
 
