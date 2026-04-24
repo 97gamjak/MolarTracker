@@ -13,6 +13,11 @@ orm::WhereExpr InstrumentRow::hasKind(InstrumentKind kind)
     return orm::makeWhere(kindField{kind}, filter::Operator::Equal);
 }
 
+orm::WhereExpr InstrumentRow::hasCurrency(Currency currency)
+{
+    return orm::makeWhere(currencyField{currency}, filter::Operator::Equal);
+}
+
 InstrumentRow InstrumentRow::createCashInstrument(Currency currency)
 {
     InstrumentRow row;

@@ -40,6 +40,10 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     [[nodiscard]]
     static orm::WhereExpr hasKind(InstrumentKind kind);
 
+    [[nodiscard]]
+    static orm::WhereExpr hasCurrency(Currency currency);
+
+    [[nodiscard]]
     static InstrumentRow createCashInstrument(Currency currency);
 };
 

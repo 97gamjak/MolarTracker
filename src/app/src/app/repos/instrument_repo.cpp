@@ -51,7 +51,8 @@ namespace app
             case InstrumentKind::Cash:
             {
                 const auto query = orm::Query{}.where(
-                    InstrumentRow::hasKind(InstrumentKind::Cash)
+                    InstrumentRow::hasKind(InstrumentKind::Cash) &&
+                    InstrumentRow::hasCurrency(row.currency.value())
                 );
 
                 const auto instrument =

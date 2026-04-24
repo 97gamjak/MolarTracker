@@ -37,7 +37,12 @@ namespace orm
      */
     std::string Query::getWhereDBOperations() const
     {
-        return orm::getDBOperations(_whereExpr);
+        const auto operations = orm::getDBOperations(_whereExpr);
+
+        if (operations.empty())
+            return "";
+
+        return "WHERE " + operations;
     }
 
     /**
