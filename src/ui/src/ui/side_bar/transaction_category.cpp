@@ -4,6 +4,7 @@
 
 #include "config/finance.hpp"
 #include "ui/side_bar/category.hpp"
+#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -59,25 +60,15 @@ namespace ui
     {
         _createAction = menu.addAction("Create Transaction");
 
-        _createDepositAction = menu.addAction(
-            "Create " +
-            QString::fromStdString(
-                TransactionTypeMeta::toString(TransactionType::Deposit)
-            )
-        );
-        _createDepositAction->setData(
-            QVariant::fromValue(TransactionType::Deposit)
-        );
+        using enum TransactionType;
 
-        _createWithdrawalAction = menu.addAction(
-            "Create " +
-            QString::fromStdString(
-                TransactionTypeMeta::toString(TransactionType::Withdrawal)
-            )
-        );
-        _createWithdrawalAction->setData(
-            QVariant::fromValue(TransactionType::Withdrawal)
-        );
+        const auto depositName = "Create " + utils::toQString(Deposit);
+        _createDepositAction   = menu.addAction(depositName);
+        _createDepositAction->setData(QVariant::fromValue(Deposit));
+
+        const auto withdrawalName = "Create " + utils::toQString(Withdrawal);
+        _createWithdrawalAction   = menu.addAction(withdrawalName);
+        _createWithdrawalAction->setData(QVariant::fromValue(Withdrawal));
     }
 
 }   // namespace ui

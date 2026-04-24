@@ -144,20 +144,59 @@ namespace ui
     };
 
     /**
-     * @brief Factory function to create a transaction widget based on the
-     * transaction type
+     * @brief Widget for creating or editing a security transaction
      *
-     * @param parent The parent widget
-     * @param type The type of the transaction
-     * @param accounts The list of account drafts to choose from
-     *
-     * @return ICreateTransactionWidget* A pointer to the created transaction
-     * widget
+     * This widget provides a form for creating or editing a security
+     * transaction. It includes fields for selecting the accounts involved in
+     * the transaction, entering the amount, and specifying other details.
+     * The widget validates the input and emits a signal with the transaction
+     * draft when the user submits the form.
      */
+    class SecurityWidget : public NonEmptyTransactionWidget
+    {
+       private:
+        /// A list of reference account drafts to populate the reference account
+        /// selection field
+        std::vector<drafts::AccountDraft> _referenceAccounts;
+
+       public:
+        explicit SecurityWidget(
+            QWidget*                          parent,
+            TransactionType                   type,
+            std::vector<drafts::AccountDraft> accounts,
+            std::vector<drafts::AccountDraft> referenceAccounts
+        );
+    };
+
+    /**
+     * @brief Widget for creating or editing a stock transaction
+     *
+     * This widget provides a form for creating or editing a stock
+     * transaction. It includes fields for selecting the accounts involved in
+     * the transaction, entering the amount, and specifying other details.
+     * The widget validates the input and emits a signal with the transaction
+     * draft when the user submits the form.
+     */
+    class StockWidget : public SecurityWidget
+    {
+       private:
+        using SecurityWidget::SecurityWidget;
+
+        [[nodiscard]]
+        drafts::TransactionDraft getDraft() const override;
+    };
+
     ICreateTransactionWidget* makeTransactionWidget(
         QWidget*                          parent,
         TransactionType                   type,
         std::vector<drafts::AccountDraft> accounts
+    );
+
+    ICreateTransactionWidget* makeTransactionWidget(
+        QWidget*                          parent,
+        TransactionType                   type,
+        std::vector<drafts::AccountDraft> accounts,
+        std::vector<drafts::AccountDraft> referenceAccounts
     );
 
 }   // namespace ui

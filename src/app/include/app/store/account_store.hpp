@@ -65,6 +65,8 @@ namespace app
         [[nodiscard]]
         std::vector<drafts::AccountDraft> getCashAccounts() const;
         [[nodiscard]]
+        std::vector<drafts::AccountDraft> getSecurityAccounts() const;
+        [[nodiscard]]
         std::unordered_map<
             AccountId,
             std::string,

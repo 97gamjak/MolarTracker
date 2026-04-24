@@ -9,6 +9,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Finance
 
 - Add security account type
+- Add transaction type stock
 
 #### HTTP
 

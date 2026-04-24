@@ -1,5 +1,7 @@
 #include "transaction_controller.hpp"
 
+#include <optional>
+
 #include "app/store/account_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
@@ -83,12 +85,19 @@ namespace controller
         {
             std::optional<TransactionType> type;
 
-            if (action == item->getCreateDepositAction())
-                type = TransactionType::Deposit;
-            else if (action == item->getCreateWithdrawalAction())
-                type = TransactionType::Withdrawal;
-            else
+            if (action->data().canConvert<TransactionType>())
+            {
+                type = action->data().value<TransactionType>();
+            }
+            else if (action == item->getCreateAction())
+            {
+                // default case to create empty transaction create widget
                 type = std::nullopt;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown transaction action");
+            }
 
             LOG_DEBUG(
                 "Create action triggered for transaction category with type: " +
@@ -127,16 +136,24 @@ namespace controller
         if (_createDlg != nullptr)
         {
             std::vector<drafts::AccountDraft> accounts;
+            std::vector<drafts::AccountDraft> referenceAccounts;
 
             switch (type)
             {
                 case TransactionType::Deposit:
                 case TransactionType::Withdrawal:
                     accounts = _accountStore.getCashAccounts();
+                    // no need to set reference accounts for withdrawal or
+                    // Deposit here we use external accounts which are
+                    // determined automatically
+                    break;
+                case TransactionType::Stock:
+                    accounts          = _accountStore.getSecurityAccounts();
+                    referenceAccounts = _accountStore.getCashAccounts();
                     break;
             }
 
-            _createDlg->setWidget(type, accounts);
+            _createDlg->setWidget(type, accounts, referenceAccounts);
         }
     }
 
