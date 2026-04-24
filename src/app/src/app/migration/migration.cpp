@@ -76,6 +76,7 @@ namespace app
 
         // add migrations
         _migrate_0_0_3();
+        _migrate_0_1_0();
 
         assert(_migrations.size() == toVersion);
     }
@@ -103,6 +104,13 @@ namespace app
         _migrateV3();
         _migrateV4();
         _migrateV5();
+    }
+
+    void Migrations::_migrate_0_1_0()
+    {
+        _lastReleaseVersion = utils::SemVer(0, 1, 0);
+
+        _migrateV6();
     }
 
     /**
@@ -234,6 +242,19 @@ namespace app
             std::make_unique<AddColumnMigration<InstrumentRow::currencyField>>(
                 InstrumentRow::currencyField{Currency::USD}
             )
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    void Migrations::_migrateV6()
+    {
+        static constexpr size_t fromVersion = 5;
+        Migration               migration(fromVersion, _lastReleaseVersion);
+
+        // Add status field to transaction table
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<StockRow>>()
         );
 
         _migrations.push_back(std::move(migration));

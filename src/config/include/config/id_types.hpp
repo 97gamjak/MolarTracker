@@ -6,29 +6,22 @@
 // clang-format off
 struct ProfileTag {};
 using ProfileId = StrongId<ProfileTag>;
-// clang-format on
 
-// clang-format off
 struct SecurityTag {};
 using SecurityId = StrongId<SecurityTag>;
-// clang-format on
 
-// clang-format off
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
-// clang-format on
 
-// clang-format off
+struct StockTag {};
+using StockId = StrongId<StockTag>;
+
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
-// clang-format on
 
-// clang-format off
 struct TransactionTag {};
 using TransactionId = StrongId<TransactionTag>;
-// clang-format on
 
-// clang-format off
 struct TransactionEntryTag {};
 using TransactionEntryId = StrongId<TransactionEntryTag>;
 // clang-format on

@@ -3,6 +3,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "orm/constraints.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/where_expr.hpp"
 
@@ -38,6 +39,29 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
 
     [[nodiscard]]
     static orm::WhereExpr hasKind(InstrumentKind kind);
+};
+
+struct StockRow : public orm::ORMModel<"stock">
+{
+    ORM_FIELD(id, IdField<StockId>)
+    ORM_FIELD(
+        ticker,
+        Field<"ticker", std::string, orm::not_null_t, orm::unique_t>
+    )
+
+    ORM_FIELD(
+        instrumentId,
+        Field<
+            "instrument_id",
+            InstrumentId,
+            orm::not_null_t,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                InstrumentRow,
+                InstrumentRow::idField>>
+    )
+
+    ORM_FIELDS(StockRow, id, ticker);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__

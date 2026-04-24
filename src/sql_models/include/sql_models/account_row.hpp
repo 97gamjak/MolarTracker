@@ -44,7 +44,7 @@ struct AccountRow : orm::ORMModel<"account">
             orm::foreign_key_t<
                 orm::RestrictDelete,
                 ProfileRow,
-                decltype(ProfileRow::id)>>
+                ProfileRow::idField>>
     )
 
     /// The name field, this is a required field
