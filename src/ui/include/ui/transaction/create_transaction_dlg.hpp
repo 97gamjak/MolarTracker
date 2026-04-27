@@ -41,6 +41,12 @@ namespace ui
             std::vector<drafts::AccountDraft> accounts
         );
 
+        void setWidget(
+            TransactionType                   type,
+            std::vector<drafts::AccountDraft> accounts,
+            std::vector<drafts::AccountDraft> referenceAccounts
+        );
+
         void reset();
 
        signals:

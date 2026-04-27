@@ -288,6 +288,33 @@ namespace app
     }
 
     /**
+     * @brief Get all security accounts in the store
+     *
+     * This allows callers to retrieve only the security accounts managed by the
+     * store, which can be useful for display purposes or for operations that
+     * specifically involve security accounts, and provides a way to filter the
+     * accounts based on their type and status.
+     *
+     * @return std::vector<drafts::AccountDraft> A vector of account drafts
+     * representing the security accounts currently in the store, each draft
+     * contains the necessary information about a security account that can be
+     * used for display or further processing, and the caller can use this
+     * vector to access the security account data as needed.
+     */
+    std::vector<drafts::AccountDraft> AccountStore::getSecurityAccounts() const
+    {
+        const auto options = Options{
+            .filter = IsAccountType(AccountKind::Security) && IsAccountActive(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        auto accounts = _getValues(options) |
+                        std::views::transform(drafts::AccountMapper::toDraft);
+
+        return {accounts.begin(), accounts.end()};
+    }
+
+    /**
      * @brief Get a mapping of account IDs to account names for all active
      * accounts in the store, this allows callers to easily look up the name of
      * an account based on its ID, which can be useful for display purposes or
