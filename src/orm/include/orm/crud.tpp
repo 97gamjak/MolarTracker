@@ -622,7 +622,12 @@ namespace orm
         const Field&  field
     )
     {
-        const auto columnExist = _columnExists<Field>(database);
+        const auto columnExist = _columnExists(
+            database,
+            std::string(Field::name),
+            std::string(Field::tableName)
+        );
+
         if (columnExist)
         {
             return std::unexpected(CrudError(
@@ -655,29 +660,43 @@ namespace orm
     }
 
     /**
-     * @brief Check if a column exists in the database
+     * @brief Drop a column from the database
      *
-     * @tparam Field
+     * @tparam Model
      * @param database
-     * @return true if the column exists, false otherwise
+     * @param columnName
+     * @return std::expected<void, CrudError> An empty expected on success,
+     * or an error on failure
      */
-    template <typename Field>
-    bool Crud::_columnExists(db::Database& database)
+    template <typename Model>
+    std::expected<void, CrudError> Crud::dropColumn(
+        db::Database&      database,
+        const std::string& columnName
+    )
     {
+        if (!_columnExists(database, columnName, Model::tableName))
+        {
+            return std::unexpected(CrudError(
+                CrudErrorType::ColumnDoesNotExist,
+                "Column does not exist"
+            ));
+        }
+
         std::string sql;
-        sql += "SELECT COUNT(*) FROM PRAGMA_TABLE_INFO('";
-        sql += Field::tableName;
-        sql += "') WHERE name = '";
-        sql += Field::name + "'";
+        sql += "ALTER TABLE ";
+        sql += Model::tableName;
+        sql += " DROP COLUMN ";
+        sql += columnName;
+
+        LOG_DEBUG(std::format("Dropping column with SQL: {}", sql));
 
         db::Statement statement = database.prepare(sql);
 
         _sqlExecutions.push_back(sql);
 
-        if (statement.step() == db::StepResult::RowAvailable)
-            return statement.columnInt64(0) > 0;
+        statement.executeToCompletion();
 
-        throw orm::CrudException("Failed to check if column exists");
+        return {};
     }
 
 }   // namespace orm

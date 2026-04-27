@@ -10,14 +10,12 @@ namespace drafts
      *
      * @param accountId_
      * @param cash_
-     * @param accountKind_
      */
     TransactionEntryDraft::TransactionEntryDraft(
         AccountId     accountId_,
-        finance::Cash cash_,
-        AccountKind   accountKind_
+        finance::Cash cash_
     )
-        : accountId(accountId_), cash(cash_), accountKind(accountKind_)
+        : accountId(accountId_), cash(cash_)
     {
     }
 }   // namespace drafts

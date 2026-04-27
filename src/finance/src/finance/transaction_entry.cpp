@@ -9,14 +9,14 @@ namespace finance
      *
      * @param id
      * @param accountId
-     * @param details
+     * @param cash
      */
     TransactionEntry::TransactionEntry(
         TransactionEntryId id,
         AccountId          accountId,
-        TransactionDetail  details
+        Cash               cash
     )
-        : _id(id), _accountId(accountId), _details(details)
+        : _id(id), _accountId(accountId), _cash(cash)
     {
     }
 
@@ -35,23 +35,13 @@ namespace finance
     AccountId TransactionEntry::getAccountId() const { return _accountId; }
 
     /**
-     * @brief Gets the details of the transaction entry.
-     *
-     * @return TransactionDetail The details of the transaction entry.
-     */
-    TransactionDetail TransactionEntry::getDetails() const { return _details; }
-
-    /**
      * @brief Gets the amount of the transaction entry.
      *
      * @return micro_units The amount of the transaction entry in micro units.
      */
     micro_units TransactionEntry::getAmount() const
     {
-        return std::visit(
-            [](const auto& detail) { return detail.getAmount(); },
-            _details
-        );
+        return _cash.getAmount();
     }
 
     /**
@@ -61,11 +51,10 @@ namespace finance
      */
     Currency TransactionEntry::getCurrency() const
     {
-        return std::visit(
-            [](const auto& detail) { return detail.getCurrency(); },
-            _details
-        );
+        return _cash.getCurrency();
     }
+
+    [[nodiscard]] Cash TransactionEntry::getCash() const { return _cash; }
 
     /**
      * @brief Sets the account ID associated with the transaction entry.

@@ -45,18 +45,11 @@ namespace drafts
         /// The cash amount associated with the transaction entry
         finance::Cash cash;
 
-        /// The kind of account associated with the transaction entry
-        AccountKind accountKind;
-
         /// A flag indicating whether this transaction entry needs an external
         /// account
         bool needsExternal = false;
 
-        TransactionEntryDraft(
-            AccountId     accountId_,
-            finance::Cash cash_,
-            AccountKind   accountKind_
-        );
+        TransactionEntryDraft(AccountId accountId_, finance::Cash cash_);
     };
 
 }   // namespace drafts

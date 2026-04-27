@@ -24,13 +24,6 @@ namespace app
 
         [[nodiscard]]
         std::vector<finance::Transaction> getTransactions() override;
-
-       private:
-        [[nodiscard]]
-        std::optional<InstrumentId> _getInstrument(const InstrumentRow& row);
-
-        [[nodiscard]]
-        InstrumentId _insertInstrument(const InstrumentRow& row);
     };
 }   // namespace app
 

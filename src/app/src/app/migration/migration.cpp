@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <memory>
+#include <string>
 
 #include "app/migration/multi_migration.hpp"
 #include "app/migration/single_migration.hpp"
@@ -76,6 +77,7 @@ namespace app
 
         // add migrations
         _migrate_0_0_3();
+        _migrate_0_1_0();
 
         assert(_migrations.size() == toVersion);
     }
@@ -234,6 +236,34 @@ namespace app
             std::make_unique<AddColumnMigration<InstrumentRow::currencyField>>(
                 InstrumentRow::currencyField{Currency::USD}
             )
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    void Migrations::_migrate_0_1_0()
+    {
+        _lastReleaseVersion = utils::SemVer(0, 1, 0);
+
+        _migrateV6();
+    }
+
+    void Migrations::_migrateV6()
+    {
+        constexpr std::size_t currentVersion = 5;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<
+                DropAndRecreateTableMigration<TransactionEntryRow>>()
+        );
+
+        migration.addMigration(
+            std::make_unique<DropAndRecreateTableMigration<InstrumentRow>>()
+        );
+
+        migration.addMigration(
+            std::make_unique<DropAndRecreateTableMigration<TransactionRow>>()
         );
 
         _migrations.push_back(std::move(migration));

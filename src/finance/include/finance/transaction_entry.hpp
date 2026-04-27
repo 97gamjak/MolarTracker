@@ -5,12 +5,11 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "finance/cash.hpp"
 #include "finance/cash_transaction.hpp"
 
 namespace finance
 {
-    using TransactionDetail = std::variant<CashTransaction>;
-
     /**
      * @brief Represents a single entry in a financial transaction.
      *
@@ -24,41 +23,18 @@ namespace finance
         /// The account associated with the cash transaction
         AccountId _accountId;
 
-        /// The cash amount involved in the transaction
-        TransactionDetail _details;
+        Cash _cash;
 
        public:
-        TransactionEntry(
-            TransactionEntryId id,
-            AccountId          accountId,
-            TransactionDetail  details
-        );
+        TransactionEntry(TransactionEntryId id, AccountId accountId, Cash cash);
 
         [[nodiscard]] TransactionEntryId getId() const;
         [[nodiscard]] AccountId          getAccountId() const;
-        [[nodiscard]] TransactionDetail  getDetails() const;
         [[nodiscard]] micro_units        getAmount() const;
         [[nodiscard]] Currency           getCurrency() const;
+        [[nodiscard]] Cash               getCash() const;
 
         void setAccountId(AccountId accountId);
-    };
-
-    /**
-     * @brief Visitor for extracting the amount from a TransactionDetail.
-     *
-     */
-    struct AmountVisitor
-    {
-        /**
-         * @brief Extracts the amount from a TransactionDetail.
-         *
-         * @param detail The TransactionDetail to extract the amount from.
-         * @return The extracted amount in micro_units.
-         */
-        micro_units operator()(const CashTransaction& detail) const
-        {
-            return detail.getAmount();
-        }
     };
 
 }   // namespace finance

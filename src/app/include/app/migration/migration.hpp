@@ -63,11 +63,13 @@ namespace app
 
        private:
         void _migrate_0_0_3();
+        void _migrate_0_1_0();
         void _migrateV1();
         void _migrateV2();
         void _migrateV3();
         void _migrateV4();
         void _migrateV5();
+        void _migrateV6();
     };
 
 }   // namespace app

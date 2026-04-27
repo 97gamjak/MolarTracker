@@ -3,7 +3,6 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "exceptions/not_yet_implemented.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
@@ -12,35 +11,6 @@ REGISTER_LOG_CATEGORY("Drafts.TransactionMapper");
 
 namespace drafts
 {
-
-    /**
-     * @brief Visitor struct for converting TransactionEntryDetails to
-     * TransactionEntryDraft
-     *
-     * This struct is used with std::visit to convert different types of
-     * TransactionEntryDetails (e.g., CashTransaction) to a common
-     * TransactionEntryDraft format. This allows us to handle different types of
-     * transaction entries in a uniform way when creating drafts.
-     */
-    struct ToDraftVisitor
-    {
-        /**
-         * @brief operator() overload for handling CashTransaction details, this
-         * will convert a CashTransaction detail into a TransactionEntryDraft
-         *
-         * @param detail
-         * @return TransactionEntryDraft
-         */
-        TransactionEntryDraft operator()(const finance::CashTransaction& detail
-        ) const
-        {
-            return TransactionEntryDraft{
-                AccountId::invalid(),
-                detail.getCash(),
-                AccountKind::Cash
-            };
-        }
-    };
 
     /**
      * @brief Convert a finance::Transaction to a TransactionDraft
@@ -66,7 +36,11 @@ namespace drafts
 
         for (const auto& entry : transaction.getEntries())
         {
-            auto entryDraft = std::visit(ToDraftVisitor{}, entry.getDetails());
+            TransactionEntryDraft entryDraft{
+                AccountId::invalid(),
+                entry.getCash()
+            };
+
             entryDraft.accountId = entry.getAccountId();
 
             draft.entries.push_back(entryDraft);
@@ -107,31 +81,13 @@ namespace drafts
 
         for (const auto& entryDraft : draft.entries)
         {
-            switch (entryDraft.accountKind)
-            {
-                case AccountKind::Cash:
-                {
-                    const auto entry = finance::TransactionEntry{
-                        TransactionEntryId::invalid(),
-                        entryDraft.accountId,
-                        finance::CashTransaction{entryDraft.cash}
-                    };
+            const finance::TransactionEntry entry{
+                TransactionEntryId::invalid(),
+                entryDraft.accountId,
+                entryDraft.cash
+            };
 
-                    transaction.addEntry(entry);
-
-                    break;
-                }
-                case AccountKind::Security:
-                {
-                    // TODO (97gamjak)[MOLTRACK-231]: implement creating
-                    // transaction entry from draft for account kind security
-                    throw NotYetImplementedException(
-                        "Security transactions are not supported"
-                    );
-                }
-                case AccountKind::External:
-                    break;
-            }
+            transaction.addEntry(entry);
         }
 
         return transaction;

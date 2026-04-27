@@ -299,16 +299,14 @@ namespace ui
             throw std::runtime_error("No account selected");
         }
 
-        const auto amountTmp = _getAmountField()->getAmount();
-        const auto amount    = _getTransactionType() == TransactionType::Deposit
-                                   ? amountTmp
-                                   : -amountTmp;
+        auto cash = finance::Cash(
+            selectedAccount->currency,
+            _getAmountField()->getAmount()
+        );
 
-        auto entry = drafts::TransactionEntryDraft{
-            selectedAccount->id,
-            finance::Cash(selectedAccount->currency, amount),
-            selectedAccount->kind
-        };
+        cash = _getTransactionType() == TransactionType::Deposit ? cash : -cash;
+
+        auto entry = drafts::TransactionEntryDraft{selectedAccount->id, cash};
         entry.needsExternal = true;
 
         draft.entries.push_back(entry);

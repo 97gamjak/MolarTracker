@@ -119,9 +119,9 @@ namespace orm
         template <db_model Model>
         void deleteByPk(db::Database& database, const Model& model);
 
-        /***************
-         * ADD METHODS *
-         ***************/
+        /******************
+         * COLUMN METHODS *
+         ******************/
 
         template <typename Field>
         std::expected<void, CrudError> addColumn(
@@ -129,9 +129,18 @@ namespace orm
             const Field&  field
         );
 
+        template <typename Model>
+        std::expected<void, CrudError> dropColumn(
+            db::Database&      database,
+            const std::string& columnName
+        );
+
        private:
-        template <typename Field>
-        bool _columnExists(db::Database& database);
+        bool _columnExists(
+            db::Database&      database,
+            const std::string& columnName,
+            const std::string& tableName
+        );
     };
 
 }   // namespace orm

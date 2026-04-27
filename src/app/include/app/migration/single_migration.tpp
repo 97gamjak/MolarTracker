@@ -75,6 +75,23 @@ namespace app
         setSQLStatements(crud.getExecutedSQL());
     }
 
+    template <typename Model>
+    DropColumnMigration<Model>::DropColumnMigration(std::string columnName)
+        : SingleMigration(MigrationType::DropColumn),
+          _columnName(std::move(columnName))
+    {
+    }
+
+    template <typename Model>
+    void DropColumnMigration<Model>::applyMigration(db::Database& db)
+    {
+        orm::Crud crud;
+
+        crud.dropColumn<Model>(db, _columnName);
+
+        setSQLStatements(crud.getExecutedSQL());
+    }
+
 }   // namespace app
 
 #endif   // __APP__INCLUDE__APP__MIGRATION__SINGLE_MIGRATION_TPP__

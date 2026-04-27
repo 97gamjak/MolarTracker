@@ -28,26 +28,12 @@ namespace app
         [[nodiscard]]
         static TransactionEntryRow toEntryRow(
             const finance::TransactionEntry& entry,
-            TransactionId                    transactionId,
-            InstrumentId                     instrumentId
+            TransactionId                    transactionId
         );
 
         [[nodiscard]]
         static finance::TransactionEntry fromEntryRow(
-            const TransactionEntryRow& row,
-            const InstrumentRow&       instrumentRow
-        );
-
-        [[nodiscard]]
-        static InstrumentRow toInstrumentRow(
-            const finance::TransactionDetail& detail
-        );
-
-       private:
-        [[nodiscard]]
-        static finance::CashTransaction _toCashTransaction(
-            const TransactionEntryRow& row,
-            const InstrumentRow&       instrumentRow
+            const TransactionEntryRow& row
         );
     };
 

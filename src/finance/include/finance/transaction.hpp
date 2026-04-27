@@ -1,7 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -10,10 +9,17 @@
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
 
-enum class TransactionStatus : std::uint8_t;   // Forward declaration
-
 namespace finance
 {
+    // TODO: replace these
+    struct CashData
+    {
+    };
+    struct TradeData
+    {
+    };
+
+    using TransactionData = std::variant<CashData>;
 
     /**
      * @brief A class representing a financial transaction, which may involve
@@ -35,6 +41,9 @@ namespace finance
 
         /// An optional comment or description for the transaction
         std::optional<std::string> _comment;
+
+        /// The data associated with the transaction
+        TransactionData _data;
 
         /// A list of entries associated with the transaction, each entry
         /// represents a specific cash movement or account change related to the
