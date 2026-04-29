@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__REPOS__INSTRUMENT_REPO_HPP__
-#define __APP__INCLUDE__APP__REPOS__INSTRUMENT_REPO_HPP__
+#ifndef __APP__SRC__APP__REPOS__INSTRUMENT_REPO_HPP__
+#define __APP__SRC__APP__REPOS__INSTRUMENT_REPO_HPP__
 
 #include "app/repos/base_repo.hpp"
 #include "app/repos_api/i_instrument_repo.hpp"
@@ -21,4 +21,4 @@ namespace app
     };
 }   // namespace app
 
-#endif   // __APP__INCLUDE__APP__REPOS__INSTRUMENT_REPO_HPP__
+#endif   // __APP__SRC__APP__REPOS__INSTRUMENT_REPO_HPP__
