@@ -70,6 +70,7 @@ namespace app
         void _migrateV4();
         void _migrateV5();
         void _migrateV6();
+        void _migrateV7();
     };
 
 }   // namespace app
