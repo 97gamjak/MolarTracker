@@ -13,7 +13,6 @@
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "filter/expr_node.hpp"
-#include "orm/concepts.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
