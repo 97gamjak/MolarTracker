@@ -8,6 +8,7 @@
 #include "config/finance.hpp"
 #include "create_transaction_details.hpp"
 #include "drafts/account_draft.hpp"
+#include "drafts/transaction_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 namespace ui
@@ -57,16 +58,9 @@ namespace ui
          */
         void transactionTypeChanged(TransactionType type);
 
-        /**
-         * @brief signal emitted when a transaction draft is ready to be created
-         *
-         * @param draft The transaction draft containing the details of the
-         * transaction to be created, this will be emitted when the user has
-         * filled out the necessary information in the dialog and is ready to
-         * create the transaction, allowing the controller to handle the
-         * creation of the transaction based on the provided draft.
-         */
-        void createTransactionRequested(const drafts::TransactionDraft& draft);
+        void createCashTransactionRequested(
+            const drafts::CreateCashTransactionDraft& draft
+        );
 
        private:
         void _buildUI();

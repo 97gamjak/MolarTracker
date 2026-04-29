@@ -1,12 +1,9 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_ENTRY_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION_ENTRY_HPP__
 
-#include <variant>
-
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
-#include "finance/cash_transaction.hpp"
 
 namespace finance
 {

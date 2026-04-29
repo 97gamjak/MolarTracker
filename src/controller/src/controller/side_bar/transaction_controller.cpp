@@ -6,6 +6,7 @@
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
 #include "drafts/transaction_draft.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/create_transaction_dlg.hpp"
@@ -175,6 +176,7 @@ namespace controller
         drafts::TransactionDraft draft
     )
     {
+        // TODO: change this to proabably something like onCashCreate...
         std::vector<drafts::TransactionEntryDraft> additionalEntries;
 
         for (auto entry : draft.entries)
@@ -193,7 +195,11 @@ namespace controller
             draft.entries.push_back(entry);
         }
 
-        _transactionStore.addTransaction(draft);
+        if (draft.type == TransactionDataType::Cash)
+            _transactionStore.addCashTransaction(draft);
+        else
+            throw NotYetImplementedException("Transaction type not supported");
+
         // TODO(97gamjak): add here commands and also error handling
         _createDlg->close();
         _createDlg->reset();

@@ -8,6 +8,7 @@
 #include <qpushbutton.h>
 
 #include <algorithm>
+#include <optional>
 
 #include "config/finance.hpp"
 #include "drafts/transaction_draft.hpp"
@@ -41,7 +42,7 @@ namespace ui
      * @param type
      * @param accounts
      */
-    NonEmptyTransactionWidget::NonEmptyTransactionWidget(
+    CreateTransactionWidget::CreateTransactionWidget(
         QWidget*                          parent,
         TransactionType                   type,
         std::vector<drafts::AccountDraft> accounts
@@ -80,13 +81,13 @@ namespace ui
             _amountField,
             &AmountLineEdit::validityChanged,
             this,
-            &NonEmptyTransactionWidget::_enableAddButtonIfValid
+            &CreateTransactionWidget::_enableAddButtonIfValid
         );
         connect(
             _amountField,
             &AmountLineEdit::valueChanged,
             this,
-            &NonEmptyTransactionWidget::_enableAddButtonIfValid
+            &CreateTransactionWidget::_enableAddButtonIfValid
         );
 
         // connect the add button to emit the Ok action with the profile draft
@@ -94,7 +95,7 @@ namespace ui
             _addButton,
             &QPushButton::clicked,
             this,
-            &NonEmptyTransactionWidget::_emitOk
+            &CreateTransactionWidget::_emitOk
         );
 
         buttonLayout->addWidget(_addButton);
@@ -107,7 +108,7 @@ namespace ui
      *
      * @return TransactionType
      */
-    TransactionType NonEmptyTransactionWidget::_getTransactionType() const
+    TransactionType CreateTransactionWidget::getTransactionType() const
     {
         return _type;
     }
@@ -121,7 +122,7 @@ namespace ui
      *
      * @return std::optional<drafts::AccountDraft>
      */
-    std::optional<drafts::AccountDraft> NonEmptyTransactionWidget::
+    std::optional<drafts::AccountDraft> CreateTransactionWidget::
         _getSelectedAccount() const
     {
         const auto accountId =
@@ -144,7 +145,7 @@ namespace ui
     /**
      * @brief set the accounts for the accounts selection combo box
      */
-    void NonEmptyTransactionWidget::_setAccounts()
+    void CreateTransactionWidget::_setAccounts()
     {
         _accountsSelection = makeQChild<QComboBox>(this);
         _accountsSelection->setPlaceholderText("Select Account");
@@ -162,7 +163,7 @@ namespace ui
             _accountsSelection,
             &QComboBox::activated,
             this,
-            &NonEmptyTransactionWidget::_onAccountSelected
+            &CreateTransactionWidget::_onAccountSelected
         );
     }
 
@@ -180,7 +181,7 @@ namespace ui
         std::vector<drafts::AccountDraft> accounts,
         std::vector<drafts::AccountDraft> referenceAccounts
     )
-        : NonEmptyTransactionWidget(parent, type, std::move(accounts)),
+        : CreateTransactionWidget(parent, type, std::move(accounts)),
           _referenceAccounts(std::move(referenceAccounts))
     {
     }
@@ -198,7 +199,7 @@ namespace ui
      * method to access the details of the selected account and update the UI
      * accordingly.
      */
-    void NonEmptyTransactionWidget::_onAccountSelected(int /*index*/)
+    void CreateTransactionWidget::_onAccountSelected(int /*index*/)
     {
         const auto account = _getSelectedAccount();
 
@@ -245,7 +246,7 @@ namespace ui
         QWidget*                          parent,
         TransactionType                   type,
         std::vector<drafts::AccountDraft> accounts,
-        std::vector<drafts::AccountDraft> referenceAccounts
+        std::vector<drafts::AccountDraft> /*referenceAccounts*/
     )
     {
         switch (type)
@@ -258,26 +259,19 @@ namespace ui
                     std::move(accounts)
                 );
             case TransactionType::Stock:
-                return makeQChild<StockWidget>(
-                    parent,
-                    type,
-                    std::move(accounts),
-                    std::move(referenceAccounts)
+                // TODO:
+                throw std::runtime_error(
+                    "Stock transactions are not supported"
                 );
+                // return makeQChild<StockWidget>(
+                //     parent,
+                //     type,
+                //     std::move(accounts),
+                //     std::move(referenceAccounts)
+                // );
         }
 
         throw std::invalid_argument("Unsupported transaction type");
-    }
-
-    /**
-     * @brief Construct a new Empty Transaction Widget:: Empty Transaction
-     * Widget object
-     *
-     * @param parent
-     */
-    EmptyTransactionWidget::EmptyTransactionWidget(QWidget* parent)
-        : ICreateTransactionWidget(parent)
-    {
     }
 
     /**
@@ -285,12 +279,9 @@ namespace ui
      *
      * @return drafts::TransactionDraft
      */
-    drafts::TransactionDraft DepositWithdrawalWidget::getDraft() const
+    drafts::CreateCashTransactionDraft DepositWithdrawalWidget::getDraft() const
     {
-        drafts::TransactionDraft draft;
-        Timestamp                now = Timestamp{};
-
-        draft.timestamp = now;
+        const auto now = Timestamp{};
 
         const auto selectedAccount = _getSelectedAccount();
 
@@ -304,33 +295,20 @@ namespace ui
             _getAmountField()->getAmount()
         );
 
-        cash = _getTransactionType() == TransactionType::Deposit ? cash : -cash;
+        cash = getTransactionType() == TransactionType::Deposit ? cash : -cash;
 
         auto entry = drafts::TransactionEntryDraft{selectedAccount->id, cash};
         entry.needsExternal = true;
 
-        draft.entries.push_back(entry);
+        // TODO: implement comment and timestamp
 
-        return draft;
+        return {now, {entry}, std::nullopt};
     }
 
-    drafts::TransactionDraft StockWidget::getDraft() const
-    {
-        // TODO (97gamjak)[MOLTRACK-233]: implement StockWidget::getDraft()
-        throw NotYetImplementedException(
-            "StockWidget::getDraft() not yet implemented"
-        );
-    }
-
-    /**
-     * @brief Emit the createTransactionRequested signal with the transaction
-     * draft
-     *
-     */
-    void NonEmptyTransactionWidget::_emitOk()
+    void DepositWithdrawalWidget::_emitOk()
     {
         const auto draft = getDraft();
-        emit       createTransactionRequested(draft);
+        emit       createCashTransactionRequested(draft);
     }
 
     /**
@@ -342,7 +320,7 @@ namespace ui
      * transaction draft based on the current input values.
      *
      */
-    void NonEmptyTransactionWidget::_enableAddButtonIfValid()
+    void CreateTransactionWidget::_enableAddButtonIfValid()
     {
         const auto isValid = _getSelectedAccount().has_value() &&
                              _amountField->isValid() &&
@@ -356,7 +334,7 @@ namespace ui
      *
      * @return AmountLineEdit*
      */
-    AmountLineEdit* NonEmptyTransactionWidget::_getAmountField() const
+    AmountLineEdit* CreateTransactionWidget::_getAmountField() const
     {
         return _amountField;
     }

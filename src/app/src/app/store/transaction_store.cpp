@@ -72,30 +72,15 @@ namespace app
         _cleanEntries();
     }
 
-    /**
-     * @brief Add a transaction to the store, this will add the transaction as
-     * a new entry in the store and mark it as New, indicating that it has not
-     * yet been committed to the database, and will be included in the next
-     * commit operation.
-     *
-     * @param draft The transaction draft to add to the store, this contains the
-     * details of the transaction to be added, including its entries and other
-     * relevant information needed to create a complete transaction in the
-     * store.
-     * @return TransactionStoreResult The result of the add operation,
-     * indicating whether it was successful or if there were any issues (e.g.,
-     * if the transaction sum is not zero).
-     */
     TransactionStoreResult TransactionStore::addTransaction(
-        const drafts::TransactionDraft& draft
+        finance::Transaction& transaction
     )
     {
         const auto& id = _generateNewId();
 
-        auto cash = finance::Cash(draft.entries.front().cash.getCurrency(), 0);
+        transaction.setId(id);
 
-        for (const auto& entry : draft.entries)
-            cash += entry.cash;
+        const auto cash = transaction.calculateTotalSum();
 
         if (!cash.isZero())
         {
@@ -108,7 +93,7 @@ namespace app
             return TransactionStoreResult::TransactionSumNotZero;
         }
 
-        _addEntry(TransactionMapper::toTransaction(draft, id), StoreState::New);
+        _addEntry(transaction, StoreState::New);
 
         return TransactionStoreResult::Ok;
     }
@@ -156,18 +141,7 @@ namespace app
         }
     }
 
-    /**
-     * @brief Retrieves all transactions from the store, this will return a
-     * vector of transaction drafts representing the transactions currently in
-     * the store, including any new transactions that have been added but not
-     * yet committed to the database, as well as transactions that are already
-     * in the database but may have been modified in the store.
-     *
-     * @return std::vector<drafts::TransactionDraft> A vector of transaction
-     * drafts representing the transactions in the store.
-     */
-    std::vector<drafts::TransactionDraft> TransactionStore::getTransactions(
-    ) const
+    std::vector<finance::Transaction> TransactionStore::getTransactions() const
     {
         const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
@@ -181,30 +155,31 @@ namespace app
 
         std::unordered_map<
             TransactionId,
-            drafts::TransactionDraft,
+            finance::Transaction,
             TransactionId::Hash>
             transactionMap;
 
-        std::vector<drafts::TransactionDraft> results;
+        std::vector<finance::Transaction> results;
 
         for (const auto& transaction : transactions)
         {
             // Only include transactions that are new, for all others the id is
             // already in the database and we will get it from there
-            const auto draft = TransactionMapper::toDraft(transaction.value);
-
-            results.push_back(draft);
+            results.push_back(transaction.value);
 
             if (transaction.state != StoreState::New)
             {
-                transactionMap.emplace(transaction.value.getId(), draft);
+                transactionMap.emplace(
+                    transaction.value.getId(),
+                    transaction.value
+                );
             }
         }
 
         for (const auto& transaction : dbTransactions)
         {
             if (!transactionMap.contains(transaction.getId()))
-                results.push_back(TransactionMapper::toDraft(transaction));
+                results.push_back(transaction);
         }
 
         return results;

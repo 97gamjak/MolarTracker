@@ -3,6 +3,7 @@
 
 #include <qwidget.h>
 
+#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
 
@@ -35,42 +36,11 @@ namespace ui
        public:
         explicit ICreateTransactionWidget(QWidget* parent);
 
-       signals:
-        /**
-         * @brief Signal emitted when a transaction draft is ready to be created
-         *
-         * @param draft
-         */
-        void createTransactionRequested(const drafts::TransactionDraft& draft);
+        [[nodiscard]]
+        virtual TransactionType getTransactionType() const = 0;
     };
 
-    /**
-     * @brief Widget for creating or editing a transaction, with fields for
-     * selecting accounts, entering amounts, and specifying transaction details
-     *
-     * This widget provides a form for creating or editing a transaction. It
-     * includes fields for selecting the accounts involved in the transaction,
-     * entering the amount, and specifying other details. The widget validates
-     * the input and emits a signal with the transaction draft when the user
-     * submits the form.
-     */
-    class EmptyTransactionWidget : public ICreateTransactionWidget
-    {
-       public:
-        explicit EmptyTransactionWidget(QWidget* parent);
-    };
-
-    /**
-     * @brief Widget for creating or editing a transaction, with fields for
-     * selecting accounts, entering amounts, and specifying transaction details
-     *
-     * This widget provides a form for creating or editing a transaction. It
-     * includes fields for selecting the accounts involved in the transaction,
-     * entering the amount, and specifying other details. The widget validates
-     * the input and emits a signal with the transaction draft when the user
-     * submits the form.
-     */
-    class NonEmptyTransactionWidget : public ICreateTransactionWidget
+    class CreateTransactionWidget : public ICreateTransactionWidget
     {
         Q_OBJECT
        private:
@@ -93,30 +63,22 @@ namespace ui
         QFormLayout* _layout = nullptr;
 
        public:
-        explicit NonEmptyTransactionWidget(
+        explicit CreateTransactionWidget(
             QWidget*                          parent,
             TransactionType                   type,
             std::vector<drafts::AccountDraft> accounts
         );
 
-        /**
-         * @brief Get the Transaction Draft object
-         *
-         * @return drafts::TransactionDraft
-         */
         [[nodiscard]]
-        virtual drafts::TransactionDraft getDraft() const = 0;
+        TransactionType getTransactionType() const override;
 
        private:
-        void _setAccounts();
-        void _onAccountSelected(int index);
-        void _emitOk();
-        void _enableAddButtonIfValid();
+        void         _setAccounts();
+        void         _onAccountSelected(int index);
+        virtual void _emitOk() = 0;
+        void         _enableAddButtonIfValid();
 
        protected:
-        [[nodiscard]]
-        TransactionType _getTransactionType() const;
-
         [[nodiscard]]
         std::optional<drafts::AccountDraft> _getSelectedAccount() const;
 
@@ -135,12 +97,23 @@ namespace ui
      * @return ICreateTransactionWidget* A pointer to the created transaction
      * widget
      */
-    class DepositWithdrawalWidget : public NonEmptyTransactionWidget
+    class DepositWithdrawalWidget : public CreateTransactionWidget
     {
-        using NonEmptyTransactionWidget::NonEmptyTransactionWidget;
+        using CreateTransactionWidget::CreateTransactionWidget;
 
        public:
-        [[nodiscard]] drafts::TransactionDraft getDraft() const override;
+        [[nodiscard]] drafts::CreateCashTransactionDraft getDraft() const;
+
+        void _emitOk() override;
+
+        /**
+         * @brief Signal emitted when a transaction draft is ready to be created
+         *
+         * @param draft
+         */
+        void createCashTransactionRequested(
+            const drafts::CreateCashTransactionDraft& draft
+        );
     };
 
     /**
@@ -152,7 +125,7 @@ namespace ui
      * The widget validates the input and emits a signal with the transaction
      * draft when the user submits the form.
      */
-    class SecurityWidget : public NonEmptyTransactionWidget
+    class SecurityWidget : public CreateTransactionWidget
     {
        private:
         /// A list of reference account drafts to populate the reference account
@@ -181,9 +154,6 @@ namespace ui
     {
        private:
         using SecurityWidget::SecurityWidget;
-
-        [[nodiscard]]
-        drafts::TransactionDraft getDraft() const override;
     };
 
     ICreateTransactionWidget* makeTransactionWidget(

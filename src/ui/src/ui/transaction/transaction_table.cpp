@@ -11,6 +11,8 @@
 #include <QFont>
 #include <mstd/enum.hpp>
 
+#include "drafts/transaction_draft.hpp"
+
 namespace ui
 {
 
@@ -61,8 +63,8 @@ namespace ui
      * @param accountIdToName
      */
     void TransactionTableModel::setTransactions(
-        std::vector<drafts::TransactionDraft> transactions,
-        IdToNameMap                           accountIdToName
+        std::vector<drafts::TransactionOverviewDraft> transactions,
+        IdToNameMap                                   accountIdToName
     )
     {
         beginResetModel();
@@ -134,49 +136,50 @@ namespace ui
      * @return QVariant
      */
     QVariant TransactionTableModel::_displayData(
-        const drafts::TransactionDraft& transaction,
-        Column                          col
+        const drafts::TransactionOverviewDraft& /*transaction*/,
+        Column /*col*/
     ) const
     {
-        switch (col)
-        {
-            case Column::Date:
-            {
-                return transaction.timestamp.toQDateTime().toString(
-                    "yyyy-MM-dd"
-                );
-            }
-            case Column::Description:
-                return QString::fromStdString(transaction.comment.value_or(""));
-            case Column::Type:
-                return QString::fromStdString("");
-            case Column::Account:
-            {
-                if (!_accountIdToName.contains(
-                        transaction.entries.front().accountId
-                    ))
-                    return "";
+        // switch (col)
+        // {
+        //     case Column::Date:
+        //     {
+        //         return transaction.timestamp.toQDateTime().toString(
+        //             "yyyy-MM-dd"
+        //         );
+        //     }
+        //     case Column::Description:
+        //         return
+        //         QString::fromStdString(transaction.comment.value_or(""));
+        //     case Column::Type:
+        //         return QString::fromStdString("");
+        //     case Column::Account:
+        //     {
+        //         if (!_accountIdToName.contains(
+        //                 transaction.entries.front().accountId
+        //             ))
+        //             return "";
 
-                return QString::fromStdString(
-                    _accountIdToName.at(transaction.entries.front().accountId)
-                );
-            }
-            case Column::ReferenceAccount:
-            {
-                if (!_accountIdToName.contains(
-                        transaction.entries.back().accountId
-                    ))
-                    return "";
+        //         return QString::fromStdString(
+        //             _accountIdToName.at(transaction.entries.front().accountId)
+        //         );
+        //     }
+        //     case Column::ReferenceAccount:
+        //     {
+        //         if (!_accountIdToName.contains(
+        //                 transaction.entries.back().accountId
+        //             ))
+        //             return "";
 
-                return QString::fromStdString(
-                    _accountIdToName.at(transaction.entries.back().accountId)
-                );
-            }
-            case Column::Amount:
-                return QString::fromStdString(
-                    transaction.entries.front().cash.toString(2)
-                );
-        }
+        //         return QString::fromStdString(
+        //             _accountIdToName.at(transaction.entries.back().accountId)
+        //         );
+        //     }
+        //     case Column::Amount:
+        //         return QString::fromStdString(
+        //             transaction.entries.front().cash.toString(2)
+        //         );
+        // }
         return {};
     }
 
@@ -188,16 +191,17 @@ namespace ui
      * @return QVariant
      */
     QVariant TransactionTableModel::_decorationData(
-        const drafts::TransactionDraft& transaction,
-        Column                          col
+        const drafts::TransactionOverviewDraft& /*transaction*/,
+        Column /*col*/
     )
     {
-        if (col != Column::Amount)
-            return {};
+        // if (col != Column::Amount)
+        //     return {};
 
-        return transaction.entries.front().cash.getAmount() >= 0
-                   ? QColor(Qt::GlobalColor::green)
-                   : QColor(Qt::GlobalColor::red);
+        // return transaction.entries.front().cash.getAmount() >= 0
+        //            ? QColor(Qt::GlobalColor::green)
+        //            : QColor(Qt::GlobalColor::red);
+        return {};
     }
     /**
      * @brief text alignment data for the table model

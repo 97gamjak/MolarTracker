@@ -14,8 +14,6 @@ namespace ui
     class TransactionCategory : public Category
     {
        private:
-        /// The create action for the transaction category
-        QAction* _createAction;
         /// The create deposit action for the transaction category
         QAction* _createDepositAction;
         /// The create withdrawal action for the transaction category

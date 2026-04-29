@@ -11,6 +11,7 @@
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/profile_row.hpp"
+#include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 #include "utils/version.hpp"
@@ -264,6 +265,10 @@ namespace app
 
         migration.addMigration(
             std::make_unique<DropAndRecreateTableMigration<TransactionRow>>()
+        );
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<TradeLegRow>>()
         );
 
         _migrations.push_back(std::move(migration));

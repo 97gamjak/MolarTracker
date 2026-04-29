@@ -34,7 +34,7 @@ namespace ui
         explicit TransactionsOverview(QWidget* parent);
 
         void refresh(
-            const std::vector<drafts::TransactionDraft>& transactions,
+            const std::vector<drafts::TransactionOverviewDraft>& transactions,
             const std::unordered_map<AccountId, std::string, AccountId::Hash>&
                 accountIdToName
         );

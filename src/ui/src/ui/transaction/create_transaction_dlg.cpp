@@ -38,7 +38,6 @@ namespace ui
     void CreateTransactionDialog::_buildUI()
     {
         _stack = makeQChild<QStackedWidget>(this);
-        _stack->addWidget(makeQChild<EmptyTransactionWidget>(_stack));
         setWindowTitle("New Transaction");
 
         _transactionType = makeQChild<QComboBox>(this);
@@ -184,12 +183,25 @@ namespace ui
             _widgetMap[type] = widget;
             _stack->addWidget(widget);
 
-            connect(
-                widget,
-                &ICreateTransactionWidget::createTransactionRequested,
-                this,
-                &CreateTransactionDialog::createTransactionRequested
-            );
+            switch (type)
+            {
+                case TransactionType::Deposit:
+                case TransactionType::Withdrawal:
+                    connect(
+                        dynamic_cast<DepositWithdrawalWidget*>(widget),
+                        &DepositWithdrawalWidget::
+                            createCashTransactionRequested,
+                        this,
+                        &CreateTransactionDialog::createCashTransactionRequested
+                    );
+                    break;
+                case TransactionType::Stock:
+                    // TODO:
+                    throw std::logic_error(
+                        "Stock transactions are not yet implemented"
+                    );
+                    break;
+            }
         }
 
         _stack->setCurrentWidget(_widgetMap[type]);

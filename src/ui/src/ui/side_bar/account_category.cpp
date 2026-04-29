@@ -41,15 +41,6 @@ namespace ui
     void AccountCategory::clearAccounts() { removeRows(0, rowCount()); }
 
     /**
-     * @brief Get the Create Action object, this is used to connect the action
-     * to a slot in the controller that will handle creating a new account when
-     * the action is triggered
-     *
-     * @return QAction*
-     */
-    QAction* AccountCategory::getCreateAction() const { return _createAction; }
-
-    /**
      * @brief Populate the context menu of the account category, this will be
      * called when the account category is right-clicked, and the menu will be
      * shown to the user

@@ -33,8 +33,10 @@ struct TransactionRow : public orm::ORMModel<"transaction_">
     /// The comment field, this is an optional field
     ORM_FIELD(comment, Field<"comment", std::optional<std::string>>)
 
+    ORM_FIELD(type, Field<"type", TransactionDataType, orm::not_null_t>)
+
     /// auto generate the fields() function using the ORM_FIELDS macro
-    ORM_FIELDS(TransactionRow, id, timestamp, status, comment);
+    ORM_FIELDS(TransactionRow, id, timestamp, status, comment, type);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ROW_HPP__

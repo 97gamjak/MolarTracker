@@ -14,20 +14,9 @@ namespace ui
      */
     TransactionCategory::TransactionCategory()
         : Category("Transactions", SideBarItemType::TransactionCategory),
-          _createAction(nullptr),
           _createDepositAction(nullptr),
           _createWithdrawalAction(nullptr)
     {
-    }
-
-    /**
-     * @brief Get the create action for the transaction category
-     *
-     * @return QAction* The create action for the transaction category
-     */
-    QAction* TransactionCategory::getCreateAction() const
-    {
-        return _createAction;
     }
 
     /**
@@ -58,8 +47,6 @@ namespace ui
      */
     void TransactionCategory::populateContextMenu(QMenu& menu)
     {
-        _createAction = menu.addAction("Create Transaction");
-
         using enum TransactionType;
 
         const auto depositName = "Create " + utils::toQString(Deposit);

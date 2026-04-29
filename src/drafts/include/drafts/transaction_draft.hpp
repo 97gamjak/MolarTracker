@@ -12,27 +12,7 @@
 namespace drafts
 {
 
-    struct TransactionEntryDraft;   // Forward declaration
-
-    /**
-     * @brief A draft representation of a transaction
-     *
-     */
-    struct TransactionDraft
-    {
-        /// The ID of the transaction
-        TransactionId id = TransactionId::invalid();
-
-        /// The timestamp of the transaction
-        Timestamp timestamp;
-
-        /// An optional comment for the transaction
-        std::optional<std::string> comment;
-
-        /// The entries of the transaction
-        std::vector<TransactionEntryDraft> entries;
-    };
-
+    // TODO: create own draft files
     /**
      * @brief A draft representation of a transaction entry
      *
@@ -50,6 +30,48 @@ namespace drafts
         bool needsExternal = false;
 
         TransactionEntryDraft(AccountId accountId_, finance::Cash cash_);
+    };
+
+    struct TransactionDataDraft
+    {
+    };
+
+    /**
+     * @brief A draft representation of a transaction
+     *
+     */
+    class CreateCashTransactionDraft
+    {
+       private:
+        /// The timestamp of the transaction
+        Timestamp _timestamp;
+
+        /// The entries of the transaction
+        std::vector<TransactionEntryDraft> _entries;
+
+        std::optional<std::string> _comment;
+
+       public:
+        CreateCashTransactionDraft(
+            Timestamp                          timestamp,
+            std::vector<TransactionEntryDraft> entries,
+            std::optional<std::string>         comment
+        );
+
+        [[nodiscard]]
+        const std::vector<TransactionEntryDraft>& getEntries() const;
+
+        [[nodiscard]]
+        const Timestamp& getTimestamp() const;
+
+        [[nodiscard]]
+        const std::optional<std::string>& getComment() const;
+    };
+
+    class TransactionOverviewDraft
+    {
+       private:
+       public:
     };
 
 }   // namespace drafts

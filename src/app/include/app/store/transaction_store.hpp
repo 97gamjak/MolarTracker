@@ -46,11 +46,11 @@ namespace app
         );
 
         TransactionStoreResult addTransaction(
-            const drafts::TransactionDraft& draft
+            finance::Transaction& transaction
         );
 
         // TODO (97gamjak): create filter here
-        std::vector<drafts::TransactionDraft> getTransactions() const;
+        std::vector<finance::Transaction> getTransactions() const;
 
        private:
         void _updateAccountIds(
