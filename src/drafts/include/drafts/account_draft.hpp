@@ -33,12 +33,6 @@ namespace drafts
         std::optional<AccountStatus> status = std::nullopt;
 
         explicit AccountDraft(
-            std::string _name,
-            AccountKind _kind,
-            Currency    _currency
-        );
-
-        explicit AccountDraft(
             AccountId                    _id,
             std::string                  _name,
             AccountKind                  _kind,

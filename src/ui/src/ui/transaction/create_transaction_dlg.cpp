@@ -6,7 +6,9 @@
 #include "config/finance.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
-#include "ui/transaction/create_transaction_details.hpp"
+#include "ui/transaction/deposit_withdrawal_widget.hpp"
+#include "ui/transaction/i_create_transaction_widget.hpp"
+#include "ui/transaction/make_transaction_widget.hpp"
 #include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Transaction.CreateTransactionDialog");

@@ -7,9 +7,9 @@
 #include <QComboBox>
 
 #include "config/finance.hpp"
-#include "create_transaction_details.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
+#include "i_create_transaction_widget.hpp"
 #include "ui/base/dialog.hpp"
 
 namespace ui

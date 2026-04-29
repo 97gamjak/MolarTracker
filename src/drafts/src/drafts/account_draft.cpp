@@ -8,22 +8,6 @@ namespace drafts
     /**
      * @brief Construct a new Account Draft:: Account Draft object
      *
-     * @param _name
-     * @param _kind
-     * @param _currency
-     */
-    AccountDraft::AccountDraft(
-        std::string _name,
-        AccountKind _kind,
-        Currency    _currency
-    )
-        : name(std::move(_name)), kind(_kind), currency(_currency)
-    {
-    }
-
-    /**
-     * @brief Construct a new Account Draft:: Account Draft object
-     *
      * @param _id
      * @param _name
      * @param _kind

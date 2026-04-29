@@ -15,7 +15,8 @@ namespace ui
     TransactionCategory::TransactionCategory()
         : Category("Transactions", SideBarItemType::TransactionCategory),
           _createDepositAction(nullptr),
-          _createWithdrawalAction(nullptr)
+          _createWithdrawalAction(nullptr),
+          _createStockTransactionAction(nullptr)
     {
     }
 

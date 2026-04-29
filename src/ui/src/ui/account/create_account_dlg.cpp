@@ -7,6 +7,7 @@
 #include <string>
 
 #include "config/finance.hpp"
+#include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/validators/name_line_edit.hpp"
 #include "ui/validators/validators.hpp"
@@ -150,9 +151,11 @@ namespace ui
         const auto currency    = CurrencyMeta::from_string(currencyStr).value();
 
         return drafts::AccountDraft{
+            AccountId::invalid(),
             _nameLineEdit->text().toStdString(),
             type,
-            currency
+            currency,
+            AccountStatus::Active
         };
     }
 
