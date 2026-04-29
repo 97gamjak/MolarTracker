@@ -7,6 +7,8 @@
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
 #include "repo_errors.hpp"
+#include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_row.hpp"
 
 namespace app
 {

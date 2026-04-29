@@ -2,8 +2,7 @@
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
 #include <variant>
-
-#include "drafts/transaction_draft.hpp"
+#include <vector>
 
 namespace finance
 {
@@ -18,7 +17,8 @@ namespace finance
 
 namespace drafts
 {
-    struct CreateCashTransactionDraft;
+    class CreateCashTransactionDraft;
+    class TransactionOverviewDraft;
 
     /**
      * @brief Mapper class for converting between Transaction and

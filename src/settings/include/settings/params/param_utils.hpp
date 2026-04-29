@@ -121,45 +121,41 @@ namespace settings
         forEachParam(std::forward<Tuple>(tuple), paramFromJson);
     }
 
-    // NOLINTBEGIN(misc-definitions-in-headers)
-
     template <typename T>
-    constexpr bool is_bool_param = false;
+    inline constexpr bool is_bool_param = false;
 
     template <>
-    constexpr bool is_bool_param<BoolParam> = true;
+    inline constexpr bool is_bool_param<BoolParam> = true;
 
     template <typename T>
-    constexpr bool is_string_param = false;
+    inline constexpr bool is_string_param = false;
 
     template <>
-    constexpr bool is_string_param<StringParam> = true;
+    inline constexpr bool is_string_param<StringParam> = true;
 
     template <typename T>
-    constexpr bool is_numeric_param = false;
+    inline constexpr bool is_numeric_param = false;
 
     template <typename T>
-    constexpr bool is_numeric_param<NumericParam<T>> = true;
+    inline constexpr bool is_numeric_param<NumericParam<T>> = true;
 
     template <typename T>
-    constexpr bool is_version_param = false;
+    inline constexpr bool is_version_param = false;
 
     template <>
-    constexpr bool is_version_param<VersionParam> = true;
+    inline constexpr bool is_version_param<VersionParam> = true;
 
     template <typename T>
-    constexpr bool is_enum_param = false;
+    inline constexpr bool is_enum_param = false;
 
     template <typename E>
-    constexpr bool is_enum_param<EnumParam<E>> = true;
+    inline constexpr bool is_enum_param<EnumParam<E>> = true;
 
     template <typename T>
-    constexpr bool is_numeric_vec_param = false;
+    inline constexpr bool is_numeric_vec_param = false;
 
     template <typename T, std::size_t N>
-    constexpr bool is_numeric_vec_param<NumericVecParam<T, N>> = true;
-
-    // NOLINTEND(misc-definitions-in-headers)
+    inline constexpr bool is_numeric_vec_param<NumericVecParam<T, N>> = true;
 
 }   // namespace settings
 

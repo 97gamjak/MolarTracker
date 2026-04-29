@@ -198,7 +198,7 @@ namespace ui
         // if (col != Column::Amount)
         //     return {};
 
-        // return transaction.entries.front().cash.getAmount() >= 0
+        // return transaction.entries.front().cash >= 0
         //            ? QColor(Qt::GlobalColor::green)
         //            : QColor(Qt::GlobalColor::red);
         return {};
