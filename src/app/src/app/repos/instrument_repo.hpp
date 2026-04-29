@@ -12,6 +12,9 @@ namespace app
     class InstrumentRepo : public BaseRepo, public IInstrumentRepo
     {
        public:
+        using BaseRepo::BaseRepo;
+
+        [[nodiscard]]
         std::vector<std::string> getTickers() override;
 
         void addStock(const finance::Stock& stock) override;

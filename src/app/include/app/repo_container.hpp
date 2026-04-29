@@ -14,6 +14,7 @@ namespace app
     class IProfileRepo;       // Forward declaration
     class IAccountRepo;       // Forward declaration
     class ITransactionRepo;   // Forward declaration
+    class IInstrumentRepo;    // Forward declaration
 
     /**
      * @brief Container for all repositories
@@ -28,6 +29,8 @@ namespace app
         std::shared_ptr<IAccountRepo> _accountRepo;
         /// The Transaction repository
         std::shared_ptr<ITransactionRepo> _transactionRepo;
+        /// The Instrument repository
+        std::shared_ptr<IInstrumentRepo> _instrumentRepo;
 
        public:
         explicit RepoContainer(db::Database& db);
@@ -42,6 +45,10 @@ namespace app
 
         [[nodiscard]] std::shared_ptr<ITransactionRepo> getTransactionRepo();
         [[nodiscard]] std::shared_ptr<const ITransactionRepo> getTransactionRepo(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<IInstrumentRepo> getInstrumentRepo();
+        [[nodiscard]] std::shared_ptr<const IInstrumentRepo> getInstrumentRepo(
         ) const;
     };
 

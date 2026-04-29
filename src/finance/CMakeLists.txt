@@ -7,6 +7,7 @@ add_library(molartracker_finance STATIC
     src/finance/transaction.cpp
     src/finance/transaction_entry.cpp
     src/finance/trade_data.cpp
+    src/finance/stock.cpp
 )
 
 target_include_directories(molartracker_finance
