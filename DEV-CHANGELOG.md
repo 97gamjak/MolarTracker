@@ -10,6 +10,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Add security account type
 - Add transaction type stock
+- Add create stock dialog draft
 
 #### HTTP
 
