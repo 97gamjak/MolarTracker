@@ -157,6 +157,18 @@ int Constants::getDbBusyTimeoutMs()
 }
 
 /**
+ * @brief Get the precision for micro units for securities, this is the number
+ * of decimal places to use for micro units, which are used for representing
+ * fractional shares and other fractional quantities in the application
+ *
+ * @return std::uint8_t
+ */
+std::uint8_t Constants::getMicroUnitsPrecision()
+{
+    return ConstantsSchema::_microUnitsPrecision;
+}
+
+/**
  * @brief Get the multiplier to convert seconds to milliseconds, this is used
  * for settings that are stored in seconds but need to be converted to
  * milliseconds for use in the application (e.g. auto-reload interval)

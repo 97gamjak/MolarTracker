@@ -1,31 +1,13 @@
 #include "finance/transaction.hpp"
 
 #include <utility>
+#include <variant>
 
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 
 namespace finance
 {
-    /**
-     * @brief Construct a new Transaction:: Transaction object
-     *
-     * @param id
-     * @param timestamp
-     * @param status
-     * @param comment
-     */
-    Transaction::Transaction(
-        TransactionId     id,
-        Timestamp         timestamp,
-        TransactionStatus status,
-        std::string       comment
-    )
-        : _id(id),
-          _timestamp(timestamp),
-          _status(status),
-          _comment(std::move(comment))
-    {
-    }
 
     /**
      * @brief Construct a new Transaction:: Transaction object
@@ -33,34 +15,24 @@ namespace finance
      * @param id
      * @param timestamp
      * @param status
+     * @param data
+     * @param entries
      * @param comment
      */
     Transaction::Transaction(
-        TransactionId              id,
-        Timestamp                  timestamp,
-        TransactionStatus          status,
-        std::optional<std::string> comment
+        TransactionId                 id,
+        Timestamp                     timestamp,
+        TransactionStatus             status,
+        TransactionData               data,
+        std::vector<TransactionEntry> entries,
+        std::optional<std::string>    comment
     )
         : _id(id),
           _timestamp(timestamp),
           _status(status),
+          _data(std::move(data)),
+          _entries(std::move(entries)),
           _comment(std::move(comment))
-    {
-    }
-
-    /**
-     * @brief Construct a new Transaction:: Transaction object without a comment
-     *
-     * @param id
-     * @param timestamp
-     * @param status
-     */
-    Transaction::Transaction(
-        TransactionId     id,
-        Timestamp         timestamp,
-        TransactionStatus status
-    )
-        : _id(id), _timestamp(timestamp), _status(status)
     {
     }
 
@@ -132,6 +104,53 @@ namespace finance
     void Transaction::addEntry(const TransactionEntry& entry)
     {
         _entries.push_back(entry);
+    }
+
+    /**
+     * @brief Gets the type of the transaction based on its data.
+     *
+     * @return TransactionDataType The type of the transaction (e.g., Cash,
+     * Trade).
+     */
+    TransactionDataType Transaction::getType() const
+    {
+        struct Visitor
+        {
+            TransactionDataType operator()(const CashData& /*data*/) const
+            {
+                return TransactionDataType::Cash;
+            }
+
+            TransactionDataType operator()(const TradeData& /*data*/) const
+            {
+                return TransactionDataType::Trade;
+            }
+        };
+
+        return std::visit(Visitor{}, _data);
+    }
+
+    /**
+     * @brief Calculates the total sum of the transaction by summing the cash
+     * amounts of all entries, this is used to ensure that the transaction is
+     * balanced (i.e., the total sum should be zero for a valid transaction),
+     * and can be used for validation before committing the transaction to the
+     * database.
+     *
+     * @return Cash The total sum of the transaction, calculated by summing the
+     * cash amounts of all entries.
+     */
+    Cash Transaction::calculateTotalSum() const
+    {
+        if (_entries.empty())
+            return Cash(Currency::USD);
+
+        Cash total(_entries.front().getCurrency());
+
+        for (const auto& entry : _entries)
+            total += entry.getCash();
+
+        return total;
     }
 
 }   // namespace finance

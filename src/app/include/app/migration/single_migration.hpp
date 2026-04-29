@@ -188,6 +188,10 @@ namespace app
         void applyMigration(db::Database& db) override;
     };
 
+    /**
+     * @brief Migration to drop a column from a table
+     *
+     */
     template <typename Model>
     class DropColumnMigration : public SingleMigration
     {

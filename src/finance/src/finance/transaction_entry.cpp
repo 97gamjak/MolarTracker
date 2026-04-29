@@ -54,6 +54,11 @@ namespace finance
         return _cash.getCurrency();
     }
 
+    /**
+     * @brief Gets the cash associated with the transaction entry.
+     *
+     * @return Cash The cash associated with the transaction entry.
+     */
     [[nodiscard]] Cash TransactionEntry::getCash() const { return _cash; }
 
     /**

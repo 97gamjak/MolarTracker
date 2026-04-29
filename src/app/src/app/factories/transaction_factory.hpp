@@ -1,12 +1,16 @@
 #ifndef __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 #define __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 
-#include "finance/cash_transaction.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "sql_models/instrument_row.hpp"
-#include "sql_models/transaction_entry_row.hpp"
-#include "sql_models/transaction_row.hpp"
+#include "config/id_types.hpp"
+
+namespace finance
+{
+    class Transaction;
+    class TransactionEntry;
+}   // namespace finance
+
+struct TransactionRow;        // forward declaration
+struct TransactionEntryRow;   // forward declaration
 
 namespace app
 {

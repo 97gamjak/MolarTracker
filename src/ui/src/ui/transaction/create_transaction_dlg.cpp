@@ -4,8 +4,11 @@
 #include <qvariant.h>
 
 #include "config/finance.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
-#include "ui/transaction/create_transaction_details.hpp"
+#include "ui/transaction/deposit_withdrawal_widget.hpp"
+#include "ui/transaction/i_create_transaction_widget.hpp"
+#include "ui/transaction/make_transaction_widget.hpp"
 #include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Transaction.CreateTransactionDialog");
@@ -38,7 +41,6 @@ namespace ui
     void CreateTransactionDialog::_buildUI()
     {
         _stack = makeQChild<QStackedWidget>(this);
-        _stack->addWidget(makeQChild<EmptyTransactionWidget>(_stack));
         setWindowTitle("New Transaction");
 
         _transactionType = makeQChild<QComboBox>(this);
@@ -188,7 +190,7 @@ namespace ui
                 widget,
                 &ICreateTransactionWidget::createTransactionRequested,
                 this,
-                &CreateTransactionDialog::createTransactionRequested
+                &CreateTransactionDialog::_onCreateTransactionRequested
             );
         }
 
@@ -223,5 +225,44 @@ namespace ui
         throw std::logic_error(
             "Unhandled transaction type: " + TransactionTypeMeta::toString(type)
         );
+    }
+
+    /**
+     * @brief Handle the request to create a new transaction, this will be
+     * called when the user submits the create transaction dialog, and should
+     * handle validating the transaction draft, adding any necessary additional
+     * entries (e.g. for external accounts), and then emitting a signal with the
+     * transaction draft to be handled by the controller for creating the
+     * transaction in the store. This allows the dialog to manage the process of
+     * creating a new transaction from the UI, ensuring that the transaction is
+     * properly validated and contains all necessary information before it is
+     * passed to the controller for creation.
+     *
+     * @param type The type of transaction being created, this is used to
+     * determine how to handle the creation process based on the specific
+     * requirements of each transaction type (e.g. handling external accounts
+     * for cash transactions).
+     */
+    void CreateTransactionDialog::_onCreateTransactionRequested(
+        TransactionType type
+    )
+    {
+        LOG_ENTRY;
+
+        switch (type)
+        {
+            case TransactionType::Deposit:
+            case TransactionType::Withdrawal:
+            {
+                const auto* widget =
+                    dynamic_cast<DepositWithdrawalWidget*>(_widgetMap[type]);
+                emit createCashTransactionRequested(widget->getDraft());
+                break;
+            }
+            case TransactionType::Stock:
+                throw NotYetImplementedException(
+                    "Stock transactions are not yet implemented"
+                );
+        }
     }
 }   // namespace ui

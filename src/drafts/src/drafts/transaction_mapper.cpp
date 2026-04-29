@@ -3,7 +3,6 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
 
@@ -13,84 +12,108 @@ namespace drafts
 {
 
     /**
-     * @brief Convert a finance::Transaction to a TransactionDraft
+     * @brief Converts a finance::TransactionEntry to a
+     * drafts::TransactionEntryDraft
      *
-     * @param transaction The finance::Transaction to convert, this is the
-     * domain model representation of a transaction, and contains all the
-     * details of the transaction as it exists in the business logic layer.
-     * @return TransactionDraft The corresponding TransactionDraft, this is the
-     * draft model representation of a transaction, and is used for transferring
-     * data between the business logic and the UI, it contains the same
-     * information as the finance::Transaction but may be structured differently
-     * to better suit the needs of the UI.
+     * @param entry
+     * @return drafts::TransactionEntryDraft
      */
-    TransactionDraft TransactionMapper::toDraft(
-        const finance::Transaction& transaction
+    drafts::TransactionEntryDraft TransactionMapper::toEntryDraft(
+        const finance::TransactionEntry& entry
     )
     {
-        TransactionDraft draft;
-
-        draft.timestamp = transaction.getTimestamp();
-        draft.comment   = transaction.getComment();
-        draft.id        = transaction.getId();
-
-        for (const auto& entry : transaction.getEntries())
-        {
-            TransactionEntryDraft entryDraft{
-                AccountId::invalid(),
-                entry.getCash()
-            };
-
-            entryDraft.accountId = entry.getAccountId();
-
-            draft.entries.push_back(entryDraft);
-        }
-
-        return draft;
+        return TransactionEntryDraft{entry.getAccountId(), entry.getCash()};
     }
 
     /**
-     * @brief Convert a TransactionDraft to a finance::Transaction
+     * @brief Converts a drafts::TransactionEntryDraft to a
+     * finance::TransactionEntry
      *
-     * @param draft The TransactionDraft to convert, this is the draft model
-     * representation of a transaction, and is used for transferring data
-     * between the business logic and the UI, it contains the same information
-     * as the finance::Transaction but may be structured differently to better
-     * suit the needs of the UI.
-     * @param id The ID to assign to the resulting finance::Transaction, this is
-     * used to ensure that the transaction has a valid ID when it is created
-     * from the draft, and allows us to maintain the association between the
-     * draft and the domain model representation of the transaction.
-     * @return finance::Transaction The corresponding finance::Transaction, this
-     * is the domain model representation of a transaction, and contains all the
-     * details of the transaction as it exists in the business logic layer.
+     * @param entryDraft
+     * @return finance::TransactionEntry
      */
-    finance::Transaction TransactionMapper::toTransaction(
-        const TransactionDraft& draft,
-        TransactionId           id
+    finance::TransactionEntry TransactionMapper::fromEntryDraft(
+        const drafts::TransactionEntryDraft& entryDraft
+    )
+    {
+        return finance::TransactionEntry{
+            TransactionEntryId::invalid(),
+            entryDraft.getAccountId(),
+            entryDraft.getCash()
+        };
+    }
+
+    /**
+     * @brief Converts a drafts::CreateCashTransactionDraft to a
+     * finance::Transaction
+     *
+     * @param draft
+     * @return finance::Transaction
+     */
+    finance::Transaction TransactionMapper::fromCreateCashTransactionDraft(
+        const CreateCashTransactionDraft& draft
     )
     {
         std::vector<finance::TransactionEntry> entries;
 
+        for (const auto& entryDraft : draft.getEntries())
+            entries.push_back(fromEntryDraft(entryDraft));
+
         finance::Transaction transaction{
-            id,
-            draft.timestamp,
+            TransactionId::invalid(),
+            draft.getTimestamp(),
             TransactionStatus::Completed,
-            draft.comment,
+            finance::CashData{},
+            entries,
+            draft.getComment()
         };
 
-        for (const auto& entryDraft : draft.entries)
-        {
-            const finance::TransactionEntry entry{
-                TransactionEntryId::invalid(),
-                entryDraft.accountId,
-                entryDraft.cash
-            };
+        return transaction;
+    }
 
-            transaction.addEntry(entry);
+    /**
+     * @brief Converts a vector of finance::Transaction to a vector of
+     * drafts::TransactionOverviewDraft
+     *
+     * @param transactions
+     * @return std::vector<drafts::TransactionOverviewDraft>
+     */
+    std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
+        toOverviewDrafts(const std::vector<finance::Transaction>& transactions)
+    {
+        std::vector<drafts::TransactionOverviewDraft> drafts;
+        drafts.reserve(transactions.size());
+
+        for (const auto& transaction : transactions)
+            drafts.emplace_back(toOverviewDraft(transaction));
+
+        return drafts;
+    }
+
+    /**
+     * @brief Converts a finance::Transaction to a
+     * drafts::TransactionOverviewDraft
+     *
+     * @param transaction
+     * @return drafts::TransactionOverviewDraft
+     */
+    drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
+        const finance::Transaction& transaction
+    )
+    {
+        std::vector<drafts::TransactionEntryDraft> entryDrafts;
+        entryDrafts.reserve(transaction.getEntries().size());
+
+        for (const auto& entry : transaction.getEntries())
+        {
+            entryDrafts.push_back(toEntryDraft(entry));
         }
 
-        return transaction;
+        return drafts::TransactionOverviewDraft{
+            transaction.getTimestamp(),
+            std::move(entryDrafts),
+            transaction.getComment()
+        };
     }
 
 }   // namespace drafts

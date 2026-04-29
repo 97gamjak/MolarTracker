@@ -40,6 +40,12 @@ MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST);
 
 MSTD_ENUM(TransactionType, std::uint8_t, TRANSACTION_TYPE_LIST);
 
+#define TRANSACTION_DATA_TYPE_LIST(X) \
+    X(Cash)                           \
+    X(Trade)
+
+MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
+
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
 using micro_units = std::int64_t;

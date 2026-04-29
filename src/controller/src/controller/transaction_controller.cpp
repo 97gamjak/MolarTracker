@@ -4,6 +4,7 @@
 
 #include "app/store/account_store.hpp"
 #include "app/store/transaction_store.hpp"
+#include "drafts/transaction_mapper.hpp"
 #include "ui/transaction/transactions_overview.hpp"
 
 namespace controller
@@ -71,8 +72,12 @@ namespace controller
         if (focus)
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
+        const auto transactions = _transactionStore.getTransactions();
+        const auto drafts =
+            drafts::TransactionMapper::toOverviewDrafts(transactions);
+
         _transactionDetailView->refresh(
-            _transactionStore.getTransactions(),
+            drafts,
             _accountStore.getAccountIdToNameMap()
         );
     }

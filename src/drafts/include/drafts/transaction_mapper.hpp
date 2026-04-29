@@ -1,11 +1,26 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
-#include "finance/transaction.hpp"
+#include <variant>
+#include <vector>
+
+namespace finance
+{
+    struct CashData;          // forward declaration
+    class TradeData;          // forward declaration
+    class TransactionEntry;   // forward declaration
+    class Transaction;        // forward declaration
+
+    using TransactionData =
+        std::variant<CashData, TradeData>;   // forward declaration
+
+}   // namespace finance
 
 namespace drafts
 {
-    struct TransactionDraft;
+    class CreateCashTransactionDraft;   // forward declaration
+    class TransactionOverviewDraft;     // forward declaration
+    class TransactionEntryDraft;        // forward declaration
 
     /**
      * @brief Mapper class for converting between Transaction and
@@ -20,13 +35,24 @@ namespace drafts
     class TransactionMapper
     {
        public:
-        static TransactionDraft toDraft(
-            const finance::Transaction& transaction
+        static drafts::TransactionEntryDraft toEntryDraft(
+            const finance::TransactionEntry& entry
         );
 
-        static finance::Transaction toTransaction(
-            const TransactionDraft& draft,
-            TransactionId           id
+        static finance::TransactionEntry fromEntryDraft(
+            const drafts::TransactionEntryDraft& entryDraft
+        );
+
+        static finance::Transaction fromCreateCashTransactionDraft(
+            const CreateCashTransactionDraft& draft
+        );
+
+        static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
+            const std::vector<finance::Transaction>& transactions
+        );
+
+        static drafts::TransactionOverviewDraft toOverviewDraft(
+            const finance::Transaction& transaction
         );
     };
 

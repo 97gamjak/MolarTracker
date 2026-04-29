@@ -31,7 +31,7 @@ namespace ui
             std::unordered_map<AccountId, std::string, AccountId::Hash>;
 
         /// The list of transactions to display in the table
-        std::vector<drafts::TransactionDraft> _transactions;
+        std::vector<drafts::TransactionOverviewDraft> _transactions;
 
         /// A map of account IDs to account names for display purposes
         IdToNameMap _accountIdToName;
@@ -40,8 +40,8 @@ namespace ui
         explicit TransactionTableModel(QObject* parent);
 
         void setTransactions(
-            std::vector<drafts::TransactionDraft> transactions,
-            IdToNameMap                           accountIdToName
+            std::vector<drafts::TransactionOverviewDraft> transactions,
+            IdToNameMap                                   accountIdToName
         );
 
         [[nodiscard]] int rowCount(const QModelIndex& parent) const override;
@@ -63,13 +63,13 @@ namespace ui
        private:
         [[nodiscard]]
         QVariant _displayData(
-            const drafts::TransactionDraft& transaction,
-            Column                          col
+            const drafts::TransactionOverviewDraft& transaction,
+            Column                                  col
         ) const;
         [[nodiscard]]
         static QVariant _decorationData(
-            const drafts::TransactionDraft& transaction,
-            Column                          col
+            const drafts::TransactionOverviewDraft& transaction,
+            Column                                  col
         );
         [[nodiscard]]
         static QVariant _textAlignmentData(Column col);

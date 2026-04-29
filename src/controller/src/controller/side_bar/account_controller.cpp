@@ -147,35 +147,24 @@ namespace controller
     {
         LOG_INFO("Create Account requested with name: " + account.name);
 
-        if (account.kind == AccountKind::Cash)
+        cmd::Commands command("Create Account");
+
+        auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
+            _appContext.getStore().getAccountStore(),
+            account
+        );
+
+        if (!result)
         {
-            cmd::Commands command("Create Account");
-
-            auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
-                _appContext.getStore().getAccountStore(),
-                account
-            );
-
-            if (!result)
-            {
-                const auto& error = result.error();
-                const auto  msg =
-                    "Failed to create account: " + error->getMessage();
-                LOG_ERROR(msg);
-                return;
-            }
-
-            command << std::move(result);
-
-            _undoStack.push(std::move(command));
+            const auto& error = result.error();
+            const auto msg = "Failed to create account: " + error->getMessage();
+            LOG_ERROR(msg);
+            return;
         }
-        else
-        {
-            LOG_WARNING(
-                "Unsupported account kind: " +
-                AccountKindMeta::toString(account.kind)
-            );
-        }
+
+        command << std::move(result);
+
+        _undoStack.push(std::move(command));
 
         refresh();
     }

@@ -137,7 +137,6 @@ namespace app
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
 
-        // NOLINTBEGIN(fuchsia-default-arguments-declarations)
         [[nodiscard]]
         auto _getEntries(Options options = Options()) const;
         [[nodiscard]]
@@ -149,7 +148,6 @@ namespace app
         Entry* _findEntry(Options options = Options());
         [[nodiscard]]
         std::optional<T> _get(Options options = Options()) const;
-        // NOLINTEND(fuchsia-default-arguments-declarations)
 
         void _addEntry(const T& value, StoreState state);
         void _removeEntry(IdType id);

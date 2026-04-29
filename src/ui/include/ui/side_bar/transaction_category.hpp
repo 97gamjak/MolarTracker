@@ -14,19 +14,19 @@ namespace ui
     class TransactionCategory : public Category
     {
        private:
-        /// The create action for the transaction category
-        QAction* _createAction;
         /// The create deposit action for the transaction category
         QAction* _createDepositAction;
         /// The create withdrawal action for the transaction category
         QAction* _createWithdrawalAction;
+        /// The create stock transaction action for the transaction category
+        QAction* _createStockTransactionAction;
 
        public:
         explicit TransactionCategory();
 
-        [[nodiscard]] QAction* getCreateAction() const;
         [[nodiscard]] QAction* getCreateDepositAction() const;
         [[nodiscard]] QAction* getCreateWithdrawalAction() const;
+        [[nodiscard]] QAction* getCreateStockTransactionAction() const;
 
         void populateContextMenu(QMenu& menu) override;
     };

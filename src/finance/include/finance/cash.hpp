@@ -41,6 +41,8 @@ namespace finance
         friend Cash& operator-=(Cash& lhs, const Cash& rhs);
 
         [[nodiscard]] bool isZero() const;
+        [[nodiscard]] bool isPositive() const;
+        [[nodiscard]] bool isNegative() const;
 
         [[nodiscard]] micro_units getAmount() const;
         [[nodiscard]] Currency    getCurrency() const;

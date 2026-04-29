@@ -1,11 +1,12 @@
 #include "transaction_controller.hpp"
 
-#include <optional>
+#include <stdexcept>
 
 #include "app/store/account_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
 #include "drafts/transaction_draft.hpp"
+#include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/create_transaction_dlg.hpp"
@@ -48,9 +49,9 @@ namespace controller
 
         connect(
             _createDlg,
-            &ui::CreateTransactionDialog::createTransactionRequested,
+            &ui::CreateTransactionDialog::createCashTransactionRequested,
             this,
-            &TransactionSideBarController::_onCreateTransactionRequested
+            &TransactionSideBarController::_onCreateCashTransactionRequested
         );
     }
 
@@ -79,37 +80,28 @@ namespace controller
             return;
         }
 
-        if (action == item->getCreateAction() ||
-            action == item->getCreateDepositAction() ||
-            action == item->getCreateWithdrawalAction())
+        if (action == item->getCreateDepositAction() ||
+            action == item->getCreateWithdrawalAction() ||
+            action == item->getCreateStockTransactionAction())
         {
-            std::optional<TransactionType> type;
-
-            if (action->data().canConvert<TransactionType>())
-            {
-                type = action->data().value<TransactionType>();
-            }
-            else if (action == item->getCreateAction())
-            {
-                // default case to create empty transaction create widget
-                type = std::nullopt;
-            }
-            else
-            {
-                throw std::runtime_error("Unknown transaction action");
-            }
+            const auto type = action->data().value<TransactionType>();
 
             LOG_DEBUG(
                 "Create action triggered for transaction category with type: " +
-                (type.has_value() ? TransactionTypeMeta::toString(type.value())
-                                  : "None")
+                TransactionTypeMeta::toString(type)
             );
 
-            if (type.has_value())
-                _onTransactionTypeChanged(type.value());
+            _onTransactionTypeChanged(type);
 
             if (auto* dialog = _createDlg.data())
                 dialog->exec();
+        }
+        else
+        {
+            throw std::logic_error(
+                "Unhandled context menu action for transaction category: " +
+                action->text().toStdString()
+            );
         }
     }
 
@@ -158,42 +150,45 @@ namespace controller
     }
 
     /**
-     * @brief Handle the creation of a new transaction, this will take the
-     * transaction draft from the create transaction dialog, convert it to a
-     * transaction model, and add it to the transaction store, this allows the
-     * controller to handle the creation of new transactions based on the input
-     * from the user in the create transaction dialog, and ensures that new
-     * transactions are properly added to the store and can be displayed in the
-     * UI.
+     * @brief Handle the creation of a new cash transaction, this will be called
+     * when the user submits the create transaction dialog for a cash
+     * transaction, and should handle validating the transaction draft, adding
+     * any necessary additional entries (e.g. for external accounts), and then
+     * adding the transaction to the store. This allows the controller to manage
+     * the process of creating a new cash transaction from the UI, ensuring that
+     * the transaction is properly validated and added to the store with all
+     * necessary information.
      *
-     * @param draft The transaction draft containing the information needed to
-     * create a new transaction, this includes details such as the type of
-     * transaction, the entries for the transaction, and any other relevant
-     * information needed to create a new transaction in the store.
+     * @param draft The draft of the cash transaction to create, this contains
+     * all the necessary information for creating a new cash transaction,
+     * including the timestamp, entries, and any optional comment.
      */
-    void TransactionSideBarController::_onCreateTransactionRequested(
-        drafts::TransactionDraft draft
+    void TransactionSideBarController::_onCreateCashTransactionRequested(
+        drafts::CreateCashTransactionDraft draft
     )
     {
         std::vector<drafts::TransactionEntryDraft> additionalEntries;
 
-        for (auto entry : draft.entries)
+        for (auto entry : draft.getEntries())
         {
-            if (entry.needsExternal)
+            if (entry.needsExternal())
             {
-                entry.accountId =
-                    _accountStore.getExternalAccount(entry.cash.getCurrency());
-                entry.cash = -entry.cash;
-                additionalEntries.push_back(entry);
+                additionalEntries.emplace_back(
+                    _accountStore.getExternalAccount(
+                        entry.getCash().getCurrency()
+                    ),
+                    -entry.getCash()
+                );
             }
         }
 
         for (const auto& entry : additionalEntries)
-        {
-            draft.entries.push_back(entry);
-        }
+            draft.addEntry(entry);
 
-        _transactionStore.addTransaction(draft);
+        _transactionStore.addTransaction(
+            drafts::TransactionMapper::fromCreateCashTransactionDraft(draft)
+        );
+
         // TODO(97gamjak): add here commands and also error handling
         _createDlg->close();
         _createDlg->reset();
@@ -201,10 +196,11 @@ namespace controller
     }
 
     /**
-     * @brief Handle the selection of transactions in the side bar, this will
-     * trigger the transaction overview to update with the latest data from the
-     * store, and provides a way for the UI to trigger updates to the
-     * transaction overview when it is selected.
+     * @brief Handle the selection of transactions in the side bar,
+     * this will trigger the transaction overview to update with the
+     * latest data from the store, and provides a way for the UI to
+     * trigger updates to the transaction overview when it is
+     * selected.
      *
      */
     void TransactionSideBarController::onTransactionsSelected()

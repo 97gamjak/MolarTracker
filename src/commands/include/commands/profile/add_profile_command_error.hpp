@@ -1,7 +1,6 @@
 #ifndef __COMMANDS__INCLUDE__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__
 #define __COMMANDS__INCLUDE__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_ERROR_HPP__
 
-#include <cstddef>
 #include <mstd/enum.hpp>
 #include <string>
 
@@ -22,16 +21,13 @@
  * error handling and user feedback.
  *
  */
-enum class AddProfileCommandErrorCode : std::size_t;   // only for doxygen
+enum class AddProfileCommandErrorCode : std::uint8_t;   // only for doxygen
 
-// NOLINTBEGIN
-// cppcheck-suppress syntaxError
 MSTD_ENUM(
     AddProfileCommandErrorCode,
-    std::size_t,
+    std::uint8_t,
     ADD_PROFILE_COMMAND_ERROR_CODE
 );
-// NOLINTEND
 
 namespace cmd
 {

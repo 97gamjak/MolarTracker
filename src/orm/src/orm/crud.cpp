@@ -17,6 +17,8 @@ namespace orm
      * @brief Check if a column exists in the database
      *
      * @param database
+     * @param columnName The name of the column to check for existence
+     * @param tableName The name of the table to check for the column in
      * @return true if the column exists, false otherwise
      */
     bool Crud::_columnExists(

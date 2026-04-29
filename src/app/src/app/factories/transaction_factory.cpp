@@ -2,9 +2,10 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "finance/cash.hpp"
+#include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
-#include "sql_models/instrument_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
@@ -26,6 +27,7 @@ namespace app
         row.timestamp = transaction.getTimestamp();
         row.status    = transaction.getStatus();
         row.comment   = transaction.getComment();
+        row.type      = transaction.getType();
 
         return row;
     }
@@ -38,10 +40,26 @@ namespace app
      */
     finance::Transaction TransactionFactory::fromRow(const TransactionRow &row)
     {
+        finance::TransactionData type;
+
+        switch (row.type.value())
+        {
+            case TransactionDataType::Cash:
+                type = finance::CashData{};
+                break;
+            case TransactionDataType::Trade:
+                throw NotYetImplementedException(
+                    "Trade transactions are not yet implemented"
+                );
+                break;
+        }
+
         finance::Transaction transaction{
             row.id.value(),
             row.timestamp.value(),
             row.status.value(),
+            type,
+            {},
             row.comment.value()
         };
         return transaction;
