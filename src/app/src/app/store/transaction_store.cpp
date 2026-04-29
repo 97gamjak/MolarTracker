@@ -1,11 +1,9 @@
 #include "app/store/transaction_store.hpp"
 
-#include "drafts/transaction_draft.hpp"
+#include "app/services_api/i_transaction_service.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
-
-using drafts::TransactionMapper;
 
 namespace app
 {

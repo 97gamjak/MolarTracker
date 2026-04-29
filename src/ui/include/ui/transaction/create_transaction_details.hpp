@@ -155,6 +155,14 @@ namespace ui
     {
        private:
         using SecurityWidget::SecurityWidget;
+
+       private:
+        void _emitOk() override
+        {
+            throw std::logic_error(
+                "Stock transactions are not yet implemented"
+            );
+        }
     };
 
     ICreateTransactionWidget* makeTransactionWidget(

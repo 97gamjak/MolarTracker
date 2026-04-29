@@ -40,6 +40,11 @@ namespace ui
         return _createWithdrawalAction;
     }
 
+    QAction* TransactionCategory::getCreateStockTransactionAction() const
+    {
+        return _createStockTransactionAction;
+    }
+
     /**
      * @brief Populate the context menu for the transaction category
      *
@@ -56,6 +61,14 @@ namespace ui
         const auto withdrawalName = "Create " + utils::toQString(Withdrawal);
         _createWithdrawalAction   = menu.addAction(withdrawalName);
         _createWithdrawalAction->setData(QVariant::fromValue(Withdrawal));
+
+        const auto stockTransactionName =
+            "Create " + utils::toQString(TransactionType::Stock) +
+            " Transaction";
+        _createStockTransactionAction = menu.addAction(stockTransactionName);
+        _createStockTransactionAction->setData(
+            QVariant::fromValue(TransactionType::Stock)
+        );
     }
 
 }   // namespace ui

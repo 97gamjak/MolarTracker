@@ -1,13 +1,12 @@
 #include "transaction_controller.hpp"
 
-#include <optional>
+#include <stdexcept>
 
 #include "app/store/account_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
-#include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/create_transaction_dlg.hpp"
@@ -82,18 +81,10 @@ namespace controller
         }
 
         if (action == item->getCreateDepositAction() ||
-            action == item->getCreateWithdrawalAction())
+            action == item->getCreateWithdrawalAction() ||
+            action == item->getCreateStockTransactionAction())
         {
-            TransactionType type = TransactionType::Deposit;
-
-            if (action->data().canConvert<TransactionType>())
-            {
-                type = action->data().value<TransactionType>();
-            }
-            else
-            {
-                throw std::runtime_error("Unknown transaction action");
-            }
+            const auto type = action->data().value<TransactionType>();
 
             LOG_DEBUG(
                 "Create action triggered for transaction category with type: " +
@@ -104,6 +95,13 @@ namespace controller
 
             if (auto* dialog = _createDlg.data())
                 dialog->exec();
+        }
+        else
+        {
+            throw std::logic_error(
+                "Unhandled context menu action for transaction category: " +
+                action->text().toStdString()
+            );
         }
     }
 

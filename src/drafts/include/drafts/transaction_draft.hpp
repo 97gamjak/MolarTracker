@@ -4,7 +4,6 @@
 #include <optional>
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "utils/timestamp.hpp"

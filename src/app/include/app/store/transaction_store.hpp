@@ -5,14 +5,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "app/services_api/i_transaction_service.hpp"
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
-#include "drafts/transaction_draft.hpp"
 #include "finance/transaction.hpp"
 
 namespace app
 {
+    class ITransactionService;   // forward declaration
+
     /**
      * @brief Result of transaction store operations
      *

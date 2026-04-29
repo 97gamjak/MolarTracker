@@ -184,24 +184,12 @@ namespace ui
             _widgetMap[type] = widget;
             _stack->addWidget(widget);
 
-            switch (type)
-            {
-                case TransactionType::Deposit:
-                case TransactionType::Withdrawal:
-                    connect(
-                        widget,
-                        &ICreateTransactionWidget::createTransactionRequested,
-                        this,
-                        &CreateTransactionDialog::_onCreateTransactionRequested
-                    );
-                    break;
-                case TransactionType::Stock:
-                    // TODO:
-                    throw std::logic_error(
-                        "Stock transactions are not yet implemented"
-                    );
-                    break;
-            }
+            connect(
+                widget,
+                &ICreateTransactionWidget::createTransactionRequested,
+                this,
+                &CreateTransactionDialog::_onCreateTransactionRequested
+            );
         }
 
         _stack->setCurrentWidget(_widgetMap[type]);

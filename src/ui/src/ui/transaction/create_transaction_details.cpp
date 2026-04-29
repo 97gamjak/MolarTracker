@@ -10,10 +10,10 @@
 
 #include <algorithm>
 #include <optional>
+#include <stdexcept>
 
 #include "config/finance.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "exceptions/not_yet_implemented.hpp"
 #include "finance/currency.hpp"
 #include "ui/validators/amount_line_edit.hpp"
 #include "ui/validators/validators.hpp"
@@ -247,7 +247,7 @@ namespace ui
         QWidget*                          parent,
         TransactionType                   type,
         std::vector<drafts::AccountDraft> accounts,
-        std::vector<drafts::AccountDraft> /*referenceAccounts*/
+        std::vector<drafts::AccountDraft> referenceAccounts
     )
     {
         switch (type)
@@ -260,19 +260,15 @@ namespace ui
                     std::move(accounts)
                 );
             case TransactionType::Stock:
-                // TODO:
-                throw std::runtime_error(
-                    "Stock transactions are not supported"
+                return makeQChild<StockWidget>(
+                    parent,
+                    type,
+                    std::move(accounts),
+                    std::move(referenceAccounts)
                 );
-                // return makeQChild<StockWidget>(
-                //     parent,
-                //     type,
-                //     std::move(accounts),
-                //     std::move(referenceAccounts)
-                // );
         }
 
-        throw std::invalid_argument("Unsupported transaction type");
+        throw std::logic_error("Unsupported transaction type");
     }
 
     /**

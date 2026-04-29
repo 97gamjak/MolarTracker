@@ -19,11 +19,14 @@ namespace ui
         /// The create withdrawal action for the transaction category
         QAction* _createWithdrawalAction;
 
+        QAction* _createStockTransactionAction;
+
        public:
         explicit TransactionCategory();
 
         [[nodiscard]] QAction* getCreateDepositAction() const;
         [[nodiscard]] QAction* getCreateWithdrawalAction() const;
+        [[nodiscard]] QAction* getCreateStockTransactionAction() const;
 
         void populateContextMenu(QMenu& menu) override;
     };

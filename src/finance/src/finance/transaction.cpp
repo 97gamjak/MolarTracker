@@ -28,7 +28,7 @@ namespace finance
         : _id(id),
           _timestamp(timestamp),
           _status(status),
-          _data(data),
+          _data(std::move(data)),
           _entries(std::move(entries)),
           _comment(std::move(comment))
     {
@@ -108,12 +108,12 @@ namespace finance
     {
         struct Visitor
         {
-            TransactionDataType operator()(const CashData&) const
+            TransactionDataType operator()(const CashData& /*data*/) const
             {
                 return TransactionDataType::Cash;
             }
 
-            TransactionDataType operator()(const TradeData&) const
+            TransactionDataType operator()(const TradeData& /*data*/) const
             {
                 return TransactionDataType::Trade;
             }

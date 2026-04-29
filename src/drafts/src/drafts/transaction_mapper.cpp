@@ -3,7 +3,6 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
 
