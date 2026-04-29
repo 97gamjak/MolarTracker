@@ -12,6 +12,24 @@ REGISTER_LOG_CATEGORY("Drafts.TransactionMapper");
 namespace drafts
 {
 
+    drafts::TransactionEntryDraft TransactionMapper::toEntryDraft(
+        const finance::TransactionEntry& entry
+    )
+    {
+        return TransactionEntryDraft{entry.getAccountId(), entry.getCash()};
+    }
+
+    finance::TransactionEntry TransactionMapper::fromEntryDraft(
+        const drafts::TransactionEntryDraft& entryDraft
+    )
+    {
+        return finance::TransactionEntry{
+            TransactionEntryId::invalid(),
+            entryDraft.getAccountId(),
+            entryDraft.getCash()
+        };
+    }
+
     finance::Transaction TransactionMapper::fromCreateCashTransactionDraft(
         const CreateCashTransactionDraft& draft
     )
@@ -19,15 +37,7 @@ namespace drafts
         std::vector<finance::TransactionEntry> entries;
 
         for (const auto& entryDraft : draft.getEntries())
-        {
-            const finance::TransactionEntry entry{
-                TransactionEntryId::invalid(),
-                entryDraft.accountId,
-                entryDraft.cash
-            };
-
-            entries.push_back(entry);
-        }
+            entries.push_back(fromEntryDraft(entryDraft));
 
         finance::Transaction transaction{
             TransactionId::invalid(),
@@ -54,11 +64,22 @@ namespace drafts
     }
 
     drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
-        const finance::Transaction& /*transaction*/
+        const finance::Transaction& transaction
     )
     {
-        // TODO: implement this properly, for now just return an empty draft
-        return drafts::TransactionOverviewDraft{};
+        std::vector<drafts::TransactionEntryDraft> entryDrafts;
+        entryDrafts.reserve(transaction.getEntries().size());
+
+        for (const auto& entry : transaction.getEntries())
+        {
+            entryDrafts.push_back(toEntryDraft(entry));
+        }
+
+        return drafts::TransactionOverviewDraft{
+            transaction.getTimestamp(),
+            std::move(entryDrafts),
+            transaction.getComment()
+        };
     }
 
 }   // namespace drafts

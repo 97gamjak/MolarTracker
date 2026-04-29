@@ -299,7 +299,7 @@ namespace ui
         cash = getTransactionType() == TransactionType::Deposit ? cash : -cash;
 
         auto entry = drafts::TransactionEntryDraft{selectedAccount->id, cash};
-        entry.needsExternal = true;
+        entry.setNeedsExternal(true);
 
         // TODO: implement comment and timestamp
 

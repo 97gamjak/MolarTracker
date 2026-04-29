@@ -136,50 +136,51 @@ namespace ui
      * @return QVariant
      */
     QVariant TransactionTableModel::_displayData(
-        const drafts::TransactionOverviewDraft& /*transaction*/,
-        Column /*col*/
+        const drafts::TransactionOverviewDraft& transaction,
+        Column                                  col
     ) const
     {
-        // switch (col)
-        // {
-        //     case Column::Date:
-        //     {
-        //         return transaction.timestamp.toQDateTime().toString(
-        //             "yyyy-MM-dd"
-        //         );
-        //     }
-        //     case Column::Description:
-        //         return
-        //         QString::fromStdString(transaction.comment.value_or(""));
-        //     case Column::Type:
-        //         return QString::fromStdString("");
-        //     case Column::Account:
-        //     {
-        //         if (!_accountIdToName.contains(
-        //                 transaction.entries.front().accountId
-        //             ))
-        //             return "";
+        switch (col)
+        {
+            case Column::Date:
+            {
+                return transaction.getTimestamp().toQDateTime().toString(
+                    "yyyy-MM-dd"
+                );
+            }
+            case Column::Description:
+                return QString::fromStdString(
+                    transaction.getComment().value_or("")
+                );
+            case Column::Type:
+                return QString::fromStdString("");
+            case Column::Account:
+            {
+                if (!_accountIdToName.contains(
+                        transaction.getEntries().front().getAccountId()
+                    ))
+                    return "";
 
-        //         return QString::fromStdString(
-        //             _accountIdToName.at(transaction.entries.front().accountId)
-        //         );
-        //     }
-        //     case Column::ReferenceAccount:
-        //     {
-        //         if (!_accountIdToName.contains(
-        //                 transaction.entries.back().accountId
-        //             ))
-        //             return "";
+                return QString::fromStdString(_accountIdToName.at(
+                    transaction.getEntries().front().getAccountId()
+                ));
+            }
+            case Column::ReferenceAccount:
+            {
+                if (!_accountIdToName.contains(
+                        transaction.getEntries().back().getAccountId()
+                    ))
+                    return "";
 
-        //         return QString::fromStdString(
-        //             _accountIdToName.at(transaction.entries.back().accountId)
-        //         );
-        //     }
-        //     case Column::Amount:
-        //         return QString::fromStdString(
-        //             transaction.entries.front().cash.toString(2)
-        //         );
-        // }
+                return QString::fromStdString(_accountIdToName.at(
+                    transaction.getEntries().back().getAccountId()
+                ));
+            }
+            case Column::Amount:
+                return QString::fromStdString(
+                    transaction.getEntries().front().getCash().toString(2)
+                );
+        }
         return {};
     }
 
@@ -191,17 +192,16 @@ namespace ui
      * @return QVariant
      */
     QVariant TransactionTableModel::_decorationData(
-        const drafts::TransactionOverviewDraft& /*transaction*/,
-        Column /*col*/
+        const drafts::TransactionOverviewDraft& transaction,
+        Column                                  col
     )
     {
-        // if (col != Column::Amount)
-        //     return {};
+        if (col != Column::Amount)
+            return {};
 
-        // return transaction.entries.front().cash >= 0
-        //            ? QColor(Qt::GlobalColor::green)
-        //            : QColor(Qt::GlobalColor::red);
-        return {};
+        return transaction.getEntries().front().getCash().isPositive()
+                   ? QColor(Qt::GlobalColor::green)
+                   : QColor(Qt::GlobalColor::red);
     }
     /**
      * @brief text alignment data for the table model

@@ -166,6 +166,20 @@ namespace finance
     bool Cash::isZero() const { return _amount == 0; }
 
     /**
+     * @brief Checks if the Cash amount is positive.
+     *
+     * @return true if the amount is greater than zero, false otherwise.
+     */
+    bool Cash::isPositive() const { return _amount > 0; }
+
+    /**
+     * @brief Checks if the Cash amount is negative.
+     *
+     * @return true if the amount is less than zero, false otherwise.
+     */
+    bool Cash::isNegative() const { return _amount < 0; }
+
+    /**
      * @brief Gets the amount of cash in micro_units.
      *
      * @return micro_units The amount of cash.

@@ -17,19 +17,29 @@ namespace drafts
      * @brief A draft representation of a transaction entry
      *
      */
-    struct TransactionEntryDraft
+    class TransactionEntryDraft
     {
+       private:
         /// The ID of the account associated with the transaction entry
-        AccountId accountId;
+        AccountId _accountId;
 
         /// The cash amount associated with the transaction entry
-        finance::Cash cash;
+        finance::Cash _cash;
 
         /// A flag indicating whether this transaction entry needs an external
         /// account
-        bool needsExternal = false;
+        bool _needsExternal = false;
 
-        TransactionEntryDraft(AccountId accountId_, finance::Cash cash_);
+       public:
+        TransactionEntryDraft(AccountId accountId, finance::Cash cash);
+
+        void setNeedsExternal(bool needsExternal);
+
+        [[nodiscard]] AccountId getAccountId() const;
+
+        [[nodiscard]] finance::Cash getCash() const;
+
+        [[nodiscard]] bool needsExternal() const;
     };
 
     struct TransactionDataDraft
@@ -73,7 +83,25 @@ namespace drafts
     class TransactionOverviewDraft
     {
        private:
+        Timestamp _timestamp;
+
+        std::vector<TransactionEntryDraft> _entries;
+
+        std::optional<std::string> _comment;
+
        public:
+        explicit TransactionOverviewDraft(
+            Timestamp                          timestamp,
+            std::vector<TransactionEntryDraft> entries,
+            std::optional<std::string>         comment
+        );
+
+        [[nodiscard]] const Timestamp& getTimestamp() const;
+
+        [[nodiscard]]
+        const std::vector<TransactionEntryDraft>& getEntries() const;
+
+        [[nodiscard]] const std::optional<std::string>& getComment() const;
     };
 
 }   // namespace drafts

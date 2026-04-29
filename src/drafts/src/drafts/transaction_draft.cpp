@@ -46,14 +46,54 @@ namespace drafts
      * @brief Construct a new Transaction Entry Draft:: Transaction Entry Draft
      * object
      *
-     * @param accountId_
-     * @param cash_
+     * @param accountId
+     * @param cash
      */
     TransactionEntryDraft::TransactionEntryDraft(
-        AccountId     accountId_,
-        finance::Cash cash_
+        AccountId     accountId,
+        finance::Cash cash
     )
-        : accountId(accountId_), cash(cash_)
+        : _accountId(accountId), _cash(cash)
     {
     }
+
+    void TransactionEntryDraft::setNeedsExternal(bool needsExternal)
+    {
+        _needsExternal = needsExternal;
+    }
+
+    AccountId TransactionEntryDraft::getAccountId() const { return _accountId; }
+
+    finance::Cash TransactionEntryDraft::getCash() const { return _cash; }
+
+    bool TransactionEntryDraft::needsExternal() const { return _needsExternal; }
+
+    TransactionOverviewDraft::TransactionOverviewDraft(
+        Timestamp                          timestamp,
+        std::vector<TransactionEntryDraft> entries,
+        std::optional<std::string>         comment
+    )
+        : _timestamp(timestamp),
+          _entries(std::move(entries)),
+          _comment(std::move(comment))
+    {
+    }
+
+    const Timestamp& TransactionOverviewDraft::getTimestamp() const
+    {
+        return _timestamp;
+    }
+
+    const std::vector<TransactionEntryDraft>& TransactionOverviewDraft::
+        getEntries() const
+    {
+        return _entries;
+    }
+
+    const std::optional<std::string>& TransactionOverviewDraft::getComment(
+    ) const
+    {
+        return _comment;
+    }
+
 }   // namespace drafts

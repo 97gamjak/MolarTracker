@@ -159,12 +159,14 @@ namespace controller
 
         for (auto entry : draft.getEntries())
         {
-            if (entry.needsExternal)
+            if (entry.needsExternal())
             {
-                entry.accountId =
-                    _accountStore.getExternalAccount(entry.cash.getCurrency());
-                entry.cash = -entry.cash;
-                additionalEntries.push_back(entry);
+                additionalEntries.emplace_back(
+                    _accountStore.getExternalAccount(
+                        entry.getCash().getCurrency()
+                    ),
+                    -entry.getCash()
+                );
             }
         }
 

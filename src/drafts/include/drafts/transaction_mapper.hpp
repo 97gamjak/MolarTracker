@@ -6,9 +6,10 @@
 
 namespace finance
 {
-    class Transaction;   // forward declaration
-    struct CashData;     // forward declaration
-    class TradeData;     // forward declaration
+    struct CashData;          // forward declaration
+    class TradeData;          // forward declaration
+    class TransactionEntry;   // forward declaration
+    class Transaction;        // forward declaration
 
     using TransactionData =
         std::variant<CashData, TradeData>;   // forward declaration
@@ -17,8 +18,9 @@ namespace finance
 
 namespace drafts
 {
-    class CreateCashTransactionDraft;
-    class TransactionOverviewDraft;
+    class CreateCashTransactionDraft;   // forward declaration
+    class TransactionOverviewDraft;     // forward declaration
+    class TransactionEntryDraft;        // forward declaration
 
     /**
      * @brief Mapper class for converting between Transaction and
@@ -33,6 +35,14 @@ namespace drafts
     class TransactionMapper
     {
        public:
+        static drafts::TransactionEntryDraft toEntryDraft(
+            const finance::TransactionEntry& entry
+        );
+
+        static finance::TransactionEntry fromEntryDraft(
+            const drafts::TransactionEntryDraft& entryDraft
+        );
+
         static finance::Transaction fromCreateCashTransactionDraft(
             const CreateCashTransactionDraft& draft
         );
