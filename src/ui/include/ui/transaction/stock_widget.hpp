@@ -32,16 +32,34 @@ namespace ui
     {
         Q_OBJECT
        private:
+        /// The type of transaction this widget creates (Stock)
         TransactionType _type;
-        QFormLayout*    _layout;
-        AccountCombo*   _accountCombo;
-        AccountCombo*   _referenceAccountCombo;
-        AmountRow*      _quantityRow;
-        AmountRow*      _priceRow;
-        QLabel*         _currencyLabel;
-        QPushButton*    _addButton;
-        TickerField*    _tickerField;
 
+        /// The layout for this widget
+        QFormLayout* _layout;
+
+        /// The combo box for selecting the primary account
+        AccountCombo* _accountCombo;
+
+        /// The combo box for selecting the reference account
+        AccountCombo* _referenceAccountCombo;
+
+        /// The row for entering the quantity of the stock
+        AmountRow* _quantityRow;
+
+        /// The row for entering the price of the stock
+        AmountRow* _priceRow;
+
+        /// The label for displaying the currency of the selected account
+        QLabel* _currencyLabel;
+
+        /// The button for adding the transaction
+        QPushButton* _addButton;
+
+        /// The field for entering the stock ticker
+        TickerField* _tickerField;
+
+        /// The list of reference accounts
         std::vector<drafts::AccountDraft> _referenceAccounts;
 
        public:

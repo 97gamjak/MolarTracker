@@ -59,6 +59,18 @@ namespace ui
          */
         void transactionTypeChanged(TransactionType type);
 
+        /**
+         * @brief signal emitted when a request to create a new cash transaction
+         * is made, this will be emitted when the user submits the create
+         * transaction dialog for a cash transaction, and should contain the
+         * necessary information for creating the transaction, including the
+         * timestamp, entries, and any optional comment.
+         *
+         * @param draft The draft of the cash transaction to create, this
+         * contains all the necessary information for creating a new cash
+         * transaction, including the timestamp, entries, and any optional
+         * comment.
+         */
         void createCashTransactionRequested(
             drafts::CreateCashTransactionDraft draft
         );

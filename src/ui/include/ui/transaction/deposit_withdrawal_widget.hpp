@@ -32,6 +32,27 @@ namespace ui
     {
         Q_OBJECT
 
+       private:
+        /// The type of transaction this widget is creating (Deposit or
+        /// Withdrawal)
+        TransactionType _type;
+
+        /// The layout for the widget
+        QFormLayout* _layout;
+
+        /// The combo box for selecting the account to deposit to or withdraw
+        /// from
+        AccountCombo* _accountCombo;
+
+        /// The row for entering the amount to deposit or withdraw
+        AmountRow* _amountRow;
+
+        /// The label for displaying the currency of the selected account
+        QLabel* _currencyLabel;
+
+        /// The button for adding the transaction
+        QPushButton* _addButton;
+
        public:
         explicit DepositWithdrawalWidget(
             TransactionType                   type,
@@ -46,13 +67,6 @@ namespace ui
         void _onAccountSelected(const drafts::AccountDraft& account);
         void _updateAddButton();
         void _emitOk();
-
-        TransactionType _type;
-        QFormLayout*    _layout;
-        AccountCombo*   _accountCombo;
-        AmountRow*      _amountRow;
-        QLabel*         _currencyLabel;
-        QPushButton*    _addButton;
     };
 
 }   // namespace ui

@@ -227,6 +227,22 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Handle the request to create a new transaction, this will be
+     * called when the user submits the create transaction dialog, and should
+     * handle validating the transaction draft, adding any necessary additional
+     * entries (e.g. for external accounts), and then emitting a signal with the
+     * transaction draft to be handled by the controller for creating the
+     * transaction in the store. This allows the dialog to manage the process of
+     * creating a new transaction from the UI, ensuring that the transaction is
+     * properly validated and contains all necessary information before it is
+     * passed to the controller for creation.
+     *
+     * @param type The type of transaction being created, this is used to
+     * determine how to handle the creation process based on the specific
+     * requirements of each transaction type (e.g. handling external accounts
+     * for cash transactions).
+     */
     void CreateTransactionDialog::_onCreateTransactionRequested(
         TransactionType type
     )
@@ -238,7 +254,7 @@ namespace ui
             case TransactionType::Deposit:
             case TransactionType::Withdrawal:
             {
-                auto* widget =
+                const auto* widget =
                     dynamic_cast<DepositWithdrawalWidget*>(_widgetMap[type]);
                 emit createCashTransactionRequested(widget->getDraft());
                 break;

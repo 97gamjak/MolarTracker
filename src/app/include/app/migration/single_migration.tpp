@@ -75,6 +75,13 @@ namespace app
         setSQLStatements(crud.getExecutedSQL());
     }
 
+    /**
+     * @brief Construct a new Drop Column Migration< Model>:: Drop Column
+     * Migration object
+     *
+     * @tparam Model
+     * @param columnName
+     */
     template <typename Model>
     DropColumnMigration<Model>::DropColumnMigration(std::string columnName)
         : SingleMigration(MigrationType::DropColumn),
@@ -82,6 +89,11 @@ namespace app
     {
     }
 
+    /**
+     * @brief Apply the migration to drop a column from the database
+     *
+     * @param db The database to apply the migration to
+     */
     template <typename Model>
     void DropColumnMigration<Model>::applyMigration(db::Database& db)
     {

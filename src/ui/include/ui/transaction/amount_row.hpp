@@ -4,6 +4,8 @@
 
 #include <qwidget.h>
 
+#include "config/finance.hpp"
+
 namespace ui
 {
 
@@ -21,6 +23,7 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// The line edit for entering the amount
         AmountLineEdit* _amountField;
 
        public:
@@ -28,8 +31,8 @@ namespace ui
 
         void setNDecimalPlaces(int places);
 
-        [[nodiscard]] bool   isValid() const;
-        [[nodiscard]] double getAmount() const;
+        [[nodiscard]] bool        isValid() const;
+        [[nodiscard]] micro_units getAmount() const;
 
        signals:
         /**

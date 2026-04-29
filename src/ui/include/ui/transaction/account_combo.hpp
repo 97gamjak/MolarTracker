@@ -25,6 +25,13 @@ namespace ui
     {
         Q_OBJECT
 
+       private:
+        /// The list of account drafts to populate the combo box with
+        std::vector<drafts::AccountDraft> _accounts;
+
+        /// The combo box widget for selecting an account
+        QComboBox* _combo;
+
        public:
         explicit AccountCombo(
             std::vector<drafts::AccountDraft> accounts,
@@ -43,10 +50,6 @@ namespace ui
          * @param account The selected account draft
          */
         void accountSelected(drafts::AccountDraft account);
-
-       private:
-        std::vector<drafts::AccountDraft> _accounts;
-        QComboBox*                        _combo;
     };
 
 }   // namespace ui

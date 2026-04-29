@@ -20,6 +20,7 @@ namespace finance
         /// The account associated with the cash transaction
         AccountId _accountId;
 
+        /// The cash amount associated with the transaction entry
         Cash _cash;
 
        public:

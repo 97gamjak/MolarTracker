@@ -11,6 +11,13 @@ REGISTER_LOG_CATEGORY("Drafts.TransactionMapper");
 namespace drafts
 {
 
+    /**
+     * @brief Converts a finance::TransactionEntry to a
+     * drafts::TransactionEntryDraft
+     *
+     * @param entry
+     * @return drafts::TransactionEntryDraft
+     */
     drafts::TransactionEntryDraft TransactionMapper::toEntryDraft(
         const finance::TransactionEntry& entry
     )
@@ -18,6 +25,13 @@ namespace drafts
         return TransactionEntryDraft{entry.getAccountId(), entry.getCash()};
     }
 
+    /**
+     * @brief Converts a drafts::TransactionEntryDraft to a
+     * finance::TransactionEntry
+     *
+     * @param entryDraft
+     * @return finance::TransactionEntry
+     */
     finance::TransactionEntry TransactionMapper::fromEntryDraft(
         const drafts::TransactionEntryDraft& entryDraft
     )
@@ -29,6 +43,13 @@ namespace drafts
         };
     }
 
+    /**
+     * @brief Converts a drafts::CreateCashTransactionDraft to a
+     * finance::Transaction
+     *
+     * @param draft
+     * @return finance::Transaction
+     */
     finance::Transaction TransactionMapper::fromCreateCashTransactionDraft(
         const CreateCashTransactionDraft& draft
     )
@@ -50,6 +71,13 @@ namespace drafts
         return transaction;
     }
 
+    /**
+     * @brief Converts a vector of finance::Transaction to a vector of
+     * drafts::TransactionOverviewDraft
+     *
+     * @param transactions
+     * @return std::vector<drafts::TransactionOverviewDraft>
+     */
     std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
         toOverviewDrafts(const std::vector<finance::Transaction>& transactions)
     {
@@ -62,6 +90,13 @@ namespace drafts
         return drafts;
     }
 
+    /**
+     * @brief Converts a finance::Transaction to a
+     * drafts::TransactionOverviewDraft
+     *
+     * @param transaction
+     * @return drafts::TransactionOverviewDraft
+     */
     drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
         const finance::Transaction& transaction
     )

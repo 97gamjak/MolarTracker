@@ -18,7 +18,7 @@ namespace ui
         QAction* _createDepositAction;
         /// The create withdrawal action for the transaction category
         QAction* _createWithdrawalAction;
-
+        /// The create stock transaction action for the transaction category
         QAction* _createStockTransactionAction;
 
        public:

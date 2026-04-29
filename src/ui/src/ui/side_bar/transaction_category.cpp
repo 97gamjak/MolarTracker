@@ -41,6 +41,13 @@ namespace ui
         return _createWithdrawalAction;
     }
 
+    /**
+     * @brief Get the create stock transaction action for the transaction
+     * category
+     *
+     * @return QAction* The create stock transaction action for the transaction
+     * category
+     */
     QAction* TransactionCategory::getCreateStockTransactionAction() const
     {
         return _createStockTransactionAction;

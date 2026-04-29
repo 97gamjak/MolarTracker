@@ -14,6 +14,12 @@ using utils::makeQChild;
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Account Combo:: Account Combo object
+     *
+     * @param accounts A list of account drafts to populate the combo box with
+     * @param parent The parent widget for the account combo
+     */
     AccountCombo::AccountCombo(
         std::vector<drafts::AccountDraft> accounts,
         QWidget*                          parent
@@ -50,6 +56,16 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Get the currently selected account from the combo box, this will
+     * return an optional containing the selected account draft if an account is
+     * selected, or std::nullopt if no account is selected, allowing the owning
+     * widget to easily check for a selection and handle it accordingly.
+     *
+     * @return std::optional<drafts::AccountDraft> An optional containing the
+     * selected account draft if an account is selected, or std::nullopt if no
+     * account is selected.
+     */
     std::optional<drafts::AccountDraft> AccountCombo::selected() const
     {
         const auto id = _combo->currentData().value<AccountId>();
@@ -63,8 +79,23 @@ namespace ui
         return it != _accounts.end() ? std::optional{*it} : std::nullopt;
     }
 
+    /**
+     * @brief Reset the selection in the combo box, this will clear any current
+     * selection and set the combo box back to its placeholder state, allowing
+     * the user to make a new selection if needed.
+     *
+     */
     void AccountCombo::resetSelection() { _combo->setCurrentIndex(-1); }
 
+    /**
+     * @brief Update the list of accounts in the combo box, this will replace
+     * the current list of accounts with the provided list, and update the
+     * combo box items accordingly, allowing the combo box to reflect any
+     * changes to the available accounts.
+     *
+     * @param accounts A new list of account drafts to populate the combo box
+     * with
+     */
     void AccountCombo::updateAccounts(
         std::vector<drafts::AccountDraft> accounts
     )

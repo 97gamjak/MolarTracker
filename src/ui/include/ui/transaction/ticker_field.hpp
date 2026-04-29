@@ -27,6 +27,20 @@ namespace ui
     {
         Q_OBJECT
 
+       private:
+        /// The list of available ticker symbols for autocomplete
+        std::vector<QString> _tickers;
+
+        /// The line edit for entering the ticker symbol
+        QLineEdit* _lineEdit;
+
+        /// The button for creating a new ticker
+        QPushButton* _addButton;
+
+        /// The completer for providing autocomplete suggestions based on the
+        /// list of tickers
+        QCompleter* _completer;
+
        public:
         explicit TickerField(
             std::vector<QString> tickers,
@@ -55,11 +69,6 @@ namespace ui
         void _onTextEdited(const QString& text);
         void _onActivated(const QString& ticker);
         void _rebuildCompleter();
-
-        std::vector<QString> _tickers;
-        QLineEdit*           _lineEdit;
-        QPushButton*         _addButton;
-        QCompleter*          _completer;
     };
 
 }   // namespace ui

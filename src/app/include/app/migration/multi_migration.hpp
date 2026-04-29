@@ -39,6 +39,10 @@ namespace app
         CopyDropRenameMigration();
     };
 
+    /**
+     * @brief Migration to drop and recreate a table
+     *
+     */
     template <orm::db_model Model>
     class DropAndRecreateTableMigration : public MultiMigration
     {

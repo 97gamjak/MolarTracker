@@ -70,6 +70,22 @@ namespace app
         _cleanEntries();
     }
 
+    /**
+     * @brief Add a transaction to the store, this adds a new transaction to the
+     * store in a temporary state, which can then be committed to the database
+     * using the commit method. The transaction must have a total sum of zero,
+     * meaning that the sum of all entries in the transaction must equal zero,
+     * ensuring that the transaction is balanced and does not create or destroy
+     * money.
+     *
+     * @param transaction The transaction to add to the store, this should be a
+     * complete transaction with all necessary entries and details filled out,
+     * but it will not be saved to the database until the commit method is
+     * called.
+     * @return TransactionStoreResult The result of the add operation, this will
+     * indicate whether the transaction was added successfully or if there was
+     * an error (e.g., if the transaction sum is not zero).
+     */
     TransactionStoreResult TransactionStore::addTransaction(
         finance::Transaction transaction
     )
@@ -139,6 +155,19 @@ namespace app
         }
     }
 
+    /**
+     * @brief Get all transactions from the store, this retrieves all
+     * transactions that are currently in the store, including both new
+     * transactions that have not yet been committed to the database and
+     * existing transactions that have been loaded from the database. The
+     * returned transactions will reflect any changes made to them in the store,
+     * but they will not be saved to the database until the commit method is
+     * called.
+     *
+     * @return std::vector<finance::Transaction> A vector of transactions
+     * currently in the store, this includes both new and existing transactions,
+     * and reflects any changes made to them in the store.
+     */
     std::vector<finance::Transaction> TransactionStore::getTransactions() const
     {
         const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};

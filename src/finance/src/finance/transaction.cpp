@@ -15,6 +15,8 @@ namespace finance
      * @param id
      * @param timestamp
      * @param status
+     * @param data
+     * @param entries
      * @param comment
      */
     Transaction::Transaction(
@@ -104,6 +106,12 @@ namespace finance
         _entries.push_back(entry);
     }
 
+    /**
+     * @brief Gets the type of the transaction based on its data.
+     *
+     * @return TransactionDataType The type of the transaction (e.g., Cash,
+     * Trade).
+     */
     TransactionDataType Transaction::getType() const
     {
         struct Visitor
@@ -122,6 +130,16 @@ namespace finance
         return std::visit(Visitor{}, _data);
     }
 
+    /**
+     * @brief Calculates the total sum of the transaction by summing the cash
+     * amounts of all entries, this is used to ensure that the transaction is
+     * balanced (i.e., the total sum should be zero for a valid transaction),
+     * and can be used for validation before committing the transaction to the
+     * database.
+     *
+     * @return Cash The total sum of the transaction, calculated by summing the
+     * cash amounts of all entries.
+     */
     Cash Transaction::calculateTotalSum() const
     {
         if (_entries.empty())

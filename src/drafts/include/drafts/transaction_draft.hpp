@@ -58,6 +58,7 @@ namespace drafts
         /// The entries of the transaction
         std::vector<TransactionEntryDraft> _entries;
 
+        /// An optional comment associated with the transaction
         std::optional<std::string> _comment;
 
        public:
@@ -79,13 +80,23 @@ namespace drafts
         void addEntry(const TransactionEntryDraft& entry);
     };
 
+    /**
+     * @brief A draft representation of a transaction overview, this is used to
+     * display a summary of a transaction in the UI, and contains the necessary
+     * information to provide an overview of the transaction without needing to
+     * load the full transaction details.
+     *
+     */
     class TransactionOverviewDraft
     {
        private:
+        /// The timestamp of the transaction
         Timestamp _timestamp;
 
+        /// The entries of the transaction
         std::vector<TransactionEntryDraft> _entries;
 
+        /// An optional comment associated with the transaction
         std::optional<std::string> _comment;
 
        public:

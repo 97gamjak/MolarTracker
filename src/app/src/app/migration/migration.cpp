@@ -242,6 +242,10 @@ namespace app
         _migrations.push_back(std::move(migration));
     }
 
+    /**
+     * @brief Migrate from version 0.1.0
+     *
+     */
     void Migrations::_migrate_0_1_0()
     {
         _lastReleaseVersion = utils::SemVer(0, 1, 0);
@@ -249,6 +253,14 @@ namespace app
         _migrateV6();
     }
 
+    /**
+     * @brief Migrate to version 6
+     *
+     * @details This handles the migration from v5 to v6. It drops and
+     * recreates the transaction, transaction_entry, and instrument tables to
+     * add new fields and constraints, and creates a new trade_leg table for
+     * representing trade transactions in a more structured way.
+     */
     void Migrations::_migrateV6()
     {
         constexpr std::size_t currentVersion = 5;
