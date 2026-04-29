@@ -161,9 +161,9 @@ int Constants::getDbBusyTimeoutMs()
  * of decimal places to use for micro units, which are used for representing
  * fractional shares and other fractional quantities in the application
  *
- * @return int
+ * @return std::uint8_t
  */
-int Constants::getMicroUnitsPrecision()
+std::uint8_t Constants::getMicroUnitsPrecision()
 {
     return ConstantsSchema::_microUnitsPrecision;
 }
