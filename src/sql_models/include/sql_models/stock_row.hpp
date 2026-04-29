@@ -8,10 +8,10 @@
 #include "sql_models/instrument_row.hpp"
 
 /**
- * @brief Represents a row in the "stock_instrument" database table, which
+ * @brief Represents a row in the "stock" database table, which
  * contains specific details about stock instruments. This table has a
  * one-to-one relationship with the "instrument" table, where each row in the
- * "stock_instrument" table corresponds to a row in the "instrument" table. The
+ * "stock" table corresponds to a row in the "instrument" table. The
  * primary key of this table is also a foreign key referencing the id field of
  * the "instrument" table, ensuring that each stock instrument is associated
  * with a valid instrument entry.
@@ -20,9 +20,7 @@
 struct StockRow : public orm::ORMModel<"stock">
 {
     /// The ID of the stock instrument, this is the primary key for the stock
-    /// table and is also a foreign key referencing the id field of the
-    /// instrument table, ensuring a one-to-one relationship between the two
-    /// tables.
+    /// table.
     ORM_FIELD(id, IdField<StockId>)
 
     /// The ticker symbol of the stock, this is a unique identifier for the

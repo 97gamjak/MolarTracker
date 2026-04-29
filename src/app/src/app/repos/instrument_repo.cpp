@@ -31,18 +31,22 @@ namespace app
         auto result = _getCrud().insert(_getDb(), instrumentRow);
 
         if (!result)
+        {
             throw std::runtime_error(
                 "Failed to insert instrument row: " +
                 result.error().getMessage()
             );
+        }
 
         stockRow.instrumentId = InstrumentId(result.value());
         result                = _getCrud().insert(_getDb(), stockRow);
 
         if (!result)
+        {
             throw std::runtime_error(
                 "Failed to insert stock row: " + result.error().getMessage()
             );
+        }
     }
 
 }   // namespace app
