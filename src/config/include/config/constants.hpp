@@ -75,6 +75,9 @@ class ConstantsSchema
 
     /// Width of the side bar
     static constexpr const int _sideBarWidth = 120;
+
+    /// The precision for micro units for securities
+    static constexpr const int _microUnitsPrecision = 6;
 };
 
 /**
@@ -108,6 +111,7 @@ class Constants
     [[nodiscard]] static utils::SemVer getSemVer();
 
     [[nodiscard]] static int getDbBusyTimeoutMs();
+    [[nodiscard]] static int getMicroUnitsPrecision();
 
     // TODO(97gamjak): move this to a specialized quantity approach
     // as soon as it is implemented in mstd

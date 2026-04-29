@@ -6,6 +6,7 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 
+#include "config/constants.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
@@ -58,7 +59,7 @@ namespace ui
         auto* quantityRowLayout = makeQChild<QHBoxLayout>();
         quantityRowLayout->addWidget(_quantityRow);
         _layout->addRow("Quantity:", quantityRowLayout);
-        _quantityRow->setNDecimalPlaces(6);
+        _quantityRow->setNDecimalPlaces(Constants::getMicroUnitsPrecision());
 
         auto* amountRowLayout = makeQChild<QHBoxLayout>();
         amountRowLayout->addWidget(_priceRow);

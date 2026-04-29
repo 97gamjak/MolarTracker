@@ -29,7 +29,7 @@ namespace ui
        public:
         explicit AmountRow(QWidget* parent = nullptr);
 
-        void setNDecimalPlaces(int places);
+        void setNDecimalPlaces(std::uint8_t places);
 
         [[nodiscard]] bool        isValid() const;
         [[nodiscard]] micro_units getAmount() const;

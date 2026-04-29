@@ -36,13 +36,13 @@ namespace finance
         Cash _unitPrice;
 
        public:
-        // TradeLeg(
-        //     TradeLegId   id,
-        //     AccountId    accountId,
-        //     InstrumentId instrumentId,
-        //     micro_units  quantity,
-        //     const Cash&  unitPrice
-        // );
+        TradeLeg(
+            TradeLegId   id,
+            AccountId    accountId,
+            InstrumentId instrumentId,
+            micro_units  quantity,
+            const Cash&  unitPrice
+        );
     };
 
     /**

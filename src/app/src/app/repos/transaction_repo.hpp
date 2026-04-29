@@ -4,7 +4,6 @@
 #include "app/repos_api/i_transaction_repo.hpp"
 #include "base_repo.hpp"
 #include "config/id_types.hpp"
-#include "sql_models/instrument_row.hpp"
 
 namespace app
 {

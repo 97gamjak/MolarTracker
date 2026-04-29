@@ -3,6 +3,8 @@
 
 #include <qboxlayout.h>
 
+#include <cstdint>
+
 #include "config/finance.hpp"
 #include "ui/validators/amount_line_edit.hpp"
 #include "utils/qt_helpers.hpp"
@@ -51,7 +53,7 @@ namespace ui
      *
      * @param places The number of decimal places to allow in the amount input
      */
-    void AmountRow::setNDecimalPlaces(int places)
+    void AmountRow::setNDecimalPlaces(std::uint8_t places)
     {
         _amountField->setNDecimalPlaces(places);
     }

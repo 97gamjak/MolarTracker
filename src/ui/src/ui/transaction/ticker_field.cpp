@@ -37,7 +37,8 @@ namespace ui
 
         _lineEdit->setPlaceholderText("Search ticker...");
 
-        _addButton->setFixedWidth(28);
+        constexpr int buttonSize = 28;
+        _addButton->setFixedWidth(buttonSize);
 
         _completer->setCaseSensitivity(Qt::CaseInsensitive);
         _completer->setFilterMode(Qt::MatchContains);
@@ -152,7 +153,9 @@ namespace ui
         for (const auto& ticker : _tickers)
             list.append(ticker);
 
-        _completer->setModel(new QStringListModel(list, _completer));
+        _completer->setModel(
+            utils::makeQChild<QStringListModel>(list, _completer)
+        );
     }
 
 }   // namespace ui
