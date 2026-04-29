@@ -3,6 +3,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "orm/constraints.hpp"
 #include "orm/orm_model.hpp"
 
 /**
@@ -30,6 +31,17 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(InstrumentRow, id, currency);
+
+    /// Helper type alias for defining foreign key fields referencing the id
+    /// field of the instrument table, this allows for concise definitions of
+    /// foreign key fields that reference the instrument table with a specified
+    /// deletion behavior (e.g., cascade or restrict)
+    template <orm::DeletionType T>
+    using ForeignId = Field<
+        "instrument_id",
+        InstrumentId,
+        orm::foreign_key_t<T, InstrumentRow, decltype(InstrumentRow::id)>,
+        orm::not_null_t>;
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__

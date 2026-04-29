@@ -13,6 +13,9 @@ using SecurityId = StrongId<SecurityTag>;
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
 
+struct StockTag {};
+using StockId = StrongId<StockTag>;
+
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
 

@@ -11,6 +11,7 @@
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/profile_row.hpp"
+#include "sql_models/stock_row.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
@@ -251,6 +252,7 @@ namespace app
         _lastReleaseVersion = utils::SemVer(0, 1, 0);
 
         _migrateV6();
+        _migrateV7();
     }
 
     /**
@@ -281,6 +283,27 @@ namespace app
 
         migration.addMigration(
             std::make_unique<CreateTableMigration<TradeLegRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 7
+     *
+     * @details This handles the migration from v6 to v7. It creates a new
+     * stock table for representing stock instruments, which has a one-to-one
+     * relationship with the instrument table, allowing for more specific fields
+     * related to stocks (e.g., ticker symbol) while still maintaining a common
+     * base for all instruments.
+     */
+    void Migrations::_migrateV7()
+    {
+        constexpr std::size_t currentVersion = 6;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<StockRow>>()
         );
 
         _migrations.push_back(std::move(migration));
