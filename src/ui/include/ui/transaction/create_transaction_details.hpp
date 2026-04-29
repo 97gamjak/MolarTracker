@@ -1,6 +1,7 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__CREATE_TRANSACTION_DETAILS_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__CREATE_TRANSACTION_DETAILS_HPP__
 
+#include <qvariant.h>
 #include <qwidget.h>
 
 #include "config/finance.hpp"
@@ -38,6 +39,15 @@ namespace ui
 
         [[nodiscard]]
         virtual TransactionType getTransactionType() const = 0;
+
+       signals:
+        /**
+         * @brief Signal emitted when a transaction draft is ready to be
+         * created
+         *
+         * @param type The type of the transaction (e.g., Deposit, Withdrawal)
+         */
+        void createTransactionRequested(TransactionType type);
     };
 
     class CreateTransactionWidget : public ICreateTransactionWidget
@@ -105,15 +115,6 @@ namespace ui
         [[nodiscard]] drafts::CreateCashTransactionDraft getDraft() const;
 
         void _emitOk() override;
-
-        /**
-         * @brief Signal emitted when a transaction draft is ready to be created
-         *
-         * @param draft
-         */
-        void createCashTransactionRequested(
-            const drafts::CreateCashTransactionDraft& draft
-        );
     };
 
     /**

@@ -3,6 +3,8 @@
 
 #include <variant>
 
+#include "drafts/transaction_draft.hpp"
+
 namespace finance
 {
     class Transaction;   // forward declaration
@@ -31,12 +33,16 @@ namespace drafts
     class TransactionMapper
     {
        public:
-        // static TransactionDraft toDraft(
-        //     const finance::Transaction& transaction
-        // );
-
         static finance::Transaction fromCreateCashTransactionDraft(
             const CreateCashTransactionDraft& draft
+        );
+
+        static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
+            const std::vector<finance::Transaction>& transactions
+        );
+
+        static drafts::TransactionOverviewDraft toOverviewDraft(
+            const finance::Transaction& transaction
         );
     };
 

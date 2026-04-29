@@ -122,4 +122,17 @@ namespace finance
         return std::visit(Visitor{}, _data);
     }
 
+    Cash Transaction::calculateTotalSum() const
+    {
+        if (_entries.empty())
+            return Cash(Currency::USD);
+
+        Cash total(_entries.front().getCurrency());
+
+        for (const auto& entry : _entries)
+            total += entry.getCash();
+
+        return total;
+    }
+
 }   // namespace finance

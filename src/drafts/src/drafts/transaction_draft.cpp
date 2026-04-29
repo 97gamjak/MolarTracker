@@ -35,6 +35,13 @@ namespace drafts
         return _comment;
     }
 
+    void CreateCashTransactionDraft::addEntry(
+        const TransactionEntryDraft& entry
+    )
+    {
+        _entries.push_back(entry);
+    }
+
     /**
      * @brief Construct a new Transaction Entry Draft:: Transaction Entry Draft
      * object

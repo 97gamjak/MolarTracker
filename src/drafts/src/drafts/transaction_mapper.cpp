@@ -12,31 +12,6 @@ REGISTER_LOG_CATEGORY("Drafts.TransactionMapper");
 namespace drafts
 {
 
-    // TransactionDraft TransactionMapper::toDraft(
-    //     const finance::Transaction& transaction
-    // )
-    // {
-    //     TransactionDraft draft;
-
-    //     draft.timestamp = transaction.getTimestamp();
-    //     draft.comment   = transaction.getComment();
-    //     draft.id        = transaction.getId();
-
-    //     for (const auto& entry : transaction.getEntries())
-    //     {
-    //         TransactionEntryDraft entryDraft{
-    //             AccountId::invalid(),
-    //             entry.getCash()
-    //         };
-
-    //         entryDraft.accountId = entry.getAccountId();
-
-    //         draft.entries.push_back(entryDraft);
-    //     }
-
-    //     return draft;
-    // }
-
     finance::Transaction TransactionMapper::fromCreateCashTransactionDraft(
         const CreateCashTransactionDraft& draft
     )
@@ -64,6 +39,26 @@ namespace drafts
         };
 
         return transaction;
+    }
+
+    std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
+        toOverviewDrafts(const std::vector<finance::Transaction>& transactions)
+    {
+        std::vector<drafts::TransactionOverviewDraft> drafts;
+        drafts.reserve(transactions.size());
+
+        for (const auto& transaction : transactions)
+            drafts.emplace_back(toOverviewDraft(transaction));
+
+        return drafts;
+    }
+
+    drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
+        const finance::Transaction& /*transaction*/
+    )
+    {
+        // TODO: implement this properly, for now just return an empty draft
+        return drafts::TransactionOverviewDraft{};
     }
 
 }   // namespace drafts

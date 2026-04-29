@@ -66,6 +66,8 @@ namespace drafts
 
         [[nodiscard]]
         const std::optional<std::string>& getComment() const;
+
+        void addEntry(const TransactionEntryDraft& entry);
     };
 
     class TransactionOverviewDraft

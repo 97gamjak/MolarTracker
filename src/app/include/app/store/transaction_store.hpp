@@ -45,9 +45,7 @@ namespace app
                 accountIdMap
         );
 
-        TransactionStoreResult addTransaction(
-            finance::Transaction& transaction
-        );
+        TransactionStoreResult addTransaction(finance::Transaction transaction);
 
         // TODO (97gamjak): create filter here
         std::vector<finance::Transaction> getTransactions() const;

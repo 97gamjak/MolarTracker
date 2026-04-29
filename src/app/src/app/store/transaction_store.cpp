@@ -73,7 +73,7 @@ namespace app
     }
 
     TransactionStoreResult TransactionStore::addTransaction(
-        finance::Transaction& transaction
+        finance::Transaction transaction
     )
     {
         const auto& id = _generateNewId();

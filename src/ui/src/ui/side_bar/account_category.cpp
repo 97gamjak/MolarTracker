@@ -53,4 +53,9 @@ namespace ui
         _createAction = menu.addAction("Create Account");
     }
 
+    [[nodiscard]] QAction* AccountCategory::getCreateAction() const
+    {
+        return _createAction;
+    }
+
 }   // namespace ui

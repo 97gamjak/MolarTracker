@@ -2,6 +2,7 @@
 #define __UI__INCLUDE__UI__TRANSACTION__CREATE_TRANSACTION_DLG_HPP__
 
 #include <qstackedwidget.h>
+#include <qvariant.h>
 
 #include <QComboBox>
 
@@ -54,18 +55,19 @@ namespace ui
         /**
          * @brief signal emitted when a transaction type is changed
          *
-         * @param type
+         * @param type The new transaction type
          */
         void transactionTypeChanged(TransactionType type);
 
         void createCashTransactionRequested(
-            const drafts::CreateCashTransactionDraft& draft
+            drafts::CreateCashTransactionDraft draft
         );
 
        private:
         void _buildUI();
         void _onTransactionTypeChanged(int index);
         void _setWindowTitle(TransactionType type);
+        void _onCreateTransactionRequested(TransactionType type);
     };
 }   // namespace ui
 

@@ -4,6 +4,7 @@
 #include <qvariant.h>
 
 #include "config/finance.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/transaction/create_transaction_details.hpp"
 #include "utils/qt_helpers.hpp"
@@ -188,11 +189,10 @@ namespace ui
                 case TransactionType::Deposit:
                 case TransactionType::Withdrawal:
                     connect(
-                        dynamic_cast<DepositWithdrawalWidget*>(widget),
-                        &DepositWithdrawalWidget::
-                            createCashTransactionRequested,
+                        widget,
+                        &ICreateTransactionWidget::createTransactionRequested,
                         this,
-                        &CreateTransactionDialog::createCashTransactionRequested
+                        &CreateTransactionDialog::_onCreateTransactionRequested
                     );
                     break;
                 case TransactionType::Stock:
@@ -235,5 +235,28 @@ namespace ui
         throw std::logic_error(
             "Unhandled transaction type: " + TransactionTypeMeta::toString(type)
         );
+    }
+
+    void CreateTransactionDialog::_onCreateTransactionRequested(
+        TransactionType type
+    )
+    {
+        LOG_ENTRY;
+
+        switch (type)
+        {
+            case TransactionType::Deposit:
+            case TransactionType::Withdrawal:
+            {
+                auto* widget =
+                    dynamic_cast<DepositWithdrawalWidget*>(_widgetMap[type]);
+                emit createCashTransactionRequested(widget->getDraft());
+                break;
+            }
+            case TransactionType::Stock:
+                throw NotYetImplementedException(
+                    "Stock transactions are not yet implemented"
+                );
+        }
     }
 }   // namespace ui

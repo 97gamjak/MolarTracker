@@ -6,6 +6,7 @@
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
+#include <qvariant.h>
 
 #include <algorithm>
 #include <optional>
@@ -308,7 +309,7 @@ namespace ui
     void DepositWithdrawalWidget::_emitOk()
     {
         const auto draft = getDraft();
-        emit       createCashTransactionRequested(draft);
+        emit       createTransactionRequested(getTransactionType());
     }
 
     /**

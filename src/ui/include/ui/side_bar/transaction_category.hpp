@@ -22,7 +22,6 @@ namespace ui
        public:
         explicit TransactionCategory();
 
-        [[nodiscard]] QAction* getCreateAction() const;
         [[nodiscard]] QAction* getCreateDepositAction() const;
         [[nodiscard]] QAction* getCreateWithdrawalAction() const;
 
