@@ -11,7 +11,7 @@
 namespace drafts
 {
 
-    // TODO: create own draft files
+    // TODO(97gamjak): create own draft files
     /**
      * @brief A draft representation of a transaction entry
      *
