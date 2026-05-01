@@ -12,6 +12,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add transaction type stock
 - Add create stock dialog draft
 - Add instrument repo/service and stockRow to db
+- Add comment and timestamp fields to deposit and withdrawal widgets
 
 #### HTTP
 
