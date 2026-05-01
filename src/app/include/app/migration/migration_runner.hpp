@@ -17,7 +17,7 @@ namespace app
     {
        private:
         /// current db version
-        constexpr static std::size_t DB_VERSION = 7;
+        constexpr static std::size_t DB_VERSION = 8;
 
         /// The migration states for the application
         Migrations _migrations;

@@ -2,8 +2,6 @@
 #define __APP__INCLUDE__APP__MIGRATION__SINGLE_MIGRATION_TPP__
 
 #include "app/migration/single_migration.hpp"
-#include "db/statement.hpp"
-#include "orm/constraints.hpp"
 #include "orm/crud.hpp"
 #include "orm/type_traits.hpp"
 

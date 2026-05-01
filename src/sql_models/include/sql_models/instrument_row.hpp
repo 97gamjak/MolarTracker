@@ -1,7 +1,6 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
 #include "orm/orm_model.hpp"
@@ -26,11 +25,8 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     /// auto-incremented
     ORM_FIELD(id, IdField<InstrumentId>)
 
-    /// The currency field, this indicates the currency of the instrument
-    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
-
     /// auto generate the fields() function using the ORM_FIELDS macro
-    ORM_FIELDS(InstrumentRow, id, currency);
+    ORM_FIELDS(InstrumentRow, id);
 
     /// Helper type alias for defining foreign key fields referencing the id
     /// field of the instrument table, this allows for concise definitions of

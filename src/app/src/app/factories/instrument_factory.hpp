@@ -26,6 +26,9 @@ namespace app
         static std::pair<InstrumentRow, StockRow> fromStock(
             const finance::Stock& stock
         );
+
+        [[nodiscard]]
+        static finance::Stock toStock(const StockRow& row);
     };
 
 }   // namespace app
