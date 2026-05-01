@@ -11,6 +11,7 @@
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
+#include "ui/transaction/comment_field.hpp"
 #include "utils/qt_helpers.hpp"
 #include "utils/timestamp.hpp"
 
@@ -39,6 +40,7 @@ namespace ui
           _accountCombo(makeQChild<AccountCombo>(std::move(accounts), this)),
           _amountRow(makeQChild<AmountRow>(this)),
           _currencyLabel(makeQChild<QLabel>(this)),
+          _commentField(makeQChild<CommentField>(this)),
           _addButton(makeQChild<QPushButton>("Add Transaction", this))
     {
         setLayout(_layout);
@@ -49,6 +51,7 @@ namespace ui
         amountRowLayout->addWidget(_amountRow);
         amountRowLayout->addWidget(_currencyLabel);
         _layout->addRow("Amount:", amountRowLayout);
+        _layout->addRow("Comment:", _commentField);
 
         _addButton->setEnabled(false);
         auto* buttonLayout = makeQChild<QHBoxLayout>();
@@ -121,7 +124,7 @@ namespace ui
         auto entry = drafts::TransactionEntryDraft{account->id, cash};
         entry.setNeedsExternal(true);
 
-        return {Timestamp{}, {entry}, std::nullopt};
+        return {Timestamp{}, {entry}, _commentField->getComment()};
     }
 
     /**
