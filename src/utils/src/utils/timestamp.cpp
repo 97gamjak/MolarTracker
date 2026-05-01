@@ -117,8 +117,8 @@ std::string Timestamp::fileSafe() const
  * @param dateTime The QDateTime object to use for the Timestamp.
  */
 Timestamp::Timestamp(const QDateTime& dateTime)
+    : _timePoint(Clock::time_point{milliseconds{dateTime.toMSecsSinceEpoch()}})
 {
-    _timePoint = Clock::time_point{milliseconds{dateTime.toMSecsSinceEpoch()}};
 }
 
 /**
