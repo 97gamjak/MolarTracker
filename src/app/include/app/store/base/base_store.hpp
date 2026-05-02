@@ -19,7 +19,8 @@ namespace app
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define STATE_POLICY_LIST(X) \
     X(IncludeDelete)         \
-    X(ExcludeDelete)
+    X(ExcludeDelete)         \
+    X(OnlyDeleted)
 
     MSTD_ENUM(DeletionPolicy, std::int8_t, STATE_POLICY_LIST);
 

@@ -1,10 +1,12 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__STOCK_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__STOCK_ROW_HPP__
 
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 #include "sql_models/instrument_row.hpp"
 
 /**
@@ -30,6 +32,10 @@ struct StockRow : public orm::ORMModel<"stock">
         Field<"ticker", std::string, orm::not_null_t, orm::unique_t>
     )
 
+    /// The currency of the stock, this indicates the currency in which the
+    /// stock is traded, and is used for financial calculations and reporting.
+    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
+
     /// The ID of the instrument associated with this stock, this is a foreign
     /// key referencing the id field of the instrument table, and is used to
     /// associate this stock instrument with a specific entry in the instrument
@@ -42,8 +48,11 @@ struct StockRow : public orm::ORMModel<"stock">
     )
 
     /// @cond DOXYGEN_IGNORE
-    ORM_FIELDS(StockRow, id, ticker, instrumentId);
+    ORM_FIELDS(StockRow, id, ticker, currency, instrumentId);
     /// @endcond
+
+    [[nodiscard]]
+    static orm::WhereExpr hasTicker(const std::string& ticker);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__STOCK_ROW_HPP__

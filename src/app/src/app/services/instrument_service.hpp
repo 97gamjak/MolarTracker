@@ -31,7 +31,11 @@ namespace app
 
         [[nodiscard]] std::vector<std::string> getTickers() override;
 
+        [[nodiscard]] std::vector<finance::Stock> getStocks() override;
+
         void addStock(const finance::Stock& stock) override;
+
+        [[nodiscard]] bool stockExists(const std::string& ticker) override;
     };
 
 }   // namespace app

@@ -673,7 +673,7 @@ namespace orm
         const std::string& columnName
     )
     {
-        if (!_columnExists(database, columnName, Model::tableName))
+        if (!_columnExists(database, columnName, std::string(Model::tableName)))
         {
             return std::unexpected(CrudError(
                 CrudErrorType::ColumnDoesNotExist,

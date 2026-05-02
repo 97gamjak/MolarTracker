@@ -112,6 +112,16 @@ std::string Timestamp::fileSafe() const
 
 #ifdef __QT_ENABLED__
 /**
+ * @brief Constructs a Timestamp object from a QDateTime object.
+ *
+ * @param dateTime The QDateTime object to use for the Timestamp.
+ */
+Timestamp::Timestamp(const QDateTime& dateTime)
+    : _timePoint(Clock::time_point{milliseconds{dateTime.toMSecsSinceEpoch()}})
+{
+}
+
+/**
  * @brief Converts the Timestamp to a QDateTime object.
  *
  * @return QDateTime
