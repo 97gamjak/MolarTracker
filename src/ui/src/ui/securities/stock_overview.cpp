@@ -3,8 +3,9 @@
 #include <qboxlayout.h>
 #include <qheaderview.h>
 #include <qsortfilterproxymodel.h>
-#include <qt6/QtWidgets/qlineedit.h>
 #include <qtableview.h>
+
+#include <QLineEdit>
 
 #include "ui/securities/stock_info_model.hpp"
 #include "utils/qt_helpers.hpp"
