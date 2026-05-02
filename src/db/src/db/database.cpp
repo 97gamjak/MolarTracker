@@ -439,4 +439,11 @@ namespace db
         return openedHandle;
     }
 
+    /**
+     * @brief Get the path to the database file
+     *
+     * @return std::string
+     */
+    [[nodiscard]] std::string Database::getDBPath() const { return _dbPath; }
+
 }   // namespace db

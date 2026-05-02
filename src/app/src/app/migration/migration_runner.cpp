@@ -10,6 +10,35 @@ REGISTER_LOG_CATEGORY("App.Migration");
 namespace app
 {
     /**
+     * @brief Construct a new Migration Exception:: Migration Exception object
+     *
+     * @param message
+     * @param dbPath
+     */
+    MigrationException::MigrationException(
+        const std::string& message,
+        std::string        dbPath
+    )
+        : MolarTrackerException(message), _dbPath(std::move(dbPath))
+    {
+    }
+
+    /**
+     * @brief Get the error message
+     *
+     * @return const char* The error message
+     */
+    const char* MigrationException::what() const noexcept
+    {
+        const std::string prefix =
+            "MigrationException for database (" + _dbPath + "): ";
+        static std::string fullMessage;
+
+        fullMessage = prefix + MolarTrackerException::what();
+        return fullMessage.c_str();
+    }
+
+    /**
      * @brief Construct a new MigrationRunner object
      *
      * @param db The database to migrate
@@ -17,7 +46,14 @@ namespace app
     MigrationRunner::MigrationRunner(db::Database& db)
         : _migrations(0, DB_VERSION)
     {
-        migrate(db);
+        try
+        {
+            migrate(db);
+        }
+        catch (const std::exception& e)
+        {
+            throw MigrationException(e.what(), db.getDBPath());
+        }
     }
 
     /**
