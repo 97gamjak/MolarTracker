@@ -91,7 +91,7 @@ namespace finance
         info.shortName          = _safeGet<std::string>(price, "shortName");
         info.longName           = _safeGet<std::string>(price, "longName");
         info.exchange           = _safeGet<std::string>(price, "exchangeName");
-        info.currency           = _safeGet<std::string>(price, "currency");
+        info.currency           = _safeGet<Currency>(price, "currency");
         info.regularMarketPrice = _rawValue(price, "regularMarketPrice");
         info.previousClose = _rawValue(price, "regularMarketPreviousClose");
         info.assetClass = fromQuote(_safeGet<std::string>(price, "quoteType"));

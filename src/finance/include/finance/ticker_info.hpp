@@ -31,7 +31,7 @@ namespace finance
         /// The exchange where the stock is listed
         std::string exchange;
         /// The currency of the stock
-        std::string currency;
+        Currency currency;
         /// The industry of the stock
         std::string industry;
         /// The sector of the stock
