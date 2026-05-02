@@ -1,23 +1,14 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TICKER_INFO_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TICKER_INFO_HPP__
 
-#include <cstdint>
 #include <mstd/enum.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
+
+#include "config/finance.hpp"
 
 namespace finance
 {
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSET_CLASS_LIST(X) \
-    X(Stock)                \
-    X(Etf)                  \
-    X(Crypto)               \
-    X(MutualFund)           \
-    X(Future)               \
-    X(Unknown)
-
-    MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST)
 
     [[nodiscard]]
     AssetClass fromQuote(std::string_view quote);
@@ -25,18 +16,34 @@ namespace finance
     [[nodiscard]]
     std::string toString(AssetClass assetClass);
 
+    /**
+     * @brief Structure representing information about a stock ticker.
+     *
+     */
     struct TickerInfo
     {
+        /// The ticker symbol of the stock
         std::string symbol;
+        /// The short name of the stock
         std::string shortName;
+        /// The long name of the stock
         std::string longName;
+        /// The exchange where the stock is listed
         std::string exchange;
+        /// The currency of the stock
         std::string currency;
+        /// The industry of the stock
         std::string industry;
+        /// The sector of the stock
         std::string sector;
-        double      regularMarketPrice{};
-        double      previousClose{};
-        AssetClass  assetClass{AssetClass::Unknown};
+        /// The regular market price of the stock
+        double regularMarketPrice{};
+        /// The previous close price of the stock
+        double previousClose{};
+        /// The asset class of the stock
+        AssetClass assetClass{AssetClass::Unknown};
+
+        static TickerInfo fromJson(const nlohmann::json& json);
     };
 
 }   // namespace finance

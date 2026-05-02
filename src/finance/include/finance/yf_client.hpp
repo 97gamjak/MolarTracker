@@ -9,12 +9,18 @@
 namespace finance
 {
 
+    /**
+     * @brief Client for interacting with the Yahoo Finance API.
+     *
+     */
     class YahooFinanceClient
     {
        private:
-        static constexpr std::string_view k_baseUrl =
+        /// Base URL for the Yahoo Finance API
+        static constexpr std::string_view _baseUrl =
             "https://query2.finance.yahoo.com";
-        static constexpr std::string_view k_userAgent =
+        /// User-Agent header to use for requests
+        static constexpr std::string_view _userAgent =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64)";
 
        public:
