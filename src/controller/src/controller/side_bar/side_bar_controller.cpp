@@ -52,11 +52,13 @@ namespace controller
               transactionController,
               mainWindow
           ),
+          _securitiesSideBarController(mainWindow),
           _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
         _sideBar->addCategory(_accountSideBarController.getCategory());
         _sideBar->addCategory(_transactionSideBarController.getCategory());
+        _sideBar->addCategory(_securitiesSideBarController.getCategory());
 
         connect(
             _sideBar,
@@ -125,6 +127,7 @@ namespace controller
             }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
                 // Handle overview and account category clicks if needed
                 break;
         }
@@ -173,9 +176,6 @@ namespace controller
                 }
                 break;
             }
-            case ui::SideBarItemType::OverviewCategory:
-                // Handle overview item click
-                break;
             case ui::SideBarItemType::AccountCategory:
             {
                 const auto* acc = dynamic_cast<ui::AccountCategory*>(item);
@@ -185,12 +185,18 @@ namespace controller
                 break;
             }
             case ui::SideBarItemType::TransactionCategory:
+            {
                 const auto* transaction =
                     dynamic_cast<ui::TransactionCategory*>(item);
                 _transactionSideBarController.handleContextMenuAction(
                     transaction,
                     action
                 );
+                break;
+            }
+            case ui::SideBarItemType::OverviewCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
+                // Handle overview item click
                 break;
         }
     }
