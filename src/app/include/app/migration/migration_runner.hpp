@@ -11,9 +11,14 @@ namespace db
 
 namespace app
 {
+    /**
+     * @brief Exception thrown when a migration fails
+     *
+     */
     class MigrationException : public MolarTrackerException
     {
        private:
+        /// The database path
         std::string _dbPath;
 
        public:
