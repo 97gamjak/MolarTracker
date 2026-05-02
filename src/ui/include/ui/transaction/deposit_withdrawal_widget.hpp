@@ -18,8 +18,10 @@ class QPushButton;   // Forward declaration
 namespace ui
 {
 
-    class AccountCombo;   // Forward declaration
-    class AmountRow;      // Forward declaration
+    class AccountCombo;     // Forward declaration
+    class AmountRow;        // Forward declaration
+    class CommentField;     // Forward declaration
+    class TimestampField;   // Forward declaration
 
     /**
      * @brief Widget for creating a deposit or withdrawal transaction
@@ -44,11 +46,17 @@ namespace ui
         /// from
         AccountCombo* _accountCombo;
 
+        /// The field for selecting the transaction timestamp
+        TimestampField* _timestampField;
+
         /// The row for entering the amount to deposit or withdraw
         AmountRow* _amountRow;
 
         /// The label for displaying the currency of the selected account
         QLabel* _currencyLabel;
+
+        /// The field for entering an optional comment
+        CommentField* _commentField;
 
         /// The button for adding the transaction
         QPushButton* _addButton;
