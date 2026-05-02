@@ -45,10 +45,15 @@ namespace app
      *
      * @param stock The Stock object containing the details of the stock to be
      * added to the database
+     *
+     * @return A pair containing the StockId and InstrumentId of the newly
+     * added stock
      */
-    void InstrumentService::addStock(const finance::Stock& stock)
+    std::pair<StockId, InstrumentId> InstrumentService::addStock(
+        const finance::Stock& stock
+    )
     {
-        _instrumentRepo->addStock(stock);
+        return _instrumentRepo->addStock(stock);
     }
 
     /**

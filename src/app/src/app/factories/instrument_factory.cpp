@@ -29,6 +29,12 @@ namespace app
         stockRow.id           = stock.getId();
         stockRow.instrumentId = stock.getInstrumentId();
         stockRow.currency     = stock.getCurrency();
+        stockRow.shortName    = stock.getShortName();
+        stockRow.longName     = stock.getLongName();
+        stockRow.assetClass   = stock.getAssetClass();
+        stockRow.sector       = stock.getSector();
+        stockRow.industry     = stock.getIndustry();
+        stockRow.exchange     = stock.getExchange();
 
         return {instrumentRow, stockRow};
     }
@@ -44,7 +50,16 @@ namespace app
      */
     finance::Stock InstrumentFactory::toStock(const StockRow& row)
     {
-        auto stock = finance::Stock(row.ticker.value(), row.currency.value());
+        auto stock = finance::Stock(
+            row.ticker.value(),
+            row.currency.value(),
+            row.shortName.value(),
+            row.longName.value(),
+            row.exchange.value(),
+            row.industry.value(),
+            row.sector.value(),
+            row.assetClass.value()
+        );
 
         stock.setId(row.id.value());
         stock.setInstrumentId(row.instrumentId.value());

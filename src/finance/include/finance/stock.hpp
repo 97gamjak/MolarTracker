@@ -57,7 +57,16 @@ namespace finance
         AssetClass _assetClass;
 
        public:
-        explicit Stock(std::string ticker, Currency currency);
+        explicit Stock(
+            std::string ticker,
+            Currency    currency,
+            std::string shortName,
+            std::string longName,
+            std::string exchange,
+            std::string industry,
+            std::string sector,
+            AssetClass  assetClass
+        );
 
         [[nodiscard]]
         static std::expected<Stock, http::HttpError> retrieveTickerInfo(

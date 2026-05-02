@@ -256,6 +256,7 @@ namespace app
         _migrateV6();
         _migrateV7();
         _migrateV8();
+        _migrateV9();
     }
 
     /**
@@ -339,6 +340,53 @@ namespace app
 
         migration.addMigration(
             std::make_unique<DropColumnMigration<InstrumentRow>>("currency")
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 9
+     */
+    void Migrations::_migrateV9()
+    {
+        constexpr std::size_t currentVersion = 8;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::shortNameField>>(
+                StockRow::shortNameField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::longNameField>>(
+                StockRow::longNameField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::assetClassField>>(
+                StockRow::assetClassField{AssetClass::Unknown}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::sectorField>>(
+                StockRow::sectorField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::industryField>>(
+                StockRow::industryField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::exchangeField>>(
+                StockRow::exchangeField{""}
+            )
         );
 
         _migrations.push_back(std::move(migration));

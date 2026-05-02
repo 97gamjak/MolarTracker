@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "app/store/base/store_state.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StockStore");
@@ -113,4 +114,32 @@ namespace app
 
         return stocks;
     }
+
+    /**
+     * @brief Commit the changes in the stock store
+     *
+     */
+    void StockStore::commit()
+    {
+        for (auto& entry : _getEntries())
+        {
+            if (entry.state == StoreState::New)
+            {
+                const auto [stockId, instrumentId] =
+                    _instrumentService->addStock(entry.value);
+
+                entry.value.setId(stockId);
+                entry.value.setInstrumentId(instrumentId);
+            }
+            else if (entry.state == StoreState::Modified)
+            {
+                throw NotYetImplementedException(
+                    "Stock modification is not yet implemented"
+                );
+            }
+        }
+
+        _clearEntries();
+    }
+
 }   // namespace app

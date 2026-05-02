@@ -21,7 +21,10 @@ namespace app
         [[nodiscard]]
         std::vector<finance::Stock> getStocks() override;
 
-        void addStock(const finance::Stock& stock) override;
+        [[nodiscard]]
+        std::pair<StockId, InstrumentId> addStock(
+            const finance::Stock& stock
+        ) override;
 
         [[nodiscard]]
         bool stockExists(const std::string& ticker) override;

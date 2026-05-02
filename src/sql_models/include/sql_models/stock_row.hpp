@@ -32,10 +32,6 @@ struct StockRow : public orm::ORMModel<"stock">
         Field<"ticker", std::string, orm::not_null_t, orm::unique_t>
     )
 
-    /// The currency of the stock, this indicates the currency in which the
-    /// stock is traded, and is used for financial calculations and reporting.
-    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
-
     /// The ID of the instrument associated with this stock, this is a foreign
     /// key referencing the id field of the instrument table, and is used to
     /// associate this stock instrument with a specific entry in the instrument
@@ -47,8 +43,31 @@ struct StockRow : public orm::ORMModel<"stock">
         InstrumentRow::template ForeignId<orm::CascadeDelete>
     )
 
+    /// The currency of the stock, this indicates the currency in which the
+    /// stock is traded, and is used for financial calculations and reporting.
+    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
+
+    ORM_FIELD(shortName, Field<"short_name", std::string, orm::not_null_t>)
+    ORM_FIELD(longName, Field<"long_name", std::string, orm::not_null_t>)
+    ORM_FIELD(assetClass, Field<"asset_class", AssetClass, orm::not_null_t>)
+    ORM_FIELD(sector, Field<"sector", std::string, orm::not_null_t>)
+    ORM_FIELD(industry, Field<"industry", std::string, orm::not_null_t>)
+    ORM_FIELD(exchange, Field<"exchange", std::string, orm::not_null_t>)
+
     /// @cond DOXYGEN_IGNORE
-    ORM_FIELDS(StockRow, id, ticker, currency, instrumentId);
+    ORM_FIELDS(
+        StockRow,
+        id,
+        ticker,
+        instrumentId,
+        currency,
+        shortName,
+        longName,
+        assetClass,
+        sector,
+        industry,
+        exchange
+    );
     /// @endcond
 
     [[nodiscard]]

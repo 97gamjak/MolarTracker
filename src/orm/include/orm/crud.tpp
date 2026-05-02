@@ -129,26 +129,50 @@ namespace orm
         const Model& row
     )
     {
-        auto sqlText = "INSERT INTO " + Model::tableName + " (";
-
-        std::vector<std::string> columnNames;
+        std::size_t nInsertableFields = 0;
         Model::forEachColumn(
             [&](const auto& field)
             {
                 if (field.isAutoIncrementPk)
                     return;
 
-                columnNames.push_back(std::string(field.name));
+                ++nInsertableFields;
             }
         );
 
-        sqlText += mstd::join(columnNames, ", ");
-        sqlText += ") VALUES (";
+        auto sqlText = "INSERT INTO " + Model::tableName + " ";
 
-        const std::vector<std::string> placeholders(columnNames.size(), "?");
-        sqlText += mstd::join(placeholders, ", ");
+        if (nInsertableFields > 0)
+        {
+            sqlText += "(";
 
-        sqlText += ");";
+            std::vector<std::string> columnNames;
+            Model::forEachColumn(
+                [&](const auto& field)
+                {
+                    if (field.isAutoIncrementPk)
+                        return;
+
+                    columnNames.push_back(std::string(field.name));
+                }
+            );
+
+            sqlText += mstd::join(columnNames, ", ");
+            sqlText += ") VALUES (";
+
+            const std::vector<std::string> placeholders(
+                columnNames.size(),
+                "?"
+            );
+            sqlText += mstd::join(placeholders, ", ");
+            sqlText += ")";
+        }
+        else
+        {
+            sqlText += " DEFAULT VALUES";
+        }
+
+        sqlText += ";";
 
         LOG_DEBUG(
             std::format(
