@@ -28,6 +28,8 @@ namespace controller
      * @param accountController
      * @param transactionController
      */
+    // TODO(97gamjak): would be probably best to remove dependency on central
+    // stack here
     SideBarController::SideBarController(
         cmd::UndoStack&        undoStack,
         app::AppContext&       appContext,
@@ -52,7 +54,11 @@ namespace controller
               transactionController,
               mainWindow
           ),
-          _securitiesSideBarController(mainWindow),
+          _securitiesSideBarController(
+              mainWindow,
+              appContext.getStore().getStockStore(),
+              centralStack
+          ),
           _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
@@ -125,9 +131,13 @@ namespace controller
                 _transactionSideBarController.onTransactionsSelected();
                 break;
             }
+            case ui::SideBarItemType::SecuritiesCategory:
+            {
+                _securitiesSideBarController.onSecuritiesSelected();
+                break;
+            }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
-            case ui::SideBarItemType::SecuritiesCategory:
                 // Handle overview and account category clicks if needed
                 break;
         }

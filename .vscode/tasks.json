@@ -47,7 +47,7 @@
             "command": "bash",
             "args": [
                 "-c",
-                "clangd-tidy $(find src/) -j3 -p=.build --tqdm"
+                "scripts/clangd.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -84,35 +84,6 @@
             "problemMatcher": [
                 {
                     "owner": "custom-cpp-checks",
-                    "fileLocation": [
-                        "absolute"
-                    ],
-                    "pattern": {
-                        "regexp": "^(.*?):(\\d+):(\\d+):\\s*(warning|error|note):\\s*(.*)$",
-                        "file": 1,
-                        "line": 2,
-                        "column": 3,
-                        "severity": 4,
-                        "message": 5
-                    }
-                }
-            ],
-            "group": "build"
-        },
-        {
-            "label": "clang-tidy",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "-c",
-                "clangd-tidy $(find src/) -j3 -p=.build --tqdm"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                {
-                    "owner": "clang-tidy",
                     "fileLocation": [
                         "absolute"
                     ],

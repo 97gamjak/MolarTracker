@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "app/service_container.hpp"
+#include "app/store/stock_store.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
@@ -18,11 +19,13 @@ namespace app
     StoreContainer::StoreContainer(ServiceContainer& services)
         : _profileStore{services.getProfileService()},
           _accountStore{services.getAccountService()},
-          _transactionStore{services.getTransactionService()}
+          _transactionStore{services.getTransactionService()},
+          _stockStore{services.getInstrumentService()}
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
         _allStores.push_back(&_transactionStore);
+        _allStores.push_back(&_stockStore);
 
         auto connectProfileIdUpdate =
             [](void* user, const std::optional<ProfileId>& profileId)
@@ -157,6 +160,23 @@ namespace app
     const TransactionStore& StoreContainer::getTransactionStore() const
     {
         return _transactionStore;
+    }
+
+    /**
+     * @brief Get the StockStore
+     *
+     * @return StockStore&
+     */
+    StockStore& StoreContainer::getStockStore() { return _stockStore; }
+
+    /**
+     * @brief Get the StockStore (const version)
+     *
+     * @return const StockStore&
+     */
+    const StockStore& StoreContainer::getStockStore() const
+    {
+        return _stockStore;
     }
 
 }   // namespace app

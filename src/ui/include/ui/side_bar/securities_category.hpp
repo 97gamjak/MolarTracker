@@ -5,6 +5,12 @@
 
 namespace ui
 {
+    /**
+     * @brief Category for managing securities-related UI components.
+     *
+     * This class provides the necessary methods to handle the securities
+     * category within the side bar.
+     */
     class SecuritiesCategory : public Category
     {
        public:

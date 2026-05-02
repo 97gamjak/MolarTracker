@@ -6,17 +6,24 @@
 #include <qt6/QtWidgets/qlineedit.h>
 #include <qtableview.h>
 
+#include "ui/securities/stock_info_model.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Stock Overview Widget:: Stock Overview Widget
+     * object
+     *
+     * @param parent
+     */
     StockOverviewWidget::StockOverviewWidget(QWidget* parent)
         : QWidget(parent),
-          _model(makeQChild<StockInfoTableModel>(this)),
-          _proxy(makeQChild<QSortFilterProxyModel>(this)),
-          _table(makeQChild<QTableView>(this))
+          _model(new StockInfoTableModel(this)),
+          _proxy(new QSortFilterProxyModel(this)),
+          _table(new QTableView(this))
     {
         _proxy->setSourceModel(_model);
         _proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -35,15 +42,18 @@ namespace ui
 
         _setupTable();
 
-        auto* topBar = new QHBoxLayout();
+        auto* topBar = makeQChild<QHBoxLayout>();
         topBar->addWidget(search);
         topBar->addStretch();
 
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = makeQChild<QVBoxLayout>(this);
         layout->addLayout(topBar);
         layout->addWidget(_table);
     }
 
+    /**
+     * @brief Set up the table view for displaying stock information.
+     */
     void StockOverviewWidget::_setupTable()
     {
         _table->setModel(_proxy);
@@ -57,27 +67,10 @@ namespace ui
         auto* hdr = _table->horizontalHeader();
         hdr->setSortIndicatorShown(true);
         hdr->setStretchLastSection(false);
-        // Name column stretches; everything else is content-sized
-        hdr->setSectionResizeMode(
-            static_cast<int>(StockInfoTableModel::Column::Name),
-            QHeaderView::Stretch
-        );
-        hdr->setSectionResizeMode(
-            static_cast<int>(StockInfoTableModel::Column::Ticker),
-            QHeaderView::ResizeToContents
-        );
-        hdr->setSectionResizeMode(
-            static_cast<int>(StockInfoTableModel::Column::Currency),
-            QHeaderView::ResizeToContents
-        );
-        hdr->setSectionResizeMode(
-            static_cast<int>(StockInfoTableModel::Column::LastUpdated),
-            QHeaderView::ResizeToContents
-        );
 
         // Default sort: alphabetical by ticker
         _table->sortByColumn(
-            static_cast<int>(StockInfoTableModel::Column::Ticker),
+            StockInfoTableModel::getTickerColumn(),
             Qt::AscendingOrder
         );
 
@@ -89,6 +82,9 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Handle selection changes in the table view.
+     */
     void StockOverviewWidget::_onSelectionChanged()
     {
         const auto selected = _table->selectionModel()->selectedRows();
@@ -101,13 +97,23 @@ namespace ui
                 ->data(
                     _model->index(
                         sourceIndex.row(),
-                        static_cast<int>(StockInfoTableModel::Column::Ticker)
+                        StockInfoTableModel::getTickerColumn()
                     ),
                     Qt::DisplayRole
                 )
                 .toString();
 
         emit tickerSelected(ticker);
+    }
+
+    /**
+     * @brief Get the model for displaying stock information.
+     *
+     * @return StockInfoTableModel* The model for displaying stock information.
+     */
+    StockInfoTableModel* StockOverviewWidget::getModel() const
+    {
+        return _model;
     }
 
 }   // namespace ui
