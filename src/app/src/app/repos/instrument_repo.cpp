@@ -62,8 +62,13 @@ namespace app
      *
      * @param stock The Stock object containing the details of the stock to be
      * added to the database
+     *
+     * @return A pair containing the StockId and InstrumentId of the newly
+     * added stock
      */
-    void InstrumentRepo::addStock(const finance::Stock& stock)
+    std::pair<StockId, InstrumentId> InstrumentRepo::addStock(
+        const finance::Stock& stock
+    )
     {
         auto [instrumentRow, stockRow] = InstrumentFactory::fromStock(stock);
 
@@ -86,6 +91,8 @@ namespace app
                 "Failed to insert stock row: " + result.error().getMessage()
             );
         }
+
+        return {stockRow.id.value(), stockRow.instrumentId.value()};
     }
 
     /**

@@ -51,6 +51,8 @@ namespace app
         _accountStore.commit();
 
         _transactionStore.commit(_accountStore.getChangedIds());
+
+        _stockStore.commit();
     }
 
     /**

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "config/id_types.hpp"
+
 namespace finance
 {
     class Stock;
@@ -45,8 +47,14 @@ namespace app
          *
          * @param stock The Stock object containing the details of the stock to
          * be added to the database
+         *
+         * @return A pair containing the StockId and InstrumentId of the newly
+         * added stock
          */
-        virtual void addStock(const finance::Stock& stock) = 0;
+        [[nodiscard]]
+        virtual std::pair<StockId, InstrumentId> addStock(
+            const finance::Stock& stock
+        ) = 0;
 
         /**
          * @brief Check if a stock with the given ticker already exists in the

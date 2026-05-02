@@ -11,12 +11,26 @@ namespace finance
      * @param ticker
      * @param currency
      */
-    Stock::Stock(std::string ticker, Currency currency)
+    Stock::Stock(
+        std::string ticker,
+        Currency    currency,
+        std::string shortName,
+        std::string longName,
+        std::string exchange,
+        std::string industry,
+        std::string sector,
+        AssetClass  assetClass
+    )
         : _id(StockId::invalid()),
           _instrumentId(InstrumentId::invalid()),
           _ticker(std::move(ticker)),
           _currency(currency),
-          _assetClass(AssetClass::Unknown)
+          _shortName(std::move(shortName)),
+          _longName(std::move(longName)),
+          _exchange(std::move(exchange)),
+          _industry(std::move(industry)),
+          _sector(std::move(sector)),
+          _assetClass(assetClass)
     {
     }
 

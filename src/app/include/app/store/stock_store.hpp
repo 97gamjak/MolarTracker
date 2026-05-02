@@ -39,6 +39,8 @@ namespace app
         StockStoreResult addStock(finance::Stock stock);
 
         std::vector<finance::Stock> getStocks() const;
+
+        void commit();
     };
 }   // namespace app
 
