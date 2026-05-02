@@ -10,6 +10,12 @@ namespace finance
      *
      * @param ticker
      * @param currency
+     * @param shortName
+     * @param longName
+     * @param exchange
+     * @param industry
+     * @param sector
+     * @param assetClass
      */
     Stock::Stock(
         std::string ticker,

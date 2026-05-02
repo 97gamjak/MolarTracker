@@ -345,6 +345,9 @@ namespace app
         _migrations.push_back(std::move(migration));
     }
 
+    /**
+     * @brief Migrate to version 9
+     */
     void Migrations::_migrateV9()
     {
         constexpr std::size_t currentVersion = 8;

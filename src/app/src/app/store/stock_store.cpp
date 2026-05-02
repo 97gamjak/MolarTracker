@@ -115,6 +115,10 @@ namespace app
         return stocks;
     }
 
+    /**
+     * @brief Commit the changes in the stock store
+     *
+     */
     void StockStore::commit()
     {
         for (auto& entry : _getEntries())
