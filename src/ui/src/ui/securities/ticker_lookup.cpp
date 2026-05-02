@@ -157,4 +157,10 @@ namespace ui
         return _acceptButton;
     }
 
+    void TickerLookupWidget::setTicker(const std::string& ticker)
+    {
+        clearResult();
+        _tickerInput->setText(QString::fromStdString(ticker));
+    }
+
 }   // namespace ui

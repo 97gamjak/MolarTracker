@@ -8,6 +8,7 @@
 #include "orm/orm_model.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/position_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
 /**
@@ -74,6 +75,17 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// trade leg is properly associated with the correct currency for financial
     /// calculations and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
+
+    ORM_FIELD(
+        positionId,
+        Field<
+            "position_id",
+            PositionId,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                PositionRow,
+                decltype(PositionRow::id)>>
+    )
 
     /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(

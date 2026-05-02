@@ -3,13 +3,18 @@
 #include <stdexcept>
 
 #include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
+#include "controller/side_bar/securities_controller.hpp"
+#include "controller/transaction_controller.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
-#include "ui/transaction/create_transaction_dlg.hpp"
+#include "ui/transaction/deposit_withdrawal_widget.hpp"
+#include "ui/transaction/stock_widget.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
@@ -27,32 +32,25 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&        undoStack,
-        app::AccountStore&     accountStore,
-        app::TransactionStore& transactionStore,
-        TransactionController& transactionController,
-        QMainWindow*           mainWindow
+        cmd::UndoStack&              undoStack,
+        app::AccountStore&           accountStore,
+        app::TransactionStore&       transactionStore,
+        app::StockStore&             stockStore,
+        TransactionController&       transactionController,
+        SecuritiesSideBarController& stockController,
+        QMainWindow*                 mainWindow
     )
         : SideBarCategoryController(new ui::TransactionCategory(), mainWindow),
           _undoStack(undoStack),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
-          _createDlg(new ui::CreateTransactionDialog(mainWindow)),
-          _transactionController(transactionController)
+          _stockStore(stockStore),
+          _createCashTransactionDlg(nullptr),
+          _createStockTransactionDlg(nullptr),
+          _transactionController(transactionController),
+          _stockController(stockController),
+          _mainWindow(mainWindow)
     {
-        connect(
-            _createDlg,
-            &ui::CreateTransactionDialog::transactionTypeChanged,
-            this,
-            &TransactionSideBarController::_onTransactionTypeChanged
-        );
-
-        connect(
-            _createDlg,
-            &ui::CreateTransactionDialog::createCashTransactionRequested,
-            this,
-            &TransactionSideBarController::_onCreateCashTransactionRequested
-        );
     }
 
     /**
@@ -81,8 +79,7 @@ namespace controller
         }
 
         if (action == item->getCreateDepositAction() ||
-            action == item->getCreateWithdrawalAction() ||
-            action == item->getCreateStockTransactionAction())
+            action == item->getCreateWithdrawalAction())
         {
             const auto type = action->data().value<TransactionType>();
 
@@ -91,10 +88,68 @@ namespace controller
                 TransactionTypeMeta::toString(type)
             );
 
-            _onTransactionTypeChanged(type);
+            if (_createCashTransactionDlg == nullptr)
+            {
+                _createCashTransactionDlg =
+                    utils::makeQChild<ui::DepositWithdrawalWidget>(
+                        type,
+                        _accountStore.getCashAccounts(),
+                        _mainWindow
+                    );
 
-            if (auto* dialog = _createDlg.data())
-                dialog->exec();
+                connect(
+                    _createCashTransactionDlg,
+                    &ui::DepositWithdrawalWidget::
+                        createCashTransactionRequested,
+                    this,
+                    &TransactionSideBarController::
+                        _onCreateCashTransactionRequested
+                );
+            }
+            else
+            {
+                _createCashTransactionDlg->setTransactionType(type);
+                _createCashTransactionDlg->updateAccounts(
+                    _accountStore.getCashAccounts()
+                );
+                _createCashTransactionDlg->refresh();
+            }
+
+            _createCashTransactionDlg->show();
+        }
+        else if (action == item->getCreateStockTransactionAction())
+        {
+            if (_createStockTransactionDlg == nullptr)
+            {
+                _createStockTransactionDlg = utils::makeQChild<ui::StockWidget>(
+                    _accountStore.getAllAccounts(),
+                    _accountStore.getAllAccounts(),
+                    _stockStore.getAllTickers(),
+                    _mainWindow
+                );
+
+                connect(
+                    _createStockTransactionDlg,
+                    &ui::StockWidget::createTickerRequested,
+                    this,
+                    &TransactionSideBarController::_onCreateTickerRequested
+                );
+            }
+            else
+            {
+                _createStockTransactionDlg->updateAccounts(
+                    _accountStore.getAllAccounts()
+                );
+                _createStockTransactionDlg->updateReferenceAccounts(
+                    _accountStore.getAllAccounts()
+                );
+                _createStockTransactionDlg->updateTickers(
+                    _stockStore.getAllTickers()
+                );
+                _createStockTransactionDlg->refresh();
+            }
+
+            _createStockTransactionDlg->show();
         }
         else
         {
@@ -102,50 +157,6 @@ namespace controller
                 "Unhandled context menu action for transaction category: " +
                 action->text().toStdString()
             );
-        }
-    }
-
-    /**
-     * @brief Handle the selection of transactions in the side bar, this will
-     * trigger the transaction overview to update with the latest data from the
-     * store, and provides a way for the UI to trigger updates to the
-     * transaction overview when it is selected.
-     *
-     * @param type The type of transactions to show in the overview, this allows
-     * the controller to filter the transactions displayed based on their type.
-     */
-    void TransactionSideBarController::_onTransactionTypeChanged(
-        TransactionType type
-    )
-    {
-        LOG_DEBUG(
-            std::format(
-                "Transaction type changed to '{}'",
-                TransactionTypeMeta::toString(type)
-            )
-        );
-
-        if (_createDlg != nullptr)
-        {
-            std::vector<drafts::AccountDraft> accounts;
-            std::vector<drafts::AccountDraft> referenceAccounts;
-
-            switch (type)
-            {
-                case TransactionType::Deposit:
-                case TransactionType::Withdrawal:
-                    accounts = _accountStore.getCashAccounts();
-                    // no need to set reference accounts for withdrawal or
-                    // Deposit here we use external accounts which are
-                    // determined automatically
-                    break;
-                case TransactionType::Stock:
-                    accounts          = _accountStore.getSecurityAccounts();
-                    referenceAccounts = _accountStore.getCashAccounts();
-                    break;
-            }
-
-            _createDlg->setWidget(type, accounts, referenceAccounts);
         }
     }
 
@@ -190,8 +201,7 @@ namespace controller
         );
 
         // TODO(97gamjak): add here commands and also error handling
-        _createDlg->close();
-        _createDlg->reset();
+        _createCashTransactionDlg->close();
         _transactionController.transactionOverviewSelected(false);
     }
 
@@ -206,6 +216,17 @@ namespace controller
     void TransactionSideBarController::onTransactionsSelected()
     {
         _transactionController.transactionOverviewSelected();
+    }
+
+    void TransactionSideBarController::_onCreateTickerRequested(
+        const std::string& ticker
+    )
+    {
+        _stockController.createStock(ticker);
+        _createStockTransactionDlg->updateTickers(
+            _stockStore.getAllTickers(),
+            ticker
+        );
     }
 
 }   // namespace controller

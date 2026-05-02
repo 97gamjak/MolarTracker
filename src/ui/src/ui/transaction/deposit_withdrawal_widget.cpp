@@ -1,7 +1,7 @@
-// deposit_withdrawal_widget.cpp
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
 
 #include <qboxlayout.h>
+#include <qdialog.h>
 #include <qformlayout.h>
 #include <qlabel.h>
 #include <qpushbutton.h>
@@ -34,7 +34,7 @@ namespace ui
         std::vector<drafts::AccountDraft> accounts,
         QWidget*                          parent
     )
-        : ICreateTransactionWidget(parent),
+        : Dialog(parent),
           _type(type),
           _layout(new QFormLayout(this)),
           _accountCombo(makeQChild<AccountCombo>(std::move(accounts), this)),
@@ -86,6 +86,23 @@ namespace ui
         );
     }
 
+    void DepositWithdrawalWidget::updateAccounts(
+        std::vector<drafts::AccountDraft> accounts
+    )
+    {
+        _accountCombo->updateAccounts(std::move(accounts));
+    }
+
+    void DepositWithdrawalWidget::refresh()
+    {
+        _accountCombo->update();
+        _timestampField->update();
+        _amountRow->update();
+        _currencyLabel->update();
+        _commentField->update();
+        _addButton->update();
+    }
+
     /**
      * @brief Get the transaction type of this widget, this will return the type
      * of transaction that this widget is designed to create (either Deposit or
@@ -97,6 +114,11 @@ namespace ui
     TransactionType DepositWithdrawalWidget::getTransactionType() const
     {
         return _type;
+    }
+
+    void DepositWithdrawalWidget::setTransactionType(TransactionType type)
+    {
+        _type = type;
     }
 
     /**
@@ -196,7 +218,7 @@ namespace ui
      */
     void DepositWithdrawalWidget::_emitOk()
     {
-        emit createTransactionRequested(_type);
+        emit createCashTransactionRequested(getDraft());
     }
 
 }   // namespace ui

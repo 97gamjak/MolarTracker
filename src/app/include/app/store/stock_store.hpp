@@ -40,6 +40,8 @@ namespace app
 
         std::vector<finance::Stock> getStocks() const;
 
+        std::vector<std::string> getAllTickers() const;
+
         void commit();
     };
 }   // namespace app

@@ -51,10 +51,10 @@ namespace controller
 
         /// Controller for the accounts category in the side bar
         AccountSideBarController _accountSideBarController;
-        /// Controller for the transactions category in the side bar
-        TransactionSideBarController _transactionSideBarController;
         /// Controller for the securities category in the side bar
         SecuritiesSideBarController _securitiesSideBarController;
+        /// Controller for the transactions category in the side bar
+        TransactionSideBarController _transactionSideBarController;
         /// Pointer to the overview category in the side bar
         ui::OverviewCategory* _overviewCategory;
 

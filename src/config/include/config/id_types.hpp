@@ -27,6 +27,9 @@ using TransactionEntryId = StrongId<TransactionEntryTag>;
 
 struct TradeLegTag {};
 using TradeLegId = StrongId<TradeLegTag>;
+
+struct PositionTag {};
+using PositionId = StrongId<PositionTag>;
 // clang-format on
 
 template <typename T>

@@ -82,7 +82,7 @@ namespace controller
     {
         if (action == category->getCreateAction())
         {
-            _tickerLookupWidget->show();
+            createStock("");
         }
         else
         {
@@ -124,6 +124,15 @@ namespace controller
 
         _tickerLookupWidget->clearResult();
         _tickerLookupWidget->hide();
+
+        if (_acceptedQuote)
+            emit stockCreated(_acceptedQuote.value());
+    }
+
+    void SecuritiesSideBarController::createStock(const std::string& ticker)
+    {
+        _tickerLookupWidget->setTicker(ticker);
+        _tickerLookupWidget->show();
     }
 
 }   // namespace controller

@@ -22,9 +22,9 @@ namespace ui
      * @param tickers A list of ticker symbols to initialize the field with
      * @param parent The parent widget for this field
      */
-    TickerField::TickerField(std::vector<QString> tickers, QWidget* parent)
+    TickerField::TickerField(std::vector<std::string> tickers, QWidget* parent)
         : QWidget(parent),
-          _tickers(std::move(tickers)),
+          _tickers(utils::toQStringVector(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
           _addButton(makeQChild<QPushButton>("+", this)),
           _completer(new QCompleter(this))
@@ -63,7 +63,7 @@ namespace ui
             _addButton,
             &QPushButton::clicked,
             this,
-            &TickerField::createTickerRequested
+            &TickerField::_onCreateTickerRequest
         );
     }
 
@@ -156,6 +156,24 @@ namespace ui
         _completer->setModel(
             utils::makeQChild<QStringListModel>(list, _completer)
         );
+    }
+
+    void TickerField::updateTickers(std::vector<QString> tickers)
+    {
+        _tickers = std::move(tickers);
+        _rebuildCompleter();
+    }
+
+    void TickerField::_onCreateTickerRequest()
+    {
+        const auto text = _lineEdit->text().trimmed();
+        emit       createTickerRequested(text.toStdString());
+    }
+
+    void TickerField::selectTicker(const QString& ticker)
+    {
+        _lineEdit->setText(ticker);
+        _rebuildCompleter();
     }
 
 }   // namespace ui

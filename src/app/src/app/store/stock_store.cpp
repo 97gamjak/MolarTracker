@@ -1,6 +1,7 @@
 #include "app/store/stock_store.hpp"
 
 #include <algorithm>
+#include <vector>
 
 #include "app/store/base/store_state.hpp"
 #include "exceptions/not_yet_implemented.hpp"
@@ -140,6 +141,18 @@ namespace app
         }
 
         _clearEntries();
+    }
+
+    std::vector<std::string> StockStore::getAllTickers() const
+    {
+        std::vector<std::string> tickers;
+
+        for (const auto& stock : getStocks())
+        {
+            tickers.push_back(stock.getTicker());
+        }
+
+        return tickers;
     }
 
 }   // namespace app

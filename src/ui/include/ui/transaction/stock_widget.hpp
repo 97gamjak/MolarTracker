@@ -8,8 +8,7 @@
 
 #include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
-#include "ui/transaction/i_create_transaction_widget.hpp"
-#include "ui/transaction/ticker_field.hpp"
+#include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
@@ -20,6 +19,7 @@ namespace ui
 
     class AccountCombo;   // Forward declaration
     class AmountRow;      // Forward declaration
+    class TickerField;    // Forward declaration
 
     /**
      * @brief Widget for creating a stock transaction
@@ -28,13 +28,10 @@ namespace ui
      * which is kept disabled until a primary account has been chosen. The
      * add button requires both accounts and a non-zero valid amount.
      */
-    class StockWidget : public ICreateTransactionWidget
+    class StockWidget : public Dialog
     {
         Q_OBJECT
        private:
-        /// The type of transaction this widget creates (Stock)
-        TransactionType _type;
-
         /// The layout for this widget
         QFormLayout* _layout;
 
@@ -64,13 +61,25 @@ namespace ui
 
        public:
         explicit StockWidget(
-            TransactionType                          type,
             std::vector<drafts::AccountDraft>        accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
+            std::vector<std::string>                 tickers,
             QWidget*                                 parent = nullptr
         );
 
-        [[nodiscard]] TransactionType getTransactionType() const override;
+        void updateAccounts(std::vector<drafts::AccountDraft> accounts);
+        void updateReferenceAccounts(
+            std::vector<drafts::AccountDraft> referenceAccounts
+        );
+        void updateTickers(const std::vector<std::string>& tickers);
+        void updateTickers(
+            const std::vector<std::string>& tickers,
+            const std::string&              tickerToSelect
+        );
+        void refresh();
+
+       signals:
+        void createTickerRequested(const std::string& ticker);
 
        private:
         void _onAccountSelected(const drafts::AccountDraft& account);

@@ -26,6 +26,24 @@ namespace utils
         return list;
     }
 
+    QStringList toQStringList(const std::span<std::string>& vec)
+    {
+        QStringList list;
+        for (const auto& str : vec)
+            list.append(QString::fromStdString(str));
+
+        return list;
+    }
+
+    std::vector<QString> toQStringVector(const std::span<std::string>& vec)
+    {
+        std::vector<QString> list;
+        list.reserve(vec.size());
+        for (const auto& str : vec)
+            list.push_back(QString::fromStdString(str));
+        return list;
+    }
+
     /**
      * @brief Moves the dialog to the center of the parent's screen
      *

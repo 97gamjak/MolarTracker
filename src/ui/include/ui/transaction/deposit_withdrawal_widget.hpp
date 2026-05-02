@@ -9,7 +9,7 @@
 #include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "ui/transaction/i_create_transaction_widget.hpp"
+#include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
@@ -30,7 +30,7 @@ namespace ui
      * label. The add button is enabled only when both the account and a
      * non-zero valid amount are present.
      */
-    class DepositWithdrawalWidget : public ICreateTransactionWidget
+    class DepositWithdrawalWidget : public Dialog
     {
         Q_OBJECT
 
@@ -68,8 +68,17 @@ namespace ui
             QWidget*                          parent = nullptr
         );
 
-        [[nodiscard]] TransactionType getTransactionType() const override;
         [[nodiscard]] drafts::CreateCashTransactionDraft getDraft() const;
+        [[nodiscard]] TransactionType getTransactionType() const;
+        void                          setTransactionType(TransactionType type);
+
+        void updateAccounts(std::vector<drafts::AccountDraft> accounts);
+        void refresh();
+
+       signals:
+        void createCashTransactionRequested(
+            drafts::CreateCashTransactionDraft draft
+        );
 
        private:
         void _onAccountSelected(const drafts::AccountDraft& account);

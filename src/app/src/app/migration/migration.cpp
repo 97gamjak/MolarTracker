@@ -7,10 +7,12 @@
 #include "app/migration/multi_migration.hpp"
 #include "app/migration/single_migration.hpp"
 #include "config/finance.hpp"
+#include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "orm/constraints.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/position_row.hpp"
 #include "sql_models/profile_row.hpp"
 #include "sql_models/stock_row.hpp"
 #include "sql_models/trade_leg_row.hpp"
@@ -257,6 +259,7 @@ namespace app
         _migrateV7();
         _migrateV8();
         _migrateV9();
+        _migrateV10();
     }
 
     /**
@@ -386,6 +389,29 @@ namespace app
         migration.addMigration(
             std::make_unique<AddColumnMigration<StockRow::exchangeField>>(
                 StockRow::exchangeField{""}
+            )
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 10
+     */
+    void Migrations::_migrateV10()
+    {
+        constexpr std::size_t currentVersion = 9;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<PositionRow>>()
+        );
+
+        // here we can safely migrate with invalid as we did not yet add any
+        // trade legs to the db
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<TradeLegRow::positionIdField>>(
+                TradeLegRow::positionIdField{PositionId::invalid()}
             )
         );
 

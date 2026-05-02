@@ -63,6 +63,7 @@ namespace ui
         void displayQuote(const drafts::StockInfoDraft& quote);
         void displayError(const std::string& message);
         void clearResult();
+        void setTicker(const std::string& ticker);
     };
 
 }   // namespace ui
