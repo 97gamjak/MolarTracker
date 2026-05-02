@@ -3,6 +3,7 @@
 
 #include "app/repos/base_repo.hpp"
 #include "app/repos_api/i_instrument_repo.hpp"
+#include "sql_models/stock_row.hpp"
 
 namespace app
 {
@@ -17,7 +18,17 @@ namespace app
         [[nodiscard]]
         std::vector<std::string> getTickers() override;
 
+        [[nodiscard]]
+        std::vector<finance::Stock> getStocks() override;
+
         void addStock(const finance::Stock& stock) override;
+
+        [[nodiscard]]
+        bool stockExists(const std::string& ticker) override;
+
+       private:
+        [[nodiscard]]
+        std::vector<StockRow> _getStockRows();
     };
 }   // namespace app
 

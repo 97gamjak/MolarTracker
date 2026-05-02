@@ -1,6 +1,7 @@
 #include "instrument_service.hpp"
 
 #include "app/repos_api/i_instrument_repo.hpp"
+#include "finance/stock.hpp"
 
 namespace app
 {
@@ -21,9 +22,19 @@ namespace app
      *
      * @return std::vector<std::string>
      */
-    [[nodiscard]] std::vector<std::string> InstrumentService::getTickers()
+    std::vector<std::string> InstrumentService::getTickers()
     {
         return _instrumentRepo->getTickers();
+    }
+
+    /**
+     * @brief get a list of all stocks in the database
+     *
+     * @return std::vector<finance::Stock>
+     */
+    std::vector<finance::Stock> InstrumentService::getStocks()
+    {
+        return _instrumentRepo->getStocks();
     }
 
     /**
@@ -38,6 +49,19 @@ namespace app
     void InstrumentService::addStock(const finance::Stock& stock)
     {
         _instrumentRepo->addStock(stock);
+    }
+
+    /**
+     * @brief Check if a stock with the given ticker already exists in the
+     * database, this is used to prevent duplicate entries and ensure data
+     * integrity.
+     *
+     * @param ticker The ticker symbol of the stock to check for existence
+     * @return true if a stock with the given ticker exists, false otherwise
+     */
+    bool InstrumentService::stockExists(const std::string& ticker)
+    {
+        return _instrumentRepo->stockExists(ticker);
     }
 
 }   // namespace app

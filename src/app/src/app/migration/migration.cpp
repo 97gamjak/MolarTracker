@@ -8,6 +8,7 @@
 #include "app/migration/single_migration.hpp"
 #include "config/finance.hpp"
 #include "db/database.hpp"
+#include "orm/constraints.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/profile_row.hpp"
@@ -234,10 +235,11 @@ namespace app
         // of line, but as before this migration it was not possible to add
         // instruments to the database via the app this should be safe unless
         // someone decided to mess around with the db manually!!!
+        using Field =
+            InstrumentRow::Field<"currency", Currency, orm::not_null_t>;
+
         migration.addMigration(
-            std::make_unique<AddColumnMigration<InstrumentRow::currencyField>>(
-                InstrumentRow::currencyField{Currency::USD}
-            )
+            std::make_unique<AddColumnMigration<Field>>(Field{Currency::USD})
         );
 
         _migrations.push_back(std::move(migration));
@@ -253,6 +255,7 @@ namespace app
 
         _migrateV6();
         _migrateV7();
+        _migrateV8();
     }
 
     /**
@@ -304,6 +307,38 @@ namespace app
 
         migration.addMigration(
             std::make_unique<CreateTableMigration<StockRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 8
+     *
+     * @details This handles the migration from v7 to v8. It adds a currency
+     * field to the stock table for representing the currency in which the stock
+     * is traded, and removes the currency field from the instrument table as it
+     * is not relevant for all types of instruments and can lead to confusion.
+     */
+    void Migrations::_migrateV8()
+    {
+        constexpr std::size_t currentVersion = 7;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        // Add currency field to stock table
+        // ATTENTION: could be
+        // problematic when migrating existing data as the currency could be out
+        // of line, but as before this migration it was not possible to add
+        // stocks to the database via the app this should be safe unless
+        // someone decided to mess around with the db manually!!!
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::currencyField>>(
+                StockRow::currencyField{Currency::USD}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<DropColumnMigration<InstrumentRow>>("currency")
         );
 
         _migrations.push_back(std::move(migration));

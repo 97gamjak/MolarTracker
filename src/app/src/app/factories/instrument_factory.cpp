@@ -22,15 +22,34 @@ namespace app
     )
     {
         InstrumentRow instrumentRow;
-        instrumentRow.currency = stock.getCurrency();
-        instrumentRow.id       = stock.getInstrumentId();
+        instrumentRow.id = stock.getInstrumentId();
 
         StockRow stockRow;
         stockRow.ticker       = stock.getTicker();
-        stockRow.id           = stock.getStockId();
+        stockRow.id           = stock.getId();
         stockRow.instrumentId = stock.getInstrumentId();
+        stockRow.currency     = stock.getCurrency();
 
         return {instrumentRow, stockRow};
+    }
+
+    /**
+     * @brief Create a Stock object from a StockRow, this factory method takes a
+     * StockRow object as input and creates a corresponding Stock object that
+     * can be used in the application, ensuring that the details from the
+     * database row are correctly mapped to the properties of the Stock object.
+     *
+     * @param row
+     * @return finance::Stock
+     */
+    finance::Stock InstrumentFactory::toStock(const StockRow& row)
+    {
+        auto stock = finance::Stock(row.ticker.value(), row.currency.value());
+
+        stock.setId(row.id.value());
+        stock.setInstrumentId(row.instrumentId.value());
+
+        return stock;
     }
 
 }   // namespace app
