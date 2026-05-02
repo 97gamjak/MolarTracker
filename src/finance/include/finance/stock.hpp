@@ -5,6 +5,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "filter/predicate.hpp"
 namespace finance
 {
     /**
@@ -18,7 +19,7 @@ namespace finance
     {
        private:
         /// The ID of the stock
-        StockId _stockId;
+        StockId _id;
 
         /// The ID of the instrument associated with this stock
         InstrumentId _instrumentId;
@@ -31,11 +32,20 @@ namespace finance
         Currency _currency;
 
        public:
-        [[nodiscard]] StockId      getStockId() const;
+        explicit Stock(std::string ticker, Currency currency);
+
+        [[nodiscard]] StockId      getId() const;
         [[nodiscard]] InstrumentId getInstrumentId() const;
         [[nodiscard]] std::string  getTicker() const;
         [[nodiscard]] Currency     getCurrency() const;
+
+        void setId(StockId stockId);
+        void setInstrumentId(InstrumentId instrumentId);
     };
+
+    [[nodiscard]]
+    filter::Predicate<Stock> HasTicker(const std::string& ticker);
+
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__STOCK_HPP__

@@ -1,8 +1,11 @@
+set(SRC src/sql_models/)
+
 add_library(molartracker_sql_models STATIC
-    src/sql_models/account_row.cpp
-    src/sql_models/instrument_row.cpp
-    src/sql_models/profile_row.cpp
-    src/sql_models/transaction_entry_row.cpp
+    ${SRC}/account_row.cpp
+    ${SRC}/instrument_row.cpp
+    ${SRC}/profile_row.cpp
+    ${SRC}/transaction_entry_row.cpp
+    ${SRC}/stock_row.cpp
 )
 
 target_include_directories(molartracker_sql_models

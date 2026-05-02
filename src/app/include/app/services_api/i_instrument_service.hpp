@@ -26,7 +26,15 @@ namespace app
          *
          * @return std::vector<std::string>
          */
-        [[nodiscard]] virtual std::vector<std::string> getTickers() = 0;
+        [[nodiscard]]
+        virtual std::vector<std::string> getTickers() = 0;
+
+        /**
+         * @brief get a list of all stocks in the database
+         *
+         * @return std::vector<finance::Stock>
+         */
+        virtual std::vector<finance::Stock> getStocks() = 0;
 
         /**
          * @brief Add a stock instrument to the database, this involves
@@ -38,6 +46,17 @@ namespace app
          * be added to the database
          */
         virtual void addStock(const finance::Stock& stock) = 0;
+
+        /**
+         * @brief Check if a stock with the given ticker already exists in the
+         * database, this is used to prevent duplicate entries and ensure data
+         * integrity.
+         *
+         * @param ticker The ticker symbol of the stock to check for existence
+         * @return true if a stock with the given ticker exists, false otherwise
+         */
+        [[nodiscard]]
+        virtual bool stockExists(const std::string& ticker) = 0;
     };
 }   // namespace app
 
