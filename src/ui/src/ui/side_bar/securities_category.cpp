@@ -4,11 +4,34 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Securities Category:: Securities Category object
+     *
+     */
     SecuritiesCategory::SecuritiesCategory()
-        : Category("Securities", SideBarItemType::SecuritiesCategory)
+        : Category("Securities", SideBarItemType::SecuritiesCategory),
+          _createAction(nullptr)
     {
     }
 
-    void SecuritiesCategory::populateContextMenu(QMenu& /*menu*/) {}
+    /**
+     * @brief Populate the context menu for the securities category.
+     *
+     * @param menu The context menu to populate.
+     */
+    void SecuritiesCategory::populateContextMenu(QMenu& menu)
+    {
+        _createAction = menu.addAction("Add Security");
+    }
+
+    /**
+     * @brief Get the "Add Security" action.
+     *
+     * @return QAction* The "Add Security" action.
+     */
+    QAction* SecuritiesCategory::getCreateAction() const
+    {
+        return _createAction;
+    }
 
 }   // namespace ui

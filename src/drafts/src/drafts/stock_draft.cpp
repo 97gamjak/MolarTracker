@@ -7,6 +7,7 @@ namespace drafts
      *
      * @param ticker
      * @param shortName
+     * @param longName
      * @param exchange
      * @param currency
      * @param industry
@@ -16,6 +17,7 @@ namespace drafts
     StockInfoDraft::StockInfoDraft(
         std::string ticker,
         std::string shortName,
+        std::string longName,
         std::string exchange,
         Currency    currency,
         std::string industry,
@@ -24,6 +26,7 @@ namespace drafts
     )
         : _ticker(std::move(ticker)),
           _shortName(std::move(shortName)),
+          _longName(std::move(longName)),
           _exchange(std::move(exchange)),
           _currency(currency),
           _industry(std::move(industry)),
@@ -45,6 +48,13 @@ namespace drafts
      * @return std::string
      */
     std::string StockInfoDraft::getShortName() const { return _shortName; }
+
+    /**
+     * @brief Get the long name.
+     *
+     * @return std::string
+     */
+    std::string StockInfoDraft::getLongName() const { return _longName; }
 
     /**
      * @brief Get the exchange.

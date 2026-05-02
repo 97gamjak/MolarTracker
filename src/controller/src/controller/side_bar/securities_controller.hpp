@@ -3,11 +3,14 @@
 
 #include <QObject>
 
+#include "finance/stock.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace ui
 {
     class StockOverviewWidget;   // Forward declaration
+    class SecuritiesCategory;    // Forward declaration
+    class TickerLookupWidget;    // Forward declaration
 }   // namespace ui
 
 namespace app
@@ -16,6 +19,7 @@ namespace app
 }   // namespace app
 
 class QStackedWidget;   // Forward declaration
+class QAction;          // Forward declaration
 
 namespace controller
 {
@@ -33,6 +37,11 @@ namespace controller
        private:
         /// Widget for displaying stock overview infos
         ui::StockOverviewWidget* _stockOverviewWidget = nullptr;
+        /// Widget for looking up stock tickers
+        ui::TickerLookupWidget* _tickerLookupWidget = nullptr;
+
+        /// Optional accepted stock quote
+        std::optional<finance::Stock> _acceptedQuote = std::nullopt;
 
         /// Reference to the stock store
         app::StockStore& _stockStore;
@@ -50,6 +59,15 @@ namespace controller
         void refresh() override;
 
         void onSecuritiesSelected();
+
+        void handleContextMenuAction(
+            const ui::SecuritiesCategory* category,
+            QAction*                      action
+        );
+
+       private:
+        void _onFindTickerButtonClicked();
+        void _onAcceptTickerButtonClicked();
     };
 
 }   // namespace controller

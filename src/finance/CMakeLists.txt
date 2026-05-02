@@ -28,5 +28,6 @@ target_link_libraries(molartracker_finance
     molartracker_exceptions
     molartracker_utils
     molartracker_http
+    molartracker_logging
     mstd
 )

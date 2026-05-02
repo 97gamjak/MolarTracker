@@ -8,6 +8,38 @@
 
 namespace finance
 {
+    /**
+     * @brief Yahoo Finance API credentials
+     *
+     */
+    struct YahooCredentials
+    {
+        /// Yahoo Finance API cookie
+        std::string cookie;
+        /// Yahoo Finance API crumb
+        std::string crumb;
+    };
+
+    /**
+     * @brief Yahoo Finance API session
+     *
+     */
+    class YahooSession
+    {
+       private:
+        /// Yahoo Finance API credentials
+        YahooCredentials _credentials;
+        /// Whether the session is authenticated
+        bool _authenticated = false;
+
+       public:
+        // Fetches cookie + crumb. Call once before any ticker requests.
+        [[nodiscard]] std::expected<void, http::HttpError> authenticate();
+
+        [[nodiscard]] bool isAuthenticated() const;
+
+        [[nodiscard]] const YahooCredentials& credentials() const;
+    };
 
     /**
      * @brief Client for interacting with the Yahoo Finance API.

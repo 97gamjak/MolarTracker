@@ -2,6 +2,7 @@
 #define __HTTP__INCLUDE__HTTP__HTTP_ERROR_HPP__
 
 #include <cstdint>
+#include <map>
 #include <mstd/enum.hpp>
 #include <string>
 
@@ -13,7 +14,8 @@ namespace http
     X(CurlInit)            \
     X(CurlPerform)         \
     X(BadStatus)           \
-    X(ParseError)
+    X(ParseError)          \
+    X(AuthError)
 
     MSTD_ENUM(HttpErrorKind, std::uint8_t, HTTP_ERROR_ENUM);
 
@@ -31,6 +33,9 @@ namespace http
 
         /// The error message from curl_easy_strerror or description
         std::string message;
+
+        /// The response headers from the HTTP request
+        std::map<std::string, std::string> responseHeaders;
     };
 
 }   // namespace http
