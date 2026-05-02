@@ -12,7 +12,8 @@ namespace http
 #define HTTP_ERROR_ENUM(X) \
     X(CurlInit)            \
     X(CurlPerform)         \
-    X(BadStatus)
+    X(BadStatus)           \
+    X(ParseError)
 
     MSTD_ENUM(HttpErrorKind, std::uint8_t, HTTP_ERROR_ENUM);
 

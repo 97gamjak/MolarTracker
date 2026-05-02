@@ -14,6 +14,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add instrument repo/service and stockRow to db
 - Add comment and timestamp fields to deposit and withdrawal widgets
 - Add stock store and different methods for instrument repo / service
+- Add yf client to retrieve basic ticker info
 
 #### HTTP
 

@@ -16,17 +16,6 @@ namespace http
     class HttpClient
     {
        public:
-        HttpClient()  = default;
-        ~HttpClient() = default;
-
-        HttpClient(const HttpClient&)            = delete;
-        HttpClient& operator=(const HttpClient&) = delete;
-
-        /// @cond DOXYGEN_IGNORE
-        HttpClient(HttpClient&&)            = default;
-        HttpClient& operator=(HttpClient&&) = default;
-        /// @endcond
-
         [[nodiscard]]
         static std::expected<HttpResponse, HttpError> get(
             const HttpRequest& request

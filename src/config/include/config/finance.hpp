@@ -46,6 +46,16 @@ MSTD_ENUM(TransactionType, std::uint8_t, TRANSACTION_TYPE_LIST);
 
 MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
 
+#define ASSET_CLASS_LIST(X) \
+    X(Stock)                \
+    X(Etf)                  \
+    X(Crypto)               \
+    X(MutualFund)           \
+    X(Future)               \
+    X(Unknown)
+
+MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST)
+
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
 using micro_units = std::int64_t;
