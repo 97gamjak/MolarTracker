@@ -1,7 +1,6 @@
 #ifndef __ORM__INCLUDE__ORM__CRUD_HPP__
 #define __ORM__INCLUDE__ORM__CRUD_HPP__
 
-#include <cstdint>
 #include <expected>
 #include <mstd/error.hpp>
 #include <optional>

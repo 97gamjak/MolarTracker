@@ -16,7 +16,8 @@ namespace finance
         : _id(StockId::invalid()),
           _instrumentId(InstrumentId::invalid()),
           _ticker(std::move(ticker)),
-          _currency(currency)
+          _currency(currency),
+          _assetClass(AssetClass::Unknown)
     {
     }
 
@@ -47,6 +48,48 @@ namespace finance
      * @return Currency
      */
     Currency Stock::getCurrency() const { return _currency; }
+
+    /**
+     * @brief Get the short name of the stock
+     *
+     * @return std::string
+     */
+    std::string Stock::getShortName() const { return _shortName; }
+
+    /**
+     * @brief Get the long name of the stock
+     *
+     * @return std::string
+     */
+    std::string Stock::getLongName() const { return _longName; }
+
+    /**
+     * @brief Get the exchange of the stock
+     *
+     * @return std::string
+     */
+    std::string Stock::getExchange() const { return _exchange; }
+
+    /**
+     * @brief Get the industry of the stock
+     *
+     * @return std::string
+     */
+    std::string Stock::getIndustry() const { return _industry; }
+
+    /**
+     * @brief Get the sector of the stock
+     *
+     * @return std::string
+     */
+    std::string Stock::getSector() const { return _sector; }
+
+    /**
+     * @brief Get the asset class of the stock
+     *
+     * @return AssetClass
+     */
+    AssetClass Stock::getAssetClass() const { return _assetClass; }
 
     /**
      * @brief Set the StockId of the stock

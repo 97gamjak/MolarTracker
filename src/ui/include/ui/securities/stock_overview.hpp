@@ -3,23 +3,27 @@
 
 #include <QWidget>
 
-class QLineEdit;
 class QTableView;
 class QSortFilterProxyModel;
-class StockInfoTableModel;
-struct StockInfoRow;
 
 namespace ui
 {
+    class StockInfoTableModel;
 
+    /**
+     * @brief Widget for displaying stock overview information.
+     */
     class StockOverviewWidget : public QWidget
     {
         Q_OBJECT
 
        private:
-        StockInfoTableModel*   _model;
+        /// The model for displaying stock information
+        StockInfoTableModel* _model;
+        /// The proxy model for filtering and sorting
         QSortFilterProxyModel* _proxy;
-        QTableView*            _table;
+        /// The table view for displaying stock information
+        QTableView* _table;
 
        public:
         explicit StockOverviewWidget(QWidget* parent = nullptr);
@@ -28,6 +32,11 @@ namespace ui
         StockInfoTableModel* getModel() const;
 
        signals:
+        /**
+         * @brief Emitted when a stock ticker is selected.
+         *
+         * @param ticker The selected stock ticker.
+         */
         void tickerSelected(const QString& ticker);
 
        private:

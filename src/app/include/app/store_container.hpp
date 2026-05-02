@@ -3,6 +3,7 @@
 
 #include "app/store/account_store.hpp"
 #include "app/store/profile/profile_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
@@ -27,6 +28,9 @@ namespace app
 
         /// The Transaction store
         TransactionStore _transactionStore;
+
+        /// The stock store
+        StockStore _stockStore;
 
         /// list of all stores
         std::vector<IStore*> _allStores;
@@ -54,6 +58,9 @@ namespace app
 
         [[nodiscard]] TransactionStore&       getTransactionStore();
         [[nodiscard]] const TransactionStore& getTransactionStore() const;
+
+        [[nodiscard]] StockStore&       getStockStore();
+        [[nodiscard]] const StockStore& getStockStore() const;
     };
 
 }   // namespace app

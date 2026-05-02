@@ -4,47 +4,50 @@
 #include <QAbstractTableModel>
 #include <vector>
 
-#include "StockInfoRow.hpp"
+#include "drafts/stock_draft.hpp"
 
-class StockInfoTableModel : public QAbstractTableModel
+namespace ui
 {
-    Q_OBJECT
 
-   public:
-    enum class Column : int
+    /**
+     * @brief Model for displaying stock information in a table view.
+     */
+    class StockInfoTableModel : public QAbstractTableModel
     {
-        Ticker = 0,
-        Name,
-        Price,
-        Change,
-        ChangePercent,
-        PrevClose,
-        Currency,
-        LastUpdated,
-        COUNT
+        Q_OBJECT
+
+       private:
+        /// The rows of the model
+        std::vector<drafts::StockInfoDraft> _rows;
+
+       public:
+        explicit StockInfoTableModel(QObject* parent = nullptr);
+
+        void setRows(std::vector<drafts::StockInfoDraft> rows);
+        void updateRow(const drafts::StockInfoDraft& row);
+
+        [[nodiscard]]
+        int rowCount(const QModelIndex& parent) const override;
+
+        [[nodiscard]]
+        int columnCount(const QModelIndex& parent) const override;
+
+        [[nodiscard]]
+        QVariant data(const QModelIndex& index, int role) const override;
+
+        [[nodiscard]]
+        QVariant headerData(
+            int             section,
+            Qt::Orientation orientation,
+            int             role
+        ) const override;
+
+        [[nodiscard]]
+        static int getTickerColumn();
+
+        [[nodiscard]]
+        Qt::ItemFlags flags(const QModelIndex& index) const override;
     };
+}   // namespace ui
 
-    explicit StockInfoTableModel(QObject* parent = nullptr);
-
-    void setRows(std::vector<StockInfoRow> rows);
-    void updateRow(const StockInfoRow& row);   // upsert by ticker
-
-    int      rowCount(const QModelIndex& parent = {}) const override;
-    int      columnCount(const QModelIndex& parent = {}) const override;
-    QVariant data(
-        const QModelIndex& index,
-        int                role = Qt::DisplayRole
-    ) const override;
-    QVariant headerData(
-        int             section,
-        Qt::Orientation orientation,
-        int             role = Qt::DisplayRole
-    ) const override;
-    Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-   private:
-    std::vector<StockInfoRow> m_rows;
-
-    static QString formatChange(double change, double pct);
-    static QColor  changeColor(double change);
-};
+#endif   // __UI__INCLUDE__UI__SECURITIES__STOCK_INFO_MODEL_HPP__
