@@ -10,7 +10,7 @@ namespace finance
 
 namespace drafts
 {
-    struct StockInfoDraft;   // forward declaration
+    class StockInfoDraft;   // forward declaration
 
     /**
      * @brief Mapper class for converting between Stock and Stock drafts for UI.
