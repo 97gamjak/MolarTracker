@@ -4,6 +4,12 @@
 
 namespace finance
 {
+    /**
+     * @brief Convert a string representation of a quote type to an AssetClass.
+     *
+     * @param quote The string representation of the quote type.
+     * @return AssetClass The corresponding AssetClass.
+     */
     AssetClass fromQuote(std::string_view quote)
     {
         if (quote == "Stock")
@@ -20,6 +26,12 @@ namespace finance
         return AssetClass::Unknown;
     }
 
+    /**
+     * @brief Convert an AssetClass to its string representation.
+     *
+     * @param assetClass The AssetClass to convert.
+     * @return std::string The string representation of the AssetClass.
+     */
     std::string toString(AssetClass assetClass)
     {
         if (assetClass == AssetClass::MutualFund)
