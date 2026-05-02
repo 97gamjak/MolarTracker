@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "controller/side_bar/account_controller.hpp"
+#include "controller/side_bar/securities_controller.hpp"
 #include "controller/side_bar/transaction_controller.hpp"
 
 class QStackedWidget;   // Forward declaration
@@ -52,6 +53,8 @@ namespace controller
         AccountSideBarController _accountSideBarController;
         /// Controller for the transactions category in the side bar
         TransactionSideBarController _transactionSideBarController;
+        /// Controller for the securities category in the side bar
+        SecuritiesSideBarController _securitiesSideBarController;
         /// Pointer to the overview category in the side bar
         ui::OverviewCategory* _overviewCategory;
 

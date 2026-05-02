@@ -31,6 +31,22 @@ namespace finance
         /// The currency of the stock
         Currency _currency;
 
+        /// Short name of the stock
+        std::string _shortName;
+        /// Long name of the stock
+        std::string _longName;
+
+        /// Exchange where the stock is listed
+        std::string _exchange;
+
+        /// Industry of the stock
+        std::string _industry;
+        /// Sector of the stock
+        std::string _sector;
+
+        /// Asset class of the stock
+        AssetClass _assetClass;
+
        public:
         explicit Stock(std::string ticker, Currency currency);
 
@@ -38,6 +54,12 @@ namespace finance
         [[nodiscard]] InstrumentId getInstrumentId() const;
         [[nodiscard]] std::string  getTicker() const;
         [[nodiscard]] Currency     getCurrency() const;
+        [[nodiscard]] std::string  getShortName() const;
+        [[nodiscard]] std::string  getLongName() const;
+        [[nodiscard]] std::string  getExchange() const;
+        [[nodiscard]] std::string  getIndustry() const;
+        [[nodiscard]] std::string  getSector() const;
+        [[nodiscard]] AssetClass   getAssetClass() const;
 
         void setId(StockId stockId);
         void setInstrumentId(InstrumentId instrumentId);

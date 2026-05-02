@@ -28,6 +28,8 @@ namespace controller
      * @param accountController
      * @param transactionController
      */
+    // TODO(97gamjak): would be probably best to remove dependency on central
+    // stack here
     SideBarController::SideBarController(
         cmd::UndoStack&        undoStack,
         app::AppContext&       appContext,
@@ -52,11 +54,17 @@ namespace controller
               transactionController,
               mainWindow
           ),
+          _securitiesSideBarController(
+              mainWindow,
+              appContext.getStore().getStockStore(),
+              centralStack
+          ),
           _overviewCategory(new ui::OverviewCategory())
     {
         _sideBar->addCategory(_overviewCategory);
         _sideBar->addCategory(_accountSideBarController.getCategory());
         _sideBar->addCategory(_transactionSideBarController.getCategory());
+        _sideBar->addCategory(_securitiesSideBarController.getCategory());
 
         connect(
             _sideBar,
@@ -123,6 +131,11 @@ namespace controller
                 _transactionSideBarController.onTransactionsSelected();
                 break;
             }
+            case ui::SideBarItemType::SecuritiesCategory:
+            {
+                _securitiesSideBarController.onSecuritiesSelected();
+                break;
+            }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
                 // Handle overview and account category clicks if needed
@@ -173,9 +186,6 @@ namespace controller
                 }
                 break;
             }
-            case ui::SideBarItemType::OverviewCategory:
-                // Handle overview item click
-                break;
             case ui::SideBarItemType::AccountCategory:
             {
                 const auto* acc = dynamic_cast<ui::AccountCategory*>(item);
@@ -185,12 +195,18 @@ namespace controller
                 break;
             }
             case ui::SideBarItemType::TransactionCategory:
+            {
                 const auto* transaction =
                     dynamic_cast<ui::TransactionCategory*>(item);
                 _transactionSideBarController.handleContextMenuAction(
                     transaction,
                     action
                 );
+                break;
+            }
+            case ui::SideBarItemType::OverviewCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
+                // Handle overview item click
                 break;
         }
     }
