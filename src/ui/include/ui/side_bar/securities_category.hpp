@@ -3,6 +3,8 @@
 
 #include "category.hpp"
 
+class QAction;
+
 namespace ui
 {
     /**
@@ -13,10 +15,16 @@ namespace ui
      */
     class SecuritiesCategory : public Category
     {
+       private:
+        /// Pointer to the "Add Security" action.
+        QAction* _createAction;
+
        public:
         SecuritiesCategory();
 
         void populateContextMenu(QMenu& menu) override;
+
+        [[nodiscard]] QAction* getCreateAction() const;
     };
 }   // namespace ui
 

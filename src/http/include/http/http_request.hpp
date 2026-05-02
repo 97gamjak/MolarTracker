@@ -35,6 +35,9 @@ namespace http
 
         /// The body of the response
         std::string body;
+
+        /// The headers for the response
+        std::map<std::string, std::string> headers;
     };
 
 }   // namespace http

@@ -19,6 +19,8 @@ namespace drafts
         std::string _ticker;
         /// Short name of the stock
         std::string _shortName;
+        /// Long name of the stock
+        std::string _longName;
         /// Exchange where the stock is listed
         std::string _exchange;
         /// Currency of the stock
@@ -34,6 +36,7 @@ namespace drafts
         explicit StockInfoDraft(
             std::string ticker,
             std::string shortName,
+            std::string longName,
             std::string exchange,
             Currency    currency,
             std::string industry,
@@ -43,6 +46,7 @@ namespace drafts
 
         [[nodiscard]] std::string getTicker() const;
         [[nodiscard]] std::string getShortName() const;
+        [[nodiscard]] std::string getLongName() const;
         [[nodiscard]] std::string getExchange() const;
         [[nodiscard]] Currency    getCurrency() const;
         [[nodiscard]] std::string getIndustry() const;

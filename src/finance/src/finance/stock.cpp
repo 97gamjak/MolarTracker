@@ -1,16 +1,15 @@
 #include "finance/stock.hpp"
 
+#include "finance/ticker_info.hpp"
+#include "finance/yf_client.hpp"
+
 namespace finance
 {
-
     /**
-     * @brief Construct a new Stock object
+     * @brief Construct a new Stock:: Stock object
      *
-     * @param ticker The ticker symbol of the stock, this is a unique identifier
-     * for the stock and is used to identify the stock in financial markets.
-     * @param currency The currency of the stock, this indicates the currency in
-     * which the stock is traded, and is used for financial calculations and
-     * reporting.
+     * @param ticker
+     * @param currency
      */
     Stock::Stock(std::string ticker, Currency currency)
         : _id(StockId::invalid()),
@@ -18,6 +17,43 @@ namespace finance
           _ticker(std::move(ticker)),
           _currency(currency),
           _assetClass(AssetClass::Unknown)
+    {
+    }
+
+    /**
+     * @brief Retrieve ticker information for a given stock ticker.
+     *
+     * @param ticker The stock ticker symbol
+     * @return std::expected<Stock, http::HttpError>
+     */
+    std::expected<Stock, http::HttpError> Stock::retrieveTickerInfo(
+        const std::string& ticker
+    )
+    {
+        const auto result = YahooFinanceClient::fetchTickerInfo(ticker);
+
+        if (!result)
+            return std::unexpected(result.error());
+
+        return Stock(result.value());
+    }
+
+    /**
+     * @brief Construct a new Stock:: Stock object -- private
+     *
+     * @param info
+     */
+    Stock::Stock(const TickerInfo& info)
+        : _id(StockId::invalid()),
+          _instrumentId(InstrumentId::invalid()),
+          _ticker(info.symbol),
+          _currency(info.currency),
+          _shortName(info.shortName),
+          _longName(info.longName),
+          _exchange(info.exchange),
+          _industry(info.industry),
+          _sector(info.sector),
+          _assetClass(info.assetClass)
     {
     }
 

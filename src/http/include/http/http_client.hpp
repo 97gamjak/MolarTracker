@@ -21,6 +21,9 @@ namespace http
             const HttpRequest& request
         );
 
+        [[nodiscard]]
+        static std::string urlEncode(const std::string& value);
+
        private:
         [[nodiscard]]
         static size_t _writeCallback(
@@ -28,6 +31,14 @@ namespace http
             size_t       size,
             size_t       nMembers,
             std::string* data
+        );
+
+        [[nodiscard]]
+        static size_t headerCallback(
+            char*                               ptr,
+            size_t                              size,
+            size_t                              nmemb,
+            std::map<std::string, std::string>* headers
         );
     };
 

@@ -9,6 +9,7 @@
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
 #include "ui/side_bar/overview_category.hpp"
+#include "ui/side_bar/securities_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
 #include "ui/side_bar/transaction_category.hpp"
@@ -204,8 +205,17 @@ namespace controller
                 );
                 break;
             }
-            case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::SecuritiesCategory:
+            {
+                const auto* securities =
+                    dynamic_cast<ui::SecuritiesCategory*>(item);
+                _securitiesSideBarController.handleContextMenuAction(
+                    securities,
+                    action
+                );
+                break;
+            }
+            case ui::SideBarItemType::OverviewCategory:
                 // Handle overview item click
                 break;
         }

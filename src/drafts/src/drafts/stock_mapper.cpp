@@ -17,6 +17,7 @@ namespace drafts
         return StockInfoDraft{
             stock.getTicker(),
             stock.getShortName(),
+            stock.getLongName(),
             stock.getExchange(),
             stock.getCurrency(),
             stock.getIndustry(),

@@ -16,6 +16,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add stock store and different methods for instrument repo / service
 - Add yf client to retrieve basic ticker info
 - Add security overview page
+- Add option to add a security via `Add Security` dialog
 
 #### HTTP
 

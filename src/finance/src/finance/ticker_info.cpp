@@ -12,9 +12,9 @@ namespace finance
      */
     AssetClass fromQuote(std::string_view quote)
     {
-        if (quote == "Stock")
+        if (quote == "EQUITY")
             return AssetClass::Stock;
-        if (quote == "Etf")
+        if (quote == "ETF")
             return AssetClass::Etf;
         if (quote == "Crypto")
             return AssetClass::Crypto;
@@ -99,11 +99,18 @@ namespace finance
             hasProfile ? result.at("assetProfile") : nlohmann::json::object();
 
         TickerInfo info;
-        info.symbol             = _safeGet<std::string>(price, "symbol");
-        info.shortName          = _safeGet<std::string>(price, "shortName");
-        info.longName           = _safeGet<std::string>(price, "longName");
-        info.exchange           = _safeGet<std::string>(price, "exchangeName");
-        info.currency           = _safeGet<Currency>(price, "currency");
+        info.symbol    = _safeGet<std::string>(price, "symbol");
+        info.shortName = _safeGet<std::string>(price, "shortName");
+        info.longName  = _safeGet<std::string>(price, "longName");
+        info.exchange  = _safeGet<std::string>(price, "exchangeName");
+        const auto currencyOpt =
+            CurrencyMeta::from_string(_safeGet<std::string>(price, "currency"));
+
+        if (!currencyOpt)
+            throw(std::runtime_error("Invalid currency"));
+
+        info.currency = currencyOpt.value();
+
         info.regularMarketPrice = _rawValue(price, "regularMarketPrice");
         info.previousClose = _rawValue(price, "regularMarketPreviousClose");
         info.assetClass = fromQuote(_safeGet<std::string>(price, "quoteType"));

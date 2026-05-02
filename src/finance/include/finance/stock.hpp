@@ -1,13 +1,22 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
 #define __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
 
+#include <expected>
 #include <string>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
+
+namespace http
+{
+    struct HttpError;   // forward declaration
+}   // namespace http
+
 namespace finance
 {
+    class TickerInfo;   // forward declaration
+
     /**
      * @brief A class representing a stock instrument, this is used to represent
      * the details of a stock financial instrument, including its ticker symbol
@@ -50,6 +59,11 @@ namespace finance
        public:
         explicit Stock(std::string ticker, Currency currency);
 
+        [[nodiscard]]
+        static std::expected<Stock, http::HttpError> retrieveTickerInfo(
+            const std::string& ticker
+        );
+
         [[nodiscard]] StockId      getId() const;
         [[nodiscard]] InstrumentId getInstrumentId() const;
         [[nodiscard]] std::string  getTicker() const;
@@ -63,6 +77,9 @@ namespace finance
 
         void setId(StockId stockId);
         void setInstrumentId(InstrumentId instrumentId);
+
+       private:
+        explicit Stock(const TickerInfo& info);
     };
 
     [[nodiscard]]
