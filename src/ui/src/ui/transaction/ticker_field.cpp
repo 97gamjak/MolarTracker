@@ -22,7 +22,10 @@ namespace ui
      * @param tickers A list of ticker symbols to initialize the field with
      * @param parent The parent widget for this field
      */
-    TickerField::TickerField(std::vector<std::string> tickers, QWidget* parent)
+    TickerField::TickerField(
+        const std::vector<std::string>& tickers,
+        QWidget*                        parent
+    )
         : QWidget(parent),
           _tickers(utils::toQStringVector(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
@@ -158,18 +161,33 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Update the list of tickers in the ticker field
+     *
+     * @param tickers The new list of ticker symbols to populate the ticker
+     * field
+     */
     void TickerField::updateTickers(std::vector<QString> tickers)
     {
         _tickers = std::move(tickers);
         _rebuildCompleter();
     }
 
+    /**
+     * @brief Handle the request to create a new ticker
+     *
+     */
     void TickerField::_onCreateTickerRequest()
     {
         const auto text = _lineEdit->text().trimmed();
         emit       createTickerRequested(text.toStdString());
     }
 
+    /**
+     * @brief Select a ticker in the ticker field
+     *
+     * @param ticker The ticker symbol to select
+     */
     void TickerField::selectTicker(const QString& ticker)
     {
         _lineEdit->setText(ticker);

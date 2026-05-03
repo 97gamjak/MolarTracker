@@ -1,8 +1,10 @@
 #include "app/store/stock_store.hpp"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
+#include "app/store/base/base_store.hpp"
 #include "app/store/base/store_state.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "logging/log_macros.hpp"
@@ -34,28 +36,8 @@ namespace app
     {
         const auto ticker = stock.getTicker();
 
-        auto options = Options{
-            .filter   = finance::HasTicker(ticker),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-
-        const auto existingStock = _get(options);
-
-        if (existingStock.has_value())
-        {
-            LOG_ERROR(
-                std::format("Stock with ticker {} already exists", ticker)
-            );
-
-            return StockStoreResult::StockAlreadyExists;
-        }
-
-        const auto stockExistsInDb = _instrumentService->stockExists(ticker);
-
-        options.deletion   = DeletionPolicy::OnlyDeleted;
-        auto* deletedStock = _findEntry(options);
-
-        if (stockExistsInDb && deletedStock == nullptr)
+        // check if the stock exists in the db but not in store
+        if (stockExists(ticker, true))
         {
             LOG_ERROR(
                 std::format(
@@ -67,20 +49,31 @@ namespace app
             return StockStoreResult::StockAlreadyExists;
         }
 
-        if (stockExistsInDb && deletedStock != nullptr)
-        {
-            deletedStock->value = stock;
-            deletedStock->state = StoreState::Modified;
-        }
-        else
-        {
-            const auto newId = _generateNewId();
-            stock.setId(newId);
-
-            _addEntry(stock, StoreState::New);
-        }
+        _addEntry(std::move(stock));
 
         return StockStoreResult::Ok;
+    }
+
+    /**
+     * @brief Check if a stock with the given ticker exists in the store
+     *
+     * @param ticker The ticker symbol of the stock to check
+     * @param checkDeleted Whether to include deleted stocks in the check
+     * @return true if the stock exists, false otherwise
+     */
+    bool StockStore::stockExists(
+        const std::string& ticker,
+        bool               checkDeleted
+    ) const
+    {
+        const auto options = Options{
+            .filter   = finance::HasTicker(ticker),
+            .deletion = checkDeleted ? DeletionPolicy::IncludeDelete
+                                     : DeletionPolicy::ExcludeDelete
+        };
+
+        return _getEntry(options).has_value() ||
+               _instrumentService->stockExists(ticker);
     }
 
     /**
@@ -122,35 +115,62 @@ namespace app
      */
     void StockStore::commit()
     {
-        for (auto& entry : _getEntries())
+        for (const auto& entry : _getEntries())
         {
-            if (entry.state == StoreState::New)
+            switch (entry.state)
             {
-                const auto [stockId, instrumentId] =
-                    _instrumentService->addStock(entry.value);
+                case StoreState::New:
+                {
+                    const auto [stockId, instrumentId] =
+                        _instrumentService->addStock(entry.value);
 
-                entry.value.setId(stockId);
-                entry.value.setInstrumentId(instrumentId);
-            }
-            else if (entry.state == StoreState::Modified)
-            {
-                throw NotYetImplementedException(
-                    "Stock modification is not yet implemented"
-                );
+                    auto stock = entry.value;
+                    stock.setId(stockId);
+                    stock.setInstrumentId(instrumentId);
+
+                    const auto result = _commitEntry(
+                        entry.value.getId(),
+                        Entry{.value = std::move(stock), .state = entry.state}
+                    );
+
+                    if (result != StoreResult::Ok)
+                    {
+                        throw std::runtime_error(
+                            "Failed to add new stock entry to database"
+                        );
+                    }
+
+                    break;
+                }
+                case StoreState::Modified:
+                case StoreState::Deleted:
+                {
+                    throw NotYetImplementedException(
+                        StoreStateMeta::toString(entry.state) +
+                        " not yet implemented"
+                    );
+                }
+                case StoreState::Clean:
+                {
+                    break;
+                }
             }
         }
 
-        _clearEntries();
+        _notifyOnCommit();
     }
 
+    /**
+     * @brief Get a list of all stock tickers in the store
+     *
+     * @return std::vector<std::string>
+     */
     std::vector<std::string> StockStore::getAllTickers() const
     {
         std::vector<std::string> tickers;
 
         for (const auto& stock : getStocks())
-        {
             tickers.push_back(stock.getTicker());
-        }
 
         return tickers;
     }

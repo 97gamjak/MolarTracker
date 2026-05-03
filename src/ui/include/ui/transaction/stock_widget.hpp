@@ -6,7 +6,6 @@
 
 #include <vector>
 
-#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/base/dialog.hpp"
 
@@ -79,6 +78,11 @@ namespace ui
         void refresh();
 
        signals:
+        /**
+         * @brief Emitted when a new ticker is requested
+         *
+         * @param ticker The ticker symbol to create
+         */
         void createTickerRequested(const std::string& ticker);
 
        private:

@@ -16,6 +16,9 @@ namespace utils
     QStringList toQStringList(const std::span<std::string>& vec);
 
     std::vector<QString> toQStringVector(const std::span<std::string>& vec);
+    std::vector<QString> toQStringVector(
+        const std::span<const std::string>& vec
+    );
 
     template <mstd::has_enum_meta EnumMeta>
     QString toQString(EnumMeta value);

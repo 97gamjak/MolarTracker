@@ -137,21 +137,25 @@ namespace ui
             );
             _stack->addWidget(page);
 
-            for (auto& conn : page->getConnections())
-                _connections.push_back(std::move(conn));
+            _connections.add(std::move(page->getConnections()));
 
             auto  ctx    = std::make_unique<DirtyContext>(this, stackIndex);
             auto* ctxPtr = ctx.get();
             _dirtyContexts.push_back(std::move(ctx));
 
             auto containerConnections = section.subscribeToDirty(
-                static_cast<OnDirtyChanged::func>(
-                    SettingsDialog::_onSectionDirty
-                ),
-                static_cast<void*>(ctxPtr)
+                [ctxPtr](const bool& isDirty)
+                {
+                    ctxPtr->dialog->_sidebar->setSectionDirty(
+                        ctxPtr->index,
+                        isDirty
+                    );
+                    ctxPtr->dialog->_updateUnsavedLabel();
+                },
+                ctxPtr
             );
-            for (auto& conn : containerConnections)
-                _connections.push_back(std::move(conn));
+
+            _connections.add(std::move(containerConnections));
         };
 
         auto addSection = [&](const QString& groupTitle, auto& section)
@@ -247,27 +251,6 @@ namespace ui
         const bool anyDirty = _settings.isDirty();
 
         _unsavedLabel->setVisible(anyDirty);
-    }
-
-    /**
-     * @brief Callback function for when a section's dirty state changes, this
-     * is called whenever any parameter in a section changes its dirty state,
-     * it updates the dirty indicator for that section in the sidebar and also
-     * updates the overall unsaved changes label in the bottom bar by calling
-     * _updateUnsavedLabel()
-     *
-     * @param userData A pointer to a DirtyContext struct that contains a
-     * pointer to the dialog and the index of the section that changed, this is
-     * used to update the correct section's dirty indicator in the sidebar and
-     * to call _updateUnsavedLabel() on the dialog
-     * @param isDirty The new dirty state of the section, true if there are
-     * uncommitted changes in that section, false otherwise
-     */
-    void SettingsDialog::_onSectionDirty(void* userData, const bool& isDirty)
-    {
-        auto* ctx = static_cast<DirtyContext*>(userData);
-        ctx->dialog->_sidebar->setSectionDirty(ctx->index, isDirty);
-        ctx->dialog->_updateUnsavedLabel();
     }
 
     /**

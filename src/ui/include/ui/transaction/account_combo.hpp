@@ -40,7 +40,6 @@ namespace ui
 
         [[nodiscard]] std::optional<drafts::AccountDraft> selected() const;
 
-        void resetSelection();
         void updateAccounts(std::vector<drafts::AccountDraft> accounts);
 
        signals:

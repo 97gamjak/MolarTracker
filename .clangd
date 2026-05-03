@@ -1,2 +1,9 @@
 Diagnostics:
     Suppress: redefinition
+
+CompileFlags:
+  Remove:
+    - -DMOLARTRACKER_GIT_SHA=.*
+    - -DMOLARTRACKER_GIT_DIRTY=.*
+    - -DMOLARTRACKER_GIT_TAG=.*
+    - -DMOLARTRACKER_VERSION_FULL=.*

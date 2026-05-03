@@ -42,6 +42,8 @@ namespace app
 
         std::vector<std::string> getAllTickers() const;
 
+        bool stockExists(const std::string& ticker, bool checkDeleted) const;
+
         void commit();
     };
 }   // namespace app

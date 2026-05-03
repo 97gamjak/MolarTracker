@@ -52,7 +52,7 @@ void Signal<Tag>::notify(Args&&... args) const
 {
     const auto copy = _subscribers;
     for (auto const& [_, sub] : copy)
-        sub.func(sub.user, std::forward<Args>(args)...);
+        sub.func(std::forward<Args>(args)...);
 }
 
 /**

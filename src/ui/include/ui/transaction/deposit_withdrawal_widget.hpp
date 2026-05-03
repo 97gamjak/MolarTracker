@@ -76,6 +76,11 @@ namespace ui
         void refresh();
 
        signals:
+        /**
+         * @brief Emitted when a cash transaction is requested
+         *
+         * @param draft The draft of the cash transaction
+         */
         void createCashTransactionRequested(
             drafts::CreateCashTransactionDraft draft
         );

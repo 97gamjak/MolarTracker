@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <optional>
+#include <vector>
 
 // ============================================================================
 // Connection
@@ -79,6 +80,33 @@ class Connection
         std::size_t                          id,
         const ConnectionToken::DisconnectFn& func
     );
+};
+
+/**
+ * @brief Collection of active connections.
+ *
+ * This class manages a collection of active connections, allowing for
+ * adding, removing, and disconnecting connections as needed.
+ *
+ */
+class Connections
+{
+   private:
+    /// Vector of active connections
+    std::vector<Connection> _connections;
+
+   public:
+    Connections()  = default;
+    ~Connections() = default;
+
+    Connections(const Connections&)            = delete;
+    Connections& operator=(const Connections&) = delete;
+
+    Connections(Connections&& other) noexcept;
+    Connections& operator=(Connections&& other) noexcept;
+
+    void add(Connection&& connection);
+    void add(Connections&& connections);
 };
 
 #endif   // __CONNECTIONS__INCLUDE__CONNECTIONS__CONNECTION_HPP__

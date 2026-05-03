@@ -157,6 +157,11 @@ namespace ui
         return _acceptButton;
     }
 
+    /**
+     * @brief Set the ticker input.
+     *
+     * @param ticker The ticker symbol to set.
+     */
     void TickerLookupWidget::setTicker(const std::string& ticker)
     {
         clearResult();

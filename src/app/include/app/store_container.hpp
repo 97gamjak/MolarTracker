@@ -36,7 +36,7 @@ namespace app
         std::vector<IStore*> _allStores;
 
         /// list of connections for all stores
-        std::vector<Connection> _connections;
+        Connections _connections;
 
        public:
         explicit StoreContainer(ServiceContainer& services);
@@ -45,7 +45,7 @@ namespace app
         void clearPotentiallyDirty();
         bool isDirty() const;
 
-        std::vector<Connection> subscribeToDirty(
+        Connections subscribeToDirty(
             const OnDirtyChanged::func& func,
             void*                       user
         );

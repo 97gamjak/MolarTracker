@@ -37,6 +37,13 @@ namespace app
         return _instrumentRepo->getStocks();
     }
 
+    std::optional<finance::Stock> InstrumentService::getStock(
+        const std::string& ticker
+    )
+    {
+        return _instrumentRepo->getStock(ticker);
+    }
+
     /**
      * @brief add a stock instrument to the database, this involves inserting a
      * new row into the instrument table and a corresponding row into the stock

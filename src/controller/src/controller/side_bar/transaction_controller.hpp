@@ -63,9 +63,11 @@ namespace controller
         /// Pointer to the stock widget
         QPointer<ui::StockWidget> _createStockTransactionDlg;
         /// Reference to the transaction controller
-        TransactionController&       _transactionController;
+        TransactionController& _transactionController;
+        /// Reference to the stock controller
         SecuritiesSideBarController& _stockController;
 
+        /// Pointer to the main window
         QMainWindow* _mainWindow;
 
        public:

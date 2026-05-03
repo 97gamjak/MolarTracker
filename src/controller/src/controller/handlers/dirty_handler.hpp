@@ -1,8 +1,6 @@
 #ifndef __CONTROLLER__SRC__CONTROLLER__HANDLERS__DIRTY_HANDLER_HPP__
 #define __CONTROLLER__SRC__CONTROLLER__HANDLERS__DIRTY_HANDLER_HPP__
 
-#include <vector>
-
 #include "connections/connection.hpp"
 
 namespace app
@@ -29,10 +27,10 @@ namespace controller
     {
        private:
         /// Connections for tracking dirty state changes in stores
-        std::vector<Connection> _dirtyStoreConnections;
+        Connections _dirtyStoreConnections;
 
         /// Connections for tracking dirty state changes in settings
-        std::vector<Connection> _dirtySettingsConnections;
+        Connections _dirtySettingsConnections;
 
         /// Connection for tracking when settings are saved, used to update the
         /// window title when settings are saved and there are no dirty stores

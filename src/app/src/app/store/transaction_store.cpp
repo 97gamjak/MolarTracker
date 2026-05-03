@@ -1,6 +1,10 @@
 #include "app/store/transaction_store.hpp"
 
+#include <unordered_map>
+
 #include "app/services_api/i_transaction_service.hpp"
+#include "app/store/account_store.hpp"
+#include "config/id_types.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
@@ -11,39 +15,30 @@ namespace app
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
+     * @param accountStore
      */
     TransactionStore::TransactionStore(
-        const std::shared_ptr<ITransactionService>& transactionService
+        const std::shared_ptr<ITransactionService>& transactionService,
+        const AccountStore&                         accountStore
     )
         : _transactionService(transactionService)
     {
+        _accountIdRemapConnection = accountStore.subscribeToIdRemap(
+            [this](const AccountStore::IdMap& remap)
+            { _onAccountIdRemap(remap); },
+            this
+        );
     }
 
     /**
      * @brief Save all temporary changes to the database
      *
-     * @param accountIdMap A map of old account IDs to new account IDs, this is
-     * used to update the account IDs in the transaction entries before
-     * committing them to the database, ensuring that the transactions are
-     * associated with the correct accounts after any changes to account IDs
-     * have been made.
      */
-    void TransactionStore::commit(
-        const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
-            accountIdMap
-    )
+    void TransactionStore::commit()
     {
         LOG_ENTRY;
 
-        _updateAccountIds(accountIdMap);
-
-        if (!isDirty())
-        {
-            LOG_DEBUG("Transaction store is not dirty, nothing to commit");
-            return;
-        }
-
-        for (auto& entry : _getEntries())
+        for (const auto& entry : _getEntries())
         {
             switch (entry.state)
             {
@@ -56,7 +51,12 @@ namespace app
                         std::format("Added transaction with ID: {}", id.value())
                     );
 
-                    entry.value.setId(id);
+                    auto persisted = entry.value;
+                    persisted.setId(id);
+                    _commitEntry(
+                        entry.value.getId(),
+                        Entry{.value = persisted, .state = entry.state}
+                    );
                     break;
                 }
                 case StoreState::Modified:
@@ -67,7 +67,7 @@ namespace app
             }
         }
 
-        _cleanEntries();
+        _notifyOnCommit();
     }
 
     /**
@@ -90,10 +90,6 @@ namespace app
         finance::Transaction transaction
     )
     {
-        const auto& id = _generateNewId();
-
-        transaction.setId(id);
-
         const auto cash = transaction.calculateTotalSum();
 
         if (!cash.isZero())
@@ -107,52 +103,9 @@ namespace app
             return TransactionStoreResult::TransactionSumNotZero;
         }
 
-        _addEntry(transaction, StoreState::New);
+        _addEntry(std::move(transaction));
 
         return TransactionStoreResult::Ok;
-    }
-
-    /**
-     * @brief Updates the account IDs in the transaction entries based on the
-     * provided account ID map, this is used to ensure that any changes to
-     * account IDs are reflected in the transaction entries before they are
-     * committed to the database, maintaining the integrity of the associations
-     * between transactions and accounts.
-     *
-     * @param accountIdMap A map of old account IDs to new account IDs, this is
-     * used to update the account IDs in the transaction entries, ensuring that
-     * the transactions are associated with the correct accounts after any
-     * changes to account IDs have been made.
-     */
-    void TransactionStore::_updateAccountIds(
-        const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
-            accountIdMap
-    )
-    {
-        for (auto& entry : _getEntries())
-        {
-            for (auto& transactionEntry : entry.value.getEntries())
-            {
-                for (const auto& [id, newId] : accountIdMap)
-                {
-                    if (transactionEntry.getAccountId() == id)
-                    {
-                        if (entry.state == StoreState::New)
-                        {
-                            transactionEntry.setAccountId(newId);
-                        }
-                        else
-                        {
-                            throw std::runtime_error(
-                                "Account ID found in already committed "
-                                "transaction "
-                                "entry! This is not allowed."
-                            );
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -210,6 +163,54 @@ namespace app
         }
 
         return results;
+    }
+
+    /**
+     * @brief Handle account ID remapping for transaction entries
+     *
+     * @param remap The mapping of old account IDs to new account IDs
+     */
+    void TransactionStore::_onAccountIdRemap(const AccountStore::IdMap& remap)
+    {
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the remapped
+                // ID
+                const auto references = std::ranges::any_of(
+                    entry.value.getEntries(),
+                    [&remap](const auto& entry_)
+                    { return remap.contains(entry_.getAccountId()); }
+                );
+
+                if (references)
+                {
+                    throw std::runtime_error(
+                        "Account ID found in already committed transaction "
+                        "entry!"
+                    );
+                }
+
+                continue;
+            }
+
+            bool modified    = false;
+            auto transaction = entry.value;
+
+            for (auto& transactionEntry : transaction.getEntries())
+            {
+                if (const auto it = remap.find(transactionEntry.getAccountId());
+                    it != remap.end())
+                {
+                    transactionEntry.setAccountId(it->second);
+                    modified = true;
+                }
+            }
+
+            if (modified)
+                _updateEntry(transaction, StoreState::New);
+        }
     }
 
 }   // namespace app

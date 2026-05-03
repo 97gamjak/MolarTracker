@@ -76,6 +76,9 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// calculations and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
+    /// The ID of the position associated with this trade leg, this is a foreign
+    /// key referencing the id field of the position table, and is used to
+    /// associate this trade leg with a specific position.
     ORM_FIELD(
         positionId,
         Field<
@@ -87,7 +90,6 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
                 decltype(PositionRow::id)>>
     )
 
-    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
         TradeLegRow,
         id,
@@ -98,7 +100,6 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
         unitPrice,
         currency
     )
-    /// @endcond
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__

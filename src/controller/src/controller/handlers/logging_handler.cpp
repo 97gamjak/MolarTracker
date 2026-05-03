@@ -31,10 +31,10 @@ namespace controller
     {
         auto& param         = loggingSettings.getDefaultLogLevelParam();
         _logLevelConnection = param.subscribe(
-            [](void* user, const LogLevel& newLogLevel)
+            [](const LogLevel& newLogLevel)
             {
-                if (auto* logManager = static_cast<logging::LogManager*>(user))
-                    logManager->setDefaultLogLevel(newLogLevel);
+                auto& logManager = logging::LogManager::getInstance();
+                logManager.setDefaultLogLevel(newLogLevel);
             },
             &logging::LogManager::getInstance()
         );

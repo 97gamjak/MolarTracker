@@ -13,11 +13,18 @@
  */
 struct PositionRow : public orm::ORMModel<"position">
 {
+    /// The ID of the position, this is the primary key for the position table
     ORM_FIELD(id, IdField<PositionId>)
+
+    /// The timestamp when the position was opened
     ORM_FIELD(openedAt, Field<"opened_at", Timestamp, orm::not_null_t>)
+
+    /// The timestamp when the position was closed
     ORM_FIELD(closedAt, Field<"closed_at", std::optional<Timestamp>>)
 
+    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(PositionRow, id, openedAt, closedAt)
+    /// @endcond
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__POSITION_ROW_HPP__

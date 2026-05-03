@@ -6,7 +6,6 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <vector>
 
 #include "connections/connection.hpp"
 #include "settings/params/param_utils.hpp"
@@ -28,12 +27,12 @@ namespace ui
        private:
         /// Connections for all params in this section, used for cleanup on
         /// section destruction
-        std::vector<Connection> _connections;
+        Connections _connections;
 
        public:
         explicit SettingsSection(TSection& section, SectionMode mode);
 
-        [[nodiscard]] std::vector<Connection>& getConnections();
+        [[nodiscard]] Connections& getConnections();
 
         void _build(TSection& section, SectionMode mode);
     };

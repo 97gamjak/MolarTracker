@@ -230,10 +230,10 @@ namespace ui
 
     template <typename TParam>
     void buildParamRows(
-        TParam&                  param,
-        QFormLayout*             layout,
-        std::vector<Connection>& connections,
-        SectionMode              mode
+        TParam&      param,
+        QFormLayout* layout,
+        Connections& connections,
+        SectionMode  mode
     )
     {
         if constexpr (settings::IsParamContainer<TParam>)
@@ -318,24 +318,14 @@ namespace ui
             layout->addRow(label, rowWidget);
 
             // Dirty subscription
-            auto connectDirty = [&](Connection conn)
-            { connections.push_back(std::move(conn)); };
+            auto onDirtyStripe = [dirtyStripe](const bool& isDirty)
+            {
+                dirtyStripe->setProperty("dirty", isDirty);
+                dirtyStripe->style()->unpolish(dirtyStripe);
+                dirtyStripe->style()->polish(dirtyStripe);
+            };
 
-            if constexpr (requires {
-                              {
-                                  param.subscribeToDirty(nullptr, nullptr)
-                              } -> std::same_as<Connection>;
-                          })
-            {
-                connectDirty(param.subscribeToDirty(onDirtyStripe, dirtyStripe)
-                );
-            }
-            else
-            {
-                for (auto& conn :
-                     param.subscribeToDirty(onDirtyStripe, dirtyStripe))
-                    connections.push_back(std::move(conn));
-            }
+            connections.add(param.subscribeToDirty(onDirtyStripe, dirtyStripe));
         }
     }
 

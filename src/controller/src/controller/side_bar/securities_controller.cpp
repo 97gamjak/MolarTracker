@@ -129,6 +129,11 @@ namespace controller
             emit stockCreated(_acceptedQuote.value());
     }
 
+    /**
+     * @brief Create a new stock with the given ticker symbol.
+     *
+     * @param ticker The ticker symbol of the stock to create
+     */
     void SecuritiesSideBarController::createStock(const std::string& ticker)
     {
         _tickerLookupWidget->setTicker(ticker);

@@ -2,7 +2,6 @@
 #define __UI__INCLUDE__UI__SETTINGS__PARAM_EDITOR_HPP__
 
 #include <cstdint>
-#include <vector>
 
 #include "connections/connection.hpp"
 #include "settings/params/bool_param.hpp"
@@ -41,8 +40,6 @@ namespace ui
     template <typename T>
     [[nodiscard]] QWidget* makeEnumEditor(T& param);
 
-    void onDirtyStripe(void* userData, const bool& isDirty);
-
     enum class SectionMode : std::uint8_t
     {
         LeavesOnly,
@@ -52,10 +49,10 @@ namespace ui
 
     template <typename TParam>
     void buildParamRows(
-        TParam&                  param,
-        QFormLayout*             layout,
-        std::vector<Connection>& connections,
-        SectionMode              mode
+        TParam&      param,
+        QFormLayout* layout,
+        Connections& connections,
+        SectionMode  mode
     );
 
 }   // namespace ui

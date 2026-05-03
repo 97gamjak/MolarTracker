@@ -26,6 +26,7 @@ namespace ui
      * @param referenceAccounts A list of account drafts to populate the
      * reference account combo box, this will be filtered based on the selected
      * primary account to only include accounts with the same currency
+     * @param tickers A list of ticker symbols to populate the ticker field
      * @param parent The parent widget for this widget
      */
     StockWidget::StockWidget(
@@ -194,11 +195,23 @@ namespace ui
         // emit createStockTransactionRequested(getDraft());
     }
 
+    /**
+     * @brief Update the list of accounts in the account combo box
+     *
+     * @param accounts The new list of account drafts to populate the combo box
+     */
     void StockWidget::updateAccounts(std::vector<drafts::AccountDraft> accounts)
     {
         _accountCombo->updateAccounts(std::move(accounts));
     }
 
+    /**
+     * @brief Update the list of reference accounts in the reference account
+     * combo box
+     *
+     * @param referenceAccounts The new list of reference account drafts to
+     * populate the combo box
+     */
     void StockWidget::updateReferenceAccounts(
         std::vector<drafts::AccountDraft> referenceAccounts
     )
@@ -206,11 +219,24 @@ namespace ui
         _referenceAccountCombo->updateAccounts(std::move(referenceAccounts));
     }
 
+    /**
+     * @brief Update the list of tickers in the ticker field
+     *
+     * @param tickers The new list of ticker symbols to populate the ticker
+     * field
+     */
     void StockWidget::updateTickers(const std::vector<std::string>& tickers)
     {
         updateTickers(tickers, "");
     }
 
+    /**
+     * @brief Update the list of tickers in the ticker field
+     *
+     * @param tickers The new list of ticker symbols to populate the ticker
+     * field
+     * @param tickerToSelect The ticker symbol to select in the ticker field
+     */
     void StockWidget::updateTickers(
         const std::vector<std::string>& tickers,
         const std::string&              tickerToSelect
@@ -225,6 +251,10 @@ namespace ui
         _tickerField->selectTicker(QString::fromStdString(tickerToSelect));
     }
 
+    /**
+     * @brief Refresh the widget to reflect the current state
+     *
+     */
     void StockWidget::refresh()
     {
         _accountCombo->update();

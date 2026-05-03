@@ -141,5 +141,7 @@
         "**/.build": true,
         "**/.cache": true
     },
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

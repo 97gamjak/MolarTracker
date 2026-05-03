@@ -54,6 +54,20 @@ namespace app
         return {results.begin(), results.end()};
     }
 
+    std::optional<finance::Stock> InstrumentRepo::getStock(
+        const std::string& ticker
+    )
+    {
+        const auto query = orm::Query{}.where(StockRow::hasTicker(ticker));
+
+        auto result = _getCrud().getUnique<StockRow>(_getDb(), query);
+
+        if (!result)
+            return std::nullopt;
+
+        return InstrumentFactory::toStock(result.value());
+    }
+
     /**
      * @brief add a stock instrument to the database, this involves inserting a
      * new row into the instrument table and a corresponding row into the stock

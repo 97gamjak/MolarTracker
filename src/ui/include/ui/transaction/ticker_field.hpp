@@ -43,8 +43,8 @@ namespace ui
 
        public:
         explicit TickerField(
-            std::vector<std::string> tickers,
-            QWidget*                 parent = nullptr
+            const std::vector<std::string>& tickers,
+            QWidget*                        parent = nullptr
         );
 
         void addTicker(QString ticker);

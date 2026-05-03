@@ -24,6 +24,13 @@ namespace app
 
     MSTD_ENUM(DeletionPolicy, std::int8_t, STATE_POLICY_LIST);
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define STORE_RESULT_LIST(X) \
+    X(Ok)                    \
+    X(NotFound)
+
+    MSTD_ENUM(StoreResult, std::int8_t, STORE_RESULT_LIST);
+
     /**
      * @brief Struct representing filter options for querying entries in the
      * store. This can be extended in the future to include additional options
@@ -84,14 +91,23 @@ namespace app
     // TODO (97gamjak)[MOLTRACK-206]: introduce concepts for types containing
     // Ids and ids
     template <typename T, typename IdType>
-    class BaseStore : public Observable<OnDirtyChanged>, public IStore
+    class BaseStore : public IStore,
+                      public Observable<
+                          OnDirtyChanged,
+                          OnStoreItemAdded<T>,
+                          OnStoreItemUpdated<T>,
+                          OnStoreItemRemoved<IdType>,
+                          OnIdRemap<IdType>>
+
     {
        public:
         /// Helper type for the dirty state change signal.
-        using DirtyObservable = Observable<OnDirtyChanged>;
-
-        /// Type alias for a map of IDs.
-        using IdMap = std::unordered_map<IdType, IdType, typename IdType::Hash>;
+        using StoreObservable = Observable<
+            OnDirtyChanged,
+            OnStoreItemAdded<T>,
+            OnStoreItemUpdated<T>,
+            OnStoreItemRemoved<IdType>,
+            OnIdRemap<IdType>>;
 
         /// Type alias for filter options used when querying entries in the
         /// store.
@@ -101,38 +117,41 @@ namespace app
         /// its state.
         struct Entry;
 
+        /// Type alias for the ID map used to track ID remappings.
+        using IdMap = std::unordered_map<IdType, IdType, typename IdType::Hash>;
+
        private:
         /// The collection of entries in the store.
         std::vector<Entry> _entries;
-
-        /// A mapping of old IDs to new IDs for entries that have been updated
-        IdMap _changedIds;
 
         /// Flag indicating whether the store is potentially dirty (i.e., has
         /// unsaved changes).
         bool _isPotentiallyDirty = false;
 
+        /// Map for remapping IDs
+        IdMap _idRemap;
+        /// Vector for tracking updated entries
+        std::vector<T> _updated;
+        /// Vector for tracking added entries
+        std::vector<T> _added;
+        /// Vector for tracking removed entry IDs
+        std::vector<IdType> _removed;
+
        public:
-        BaseStore()           = default;
-        ~BaseStore() override = default;
-
-        /// @cond DOXYGEN_IGNORE
-        BaseStore(BaseStore&&)            = default;
-        BaseStore& operator=(BaseStore&&) = default;
-        /// @endcond
-
-        // Deleted copy constructor and copy assignment operator to prevent
-        // copying of the store, as it manages a collection of entries and
-        // copying could lead to issues with shared state and dirty tracking.
-        BaseStore(const BaseStore&)            = delete;
-        BaseStore& operator=(const BaseStore&) = delete;
-
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
 
         void clearPotentiallyDirty() override;
 
-        [[nodiscard]] const IdMap& getChangedIds() const;
+        [[nodiscard]] Connection subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        ) override;
+
+        [[nodiscard]] Connection subscribeToIdRemap(
+            OnIdRemap<IdType>::func func,
+            void*                   user
+        ) const;
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
@@ -141,37 +160,39 @@ namespace app
         [[nodiscard]]
         auto _getEntries(Options options = Options()) const;
         [[nodiscard]]
-        auto _getEntries(Options options = Options());
-        [[nodiscard]]
         auto _getValues(Options options = Options()) const;
-
-        [[nodiscard]]
-        Entry* _findEntry(Options options = Options());
         [[nodiscard]]
         std::optional<T> _get(Options options = Options()) const;
+        [[nodiscard]]
+        auto _getEntry(Options options = Options()) const;
 
-        void _addEntry(const T& value, StoreState state);
-        void _removeEntry(IdType id);
-        void _cleanEntries();
+        void        _addEntry(T value);
+        void        _addCleanEntries(const std::vector<T>& value);
+        StoreResult _updateEntry(const T& value, StoreState state);
+        StoreResult _commitEntry(IdType tempId, const Entry& persistedValue);
+        StoreResult _removeEntry(IdType id);
+        StoreResult _deleteEntry(IdType id);
+
         void _clearEntries();
 
-        void _appendChangedIds(IdType oldId, IdType newId);
-        void _clearChangedIds();
-
-        [[nodiscard]] IdType _generateNewId() const;
-
-        void _markPotentiallyDirty();
-
-        [[nodiscard]] Connection subscribeToDirty(
-            OnDirtyChanged::func func,
-            void*                user
-        ) override;
+        void _notifyOnCommit();
 
        private:
         static bool _evalDeletionPolicy(
             const Entry&   entry,
             DeletionPolicy policy
         );
+
+        [[nodiscard]]
+        Entry* _findEntry(IdType id);
+
+        void                 _markPotentiallyDirty();
+        [[nodiscard]] IdType _generateNewId() const;
+
+        void _notifyIdRemap();
+        void _notifyUpdated();
+        void _notifyAdded();
+        void _notifyRemoved();
     };
 
     /**
@@ -195,6 +216,9 @@ namespace app
 
 #ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__
 #include "base_store.tpp"
+#endif
+#ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_SUBSCRIPTIONS_TPP__
+#include "base_store_subscriptions.tpp"   // IWYU pragma: keep
 #endif
 
 #endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__

@@ -27,8 +27,10 @@ namespace controller
      * @param undoStack The undo stack for the application
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
+     * @param stockStore The stock store for the application
      * @param transactionController The transaction controller for the
      * application
+     * @param stockController The stock controller for the application
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
@@ -218,15 +220,16 @@ namespace controller
         _transactionController.transactionOverviewSelected();
     }
 
+    /**
+     * @brief Handle the creation of a new stock ticker
+     *
+     * @param ticker The ticker symbol of the stock to create
+     */
     void TransactionSideBarController::_onCreateTickerRequested(
         const std::string& ticker
     )
     {
         _stockController.createStock(ticker);
-        _createStockTransactionDlg->updateTickers(
-            _stockStore.getAllTickers(),
-            ticker
-        );
     }
 
 }   // namespace controller

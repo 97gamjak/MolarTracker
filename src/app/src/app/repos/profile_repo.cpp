@@ -89,7 +89,7 @@ namespace app
         std::optional<std::string> email
     )
     {
-        const auto profile = Profile{ProfileId::from(0), name, email};
+        const auto profile = Profile{name, email};
         const auto rowId =
             orm::Crud().insert(_getDb(), ProfileFactory::toRow(profile));
 
@@ -126,11 +126,14 @@ namespace app
             );
         }
 
-        const auto& existingProfile = existingProfileOpt.value();
-        Profile     updatedProfile{existingProfile.getId(), newName, newEmail};
+        auto existingProfile = existingProfileOpt.value();
+        existingProfile.setName(newName);
+        existingProfile.setEmail(newEmail);
 
-        const auto result =
-            orm::Crud().update(_getDb(), ProfileFactory::toRow(updatedProfile));
+        const auto result = orm::Crud().update(
+            _getDb(),
+            ProfileFactory::toRow(existingProfile)
+        );
 
         if (!result)
         {

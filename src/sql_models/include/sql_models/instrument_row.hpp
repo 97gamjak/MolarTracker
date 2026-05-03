@@ -25,8 +25,9 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     /// auto-incremented
     ORM_FIELD(id, IdField<InstrumentId>)
 
-    /// auto generate the fields() function using the ORM_FIELDS macro
+    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(InstrumentRow, id);
+    /// @endcond
 
     /// Helper type alias for defining foreign key fields referencing the id
     /// field of the instrument table, this allows for concise definitions of

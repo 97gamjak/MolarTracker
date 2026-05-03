@@ -86,6 +86,11 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Update the list of accounts in the account combo box
+     *
+     * @param accounts The new list of account drafts to populate the combo box
+     */
     void DepositWithdrawalWidget::updateAccounts(
         std::vector<drafts::AccountDraft> accounts
     )
@@ -93,6 +98,10 @@ namespace ui
         _accountCombo->updateAccounts(std::move(accounts));
     }
 
+    /**
+     * @brief Refresh the widget to reflect the current state
+     *
+     */
     void DepositWithdrawalWidget::refresh()
     {
         _accountCombo->update();
@@ -116,6 +125,11 @@ namespace ui
         return _type;
     }
 
+    /**
+     * @brief Set the transaction type of this widget
+     *
+     * @param type The transaction type to set
+     */
     void DepositWithdrawalWidget::setTransactionType(TransactionType type)
     {
         _type = type;

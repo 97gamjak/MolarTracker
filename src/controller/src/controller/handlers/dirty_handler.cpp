@@ -21,15 +21,15 @@ namespace controller
         ui::MainWindow*  mainWindow
     )
     {
-        auto setTitleDirty = [](void* user, const bool& isDirty)
+        auto setTitleDirty = [mainWindow](const bool& isDirty)
         {
             // we only want to send a signal in case something is dirty
             // In case we save settings and the store, we handle the dirty state
             // there
             if (isDirty)
             {
-                if (auto* _mainWindow = static_cast<ui::MainWindow*>(user))
-                    _mainWindow->setWindowTitle(isDirty);
+                if (mainWindow)
+                    mainWindow->setWindowTitle(isDirty);
             }
         };
 
@@ -43,11 +43,11 @@ namespace controller
             settings.subscribeToDirty(setTitleDirty, mainWindow);
 
         _settingsSavedConnection = settings.subscribeToSaved(
-            [&storeContainer](void* user)
+            [mainWindow, &storeContainer]()
             {
-                if (auto* _mainWindow = static_cast<ui::MainWindow*>(user))
+                if (mainWindow)
                     if (!storeContainer.isDirty())
-                        _mainWindow->setWindowTitle(false);
+                        mainWindow->setWindowTitle(false);
             },
             mainWindow
         );
