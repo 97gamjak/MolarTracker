@@ -120,7 +120,12 @@ namespace controller
     void SecuritiesSideBarController::_onAcceptTickerButtonClicked()
     {
         if (_acceptedQuote)
-            _stockStore.addStock(_acceptedQuote.value());
+        {
+            const auto result = _stockStore.addStock(_acceptedQuote.value());
+
+            if (result != app::StockStoreResult::Ok)
+                _tickerLookupWidget->displayError("Failed to add stock");
+        }
 
         _tickerLookupWidget->clearResult();
         _tickerLookupWidget->hide();

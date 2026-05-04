@@ -20,17 +20,19 @@ namespace app
     class StoreContainer
     {
        private:
+        InstrumentIdSeq _instrumentIdSeq;
+
         /// The Profile store
         ProfileStore _profileStore;
 
         /// The Account store
         AccountStore _accountStore;
 
-        /// The Transaction store
-        TransactionStore _transactionStore;
-
         /// The stock store
         StockStore _stockStore;
+
+        /// The Transaction store
+        TransactionStore _transactionStore;
 
         /// list of all stores
         std::vector<IStore*> _allStores;

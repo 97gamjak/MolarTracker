@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction.hpp"
@@ -12,7 +13,6 @@
 namespace app
 {
     class ITransactionService;   // Forward declaration
-    class AccountStore;          // Forward declaration
 
     /**
      * @brief Result of transaction store operations
@@ -36,13 +36,14 @@ namespace app
         /// The Transaction service
         std::shared_ptr<ITransactionService> _transactionService;
 
-        /// Connection for account ID remapping
-        Connection _accountIdRemapConnection;
+        /// Connections for various events
+        Connections _connections;
 
        public:
         explicit TransactionStore(
             const std::shared_ptr<ITransactionService>& transactionService,
-            const AccountStore&                         accountStore
+            AccountStore&                               accountStore,
+            StockStore&                                 stockStore
         );
 
         void commit();
@@ -54,6 +55,7 @@ namespace app
 
        private:
         void _onAccountIdRemap(const AccountStore::IdMap& remap);
+        void _onInstrumentIdRemap(const StockStore::InstrumentIdMap& remap);
     };
 
 }   // namespace app

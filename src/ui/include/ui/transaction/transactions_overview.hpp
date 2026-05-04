@@ -1,13 +1,20 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__TRANSACTIONS_OVERVIEW_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__TRANSACTIONS_OVERVIEW_HPP__
 
+#include <qsortfilterproxymodel.h>
 #include <qwidget.h>
 
-#include "drafts/transaction_draft.hpp"
 #include "ui/transaction/transaction_table.hpp"
+
+class QSortFilterProxyModel;   // Forward declaration
+class QTableView;              // Forward declaration
 
 namespace ui
 {
+    class CashTransactionTableModel;    // Forward declaration
+    class StockTransactionTableModel;   // Forward declaration
+    class TransactionTableModel;        // Forward declaration
+
     /**
      * @brief Widget for displaying an overview of transactions in a table view
      *
@@ -24,23 +31,33 @@ namespace ui
 
        private:
         /// The model for the transaction table
-        TransactionTableModel* _model;
+        CashTransactionTableModel*  _cashModel;
+        StockTransactionTableModel* _stockModel;
         /// The proxy model for sorting and filtering the transaction table
-        QSortFilterProxyModel* _proxy;
+        QSortFilterProxyModel* _cashProxy;
+        QSortFilterProxyModel* _stockProxy;
         /// The table view for displaying the transactions
-        QTableView* _table;
+        QTableView* _cashTable;
+        QTableView* _stockTable;
 
        public:
         explicit TransactionsOverview(QWidget* parent);
 
         void refresh(
-            const std::vector<drafts::TransactionOverviewDraft>& transactions,
+            const std::vector<drafts::TransactionOverviewDraft>&
+                cashTransactions,
+            const std::vector<drafts::TransactionOverviewDraft>&
+                stockTransactions,
             const std::unordered_map<AccountId, std::string, AccountId::Hash>&
                 accountIdToName
         );
 
        private:
-        void _setupTable();
+        void _setupTable(
+            QTableView*            table,
+            QSortFilterProxyModel* proxy,
+            TransactionTableModel* model
+        );
     };
 }   // namespace ui
 

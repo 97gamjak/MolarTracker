@@ -54,6 +54,9 @@ class StrongId final
     constexpr StrongId& operator++();
     constexpr StrongId  operator++(int);
 
+    constexpr StrongId& operator--();
+    constexpr StrongId  operator--(int);
+
     /// @cond DOXYGEN_IGNORE
     bool operator==(const StrongId&) const  = default;
     auto operator<=>(const StrongId&) const = default;
@@ -64,6 +67,14 @@ class StrongId final
         std::ostream&      output,
         StrongId<Tag, Rep> id
     );
+};
+
+template <typename Id>
+class IdSequence
+{
+    Id _next{-2};   // to make it valid
+   public:
+    Id next();
 };
 
 template <class Tag>

@@ -37,7 +37,7 @@ namespace ui
          *
          * @param ticker The selected stock ticker.
          */
-        void tickerSelected(const QString& ticker);
+        void tickerSelected(const std::string& ticker);
 
        private:
         void _setupTable();

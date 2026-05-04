@@ -40,9 +40,28 @@ namespace app
     Connection BaseStore<T, IdType>::subscribeToIdRemap(
         OnIdRemap<IdType>::func func,
         void*                   user
-    ) const
+    )
     {
         return this->template on<OnIdRemap<IdType>>(func, user);
+    }
+
+    /**
+     * @brief Subscribes a callback function to be called when an entry is added
+     * to the store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param func
+     * @param user
+     * @return Connection
+     */
+    template <typename T, typename IdType>
+    Connection BaseStore<T, IdType>::subscribeToStoreChange(
+        StoreChanged<IdType>::func func,
+        void*                      user
+    )
+    {
+        return this->template on<StoreChanged<IdType>>(func, user);
     }
 
 }   // namespace app

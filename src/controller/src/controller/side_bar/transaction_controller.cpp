@@ -53,6 +53,50 @@ namespace controller
           _stockController(stockController),
           _mainWindow(mainWindow)
     {
+        _createCashTransactionDlg =
+            utils::makeQChild<ui::DepositWithdrawalWidget>(
+                TransactionType::Deposit,   // dummy type
+                _accountStore.getCashAccounts(),
+                _mainWindow
+            );
+
+        connect(
+            _createCashTransactionDlg,
+            &ui::DepositWithdrawalWidget::createCashTransactionRequested,
+            this,
+            &TransactionSideBarController::_onCreateCashTransactionRequested
+        );
+
+        _createStockTransactionDlg = utils::makeQChild<ui::StockWidget>(
+            _accountStore.getAllAccounts(),
+            _accountStore.getAllAccounts(),
+            _stockStore.getAllTickers(),
+            _mainWindow
+        );
+
+        connect(
+            _createStockTransactionDlg,
+            &ui::StockWidget::createTickerRequested,
+            this,
+            &TransactionSideBarController::_onCreateTickerRequested
+        );
+
+        connect(
+            _createStockTransactionDlg,
+            &ui::StockWidget::createStockTransactionRequested,
+            this,
+            &TransactionSideBarController::_onCreateStockTransactionRequested
+        );
+
+        _connections.add(_stockStore.subscribeToStoreChange(
+            [&]()
+            {
+                _createStockTransactionDlg->updateTickers(
+                    _stockStore.getAllTickers()
+                );
+            },
+            this
+        ));
     }
 
     /**
@@ -90,66 +134,25 @@ namespace controller
                 TransactionTypeMeta::toString(type)
             );
 
-            if (_createCashTransactionDlg == nullptr)
-            {
-                _createCashTransactionDlg =
-                    utils::makeQChild<ui::DepositWithdrawalWidget>(
-                        type,
-                        _accountStore.getCashAccounts(),
-                        _mainWindow
-                    );
-
-                connect(
-                    _createCashTransactionDlg,
-                    &ui::DepositWithdrawalWidget::
-                        createCashTransactionRequested,
-                    this,
-                    &TransactionSideBarController::
-                        _onCreateCashTransactionRequested
-                );
-            }
-            else
-            {
-                _createCashTransactionDlg->setTransactionType(type);
-                _createCashTransactionDlg->updateAccounts(
-                    _accountStore.getCashAccounts()
-                );
-                _createCashTransactionDlg->refresh();
-            }
+            _createCashTransactionDlg->setTransactionType(type);
+            _createCashTransactionDlg->updateAccounts(
+                _accountStore.getCashAccounts()
+            );
+            _createCashTransactionDlg->refresh();
 
             _createCashTransactionDlg->show();
         }
         else if (action == item->getCreateStockTransactionAction())
         {
-            if (_createStockTransactionDlg == nullptr)
-            {
-                _createStockTransactionDlg = utils::makeQChild<ui::StockWidget>(
-                    _accountStore.getAllAccounts(),
-                    _accountStore.getAllAccounts(),
-                    _stockStore.getAllTickers(),
-                    _mainWindow
-                );
-
-                connect(
-                    _createStockTransactionDlg,
-                    &ui::StockWidget::createTickerRequested,
-                    this,
-                    &TransactionSideBarController::_onCreateTickerRequested
-                );
-            }
-            else
-            {
-                _createStockTransactionDlg->updateAccounts(
-                    _accountStore.getAllAccounts()
-                );
-                _createStockTransactionDlg->updateReferenceAccounts(
-                    _accountStore.getAllAccounts()
-                );
-                _createStockTransactionDlg->updateTickers(
-                    _stockStore.getAllTickers()
-                );
-                _createStockTransactionDlg->refresh();
-            }
+            _createStockTransactionDlg->updateAccounts(
+                _accountStore.getSecurityAccounts()
+            );
+            _createStockTransactionDlg->updateReferenceAccounts(
+                _accountStore.getCashAccounts()
+            );
+            _createStockTransactionDlg->updateTickers(_stockStore.getAllTickers(
+            ));
+            _createStockTransactionDlg->refresh();
 
             _createStockTransactionDlg->show();
         }
@@ -180,6 +183,8 @@ namespace controller
         drafts::CreateCashTransactionDraft draft
     )
     {
+        LOG_ENTRY;
+
         std::vector<drafts::TransactionEntryDraft> additionalEntries;
 
         for (auto entry : draft.getEntries())
@@ -204,6 +209,38 @@ namespace controller
 
         // TODO(97gamjak): add here commands and also error handling
         _createCashTransactionDlg->close();
+        _transactionController.transactionOverviewSelected(false);
+    }
+
+    void TransactionSideBarController::_onCreateStockTransactionRequested(
+        drafts::CreateStockTransactionDraft draft
+    )
+    {
+        LOG_ENTRY;
+
+        for (auto& leg : draft.getLegs())
+        {
+            const auto instrumentId =
+                _stockStore.getInstrumentId(leg.getTicker());
+
+            if (instrumentId.has_value())
+            {
+                leg.setInstrumentId(*instrumentId);
+            }
+            else
+            {
+                throw std::logic_error(
+                    "Invalid stock ticker: " + leg.getTicker()
+                );
+            }
+        }
+
+        _transactionStore.addTransaction(
+            drafts::TransactionMapper::fromCreateStockTransactionDraft(draft)
+        );
+
+        // TODO(97gamjak): add here commands and also error handling
+        _createStockTransactionDlg->close();
         _transactionController.transactionOverviewSelected(false);
     }
 

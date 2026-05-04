@@ -100,6 +100,9 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
         unitPrice,
         currency
     )
+
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__

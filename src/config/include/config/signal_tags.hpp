@@ -76,6 +76,20 @@ struct OnIdRemap
 };
 
 /**
+ * @brief Signal tag for when a store is changed, this can be used to emit an
+ * event when a store is changed, allowing other parts of the application to
+ * react to the change.
+ *
+ * @tparam IdType
+ */
+template <typename IdType>
+struct StoreChanged
+{
+    /// Type alias for the change callback function for the store
+    using func = std::function<void()>;
+};
+
+/**
  * @brief Signal tag for when settings are saved, this can be used to emit an
  * event when the settings are saved, allowing other parts of the application to
  * react to the save event, such as updating the UI or saving changes to the

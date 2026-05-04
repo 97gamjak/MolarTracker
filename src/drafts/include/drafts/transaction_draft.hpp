@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "utils/timestamp.hpp"
@@ -41,15 +42,37 @@ namespace drafts
         [[nodiscard]] bool needsExternal() const;
     };
 
-    struct TransactionDataDraft
+    class TradeLegDraft
     {
+       private:
+        AccountId     _accountId;
+        finance::Cash _unitPrice;
+        Quantity      _quantity;
+        std::string   _ticker;
+        InstrumentId  _instrumentId;
+
+       public:
+        TradeLegDraft(
+            AccountId     accountId,
+            finance::Cash unitPrice,
+            Quantity      quantity,
+            std::string   ticker
+        );
+
+        [[nodiscard]] AccountId getAccountId() const;
+
+        [[nodiscard]] finance::Cash getUnitPrice() const;
+
+        [[nodiscard]] Quantity getQuantity() const;
+
+        [[nodiscard]] const std::string& getTicker() const;
+
+        [[nodiscard]] InstrumentId getInstrumentId() const;
+
+        void setInstrumentId(InstrumentId instrumentId);
     };
 
-    /**
-     * @brief A draft representation of a transaction
-     *
-     */
-    class CreateCashTransactionDraft
+    class CreateTransactionDraft
     {
        private:
         /// The timestamp of the transaction
@@ -62,7 +85,7 @@ namespace drafts
         std::optional<std::string> _comment;
 
        public:
-        CreateCashTransactionDraft(
+        CreateTransactionDraft(
             Timestamp                          timestamp,
             std::vector<TransactionEntryDraft> entries,
             std::optional<std::string>         comment
@@ -81,35 +104,75 @@ namespace drafts
     };
 
     /**
-     * @brief A draft representation of a transaction overview, this is used to
-     * display a summary of a transaction in the UI, and contains the necessary
-     * information to provide an overview of the transaction without needing to
-     * load the full transaction details.
+     * @brief A draft representation of a transaction
+     *
+     */
+    class CreateCashTransactionDraft : public CreateTransactionDraft
+    {
+       public:
+        using CreateTransactionDraft::CreateTransactionDraft;
+    };
+
+    class CreateStockTransactionDraft : public CreateTransactionDraft
+    {
+       private:
+        std::vector<TradeLegDraft> _legs;
+
+       public:
+        CreateStockTransactionDraft(
+            Timestamp                          timestamp,
+            std::vector<TransactionEntryDraft> entries,
+            std::vector<TradeLegDraft>         legs,
+            std::optional<std::string>         comment
+        );
+
+        [[nodiscard]] const std::vector<TradeLegDraft>& getLegs() const;
+
+        [[nodiscard]] std::vector<TradeLegDraft>& getLegs();
+    };
+
+    /**
+     * @brief A draft representation of a transaction overview, this is used
+     * to display a summary of a transaction in the UI, and contains the
+     * necessary information to provide an overview of the transaction
+     * without needing to load the full transaction details.
      *
      */
     class TransactionOverviewDraft
     {
        private:
+        TransactionDataType _type;
+
         /// The timestamp of the transaction
         Timestamp _timestamp;
 
         /// The entries of the transaction
         std::vector<TransactionEntryDraft> _entries;
 
+        /// The legs of the transaction
+        std::vector<TradeLegDraft> _legs;
+
         /// An optional comment associated with the transaction
         std::optional<std::string> _comment;
 
        public:
         explicit TransactionOverviewDraft(
+            TransactionDataType                type,
             Timestamp                          timestamp,
             std::vector<TransactionEntryDraft> entries,
+            std::vector<TradeLegDraft>         legs,
             std::optional<std::string>         comment
         );
+
+        [[nodiscard]] TransactionDataType getType() const;
 
         [[nodiscard]] const Timestamp& getTimestamp() const;
 
         [[nodiscard]]
         const std::vector<TransactionEntryDraft>& getEntries() const;
+
+        [[nodiscard]]
+        const std::vector<TradeLegDraft>& getLegs() const;
 
         [[nodiscard]] const std::optional<std::string>& getComment() const;
     };

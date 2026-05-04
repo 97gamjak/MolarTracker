@@ -13,6 +13,8 @@ using SecurityId = StrongId<SecurityTag>;
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
 
+using InstrumentIdSeq = IdSequence<InstrumentId>;
+
 struct StockTag {};
 using StockId = StrongId<StockTag>;
 

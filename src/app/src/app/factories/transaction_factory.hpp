@@ -5,12 +5,14 @@
 
 namespace finance
 {
-    class Transaction;
-    class TransactionEntry;
+    class Transaction;        // forward declaration
+    class TransactionEntry;   // forward declaration
+    class TradeLeg;           // forward declaration
 }   // namespace finance
 
 struct TransactionRow;        // forward declaration
 struct TransactionEntryRow;   // forward declaration
+struct TradeLegRow;           // forward declaration
 
 namespace app
 {
@@ -39,6 +41,15 @@ namespace app
         static finance::TransactionEntry fromEntryRow(
             const TransactionEntryRow& row
         );
+
+        [[nodiscard]]
+        static TradeLegRow toLegRow(
+            const finance::TradeLeg& leg,
+            TransactionId            transactionId
+        );
+
+        [[nodiscard]]
+        static finance::TradeLeg fromLegRow(const TradeLegRow& row);
     };
 
 }   // namespace app

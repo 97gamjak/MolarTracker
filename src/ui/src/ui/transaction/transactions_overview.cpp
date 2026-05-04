@@ -1,9 +1,14 @@
 #include "ui/transaction/transactions_overview.hpp"
 
+#include <qabstractitemmodel.h>
 #include <qboxlayout.h>
 #include <qheaderview.h>
 #include <qlineedit.h>
+#include <qsortfilterproxymodel.h>
+#include <qtableview.h>
 
+#include "ui/transaction/cash_transaction_table.hpp"
+#include "ui/transaction/stock_transaction_table.hpp"
 #include "ui/transaction/transaction_table.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -18,13 +23,20 @@ namespace ui
      */
     TransactionsOverview::TransactionsOverview(QWidget* parent)
         : QWidget(parent),
-          _model(utils::makeQChild<TransactionTableModel>(this)),
-          _proxy(utils::makeQChild<QSortFilterProxyModel>(this)),
-          _table(utils::makeQChild<QTableView>(this))
+          _cashModel(utils::makeQChild<CashTransactionTableModel>(this)),
+          _stockModel(utils::makeQChild<StockTransactionTableModel>(this)),
+          _cashProxy(utils::makeQChild<QSortFilterProxyModel>(this)),
+          _stockProxy(utils::makeQChild<QSortFilterProxyModel>(this)),
+          _cashTable(utils::makeQChild<QTableView>(this)),
+          _stockTable(utils::makeQChild<QTableView>(this))
     {
-        _proxy->setSourceModel(_model);
-        _proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-        _proxy->setFilterKeyColumn(-1);   // search all columns
+        _cashProxy->setSourceModel(_cashModel);
+        _cashProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        _cashProxy->setFilterKeyColumn(-1);   // search all columns
+
+        _stockProxy->setSourceModel(_stockModel);
+        _stockProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        _stockProxy->setFilterKeyColumn(-1);   // search all columns
 
         auto* search = utils::makeQChild<QLineEdit>(this);
         search->setPlaceholderText("Search transactions…");
@@ -32,15 +44,24 @@ namespace ui
         connect(
             search,
             &QLineEdit::textChanged,
-            _proxy,
+            _cashProxy,
             &QSortFilterProxyModel::setFilterFixedString
         );
 
-        _setupTable();
+        connect(
+            search,
+            &QLineEdit::textChanged,
+            _stockProxy,
+            &QSortFilterProxyModel::setFilterFixedString
+        );
+
+        _setupTable(_cashTable, _cashProxy, _cashModel);
+        _setupTable(_stockTable, _stockProxy, _stockModel);
 
         auto* layout = utils::makeQChild<QVBoxLayout>(this);
         layout->addWidget(search);
-        layout->addWidget(_table);
+        layout->addWidget(_cashTable);
+        layout->addWidget(_stockTable);
     }
 
     /**
@@ -50,12 +71,14 @@ namespace ui
      * @param accountIdToName
      */
     void TransactionsOverview::refresh(
-        const std::vector<drafts::TransactionOverviewDraft>& transactions,
+        const std::vector<drafts::TransactionOverviewDraft>& cashTransactions,
+        const std::vector<drafts::TransactionOverviewDraft>& stockTransactions,
         const std::unordered_map<AccountId, std::string, AccountId::Hash>&
             accountIdToName
     )
     {
-        _model->setTransactions(transactions, accountIdToName);
+        _cashModel->setTransactions(cashTransactions, accountIdToName);
+        _stockModel->setTransactions(stockTransactions, accountIdToName);
     }
 
     /**
@@ -66,17 +89,21 @@ namespace ui
      * for the user.
      *
      */
-    void TransactionsOverview::_setupTable()
+    void TransactionsOverview::_setupTable(
+        QTableView*            table,
+        QSortFilterProxyModel* proxy,
+        TransactionTableModel* model
+    )
     {
-        _table->setModel(_proxy);
-        _table->setSortingEnabled(true);
-        _table->setSelectionBehavior(QAbstractItemView::SelectRows);
-        _table->setSelectionMode(QAbstractItemView::SingleSelection);
-        _table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        _table->setAlternatingRowColors(true);
-        _table->verticalHeader()->hide();
+        table->setModel(proxy);
+        table->setSortingEnabled(true);
+        table->setSelectionBehavior(QAbstractItemView::SelectRows);
+        table->setSelectionMode(QAbstractItemView::SingleSelection);
+        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        table->setAlternatingRowColors(true);
+        table->verticalHeader()->hide();
 
-        auto* header = _table->horizontalHeader();
+        auto* header = table->horizontalHeader();
         header->setStretchLastSection(false);
         header->setSectionResizeMode(
 
@@ -88,16 +115,13 @@ namespace ui
 
         // description takes remaining space
         header->setSectionResizeMode(
-            TransactionTableModel::getDescriptionIndex(),
+            model->getDescriptionIndex(),
             QHeaderView::Stretch
         );
 
         header->setSortIndicatorShown(true);
 
         // sensible default sort: newest first
-        _table->sortByColumn(
-            TransactionTableModel::getDateIndex(),
-            Qt::DescendingOrder
-        );
+        table->sortByColumn(model->getDateIndex(), Qt::DescendingOrder);
     }
 }   // namespace ui

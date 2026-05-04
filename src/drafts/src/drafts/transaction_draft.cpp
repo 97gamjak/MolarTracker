@@ -2,10 +2,42 @@
 
 #include <utility>
 
+#include "config/id_types.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
 {
+
+    TradeLegDraft::TradeLegDraft(
+        AccountId     accountId,
+        finance::Cash unitPrice,
+        Quantity      quantity,
+        std::string   ticker
+    )
+        : _accountId(accountId),
+          _unitPrice(unitPrice),
+          _quantity(quantity),
+          _ticker(std::move(ticker))
+    {
+    }
+
+    AccountId TradeLegDraft::getAccountId() const { return _accountId; }
+
+    finance::Cash TradeLegDraft::getUnitPrice() const { return _unitPrice; }
+
+    Quantity TradeLegDraft::getQuantity() const { return _quantity; }
+
+    const std::string& TradeLegDraft::getTicker() const { return _ticker; }
+
+    InstrumentId TradeLegDraft::getInstrumentId() const
+    {
+        return _instrumentId;
+    }
+
+    void TradeLegDraft::setInstrumentId(InstrumentId instrumentId)
+    {
+        _instrumentId = instrumentId;
+    }
 
     /**
      * @brief Create a Cash Transaction Draft:: Create Cash Transaction Draft
@@ -15,7 +47,7 @@ namespace drafts
      * @param entries
      * @param comment
      */
-    CreateCashTransactionDraft::CreateCashTransactionDraft(
+    CreateTransactionDraft::CreateTransactionDraft(
         Timestamp                          timestamp,
         std::vector<TransactionEntryDraft> entries,
         std::optional<std::string>         comment
@@ -32,7 +64,7 @@ namespace drafts
      * @return const std::vector<TransactionEntryDraft>& The entries of the cash
      * transaction draft.
      */
-    const std::vector<TransactionEntryDraft>& CreateCashTransactionDraft::
+    const std::vector<TransactionEntryDraft>& CreateTransactionDraft::
         getEntries() const
     {
         return _entries;
@@ -43,7 +75,7 @@ namespace drafts
      *
      * @return const Timestamp& The timestamp of the cash transaction draft.
      */
-    const Timestamp& CreateCashTransactionDraft::getTimestamp() const
+    const Timestamp& CreateTransactionDraft::getTimestamp() const
     {
         return _timestamp;
     }
@@ -54,8 +86,7 @@ namespace drafts
      * @return const std::optional<std::string>& The comment of the cash
      * transaction draft.
      */
-    const std::optional<std::string>& CreateCashTransactionDraft::getComment(
-    ) const
+    const std::optional<std::string>& CreateTransactionDraft::getComment() const
     {
         return _comment;
     }
@@ -66,11 +97,35 @@ namespace drafts
      * @param entry The TransactionEntryDraft to add to the cash transaction
      * draft.
      */
-    void CreateCashTransactionDraft::addEntry(
-        const TransactionEntryDraft& entry
-    )
+    void CreateTransactionDraft::addEntry(const TransactionEntryDraft& entry)
     {
         _entries.push_back(entry);
+    }
+
+    CreateStockTransactionDraft::CreateStockTransactionDraft(
+        Timestamp                          timestamp,
+        std::vector<TransactionEntryDraft> entries,
+        std::vector<TradeLegDraft>         legs,
+        std::optional<std::string>         comment
+    )
+        : CreateTransactionDraft(
+              timestamp,
+              std::move(entries),
+              std::move(comment)
+          ),
+          _legs(std::move(legs))
+    {
+    }
+
+    const std::vector<TradeLegDraft>& CreateStockTransactionDraft::getLegs(
+    ) const
+    {
+        return _legs;
+    }
+
+    std::vector<TradeLegDraft>& CreateStockTransactionDraft::getLegs()
+    {
+        return _legs;
     }
 
     /**
@@ -136,14 +191,23 @@ namespace drafts
      * @param comment
      */
     TransactionOverviewDraft::TransactionOverviewDraft(
+        TransactionDataType                type,
         Timestamp                          timestamp,
         std::vector<TransactionEntryDraft> entries,
+        std::vector<TradeLegDraft>         legs,
         std::optional<std::string>         comment
     )
-        : _timestamp(timestamp),
+        : _type(type),
+          _timestamp(timestamp),
           _entries(std::move(entries)),
+          _legs(std::move(legs)),
           _comment(std::move(comment))
     {
+    }
+
+    TransactionDataType TransactionOverviewDraft::getType() const
+    {
+        return _type;
     }
 
     /**
@@ -166,6 +230,11 @@ namespace drafts
         getEntries() const
     {
         return _entries;
+    }
+
+    const std::vector<TradeLegDraft>& TransactionOverviewDraft::getLegs() const
+    {
+        return _legs;
     }
 
     /**

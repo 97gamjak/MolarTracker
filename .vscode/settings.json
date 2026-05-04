@@ -131,15 +131,18 @@
         "MOLTRACK",
         "MSTD",
         "NOMINMAX",
+        "remappings",
         "unpolish"
     ],
     "files.watcherExclude": {
         "**/.build/**": true,
-        "**/.cache/**": true
+        "**/.cache/**": true,
+        "/home/jag/Qt/6.8.3/**/": true
     },
     "files.exclude": {
         "**/.build": true,
-        "**/.cache": true
+        "**/.cache": true,
+        "/home/jag/Qt/6.8.3/**/": true
     },
     "workbench.editor.enablePreview": false,
     "workbench.editor.enablePreviewFromQuickOpen": false,

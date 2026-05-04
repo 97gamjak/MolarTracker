@@ -98,7 +98,7 @@ namespace orm
         template <db_model Model>
         [[nodiscard]] std::vector<Model> get(db::Database& database);
 
-        template <db_model... Models>
+        template <typename... Models>
         std::vector<std::tuple<Models...>> getJoined(
             db::Database&     database,
             const orm::Joins& joins,

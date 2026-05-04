@@ -4,10 +4,13 @@
 
 #include "app/services_api/i_transaction_service.hpp"
 #include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
 
 namespace app
 {
@@ -19,15 +22,22 @@ namespace app
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<ITransactionService>& transactionService,
-        const AccountStore&                         accountStore
+        AccountStore&                               accountStore,
+        StockStore&                                 stockStore
     )
         : _transactionService(transactionService)
     {
-        _accountIdRemapConnection = accountStore.subscribeToIdRemap(
+        _connections.add(accountStore.subscribeToIdRemap(
             [this](const AccountStore::IdMap& remap)
             { _onAccountIdRemap(remap); },
             this
-        );
+        ));
+
+        _connections.add(stockStore.subscribeToInstrumentIdRemap(
+            [this](const StockStore::InstrumentIdMap& remap)
+            { _onInstrumentIdRemap(remap); },
+            this
+        ));
     }
 
     /**
@@ -90,14 +100,17 @@ namespace app
         finance::Transaction transaction
     )
     {
+        LOG_ENTRY;
+
         const auto cash = transaction.calculateTotalSum();
 
         if (!cash.isZero())
         {
             LOG_ERROR(
                 std::format(
-                    "Transaction sum is not zero, cannot add transaction "
-                    "draft"
+                    "Transaction sum is not zero (={}), cannot add transaction "
+                    "draft",
+                    cash.toString()
                 )
             );
             return TransactionStoreResult::TransactionSumNotZero;
@@ -210,6 +223,76 @@ namespace app
 
             if (modified)
                 _updateEntry(transaction, StoreState::New);
+        }
+    }
+
+    void TransactionStore::_onInstrumentIdRemap(
+        const StockStore::InstrumentIdMap& remap
+    )
+    {
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the remapped
+                // ID
+                switch (entry.value.getType())
+                {
+                    case TransactionDataType::Trade:
+                    {
+                        const auto data =
+                            std::get<finance::TradeData>(entry.value.getData());
+
+                        const auto references = std::ranges::any_of(
+                            data.getLegs(),
+                            [&remap](const auto& leg)
+                            { return remap.contains(leg.getInstrumentId()); }
+                        );
+
+                        if (references)
+                        {
+                            throw std::runtime_error(
+                                "Instrument ID found in already committed "
+                                "transaction "
+                                "entry!"
+                            );
+                        }
+                        break;
+                    }
+                    case TransactionDataType::Cash:
+                        break;
+                }
+
+                continue;
+            }
+
+            switch (entry.value.getType())
+            {
+                case TransactionDataType::Trade:
+                {
+                    auto transaction = entry.value;
+                    auto data =
+                        std::get<finance::TradeData>(transaction.getData());
+
+                    bool modified = false;
+
+                    for (auto& leg : data.getLegs())
+                    {
+                        if (const auto it = remap.find(leg.getInstrumentId());
+                            it != remap.end())
+                        {
+                            leg.setInstrumentId(it->second);
+                            modified = true;
+                        }
+                    }
+
+                    if (modified)
+                        _updateEntry(transaction, StoreState::New);
+                    break;
+                }
+                case TransactionDataType::Cash:
+                    break;
+            }
         }
     }
 

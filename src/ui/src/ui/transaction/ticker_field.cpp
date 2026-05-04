@@ -76,17 +76,18 @@ namespace ui
      * the available tickers, allowing the owning dialog to determine which
      * ticker the user has selected for creating a transaction.
      *
-     * @return std::optional<QString> The currently selected ticker symbol, or
-     * std::nullopt if the text in the line edit does not match any available
+     * @return std::optional<std::string> The currently selected ticker symbol,
+     * or std::nullopt if the text in the line edit does not match any available
      * tickers.
      */
-    std::optional<QString> TickerField::selected() const
+    std::optional<std::string> TickerField::getTicker() const
     {
         const auto text = _lineEdit->text().trimmed();
 
         const auto it = std::ranges::find(_tickers, text);
 
-        return it != _tickers.end() ? std::optional{*it} : std::nullopt;
+        return it != _tickers.end() ? std::optional{it->toStdString()}
+                                    : std::nullopt;
     }
 
     /**
@@ -120,10 +121,10 @@ namespace ui
             return;
 
         // clear selection if the user edited away from a valid ticker
-        if (!selected().has_value())
+        if (!getTicker().has_value())
             return;
 
-        emit tickerSelected(*selected());
+        emit tickerSelected(getTicker().value());
     }
 
     /**
@@ -139,7 +140,7 @@ namespace ui
     void TickerField::_onActivated(const QString& ticker)
     {
         _lineEdit->setText(ticker);
-        emit tickerSelected(ticker);
+        emit tickerSelected(ticker.toStdString());
     }
 
     /**
@@ -193,5 +194,7 @@ namespace ui
         _lineEdit->setText(ticker);
         _rebuildCompleter();
     }
+
+    bool TickerField::isValid() const { return getTicker().has_value(); }
 
 }   // namespace ui

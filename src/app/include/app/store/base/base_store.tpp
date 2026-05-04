@@ -195,17 +195,9 @@ namespace app
      * @return IdType
      */
     template <typename T, typename IdType>
-    IdType BaseStore<T, IdType>::_generateNewId() const
+    IdType BaseStore<T, IdType>::_generateNewId()
     {
-        IdType newId{0};
-        while (std::ranges::any_of(
-            _entries,
-            [&newId](const auto& entry) { return getId(entry.value) == newId; }
-        ))
-        {
-            newId = IdType{newId.value() + 1};
-        }
-        return newId;
+        return _idSequence.next();
     }
 
     /**
@@ -242,6 +234,8 @@ namespace app
     {
         for (const auto& item : value)
             _entries.push_back(Entry{item, StoreState::Clean});
+
+        this->template notify<StoreChanged<IdType>>();
     }
 
     /**
@@ -459,6 +453,7 @@ namespace app
     void BaseStore<T, IdType>::_notifyIdRemap()
     {
         this->template notify<OnIdRemap<IdType>>(_idRemap);
+        this->template notify<StoreChanged<IdType>>();
         _idRemap.clear();
     }
 
@@ -472,6 +467,7 @@ namespace app
     void BaseStore<T, IdType>::_notifyUpdated()
     {
         this->template notify<OnStoreItemUpdated<T>>(_updated);
+        this->template notify<StoreChanged<IdType>>();
         _updated.clear();
     }
 
@@ -485,6 +481,7 @@ namespace app
     void BaseStore<T, IdType>::_notifyAdded()
     {
         this->template notify<OnStoreItemAdded<T>>(_added);
+        this->template notify<StoreChanged<IdType>>();
         _added.clear();
     }
 
@@ -498,6 +495,7 @@ namespace app
     void BaseStore<T, IdType>::_notifyRemoved()
     {
         this->template notify<OnStoreItemRemoved<IdType>>(_removed);
+        this->template notify<StoreChanged<IdType>>();
         _removed.clear();
     }
 

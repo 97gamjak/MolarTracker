@@ -19,8 +19,12 @@ namespace app
      *
      * @param instrumentService
      */
-    StockStore::StockStore(InstrumentServicePtr instrumentService)
-        : _instrumentService(std::move(instrumentService))
+    StockStore::StockStore(
+        InstrumentServicePtr instrumentService,
+        InstrumentIdSeq&     instrumentIdSeq
+    )
+        : _instrumentService(std::move(instrumentService)),
+          _instrumentIdSeq(instrumentIdSeq)
     {
     }
 
@@ -49,6 +53,7 @@ namespace app
             return StockStoreResult::StockAlreadyExists;
         }
 
+        stock.setInstrumentId(_instrumentIdSeq.next());
         _addEntry(std::move(stock));
 
         return StockStoreResult::Ok;
@@ -115,6 +120,9 @@ namespace app
      */
     void StockStore::commit()
     {
+        LOG_ENTRY;
+
+        InstrumentIdMap map{};
         for (const auto& entry : _getEntries())
         {
             switch (entry.state)
@@ -140,6 +148,9 @@ namespace app
                         );
                     }
 
+                    if (entry.value.getInstrumentId() != instrumentId)
+                        map[entry.value.getInstrumentId()] = instrumentId;
+
                     break;
                 }
                 case StoreState::Modified:
@@ -158,6 +169,7 @@ namespace app
         }
 
         _notifyOnCommit();
+        _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
     }
 
     /**
@@ -173,6 +185,56 @@ namespace app
             tickers.push_back(stock.getTicker());
 
         return tickers;
+    }
+
+    std::unordered_map<std::string, InstrumentId> StockStore::getTickerMap(
+    ) const
+    {
+        std::unordered_map<std::string, InstrumentId> tickerMap;
+
+        for (const auto& stock : getStocks())
+            tickerMap[stock.getTicker()] = stock.getInstrumentId();
+
+        return tickerMap;
+    }
+
+    std::unordered_map<InstrumentId, std::string, typename InstrumentId::Hash> StockStore::
+        getInstrumentIdToNameMap() const
+    {
+        std::unordered_map<
+            InstrumentId,
+            std::string,
+            typename InstrumentId::Hash>
+            map;
+
+        for (const auto& stock : getStocks())
+            map[stock.getInstrumentId()] = stock.getTicker();
+
+        return map;
+    }
+
+    std::optional<InstrumentId> StockStore::getInstrumentId(
+        const std::string& ticker
+    ) const
+    {
+        for (const auto& stock : getStocks())
+        {
+            if (stock.getTicker() == ticker)
+                return stock.getInstrumentId();
+        }
+
+        return std::nullopt;
+    }
+
+    Connection StockStore::subscribeToInstrumentIdRemap(
+        OnIdRemap<InstrumentId>::func func,
+        void*                         userData
+    )
+    {
+        return _onInstrumentIdRemap.on<OnIdRemap<InstrumentId>>(
+            std::move(func),
+            userData
+        );
     }
 
 }   // namespace app

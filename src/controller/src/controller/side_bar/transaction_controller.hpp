@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QPointer>
 
+#include "connections/connection.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace app
@@ -30,7 +31,8 @@ namespace ui
 
 namespace drafts
 {
-    class CreateCashTransactionDraft;   // Forward declaration
+    class CreateCashTransactionDraft;    // Forward declaration
+    class CreateStockTransactionDraft;   // Forward declaration
 }   // namespace drafts
 
 class QMainWindow;   // Forward declaration
@@ -70,6 +72,8 @@ namespace controller
         /// Pointer to the main window
         QMainWindow* _mainWindow;
 
+        Connections _connections;
+
        public:
         TransactionSideBarController(
             cmd::UndoStack&              undoStack,
@@ -93,6 +97,10 @@ namespace controller
        private:
         void _onCreateCashTransactionRequested(
             drafts::CreateCashTransactionDraft draft
+        );
+
+        void _onCreateStockTransactionRequested(
+            drafts::CreateStockTransactionDraft draft
         );
 
         void _onCreateTickerRequested(const std::string& ticker);

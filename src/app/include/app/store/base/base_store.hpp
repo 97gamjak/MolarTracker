@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "config/signal_tags.hpp"
+#include "config/strong_id.hpp"
 #include "connections/observable.hpp"
 #include "filter/predicate.hpp"
 #include "i_store.hpp"
@@ -97,7 +98,8 @@ namespace app
                           OnStoreItemAdded<T>,
                           OnStoreItemUpdated<T>,
                           OnStoreItemRemoved<IdType>,
-                          OnIdRemap<IdType>>
+                          OnIdRemap<IdType>,
+                          StoreChanged<IdType>>
 
     {
        public:
@@ -107,7 +109,8 @@ namespace app
             OnStoreItemAdded<T>,
             OnStoreItemUpdated<T>,
             OnStoreItemRemoved<IdType>,
-            OnIdRemap<IdType>>;
+            OnIdRemap<IdType>,
+            StoreChanged<IdType>>;
 
         /// Type alias for filter options used when querying entries in the
         /// store.
@@ -137,6 +140,8 @@ namespace app
         /// Vector for tracking removed entry IDs
         std::vector<IdType> _removed;
 
+        IdSequence<IdType> _idSequence;
+
        public:
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
@@ -151,7 +156,12 @@ namespace app
         [[nodiscard]] Connection subscribeToIdRemap(
             OnIdRemap<IdType>::func func,
             void*                   user
-        ) const;
+        );
+
+        [[nodiscard]] Connection subscribeToStoreChange(
+            StoreChanged<IdType>::func func,
+            void*                      user
+        );
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
@@ -187,7 +197,7 @@ namespace app
         Entry* _findEntry(IdType id);
 
         void                 _markPotentiallyDirty();
-        [[nodiscard]] IdType _generateNewId() const;
+        [[nodiscard]] IdType _generateNewId();
 
         void _notifyIdRemap();
         void _notifyUpdated();

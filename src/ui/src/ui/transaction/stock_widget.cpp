@@ -6,11 +6,14 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 
-#include "config/constants.hpp"
+#include "drafts/transaction_draft.hpp"
+#include "finance/cash.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
+#include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/ticker_field.hpp"
+#include "ui/transaction/timestamp_field.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -46,6 +49,8 @@ namespace ui
           _currencyLabel(makeQChild<QLabel>(this)),
           _addButton(makeQChild<QPushButton>("Add Transaction", this)),
           _tickerField(makeQChild<TickerField>(std::move(tickers), this)),
+          _timestampField(makeQChild<TimestampField>(this)),
+          _commentField(makeQChild<CommentField>(this)),
           _referenceAccounts(referenceAccounts)
     {
         setLayout(_layout);
@@ -53,16 +58,18 @@ namespace ui
         _layout->addRow("Account:", _accountCombo);
         _layout->addRow("Reference Account:", _referenceAccountCombo);
         _layout->addRow("Ticker:", _tickerField);
+        _layout->addRow("Timestamp:", _timestampField);
 
         auto* quantityRowLayout = makeQChild<QHBoxLayout>();
         quantityRowLayout->addWidget(_quantityRow);
         _layout->addRow("Quantity:", quantityRowLayout);
-        _quantityRow->setNDecimalPlaces(Constants::getMicroUnitsPrecision());
+        _quantityRow->setNDecimalPlaces(Quantity::precision);
 
         auto* amountRowLayout = makeQChild<QHBoxLayout>();
         amountRowLayout->addWidget(_priceRow);
         amountRowLayout->addWidget(_currencyLabel);
         _layout->addRow("Stock Price:", amountRowLayout);
+        _layout->addRow("Comment:", _commentField);
 
         _referenceAccountCombo->setEnabled(false);
 
@@ -83,18 +90,7 @@ namespace ui
             this,
             &StockWidget::_onReferenceAccountSelected
         );
-        connect(
-            _priceRow,
-            &AmountRow::validityChanged,
-            this,
-            &StockWidget::_updateAddButton
-        );
-        connect(
-            _priceRow,
-            &AmountRow::valueChanged,
-            this,
-            &StockWidget::_updateAddButton
-        );
+        _connectAddButton();
         connect(
             _tickerField,
             &TickerField::createTickerRequested,
@@ -171,11 +167,12 @@ namespace ui
      */
     void StockWidget::_updateAddButton()
     {
-        const auto isValid =
-            _accountCombo->selected().has_value() &&
-            _referenceAccountCombo->selected().has_value() &&
-            _priceRow->isValid() && _quantityRow->getAmount() != 0 &&
-            _priceRow->getAmount() != 0 && _quantityRow->isValid();
+        const auto isValid = _accountCombo->selected().has_value() &&
+                             _referenceAccountCombo->selected().has_value() &&
+                             _priceRow->isValid() &&
+                             _quantityRow->getAmount() != 0 &&
+                             _priceRow->getAmount() != 0 &&
+                             _quantityRow->isValid() && _tickerField->isValid();
 
         _addButton->setEnabled(isValid);
     }
@@ -192,7 +189,7 @@ namespace ui
      */
     void StockWidget::_emitOk()
     {
-        // emit createStockTransactionRequested(getDraft());
+        emit createStockTransactionRequested(_getDraft());
     }
 
     /**
@@ -216,18 +213,11 @@ namespace ui
         std::vector<drafts::AccountDraft> referenceAccounts
     )
     {
-        _referenceAccountCombo->updateAccounts(std::move(referenceAccounts));
-    }
+        _referenceAccounts = std::move(referenceAccounts);
 
-    /**
-     * @brief Update the list of tickers in the ticker field
-     *
-     * @param tickers The new list of ticker symbols to populate the ticker
-     * field
-     */
-    void StockWidget::updateTickers(const std::vector<std::string>& tickers)
-    {
-        updateTickers(tickers, "");
+        const auto account = _accountCombo->selected();
+        if (account.has_value())
+            _onAccountSelected(account.value());
     }
 
     /**
@@ -237,10 +227,7 @@ namespace ui
      * field
      * @param tickerToSelect The ticker symbol to select in the ticker field
      */
-    void StockWidget::updateTickers(
-        const std::vector<std::string>& tickers,
-        const std::string&              tickerToSelect
-    )
+    void StockWidget::updateTickers(const std::vector<std::string>& tickers)
     {
         std::vector<QString> qTickers;
         qTickers.reserve(tickers.size());
@@ -248,7 +235,6 @@ namespace ui
             qTickers.emplace_back(QString::fromStdString(ticker));
 
         _tickerField->updateTickers(std::move(qTickers));
-        _tickerField->selectTicker(QString::fromStdString(tickerToSelect));
     }
 
     /**
@@ -264,6 +250,69 @@ namespace ui
         _currencyLabel->update();
         _addButton->update();
         _tickerField->update();
+    }
+
+    drafts::CreateStockTransactionDraft StockWidget::_getDraft() const
+    {
+        const auto account = _accountCombo->selected();
+
+        if (!account.has_value() || account.value().id == AccountId::invalid())
+            throw std::runtime_error("No account selected");
+
+        const auto referenceAccount = _referenceAccountCombo->selected();
+
+        if (!referenceAccount.has_value() ||
+            referenceAccount.value().id == AccountId::invalid())
+            throw std::runtime_error("No reference account selected");
+
+        const auto unitPrice =
+            finance::Cash(referenceAccount->currency, _priceRow->getAmount());
+
+        const auto quantity = Quantity{_quantityRow->getAmount()};
+
+        const auto cash = -quantity * unitPrice;
+
+        auto entry = drafts::TransactionEntryDraft{referenceAccount->id, cash};
+
+        const auto ticker = _tickerField->getTicker();
+        if (!ticker.has_value())
+            throw std::runtime_error("No ticker selected");
+
+        auto tradeLeg = drafts::TradeLegDraft{
+            referenceAccount->id,
+            unitPrice,
+            quantity,
+            ticker.value()
+        };
+
+        return {
+            _timestampField->getTimestamp(),
+            {entry},
+            {tradeLeg},
+            _commentField->getComment()
+        };
+    }
+
+    void StockWidget::_connectAddButton()
+    {
+        connect(
+            _priceRow,
+            &AmountRow::validityChanged,
+            this,
+            &StockWidget::_updateAddButton
+        );
+        connect(
+            _priceRow,
+            &AmountRow::valueChanged,
+            this,
+            &StockWidget::_updateAddButton
+        );
+        connect(
+            _tickerField,
+            &TickerField::tickerSelected,
+            this,
+            &StockWidget::_updateAddButton
+        );
     }
 
 }   // namespace ui

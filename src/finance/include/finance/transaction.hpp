@@ -64,11 +64,14 @@ namespace finance
         [[nodiscard]] const std::vector<TransactionEntry>& getEntries() const;
         [[nodiscard]] std::vector<TransactionEntry>&       getEntries();
         [[nodiscard]] TransactionDataType                  getType() const;
+        [[nodiscard]] const TransactionData&               getData() const;
+        [[nodiscard]] TransactionData&                     getData();
 
         [[nodiscard]] Cash calculateTotalSum() const;
 
         void setId(TransactionId id);
         void addEntry(const TransactionEntry& entry);
+        void addLeg(const TradeLeg& leg);
     };
 
 }   // namespace finance

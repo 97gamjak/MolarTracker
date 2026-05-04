@@ -19,8 +19,12 @@ namespace app
     StoreContainer::StoreContainer(ServiceContainer& services)
         : _profileStore{services.getProfileService()},
           _accountStore{services.getAccountService()},
-          _transactionStore{services.getTransactionService(), _accountStore},
-          _stockStore{services.getInstrumentService()}
+          _stockStore{services.getInstrumentService(), _instrumentIdSeq},
+          _transactionStore{
+              services.getTransactionService(),
+              _accountStore,
+              _stockStore
+          }
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);

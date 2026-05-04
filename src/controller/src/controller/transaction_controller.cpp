@@ -3,7 +3,9 @@
 #include <qstackedwidget.h>
 
 #include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
+#include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "ui/transaction/transactions_overview.hpp"
 
@@ -23,11 +25,13 @@ namespace controller
         cmd::UndoStack&        undoStack,
         app::TransactionStore& transactionStore,
         app::AccountStore&     accountStore,
+        app::StockStore&       stockStore,
         QStackedWidget*        stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),
           _accountStore(accountStore),
+          _stockStore(stockStore),
           _stackedWidget(stackedWidget),
           _transactionDetailView(new ui::TransactionsOverview(_stackedWidget))
     {
@@ -73,11 +77,30 @@ namespace controller
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
         const auto transactions = _transactionStore.getTransactions();
-        const auto drafts =
-            drafts::TransactionMapper::toOverviewDrafts(transactions);
+        const auto drafts       = drafts::TransactionMapper::toOverviewDrafts(
+            transactions,
+            _stockStore.getInstrumentIdToNameMap()
+        );
+
+        std::vector<drafts::TransactionOverviewDraft> cashDrafts;
+        std::vector<drafts::TransactionOverviewDraft> stockDrafts;
+
+        for (const auto& draft : drafts)
+        {
+            switch (draft.getType())
+            {
+                case TransactionDataType::Cash:
+                    cashDrafts.push_back(draft);
+                    break;
+                case TransactionDataType::Trade:
+                    stockDrafts.push_back(draft);
+                    break;
+            }
+        }
 
         _transactionDetailView->refresh(
-            drafts,
+            cashDrafts,
+            stockDrafts,
             _accountStore.getAccountIdToNameMap()
         );
     }

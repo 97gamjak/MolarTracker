@@ -116,6 +116,19 @@ namespace finance
         return Cash(cash._currency, -cash._amount);
     }
 
+    Cash operator*(const Cash& cash, const Quantity& multiplier)
+    {
+        return Cash(
+            cash._currency,
+            mulDiv(cash._amount, multiplier.value, Quantity::factor)
+        );
+    }
+
+    Cash operator*(const Quantity& multiplier, const Cash& cash)
+    {
+        return cash * multiplier;
+    }
+
     /**
      * @brief Compound addition assignment operator for Cash
      *

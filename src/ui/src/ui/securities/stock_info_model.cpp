@@ -19,7 +19,7 @@ namespace ui
     X(AssetClass)
 
     // cppcheck-suppress unknownMacro
-    MSTD_ENUM(Column, std::uint8_t, STOCK_INFO_MODEL_COLUMNS)
+    MSTD_ENUM(StockColumn, std::uint8_t, STOCK_INFO_MODEL_COLUMNS)
 
     /**
      * @brief Construct a new Stock Info Table Model:: Stock Info Table Model
@@ -98,7 +98,7 @@ namespace ui
         if (parent.isValid())
             return 0;
 
-        return static_cast<int>(ColumnMeta::size);
+        return static_cast<int>(StockColumnMeta::size);
     }
 
     /**
@@ -114,27 +114,27 @@ namespace ui
             return {};
 
         const auto& row = _rows[static_cast<size_t>(index.row())];
-        const auto  col = static_cast<Column>(index.column());
+        const auto  col = static_cast<StockColumn>(index.column());
 
         if (role == Qt::DisplayRole)
         {
             switch (col)
             {
-                case Column::Ticker:
+                case StockColumn::Ticker:
                     return QString::fromStdString(row.getTicker());
-                case Column::Name:
+                case StockColumn::Name:
                     return QString::fromStdString(row.getShortName());
-                case Column::Exchange:
+                case StockColumn::Exchange:
                     return QString::fromStdString(row.getExchange());
-                case Column::Currency:
+                case StockColumn::Currency:
                     return QString::fromStdString(
                         CurrencyMeta::toString(row.getCurrency())
                     );
-                case Column::Industry:
+                case StockColumn::Industry:
                     return QString::fromStdString(row.getIndustry());
-                case Column::Sector:
+                case StockColumn::Sector:
                     return QString::fromStdString(row.getSector());
-                case Column::AssetClass:
+                case StockColumn::AssetClass:
                     return QString::fromStdString(
                         finance::toString(row.getAssetClass())
                     );
@@ -167,7 +167,7 @@ namespace ui
             return {};
 
         return QString::fromStdString(
-            ColumnMeta::toString(static_cast<Column>(section))
+            StockColumnMeta::toString(static_cast<StockColumn>(section))
         );
     }
 
@@ -178,7 +178,7 @@ namespace ui
      */
     int StockInfoTableModel::getTickerColumn()
     {
-        return static_cast<int>(Column::Ticker);
+        return static_cast<int>(StockColumn::Ticker);
     }
 
     /**

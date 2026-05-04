@@ -13,12 +13,19 @@ class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
 class QPushButton;   // Forward declaration
 
+namespace drafts
+{
+    class CreateStockTransactionDraft;   // Forward declaration
+}   // namespace drafts
+
 namespace ui
 {
 
-    class AccountCombo;   // Forward declaration
-    class AmountRow;      // Forward declaration
-    class TickerField;    // Forward declaration
+    class AccountCombo;     // Forward declaration
+    class AmountRow;        // Forward declaration
+    class TickerField;      // Forward declaration
+    class TimestampField;   // Forward declaration
+    class CommentField;     // Forward declaration
 
     /**
      * @brief Widget for creating a stock transaction
@@ -55,6 +62,12 @@ namespace ui
         /// The field for entering the stock ticker
         TickerField* _tickerField;
 
+        /// The field for entering the timestamp of the transaction
+        TimestampField* _timestampField;
+
+        /// The field for entering a comment about the transaction
+        CommentField* _commentField;
+
         /// The list of reference accounts
         std::vector<drafts::AccountDraft> _referenceAccounts;
 
@@ -71,10 +84,6 @@ namespace ui
             std::vector<drafts::AccountDraft> referenceAccounts
         );
         void updateTickers(const std::vector<std::string>& tickers);
-        void updateTickers(
-            const std::vector<std::string>& tickers,
-            const std::string&              tickerToSelect
-        );
         void refresh();
 
        signals:
@@ -85,11 +94,20 @@ namespace ui
          */
         void createTickerRequested(const std::string& ticker);
 
+        void createStockTransactionRequested(
+            const drafts::CreateStockTransactionDraft& draft
+        );
+
        private:
         void _onAccountSelected(const drafts::AccountDraft& account);
         void _onReferenceAccountSelected(const drafts::AccountDraft& account);
         void _updateAddButton();
         void _emitOk();
+
+        [[nodiscard]]
+        drafts::CreateStockTransactionDraft _getDraft() const;
+
+        void _connectAddButton();
     };
 
 }   // namespace ui

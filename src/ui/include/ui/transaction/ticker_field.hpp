@@ -49,10 +49,12 @@ namespace ui
 
         void addTicker(QString ticker);
 
-        [[nodiscard]] std::optional<QString> selected() const;
-
         void updateTickers(std::vector<QString> tickers);
         void selectTicker(const QString& ticker);
+
+        [[nodiscard]] std::optional<std::string> getTicker() const;
+
+        [[nodiscard]] bool isValid() const;
 
        signals:
         /**
@@ -60,7 +62,7 @@ namespace ui
          *
          * @param ticker The selected ticker symbol
          */
-        void tickerSelected(QString ticker);
+        void tickerSelected(std::string ticker);
 
         /**
          * @brief Emitted when the user clicks the "+" button to create a
