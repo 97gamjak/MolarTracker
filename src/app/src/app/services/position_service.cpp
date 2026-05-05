@@ -1,5 +1,6 @@
 #include "position_service.hpp"
 
+#include "app/repos_api/i_position_repo.hpp"
 #include "finance/position.hpp"
 
 namespace app
@@ -10,7 +11,7 @@ namespace app
      * @param positionRepo
      */
     PositionService::PositionService(
-        std::shared_ptr<IPositionService> positionRepo
+        std::shared_ptr<IPositionRepo> positionRepo
     )
         : _positionRepo(std::move(positionRepo))
     {

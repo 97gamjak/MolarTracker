@@ -7,6 +7,7 @@
 
 namespace app
 {
+    class IPositionRepo;   // Forward declaration
 
     /**
      * @brief Position Service Implementation
@@ -16,12 +17,10 @@ namespace app
     {
        private:
         /// reference to the position repository
-        std::shared_ptr<IPositionService> _positionRepo;
+        std::shared_ptr<IPositionRepo> _positionRepo;
 
        public:
-        explicit PositionService(
-            std::shared_ptr<IPositionService> positionRepo
-        );
+        explicit PositionService(std::shared_ptr<IPositionRepo> positionRepo);
 
         [[nodiscard]]
         PositionId createPosition(const finance::Position& position) override;

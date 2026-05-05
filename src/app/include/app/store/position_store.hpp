@@ -9,12 +9,13 @@
 
 namespace app
 {
+    class TransactionStore;   // Forward declaration
 
     /**
      * @brief Store for managing Positions
      *
      */
-    class PositionStore : BaseStore<finance::Position, PositionId>
+    class PositionStore : public BaseStore<finance::Position, PositionId>
     {
        private:
         /// The Position service

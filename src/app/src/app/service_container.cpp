@@ -4,6 +4,7 @@
 #include "app/services/instrument_service.hpp"
 #include "app/services/position_service.hpp"
 #include "services/account_service.hpp"
+#include "services/position_service.hpp"
 #include "services/profile_service.hpp"
 #include "services/transaction_service.hpp"
 
