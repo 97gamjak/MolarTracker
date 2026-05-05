@@ -30,10 +30,6 @@ namespace app
      */
     class StockStore : public BaseStore<finance::Stock, StockId>
     {
-       public:
-        using InstrumentIdMap =
-            std::unordered_map<InstrumentId, InstrumentId, InstrumentId::Hash>;
-
        private:
         /// The type of the Instrument service pointer
         using InstrumentServicePtr = std::shared_ptr<IInstrumentService>;
@@ -41,8 +37,10 @@ namespace app
         /// The Instrument service
         InstrumentServicePtr _instrumentService;
 
+        /// The instrument ID sequence
         InstrumentIdSeq& _instrumentIdSeq;
 
+        /// The observable for instrument ID remapping events
         Observable<OnIdRemap<InstrumentId>> _onInstrumentIdRemap;
 
        public:
@@ -70,10 +68,7 @@ namespace app
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
-        std::unordered_map<
-            InstrumentId,
-            std::string,
-            typename InstrumentId::Hash> getInstrumentIdToNameMap() const;
+        instrumentMap<std::string> getInstrumentIdToNameMap() const;
 
         [[nodiscard]]
         bool stockExists(const std::string& ticker, bool checkDeleted) const;

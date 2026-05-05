@@ -225,7 +225,6 @@ namespace ui
      *
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
-     * @param tickerToSelect The ticker symbol to select in the ticker field
      */
     void StockWidget::updateTickers(const std::vector<std::string>& tickers)
     {
@@ -252,6 +251,12 @@ namespace ui
         _tickerField->update();
     }
 
+    /**
+     * @brief Gets the draft for the stock transaction.
+     *
+     * @return drafts::CreateStockTransactionDraft The draft for the stock
+     * transaction.
+     */
     drafts::CreateStockTransactionDraft StockWidget::_getDraft() const
     {
         const auto account = _accountCombo->selected();
@@ -293,6 +298,10 @@ namespace ui
         };
     }
 
+    /**
+     * @brief Connects the add button to the appropriate signals.
+     *
+     */
     void StockWidget::_connectAddButton()
     {
         connect(

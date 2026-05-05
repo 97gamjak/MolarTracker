@@ -67,8 +67,10 @@ namespace ui
     /**
      * @brief Refresh the transactions displayed in the overview
      *
-     * @param transactions
-     * @param accountIdToName
+     * @param cashTransactions The list of cash transactions to display.
+     * @param stockTransactions The list of stock transactions to display.
+     * @param accountIdToName A mapping of account IDs to account names for
+     * display purposes.
      */
     void TransactionsOverview::refresh(
         const std::vector<drafts::TransactionOverviewDraft>& cashTransactions,
@@ -87,6 +89,10 @@ namespace ui
      * setting up sorting, selection behavior, and column resizing to ensure
      * that the transaction data is presented clearly and is easy to navigate
      * for the user.
+     *
+     * @param table The table view to set up.
+     * @param proxy The proxy model to use for filtering.
+     * @param model The model to use for the table view.
      *
      */
     void TransactionsOverview::_setupTable(

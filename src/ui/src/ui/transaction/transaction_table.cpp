@@ -4,11 +4,23 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Transaction Table Model:: Transaction Table Model
+     * object
+     *
+     * @param parent
+     */
     TransactionTableModel::TransactionTableModel(QObject* parent)
         : QAbstractTableModel(parent)
     {
     }
 
+    /**
+     * @brief Sets the transactions for the model.
+     *
+     * @param transactions The transactions to set.
+     * @param accountIdToName The mapping of account IDs to account names.
+     */
     void TransactionTableModel::setTransactions(
         std::vector<drafts::TransactionOverviewDraft> transactions,
         IdToNameMap                                   accountIdToName
@@ -62,6 +74,12 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Gets the mapping of account IDs to account names.
+     *
+     * @return const TransactionTableModel::IdToNameMap& The mapping of account
+     * IDs to account names.
+     */
     const TransactionTableModel::IdToNameMap& TransactionTableModel::
         _getAccountIdToNameMap() const
     {

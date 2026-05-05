@@ -6,7 +6,6 @@
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
-#include "orm/join.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"

@@ -94,6 +94,11 @@ namespace ui
          */
         void createTickerRequested(const std::string& ticker);
 
+        /**
+         * @brief Emitted when a new stock transaction is requested
+         *
+         * @param draft The draft of the stock transaction to create
+         */
         void createStockTransactionRequested(
             const drafts::CreateStockTransactionDraft& draft
         );

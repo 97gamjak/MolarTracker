@@ -212,6 +212,20 @@ namespace controller
         _transactionController.transactionOverviewSelected(false);
     }
 
+    /**
+     * @brief Handle the creation of a new stock transaction, this will be
+     * called when the user submits the create transaction dialog for a stock
+     * transaction, and should handle validating the transaction draft, adding
+     * any necessary additional entries (e.g. for external accounts), and then
+     * adding the transaction to the store. This allows the controller to manage
+     * the process of creating a new stock transaction from the UI, ensuring
+     * that the transaction is properly validated and added to the store with
+     * all necessary information.
+     *
+     * @param draft The draft of the stock transaction to create, this contains
+     * all the necessary information for creating a new stock transaction,
+     * including the timestamp, legs, and any optional comment.
+     */
     void TransactionSideBarController::_onCreateStockTransactionRequested(
         drafts::CreateStockTransactionDraft draft
     )

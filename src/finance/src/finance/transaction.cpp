@@ -131,8 +131,19 @@ namespace finance
         return std::visit(Visitor{}, _data);
     }
 
+    /**
+     * @brief Gets the data associated with the transaction.
+     *
+     * @return const TransactionData& The data of the transaction.
+     */
     const TransactionData& Transaction::getData() const { return _data; }
-    TransactionData&       Transaction::getData() { return _data; }
+
+    /**
+     * @brief Gets the data associated with the transaction.
+     *
+     * @return TransactionData& The data of the transaction.
+     */
+    TransactionData& Transaction::getData() { return _data; }
 
     /**
      * @brief Calculates the total sum of the transaction by summing the cash
@@ -161,6 +172,11 @@ namespace finance
         return total;
     }
 
+    /**
+     * @brief Adds a leg to the transaction.
+     *
+     * @param leg The trade leg to add.
+     */
     void Transaction::addLeg(const TradeLeg& leg)
     {
         struct Visitor

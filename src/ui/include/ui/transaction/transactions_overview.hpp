@@ -31,13 +31,17 @@ namespace ui
 
        private:
         /// The model for the transaction table
-        CashTransactionTableModel*  _cashModel;
+        CashTransactionTableModel* _cashModel;
+        /// The model for the stock transaction table
         StockTransactionTableModel* _stockModel;
         /// The proxy model for sorting and filtering the transaction table
         QSortFilterProxyModel* _cashProxy;
+        /// The proxy model for sorting and filtering the stock transaction
+        /// table
         QSortFilterProxyModel* _stockProxy;
         /// The table view for displaying the transactions
         QTableView* _cashTable;
+        /// The table view for displaying the stock transactions
         QTableView* _stockTable;
 
        public:
@@ -53,7 +57,7 @@ namespace ui
         );
 
        private:
-        void _setupTable(
+        static void _setupTable(
             QTableView*            table,
             QSortFilterProxyModel* proxy,
             TransactionTableModel* model

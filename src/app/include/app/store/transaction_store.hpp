@@ -55,7 +55,7 @@ namespace app
 
        private:
         void _onAccountIdRemap(const AccountStore::IdMap& remap);
-        void _onInstrumentIdRemap(const StockStore::InstrumentIdMap& remap);
+        void _onInstrumentIdRemap(const instrumentMap<InstrumentId>& remap);
     };
 
 }   // namespace app

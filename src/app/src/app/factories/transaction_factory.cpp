@@ -106,6 +106,13 @@ namespace app
         };
     }
 
+    /**
+     * @brief Converts a TradeLeg object to a TradeLegRow object.
+     *
+     * @param leg The TradeLeg object to convert.
+     * @param transactionId The ID of the associated transaction.
+     * @return The converted TradeLegRow object.
+     */
     TradeLegRow TransactionFactory::toLegRow(
         const finance::TradeLeg &leg,
         TransactionId            transactionId
@@ -124,7 +131,12 @@ namespace app
         return row;
     }
 
-    [[nodiscard]]
+    /**
+     * @brief Converts a TradeLegRow object to a TradeLeg object.
+     *
+     * @param row The TradeLegRow object to convert.
+     * @return The converted TradeLeg object.
+     */
     finance::TradeLeg TransactionFactory::fromLegRow(const TradeLegRow &row)
     {
         return {

@@ -15,6 +15,9 @@ using InstrumentId = StrongId<InstrumentTag>;
 
 using InstrumentIdSeq = IdSequence<InstrumentId>;
 
+template <typename T>
+using instrumentMap = unorderedIdMap<InstrumentId, T>;
+
 struct StockTag {};
 using StockId = StrongId<StockTag>;
 

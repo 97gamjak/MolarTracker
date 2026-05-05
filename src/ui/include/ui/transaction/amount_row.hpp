@@ -4,7 +4,7 @@
 
 #include <qwidget.h>
 
-#include "config/finance.hpp"
+#include "config/quantity.hpp"
 
 namespace ui
 {

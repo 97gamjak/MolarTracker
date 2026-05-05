@@ -72,6 +72,7 @@ namespace controller
         /// Pointer to the main window
         QMainWindow* _mainWindow;
 
+        /// Connections for the transaction side bar controller
         Connections _connections;
 
        public:

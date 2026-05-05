@@ -3,6 +3,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
@@ -18,6 +19,9 @@
  */
 struct TradeLegRow : public orm::ORMModel<"trade_leg">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
+
     /// The ID of the trade leg, this is the primary key for the trade_leg table
     ORM_FIELD(id, IdField<TradeLegId>)
 
@@ -100,9 +104,6 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
         unitPrice,
         currency
     )
-
-    [[nodiscard]]
-    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__

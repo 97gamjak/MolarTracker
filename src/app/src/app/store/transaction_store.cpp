@@ -19,6 +19,7 @@ namespace app
      *
      * @param transactionService
      * @param accountStore
+     * @param stockStore
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<ITransactionService>& transactionService,
@@ -34,7 +35,7 @@ namespace app
         ));
 
         _connections.add(stockStore.subscribeToInstrumentIdRemap(
-            [this](const StockStore::InstrumentIdMap& remap)
+            [this](const instrumentMap<InstrumentId>& remap)
             { _onInstrumentIdRemap(remap); },
             this
         ));
@@ -226,8 +227,13 @@ namespace app
         }
     }
 
+    /**
+     * @brief Handle instrument ID remapping for transaction entries
+     *
+     * @param remap The mapping of old instrument IDs to new instrument IDs
+     */
     void TransactionStore::_onInstrumentIdRemap(
-        const StockStore::InstrumentIdMap& remap
+        const instrumentMap<InstrumentId>& remap
     )
     {
         for (const auto& entry : _getEntries())

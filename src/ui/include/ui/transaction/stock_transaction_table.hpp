@@ -6,10 +6,14 @@
 #include "drafts/transaction_draft.hpp"
 #include "ui/transaction/transaction_table.hpp"
 
+// TODO: cleanup includes
 namespace ui
 {
-    enum class Column : std::uint8_t;
 
+    /**
+     * @brief A draft representation of a stock transaction
+     *
+     */
     class StockTransactionTableModel : public TransactionTableModel
     {
         Q_OBJECT

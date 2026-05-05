@@ -140,6 +140,7 @@ namespace app
         /// Vector for tracking removed entry IDs
         std::vector<IdType> _removed;
 
+        /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
 
        public:

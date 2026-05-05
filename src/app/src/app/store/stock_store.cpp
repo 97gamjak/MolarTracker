@@ -18,6 +18,7 @@ namespace app
      * @brief Construct a new Stock Store:: Stock Store object
      *
      * @param instrumentService
+     * @param instrumentIdSeq
      */
     StockStore::StockStore(
         InstrumentServicePtr instrumentService,
@@ -122,7 +123,7 @@ namespace app
     {
         LOG_ENTRY;
 
-        InstrumentIdMap map{};
+        instrumentMap<InstrumentId> map{};
         for (const auto& entry : _getEntries())
         {
             switch (entry.state)
@@ -187,6 +188,11 @@ namespace app
         return tickers;
     }
 
+    /**
+     * @brief Get a mapping of stock tickers to their instrument IDs
+     *
+     * @return std::unordered_map<std::string, InstrumentId>
+     */
     std::unordered_map<std::string, InstrumentId> StockStore::getTickerMap(
     ) const
     {
@@ -198,14 +204,14 @@ namespace app
         return tickerMap;
     }
 
-    std::unordered_map<InstrumentId, std::string, typename InstrumentId::Hash> StockStore::
-        getInstrumentIdToNameMap() const
+    /**
+     * @brief Get a mapping of instrument IDs to their names
+     *
+     * @return instrumentMap<std::string>
+     */
+    instrumentMap<std::string> StockStore::getInstrumentIdToNameMap() const
     {
-        std::unordered_map<
-            InstrumentId,
-            std::string,
-            typename InstrumentId::Hash>
-            map;
+        instrumentMap<std::string> map;
 
         for (const auto& stock : getStocks())
             map[stock.getInstrumentId()] = stock.getTicker();
@@ -213,19 +219,30 @@ namespace app
         return map;
     }
 
+    /**
+     * @brief Get the instrument ID for a given stock ticker
+     *
+     * @param ticker The stock ticker
+     * @return std::optional<InstrumentId>
+     */
     std::optional<InstrumentId> StockStore::getInstrumentId(
         const std::string& ticker
     ) const
     {
         for (const auto& stock : getStocks())
-        {
             if (stock.getTicker() == ticker)
                 return stock.getInstrumentId();
-        }
 
         return std::nullopt;
     }
 
+    /**
+     * @brief Subscribe to instrument ID remapping events
+     *
+     * @param func The callback function to be called on remapping
+     * @param userData User data to be passed to the callback
+     * @return Connection
+     */
     Connection StockStore::subscribeToInstrumentIdRemap(
         OnIdRemap<InstrumentId>::func func,
         void*                         userData

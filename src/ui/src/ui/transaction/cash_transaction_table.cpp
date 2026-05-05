@@ -29,6 +29,12 @@ namespace ui
 
     namespace
     {
+        /**
+         * @brief Gets the label for a column.
+         *
+         * @param col The column to get the label for.
+         * @return QString The label for the column.
+         */
         QString getColLabel(CashTransactionColumn col)
         {
             if (col == CashTransactionColumn::ReferenceAccount)
@@ -39,6 +45,12 @@ namespace ui
             );
         }
 
+        /**
+         * @brief Gets the column from an index.
+         *
+         * @param index The index to get the column for.
+         * @return CashTransactionColumn The column for the index.
+         */
         CashTransactionColumn getColFromIndex(int index)
         {
             return static_cast<CashTransactionColumn>(index);
@@ -56,11 +68,21 @@ namespace ui
         return parent.isValid() ? 0 : CashTransactionColumnMeta::size;
     }
 
+    /**
+     * @brief Gets the index of the description column.
+     *
+     * @return int The index of the description column.
+     */
     int CashTransactionTableModel::getDescriptionIndex() const
     {
         return static_cast<int>(CashTransactionColumn::Description);
     }
 
+    /**
+     * @brief Gets the index of the date column.
+     *
+     * @return int The index of the date column.
+     */
     int CashTransactionTableModel::getDateIndex() const
     {
         return static_cast<int>(CashTransactionColumn::Date);
@@ -158,6 +180,12 @@ namespace ui
         return {Qt::AlignLeft | Qt::AlignVCenter};
     }
 
+    /**
+     * @brief Gets the label for a column.
+     *
+     * @param col The column to get the label for.
+     * @return QString The label for the column.
+     */
     QString CashTransactionTableModel::_getColLabel(int col) const
     {
         return getColLabel(static_cast<CashTransactionColumn>(col));

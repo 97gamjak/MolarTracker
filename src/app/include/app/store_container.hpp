@@ -20,6 +20,7 @@ namespace app
     class StoreContainer
     {
        private:
+        /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
 
         /// The Profile store

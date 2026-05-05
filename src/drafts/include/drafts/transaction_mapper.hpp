@@ -65,35 +65,23 @@ namespace drafts
         );
 
         static TradeLegDraft toTradeLegDraft(
-            const finance::TradeLeg& leg,
-            const std::unordered_map<
-                InstrumentId,
-                std::string,
-                typename InstrumentId::Hash>& instrumentNames
+            const finance::TradeLeg&          leg,
+            const instrumentMap<std::string>& instrumentNames
         );
 
         static std::vector<TradeLegDraft> toTradeLegDrafts(
             const std::vector<finance::TradeLeg>& legs,
-            const std::unordered_map<
-                InstrumentId,
-                std::string,
-                typename InstrumentId::Hash>& instrumentNames
+            const instrumentMap<std::string>&     instrumentNames
         );
 
         static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
             const std::vector<finance::Transaction>& transactions,
-            const std::unordered_map<
-                InstrumentId,
-                std::string,
-                typename InstrumentId::Hash>& instrumentNames
+            const instrumentMap<std::string>&        instrumentNames
         );
 
         static drafts::TransactionOverviewDraft toOverviewDraft(
-            const finance::Transaction& transaction,
-            const std::unordered_map<
-                InstrumentId,
-                std::string,
-                typename InstrumentId::Hash>& instrumentNames
+            const finance::Transaction&       transaction,
+            const instrumentMap<std::string>& instrumentNames
         );
     };
 

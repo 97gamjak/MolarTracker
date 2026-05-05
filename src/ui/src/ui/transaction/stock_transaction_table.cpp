@@ -11,7 +11,7 @@
 #include <QFont>
 #include <mstd/enum.hpp>
 
-#include "config/finance.hpp"
+#include "config/quantity.hpp"
 #include "drafts/transaction_draft.hpp"
 
 namespace ui
@@ -32,6 +32,12 @@ namespace ui
 
     namespace
     {
+        /**
+         * @brief Gets the label for a column.
+         *
+         * @param col The column to get the label for.
+         * @return QString The label for the column.
+         */
         QString getColLabel(StockTransactionColumn col)
         {
             if (col == StockTransactionColumn::ReferenceAccount)
@@ -42,6 +48,12 @@ namespace ui
             );
         }
 
+        /**
+         * @brief Gets the column from an index.
+         *
+         * @param index The index to get the column for.
+         * @return StockTransactionColumn The column for the index.
+         */
         StockTransactionColumn getColFromIndex(int index)
         {
             return static_cast<StockTransactionColumn>(index);
@@ -59,11 +71,21 @@ namespace ui
         return parent.isValid() ? 0 : StockTransactionColumnMeta::size;
     }
 
+    /**
+     * @brief Gets the index of the description column.
+     *
+     * @return int The index of the description column.
+     */
     int StockTransactionTableModel::getDescriptionIndex() const
     {
         return static_cast<int>(StockTransactionColumn::Description);
     }
 
+    /**
+     * @brief Gets the index of the date column.
+     *
+     * @return int The index of the date column.
+     */
     int StockTransactionTableModel::getDateIndex() const
     {
         return static_cast<int>(StockTransactionColumn::Date);
@@ -170,6 +192,12 @@ namespace ui
         return {Qt::AlignLeft | Qt::AlignVCenter};
     }
 
+    /**
+     * @brief Gets the label for a column.
+     *
+     * @param col The column to get the label for.
+     * @return QString The label for the column.
+     */
     QString StockTransactionTableModel::_getColLabel(int col) const
     {
         return getColLabel(static_cast<StockTransactionColumn>(col));

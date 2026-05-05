@@ -42,14 +42,23 @@ namespace drafts
         [[nodiscard]] bool needsExternal() const;
     };
 
+    /**
+     * @brief A draft representation of a trade leg
+     *
+     */
     class TradeLegDraft
     {
        private:
-        AccountId     _accountId;
+        /// The ID of the account associated with the trade leg draft.
+        AccountId _accountId;
+        /// The unit price associated with the trade leg draft.
         finance::Cash _unitPrice;
-        Quantity      _quantity;
-        std::string   _ticker;
-        InstrumentId  _instrumentId;
+        /// The quantity associated with the trade leg draft.
+        Quantity _quantity;
+        /// The ticker associated with the trade leg draft.
+        std::string _ticker;
+        /// The instrument ID associated with the trade leg draft.
+        InstrumentId _instrumentId;
 
        public:
         TradeLegDraft(
@@ -72,6 +81,10 @@ namespace drafts
         void setInstrumentId(InstrumentId instrumentId);
     };
 
+    /**
+     * @brief A base class for a draft representation of a transaction
+     *
+     */
     class CreateTransactionDraft
     {
        private:
@@ -113,9 +126,14 @@ namespace drafts
         using CreateTransactionDraft::CreateTransactionDraft;
     };
 
+    /**
+     * @brief A draft representation of a stock transaction
+     *
+     */
     class CreateStockTransactionDraft : public CreateTransactionDraft
     {
        private:
+        /// The legs of the stock transaction
         std::vector<TradeLegDraft> _legs;
 
        public:
@@ -141,6 +159,7 @@ namespace drafts
     class TransactionOverviewDraft
     {
        private:
+        /// The type of the transaction
         TransactionDataType _type;
 
         /// The timestamp of the transaction

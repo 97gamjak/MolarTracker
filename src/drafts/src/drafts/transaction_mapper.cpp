@@ -75,6 +75,12 @@ namespace drafts
         return transaction;
     }
 
+    /**
+     * @brief Converts a drafts::TradeLegDraft to a finance::TradeLeg
+     *
+     * @param draft
+     * @return finance::TradeLeg
+     */
     finance::TradeLeg TransactionMapper::fromTradeLegDraft(
         const TradeLegDraft& draft
     )
@@ -87,6 +93,13 @@ namespace drafts
         };
     }
 
+    /**
+     * @brief Converts a vector of drafts::TradeLegDraft to a vector of
+     * finance::TradeLeg
+     *
+     * @param drafts
+     * @return std::vector<finance::TradeLeg>
+     */
     std::vector<finance::TradeLeg> TransactionMapper::fromTradeLegDrafts(
         const std::vector<TradeLegDraft>& drafts
     )
@@ -100,12 +113,16 @@ namespace drafts
         return legs;
     }
 
+    /**
+     * @brief Converts a finance::TradeLeg to a drafts::TradeLegDraft
+     *
+     * @param leg
+     * @param instrumentNames
+     * @return drafts::TradeLegDraft
+     */
     TradeLegDraft TransactionMapper::toTradeLegDraft(
-        const finance::TradeLeg& leg,
-        const std::unordered_map<
-            InstrumentId,
-            std::string,
-            typename InstrumentId::Hash>& instrumentNames
+        const finance::TradeLeg&          leg,
+        const instrumentMap<std::string>& instrumentNames
     )
     {
         return TradeLegDraft{
@@ -116,12 +133,17 @@ namespace drafts
         };
     }
 
+    /**
+     * @brief Converts a vector of finance::TradeLeg to a vector of
+     * drafts::TradeLegDraft
+     *
+     * @param legs
+     * @param instrumentNames
+     * @return std::vector<TradeLegDraft>
+     */
     std::vector<TradeLegDraft> TransactionMapper::toTradeLegDrafts(
         const std::vector<finance::TradeLeg>& legs,
-        const std::unordered_map<
-            InstrumentId,
-            std::string,
-            typename InstrumentId::Hash>& instrumentNames
+        const instrumentMap<std::string>&     instrumentNames
     )
     {
         std::vector<TradeLegDraft> drafts;
@@ -135,6 +157,13 @@ namespace drafts
         return drafts;
     }
 
+    /**
+     * @brief Converts a drafts::CreateStockTransactionDraft to a
+     * finance::Transaction
+     *
+     * @param draft
+     * @return finance::Transaction
+     */
     finance::Transaction TransactionMapper::fromCreateStockTransactionDraft(
         const CreateStockTransactionDraft& draft
     )
@@ -161,15 +190,13 @@ namespace drafts
      * drafts::TransactionOverviewDraft
      *
      * @param transactions
+     * @param instrumentNames
      * @return std::vector<drafts::TransactionOverviewDraft>
      */
     std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
         toOverviewDrafts(
             const std::vector<finance::Transaction>& transactions,
-            const std::unordered_map<
-                InstrumentId,
-                std::string,
-                typename InstrumentId::Hash>& instrumentNames
+            const instrumentMap<std::string>&        instrumentNames
         )
     {
         std::vector<drafts::TransactionOverviewDraft> drafts;
@@ -186,14 +213,12 @@ namespace drafts
      * drafts::TransactionOverviewDraft
      *
      * @param transaction
+     * @param instrumentNames
      * @return drafts::TransactionOverviewDraft
      */
     drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
-        const finance::Transaction& transaction,
-        const std::unordered_map<
-            InstrumentId,
-            std::string,
-            typename InstrumentId::Hash>& instrumentNames
+        const finance::Transaction&       transaction,
+        const instrumentMap<std::string>& instrumentNames
     )
     {
         std::vector<drafts::TransactionEntryDraft> entryDrafts;
@@ -204,10 +229,19 @@ namespace drafts
 
         struct Visitor
         {
-            const std::unordered_map<
-                InstrumentId,
-                std::string,
-                typename InstrumentId::Hash>& instrumentNames;
+            const instrumentMap<std::string>& instrumentNames;
+
+            ~Visitor() = default;
+
+            explicit Visitor(const instrumentMap<std::string>& instrumentNames_)
+                : instrumentNames(instrumentNames_)
+            {
+            }
+            // default copy and move constructors
+            Visitor(const Visitor&)            = delete;
+            Visitor& operator=(const Visitor&) = delete;
+            Visitor(Visitor&&)                 = delete;
+            Visitor& operator=(Visitor&&)      = delete;
 
             std::vector<TradeLegDraft> operator()(const finance::TradeData& data
             )

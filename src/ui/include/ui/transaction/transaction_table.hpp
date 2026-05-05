@@ -7,11 +7,16 @@
 
 namespace drafts
 {
-    class TransactionOverviewDraft;
-}
+    class TransactionOverviewDraft;   // Forward declaration
+}   // namespace drafts
 
 namespace ui
 {
+    /**
+     * @brief A base class for a model for displaying transaction data in a
+     * table view
+     *
+     */
     class TransactionTableModel : public QAbstractTableModel
     {
         Q_OBJECT
@@ -50,23 +55,62 @@ namespace ui
         [[nodiscard]]
         Qt::ItemFlags flags(const QModelIndex& index) const override;
 
+        /**
+         * @brief Get the Description Index
+         *
+         * @return int
+         */
         [[nodiscard]] virtual int getDescriptionIndex() const = 0;
-        [[nodiscard]] virtual int getDateIndex() const        = 0;
+
+        /**
+         * @brief Get the Date Index
+         *
+         * @return int
+         */
+        [[nodiscard]] virtual int getDateIndex() const = 0;
 
        protected:
+        /**
+         * @brief display data for a specific column
+         *
+         * @param transaction
+         * @param col
+         * @return QVariant
+         */
         [[nodiscard]]
         virtual QVariant _displayData(
             const drafts::TransactionOverviewDraft& transaction,
             int                                     col
         ) const = 0;
+
+        /**
+         * @brief Get the Decoration Data for a specific column
+         *
+         * @param transaction
+         * @param col
+         * @return QVariant
+         */
         [[nodiscard]]
         virtual QVariant _decorationData(
             const drafts::TransactionOverviewDraft& transaction,
             int                                     col
         ) const = 0;
+
+        /**
+         * @brief Get the Text Alignment Data for a specific column
+         *
+         * @param col
+         * @return QVariant
+         */
         [[nodiscard]]
         virtual QVariant _textAlignmentData(int col) const = 0;
 
+        /**
+         * @brief Get the Column Label for a specific column
+         *
+         * @param col
+         * @return QString
+         */
         [[nodiscard]]
         virtual QString _getColLabel(int col) const = 0;
 

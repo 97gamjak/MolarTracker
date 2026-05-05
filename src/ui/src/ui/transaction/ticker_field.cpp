@@ -195,6 +195,12 @@ namespace ui
         _rebuildCompleter();
     }
 
+    /**
+     * @brief Checks if the ticker field is valid.
+     *
+     * @return true If the ticker field is valid.
+     * @return false If the ticker field is not valid.
+     */
     bool TickerField::isValid() const { return getTicker().has_value(); }
 
 }   // namespace ui

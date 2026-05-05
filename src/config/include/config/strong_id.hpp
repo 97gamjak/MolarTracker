@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <ostream>
+#include <unordered_map>
 
 /**
  * @brief A strong typedef for IDs to prevent mixing different ID types
@@ -11,7 +12,7 @@
  * @tparam Rep
  *
  */
-template <class Tag, class Rep = std::int64_t>
+template <typename Tag, typename Rep = std::int64_t>
 class StrongId final
 {
    public:
@@ -69,10 +70,21 @@ class StrongId final
     );
 };
 
+template <typename StrongId, typename T>
+using unorderedIdMap = std::unordered_map<StrongId, T, typename StrongId::Hash>;
+
+/**
+ * @brief A sequence of IDs, used to generate new unique IDs
+ *
+ * @tparam Id The ID type
+ */
 template <typename Id>
 class IdSequence
 {
-    Id _next{-2};   // to make it valid
+    /// The next ID to be assigned -- starting from -2 because -1 is reserved
+    /// for invalid IDs
+    Id _next{-2};
+
    public:
     Id next();
 };

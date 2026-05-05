@@ -113,6 +113,11 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator++(int)
     return temp;
 }
 
+/**
+ * @brief Prefix decrement operator for StrongId
+ *
+ * @return StrongId&
+ */
 template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator--()
 {
@@ -120,6 +125,11 @@ constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator--()
     return *this;
 }
 
+/**
+ * @brief Postfix decrement operator for StrongId
+ *
+ * @return StrongId
+ */
 template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator--(int)
 {
@@ -142,6 +152,11 @@ std::ostream& operator<<(std::ostream& output, StrongId<Tag, Rep> id)
     return output;
 }
 
+/**
+ * @brief Get the next ID in the sequence
+ *
+ * @return Id
+ */
 template <typename Id>
 Id IdSequence<Id>::next()
 {
