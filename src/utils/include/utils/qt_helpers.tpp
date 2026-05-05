@@ -1,10 +1,32 @@
 #ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
 #define __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
 
+#include <QString>
+#include <mstd/type_traits/enum_traits.hpp>
+
 #include "qt_helpers.hpp"
 
 namespace utils
 {
+    /**
+     * @brief Convert an enum value to a QString.
+     *
+     * This function uses the enum meta information to convert the given enum
+     * value to a QString. The enum must have the necessary meta information
+     * provided by the mstd::has_enum_meta trait.
+     *
+     * @tparam Enum The enum type to convert.
+     * @param value The enum value to convert.
+     * @return A QString representation of the enum value.
+     */
+    template <mstd::has_enum_meta Enum>
+    QString toQString(Enum value)
+    {
+        using EnumMeta = mstd::enum_meta_t<Enum>;
+
+        return QString::fromStdString(EnumMeta::toString(value));
+    }
+
     /**
      * @brief Create a new child widget of type T with the given arguments, this
      * is a helper function that can be used to create new Qt widgets as

@@ -13,7 +13,6 @@
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "filter/expr_node.hpp"
-#include "orm/concepts.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
@@ -130,26 +129,50 @@ namespace orm
         const Model& row
     )
     {
-        auto sqlText = "INSERT INTO " + Model::tableName + " (";
-
-        std::vector<std::string> columnNames;
+        std::size_t nInsertableFields = 0;
         Model::forEachColumn(
             [&](const auto& field)
             {
                 if (field.isAutoIncrementPk)
                     return;
 
-                columnNames.push_back(std::string(field.name));
+                ++nInsertableFields;
             }
         );
 
-        sqlText += mstd::join(columnNames, ", ");
-        sqlText += ") VALUES (";
+        auto sqlText = "INSERT INTO " + Model::tableName + " ";
 
-        const std::vector<std::string> placeholders(columnNames.size(), "?");
-        sqlText += mstd::join(placeholders, ", ");
+        if (nInsertableFields > 0)
+        {
+            sqlText += "(";
 
-        sqlText += ");";
+            std::vector<std::string> columnNames;
+            Model::forEachColumn(
+                [&](const auto& field)
+                {
+                    if (field.isAutoIncrementPk)
+                        return;
+
+                    columnNames.push_back(std::string(field.name));
+                }
+            );
+
+            sqlText += mstd::join(columnNames, ", ");
+            sqlText += ") VALUES (";
+
+            const std::vector<std::string> placeholders(
+                columnNames.size(),
+                "?"
+            );
+            sqlText += mstd::join(placeholders, ", ");
+            sqlText += ")";
+        }
+        else
+        {
+            sqlText += " DEFAULT VALUES";
+        }
+
+        sqlText += ";";
 
         LOG_DEBUG(
             std::format(
@@ -479,7 +502,7 @@ namespace orm
      * @param query
      * @return std::vector<Model>
      */
-    template <db_model... Models>
+    template <typename... Models>
     std::vector<std::tuple<Models...>> Crud::getJoined(
         db::Database&     database,
         const orm::Joins& joins,
@@ -622,7 +645,12 @@ namespace orm
         const Field&  field
     )
     {
-        const auto columnExist = _columnExists<Field>(database);
+        const auto columnExist = _columnExists(
+            database,
+            std::string(Field::name),
+            std::string(Field::tableName)
+        );
+
         if (columnExist)
         {
             return std::unexpected(CrudError(
@@ -655,29 +683,43 @@ namespace orm
     }
 
     /**
-     * @brief Check if a column exists in the database
+     * @brief Drop a column from the database
      *
-     * @tparam Field
+     * @tparam Model
      * @param database
-     * @return true if the column exists, false otherwise
+     * @param columnName
+     * @return std::expected<void, CrudError> An empty expected on success,
+     * or an error on failure
      */
-    template <typename Field>
-    bool Crud::_columnExists(db::Database& database)
+    template <typename Model>
+    std::expected<void, CrudError> Crud::dropColumn(
+        db::Database&      database,
+        const std::string& columnName
+    )
     {
+        if (!_columnExists(database, columnName, std::string(Model::tableName)))
+        {
+            return std::unexpected(CrudError(
+                CrudErrorType::ColumnDoesNotExist,
+                "Column does not exist"
+            ));
+        }
+
         std::string sql;
-        sql += "SELECT COUNT(*) FROM PRAGMA_TABLE_INFO('";
-        sql += Field::tableName;
-        sql += "') WHERE name = '";
-        sql += Field::name + "'";
+        sql += "ALTER TABLE ";
+        sql += Model::tableName;
+        sql += " DROP COLUMN ";
+        sql += columnName;
+
+        LOG_DEBUG(std::format("Dropping column with SQL: {}", sql));
 
         db::Statement statement = database.prepare(sql);
 
         _sqlExecutions.push_back(sql);
 
-        if (statement.step() == db::StepResult::RowAvailable)
-            return statement.columnInt64(0) > 0;
+        statement.executeToCompletion();
 
-        throw orm::CrudException("Failed to check if column exists");
+        return {};
     }
 
 }   // namespace orm

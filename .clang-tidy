@@ -1,9 +1,10 @@
 ---
-# -altera-unroll-loops:             wants to use everywhere #pragma unroll
-# -abseil-string-find-str-contains: strange string library
-# -bugprone-suspicious-include:     to be able to include .tpp and still use it as impl file types
-# -hicpp-avoid-c-arrays:            does the same thing as cppcoreguidelines-avoid-c-arrays
-# -fuchsia-trailing-return:         doesn't allow trailing return types, which we use for better readability in some cases
+# -altera-unroll-loops:                    wants to use everywhere #pragma unroll
+# -abseil-string-find-str-contains:        strange string library
+# -bugprone-suspicious-include:            to be able to include .tpp and still use it as impl file types
+# -hicpp-avoid-c-arrays:                   does the same thing as cppcoreguidelines-avoid-c-arrays
+# -fuchsia-trailing-return:                doesn't allow trailing return types, which we use for better readability in some cases
+# -fuchsia-default-arguments-declarations: doesn't allow default arguments in function declarations (use only carefully)
 
 # TO BE REMOVED:
 # -misc-include-cleaner:            problems with QT < 6.8
@@ -19,6 +20,7 @@ Checks:
   -fuchsia-overloaded-operator,
   -fuchsia-statically-constructed-objects,
   -fuchsia-trailing-return,
+  -fuchsia-default-arguments-declarations,
   -hicpp-avoid-c-arrays,
   -llvm-header-guard,
   -llvmlibc-callee-namespace,

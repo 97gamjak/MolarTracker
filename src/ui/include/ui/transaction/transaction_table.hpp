@@ -1,80 +1,121 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__TRANSACTION_TABLE_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__TRANSACTION_TABLE_HPP__
 
-#include <qtablewidget.h>
+#include <qabstractitemmodel.h>
 
-#include <QAbstractTableModel>
-#include <QSortFilterProxyModel>
+#include "config/id_types.hpp"
 
-#include "drafts/transaction_draft.hpp"
+namespace drafts
+{
+    class TransactionOverviewDraft;   // Forward declaration
+}   // namespace drafts
 
 namespace ui
 {
-    enum class Column : std::uint8_t;
-
     /**
-     * @brief Table model for displaying transactions in a QTableView
+     * @brief A base class for a model for displaying transaction data in a
+     * table view
      *
-     * This model provides the data and behavior for displaying transactions in
-     * a QTableView. It holds a list of TransactionDrafts and maps account IDs
-     * to account names for display purposes. The model implements the necessary
-     * methods for row and column count, data retrieval, header data, and item
-     * flags to enable proper display and interaction with the transaction data.
      */
     class TransactionTableModel : public QAbstractTableModel
     {
         Q_OBJECT
-
        private:
         /// alias for the map of account IDs to account names
         using IdToNameMap =
             std::unordered_map<AccountId, std::string, AccountId::Hash>;
 
         /// The list of transactions to display in the table
-        std::vector<drafts::TransactionDraft> _transactions;
+        std::vector<drafts::TransactionOverviewDraft> _transactions;
 
         /// A map of account IDs to account names for display purposes
         IdToNameMap _accountIdToName;
 
        public:
-        explicit TransactionTableModel(QObject* parent);
+        explicit TransactionTableModel(QObject* parent = nullptr);
 
         void setTransactions(
-            std::vector<drafts::TransactionDraft> transactions,
-            IdToNameMap                           accountIdToName
+            std::vector<drafts::TransactionOverviewDraft> transactions,
+            IdToNameMap                                   accountIdToName
         );
 
-        [[nodiscard]] int rowCount(const QModelIndex& parent) const override;
-        [[nodiscard]] int columnCount(const QModelIndex& parent) const override;
+        [[nodiscard]]
+        int rowCount(const QModelIndex& parent) const override;
+
         [[nodiscard]]
         QVariant data(const QModelIndex& index, int role) const override;
+
         [[nodiscard]]
         QVariant headerData(
             int             section,
             Qt::Orientation orientation,
             int             role
         ) const override;
+
         [[nodiscard]]
         Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-        [[nodiscard]] static int getDescriptionIndex();
-        [[nodiscard]] static int getDateIndex();
+        /**
+         * @brief Get the Description Index
+         *
+         * @return int
+         */
+        [[nodiscard]] virtual int getDescriptionIndex() const = 0;
 
-       private:
+        /**
+         * @brief Get the Date Index
+         *
+         * @return int
+         */
+        [[nodiscard]] virtual int getDateIndex() const = 0;
+
+       protected:
+        /**
+         * @brief display data for a specific column
+         *
+         * @param transaction
+         * @param col
+         * @return QVariant
+         */
         [[nodiscard]]
-        QVariant _displayData(
-            const drafts::TransactionDraft& transaction,
-            Column                          col
-        ) const;
+        virtual QVariant _displayData(
+            const drafts::TransactionOverviewDraft& transaction,
+            int                                     col
+        ) const = 0;
+
+        /**
+         * @brief Get the Decoration Data for a specific column
+         *
+         * @param transaction
+         * @param col
+         * @return QVariant
+         */
         [[nodiscard]]
-        static QVariant _decorationData(
-            const drafts::TransactionDraft& transaction,
-            Column                          col
-        );
+        virtual QVariant _decorationData(
+            const drafts::TransactionOverviewDraft& transaction,
+            int                                     col
+        ) const = 0;
+
+        /**
+         * @brief Get the Text Alignment Data for a specific column
+         *
+         * @param col
+         * @return QVariant
+         */
         [[nodiscard]]
-        static QVariant _textAlignmentData(Column col);
+        virtual QVariant _textAlignmentData(int col) const = 0;
+
+        /**
+         * @brief Get the Column Label for a specific column
+         *
+         * @param col
+         * @return QString
+         */
+        [[nodiscard]]
+        virtual QString _getColLabel(int col) const = 0;
+
+        const IdToNameMap& _getAccountIdToNameMap() const;
     };
-
 }   // namespace ui
 
 #endif   // __UI__INCLUDE__UI__TRANSACTION__TRANSACTION_TABLE_HPP__

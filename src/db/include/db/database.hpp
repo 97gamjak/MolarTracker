@@ -71,6 +71,8 @@ namespace db
         void               commit();
         void               rollback();
 
+        [[nodiscard]] std::string getDBPath() const;
+
        private:   // PRIVATE HELPER METHODS
         void                      _ensureOpen() const;
         [[nodiscard]] std::string _sqliteErrorMessage() const;

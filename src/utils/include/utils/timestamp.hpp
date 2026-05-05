@@ -33,6 +33,7 @@ class Timestamp
    public:
     Timestamp();
     explicit Timestamp(const TimePoint& timePoint);
+    explicit Timestamp(const QDateTime& dateTime);
 
     // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] std::string iso8601() const;

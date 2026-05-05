@@ -6,7 +6,10 @@ add_library(molartracker_finance STATIC
     
     src/finance/transaction.cpp
     src/finance/transaction_entry.cpp
-    src/finance/cash_transaction.cpp
+    src/finance/trade_data.cpp
+    src/finance/stock.cpp
+    src/finance/ticker_info.cpp
+    src/finance/yf_client.cpp
 )
 
 target_include_directories(molartracker_finance
@@ -24,4 +27,7 @@ target_link_libraries(molartracker_finance
     molartracker_config
     molartracker_exceptions
     molartracker_utils
+    molartracker_http
+    molartracker_logging
+    mstd
 )

@@ -2,8 +2,6 @@
 #define __APP__INCLUDE__APP__MIGRATION__SINGLE_MIGRATION_TPP__
 
 #include "app/migration/single_migration.hpp"
-#include "db/statement.hpp"
-#include "orm/constraints.hpp"
 #include "orm/crud.hpp"
 #include "orm/type_traits.hpp"
 
@@ -71,6 +69,35 @@ namespace app
         orm::Crud crud;
 
         crud.addColumn(db, _defaultValue);
+
+        setSQLStatements(crud.getExecutedSQL());
+    }
+
+    /**
+     * @brief Construct a new Drop Column Migration< Model>:: Drop Column
+     * Migration object
+     *
+     * @tparam Model
+     * @param columnName
+     */
+    template <typename Model>
+    DropColumnMigration<Model>::DropColumnMigration(std::string columnName)
+        : SingleMigration(MigrationType::DropColumn),
+          _columnName(std::move(columnName))
+    {
+    }
+
+    /**
+     * @brief Apply the migration to drop a column from the database
+     *
+     * @param db The database to apply the migration to
+     */
+    template <typename Model>
+    void DropColumnMigration<Model>::applyMigration(db::Database& db)
+    {
+        orm::Crud crud;
+
+        crud.dropColumn<Model>(db, _columnName);
 
         setSQLStatements(crud.getExecutedSQL());
     }

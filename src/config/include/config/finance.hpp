@@ -16,6 +16,7 @@ MSTD_ENUM(Currency, std::uint8_t, CURRENCY_LIST);
 
 #define ACCOUNT_KIND_LIST(X) \
     X(Cash)                  \
+    X(Security)              \
     X(External)
 
 MSTD_ENUM(AccountKind, std::uint8_t, ACCOUNT_KIND_LIST);
@@ -34,18 +35,27 @@ MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST);
 
 #define TRANSACTION_TYPE_LIST(X) \
     X(Deposit)                   \
-    X(Withdrawal)
+    X(Withdrawal)                \
+    X(Stock)
 
 MSTD_ENUM(TransactionType, std::uint8_t, TRANSACTION_TYPE_LIST);
 
-#define INSTRUMENT_KIND_LIST(X) \
-    X(Stock)                    \
-    X(Cash)
+#define TRANSACTION_DATA_TYPE_LIST(X) \
+    X(Cash)                           \
+    X(Trade)
 
-MSTD_ENUM(InstrumentKind, std::uint8_t, INSTRUMENT_KIND_LIST);
+MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
+
+#define ASSET_CLASS_LIST(X) \
+    X(Stock)                \
+    X(Etf)                  \
+    X(Crypto)               \
+    X(MutualFund)           \
+    X(Future)               \
+    X(Unknown)
+
+MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST);
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
-
-using micro_units = std::int64_t;
 
 #endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__

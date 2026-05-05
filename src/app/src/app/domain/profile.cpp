@@ -7,16 +7,11 @@ namespace app
     /**
      * @brief Construct a new Profile:: Profile object
      *
-     * @param id
      * @param name
      * @param email
      */
-    Profile::Profile(
-        ProfileId                         id,
-        std::string                       name,
-        const std::optional<std::string>& email
-    )
-        : _id{id}, _name{std::move(name)}, _email{email}
+    Profile::Profile(std::string name, const std::optional<std::string>& email)
+        : _id{ProfileId::invalid()}, _name{std::move(name)}, _email{email}
     {
     }
 

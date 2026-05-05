@@ -91,9 +91,9 @@ namespace app
         );
 
        private:
-        void _commitNewProfile(Entry* entry);
-        void _commitModifiedProfile(Entry* entry);
-        void _commitDeletedProfile(Entry* entry);
+        void _commitNewProfile(Entry entry);
+        void _commitModifiedProfile(const Entry& entry);
+        void _commitDeletedProfile(const Entry& entry);
     };
 
 }   // namespace app

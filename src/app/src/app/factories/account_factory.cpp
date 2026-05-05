@@ -18,13 +18,15 @@ namespace app
         const AccountRow& accountRow
     )
     {
-        return {
-            accountRow.id.value(),
+        auto account = finance::Account{
             accountRow.status.value(),
             accountRow.name.value(),
             accountRow.currency.value(),
             accountRow.kind.value()
         };
+
+        account.setId(accountRow.id.value());
+        return account;
     }
 
     /**

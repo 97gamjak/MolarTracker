@@ -117,6 +117,30 @@ namespace finance
     }
 
     /**
+     * @brief Multiplication operator for Cash
+     *
+     * @param cash
+     * @param multiplier
+     * @return Cash the result of multiplying a Cash object by a Quantity
+     */
+    Cash operator*(const Cash& cash, const Quantity& multiplier)
+    {
+        return Cash(cash._currency, mulDiv(cash._amount, multiplier));
+    }
+
+    /**
+     * @brief Multiplication operator for Cash
+     *
+     * @param multiplier
+     * @param cash
+     * @return Cash the result of multiplying a Quantity by a Cash object
+     */
+    Cash operator*(const Quantity& multiplier, const Cash& cash)
+    {
+        return cash * multiplier;
+    }
+
+    /**
      * @brief Compound addition assignment operator for Cash
      *
      * @param lhs
@@ -164,6 +188,20 @@ namespace finance
      * @return true if the amount is zero, false otherwise.
      */
     bool Cash::isZero() const { return _amount == 0; }
+
+    /**
+     * @brief Checks if the Cash amount is positive.
+     *
+     * @return true if the amount is greater than zero, false otherwise.
+     */
+    bool Cash::isPositive() const { return _amount > 0; }
+
+    /**
+     * @brief Checks if the Cash amount is negative.
+     *
+     * @return true if the amount is less than zero, false otherwise.
+     */
+    bool Cash::isNegative() const { return _amount < 0; }
 
     /**
      * @brief Gets the amount of cash in micro_units.

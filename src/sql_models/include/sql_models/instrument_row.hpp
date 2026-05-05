@@ -1,10 +1,9 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "orm/constraints.hpp"
 #include "orm/orm_model.hpp"
-#include "orm/where_expr.hpp"
 
 /**
  * @brief Represents a row in the "instrument" database table, which serves as a
@@ -26,18 +25,20 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     /// auto-incremented
     ORM_FIELD(id, IdField<InstrumentId>)
 
-    /// The kind field, this indicates the type of instrument (e.g., cash,
-    /// stock, bond, etc.) and is a required field
-    ORM_FIELD(kind, Field<"kind", InstrumentKind, orm::not_null_t>)
+    /// @cond DOXYGEN_IGNORE
+    ORM_FIELDS(InstrumentRow, id);
+    /// @endcond
 
-    /// The currency field, this indicates the currency of the instrument
-    ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
-
-    /// auto generate the fields() function using the ORM_FIELDS macro
-    ORM_FIELDS(InstrumentRow, id, kind, currency);
-
-    [[nodiscard]]
-    static orm::WhereExpr hasKind(InstrumentKind kind);
+    /// Helper type alias for defining foreign key fields referencing the id
+    /// field of the instrument table, this allows for concise definitions of
+    /// foreign key fields that reference the instrument table with a specified
+    /// deletion behavior (e.g., cascade or restrict)
+    template <orm::DeletionType T>
+    using ForeignId = Field<
+        "instrument_id",
+        InstrumentId,
+        orm::foreign_key_t<T, InstrumentRow, decltype(InstrumentRow::id)>,
+        orm::not_null_t>;
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__INSTRUMENT_ROW_HPP__

@@ -1,11 +1,16 @@
 #include "app/store/transaction_store.hpp"
 
-#include "drafts/transaction_draft.hpp"
+#include <unordered_map>
+
+#include "app/services_api/i_transaction_service.hpp"
+#include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
+#include "config/id_types.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
 
-using drafts::TransactionMapper;
+REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
 
 namespace app
 {
@@ -13,39 +18,38 @@ namespace app
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
+     * @param accountStore
+     * @param stockStore
      */
     TransactionStore::TransactionStore(
-        const std::shared_ptr<ITransactionService>& transactionService
+        const std::shared_ptr<ITransactionService>& transactionService,
+        AccountStore&                               accountStore,
+        StockStore&                                 stockStore
     )
         : _transactionService(transactionService)
     {
+        _connections.add(accountStore.subscribeToIdRemap(
+            [this](const AccountStore::IdMap& remap)
+            { _onAccountIdRemap(remap); },
+            this
+        ));
+
+        _connections.add(stockStore.subscribeToInstrumentIdRemap(
+            [this](const instrumentMap<InstrumentId>& remap)
+            { _onInstrumentIdRemap(remap); },
+            this
+        ));
     }
 
     /**
      * @brief Save all temporary changes to the database
      *
-     * @param accountIdMap A map of old account IDs to new account IDs, this is
-     * used to update the account IDs in the transaction entries before
-     * committing them to the database, ensuring that the transactions are
-     * associated with the correct accounts after any changes to account IDs
-     * have been made.
      */
-    void TransactionStore::commit(
-        const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
-            accountIdMap
-    )
+    void TransactionStore::commit()
     {
         LOG_ENTRY;
 
-        _updateAccountIds(accountIdMap);
-
-        if (!isDirty())
-        {
-            LOG_DEBUG("Transaction store is not dirty, nothing to commit");
-            return;
-        }
-
-        for (auto& entry : _getEntries())
+        for (const auto& entry : _getEntries())
         {
             switch (entry.state)
             {
@@ -58,7 +62,12 @@ namespace app
                         std::format("Added transaction with ID: {}", id.value())
                     );
 
-                    entry.value.setId(id);
+                    auto persisted = entry.value;
+                    persisted.setId(id);
+                    _commitEntry(
+                        entry.value.getId(),
+                        Entry{.value = persisted, .state = entry.state}
+                    );
                     break;
                 }
                 case StoreState::Modified:
@@ -69,105 +78,64 @@ namespace app
             }
         }
 
-        _cleanEntries();
+        _notifyOnCommit();
     }
 
     /**
-     * @brief Add a transaction to the store, this will add the transaction as
-     * a new entry in the store and mark it as New, indicating that it has not
-     * yet been committed to the database, and will be included in the next
-     * commit operation.
+     * @brief Add a transaction to the store, this adds a new transaction to the
+     * store in a temporary state, which can then be committed to the database
+     * using the commit method. The transaction must have a total sum of zero,
+     * meaning that the sum of all entries in the transaction must equal zero,
+     * ensuring that the transaction is balanced and does not create or destroy
+     * money.
      *
-     * @param draft The transaction draft to add to the store, this contains the
-     * details of the transaction to be added, including its entries and other
-     * relevant information needed to create a complete transaction in the
-     * store.
-     * @return TransactionStoreResult The result of the add operation,
-     * indicating whether it was successful or if there were any issues (e.g.,
-     * if the transaction sum is not zero).
+     * @param transaction The transaction to add to the store, this should be a
+     * complete transaction with all necessary entries and details filled out,
+     * but it will not be saved to the database until the commit method is
+     * called.
+     * @return TransactionStoreResult The result of the add operation, this will
+     * indicate whether the transaction was added successfully or if there was
+     * an error (e.g., if the transaction sum is not zero).
      */
     TransactionStoreResult TransactionStore::addTransaction(
-        const drafts::TransactionDraft& draft
+        finance::Transaction transaction
     )
     {
-        const auto& id = _generateNewId();
+        LOG_ENTRY;
 
-        auto cash = finance::Cash(draft.entries.front().cash.getCurrency(), 0);
-
-        for (const auto& entry : draft.entries)
-            cash += entry.cash;
+        const auto cash = transaction.calculateTotalSum();
 
         if (!cash.isZero())
         {
             LOG_ERROR(
                 std::format(
-                    "Transaction sum is not zero, cannot add transaction "
-                    "draft"
+                    "Transaction sum is not zero (={}), cannot add transaction "
+                    "draft",
+                    cash.toString()
                 )
             );
             return TransactionStoreResult::TransactionSumNotZero;
         }
 
-        _addEntry(TransactionMapper::toTransaction(draft, id), StoreState::New);
+        _addEntry(std::move(transaction));
 
         return TransactionStoreResult::Ok;
     }
 
     /**
-     * @brief Updates the account IDs in the transaction entries based on the
-     * provided account ID map, this is used to ensure that any changes to
-     * account IDs are reflected in the transaction entries before they are
-     * committed to the database, maintaining the integrity of the associations
-     * between transactions and accounts.
+     * @brief Get all transactions from the store, this retrieves all
+     * transactions that are currently in the store, including both new
+     * transactions that have not yet been committed to the database and
+     * existing transactions that have been loaded from the database. The
+     * returned transactions will reflect any changes made to them in the store,
+     * but they will not be saved to the database until the commit method is
+     * called.
      *
-     * @param accountIdMap A map of old account IDs to new account IDs, this is
-     * used to update the account IDs in the transaction entries, ensuring that
-     * the transactions are associated with the correct accounts after any
-     * changes to account IDs have been made.
+     * @return std::vector<finance::Transaction> A vector of transactions
+     * currently in the store, this includes both new and existing transactions,
+     * and reflects any changes made to them in the store.
      */
-    void TransactionStore::_updateAccountIds(
-        const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
-            accountIdMap
-    )
-    {
-        for (auto& entry : _getEntries())
-        {
-            for (auto& transactionEntry : entry.value.getEntries())
-            {
-                for (const auto& [id, newId] : accountIdMap)
-                {
-                    if (transactionEntry.getAccountId() == id)
-                    {
-                        if (entry.state == StoreState::New)
-                        {
-                            transactionEntry.setAccountId(newId);
-                        }
-                        else
-                        {
-                            throw std::runtime_error(
-                                "Account ID found in already committed "
-                                "transaction "
-                                "entry! This is not allowed."
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @brief Retrieves all transactions from the store, this will return a
-     * vector of transaction drafts representing the transactions currently in
-     * the store, including any new transactions that have been added but not
-     * yet committed to the database, as well as transactions that are already
-     * in the database but may have been modified in the store.
-     *
-     * @return std::vector<drafts::TransactionDraft> A vector of transaction
-     * drafts representing the transactions in the store.
-     */
-    std::vector<drafts::TransactionDraft> TransactionStore::getTransactions(
-    ) const
+    std::vector<finance::Transaction> TransactionStore::getTransactions() const
     {
         const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
@@ -181,33 +149,157 @@ namespace app
 
         std::unordered_map<
             TransactionId,
-            drafts::TransactionDraft,
+            finance::Transaction,
             TransactionId::Hash>
             transactionMap;
 
-        std::vector<drafts::TransactionDraft> results;
+        std::vector<finance::Transaction> results;
 
         for (const auto& transaction : transactions)
         {
             // Only include transactions that are new, for all others the id is
             // already in the database and we will get it from there
-            const auto draft = TransactionMapper::toDraft(transaction.value);
-
-            results.push_back(draft);
+            results.push_back(transaction.value);
 
             if (transaction.state != StoreState::New)
             {
-                transactionMap.emplace(transaction.value.getId(), draft);
+                transactionMap.emplace(
+                    transaction.value.getId(),
+                    transaction.value
+                );
             }
         }
 
         for (const auto& transaction : dbTransactions)
         {
             if (!transactionMap.contains(transaction.getId()))
-                results.push_back(TransactionMapper::toDraft(transaction));
+                results.push_back(transaction);
         }
 
         return results;
+    }
+
+    /**
+     * @brief Handle account ID remapping for transaction entries
+     *
+     * @param remap The mapping of old account IDs to new account IDs
+     */
+    void TransactionStore::_onAccountIdRemap(const AccountStore::IdMap& remap)
+    {
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the remapped
+                // ID
+                const auto references = std::ranges::any_of(
+                    entry.value.getEntries(),
+                    [&remap](const auto& entry_)
+                    { return remap.contains(entry_.getAccountId()); }
+                );
+
+                if (references)
+                {
+                    throw std::runtime_error(
+                        "Account ID found in already committed transaction "
+                        "entry!"
+                    );
+                }
+
+                continue;
+            }
+
+            bool modified    = false;
+            auto transaction = entry.value;
+
+            for (auto& transactionEntry : transaction.getEntries())
+            {
+                if (const auto it = remap.find(transactionEntry.getAccountId());
+                    it != remap.end())
+                {
+                    transactionEntry.setAccountId(it->second);
+                    modified = true;
+                }
+            }
+
+            if (modified)
+                _updateEntry(transaction, StoreState::New);
+        }
+    }
+
+    /**
+     * @brief Handle instrument ID remapping for transaction entries
+     *
+     * @param remap The mapping of old instrument IDs to new instrument IDs
+     */
+    void TransactionStore::_onInstrumentIdRemap(
+        const instrumentMap<InstrumentId>& remap
+    )
+    {
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the remapped
+                // ID
+                switch (entry.value.getType())
+                {
+                    case TransactionDataType::Trade:
+                    {
+                        const auto data =
+                            std::get<finance::TradeData>(entry.value.getData());
+
+                        const auto references = std::ranges::any_of(
+                            data.getLegs(),
+                            [&remap](const auto& leg)
+                            { return remap.contains(leg.getInstrumentId()); }
+                        );
+
+                        if (references)
+                        {
+                            throw std::runtime_error(
+                                "Instrument ID found in already committed "
+                                "transaction "
+                                "entry!"
+                            );
+                        }
+                        break;
+                    }
+                    case TransactionDataType::Cash:
+                        break;
+                }
+
+                continue;
+            }
+
+            switch (entry.value.getType())
+            {
+                case TransactionDataType::Trade:
+                {
+                    auto transaction = entry.value;
+                    auto data =
+                        std::get<finance::TradeData>(transaction.getData());
+
+                    bool modified = false;
+
+                    for (auto& leg : data.getLegs())
+                    {
+                        if (const auto it = remap.find(leg.getInstrumentId());
+                            it != remap.end())
+                        {
+                            leg.setInstrumentId(it->second);
+                            modified = true;
+                        }
+                    }
+
+                    if (modified)
+                        _updateEntry(transaction, StoreState::New);
+                    break;
+                }
+                case TransactionDataType::Cash:
+                    break;
+            }
+        }
     }
 
 }   // namespace app

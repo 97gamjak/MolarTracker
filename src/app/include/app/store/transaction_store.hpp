@@ -2,17 +2,18 @@
 #define __APP__INCLUDE__APP__STORE__TRANSACTION_STORE_HPP__
 
 #include <memory>
-#include <unordered_map>
 #include <vector>
 
-#include "app/services_api/i_transaction_service.hpp"
+#include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
-#include "drafts/transaction_draft.hpp"
 #include "finance/transaction.hpp"
 
 namespace app
 {
+    class ITransactionService;   // Forward declaration
+
     /**
      * @brief Result of transaction store operations
      *
@@ -35,28 +36,26 @@ namespace app
         /// The Transaction service
         std::shared_ptr<ITransactionService> _transactionService;
 
+        /// Connections for various events
+        Connections _connections;
+
        public:
         explicit TransactionStore(
-            const std::shared_ptr<ITransactionService>& transactionService
+            const std::shared_ptr<ITransactionService>& transactionService,
+            AccountStore&                               accountStore,
+            StockStore&                                 stockStore
         );
 
-        void commit(
-            const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
-                accountIdMap
-        );
+        void commit();
 
-        TransactionStoreResult addTransaction(
-            const drafts::TransactionDraft& draft
-        );
+        TransactionStoreResult addTransaction(finance::Transaction transaction);
 
         // TODO (97gamjak): create filter here
-        std::vector<drafts::TransactionDraft> getTransactions() const;
+        std::vector<finance::Transaction> getTransactions() const;
 
        private:
-        void _updateAccountIds(
-            const std::unordered_map<AccountId, AccountId, AccountId::Hash>&
-                accountIdMap
-        );
+        void _onAccountIdRemap(const AccountStore::IdMap& remap);
+        void _onInstrumentIdRemap(const instrumentMap<InstrumentId>& remap);
     };
 
 }   // namespace app

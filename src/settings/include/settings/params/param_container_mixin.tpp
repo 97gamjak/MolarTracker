@@ -55,36 +55,22 @@ namespace settings
      * @param user A user-defined pointer that will be passed to the callback
      * function when it is called, this can be used to provide additional
      * context for the callback function
-     * @return std::vector<Connection> A vector of Connection objects
-     * representing the subscriptions, these can be used to unsubscribe from
-     * changes by calling disconnect() on them or by letting them go out of
-     * scope
+     * @return Connections A Connections object representing the subscriptions,
+     * these can be used to unsubscribe from changes by calling disconnect() on
+     * them or by letting them go out of scope
      */
     template <typename Derived>
-    std::vector<Connection> ParamContainerMixin<Derived>::subscribeToDirty(
+    Connections ParamContainerMixin<Derived>::subscribeToDirty(
         OnDirtyChanged::func func,
         void*                user
     )
     {
-        std::vector<Connection> connections;
+        Connections connections;
 
         auto subscribeToDirtyForParam = [&](auto& param)
         {
-            // subscribe to dirty can either return a single Connection or a
-            // vector of Connections, we need to handle both cases
-            if constexpr (std::is_same_v<
-                              decltype(param.subscribeToDirty(func, user)),
-                              Connection>)
-            {
-                auto connection = param.subscribeToDirty(func, user);
-                connections.push_back(std::move(connection));
-            }
-            else
-            {
-                auto paramConnections = param.subscribeToDirty(func, user);
-                for (auto& connection : paramConnections)
-                    connections.push_back(std::move(connection));
-            }
+            auto connection = param.subscribeToDirty(func, user);
+            connections.add(std::move(connection));
         };
 
         _self().forEachParam(subscribeToDirtyForParam);

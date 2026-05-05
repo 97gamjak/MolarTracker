@@ -2,14 +2,20 @@
 
 #include <cassert>
 #include <memory>
+#include <string>
 
 #include "app/migration/multi_migration.hpp"
 #include "app/migration/single_migration.hpp"
 #include "config/finance.hpp"
+#include "config/id_types.hpp"
 #include "db/database.hpp"
+#include "orm/constraints.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/position_row.hpp"
 #include "sql_models/profile_row.hpp"
+#include "sql_models/stock_row.hpp"
+#include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 #include "utils/version.hpp"
@@ -76,6 +82,7 @@ namespace app
 
         // add migrations
         _migrate_0_0_3();
+        _migrate_0_1_0();
 
         assert(_migrations.size() == toVersion);
     }
@@ -230,9 +237,181 @@ namespace app
         // of line, but as before this migration it was not possible to add
         // instruments to the database via the app this should be safe unless
         // someone decided to mess around with the db manually!!!
+        using Field =
+            InstrumentRow::Field<"currency", Currency, orm::not_null_t>;
+
         migration.addMigration(
-            std::make_unique<AddColumnMigration<InstrumentRow::currencyField>>(
-                InstrumentRow::currencyField{Currency::USD}
+            std::make_unique<AddColumnMigration<Field>>(Field{Currency::USD})
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate from version 0.1.0
+     *
+     */
+    void Migrations::_migrate_0_1_0()
+    {
+        _lastReleaseVersion = utils::SemVer(0, 1, 0);
+
+        _migrateV6();
+        _migrateV7();
+        _migrateV8();
+        _migrateV9();
+        _migrateV10();
+    }
+
+    /**
+     * @brief Migrate to version 6
+     *
+     * @details This handles the migration from v5 to v6. It drops and
+     * recreates the transaction, transaction_entry, and instrument tables to
+     * add new fields and constraints, and creates a new trade_leg table for
+     * representing trade transactions in a more structured way.
+     */
+    void Migrations::_migrateV6()
+    {
+        constexpr std::size_t currentVersion = 5;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<
+                DropAndRecreateTableMigration<TransactionEntryRow>>()
+        );
+
+        migration.addMigration(
+            std::make_unique<DropAndRecreateTableMigration<InstrumentRow>>()
+        );
+
+        migration.addMigration(
+            std::make_unique<DropAndRecreateTableMigration<TransactionRow>>()
+        );
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<TradeLegRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 7
+     *
+     * @details This handles the migration from v6 to v7. It creates a new
+     * stock table for representing stock instruments, which has a one-to-one
+     * relationship with the instrument table, allowing for more specific fields
+     * related to stocks (e.g., ticker symbol) while still maintaining a common
+     * base for all instruments.
+     */
+    void Migrations::_migrateV7()
+    {
+        constexpr std::size_t currentVersion = 6;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<StockRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 8
+     *
+     * @details This handles the migration from v7 to v8. It adds a currency
+     * field to the stock table for representing the currency in which the stock
+     * is traded, and removes the currency field from the instrument table as it
+     * is not relevant for all types of instruments and can lead to confusion.
+     */
+    void Migrations::_migrateV8()
+    {
+        constexpr std::size_t currentVersion = 7;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        // Add currency field to stock table
+        // ATTENTION: could be
+        // problematic when migrating existing data as the currency could be out
+        // of line, but as before this migration it was not possible to add
+        // stocks to the database via the app this should be safe unless
+        // someone decided to mess around with the db manually!!!
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::currencyField>>(
+                StockRow::currencyField{Currency::USD}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<DropColumnMigration<InstrumentRow>>("currency")
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 9
+     */
+    void Migrations::_migrateV9()
+    {
+        constexpr std::size_t currentVersion = 8;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::shortNameField>>(
+                StockRow::shortNameField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::longNameField>>(
+                StockRow::longNameField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::assetClassField>>(
+                StockRow::assetClassField{AssetClass::Unknown}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::sectorField>>(
+                StockRow::sectorField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::industryField>>(
+                StockRow::industryField{""}
+            )
+        );
+
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<StockRow::exchangeField>>(
+                StockRow::exchangeField{""}
+            )
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 10
+     */
+    void Migrations::_migrateV10()
+    {
+        constexpr std::size_t currentVersion = 9;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<PositionRow>>()
+        );
+
+        // here we can safely migrate with invalid as we did not yet add any
+        // trade legs to the db
+        migration.addMigration(
+            std::make_unique<AddColumnMigration<TradeLegRow::positionIdField>>(
+                TradeLegRow::positionIdField{PositionId::invalid()}
             )
         );
 

@@ -30,7 +30,7 @@ namespace settings
         /// value of the parameter, this is used to notify subscribers when the
         /// parameter value changes
         template <typename U>
-        using ChangedFnBase = void (*)(void*, const U&);
+        using ChangedFnBase = void (*)(const U&);
 
         /// Type alias for the change callback function for the parameter value,
         /// this is a function pointer that takes a pointer to the user data and

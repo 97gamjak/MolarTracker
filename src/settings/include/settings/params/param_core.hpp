@@ -48,7 +48,7 @@ namespace settings
         /// is a function pointer that takes a pointer to the user data and the
         /// new value of the parameter, this is used to notify subscribers when
         /// the parameter value changes
-        using func = std::function<void(void*, const T& newValue)>;
+        using func = std::function<void(const T& newValue)>;
     };
 
     /**
@@ -64,7 +64,7 @@ namespace settings
     {
         /// Type alias for the change callback function for the optional
         /// parameter
-        using func = std::function<void(void*, const std::optional<T>&)>;
+        using func = std::function<void(const std::optional<T>&)>;
     };
 
     /**
@@ -90,15 +90,14 @@ namespace settings
         /// this is a function pointer that takes a pointer to the user data and
         /// the new value of the parameter, this is used to notify subscribers
         /// when the parameter value changes
-        using ChangedFn = void (*)(void*, const T& newValue);
+        using ChangedFn = ParamValueChanged<T>::func;
 
         /// Type alias for the change callback function for the optional
         /// parameter value, this is a function pointer that takes a pointer to
         /// the user data and the new optional value of the parameter, this is
         /// used to notify subscribers when the parameter value changes, this is
         /// useful for parameters that can be unset (optional)
-        using ChangedFnOptional =
-            void (*)(void*, const std::optional<T>& newValue);
+        using ChangedFnOptional = ParamOptionalChanged<T>::func;
 
        private:
         /// type alias for ParamCoreSchema

@@ -4,6 +4,11 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+#### Finance
+
+- Add possibility to add stocks via ticker and yfinance to database
+- Add possibility to create stock transactions
+
 <!-- insertion marker -->
 ## [0.1.0](https://github.com/repo/owner/releases/tag/0.1.0) - 2026-04-22
 
@@ -21,6 +26,7 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Create transactions is now really only possible with the max amount of decimal places
 - Added some nice formatting for amount input in create transaction dialog
+- Now it is possible to add securities to a database (with basic info from yahoo finance) and see an overview of them
 
 ### Bug Fixes
 

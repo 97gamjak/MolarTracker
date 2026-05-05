@@ -24,7 +24,8 @@ namespace app
     X(DropTable)               \
     X(CopyTable)               \
     X(RenameTable)             \
-    X(AddColumn)
+    X(AddColumn)               \
+    X(DropColumn)
 
     MSTD_ENUM(MigrationType, std::uint8_t, MIGRATION_TYPE_LIST);
 
@@ -183,6 +184,23 @@ namespace app
 
        public:
         explicit AddColumnMigration(Field defaultValue);
+
+        void applyMigration(db::Database& db) override;
+    };
+
+    /**
+     * @brief Migration to drop a column from a table
+     *
+     */
+    template <typename Model>
+    class DropColumnMigration : public SingleMigration
+    {
+       private:
+        /// the name of the column to drop
+        std::string _columnName;
+
+       public:
+        explicit DropColumnMigration(std::string columnName);
 
         void applyMigration(db::Database& db) override;
     };

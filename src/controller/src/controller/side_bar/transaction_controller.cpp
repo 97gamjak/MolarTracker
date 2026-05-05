@@ -1,12 +1,20 @@
 #include "transaction_controller.hpp"
 
+#include <stdexcept>
+
 #include "app/store/account_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
+#include "controller/side_bar/securities_controller.hpp"
+#include "controller/transaction_controller.hpp"
 #include "drafts/transaction_draft.hpp"
+#include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/transaction_category.hpp"
-#include "ui/transaction/create_transaction_dlg.hpp"
+#include "ui/transaction/deposit_withdrawal_widget.hpp"
+#include "ui/transaction/stock_widget.hpp"
+#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
@@ -19,37 +27,76 @@ namespace controller
      * @param undoStack The undo stack for the application
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
+     * @param stockStore The stock store for the application
      * @param transactionController The transaction controller for the
      * application
+     * @param stockController The stock controller for the application
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&        undoStack,
-        app::AccountStore&     accountStore,
-        app::TransactionStore& transactionStore,
-        TransactionController& transactionController,
-        QMainWindow*           mainWindow
+        cmd::UndoStack&              undoStack,
+        app::AccountStore&           accountStore,
+        app::TransactionStore&       transactionStore,
+        app::StockStore&             stockStore,
+        TransactionController&       transactionController,
+        SecuritiesSideBarController& stockController,
+        QMainWindow*                 mainWindow
     )
         : SideBarCategoryController(new ui::TransactionCategory(), mainWindow),
           _undoStack(undoStack),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
-          _createDlg(new ui::CreateTransactionDialog(mainWindow)),
-          _transactionController(transactionController)
+          _stockStore(stockStore),
+          _createCashTransactionDlg(nullptr),
+          _createStockTransactionDlg(nullptr),
+          _transactionController(transactionController),
+          _stockController(stockController),
+          _mainWindow(mainWindow)
     {
+        _createCashTransactionDlg =
+            utils::makeQChild<ui::DepositWithdrawalWidget>(
+                TransactionType::Deposit,   // dummy type
+                _accountStore.getCashAccounts(),
+                _mainWindow
+            );
+
         connect(
-            _createDlg,
-            &ui::CreateTransactionDialog::transactionTypeChanged,
+            _createCashTransactionDlg,
+            &ui::DepositWithdrawalWidget::createCashTransactionRequested,
             this,
-            &TransactionSideBarController::_onTransactionTypeChanged
+            &TransactionSideBarController::_onCreateCashTransactionRequested
+        );
+
+        _createStockTransactionDlg = utils::makeQChild<ui::StockWidget>(
+            _accountStore.getAllAccounts(),
+            _accountStore.getAllAccounts(),
+            _stockStore.getAllTickers(),
+            _mainWindow
         );
 
         connect(
-            _createDlg,
-            &ui::CreateTransactionDialog::createTransactionRequested,
+            _createStockTransactionDlg,
+            &ui::StockWidget::createTickerRequested,
             this,
-            &TransactionSideBarController::_onCreateTransactionRequested
+            &TransactionSideBarController::_onCreateTickerRequested
         );
+
+        connect(
+            _createStockTransactionDlg,
+            &ui::StockWidget::createStockTransactionRequested,
+            this,
+            &TransactionSideBarController::_onCreateStockTransactionRequested
+        );
+
+        _connections.add(_stockStore.subscribeToStoreChange(
+            [&]()
+            {
+                _createStockTransactionDlg->updateTickers(
+                    _stockStore.getAllTickers()
+                );
+            },
+            this
+        ));
     }
 
     /**
@@ -77,122 +124,163 @@ namespace controller
             return;
         }
 
-        if (action == item->getCreateAction() ||
-            action == item->getCreateDepositAction() ||
+        if (action == item->getCreateDepositAction() ||
             action == item->getCreateWithdrawalAction())
         {
-            std::optional<TransactionType> type;
-
-            if (action == item->getCreateDepositAction())
-                type = TransactionType::Deposit;
-            else if (action == item->getCreateWithdrawalAction())
-                type = TransactionType::Withdrawal;
-            else
-                type = std::nullopt;
+            const auto type = action->data().value<TransactionType>();
 
             LOG_DEBUG(
                 "Create action triggered for transaction category with type: " +
-                (type.has_value() ? TransactionTypeMeta::toString(type.value())
-                                  : "None")
+                TransactionTypeMeta::toString(type)
             );
 
-            if (type.has_value())
-                _onTransactionTypeChanged(type.value());
+            _createCashTransactionDlg->setTransactionType(type);
+            _createCashTransactionDlg->updateAccounts(
+                _accountStore.getCashAccounts()
+            );
+            _createCashTransactionDlg->refresh();
 
-            if (auto* dialog = _createDlg.data())
-                dialog->exec();
+            _createCashTransactionDlg->show();
         }
-    }
-
-    /**
-     * @brief Handle the selection of transactions in the side bar, this will
-     * trigger the transaction overview to update with the latest data from the
-     * store, and provides a way for the UI to trigger updates to the
-     * transaction overview when it is selected.
-     *
-     * @param type The type of transactions to show in the overview, this allows
-     * the controller to filter the transactions displayed based on their type.
-     */
-    void TransactionSideBarController::_onTransactionTypeChanged(
-        TransactionType type
-    )
-    {
-        LOG_DEBUG(
-            std::format(
-                "Transaction type changed to '{}'",
-                TransactionTypeMeta::toString(type)
-            )
-        );
-
-        if (_createDlg != nullptr)
+        else if (action == item->getCreateStockTransactionAction())
         {
-            std::vector<drafts::AccountDraft> accounts;
+            _createStockTransactionDlg->updateAccounts(
+                _accountStore.getSecurityAccounts()
+            );
+            _createStockTransactionDlg->updateReferenceAccounts(
+                _accountStore.getCashAccounts()
+            );
+            _createStockTransactionDlg->updateTickers(_stockStore.getAllTickers(
+            ));
+            _createStockTransactionDlg->refresh();
 
-            switch (type)
-            {
-                case TransactionType::Deposit:
-                case TransactionType::Withdrawal:
-                    accounts = _accountStore.getCashAccounts();
-                    break;
-            }
-
-            _createDlg->setWidget(type, accounts);
+            _createStockTransactionDlg->show();
+        }
+        else
+        {
+            throw std::logic_error(
+                "Unhandled context menu action for transaction category: " +
+                action->text().toStdString()
+            );
         }
     }
 
     /**
-     * @brief Handle the creation of a new transaction, this will take the
-     * transaction draft from the create transaction dialog, convert it to a
-     * transaction model, and add it to the transaction store, this allows the
-     * controller to handle the creation of new transactions based on the input
-     * from the user in the create transaction dialog, and ensures that new
-     * transactions are properly added to the store and can be displayed in the
-     * UI.
+     * @brief Handle the creation of a new cash transaction, this will be called
+     * when the user submits the create transaction dialog for a cash
+     * transaction, and should handle validating the transaction draft, adding
+     * any necessary additional entries (e.g. for external accounts), and then
+     * adding the transaction to the store. This allows the controller to manage
+     * the process of creating a new cash transaction from the UI, ensuring that
+     * the transaction is properly validated and added to the store with all
+     * necessary information.
      *
-     * @param draft The transaction draft containing the information needed to
-     * create a new transaction, this includes details such as the type of
-     * transaction, the entries for the transaction, and any other relevant
-     * information needed to create a new transaction in the store.
+     * @param draft The draft of the cash transaction to create, this contains
+     * all the necessary information for creating a new cash transaction,
+     * including the timestamp, entries, and any optional comment.
      */
-    void TransactionSideBarController::_onCreateTransactionRequested(
-        drafts::TransactionDraft draft
+    void TransactionSideBarController::_onCreateCashTransactionRequested(
+        drafts::CreateCashTransactionDraft draft
     )
     {
+        LOG_ENTRY;
+
         std::vector<drafts::TransactionEntryDraft> additionalEntries;
 
-        for (auto entry : draft.entries)
+        for (auto entry : draft.getEntries())
         {
-            if (entry.needsExternal)
+            if (entry.needsExternal())
             {
-                entry.accountId =
-                    _accountStore.getExternalAccount(entry.cash.getCurrency());
-                entry.cash = -entry.cash;
-                additionalEntries.push_back(entry);
+                additionalEntries.emplace_back(
+                    _accountStore.getExternalAccount(
+                        entry.getCash().getCurrency()
+                    ),
+                    -entry.getCash()
+                );
             }
         }
 
         for (const auto& entry : additionalEntries)
-        {
-            draft.entries.push_back(entry);
-        }
+            draft.addEntry(entry);
 
-        _transactionStore.addTransaction(draft);
+        _transactionStore.addTransaction(
+            drafts::TransactionMapper::fromCreateCashTransactionDraft(draft)
+        );
+
         // TODO(97gamjak): add here commands and also error handling
-        _createDlg->close();
-        _createDlg->reset();
+        _createCashTransactionDlg->close();
         _transactionController.transactionOverviewSelected(false);
     }
 
     /**
-     * @brief Handle the selection of transactions in the side bar, this will
-     * trigger the transaction overview to update with the latest data from the
-     * store, and provides a way for the UI to trigger updates to the
-     * transaction overview when it is selected.
+     * @brief Handle the creation of a new stock transaction, this will be
+     * called when the user submits the create transaction dialog for a stock
+     * transaction, and should handle validating the transaction draft, adding
+     * any necessary additional entries (e.g. for external accounts), and then
+     * adding the transaction to the store. This allows the controller to manage
+     * the process of creating a new stock transaction from the UI, ensuring
+     * that the transaction is properly validated and added to the store with
+     * all necessary information.
+     *
+     * @param draft The draft of the stock transaction to create, this contains
+     * all the necessary information for creating a new stock transaction,
+     * including the timestamp, legs, and any optional comment.
+     */
+    void TransactionSideBarController::_onCreateStockTransactionRequested(
+        drafts::CreateStockTransactionDraft draft
+    )
+    {
+        LOG_ENTRY;
+
+        for (auto& leg : draft.getLegs())
+        {
+            const auto instrumentId =
+                _stockStore.getInstrumentId(leg.getTicker());
+
+            if (instrumentId.has_value())
+            {
+                leg.setInstrumentId(*instrumentId);
+            }
+            else
+            {
+                throw std::logic_error(
+                    "Invalid stock ticker: " + leg.getTicker()
+                );
+            }
+        }
+
+        _transactionStore.addTransaction(
+            drafts::TransactionMapper::fromCreateStockTransactionDraft(draft)
+        );
+
+        // TODO(97gamjak): add here commands and also error handling
+        _createStockTransactionDlg->close();
+        _transactionController.transactionOverviewSelected(false);
+    }
+
+    /**
+     * @brief Handle the selection of transactions in the side bar,
+     * this will trigger the transaction overview to update with the
+     * latest data from the store, and provides a way for the UI to
+     * trigger updates to the transaction overview when it is
+     * selected.
      *
      */
     void TransactionSideBarController::onTransactionsSelected()
     {
         _transactionController.transactionOverviewSelected();
+    }
+
+    /**
+     * @brief Handle the creation of a new stock ticker
+     *
+     * @param ticker The ticker symbol of the stock to create
+     */
+    void TransactionSideBarController::_onCreateTickerRequested(
+        const std::string& ticker
+    )
+    {
+        _stockController.createStock(ticker);
     }
 
 }   // namespace controller

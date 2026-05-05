@@ -1,6 +1,4 @@
-set -e
-
-cpp_checks --dirs src
+source $PATH/custom_cpp_checks.sh
 
 cd .build
 cmake .. -DMOLARTRACKER_ENABLE_DOCS=ON -DMOLARTRACKER_ENABLE_TESTING=ON

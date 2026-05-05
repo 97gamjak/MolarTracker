@@ -19,11 +19,16 @@ namespace finance
     {
     };
 
+    class SecurityAccount
+    {
+    };
+
     class ExternalAccount
     {
     };
 
-    using AccountDetails = std::variant<CashAccount, ExternalAccount>;
+    using AccountDetails =
+        std::variant<CashAccount, SecurityAccount, ExternalAccount>;
 
     /**
      * @brief A base class representing a financial account, which can be
@@ -53,7 +58,6 @@ namespace finance
 
        public:
         Account(
-            AccountId     id,
             AccountStatus status,
             std::string   name,
             Currency      currency,

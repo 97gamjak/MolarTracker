@@ -13,7 +13,9 @@ namespace app
      */
     Profile ProfileFactory::toDomain(const ProfileRow& row)
     {
-        return Profile{row.id.value(), row.name.value(), row.email.value()};
+        auto profile = Profile{row.name.value(), row.email.value()};
+        profile.setId(row.id.value());
+        return profile;
     }
 
     /**

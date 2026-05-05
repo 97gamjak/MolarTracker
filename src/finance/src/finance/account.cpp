@@ -2,36 +2,40 @@
 
 #include <utility>
 
+#include "config/finance.hpp"
+
 namespace finance
 {
 
     /**
      * @brief Construct a new Account:: Account object
      *
-     * @param id the unique identifier for the cash account
      * @param status the status of the account (e.g., Active, Closed)
      * @param currency the current currency of the account
      * @param name the current name of the account
      * @param kind the kind of the account (e.g., Cash, External, Security)
      */
     Account::Account(
-        AccountId     id,
         AccountStatus status,
         std::string   name,
         Currency      currency,
         AccountKind   kind
     )
-        : _id(id),
+        : _id(AccountId::invalid()),
           _status(status),
           _name(std::move(name)),
-          _currency(currency),
-          _details(ExternalAccount{})
+          _currency(currency)
     {
         switch (kind)
         {
             case AccountKind::Cash:
             {
                 _details = CashAccount{};
+                break;
+            }
+            case AccountKind::Security:
+            {
+                _details = SecurityAccount{};
                 break;
             }
             case AccountKind::External:
@@ -93,6 +97,10 @@ namespace finance
             AccountKind operator()(const ExternalAccount& /*details*/) const
             {
                 return AccountKind::External;
+            }
+            AccountKind operator()(const SecurityAccount& /*details*/) const
+            {
+                return AccountKind::Security;
             }
         };
         return std::visit(Visitor{}, _details);

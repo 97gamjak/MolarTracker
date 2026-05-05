@@ -4,6 +4,7 @@
 #include <compare>
 
 #include "config/finance.hpp"
+#include "config/quantity.hpp"
 
 namespace finance
 {
@@ -36,11 +37,15 @@ namespace finance
         friend Cash operator+(const Cash& lhs, const Cash& rhs);
         friend Cash operator-(const Cash& lhs, const Cash& rhs);
         friend Cash operator-(const Cash& cash);
+        friend Cash operator*(const Cash& cash, const Quantity& multiplier);
+        friend Cash operator*(const Quantity& multiplier, const Cash& cash);
 
         friend Cash& operator+=(Cash& lhs, const Cash& rhs);
         friend Cash& operator-=(Cash& lhs, const Cash& rhs);
 
         [[nodiscard]] bool isZero() const;
+        [[nodiscard]] bool isPositive() const;
+        [[nodiscard]] bool isNegative() const;
 
         [[nodiscard]] micro_units getAmount() const;
         [[nodiscard]] Currency    getCurrency() const;

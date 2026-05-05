@@ -22,11 +22,11 @@ namespace drafts
     AccountDraft AccountMapper::toDraft(const finance::Account& account)
     {
         return AccountDraft{
-            .id       = account.getId(),
-            .name     = account.getName(),
-            .kind     = account.getKind(),
-            .currency = account.getCurrency(),
-            .status   = account.getStatus(),
+            account.getId(),
+            account.getName(),
+            account.getKind(),
+            account.getCurrency(),
+            account.getStatus()
         };
     }
 
@@ -44,13 +44,14 @@ namespace drafts
      */
     finance::Account AccountMapper::toAccount(const AccountDraft& draft)
     {
-        return finance::Account{
-            draft.id,
+        auto account = finance::Account{
             draft.status.value_or(AccountStatus::Active),
             draft.name,
             draft.currency,
             draft.kind
         };
+        account.setId(draft.id);
+        return account;
     }
 
 }   // namespace drafts

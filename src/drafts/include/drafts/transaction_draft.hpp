@@ -12,51 +12,188 @@
 namespace drafts
 {
 
-    struct TransactionEntryDraft;   // Forward declaration
+    // TODO(97gamjak): create own draft files
+    /**
+     * @brief A draft representation of a transaction entry
+     *
+     */
+    class TransactionEntryDraft
+    {
+       private:
+        /// The ID of the account associated with the transaction entry
+        AccountId _accountId;
+
+        /// The cash amount associated with the transaction entry
+        finance::Cash _cash;
+
+        /// A flag indicating whether this transaction entry needs an external
+        /// account
+        bool _needsExternal = false;
+
+       public:
+        TransactionEntryDraft(AccountId accountId, finance::Cash cash);
+
+        void setNeedsExternal(bool needsExternal);
+
+        [[nodiscard]] AccountId getAccountId() const;
+
+        [[nodiscard]] finance::Cash getCash() const;
+
+        [[nodiscard]] bool needsExternal() const;
+    };
+
+    /**
+     * @brief A draft representation of a trade leg
+     *
+     */
+    class TradeLegDraft
+    {
+       private:
+        /// The ID of the account associated with the trade leg draft.
+        AccountId _accountId;
+        /// The unit price associated with the trade leg draft.
+        finance::Cash _unitPrice;
+        /// The quantity associated with the trade leg draft.
+        Quantity _quantity;
+        /// The ticker associated with the trade leg draft.
+        std::string _ticker;
+        /// The instrument ID associated with the trade leg draft.
+        InstrumentId _instrumentId;
+
+       public:
+        TradeLegDraft(
+            AccountId     accountId,
+            finance::Cash unitPrice,
+            Quantity      quantity,
+            std::string   ticker
+        );
+
+        [[nodiscard]] AccountId getAccountId() const;
+
+        [[nodiscard]] finance::Cash getUnitPrice() const;
+
+        [[nodiscard]] Quantity getQuantity() const;
+
+        [[nodiscard]] const std::string& getTicker() const;
+
+        [[nodiscard]] InstrumentId getInstrumentId() const;
+
+        void setInstrumentId(InstrumentId instrumentId);
+    };
+
+    /**
+     * @brief A base class for a draft representation of a transaction
+     *
+     */
+    class CreateTransactionDraft
+    {
+       private:
+        /// The timestamp of the transaction
+        Timestamp _timestamp;
+
+        /// The entries of the transaction
+        std::vector<TransactionEntryDraft> _entries;
+
+        /// An optional comment associated with the transaction
+        std::optional<std::string> _comment;
+
+       public:
+        CreateTransactionDraft(
+            Timestamp                          timestamp,
+            std::vector<TransactionEntryDraft> entries,
+            std::optional<std::string>         comment
+        );
+
+        [[nodiscard]]
+        const std::vector<TransactionEntryDraft>& getEntries() const;
+
+        [[nodiscard]]
+        const Timestamp& getTimestamp() const;
+
+        [[nodiscard]]
+        const std::optional<std::string>& getComment() const;
+
+        void addEntry(const TransactionEntryDraft& entry);
+    };
 
     /**
      * @brief A draft representation of a transaction
      *
      */
-    struct TransactionDraft
+    class CreateCashTransactionDraft : public CreateTransactionDraft
     {
-        /// The ID of the transaction
-        TransactionId id = TransactionId::invalid();
-
-        /// The timestamp of the transaction
-        Timestamp timestamp;
-
-        /// An optional comment for the transaction
-        std::optional<std::string> comment;
-
-        /// The entries of the transaction
-        std::vector<TransactionEntryDraft> entries;
+       public:
+        using CreateTransactionDraft::CreateTransactionDraft;
     };
 
     /**
-     * @brief A draft representation of a transaction entry
+     * @brief A draft representation of a stock transaction
      *
      */
-    struct TransactionEntryDraft
+    class CreateStockTransactionDraft : public CreateTransactionDraft
     {
-        /// The ID of the account associated with the transaction entry
-        AccountId accountId;
+       private:
+        /// The legs of the stock transaction
+        std::vector<TradeLegDraft> _legs;
 
-        /// The cash amount associated with the transaction entry
-        finance::Cash cash;
-
-        /// The kind of account associated with the transaction entry
-        AccountKind accountKind;
-
-        /// A flag indicating whether this transaction entry needs an external
-        /// account
-        bool needsExternal = false;
-
-        TransactionEntryDraft(
-            AccountId     accountId_,
-            finance::Cash cash_,
-            AccountKind   accountKind_
+       public:
+        CreateStockTransactionDraft(
+            Timestamp                          timestamp,
+            std::vector<TransactionEntryDraft> entries,
+            std::vector<TradeLegDraft>         legs,
+            std::optional<std::string>         comment
         );
+
+        [[nodiscard]] const std::vector<TradeLegDraft>& getLegs() const;
+
+        [[nodiscard]] std::vector<TradeLegDraft>& getLegs();
+    };
+
+    /**
+     * @brief A draft representation of a transaction overview, this is used
+     * to display a summary of a transaction in the UI, and contains the
+     * necessary information to provide an overview of the transaction
+     * without needing to load the full transaction details.
+     *
+     */
+    class TransactionOverviewDraft
+    {
+       private:
+        /// The type of the transaction
+        TransactionDataType _type;
+
+        /// The timestamp of the transaction
+        Timestamp _timestamp;
+
+        /// The entries of the transaction
+        std::vector<TransactionEntryDraft> _entries;
+
+        /// The legs of the transaction
+        std::vector<TradeLegDraft> _legs;
+
+        /// An optional comment associated with the transaction
+        std::optional<std::string> _comment;
+
+       public:
+        explicit TransactionOverviewDraft(
+            TransactionDataType                type,
+            Timestamp                          timestamp,
+            std::vector<TransactionEntryDraft> entries,
+            std::vector<TradeLegDraft>         legs,
+            std::optional<std::string>         comment
+        );
+
+        [[nodiscard]] TransactionDataType getType() const;
+
+        [[nodiscard]] const Timestamp& getTimestamp() const;
+
+        [[nodiscard]]
+        const std::vector<TransactionEntryDraft>& getEntries() const;
+
+        [[nodiscard]]
+        const std::vector<TradeLegDraft>& getLegs() const;
+
+        [[nodiscard]] const std::optional<std::string>& getComment() const;
     };
 
 }   // namespace drafts

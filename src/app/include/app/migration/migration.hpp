@@ -68,6 +68,12 @@ namespace app
         void _migrateV3();
         void _migrateV4();
         void _migrateV5();
+        void _migrate_0_1_0();
+        void _migrateV6();
+        void _migrateV7();
+        void _migrateV8();
+        void _migrateV9();
+        void _migrateV10();
     };
 
 }   // namespace app

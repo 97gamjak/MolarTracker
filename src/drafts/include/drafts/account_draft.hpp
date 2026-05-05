@@ -31,6 +31,14 @@ namespace drafts
         /// The status of the account, this is optional because it may not be
         /// set
         std::optional<AccountStatus> status = std::nullopt;
+
+        explicit AccountDraft(
+            AccountId                    _id,
+            std::string                  _name,
+            AccountKind                  _kind,
+            Currency                     _currency,
+            std::optional<AccountStatus> _status
+        );
     };
 }   // namespace drafts
 

@@ -9,6 +9,7 @@ namespace app
 {
     class TransactionStore;   // Forward declaration
     class AccountStore;       // Forward declaration
+    class StockStore;         // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -42,6 +43,8 @@ namespace controller
         app::TransactionStore& _transactionStore;
         /// Reference to the account store
         app::AccountStore& _accountStore;
+        /// Reference to the stock store
+        app::StockStore& _stockStore;
 
         /// Pointer to the central stacked widget
         QStackedWidget* _stackedWidget;
@@ -53,6 +56,7 @@ namespace controller
             cmd::UndoStack&        undoStack,
             app::TransactionStore& transactionStore,
             app::AccountStore&     accountStore,
+            app::StockStore&       stockStore,
             QStackedWidget*        stackedWidget
         );
 

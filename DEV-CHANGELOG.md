@@ -4,6 +4,32 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### Finance
+
+- Add security account type
+- Add transaction type stock
+- Add create stock dialog draft
+- Add instrument repo/service and stockRow to db
+- Add comment and timestamp fields to deposit and withdrawal widgets
+- Add stock store and different methods for instrument repo / service
+- Add yf client to retrieve basic ticker info
+- Add security overview page
+- Add option to add a security via `Add Security` dialog
+
+#### HTTP
+
+- Add general http client/response/request interface
+
+#### Migration
+
+- Show database path if an exception during migration occurs
+
+#### Signal System
+
+- Rework signal system of stores
+
 <!-- insertion marker -->
 ## [0.1.0](https://github.com/repo/owner/releases/tag/0.1.0) - 2026-04-22
 

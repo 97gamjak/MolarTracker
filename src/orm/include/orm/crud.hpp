@@ -1,7 +1,6 @@
 #ifndef __ORM__INCLUDE__ORM__CRUD_HPP__
 #define __ORM__INCLUDE__ORM__CRUD_HPP__
 
-#include <cstdint>
 #include <expected>
 #include <mstd/error.hpp>
 #include <optional>
@@ -99,7 +98,7 @@ namespace orm
         template <db_model Model>
         [[nodiscard]] std::vector<Model> get(db::Database& database);
 
-        template <db_model... Models>
+        template <typename... Models>
         std::vector<std::tuple<Models...>> getJoined(
             db::Database&     database,
             const orm::Joins& joins,
@@ -119,9 +118,9 @@ namespace orm
         template <db_model Model>
         void deleteByPk(db::Database& database, const Model& model);
 
-        /***************
-         * ADD METHODS *
-         ***************/
+        /******************
+         * COLUMN METHODS *
+         ******************/
 
         template <typename Field>
         std::expected<void, CrudError> addColumn(
@@ -129,9 +128,18 @@ namespace orm
             const Field&  field
         );
 
+        template <typename Model>
+        std::expected<void, CrudError> dropColumn(
+            db::Database&      database,
+            const std::string& columnName
+        );
+
        private:
-        template <typename Field>
-        bool _columnExists(db::Database& database);
+        bool _columnExists(
+            db::Database&      database,
+            const std::string& columnName,
+            const std::string& tableName
+        );
     };
 
 }   // namespace orm

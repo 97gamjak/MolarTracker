@@ -3,11 +3,10 @@
 
 #include <nlohmann/json.hpp>
 #include <string>
-#include <vector>
 
 #include "config/signal_tags.hpp"
 
-class Connection;   // Forward declaration
+class Connections;   // Forward declaration
 
 namespace settings
 {
@@ -28,7 +27,7 @@ namespace settings
         [[nodiscard]] const std::string& getTitle() const;
         [[nodiscard]] const std::string& getDescription() const;
 
-        [[nodiscard]] std::vector<Connection> subscribeToDirty(
+        [[nodiscard]] Connections subscribeToDirty(
             OnDirtyChanged::func func,
             void*                user
         );

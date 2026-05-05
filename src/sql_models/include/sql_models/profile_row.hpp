@@ -17,6 +17,9 @@
  */
 struct ProfileRow : public orm::ORMModel<"profile">
 {
+    ProfileRow() = default;
+    explicit ProfileRow(ProfileId _id);
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     ORM_FIELD(id, IdField<ProfileId>)
@@ -27,10 +30,9 @@ struct ProfileRow : public orm::ORMModel<"profile">
     /// The email field, this is an optional field
     ORM_FIELD(email, Field<"email", std::optional<std::string>>)
 
+    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(ProfileRow, id, name, email)
-
-    explicit ProfileRow() = default;
-    explicit ProfileRow(ProfileId _id);
+    /// @endcond
 
     [[nodiscard]] static orm::WhereExpr hasName(const std::string& name);
 };

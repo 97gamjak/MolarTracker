@@ -3,8 +3,9 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
+#include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
-#include "sql_models/instrument_row.hpp"
+#include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
@@ -26,6 +27,7 @@ namespace app
         row.timestamp = transaction.getTimestamp();
         row.status    = transaction.getStatus();
         row.comment   = transaction.getComment();
+        row.type      = transaction.getType();
 
         return row;
     }
@@ -38,10 +40,24 @@ namespace app
      */
     finance::Transaction TransactionFactory::fromRow(const TransactionRow &row)
     {
+        finance::TransactionData type;
+
+        switch (row.type.value())
+        {
+            case TransactionDataType::Cash:
+                type = finance::CashData{};
+                break;
+            case TransactionDataType::Trade:
+                type = finance::TradeData{};
+                break;
+        }
+
         finance::Transaction transaction{
             row.id.value(),
             row.timestamp.value(),
             row.status.value(),
+            type,
+            {},
             row.comment.value()
         };
         return transaction;
@@ -53,23 +69,21 @@ namespace app
      *
      * @param entry The TransactionEntry object to convert.
      * @param transactionId The ID of the associated transaction.
-     * @param instrumentId The ID of the associated instrument.
      * @return The converted TransactionEntryRow object.
      */
     TransactionEntryRow TransactionFactory::toEntryRow(
         const finance::TransactionEntry &entry,
-        TransactionId                    transactionId,
-        InstrumentId                     instrumentId
+        TransactionId                    transactionId
     )
     {
         TransactionEntryRow row;
 
         row.id            = entry.getId();
         row.transactionId = transactionId;
-        row.instrumentId  = instrumentId;
         row.accountId     = entry.getAccountId();
 
-        row.amount = entry.getAmount();
+        row.amount   = entry.getAmount();
+        row.currency = entry.getCurrency();
 
         return row;
     }
@@ -79,81 +93,58 @@ namespace app
      * object.
      *
      * @param row The TransactionEntryRow object to convert.
-     * @param instrumentRow The associated InstrumentRow object.
      * @return The converted TransactionEntry object.
      */
     finance::TransactionEntry TransactionFactory::fromEntryRow(
-        const TransactionEntryRow &row,
-        const InstrumentRow       &instrumentRow
+        const TransactionEntryRow &row
     )
     {
-        switch (instrumentRow.kind.value())
-        {
-            case InstrumentKind::Cash:
-                return {
-                    row.id.value(),
-                    row.accountId.value(),
-                    _toCashTransaction(row, instrumentRow)
-                };
-            case InstrumentKind::Stock:
-                throw std::runtime_error(
-                    "Stock transactions are not supported"
-                );
-        }
-
-        throw std::runtime_error("Unknown instrument kind");
-    }
-
-    /**
-     * @brief Converts a TransactionDetail object to an
-     * InstrumentRow object.
-     *
-     * @param detail The TransactionDetail object to convert.
-     * @return The converted InstrumentRow object.
-     */
-    InstrumentRow TransactionFactory::toInstrumentRow(
-        const finance::TransactionDetail &detail
-    )
-    {
-        /**
-         * @brief Visitor for converting TransactionDetail to
-         * InstrumentRow.
-         *
-         */
-        struct InstrumentRowVisitor
-        {
-            InstrumentRow operator()(const finance::CashTransaction
-                                         & /*cash*/) const
-            {
-                InstrumentRow row;
-                row.kind = InstrumentKind::Cash;
-                return row;
-            }
+        return {
+            row.id.value(),
+            row.accountId.value(),
+            finance::Cash(row.currency.value(), row.amount.value())
         };
-
-        return std::visit(InstrumentRowVisitor{}, detail);
     }
 
     /**
-     * @brief Converts a TransactionEntryRow object and an InstrumentRow
-     * object to a CashTransaction object.
+     * @brief Converts a TradeLeg object to a TradeLegRow object.
      *
-     * @param row The TransactionEntryRow object to convert.
-     * @param instrumentRow The associated InstrumentRow object.
-     * @return The converted CashTransaction object.
+     * @param leg The TradeLeg object to convert.
+     * @param transactionId The ID of the associated transaction.
+     * @return The converted TradeLegRow object.
      */
-    finance::CashTransaction TransactionFactory::_toCashTransaction(
-        const TransactionEntryRow &row,
-        const InstrumentRow       &instrumentRow
+    TradeLegRow TransactionFactory::toLegRow(
+        const finance::TradeLeg &leg,
+        TransactionId            transactionId
     )
     {
-        if (instrumentRow.kind.value() != InstrumentKind::Cash)
-        {
-            throw std::runtime_error("Invalid instrument kind");
-        }
+        TradeLegRow row;
 
-        return finance::CashTransaction(
-            finance::Cash(instrumentRow.currency.value(), row.amount.value())
-        );
+        row.id            = TradeLegId::invalid();
+        row.transactionId = transactionId;
+        row.instrumentId  = leg.getInstrumentId();
+        row.accountId     = leg.getAccountId();
+        row.quantity      = leg.getQuantity().toMicroUnits();
+        row.unitPrice     = leg.getUnitPrice().getAmount();
+        row.currency      = leg.getUnitPrice().getCurrency();
+
+        return row;
     }
+
+    /**
+     * @brief Converts a TradeLegRow object to a TradeLeg object.
+     *
+     * @param row The TradeLegRow object to convert.
+     * @return The converted TradeLeg object.
+     */
+    finance::TradeLeg TransactionFactory::fromLegRow(const TradeLegRow &row)
+    {
+        return {
+            row.accountId.value(),
+            row.instrumentId.value(),
+            Quantity(row.quantity.value()),
+            finance::Cash(row.currency.value(), row.unitPrice.value())
+        };
+    }
+
 }   // namespace app

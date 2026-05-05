@@ -9,6 +9,7 @@
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
 #include "ui/side_bar/overview_category.hpp"
+#include "ui/side_bar/securities_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
 #include "ui/side_bar/transaction_category.hpp"
@@ -28,6 +29,8 @@ namespace controller
      * @param accountController
      * @param transactionController
      */
+    // TODO(97gamjak): would be probably best to remove dependency on central
+    // stack here
     SideBarController::SideBarController(
         cmd::UndoStack&        undoStack,
         app::AppContext&       appContext,
@@ -45,11 +48,18 @@ namespace controller
               accountController,
               mainWindow
           ),
+          _securitiesSideBarController(
+              mainWindow,
+              appContext.getStore().getStockStore(),
+              centralStack
+          ),
           _transactionSideBarController(
               undoStack,
               appContext.getStore().getAccountStore(),
               appContext.getStore().getTransactionStore(),
+              appContext.getStore().getStockStore(),
               transactionController,
+              _securitiesSideBarController,
               mainWindow
           ),
           _overviewCategory(new ui::OverviewCategory())
@@ -57,6 +67,7 @@ namespace controller
         _sideBar->addCategory(_overviewCategory);
         _sideBar->addCategory(_accountSideBarController.getCategory());
         _sideBar->addCategory(_transactionSideBarController.getCategory());
+        _sideBar->addCategory(_securitiesSideBarController.getCategory());
 
         connect(
             _sideBar,
@@ -123,6 +134,11 @@ namespace controller
                 _transactionSideBarController.onTransactionsSelected();
                 break;
             }
+            case ui::SideBarItemType::SecuritiesCategory:
+            {
+                _securitiesSideBarController.onSecuritiesSelected();
+                break;
+            }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
                 // Handle overview and account category clicks if needed
@@ -173,9 +189,6 @@ namespace controller
                 }
                 break;
             }
-            case ui::SideBarItemType::OverviewCategory:
-                // Handle overview item click
-                break;
             case ui::SideBarItemType::AccountCategory:
             {
                 const auto* acc = dynamic_cast<ui::AccountCategory*>(item);
@@ -185,12 +198,27 @@ namespace controller
                 break;
             }
             case ui::SideBarItemType::TransactionCategory:
+            {
                 const auto* transaction =
                     dynamic_cast<ui::TransactionCategory*>(item);
                 _transactionSideBarController.handleContextMenuAction(
                     transaction,
                     action
                 );
+                break;
+            }
+            case ui::SideBarItemType::SecuritiesCategory:
+            {
+                const auto* securities =
+                    dynamic_cast<ui::SecuritiesCategory*>(item);
+                _securitiesSideBarController.handleContextMenuAction(
+                    securities,
+                    action
+                );
+                break;
+            }
+            case ui::SideBarItemType::OverviewCategory:
+                // Handle overview item click
                 break;
         }
     }

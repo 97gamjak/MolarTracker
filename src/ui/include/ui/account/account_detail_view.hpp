@@ -19,7 +19,7 @@ namespace ui
 
        private:
         /// The account draft being displayed
-        drafts::AccountDraft _account;
+        std::unique_ptr<drafts::AccountDraft> _account;
 
         struct UIElements;
         /// PIMPL

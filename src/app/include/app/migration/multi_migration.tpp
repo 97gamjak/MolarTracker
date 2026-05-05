@@ -25,6 +25,18 @@ namespace app
         addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
     }
 
+    template <orm::db_model Model>
+    DropAndRecreateTableMigration<Model>::DropAndRecreateTableMigration()
+    {
+        addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
+        addMigration(
+            std::make_unique<DropTableMigration>(std::string(Model::tableName))
+        );
+
+        addMigration(std::make_unique<CreateTableMigration<Model>>());
+        addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+    }
+
 }   // namespace app
 
 #endif   // __APP__INCLUDE__APP__MIGRATION__MULTI_MIGRATION_TPP__

@@ -1,12 +1,18 @@
 #ifndef __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 #define __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 
-#include "finance/cash_transaction.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "sql_models/instrument_row.hpp"
-#include "sql_models/transaction_entry_row.hpp"
-#include "sql_models/transaction_row.hpp"
+#include "config/id_types.hpp"
+
+namespace finance
+{
+    class Transaction;        // forward declaration
+    class TransactionEntry;   // forward declaration
+    class TradeLeg;           // forward declaration
+}   // namespace finance
+
+struct TransactionRow;        // forward declaration
+struct TransactionEntryRow;   // forward declaration
+struct TradeLegRow;           // forward declaration
 
 namespace app
 {
@@ -28,27 +34,22 @@ namespace app
         [[nodiscard]]
         static TransactionEntryRow toEntryRow(
             const finance::TransactionEntry& entry,
-            TransactionId                    transactionId,
-            InstrumentId                     instrumentId
+            TransactionId                    transactionId
         );
 
         [[nodiscard]]
         static finance::TransactionEntry fromEntryRow(
-            const TransactionEntryRow& row,
-            const InstrumentRow&       instrumentRow
+            const TransactionEntryRow& row
         );
 
         [[nodiscard]]
-        static InstrumentRow toInstrumentRow(
-            const finance::TransactionDetail& detail
+        static TradeLegRow toLegRow(
+            const finance::TradeLeg& leg,
+            TransactionId            transactionId
         );
 
-       private:
         [[nodiscard]]
-        static finance::CashTransaction _toCashTransaction(
-            const TransactionEntryRow& row,
-            const InstrumentRow&       instrumentRow
-        );
+        static finance::TradeLeg fromLegRow(const TradeLegRow& row);
     };
 
 }   // namespace app

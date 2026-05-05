@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "connections/connection.hpp"
 #include "connections/observable.hpp"
 #include "numeric_param.hpp"
 
@@ -98,10 +99,7 @@ namespace settings
 
         [[nodiscard]] const std::string& getKey() const;
 
-        std::vector<Connection> subscribeToDirty(
-            OnDirtyChanged::func func,
-            void*                user
-        );
+        Connections subscribeToDirty(OnDirtyChanged::func func, void* user);
 
         [[nodiscard]] bool isDirty() const;
 

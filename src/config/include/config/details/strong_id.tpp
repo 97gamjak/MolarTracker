@@ -12,7 +12,7 @@
  * @tparam Rep
  * @param value
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep>::StrongId(Rep value) : _value{value}
 {
 }
@@ -24,7 +24,7 @@ constexpr StrongId<Tag, Rep>::StrongId(Rep value) : _value{value}
  * @tparam Rep
  * @return StrongId
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::invalid()
 {
     return StrongId<Tag, Rep>{static_cast<Rep>(-1)};
@@ -38,7 +38,7 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::invalid()
  * @param value
  * @return StrongId
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::from(Rep value)
 {
     return StrongId<Tag, Rep>{value};
@@ -49,7 +49,7 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::from(Rep value)
  *
  * @return Rep
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr Rep StrongId<Tag, Rep>::value() const
 {
     return _value;
@@ -60,7 +60,7 @@ constexpr Rep StrongId<Tag, Rep>::value() const
  *
  * @return StrongId
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator-() const
 {
     return StrongId<Tag, Rep>{-_value};
@@ -71,7 +71,7 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator-() const
  *
  * @return std::string
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr std::string StrongId<Tag, Rep>::toString() const
 {
     return std::to_string(_value);
@@ -82,10 +82,10 @@ constexpr std::string StrongId<Tag, Rep>::toString() const
  *
  * @return true if the StrongId is valid, false otherwise
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr bool StrongId<Tag, Rep>::isValid() const
 {
-    return _value >= static_cast<Rep>(0);
+    return _value != invalid()._value;
 }
 
 /**
@@ -93,7 +93,7 @@ constexpr bool StrongId<Tag, Rep>::isValid() const
  *
  * @return StrongId&
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++()
 {
     ++_value;
@@ -105,11 +105,36 @@ constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator++()
  *
  * @return StrongId
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator++(int)
 {
     StrongId<Tag, Rep> temp = *this;
     ++_value;
+    return temp;
+}
+
+/**
+ * @brief Prefix decrement operator for StrongId
+ *
+ * @return StrongId&
+ */
+template <typename Tag, typename Rep>
+constexpr StrongId<Tag, Rep>& StrongId<Tag, Rep>::operator--()
+{
+    --_value;
+    return *this;
+}
+
+/**
+ * @brief Postfix decrement operator for StrongId
+ *
+ * @return StrongId
+ */
+template <typename Tag, typename Rep>
+constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator--(int)
+{
+    StrongId<Tag, Rep> temp = *this;
+    --_value;
     return temp;
 }
 
@@ -120,11 +145,26 @@ constexpr StrongId<Tag, Rep> StrongId<Tag, Rep>::operator++(int)
  * @param id
  * @return std::ostream&
  */
-template <class Tag, class Rep>
+template <typename Tag, typename Rep>
 std::ostream& operator<<(std::ostream& output, StrongId<Tag, Rep> id)
 {
     output << std::string(typeid(Tag).name()) << "(" << id.value() << ")";
     return output;
+}
+
+/**
+ * @brief Get the next ID in the sequence
+ *
+ * @return Id
+ */
+template <typename Id>
+Id IdSequence<Id>::next()
+{
+    const auto id = _next;
+
+    --_next;
+
+    return id;
 }
 
 #endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__

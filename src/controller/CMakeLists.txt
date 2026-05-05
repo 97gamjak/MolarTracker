@@ -12,6 +12,7 @@ qt_add_library(molartracker_controller STATIC
     src/controller/side_bar/side_bar_category_controller.cpp
     src/controller/side_bar/account_controller.cpp
     src/controller/side_bar/transaction_controller.cpp
+    src/controller/side_bar/securities_controller.cpp
 
     src/controller/account_controller.cpp
     src/controller/transaction_controller.cpp
@@ -43,4 +44,5 @@ target_link_libraries(molartracker_controller
     molartracker_db
     molartracker_drafts
     molartracker_commands
+    molartracker_http
 )

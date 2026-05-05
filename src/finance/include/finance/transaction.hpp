@@ -1,19 +1,22 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "finance/trade_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
 
-enum class TransactionStatus : std::uint8_t;   // Forward declaration
-
 namespace finance
 {
+    struct CashData
+    {
+    };
+
+    using TransactionData = std::variant<CashData, TradeData>;
 
     /**
      * @brief A class representing a financial transaction, which may involve
@@ -33,33 +36,25 @@ namespace finance
         /// The status of the transaction (e.g., completed, deleted)
         TransactionStatus _status;
 
-        /// An optional comment or description for the transaction
-        std::optional<std::string> _comment;
+        /// The data associated with the transaction
+        TransactionData _data;
 
         /// A list of entries associated with the transaction, each entry
         /// represents a specific cash movement or account change related to the
         /// transaction
         std::vector<TransactionEntry> _entries;
 
+        /// An optional comment or description for the transaction
+        std::optional<std::string> _comment;
+
        public:
         explicit Transaction(
-            TransactionId     id,
-            Timestamp         timestamp,
-            TransactionStatus status,
-            std::string       comment
-        );
-
-        explicit Transaction(
-            TransactionId              id,
-            Timestamp                  timestamp,
-            TransactionStatus          status,
-            std::optional<std::string> comment
-        );
-
-        explicit Transaction(
-            TransactionId     id,
-            Timestamp         timestamp,
-            TransactionStatus status
+            TransactionId                 id,
+            Timestamp                     timestamp,
+            TransactionStatus             status,
+            TransactionData               data,
+            std::vector<TransactionEntry> entries,
+            std::optional<std::string>    comment = std::nullopt
         );
 
         [[nodiscard]] TransactionId                        getId() const;
@@ -68,9 +63,15 @@ namespace finance
         [[nodiscard]] std::optional<std::string>           getComment() const;
         [[nodiscard]] const std::vector<TransactionEntry>& getEntries() const;
         [[nodiscard]] std::vector<TransactionEntry>&       getEntries();
+        [[nodiscard]] TransactionDataType                  getType() const;
+        [[nodiscard]] const TransactionData&               getData() const;
+        [[nodiscard]] TransactionData&                     getData();
+
+        [[nodiscard]] Cash calculateTotalSum() const;
 
         void setId(TransactionId id);
         void addEntry(const TransactionEntry& entry);
+        void addLeg(const TradeLeg& leg);
     };
 
 }   // namespace finance

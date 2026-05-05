@@ -3,6 +3,7 @@
 
 #include "app/store/account_store.hpp"
 #include "app/store/profile/profile_store.hpp"
+#include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
@@ -19,11 +20,17 @@ namespace app
     class StoreContainer
     {
        private:
+        /// The instrument ID sequence
+        InstrumentIdSeq _instrumentIdSeq;
+
         /// The Profile store
         ProfileStore _profileStore;
 
         /// The Account store
         AccountStore _accountStore;
+
+        /// The stock store
+        StockStore _stockStore;
 
         /// The Transaction store
         TransactionStore _transactionStore;
@@ -32,7 +39,7 @@ namespace app
         std::vector<IStore*> _allStores;
 
         /// list of connections for all stores
-        std::vector<Connection> _connections;
+        Connections _connections;
 
        public:
         explicit StoreContainer(ServiceContainer& services);
@@ -41,7 +48,7 @@ namespace app
         void clearPotentiallyDirty();
         bool isDirty() const;
 
-        std::vector<Connection> subscribeToDirty(
+        Connections subscribeToDirty(
             const OnDirtyChanged::func& func,
             void*                       user
         );
@@ -54,6 +61,9 @@ namespace app
 
         [[nodiscard]] TransactionStore&       getTransactionStore();
         [[nodiscard]] const TransactionStore& getTransactionStore() const;
+
+        [[nodiscard]] StockStore&       getStockStore();
+        [[nodiscard]] const StockStore& getStockStore() const;
     };
 
 }   // namespace app

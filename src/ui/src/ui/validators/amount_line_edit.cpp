@@ -211,10 +211,16 @@ namespace ui
         QString    cleaned  = text;
         const auto dotIndex = cleaned.indexOf('.');
 
-        if (dotIndex != -1 &&
-            cleaned.length() - dotIndex - 1 > static_cast<int>(_nDecimalPlaces))
-            cleaned =
-                cleaned.left(dotIndex + 1 + static_cast<int>(_nDecimalPlaces));
+        if (dotIndex != -1)
+        {
+            if (_nDecimalPlaces == 0)
+                cleaned = cleaned.left(dotIndex);
+            else if (cleaned.length() - dotIndex - 1 >
+                     static_cast<int>(_nDecimalPlaces))
+                cleaned = cleaned.left(
+                    dotIndex + 1 + static_cast<int>(_nDecimalPlaces)
+                );
+        }
 
         if (cleaned != text)
         {

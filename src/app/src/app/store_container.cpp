@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "app/service_container.hpp"
+#include "app/store/stock_store.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
@@ -18,18 +19,21 @@ namespace app
     StoreContainer::StoreContainer(ServiceContainer& services)
         : _profileStore{services.getProfileService()},
           _accountStore{services.getAccountService()},
-          _transactionStore{services.getTransactionService()}
+          _stockStore{services.getInstrumentService(), _instrumentIdSeq},
+          _transactionStore{
+              services.getTransactionService(),
+              _accountStore,
+              _stockStore
+          }
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
         _allStores.push_back(&_transactionStore);
+        _allStores.push_back(&_stockStore);
 
-        auto connectProfileIdUpdate =
-            [](void* user, const std::optional<ProfileId>& profileId)
-        { static_cast<AccountStore*>(user)->updateActiveProfile(profileId); };
-
-        _connections.push_back(_profileStore.subscribeToProfileChange(
-            connectProfileIdUpdate,
+        _connections.add(_profileStore.subscribeToProfileChange(
+            [&](const std::optional<ProfileId>& profileId)
+            { _accountStore.updateActiveProfile(profileId); },
             &_accountStore
         ));
     }
@@ -47,7 +51,9 @@ namespace app
         // the observer in account store
         _accountStore.commit();
 
-        _transactionStore.commit(_accountStore.getChangedIds());
+        _transactionStore.commit();
+
+        _stockStore.commit();
     }
 
     /**
@@ -86,21 +92,19 @@ namespace app
      * @param user A user-defined pointer that will be passed to the
      * callback function when it is called, this can be used to provide
      * additional context for the callback function
-     * @return std::vector<Connection> A vector of Connection objects
-     * representing the subscriptions, these can be used to unsubscribe from
-     * changes by calling disconnect() on them or by letting them go out of
-     * scope
+     * @return Connections A Connections object representing the subscriptions,
+     * these can be used to unsubscribe from changes by calling disconnect() on
+     * them or by letting them go out of scope
      */
-    std::vector<Connection> StoreContainer::subscribeToDirty(
+    Connections StoreContainer::subscribeToDirty(
         const OnDirtyChanged::func& func,
         void*                       user
     )
     {
-        std::vector<Connection> connections;
-        connections.reserve(_allStores.size());
+        Connections connections;
 
         for (auto* store : _allStores)
-            connections.push_back(store->subscribeToDirty(func, user));
+            connections.add(store->subscribeToDirty(func, user));
 
         return connections;
     }
@@ -157,6 +161,23 @@ namespace app
     const TransactionStore& StoreContainer::getTransactionStore() const
     {
         return _transactionStore;
+    }
+
+    /**
+     * @brief Get the StockStore
+     *
+     * @return StockStore&
+     */
+    StockStore& StoreContainer::getStockStore() { return _stockStore; }
+
+    /**
+     * @brief Get the StockStore (const version)
+     *
+     * @return const StockStore&
+     */
+    const StockStore& StoreContainer::getStockStore() const
+    {
+        return _stockStore;
     }
 
 }   // namespace app

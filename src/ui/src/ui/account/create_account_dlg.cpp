@@ -7,6 +7,7 @@
 #include <string>
 
 #include "config/finance.hpp"
+#include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/validators/name_line_edit.hpp"
 #include "ui/validators/validators.hpp"
@@ -144,16 +145,17 @@ namespace ui
      */
     drafts::AccountDraft CreateAccountDialog::_getAccount()
     {
+        const auto typeStr     = _accountType->currentText().toStdString();
+        const auto currencyStr = _currency->currentText().toStdString();
+        const auto type        = AccountKindMeta::from_string(typeStr).value();
+        const auto currency    = CurrencyMeta::from_string(currencyStr).value();
+
         return drafts::AccountDraft{
-            .name = _nameLineEdit->text().toStdString(),
-            .kind = AccountKindMeta::from_string(
-                        _accountType->currentText().toStdString()
-            )
-                        .value(),
-            .currency =
-                CurrencyMeta::from_string(_currency->currentText().toStdString()
-                )
-                    .value()
+            AccountId::invalid(),
+            _nameLineEdit->text().toStdString(),
+            type,
+            currency,
+            AccountStatus::Active
         };
     }
 
