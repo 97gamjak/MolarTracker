@@ -5,7 +5,6 @@
 
 #include <cstdint>
 
-#include "config/finance.hpp"
 #include "ui/validators/amount_line_edit.hpp"
 #include "utils/qt_helpers.hpp"
 
