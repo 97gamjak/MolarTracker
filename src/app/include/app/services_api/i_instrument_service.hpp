@@ -1,6 +1,7 @@
 #ifndef __APP__INCLUDE__APP__SERVICES_API__I_INSTRUMENT_SERVICE_HPP__
 #define __APP__INCLUDE__APP__SERVICES_API__I_INSTRUMENT_SERVICE_HPP__
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -36,7 +37,19 @@ namespace app
          *
          * @return std::vector<finance::Stock>
          */
+        [[nodiscard]]
         virtual std::vector<finance::Stock> getStocks() = 0;
+
+        /**
+         * @brief Get a stock by its ticker symbol
+         *
+         * @param ticker The ticker symbol of the stock to retrieve
+         * @return std::optional<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Stock> getStock(
+            const std::string& ticker
+        ) = 0;
 
         /**
          * @brief Add a stock instrument to the database, this involves

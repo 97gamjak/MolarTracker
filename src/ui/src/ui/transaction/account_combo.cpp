@@ -24,9 +24,7 @@ namespace ui
         std::vector<drafts::AccountDraft> accounts,
         QWidget*                          parent
     )
-        : QWidget(parent),
-          _accounts(std::move(accounts)),
-          _combo(makeQChild<QComboBox>(this))
+        : QWidget(parent), _combo(makeQChild<QComboBox>(this))
     {
         auto* layout = makeQChild<QHBoxLayout>();
         layout->setContentsMargins(0, 0, 0, 0);
@@ -35,13 +33,7 @@ namespace ui
 
         _combo->setPlaceholderText("Select Account");
 
-        for (const auto& account : _accounts)
-        {
-            _combo->addItem(
-                QString::fromStdString(account.name),
-                QVariant::fromValue(account.id)
-            );
-        }
+        updateAccounts(std::move(accounts));
 
         connect(
             _combo,
@@ -80,14 +72,6 @@ namespace ui
     }
 
     /**
-     * @brief Reset the selection in the combo box, this will clear any current
-     * selection and set the combo box back to its placeholder state, allowing
-     * the user to make a new selection if needed.
-     *
-     */
-    void AccountCombo::resetSelection() { _combo->setCurrentIndex(-1); }
-
-    /**
      * @brief Update the list of accounts in the combo box, this will replace
      * the current list of accounts with the provided list, and update the
      * combo box items accordingly, allowing the combo box to reflect any
@@ -110,6 +94,8 @@ namespace ui
                 QVariant::fromValue(account.id)
             );
         }
+
+        _combo->setCurrentIndex(-1);
     }
 
 }   // namespace ui

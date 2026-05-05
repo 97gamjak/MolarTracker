@@ -44,13 +44,14 @@ namespace drafts
      */
     finance::Account AccountMapper::toAccount(const AccountDraft& draft)
     {
-        return finance::Account{
-            draft.id,
+        auto account = finance::Account{
             draft.status.value_or(AccountStatus::Active),
             draft.name,
             draft.currency,
             draft.kind
         };
+        account.setId(draft.id);
+        return account;
     }
 
 }   // namespace drafts

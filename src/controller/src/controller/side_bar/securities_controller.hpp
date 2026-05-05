@@ -65,6 +65,16 @@ namespace controller
             QAction*                      action
         );
 
+        void createStock(const std::string& ticker);
+
+       signals:
+        /**
+         * @brief Emitted when a new stock is created
+         *
+         * @param stock The stock that was created
+         */
+        void stockCreated(const finance::Stock& stock);
+
        private:
         void _onFindTickerButtonClicked();
         void _onAcceptTickerButtonClicked();

@@ -40,6 +40,17 @@ namespace app
         virtual std::vector<finance::Stock> getStocks() = 0;
 
         /**
+         * @brief Get a stock by its ticker symbol
+         *
+         * @param ticker The ticker symbol of the stock to retrieve
+         * @return std::optional<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Stock> getStock(
+            const std::string& ticker
+        ) = 0;
+
+        /**
          * @brief Add a stock instrument to the database, this involves
          * inserting a new row into the instrument table and a corresponding row
          * into the stock table, ensuring that the relationships between the

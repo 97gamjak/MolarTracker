@@ -26,6 +26,47 @@ namespace utils
         return list;
     }
 
+    QStringList toQStringList(const std::span<std::string>& vec)
+    {
+        QStringList list;
+        for (const auto& str : vec)
+            list.append(QString::fromStdString(str));
+
+        return list;
+    }
+
+    /**
+     * @brief Converts a span of strings to a vector of QStrings
+     *
+     * @param vec The input span of strings
+     * @return std::vector<QString> The converted vector of QStrings
+     */
+    std::vector<QString> toQStringVector(const std::span<std::string>& vec)
+    {
+        std::vector<QString> list;
+        list.reserve(vec.size());
+        for (const auto& str : vec)
+            list.push_back(QString::fromStdString(str));
+        return list;
+    }
+
+    /**
+     * @brief Converts a span of const strings to a vector of QStrings
+     *
+     * @param vec The input span of const strings
+     * @return std::vector<QString> The converted vector of QStrings
+     */
+    std::vector<QString> toQStringVector(
+        const std::span<const std::string>& vec
+    )
+    {
+        std::vector<QString> list;
+        list.reserve(vec.size());
+        for (const auto& str : vec)
+            list.push_back(QString::fromStdString(str));
+        return list;
+    }
+
     /**
      * @brief Moves the dialog to the center of the parent's screen
      *

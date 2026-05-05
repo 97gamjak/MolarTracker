@@ -365,13 +365,11 @@ namespace settings
      * @param user A user-defined pointer that will be passed to the callback
      * function when it is called, this can be used to provide additional
      * context for the callback function
-     * @return std::vector<Connection> An object representing the subscription,
-     * this can be used to unsubscribe from changes by calling disconnect() on
-     * it or by letting it go out of scope
+     * @return Connections
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::vector<Connection> NumericVecParam<T, N>::subscribeToDirty(
+    Connections NumericVecParam<T, N>::subscribeToDirty(
         OnDirtyChanged::func func,
         void*                user
     )
@@ -379,9 +377,9 @@ namespace settings
         // subscribe to all individual numeric parameters in the vector, when
         // any of them changes, we will emit a dirty change for the whole vector
         // parameter
-        std::vector<Connection> connections;
+        Connections connections;
         for (auto& param : _params)
-            connections.push_back(param.subscribeToDirty(func, user));
+            connections.add(param.subscribeToDirty(func, user));
 
         return connections;
     }

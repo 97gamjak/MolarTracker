@@ -73,14 +73,13 @@ namespace app
         );
 
         const auto newAccount = Account{
-            _generateNewId(),
             AccountStatus::Active,
             account.name,
             account.currency,
             account.kind
         };
 
-        _addEntry(newAccount, StoreState::New);
+        _addEntry(newAccount);
 
         // special case for cash accounts
         if (account.kind == AccountKind::Cash)
@@ -97,14 +96,13 @@ namespace app
                 // If no existing entry is found, we can create a new external
                 // account
                 const auto externalAccount = Account{
-                    _generateNewId(),
                     AccountStatus::Active,
                     "External " + CurrencyMeta::toString(account.currency),
                     account.currency,
                     AccountKind::External
                 };
 
-                _addEntry(externalAccount, StoreState::New);
+                _addEntry(externalAccount);
             }
         }
 
@@ -119,29 +117,36 @@ namespace app
     {
         LOG_ENTRY;
 
-        _clearChangedIds();
-
-        for (auto& entry : _getEntries())
+        for (const auto& entry : _getEntries())
         {
             switch (entry.state)
             {
                 case StoreState::New:
                 {
-                    auto&      account = entry.value;
-                    const auto oldId   = account.getId();
-                    auto       id      = _accountService->createAccount(
-                        account,
+                    auto       newEntry = entry;
+                    const auto oldId    = newEntry.value.getId();
+                    auto       id       = _accountService->createAccount(
+                        newEntry.value,
                         _activeProfileId
                     );
+                    newEntry.value.setId(id);
 
-                    account.setId(id);
-                    _appendChangedIds(oldId, id);
-                    entry.state = StoreState::Clean;
+                    const auto result = _commitEntry(oldId, newEntry);
+
+                    if (result != StoreResult::Ok)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to add account '{}' to database",
+                                newEntry.value.getName()
+                            )
+                        );
+                    }
 
                     LOG_INFO(
                         std::format(
                             "Account '{}' added to database",
-                            account.getName()
+                            newEntry.value.getName()
                         )
                     );
                     break;
@@ -161,6 +166,8 @@ namespace app
                 }
             }
         }
+
+        _notifyOnCommit();
     }
 
     /**
@@ -230,11 +237,16 @@ namespace app
 
         if (_activeProfileId.isValid())
         {
+            LOG_TRACE(
+                std::format(
+                    "Refreshing account store for active profile: {}",
+                    _activeProfileId.value()
+                )
+            );
             const auto accounts =
                 _accountService->getAllAccounts(_activeProfileId);
 
-            for (const auto& account : accounts)
-                _addEntry(account, StoreState::Clean);
+            _addCleanEntries(accounts);
         }
     }
 

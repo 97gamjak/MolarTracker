@@ -33,10 +33,10 @@ namespace ui
      * @brief get the connections for the section
      *
      * @tparam TSection
-     * @return std::vector<Connection>&
+     * @return Connections&
      */
     template <settings::IsParamContainer TSection>
-    std::vector<Connection>& SettingsSection<TSection>::getConnections()
+    Connections& SettingsSection<TSection>::getConnections()
     {
         return _connections;
     }

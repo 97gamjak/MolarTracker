@@ -1,8 +1,11 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
+#include <string>
 #include <variant>
 #include <vector>
+
+#include "config/id_types.hpp"
 
 namespace finance
 {
@@ -10,6 +13,7 @@ namespace finance
     class TradeData;          // forward declaration
     class TransactionEntry;   // forward declaration
     class Transaction;        // forward declaration
+    class TradeLeg;           // forward declaration
 
     using TransactionData =
         std::variant<CashData, TradeData>;   // forward declaration
@@ -18,9 +22,11 @@ namespace finance
 
 namespace drafts
 {
-    class CreateCashTransactionDraft;   // forward declaration
-    class TransactionOverviewDraft;     // forward declaration
-    class TransactionEntryDraft;        // forward declaration
+    class CreateCashTransactionDraft;    // forward declaration
+    class TransactionOverviewDraft;      // forward declaration
+    class TransactionEntryDraft;         // forward declaration
+    class TradeLegDraft;                 // forward declaration
+    class CreateStockTransactionDraft;   // forward declaration
 
     /**
      * @brief Mapper class for converting between Transaction and
@@ -47,12 +53,34 @@ namespace drafts
             const CreateCashTransactionDraft& draft
         );
 
+        static finance::Transaction fromCreateStockTransactionDraft(
+            const CreateStockTransactionDraft& draft
+        );
+
+        static finance::TradeLeg fromTradeLegDraft(const TradeLegDraft& draft);
+
+        static std::vector<finance::TradeLeg> fromTradeLegDrafts(
+            const std::vector<TradeLegDraft>& drafts
+        );
+
+        static TradeLegDraft toTradeLegDraft(
+            const finance::TradeLeg&          leg,
+            const instrumentMap<std::string>& instrumentNames
+        );
+
+        static std::vector<TradeLegDraft> toTradeLegDrafts(
+            const std::vector<finance::TradeLeg>& legs,
+            const instrumentMap<std::string>&     instrumentNames
+        );
+
         static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
-            const std::vector<finance::Transaction>& transactions
+            const std::vector<finance::Transaction>& transactions,
+            const instrumentMap<std::string>&        instrumentNames
         );
 
         static drafts::TransactionOverviewDraft toOverviewDraft(
-            const finance::Transaction& transaction
+            const finance::Transaction&       transaction,
+            const instrumentMap<std::string>& instrumentNames
         );
     };
 

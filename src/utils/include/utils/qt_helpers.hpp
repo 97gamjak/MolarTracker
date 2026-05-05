@@ -1,10 +1,13 @@
+
 #ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
 #define __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
 
 #include <QtContainerFwd>
 #include <mstd/type_traits/enum_traits.hpp>
 #include <span>
+#include <string>
 #include <string_view>
+#include <vector>
 
 class QDialog;   // Forward declaration
 class QWidget;   // Forward declaration
@@ -12,6 +15,12 @@ class QWidget;   // Forward declaration
 namespace utils
 {
     QStringList toQStringList(const std::span<const std::string_view>& vec);
+    QStringList toQStringList(const std::span<std::string>& vec);
+
+    std::vector<QString> toQStringVector(const std::span<std::string>& vec);
+    std::vector<QString> toQStringVector(
+        const std::span<const std::string>& vec
+    );
 
     template <mstd::has_enum_meta EnumMeta>
     QString toQString(EnumMeta value);

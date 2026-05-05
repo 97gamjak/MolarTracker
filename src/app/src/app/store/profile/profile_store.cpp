@@ -3,6 +3,7 @@
 #include <cctype>
 #include <format>
 #include <ranges>
+#include <utility>
 
 #include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
@@ -15,6 +16,22 @@ REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
 
 namespace app
 {
+    namespace
+    {
+        ProfileStoreResult toProfileStoreResult(StoreResult result)
+        {
+            switch (result)
+            {
+                case StoreResult::Ok:
+                    return ProfileStoreResult::Ok;
+                case StoreResult::NotFound:
+                    return ProfileStoreResult::ProfileNotFound;
+            }
+
+            std::unreachable();
+        }
+    }   // namespace
+
     /**
      * @brief Construct a new Profile Store:: Profile Store object
      *
@@ -31,8 +48,7 @@ namespace app
     {
         const auto profiles = _profileService->getAll();
 
-        for (const auto& profile : profiles)
-            _addEntry(profile, StoreState::Clean);
+        _addCleanEntries(profiles);
     }
 
     /**
@@ -203,27 +219,25 @@ namespace app
         const drafts::ProfileDraft& draft
     )
     {
-        _markPotentiallyDirty();
-
-        auto* entry = _findEntry(
+        auto entry = _getEntry(
             {.filter   = HasProfileName(draft.name),
              .deletion = DeletionPolicy::IncludeDelete}
         );
 
-        if (entry != nullptr)
+        if (entry.has_value())
         {
             if (entry->state != StoreState::Deleted)
                 return ProfileStoreResult::NameAlreadyExists;
 
-            entry->state = StoreState::Modified;
             entry->value.setName(draft.name);
             entry->value.setEmail(draft.email);
+            const auto result =
+                _updateEntry(entry->value, StoreState::Modified);
 
-            return ProfileStoreResult::Ok;
+            return toProfileStoreResult(result);
         }
 
-        const auto newId = _generateNewId();
-        _addEntry(Profile{newId, draft.name, draft.email}, StoreState::New);
+        _addEntry(Profile{draft.name, draft.email});
 
         return ProfileStoreResult::Ok;
     }
@@ -241,14 +255,12 @@ namespace app
         const drafts::ProfileDraft& draft
     )
     {
-        _markPotentiallyDirty();
-
-        auto* const entry = _findEntry(
+        const auto entry = _getEntry(
             {.filter   = HasProfileName(draft.name),
              .deletion = DeletionPolicy::IncludeDelete}
         );
 
-        if (entry == nullptr)
+        if (!entry.has_value())
             return ProfileStoreResult::ProfileNotFound;
 
         if (_activeProfile.has() &&
@@ -257,17 +269,9 @@ namespace app
             _activeProfile.unset();
         }
 
-        // if the profile is new and not yet committed, just remove it
-        // entirely
-        if (entry->state == StoreState::New)
-        {
-            _removeEntry(entry->value.getId());
-            return ProfileStoreResult::Ok;
-        }
+        const auto result = _deleteEntry(entry->value.getId());
 
-        entry->state = StoreState::Deleted;
-
-        return ProfileStoreResult::Ok;
+        return toProfileStoreResult(result);
     }
 
     /**
@@ -275,32 +279,34 @@ namespace app
      *
      * @param entry
      */
-    void ProfileStore::_commitNewProfile(Entry* entry)
+    void ProfileStore::_commitNewProfile(Entry entry)
     {
-        const auto& name  = entry->value.getName();
-        const auto& email = entry->value.getEmail();
+        const auto& name  = entry.value.getName();
+        const auto& email = entry.value.getEmail();
         const auto  newId = _profileService->create(name, email);
-        const auto  oldId = entry->value.getId();
+        const auto  oldId = entry.value.getId();
 
-        if (newId != oldId)
-        {
-            entry->value.setId(newId);
-            entry->state = StoreState::Clean;
+        entry.value.setId(newId);
 
-            // Update the active profile ID if it was pointing to the old ID
-            if (_activeProfile.has() && _activeProfile.get().value() == oldId)
-                _activeProfile.set(newId);
-        }
-        else
+        const auto result = _commitEntry(oldId, entry);
+
+        if (result != StoreResult::Ok)
         {
-            entry->state = StoreState::Clean;
+            throw ProfileStoreException(
+                std::format(
+                    "Failed to commit new profile {} with error {}",
+                    name,
+                    StoreResultMeta::toString(result)
+                )
+            );
         }
+
+        // Update the active profile ID if it was pointing to the old ID
+        if (_activeProfile.has() && _activeProfile.get().value() == oldId)
+            _activeProfile.set(newId);
 
         LOG_INFO(
-            std::format(
-                "Profile '{}' saved to database",
-                entry->value.getName()
-            )
+            std::format("Profile '{}' saved to database", entry.value.getName())
         );
     }
 
@@ -309,19 +315,30 @@ namespace app
      *
      * @param entry
      */
-    void ProfileStore::_commitModifiedProfile(Entry* entry)
+    void ProfileStore::_commitModifiedProfile(const Entry& entry)
     {
-        const auto& name  = entry->value.getName();
-        const auto& email = entry->value.getEmail();
-        const auto  id    = entry->value.getId();
+        const auto& name  = entry.value.getName();
+        const auto& email = entry.value.getEmail();
+        const auto  id    = entry.value.getId();
 
         _profileService->update(id, name, email);
-        entry->state = StoreState::Clean;
+        const auto result = _commitEntry(id, entry);
+
+        if (result != StoreResult::Ok)
+        {
+            throw ProfileStoreException(
+                std::format(
+                    "Failed to commit modified profile {} with error {}",
+                    name,
+                    StoreResultMeta::toString(result)
+                )
+            );
+        }
 
         LOG_INFO(
             std::format(
                 "Profile '{}' updated in database",
-                entry->value.getName()
+                entry.value.getName()
             )
         );
     }
@@ -331,17 +348,28 @@ namespace app
      *
      * @param entry
      */
-    void ProfileStore::_commitDeletedProfile(Entry* entry)
+    void ProfileStore::_commitDeletedProfile(const Entry& entry)
     {
-        const auto id = entry->value.getId();
+        const auto id = entry.value.getId();
 
         _profileService->remove(id);
-        // NOTE: deleted entries will be removed in one go!
+        const auto result = _commitEntry(id, entry);
+
+        if (result != StoreResult::Ok)
+        {
+            throw ProfileStoreException(
+                std::format(
+                    "Failed to commit deleted profile {} with error {}",
+                    entry.value.getName(),
+                    StoreResultMeta::toString(result)
+                )
+            );
+        }
 
         LOG_INFO(
             std::format(
                 "Profile '{}' removed from database",
-                entry->value.getName()
+                entry.value.getName()
             )
         );
     }
@@ -352,31 +380,25 @@ namespace app
      */
     void ProfileStore::commit()
     {
-        if (!isDirty())
-        {
-            LOG_DEBUG("No changes to save in ProfileStore");
-            return;
-        }
-
-        for (auto& entry : _getEntries())
+        for (const auto& entry : _getEntries())
         {
             switch (entry.state)
             {
                 case StoreState::New:
-                    _commitNewProfile(&entry);
+                    _commitNewProfile(entry);
                     break;
                 case StoreState::Modified:
-                    _commitModifiedProfile(&entry);
+                    _commitModifiedProfile(entry);
                     break;
                 case StoreState::Deleted:
-                    _commitDeletedProfile(&entry);
+                    _commitDeletedProfile(entry);
                     break;
                 case StoreState::Clean:
                     break;
             }
         }
 
-        _cleanEntries();
+        _notifyOnCommit();
     }
 
     /**

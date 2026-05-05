@@ -13,6 +13,11 @@ using SecurityId = StrongId<SecurityTag>;
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
 
+using InstrumentIdSeq = IdSequence<InstrumentId>;
+
+template <typename T>
+using instrumentMap = unorderedIdMap<InstrumentId, T>;
+
 struct StockTag {};
 using StockId = StrongId<StockTag>;
 
@@ -27,6 +32,9 @@ using TransactionEntryId = StrongId<TransactionEntryTag>;
 
 struct TradeLegTag {};
 using TradeLegId = StrongId<TradeLegTag>;
+
+struct PositionTag {};
+using PositionId = StrongId<PositionTag>;
 // clang-format on
 
 template <typename T>

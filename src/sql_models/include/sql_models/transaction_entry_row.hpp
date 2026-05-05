@@ -4,6 +4,7 @@
 #include "account_row.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"

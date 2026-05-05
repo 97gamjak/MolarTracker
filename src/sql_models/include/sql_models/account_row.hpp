@@ -56,7 +56,9 @@ struct AccountRow : orm::ORMModel<"account">
     /// The currency field, this is a required field
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
+    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(AccountRow, id, kind, profileId, name, status, currency)
+    /// @endcond
 
     /**
      * @brief Get the Unique Groups object

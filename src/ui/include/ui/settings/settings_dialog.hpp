@@ -51,7 +51,7 @@ namespace ui
         QLabel* _unsavedLabel{nullptr};
 
         /// Connection lifetimes for all dirty subscriptions
-        std::vector<Connection> _connections;
+        Connections _connections;
 
         /// forward declaration of the dirty callback context struct
         struct DirtyContext;
@@ -71,10 +71,9 @@ namespace ui
         void saveRequested();
 
        private:
-        void        _build();
-        void        _applyStyleSheet();
-        void        _updateUnsavedLabel();
-        static void _onSectionDirty(void* userData, const bool& isDirty);
+        void _build();
+        void _applyStyleSheet();
+        void _updateUnsavedLabel();
     };
 
     /**

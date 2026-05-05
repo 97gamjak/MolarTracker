@@ -40,7 +40,8 @@ namespace orm
         const db::Statement& statement
     );
 
-    template <db_model... Models>
+    template <typename... Models>
+    requires((db_model<Models> || optional_model<Models>) && ...)
     std::string getSelection();
 
 }   // namespace orm

@@ -4,8 +4,10 @@
 #include <algorithm>
 #include <ranges>
 
+#include "app/store/base/store_state.hpp"
 #include "base_store.hpp"
 #include "config/id_types.hpp"
+#include "config/signal_tags.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.BaseStore");
@@ -90,15 +92,15 @@ namespace app
      *
      * @tparam T
      * @tparam IdType
-     * @param options
+     * @param id
      * @return BaseStore<T, IdType>::Entry*
      */
     template <typename T, typename IdType>
-    auto BaseStore<T, IdType>::_findEntry(Options options) -> Entry*
+    auto BaseStore<T, IdType>::_findEntry(IdType id) -> Entry*
     {
         auto it = std::ranges::find_if(
             _entries,
-            [&options](const auto& entry) { return options.eval(entry); }
+            [id](const auto& entry) { return getId(entry.value) == id; }
         );
 
         return it != _entries.end() ? &(*it) : nullptr;
@@ -127,6 +129,26 @@ namespace app
     }
 
     /**
+     * @brief Retrieves a mutable reference to the entry that matches the given
+     * options, if it exists.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param options
+     * @return std::optional<Entry&>
+     */
+    template <typename T, typename IdType>
+    auto BaseStore<T, IdType>::_getEntry(Options options) const
+    {
+        auto it = std::ranges::find_if(
+            _entries,
+            [&options](const auto& entry) { return options.eval(entry); }
+        );
+
+        return it != _entries.end() ? std::optional<Entry>{*it} : std::nullopt;
+    }
+
+    /**
      * @brief Retrieves a const reference to the collection of entries in the
      * store.
      *
@@ -137,25 +159,6 @@ namespace app
      */
     template <typename T, typename IdType>
     auto BaseStore<T, IdType>::_getEntries(Options options) const
-    {
-        // pipe operator not working here due _Partial adaptor invocable
-        // constraints -- NO IDEA WHY
-        return std::ranges::filter_view(
-            _entries,
-            [options](const auto& entry) { return options.eval(entry); }
-        );
-    }
-
-    /**
-     * @brief Retrieves a reference to the collection of entries in the store.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param options
-     * @return std::vector<typename BaseStore<T, IdType>::Entry>&
-     */
-    template <typename T, typename IdType>
-    auto BaseStore<T, IdType>::_getEntries(Options options)
     {
         // pipe operator not working here due _Partial adaptor invocable
         // constraints -- NO IDEA WHY
@@ -192,17 +195,9 @@ namespace app
      * @return IdType
      */
     template <typename T, typename IdType>
-    IdType BaseStore<T, IdType>::_generateNewId() const
+    IdType BaseStore<T, IdType>::_generateNewId()
     {
-        IdType newId{0};
-        while (std::ranges::any_of(
-            _entries,
-            [&newId](const auto& entry) { return getId(entry.value) == newId; }
-        ))
-        {
-            newId = IdType{newId.value() + 1};
-        }
-        return newId;
+        return _idSequence.next();
     }
 
     /**
@@ -212,15 +207,66 @@ namespace app
      * @tparam T
      * @tparam IdType
      * @param value
-     * @param state
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_addEntry(const T& value, StoreState state)
+    void BaseStore<T, IdType>::_addEntry(T value)
+    {
+        _markPotentiallyDirty();
+
+        value.setId(_generateNewId());
+
+        _entries.push_back(Entry{value, StoreState::New});
+
+        _added.push_back(value);
+        _notifyAdded();
+    }
+
+    /**
+     * @brief Adds a collection of new entries to the store with the given
+     * values. Marks the store as potentially dirty.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param value
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_addCleanEntries(const std::vector<T>& value)
+    {
+        for (const auto& item : value)
+            _entries.push_back(Entry{item, StoreState::Clean});
+
+        this->template notify<StoreChanged<IdType>>();
+    }
+
+    /**
+     * @brief Updates an existing entry in the store with the given value and
+     * state. If the entry is not found, returns NotFound.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param value
+     * @param state
+     * @return StoreResult
+     */
+    template <typename T, typename IdType>
+    StoreResult BaseStore<T, IdType>::_updateEntry(
+        const T&   value,
+        StoreState state
+    )
     {
         if (state != StoreState::Clean)
             _markPotentiallyDirty();
 
-        _entries.push_back(Entry{value, state});
+        auto entry = _findEntry(value.getId());
+        if (!entry)
+            return StoreResult::NotFound;
+
+        entry->value = value;
+        entry->state = state;
+
+        _updated.push_back(entry->value);
+        _notifyUpdated();
+        return StoreResult::Ok;
     }
 
     /**
@@ -231,37 +277,61 @@ namespace app
      * @tparam T
      * @tparam IdType
      * @param id
+     * @return StoreResult
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_removeEntry(IdType id)
+    StoreResult BaseStore<T, IdType>::_removeEntry(IdType id)
     {
         LOG_ENTRY;
 
+        const auto* entry = _findEntry(id);
+
+        if (entry == nullptr)
+            return StoreResult::NotFound;
+
         auto [beg, end] = std::ranges::remove_if(
             _entries,
-            [id](const auto& entry) { return entry.value.getId() == id; }
+            [id](const auto& entry_) { return entry_.value.getId() == id; }
         );
         _entries.erase(beg, end);
+
+        return StoreResult::Ok;
     }
 
     /**
-     * @brief Removes all entries from the store that are not in the Clean state
-     * (i.e., they are either New or Deleted). If any entries are removed, marks
-     * the store as potentially dirty.
+     * @brief Deletes an entry with the given ID from the store. If an entry
+     * with the specified ID is found and deleted, marks the store as
+     * potentially dirty.
      *
      * @tparam T
      * @tparam IdType
+     * @param id
+     * @return StoreResult
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_cleanEntries()
+    StoreResult BaseStore<T, IdType>::_deleteEntry(IdType id)
     {
         LOG_ENTRY;
 
-        auto [beg, end] = std::ranges::remove_if(
-            _entries,
-            [](const auto& entry) { return entry.state != StoreState::Clean; }
-        );
-        _entries.erase(beg, end);
+        const auto* entry = _findEntry(id);
+
+        if (entry == nullptr)
+            return StoreResult::NotFound;
+
+        // if entry is new, remove it directly
+        if (entry->state == StoreState::New)
+            return _removeEntry(id);
+
+        const auto result = _updateEntry(entry->value, StoreState::Deleted);
+
+        if (result != StoreResult::Ok)
+            return result;
+
+        _removed.push_back(id);
+        _notifyRemoved();
+        _markPotentiallyDirty();
+
+        return StoreResult::Ok;
     }
 
     /**
@@ -295,7 +365,7 @@ namespace app
     void BaseStore<T, IdType>::_markPotentiallyDirty()
     {
         _isPotentiallyDirty = true;
-        DirtyObservable::notify<OnDirtyChanged>(true);
+        this->template notify<OnDirtyChanged>(true);
     }
 
     /**
@@ -310,77 +380,7 @@ namespace app
     void BaseStore<T, IdType>::clearPotentiallyDirty()
     {
         _isPotentiallyDirty = false;
-        DirtyObservable::notify<OnDirtyChanged>(false);
-    }
-
-    /**
-     * @brief Subscribes a callback function to be called when the dirty state
-     * of the store changes. The callback will receive a boolean indicating
-     * whether the store is now dirty (true) or not (false).
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param func
-     * @param user
-     * @return Connection
-     */
-
-    template <typename T, typename IdType>
-    Connection BaseStore<T, IdType>::subscribeToDirty(
-        OnDirtyChanged::func func,
-        void*                user
-    )
-    {
-        return DirtyObservable::template on<OnDirtyChanged>(func, user);
-    }
-
-    /**
-     * @brief Appends a mapping of old ID to new ID to the collection of changed
-     * IDs in the store. This is used to track changes to entry IDs, such as
-     * when an entry is updated and its ID changes. Marks the store as
-     * potentially dirty.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param oldId
-     * @param newId
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_appendChangedIds(IdType oldId, IdType newId)
-    {
-        _changedIds[oldId] = newId;
-    }
-
-    /**
-     * @brief Clears the collection of changed IDs in the store, indicating that
-     * there are no tracked changes to entry IDs. Marks the store as
-     * potentially dirty.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_clearChangedIds()
-    {
-        _changedIds.clear();
-    }
-
-    /**
-     * @brief Retrieves the collection of changed IDs in the store, which is a
-     * mapping of old IDs to new IDs for entries that have been updated. This
-     * allows callers to understand how entry IDs have changed as a result of
-     * updates to the store.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @return const IdMap
-     */
-
-    template <typename T, typename IdType>
-    const BaseStore<T, IdType>::IdMap& BaseStore<T, IdType>::getChangedIds(
-    ) const
-    {
-        return _changedIds;
+        this->template notify<OnDirtyChanged>(false);
     }
 
     /**
@@ -404,6 +404,114 @@ namespace app
     {
         return policy == DeletionPolicy::IncludeDelete ||
                entry.state != StoreState::Deleted;
+    }
+
+    /**
+     * @brief Commits the changes made to a temporary entry by replacing it with
+     * a persisted entry. If the entry is not found, returns NotFound.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param tempId
+     * @param persistedValue
+     * @return StoreResult
+     */
+    template <typename T, typename IdType>
+    StoreResult BaseStore<T, IdType>::_commitEntry(
+        IdType       tempId,
+        const Entry& persistedValue
+    )
+    {
+        auto entry = _findEntry(tempId);
+        if (!entry)
+            return StoreResult::NotFound;
+
+        if (tempId != getId(persistedValue.value) &&
+            persistedValue.state == StoreState::New)
+            _idRemap[tempId] = getId(persistedValue.value);
+
+        if (persistedValue.state == StoreState::New ||
+            persistedValue.state == StoreState::Modified)
+            entry->value = persistedValue.value;
+
+        if (persistedValue.state == StoreState::Deleted)
+            _removeEntry(getId(persistedValue.value));
+
+        entry->state = StoreState::Clean;
+
+        // when committing we don't want single notifications
+        return StoreResult::Ok;
+    }
+
+    /**
+     * @brief Notifies subscribers of ID remapping events.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_notifyIdRemap()
+    {
+        this->template notify<OnIdRemap<IdType>>(_idRemap);
+        this->template notify<StoreChanged<IdType>>();
+        _idRemap.clear();
+    }
+
+    /**
+     * @brief Notifies subscribers of updated entries.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_notifyUpdated()
+    {
+        this->template notify<OnStoreItemUpdated<T>>(_updated);
+        this->template notify<StoreChanged<IdType>>();
+        _updated.clear();
+    }
+
+    /**
+     * @brief Notifies subscribers of added entries.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_notifyAdded()
+    {
+        this->template notify<OnStoreItemAdded<T>>(_added);
+        this->template notify<StoreChanged<IdType>>();
+        _added.clear();
+    }
+
+    /**
+     * @brief Notifies subscribers of removed entries.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_notifyRemoved()
+    {
+        this->template notify<OnStoreItemRemoved<IdType>>(_removed);
+        this->template notify<StoreChanged<IdType>>();
+        _removed.clear();
+    }
+
+    /**
+     * @brief Notifies subscribers of commit events.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_notifyOnCommit()
+    {
+        _notifyAdded();
+        _notifyRemoved();
+        _notifyUpdated();
+        _notifyIdRemap();
     }
 
 }   // namespace app

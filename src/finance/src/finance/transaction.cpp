@@ -5,6 +5,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "finance/trade_data.hpp"
 
 namespace finance
 {
@@ -131,6 +132,20 @@ namespace finance
     }
 
     /**
+     * @brief Gets the data associated with the transaction.
+     *
+     * @return const TransactionData& The data of the transaction.
+     */
+    const TransactionData& Transaction::getData() const { return _data; }
+
+    /**
+     * @brief Gets the data associated with the transaction.
+     *
+     * @return TransactionData& The data of the transaction.
+     */
+    TransactionData& Transaction::getData() { return _data; }
+
+    /**
      * @brief Calculates the total sum of the transaction by summing the cash
      * amounts of all entries, this is used to ensure that the transaction is
      * balanced (i.e., the total sum should be zero for a valid transaction),
@@ -150,7 +165,32 @@ namespace finance
         for (const auto& entry : _entries)
             total += entry.getCash();
 
+        if (std::holds_alternative<TradeData>(_data))
+            for (const auto& leg : std::get<TradeData>(_data).getLegs())
+                total += leg.getCash();
+
         return total;
+    }
+
+    /**
+     * @brief Adds a leg to the transaction.
+     *
+     * @param leg The trade leg to add.
+     */
+    void Transaction::addLeg(const TradeLeg& leg)
+    {
+        struct Visitor
+        {
+            TradeLeg leg;
+            void     operator()(TradeData& data) const { data.addLeg(leg); }
+
+            void operator()(CashData& /*data*/) const
+            {
+                throw std::logic_error("Cannot add legs to cash transactions");
+            }
+        };
+
+        std::visit(Visitor{leg}, _data);
     }
 
 }   // namespace finance

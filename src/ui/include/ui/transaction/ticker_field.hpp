@@ -43,13 +43,18 @@ namespace ui
 
        public:
         explicit TickerField(
-            std::vector<QString> tickers,
-            QWidget*             parent = nullptr
+            const std::vector<std::string>& tickers,
+            QWidget*                        parent = nullptr
         );
 
         void addTicker(QString ticker);
 
-        [[nodiscard]] std::optional<QString> selected() const;
+        void updateTickers(std::vector<QString> tickers);
+        void selectTicker(const QString& ticker);
+
+        [[nodiscard]] std::optional<std::string> getTicker() const;
+
+        [[nodiscard]] bool isValid() const;
 
        signals:
         /**
@@ -57,18 +62,19 @@ namespace ui
          *
          * @param ticker The selected ticker symbol
          */
-        void tickerSelected(QString ticker);
+        void tickerSelected(std::string ticker);
 
         /**
          * @brief Emitted when the user clicks the "+" button to create a
          * new ticker
          */
-        void createTickerRequested();
+        void createTickerRequested(std::string ticker);
 
        private:
         void _onTextEdited(const QString& text);
         void _onActivated(const QString& ticker);
         void _rebuildCompleter();
+        void _onCreateTickerRequest();
     };
 
 }   // namespace ui

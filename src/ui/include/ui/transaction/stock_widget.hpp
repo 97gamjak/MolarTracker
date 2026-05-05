@@ -6,20 +6,26 @@
 
 #include <vector>
 
-#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
-#include "ui/transaction/i_create_transaction_widget.hpp"
-#include "ui/transaction/ticker_field.hpp"
+#include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
 class QPushButton;   // Forward declaration
 
+namespace drafts
+{
+    class CreateStockTransactionDraft;   // Forward declaration
+}   // namespace drafts
+
 namespace ui
 {
 
-    class AccountCombo;   // Forward declaration
-    class AmountRow;      // Forward declaration
+    class AccountCombo;     // Forward declaration
+    class AmountRow;        // Forward declaration
+    class TickerField;      // Forward declaration
+    class TimestampField;   // Forward declaration
+    class CommentField;     // Forward declaration
 
     /**
      * @brief Widget for creating a stock transaction
@@ -28,13 +34,10 @@ namespace ui
      * which is kept disabled until a primary account has been chosen. The
      * add button requires both accounts and a non-zero valid amount.
      */
-    class StockWidget : public ICreateTransactionWidget
+    class StockWidget : public Dialog
     {
         Q_OBJECT
        private:
-        /// The type of transaction this widget creates (Stock)
-        TransactionType _type;
-
         /// The layout for this widget
         QFormLayout* _layout;
 
@@ -59,24 +62,57 @@ namespace ui
         /// The field for entering the stock ticker
         TickerField* _tickerField;
 
+        /// The field for entering the timestamp of the transaction
+        TimestampField* _timestampField;
+
+        /// The field for entering a comment about the transaction
+        CommentField* _commentField;
+
         /// The list of reference accounts
         std::vector<drafts::AccountDraft> _referenceAccounts;
 
        public:
         explicit StockWidget(
-            TransactionType                          type,
             std::vector<drafts::AccountDraft>        accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
+            std::vector<std::string>                 tickers,
             QWidget*                                 parent = nullptr
         );
 
-        [[nodiscard]] TransactionType getTransactionType() const override;
+        void updateAccounts(std::vector<drafts::AccountDraft> accounts);
+        void updateReferenceAccounts(
+            std::vector<drafts::AccountDraft> referenceAccounts
+        );
+        void updateTickers(const std::vector<std::string>& tickers);
+        void refresh();
+
+       signals:
+        /**
+         * @brief Emitted when a new ticker is requested
+         *
+         * @param ticker The ticker symbol to create
+         */
+        void createTickerRequested(const std::string& ticker);
+
+        /**
+         * @brief Emitted when a new stock transaction is requested
+         *
+         * @param draft The draft of the stock transaction to create
+         */
+        void createStockTransactionRequested(
+            const drafts::CreateStockTransactionDraft& draft
+        );
 
        private:
         void _onAccountSelected(const drafts::AccountDraft& account);
         void _onReferenceAccountSelected(const drafts::AccountDraft& account);
         void _updateAddButton();
         void _emitOk();
+
+        [[nodiscard]]
+        drafts::CreateStockTransactionDraft _getDraft() const;
+
+        void _connectAddButton();
     };
 
 }   // namespace ui

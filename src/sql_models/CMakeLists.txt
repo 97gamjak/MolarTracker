@@ -6,6 +6,8 @@ add_library(molartracker_sql_models STATIC
     ${SRC}/profile_row.cpp
     ${SRC}/transaction_entry_row.cpp
     ${SRC}/stock_row.cpp
+    ${SRC}/profile_row.cpp
+    ${SRC}/trade_leg_row.cpp
 )
 
 target_include_directories(molartracker_sql_models

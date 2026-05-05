@@ -7,15 +7,14 @@
 #include <QObject>
 #include <QPointer>
 
-#include "config/finance.hpp"
-#include "controller/transaction_controller.hpp"
+#include "connections/connection.hpp"
 #include "side_bar_category_controller.hpp"
-#include "ui/transaction/create_transaction_dlg.hpp"
 
 namespace app
 {
     class AccountStore;       // Forward declaration
     class TransactionStore;   // Forward declaration
+    class StockStore;         // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -25,11 +24,24 @@ namespace cmd
 
 namespace ui
 {
-    class TransactionCategory;   // Forward declaration
+    class TransactionCategory;       // Forward declaration
+    class DepositWithdrawalWidget;   // Forward declaration
+    class StockWidget;               // Forward declaration
 }   // namespace ui
+
+namespace drafts
+{
+    class CreateCashTransactionDraft;    // Forward declaration
+    class CreateStockTransactionDraft;   // Forward declaration
+}   // namespace drafts
+
+class QMainWindow;   // Forward declaration
 
 namespace controller
 {
+    class TransactionController;         // Forward declaration
+    class SecuritiesSideBarController;   // Forward declaration
+
     /**
      * @brief Controller for the transaction side bar
      *
@@ -45,19 +57,33 @@ namespace controller
         app::AccountStore& _accountStore;
         /// The transaction store for the application
         app::TransactionStore& _transactionStore;
+        /// The stock store for the application
+        app::StockStore& _stockStore;
 
         /// Pointer to the create transaction dialog
-        QPointer<ui::CreateTransactionDialog> _createDlg;
+        QPointer<ui::DepositWithdrawalWidget> _createCashTransactionDlg;
+        /// Pointer to the stock widget
+        QPointer<ui::StockWidget> _createStockTransactionDlg;
         /// Reference to the transaction controller
         TransactionController& _transactionController;
+        /// Reference to the stock controller
+        SecuritiesSideBarController& _stockController;
+
+        /// Pointer to the main window
+        QMainWindow* _mainWindow;
+
+        /// Connections for the transaction side bar controller
+        Connections _connections;
 
        public:
         TransactionSideBarController(
-            cmd::UndoStack&        undoStack,
-            app::AccountStore&     accountStore,
-            app::TransactionStore& transactionStore,
-            TransactionController& transactionController,
-            QMainWindow*           mainWindow
+            cmd::UndoStack&              undoStack,
+            app::AccountStore&           accountStore,
+            app::TransactionStore&       transactionStore,
+            app::StockStore&             stockStore,
+            TransactionController&       transactionController,
+            SecuritiesSideBarController& stockController,
+            QMainWindow*                 mainWindow
         );
 
         void refresh() override;
@@ -69,11 +95,16 @@ namespace controller
 
         void onTransactionsSelected();
 
-       private slots:
-        void _onTransactionTypeChanged(TransactionType type);
+       private:
         void _onCreateCashTransactionRequested(
             drafts::CreateCashTransactionDraft draft
         );
+
+        void _onCreateStockTransactionRequested(
+            drafts::CreateStockTransactionDraft draft
+        );
+
+        void _onCreateTickerRequested(const std::string& ticker);
     };
 }   // namespace controller
 

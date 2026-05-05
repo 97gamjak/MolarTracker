@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 
@@ -20,9 +19,6 @@ namespace finance
     class TradeLeg
     {
        private:
-        /// The ID of the trade leg
-        TradeLegId _id;
-
         /// The ID of the account associated with this trade leg
         AccountId _accountId;
 
@@ -30,19 +26,28 @@ namespace finance
         InstrumentId _instrumentId;
 
         /// The quantity of the instrument being traded in this leg
-        micro_units _quantity;
+        Quantity _quantity;
 
         /// The unit price of the instrument being traded in this leg
         Cash _unitPrice;
 
        public:
         TradeLeg(
-            TradeLegId   id,
-            AccountId    accountId,
-            InstrumentId instrumentId,
-            micro_units  quantity,
-            const Cash&  unitPrice
+            AccountId       accountId,
+            InstrumentId    instrumentId,
+            const Quantity& quantity,
+            const Cash&     unitPrice
         );
+
+        [[nodiscard]] Cash getCash() const;
+
+        [[nodiscard]] InstrumentId getInstrumentId() const;
+
+        [[nodiscard]] AccountId getAccountId() const;
+        [[nodiscard]] Quantity  getQuantity() const;
+        [[nodiscard]] Cash      getUnitPrice() const;
+
+        void setInstrumentId(InstrumentId instrumentId);
     };
 
     /**
@@ -54,6 +59,15 @@ namespace finance
        private:
         /// A list of trade legs associated with the trade transaction
         std::vector<TradeLeg> _legs;
+
+       public:
+        explicit TradeData() = default;
+        explicit TradeData(std::vector<TradeLeg> legs);
+
+        [[nodiscard]] const std::vector<TradeLeg>& getLegs() const;
+        [[nodiscard]] std::vector<TradeLeg>&       getLegs();
+
+        void addLeg(const TradeLeg& leg);
     };
 
 }   // namespace finance

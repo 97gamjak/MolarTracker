@@ -48,17 +48,19 @@ namespace controller
               accountController,
               mainWindow
           ),
-          _transactionSideBarController(
-              undoStack,
-              appContext.getStore().getAccountStore(),
-              appContext.getStore().getTransactionStore(),
-              transactionController,
-              mainWindow
-          ),
           _securitiesSideBarController(
               mainWindow,
               appContext.getStore().getStockStore(),
               centralStack
+          ),
+          _transactionSideBarController(
+              undoStack,
+              appContext.getStore().getAccountStore(),
+              appContext.getStore().getTransactionStore(),
+              appContext.getStore().getStockStore(),
+              transactionController,
+              _securitiesSideBarController,
+              mainWindow
           ),
           _overviewCategory(new ui::OverviewCategory())
     {

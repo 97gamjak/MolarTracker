@@ -3,11 +3,13 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/position_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
 /**
@@ -17,6 +19,9 @@
  */
 struct TradeLegRow : public orm::ORMModel<"trade_leg">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
+
     /// The ID of the trade leg, this is the primary key for the trade_leg table
     ORM_FIELD(id, IdField<TradeLegId>)
 
@@ -75,7 +80,20 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// calculations and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
-    /// @cond DOXYGEN_IGNORE
+    /// The ID of the position associated with this trade leg, this is a foreign
+    /// key referencing the id field of the position table, and is used to
+    /// associate this trade leg with a specific position.
+    ORM_FIELD(
+        positionId,
+        Field<
+            "position_id",
+            PositionId,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                PositionRow,
+                decltype(PositionRow::id)>>
+    )
+
     ORM_FIELDS(
         TradeLegRow,
         id,
@@ -86,7 +104,6 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
         unitPrice,
         currency
     )
-    /// @endcond
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__

@@ -104,7 +104,7 @@ namespace ui
                 )
                 .toString();
 
-        emit tickerSelected(ticker);
+        emit tickerSelected(ticker.toStdString());
     }
 
     /**

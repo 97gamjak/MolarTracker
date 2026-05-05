@@ -70,6 +70,7 @@ namespace controller
                   _undoStack,
                   _appContext.getStore().getTransactionStore(),
                   _appContext.getStore().getAccountStore(),
+                  _appContext.getStore().getStockStore(),
                   _mainWindow.getCentralWidget()
               ),
               _menuBarController(

@@ -28,7 +28,6 @@ namespace app
 
        public:
         explicit Profile(
-            ProfileId                         id,
             std::string                       name,
             const std::optional<std::string>& email
         );

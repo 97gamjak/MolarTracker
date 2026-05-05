@@ -502,7 +502,7 @@ namespace orm
      * @param query
      * @return std::vector<Model>
      */
-    template <db_model... Models>
+    template <typename... Models>
     std::vector<std::tuple<Models...>> Crud::getJoined(
         db::Database&     database,
         const orm::Joins& joins,

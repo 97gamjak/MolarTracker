@@ -22,9 +22,12 @@ namespace ui
      * @param tickers A list of ticker symbols to initialize the field with
      * @param parent The parent widget for this field
      */
-    TickerField::TickerField(std::vector<QString> tickers, QWidget* parent)
+    TickerField::TickerField(
+        const std::vector<std::string>& tickers,
+        QWidget*                        parent
+    )
         : QWidget(parent),
-          _tickers(std::move(tickers)),
+          _tickers(utils::toQStringVector(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
           _addButton(makeQChild<QPushButton>("+", this)),
           _completer(new QCompleter(this))
@@ -63,7 +66,7 @@ namespace ui
             _addButton,
             &QPushButton::clicked,
             this,
-            &TickerField::createTickerRequested
+            &TickerField::_onCreateTickerRequest
         );
     }
 
@@ -73,17 +76,18 @@ namespace ui
      * the available tickers, allowing the owning dialog to determine which
      * ticker the user has selected for creating a transaction.
      *
-     * @return std::optional<QString> The currently selected ticker symbol, or
-     * std::nullopt if the text in the line edit does not match any available
+     * @return std::optional<std::string> The currently selected ticker symbol,
+     * or std::nullopt if the text in the line edit does not match any available
      * tickers.
      */
-    std::optional<QString> TickerField::selected() const
+    std::optional<std::string> TickerField::getTicker() const
     {
         const auto text = _lineEdit->text().trimmed();
 
         const auto it = std::ranges::find(_tickers, text);
 
-        return it != _tickers.end() ? std::optional{*it} : std::nullopt;
+        return it != _tickers.end() ? std::optional{it->toStdString()}
+                                    : std::nullopt;
     }
 
     /**
@@ -117,10 +121,10 @@ namespace ui
             return;
 
         // clear selection if the user edited away from a valid ticker
-        if (!selected().has_value())
+        if (!getTicker().has_value())
             return;
 
-        emit tickerSelected(*selected());
+        emit tickerSelected(getTicker().value());
     }
 
     /**
@@ -136,7 +140,7 @@ namespace ui
     void TickerField::_onActivated(const QString& ticker)
     {
         _lineEdit->setText(ticker);
-        emit tickerSelected(ticker);
+        emit tickerSelected(ticker.toStdString());
     }
 
     /**
@@ -157,5 +161,46 @@ namespace ui
             utils::makeQChild<QStringListModel>(list, _completer)
         );
     }
+
+    /**
+     * @brief Update the list of tickers in the ticker field
+     *
+     * @param tickers The new list of ticker symbols to populate the ticker
+     * field
+     */
+    void TickerField::updateTickers(std::vector<QString> tickers)
+    {
+        _tickers = std::move(tickers);
+        _rebuildCompleter();
+    }
+
+    /**
+     * @brief Handle the request to create a new ticker
+     *
+     */
+    void TickerField::_onCreateTickerRequest()
+    {
+        const auto text = _lineEdit->text().trimmed();
+        emit       createTickerRequested(text.toStdString());
+    }
+
+    /**
+     * @brief Select a ticker in the ticker field
+     *
+     * @param ticker The ticker symbol to select
+     */
+    void TickerField::selectTicker(const QString& ticker)
+    {
+        _lineEdit->setText(ticker);
+        _rebuildCompleter();
+    }
+
+    /**
+     * @brief Checks if the ticker field is valid.
+     *
+     * @return true If the ticker field is valid.
+     * @return false If the ticker field is not valid.
+     */
+    bool TickerField::isValid() const { return getTicker().has_value(); }
 
 }   // namespace ui

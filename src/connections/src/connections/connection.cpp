@@ -128,3 +128,56 @@ Connection Connection::make(
 
     return connection;
 }
+
+/**
+ * @brief Move constructor for Connections, this transfers the active
+ * connections from the other object to this object
+ *
+ * @param other The other Connections object to move from
+ */
+Connections::Connections(Connections&& other) noexcept
+    : _connections(std::move(other._connections))
+{
+}
+
+/**
+ * @brief Move assignment operator for Connections, this transfers the active
+ * connections from the other object to this object
+ *
+ * @param other The other Connections object to move from
+ * @return A reference to this Connections object
+ */
+Connections& Connections::operator=(Connections&& other) noexcept
+{
+    if (this != &other)
+    {
+        // Move the connections from the other object
+        _connections = std::move(other._connections);
+    }
+    return *this;
+}
+
+/**
+ * @brief Add a new connection to the collection.
+ *
+ * @param connection The connection to add.
+ */
+void Connections::add(Connection&& connection)
+{
+    _connections.push_back(std::move(connection));
+}
+
+/**
+ * @brief Add a collection of connections to the collection.
+ *
+ * @param connections The connections to add.
+ */
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+void Connections::add(Connections&& connections)
+{
+    _connections.reserve(_connections.size() + connections._connections.size());
+    for (auto& connection : connections._connections)
+    {
+        _connections.push_back(std::move(connection));
+    }
+}

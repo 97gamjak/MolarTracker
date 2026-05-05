@@ -54,10 +54,8 @@ MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
     X(Future)               \
     X(Unknown)
 
-MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST)
+MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST);
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
-
-using micro_units = std::int64_t;
 
 #endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__

@@ -2,10 +2,10 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "exceptions/not_yet_implemented.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
+#include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
@@ -48,9 +48,7 @@ namespace app
                 type = finance::CashData{};
                 break;
             case TransactionDataType::Trade:
-                throw NotYetImplementedException(
-                    "Trade transactions are not yet implemented"
-                );
+                type = finance::TradeData{};
                 break;
         }
 
@@ -105,6 +103,47 @@ namespace app
             row.id.value(),
             row.accountId.value(),
             finance::Cash(row.currency.value(), row.amount.value())
+        };
+    }
+
+    /**
+     * @brief Converts a TradeLeg object to a TradeLegRow object.
+     *
+     * @param leg The TradeLeg object to convert.
+     * @param transactionId The ID of the associated transaction.
+     * @return The converted TradeLegRow object.
+     */
+    TradeLegRow TransactionFactory::toLegRow(
+        const finance::TradeLeg &leg,
+        TransactionId            transactionId
+    )
+    {
+        TradeLegRow row;
+
+        row.id            = TradeLegId::invalid();
+        row.transactionId = transactionId;
+        row.instrumentId  = leg.getInstrumentId();
+        row.accountId     = leg.getAccountId();
+        row.quantity      = leg.getQuantity().toMicroUnits();
+        row.unitPrice     = leg.getUnitPrice().getAmount();
+        row.currency      = leg.getUnitPrice().getCurrency();
+
+        return row;
+    }
+
+    /**
+     * @brief Converts a TradeLegRow object to a TradeLeg object.
+     *
+     * @param row The TradeLegRow object to convert.
+     * @return The converted TradeLeg object.
+     */
+    finance::TradeLeg TransactionFactory::fromLegRow(const TradeLegRow &row)
+    {
+        return {
+            row.accountId.value(),
+            row.instrumentId.value(),
+            Quantity(row.quantity.value()),
+            finance::Cash(row.currency.value(), row.unitPrice.value())
         };
     }
 

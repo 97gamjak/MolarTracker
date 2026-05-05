@@ -21,6 +21,9 @@
  */
 struct StockRow : public orm::ORMModel<"stock">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasTicker(const std::string& ticker);
+
     /// The ID of the stock instrument, this is the primary key for the stock
     /// table.
     ORM_FIELD(id, IdField<StockId>)
@@ -47,11 +50,26 @@ struct StockRow : public orm::ORMModel<"stock">
     /// stock is traded, and is used for financial calculations and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
+    /// The short name of the stock, this is a brief identifier for the stock.
     ORM_FIELD(shortName, Field<"short_name", std::string, orm::not_null_t>)
+
+    /// The long name of the stock, this is a more descriptive identifier for
+    /// the stock.
     ORM_FIELD(longName, Field<"long_name", std::string, orm::not_null_t>)
+
+    /// The asset class of the stock, this indicates the category of the stock
     ORM_FIELD(assetClass, Field<"asset_class", AssetClass, orm::not_null_t>)
+
+    /// The sector of the stock, this indicates the industry sector to which the
+    /// stock belongs.
     ORM_FIELD(sector, Field<"sector", std::string, orm::not_null_t>)
+
+    /// The industry of the stock, this indicates the specific industry to which
+    /// the stock belongs.
     ORM_FIELD(industry, Field<"industry", std::string, orm::not_null_t>)
+
+    /// The exchange on which the stock is listed, this indicates the
+    /// marketplace where the stock is traded.
     ORM_FIELD(exchange, Field<"exchange", std::string, orm::not_null_t>)
 
     /// @cond DOXYGEN_IGNORE
@@ -67,11 +85,8 @@ struct StockRow : public orm::ORMModel<"stock">
         sector,
         industry,
         exchange
-    );
+    )
     /// @endcond
-
-    [[nodiscard]]
-    static orm::WhereExpr hasTicker(const std::string& ticker);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__STOCK_ROW_HPP__

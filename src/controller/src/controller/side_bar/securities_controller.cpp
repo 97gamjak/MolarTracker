@@ -82,7 +82,7 @@ namespace controller
     {
         if (action == category->getCreateAction())
         {
-            _tickerLookupWidget->show();
+            createStock("");
         }
         else
         {
@@ -120,10 +120,29 @@ namespace controller
     void SecuritiesSideBarController::_onAcceptTickerButtonClicked()
     {
         if (_acceptedQuote)
-            _stockStore.addStock(_acceptedQuote.value());
+        {
+            const auto result = _stockStore.addStock(_acceptedQuote.value());
+
+            if (result != app::StockStoreResult::Ok)
+                _tickerLookupWidget->displayError("Failed to add stock");
+        }
 
         _tickerLookupWidget->clearResult();
         _tickerLookupWidget->hide();
+
+        if (_acceptedQuote)
+            emit stockCreated(_acceptedQuote.value());
+    }
+
+    /**
+     * @brief Create a new stock with the given ticker symbol.
+     *
+     * @param ticker The ticker symbol of the stock to create
+     */
+    void SecuritiesSideBarController::createStock(const std::string& ticker)
+    {
+        _tickerLookupWidget->setTicker(ticker);
+        _tickerLookupWidget->show();
     }
 
 }   // namespace controller

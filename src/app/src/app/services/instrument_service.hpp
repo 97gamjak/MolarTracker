@@ -34,6 +34,11 @@ namespace app
         [[nodiscard]] std::vector<finance::Stock> getStocks() override;
 
         [[nodiscard]]
+        std::optional<finance::Stock> getStock(
+            const std::string& ticker
+        ) override;
+
+        [[nodiscard]]
         std::pair<StockId, InstrumentId> addStock(
             const finance::Stock& stock
         ) override;

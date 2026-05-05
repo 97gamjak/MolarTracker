@@ -1,12 +1,13 @@
 #include "transaction_repo.hpp"
 
 #include "app/factories/transaction_factory.hpp"
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
 #include "orm/crud.hpp"
-#include "orm/join.hpp"
 #include "repo_errors.hpp"
+#include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
@@ -56,6 +57,36 @@ namespace app
             }
         }
 
+        switch (txRow.type.value())
+        {
+            case TransactionDataType::Trade:
+            {
+                const auto data =
+                    std::get<finance::TradeData>(transaction.getData());
+
+                for (const auto& leg : data.getLegs())
+                {
+                    const auto legRow = TransactionFactory::toLegRow(leg, txId);
+
+                    const auto legResult =
+                        _getCrud().insert(_getDb(), dbTx, legRow);
+
+                    if (!legResult.has_value())
+                    {
+                        const auto msg =
+                            getInsertError(legResult.error(), "trade leg");
+
+                        LOG_ERROR(msg);
+                        throw orm::CrudException(msg);
+                    }
+                }
+
+                break;
+            }
+            case TransactionDataType::Cash:
+                break;
+        }
+
         dbTx.commit();
 
         return TransactionId(transactionResult.value());
@@ -75,28 +106,27 @@ namespace app
 
         for (const auto& txRow : txRows)
         {
-            const auto joins = orm::Joins{}.add(
-                orm::join<
-                    TransactionEntryRow::transactionIdField,
-                    TransactionRow::idField>()
-            );
-
-            const auto query = orm::Query{}.where(
+            const auto entryQuery = orm::Query{}.where(
                 TransactionEntryRow::hasTransactionId(txRow.id.value())
             );
-
-            const auto entryRows = _getCrud().getJoined<TransactionEntryRow>(
-                _getDb(),
-                joins,
-                query
+            const auto legQuery = orm::Query{}.where(
+                TradeLegRow::hasTransactionId(txRow.id.value())
             );
+
+            const auto entryRows =
+                _getCrud().get<TransactionEntryRow>(_getDb(), entryQuery);
+            const auto legRows =
+                _getCrud().get<TradeLegRow>(_getDb(), legQuery);
 
             auto transaction = TransactionFactory::fromRow(txRow);
 
-            for (const auto& [entryRow] : entryRows)
+            for (const auto& entryRow : entryRows)
                 transaction.addEntry(
                     TransactionFactory::fromEntryRow(entryRow)
                 );
+
+            for (const auto& legRow : legRows)
+                transaction.addLeg(TransactionFactory::fromLegRow(legRow));
 
             results.push_back(std::move(transaction));
         }
