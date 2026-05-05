@@ -4,6 +4,9 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.2.0](https://github.com/repo/owner/releases/tag/0.2.0) - 2026-05-05
+
 ### Features
 
 #### Finance
@@ -30,7 +33,6 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Rework signal system of stores
 
-<!-- insertion marker -->
 ## [0.1.0](https://github.com/repo/owner/releases/tag/0.1.0) - 2026-04-22
 
 ## [0.0.5](https://github.com/repo/owner/releases/tag/0.0.5) - 2026-04-18
@@ -223,6 +225,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 

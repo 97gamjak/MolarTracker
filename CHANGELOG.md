@@ -4,12 +4,14 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.2.0](https://github.com/repo/owner/releases/tag/0.2.0) - 2026-05-05
+
 #### Finance
 
 - Add possibility to add stocks via ticker and yfinance to database
 - Add possibility to create stock transactions
 
-<!-- insertion marker -->
 ## [0.1.0](https://github.com/repo/owner/releases/tag/0.1.0) - 2026-04-22
 
 ### Features
@@ -108,6 +110,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 
