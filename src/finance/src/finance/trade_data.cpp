@@ -1,7 +1,5 @@
 #include "finance/trade_data.hpp"
 
-#include "config/finance.hpp"
-
 namespace finance
 {
 

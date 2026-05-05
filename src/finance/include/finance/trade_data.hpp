@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 

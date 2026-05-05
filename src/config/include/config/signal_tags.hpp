@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <optional>
-#include <unordered_map>
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"

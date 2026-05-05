@@ -154,11 +154,13 @@ namespace app
             void*                user
         ) override;
 
+        // cppcheck-suppress functionConst -- false positive
         [[nodiscard]] Connection subscribeToIdRemap(
             OnIdRemap<IdType>::func func,
             void*                   user
         );
 
+        // cppcheck-suppress functionConst -- false positive
         [[nodiscard]] Connection subscribeToStoreChange(
             StoreChanged<IdType>::func func,
             void*                      user

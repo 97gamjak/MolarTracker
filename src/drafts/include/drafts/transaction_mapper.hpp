@@ -2,7 +2,6 @@
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
 
 #include <string>
-#include <unordered_map>
 #include <variant>
 #include <vector>
 

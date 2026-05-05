@@ -6,8 +6,6 @@
 
 using micro_units = std::int64_t;
 
-// TODO: move this to a cpp file
-
 /**
  * @brief A compile-time integer power calculation
  *

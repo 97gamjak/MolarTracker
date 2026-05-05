@@ -1,7 +1,6 @@
 #include "drafts/transaction_mapper.hpp"
 
 #include <string>
-#include <unordered_map>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
@@ -244,7 +243,7 @@ namespace drafts
             Visitor& operator=(Visitor&&)      = delete;
 
             std::vector<TradeLegDraft> operator()(const finance::TradeData& data
-            )
+            ) const
             {
                 return TransactionMapper::toTradeLegDrafts(
                     data.getLegs(),
@@ -253,7 +252,7 @@ namespace drafts
             }
 
             std::vector<TradeLegDraft> operator()(const finance::
-                                                      CashData& /*data*/)
+                                                      CashData& /*data*/) const
             {
                 return {};
             }

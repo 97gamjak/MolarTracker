@@ -6,7 +6,6 @@
 #include "drafts/transaction_draft.hpp"
 #include "ui/transaction/transaction_table.hpp"
 
-// TODO: cleanup includes
 namespace ui
 {
 

@@ -2,7 +2,6 @@
 #define __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
 
 #include <cstdint>
-#include <format>
 #include <mstd/enum.hpp>
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
@@ -55,7 +54,7 @@ MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
     X(Future)               \
     X(Unknown)
 
-MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST)
+MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST);
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
