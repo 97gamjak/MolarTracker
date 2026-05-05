@@ -78,7 +78,7 @@ bool Quantity::operator>(const Quantity& other) const
 {
 #if defined(_MSC_VER) && !defined(__clang__)
     int64_t    high;
-    const auto low = static_cast<uint64_t>(_mul128(a, b, &high));
+    const auto low = static_cast<uint64_t>(_mul128(lhs, rhs, &high));
     int64_t    remainder;
     return _div128(high, low, divisor, &remainder);
 #else
