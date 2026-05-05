@@ -1,9 +1,11 @@
+
 #ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
 #define __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
 
 #include <QtContainerFwd>
 #include <mstd/type_traits/enum_traits.hpp>
 #include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
