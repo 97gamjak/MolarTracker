@@ -1,6 +1,7 @@
 #ifndef __APP__INCLUDE__APP__SERVICES_API__I_INSTRUMENT_SERVICE_HPP__
 #define __APP__INCLUDE__APP__SERVICES_API__I_INSTRUMENT_SERVICE_HPP__
 
+#include <optional>
 #include <string>
 #include <vector>
 
