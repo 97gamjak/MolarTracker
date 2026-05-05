@@ -8,6 +8,7 @@ add_library(molartracker_app STATIC
     src/app/services/profile_service.cpp
     src/app/services/transaction_service.cpp
     src/app/services/instrument_service.cpp
+    src/app/services/position_service.cpp
 
     src/app/repos/account_repo.cpp
     src/app/repos/profile_repo.cpp
@@ -15,10 +16,12 @@ add_library(molartracker_app STATIC
     src/app/repos/repo_errors.cpp
     src/app/repos/transaction_repo.cpp
     src/app/repos/instrument_repo.cpp
+    src/app/repos/position_repo.cpp
 
     src/app/store/account_store.cpp
     src/app/store/transaction_store.cpp
     src/app/store/stock_store.cpp
+    src/app/store/position_store.cpp
     src/app/store/profile/profile_store.cpp
     src/app/store/profile/active_profile.cpp
     src/app/store/profile/exception.cpp
@@ -27,6 +30,7 @@ add_library(molartracker_app STATIC
     src/app/factories/profile_factory.cpp
     src/app/factories/transaction_factory.cpp
     src/app/factories/instrument_factory.cpp
+    src/app/factories/position_factory.cpp
 
     src/app/domain/profile.cpp
 

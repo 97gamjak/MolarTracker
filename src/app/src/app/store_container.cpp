@@ -24,12 +24,14 @@ namespace app
               services.getTransactionService(),
               _accountStore,
               _stockStore
-          }
+          },
+          _positionStore{services.getPositionService()}
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
         _allStores.push_back(&_transactionStore);
         _allStores.push_back(&_stockStore);
+        _allStores.push_back(&_positionStore);
 
         _connections.add(_profileStore.subscribeToProfileChange(
             [&](const std::optional<ProfileId>& profileId)
@@ -178,6 +180,23 @@ namespace app
     const StockStore& StoreContainer::getStockStore() const
     {
         return _stockStore;
+    }
+
+    /**
+     * @brief Get the PositionStore
+     *
+     * @return PositionStore&
+     */
+    PositionStore& StoreContainer::getPositionStore() { return _positionStore; }
+
+    /**
+     * @brief Get the PositionStore (const version)
+     *
+     * @return const PositionStore&
+     */
+    const PositionStore& StoreContainer::getPositionStore() const
+    {
+        return _positionStore;
     }
 
 }   // namespace app

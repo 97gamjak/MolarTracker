@@ -2,6 +2,7 @@
 #define __APP__INCLUDE__APP__STORE_CONTAINER_HPP__
 
 #include "app/store/account_store.hpp"
+#include "app/store/position_store.hpp"
 #include "app/store/profile/profile_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
@@ -35,6 +36,9 @@ namespace app
         /// The Transaction store
         TransactionStore _transactionStore;
 
+        /// The Position store
+        PositionStore _positionStore;
+
         /// list of all stores
         std::vector<IStore*> _allStores;
 
@@ -64,6 +68,9 @@ namespace app
 
         [[nodiscard]] StockStore&       getStockStore();
         [[nodiscard]] const StockStore& getStockStore() const;
+
+        [[nodiscard]] PositionStore&       getPositionStore();
+        [[nodiscard]] const PositionStore& getPositionStore() const;
     };
 
 }   // namespace app
