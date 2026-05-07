@@ -44,9 +44,9 @@ namespace finance
      * @brief Retrieve ticker information for a given stock ticker.
      *
      * @param ticker The stock ticker symbol
-     * @return std::expected<Stock, http::HttpError>
+     * @return std::expected<Stock, YahooFinanceError>
      */
-    std::expected<Stock, http::HttpError> Stock::retrieveTickerInfo(
+    std::expected<Stock, YahooFinanceError> Stock::retrieveTickerInfo(
         const std::string& ticker
     )
     {

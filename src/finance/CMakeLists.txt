@@ -23,11 +23,11 @@ target_link_libraries(molartracker_finance
     PUBLIC
     mstd
     molartracker_filter
+    molartracker_http   # TODO(97gamjak): try to move this dependency to private
     PRIVATE
     molartracker_config
     molartracker_exceptions
     molartracker_utils
-    molartracker_http
     molartracker_logging
     mstd
 )
