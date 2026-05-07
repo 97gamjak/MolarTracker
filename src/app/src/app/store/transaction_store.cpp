@@ -193,7 +193,7 @@ namespace app
      *
      * @param remap The mapping of old account IDs to new account IDs
      */
-    void TransactionStore::_onAccountIdRemap(const AccountStore::IdMap& remap)
+    void TransactionStore::_onAccountIdRemap(const accountMap<AccountId>& remap)
     {
         for (const auto& entry : _getEntries())
         {
@@ -251,31 +251,19 @@ namespace app
             {
                 // check if this committed transaction references the remapped
                 // ID
-                switch (entry.value.getType())
+                const auto hasId = finance::hasId(
+                    entry.value.getData(),
+                    remap,
+                    &finance::TradeLeg::getInstrumentId
+                );
+
+                if (hasId)
                 {
-                    case TransactionDataType::Trade:
-                    {
-                        const auto data =
-                            std::get<finance::TradeData>(entry.value.getData());
-
-                        const auto references = std::ranges::any_of(
-                            data.getLegs(),
-                            [&remap](const auto& leg)
-                            { return remap.contains(leg.getInstrumentId()); }
-                        );
-
-                        if (references)
-                        {
-                            throw std::runtime_error(
-                                "Instrument ID found in already committed "
-                                "transaction "
-                                "entry!"
-                            );
-                        }
-                        break;
-                    }
-                    case TransactionDataType::Cash:
-                        break;
+                    throw std::runtime_error(
+                        "Instrument ID found in already committed "
+                        "transaction "
+                        "entry!"
+                    );
                 }
 
                 continue;
@@ -326,15 +314,13 @@ namespace app
             {
                 // check if this committed transaction references the remapped
                 // ID
-                const auto references = std::ranges::any_of(
-                    std::visit(
-                        finance::GetPositionIdVisitor(),
-                        entry.value.getData()
-                    ),
-                    [&remap](const auto& id) { return remap.contains(id); }
+                const auto hasId = finance::hasId(
+                    entry.value.getData(),
+                    remap,
+                    &finance::TradeLeg::getPositionId
                 );
 
-                if (references)
+                if (hasId)
                 {
                     throw std::runtime_error(
                         "Position ID found in already committed "
@@ -342,9 +328,8 @@ namespace app
                         "entry!"
                     );
                 }
+                continue;
             }
-
-            continue;
 
             switch (entry.value.getType())
             {

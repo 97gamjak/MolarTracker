@@ -3,7 +3,6 @@
 
 #include <format>   // IWYU pragma: keep
 #include <string>
-#include <type_traits>
 
 #include "orm/concepts.hpp"
 #include "orm/constraints.hpp"

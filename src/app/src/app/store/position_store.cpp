@@ -1,6 +1,7 @@
 #include "app/store/position_store.hpp"
 
 #include "app/store/base/base_store.hpp"
+#include "exceptions/not_yet_implemented.hpp"
 
 namespace app
 {
@@ -38,29 +39,59 @@ namespace app
      *
      * @return std::vector<finance::Position>
      */
-    std::vector<finance::Position> PositionStore::getAllPositions()
+    std::vector<finance::Position> PositionStore::getAllPositions() const
     {
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
-        auto positions = _getValues(options);
+        auto                           positionsView = _getValues(options);
+        std::vector<finance::Position> positions     = {
+            positionsView.begin(),
+            positionsView.end()
+        };
 
-        return {positions.begin(), positions.end()};
+        options.deletion = DeletionPolicy::IncludeDelete;
+        const auto ids   = _getIds(options);
+
+        for (const auto& position : _positionService->getAllPositions())
+            if (!ids.contains(position.getId()))
+                positions.push_back(position);
+
+        return positions;
     }
 
+    /**
+     * @brief Commit all changes to the position store
+     *
+     */
     void PositionStore::commit()
     {
-        // for (const auto& position : _getEntries())
-        // {
-        //     switch (position.getState())
-        //     {
-        //         case finance::PositionState::Open:
-        //             _positionService->savePosition(position);
-        //             break;
-        //         case finance::PositionState::Closed:
-        //             _positionService->removePosition(position.getId());
-        //             break;
-        //     }
-        // }
+        for (const auto& entry : _getEntries())
+        {
+            switch (entry.state)
+            {
+                case StoreState::New:
+                {
+                    const auto id =
+                        _positionService->createPosition(entry.value);
+                    auto newEntry = entry;
+                    newEntry.value.setId(id);
+
+                    _commitEntry(entry.value.getId(), newEntry);
+                    break;
+                }
+                case StoreState::Clean:
+                    break;
+                case StoreState::Deleted:
+                case StoreState::Modified:
+                {
+                    throw NotYetImplementedException(
+                        "Position modification is not yet implemented"
+                    );
+                }
+            }
+        }
+
+        _notifyOnCommit();
     }
 
 }   // namespace app

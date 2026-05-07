@@ -30,7 +30,7 @@ namespace app
             const finance::Position& position
         );
 
-        [[nodiscard]] std::vector<finance::Position> getAllPositions();
+        [[nodiscard]] std::vector<finance::Position> getAllPositions() const;
 
         void commit();
     };

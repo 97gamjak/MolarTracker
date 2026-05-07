@@ -1,14 +1,13 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 
-#include <algorithm>
-#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
+#include "finance/cash.hpp"
 #include "finance/trade_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
@@ -77,40 +76,53 @@ namespace finance
         void addLeg(const TradeLeg& leg);
     };
 
+    /**
+     * @brief Base visitor for extracting IDs from transaction data
+     *
+     * @tparam IdType
+     */
     template <typename IdType>
     struct GetIdVisitorBase
     {
-        std::vector<IdType> operator()(const CashData&) const { return {}; }
-        std::vector<IdType> operator()(const FxData&) const { return {}; }
-        std::vector<IdType> operator()(const DividendData&) const { return {}; }
+        std::vector<IdType> operator()(const CashData& /*cashData*/) const;
+
+       protected:
+        template <typename Proj>
+        static std::vector<IdType> fromLegs(
+            const TradeData& tradeData,
+            Proj             proj
+        );
     };
 
-    struct GetInstrumentIdVisitor : GetIdVisitorBase<InstrumentId>
+    /**
+     * @brief Visitor for extracting IDs from trade data
+     *
+     * @tparam IdType
+     * @tparam Proj
+     */
+    template <typename IdType, typename Proj>
+    struct GetIdVisitor : GetIdVisitorBase<IdType>
     {
-        using GetIdVisitorBase::operator();
+        /// The projection function to get the ID from a leg
+        Proj proj;
 
-        std::vector<InstrumentId> operator()(const TradeData& tradeData) const
-        {
-            std::vector<InstrumentId> ids;
-            for (const auto& leg : tradeData.getLegs())
-                ids.push_back(leg.getInstrumentId());
-            return ids;
-        }
+        /// The projection function to set the ID on a leg
+        using GetIdVisitorBase<IdType>::operator();
+
+        std::vector<IdType> operator()(const TradeData& tradeData) const;
     };
 
-    struct GetPositionIdVisitor : GetIdVisitorBase<PositionId>
-    {
-        using GetIdVisitorBase::operator();
-
-        std::vector<PositionId> operator()(const TradeData& tradeData) const
-        {
-            std::vector<PositionId> ids;
-            for (const auto& leg : tradeData.getLegs())
-                ids.push_back(leg.getPositionId());
-            return ids;
-        }
-    };
+    template <typename IdType, typename Proj>
+    bool hasId(
+        const TransactionData&                data,
+        const unorderedIdMap<IdType, IdType>& map,
+        Proj                                  proj
+    );
 
 }   // namespace finance
+
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_TPP__
+#include "transaction.tpp"
+#endif
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
