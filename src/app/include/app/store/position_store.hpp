@@ -31,6 +31,8 @@ namespace app
         );
 
         [[nodiscard]] std::vector<finance::Position> getAllPositions();
+
+        void commit();
     };
 
 }   // namespace app

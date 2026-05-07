@@ -1,11 +1,14 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__
 
+#include <algorithm>
+#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "config/strong_id.hpp"
 #include "finance/trade_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
@@ -72,6 +75,40 @@ namespace finance
         void setId(TransactionId id);
         void addEntry(const TransactionEntry& entry);
         void addLeg(const TradeLeg& leg);
+    };
+
+    template <typename IdType>
+    struct GetIdVisitorBase
+    {
+        std::vector<IdType> operator()(const CashData&) const { return {}; }
+        std::vector<IdType> operator()(const FxData&) const { return {}; }
+        std::vector<IdType> operator()(const DividendData&) const { return {}; }
+    };
+
+    struct GetInstrumentIdVisitor : GetIdVisitorBase<InstrumentId>
+    {
+        using GetIdVisitorBase::operator();
+
+        std::vector<InstrumentId> operator()(const TradeData& tradeData) const
+        {
+            std::vector<InstrumentId> ids;
+            for (const auto& leg : tradeData.getLegs())
+                ids.push_back(leg.getInstrumentId());
+            return ids;
+        }
+    };
+
+    struct GetPositionIdVisitor : GetIdVisitorBase<PositionId>
+    {
+        using GetIdVisitorBase::operator();
+
+        std::vector<PositionId> operator()(const TradeData& tradeData) const
+        {
+            std::vector<PositionId> ids;
+            for (const auto& leg : tradeData.getLegs())
+                ids.push_back(leg.getPositionId());
+            return ids;
+        }
     };
 
 }   // namespace finance

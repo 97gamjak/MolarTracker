@@ -4,6 +4,7 @@
 
 #include "app/services_api/i_transaction_service.hpp"
 #include "app/store/account_store.hpp"
+#include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_mapper.hpp"
@@ -20,11 +21,13 @@ namespace app
      * @param transactionService
      * @param accountStore
      * @param stockStore
+     * @param positionStore
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<ITransactionService>& transactionService,
         AccountStore&                               accountStore,
-        StockStore&                                 stockStore
+        StockStore&                                 stockStore,
+        PositionStore&                              positionStore
     )
         : _transactionService(transactionService)
     {
@@ -37,6 +40,12 @@ namespace app
         _connections.add(stockStore.subscribeToInstrumentIdRemap(
             [this](const instrumentMap<InstrumentId>& remap)
             { _onInstrumentIdRemap(remap); },
+            this
+        ));
+
+        _connections.add(positionStore.subscribeToIdRemap(
+            [this](const PositionStore::IdMap& remap)
+            { _onPositionIdRemap(remap); },
             this
         ));
     }
@@ -288,6 +297,71 @@ namespace app
                             it != remap.end())
                         {
                             leg.setInstrumentId(it->second);
+                            modified = true;
+                        }
+                    }
+
+                    if (modified)
+                        _updateEntry(transaction, StoreState::New);
+                    break;
+                }
+                case TransactionDataType::Cash:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @brief Handle position ID remapping for transaction entries
+     *
+     * @param remap The mapping of old position IDs to new position IDs
+     */
+    void TransactionStore::_onPositionIdRemap(
+        const positionMap<PositionId>& remap
+    )
+    {
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the remapped
+                // ID
+                const auto references = std::ranges::any_of(
+                    std::visit(
+                        finance::GetPositionIdVisitor(),
+                        entry.value.getData()
+                    ),
+                    [&remap](const auto& id) { return remap.contains(id); }
+                );
+
+                if (references)
+                {
+                    throw std::runtime_error(
+                        "Position ID found in already committed "
+                        "transaction "
+                        "entry!"
+                    );
+                }
+            }
+
+            continue;
+
+            switch (entry.value.getType())
+            {
+                case TransactionDataType::Trade:
+                {
+                    auto transaction = entry.value;
+                    auto data =
+                        std::get<finance::TradeData>(transaction.getData());
+
+                    bool modified = false;
+
+                    for (auto& leg : data.getLegs())
+                    {
+                        if (const auto it = remap.find(leg.getPositionId());
+                            it != remap.end())
+                        {
+                            leg.setPositionId(it->second);
                             modified = true;
                         }
                     }

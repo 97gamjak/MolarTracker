@@ -47,4 +47,20 @@ namespace app
         return {positions.begin(), positions.end()};
     }
 
+    void PositionStore::commit()
+    {
+        // for (const auto& position : _getEntries())
+        // {
+        //     switch (position.getState())
+        //     {
+        //         case finance::PositionState::Open:
+        //             _positionService->savePosition(position);
+        //             break;
+        //         case finance::PositionState::Closed:
+        //             _positionService->removePosition(position.getId());
+        //             break;
+        //     }
+        // }
+    }
+
 }   // namespace app

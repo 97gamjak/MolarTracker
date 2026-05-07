@@ -23,21 +23,16 @@ namespace app
        private:
         /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
-
         /// The Profile store
         ProfileStore _profileStore;
-
         /// The Account store
         AccountStore _accountStore;
-
         /// The stock store
         StockStore _stockStore;
-
-        /// The Transaction store
-        TransactionStore _transactionStore;
-
         /// The Position store
         PositionStore _positionStore;
+        /// The Transaction store
+        TransactionStore _transactionStore;
 
         /// list of all stores
         std::vector<IStore*> _allStores;

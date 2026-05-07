@@ -20,12 +20,13 @@ namespace app
         : _profileStore{services.getProfileService()},
           _accountStore{services.getAccountService()},
           _stockStore{services.getInstrumentService(), _instrumentIdSeq},
+          _positionStore{services.getPositionService()},
           _transactionStore{
               services.getTransactionService(),
               _accountStore,
-              _stockStore
-          },
-          _positionStore{services.getPositionService()}
+              _stockStore,
+              _positionStore
+          }
     {
         _allStores.push_back(&_profileStore);
         _allStores.push_back(&_accountStore);
@@ -52,6 +53,8 @@ namespace app
         // here the id of the active profile store was already updated via
         // the observer in account store
         _accountStore.commit();
+
+        _positionStore.commit();
 
         _transactionStore.commit();
 
