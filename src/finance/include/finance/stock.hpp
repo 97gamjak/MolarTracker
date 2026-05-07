@@ -7,6 +7,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
+#include "finance/yf_client.hpp"
 
 namespace http
 {
@@ -15,7 +16,7 @@ namespace http
 
 namespace finance
 {
-    class TickerInfo;   // forward declaration
+    struct TickerInfo;   // forward declaration
 
     /**
      * @brief A class representing a stock instrument, this is used to represent
@@ -69,7 +70,7 @@ namespace finance
         );
 
         [[nodiscard]]
-        static std::expected<Stock, http::HttpError> retrieveTickerInfo(
+        static std::expected<Stock, YahooFinanceError> retrieveTickerInfo(
             const std::string& ticker
         );
 

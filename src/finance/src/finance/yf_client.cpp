@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "config/error.hpp"
 #include "finance/ticker_info.hpp"
 #include "http/http_client.hpp"
 
@@ -38,6 +39,48 @@ namespace finance
         }
 
     }   // namespace
+
+    /**
+     * @brief Construct a new Yahoo Finance Error:: Yahoo Finance Error object
+     *
+     * @param type
+     * @param message
+     * @param httpError
+     */
+    YahooFinanceError::YahooFinanceError(
+        YahooFinanceError::ErrorType   type,
+        std::string                    message,
+        std::optional<http::HttpError> httpError
+    )
+        : YahooFinanceErrorBase(type, std::move(message)),
+          _httpError(std::move(httpError))
+    {
+    }
+
+    /**
+     * @brief Converts a FinanceError to a YahooFinanceError.
+     *
+     * @param error The FinanceError to convert.
+     * @return YahooFinanceError The converted YahooFinanceError.
+     */
+    YahooFinanceError YahooFinanceError::fromError(const FinanceError& error)
+    {
+        switch (error.getType())
+        {
+            case FinanceErrorType::CurrencyUnknown:
+                return YahooFinanceError{
+                    YahooFinanceErrorType::CurrencyUnknown,
+                    error.getMessage()
+                };
+            case FinanceErrorType::Unknown:
+                return YahooFinanceError{
+                    YahooFinanceErrorType::Unknown,
+                    error.getMessage()
+                };
+        }
+
+        std::unreachable();
+    }
 
     /**
      * @brief Authenticate the Yahoo Finance API session.
@@ -185,9 +228,9 @@ namespace finance
      * @brief Fetch ticker information from Yahoo Finance API.
      *
      * @param ticker The ticker symbol of the stock.
-     * @return std::expected<TickerInfo, http::HttpError>
+     * @return std::expected<TickerInfo, YahooFinanceError>
      */
-    std::expected<TickerInfo, http::HttpError> YahooFinanceClient::
+    std::expected<TickerInfo, YahooFinanceError> YahooFinanceClient::
         fetchTickerInfo(const std::string& ticker)
     {
         const std::string path = "/v10/finance/quoteSummary/" + ticker +
@@ -195,23 +238,44 @@ namespace finance
 
         auto result = http::HttpClient::get(_buildRequest(path));
         if (!result)
-            return std::unexpected(result.error());
+        {
+            return std::unexpected(
+                YahooFinanceError{
+                    YahooFinanceErrorType::HttpError,
+                    result.error().message,
+                    result.error()
+                }
+            );
+        }
 
         try
         {
-            const auto json = nlohmann::json::parse(result->body);
-            return TickerInfo::fromJson(json);
+            const auto json         = nlohmann::json::parse(result->body);
+            const auto tickerResult = TickerInfo::fromJson(json);
+
+            if (!tickerResult)
+            {
+                return std::unexpected(
+                    YahooFinanceError::fromError(tickerResult.error())
+                );
+            }
         }
         catch (const nlohmann::json::exception& ex)
         {
             return std::unexpected(
-                http::HttpError{
-                    .kind            = http::HttpErrorKind::ParseError,
-                    .message         = ex.what(),
-                    .responseHeaders = std::move(result->headers),
+                YahooFinanceError{
+                    YahooFinanceErrorType::HttpError,
+                    ex.what(),
+                    http::HttpError{
+                        .kind            = http::HttpErrorKind::ParseError,
+                        .message         = ex.what(),
+                        .responseHeaders = std::move(result->headers),
+                    }
                 }
             );
         }
+
+        std::unreachable();
     }
 
 }   // namespace finance

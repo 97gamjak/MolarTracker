@@ -83,9 +83,11 @@ namespace finance
      * @brief Create a TickerInfo object from a JSON object.
      *
      * @param json The JSON object containing ticker information.
-     * @return TickerInfo The constructed TickerInfo object.
+     * @return std::expected<TickerInfo, FinanceError>
      */
-    TickerInfo TickerInfo::fromJson(const nlohmann::json& json)
+    std::expected<TickerInfo, FinanceError> TickerInfo::fromJson(
+        const nlohmann::json& json
+    )
     {
         // quoteSummary.result[0].price
         const auto& price =
@@ -103,11 +105,17 @@ namespace finance
         info.shortName = _safeGet<std::string>(price, "shortName");
         info.longName  = _safeGet<std::string>(price, "longName");
         info.exchange  = _safeGet<std::string>(price, "exchangeName");
-        const auto currencyOpt =
-            CurrencyMeta::from_string(_safeGet<std::string>(price, "currency"));
+
+        const auto currencyStr = _safeGet<std::string>(price, "currency");
+        const auto currencyOpt = CurrencyMeta::from_string(currencyStr);
 
         if (!currencyOpt)
-            throw(std::runtime_error("Invalid currency"));
+        {
+            return std::unexpected(FinanceError(
+                FinanceErrorType::CurrencyUnknown,
+                "Unknown currency " + currencyStr
+            ));
+        }
 
         info.currency = currencyOpt.value();
 
