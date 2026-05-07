@@ -45,6 +45,18 @@ namespace finance
     }
 
     /**
+     * @brief Constructs a GetIdVisitor
+     *
+     * @tparam IdType
+     * @tparam Proj
+     * @param proj The projection function to apply
+     */
+    template <typename IdType, typename Proj>
+    GetIdVisitor<IdType, Proj>::GetIdVisitor(Proj proj) : proj(proj)
+    {
+    }
+
+    /**
      * @brief Visitor for extracting IDs from trade data
      *
      * @tparam IdType
@@ -79,7 +91,7 @@ namespace finance
     )
     {
         return std::ranges::any_of(
-            std::visit(GetIdVisitor<IdType, Proj>{.proj = proj}, data),
+            std::visit(GetIdVisitor<IdType, Proj>{proj}, data),
             [&map](const IdType& id) { return map.contains(id); }
         );
     }
