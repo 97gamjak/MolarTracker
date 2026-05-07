@@ -4,11 +4,13 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
+
 ### Bug Fix
 
 - Fix: if ticker is valid but has an unknown currency now an error will be displayed instead of aborting the application
 
-<!-- insertion marker -->
 ## [0.2.0](https://github.com/repo/owner/releases/tag/0.2.0) - 2026-05-05
 
 #### Finance
@@ -114,6 +116,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 

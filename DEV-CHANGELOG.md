@@ -4,11 +4,13 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
+
 ### Error Handling
 
 - Introduce a common error type `Error` which can be used for `std::expected` approaches
 
-<!-- insertion marker -->
 ## [0.2.0](https://github.com/repo/owner/releases/tag/0.2.0) - 2026-05-05
 
 ### Features
@@ -229,6 +231,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 
