@@ -4,6 +4,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Error Handling
+
+- Introduce a common error type `Error` which can be used for `std::expected` approaches
+
 <!-- insertion marker -->
 ## [0.2.0](https://github.com/repo/owner/releases/tag/0.2.0) - 2026-05-05
 

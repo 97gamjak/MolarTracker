@@ -6,7 +6,6 @@
 #include "app/store/stock_store.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "finance/stock.hpp"
-#include "http/http_error.hpp"
 #include "ui/securities/stock_info_model.hpp"
 #include "ui/securities/stock_overview.hpp"
 #include "ui/securities/ticker_lookup.hpp"
@@ -102,7 +101,7 @@ namespace controller
 
         if (!result)
         {
-            _tickerLookupWidget->displayError(result.error().message);
+            _tickerLookupWidget->displayError(result.error().toString());
             _acceptedQuote = std::nullopt;
             return;
         }

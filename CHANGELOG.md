@@ -4,6 +4,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Bug Fix
+
+- Fix: if ticker is valid but has an unknown currency now an error will be displayed instead of aborting the application
+
 <!-- insertion marker -->
 ## [0.2.0](https://github.com/repo/owner/releases/tag/0.2.0) - 2026-05-05
 

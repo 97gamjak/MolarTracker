@@ -1,13 +1,48 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__YF_CLIENT_HPP__
 #define __FINANCE__INCLUDE__FINANCE__YF_CLIENT_HPP__
 
-#include <http/http_client.hpp>
 #include <string>
 
 #include "finance/ticker_info.hpp"
+#include "http/http_error.hpp"
+
+namespace http
+{
+    class HttpRequest;   // Forward declaration
+}   // namespace http
 
 namespace finance
 {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define YAHOO_FINANCE_ERROR(X) \
+    X(HttpError)               \
+    X(CurrencyUnknown)         \
+    X(Unknown)
+
+    MSTD_ENUM(YahooFinanceErrorType, std::uint8_t, YAHOO_FINANCE_ERROR);
+
+    using YahooFinanceErrorBase = Error<YahooFinanceErrorType>;
+
+    /**
+     * @brief Represents an error returned by the Yahoo Finance API.
+     *
+     */
+    class YahooFinanceError : public YahooFinanceErrorBase
+    {
+       private:
+        /// optional http error from which this error results from
+        std::optional<http::HttpError> _httpError;
+
+       public:
+        YahooFinanceError(
+            ErrorType                      type,
+            std::string                    message,
+            std::optional<http::HttpError> httpError = std::nullopt
+        );
+
+        static YahooFinanceError fromError(const FinanceError& error);
+    };
+
     /**
      * @brief Yahoo Finance API credentials
      *
@@ -57,7 +92,7 @@ namespace finance
 
        public:
         [[nodiscard]]
-        static std::expected<TickerInfo, http::HttpError> fetchTickerInfo(
+        static std::expected<TickerInfo, YahooFinanceError> fetchTickerInfo(
             const std::string& ticker
         );
 
