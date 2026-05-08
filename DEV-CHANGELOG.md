@@ -4,6 +4,12 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Feautres
+
+#### Finance
+
+- Add position store, service and repo
+
 <!-- insertion marker -->
 ## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
 

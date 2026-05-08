@@ -61,6 +61,13 @@ namespace finance
     Cash TradeLeg::getUnitPrice() const { return _unitPrice; }
 
     /**
+     * @brief Gets the position ID of the trade leg.
+     *
+     * @return PositionId The position ID of the trade leg.
+     */
+    PositionId TradeLeg::getPositionId() const { return _positionId; }
+
+    /**
      * @brief Sets the instrument ID of the trade leg.
      *
      * @param instrumentId The new instrument ID for the trade leg.
@@ -68,6 +75,16 @@ namespace finance
     void TradeLeg::setInstrumentId(InstrumentId instrumentId)
     {
         _instrumentId = instrumentId;
+    }
+
+    /**
+     * @brief Sets the position ID of the trade leg.
+     *
+     * @param positionId The new position ID for the trade leg.
+     */
+    void TradeLeg::setPositionId(PositionId positionId)
+    {
+        _positionId = positionId;
     }
 
     /**

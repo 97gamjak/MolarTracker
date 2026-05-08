@@ -178,6 +178,8 @@ namespace app
         std::optional<T> _get(Options options = Options()) const;
         [[nodiscard]]
         auto _getEntry(Options options = Options()) const;
+        [[nodiscard]]
+        idSet<IdType> _getIds(Options options = Options()) const;
 
         void        _addEntry(T value);
         void        _addCleanEntries(const std::vector<T>& value);

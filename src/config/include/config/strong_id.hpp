@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <ostream>
 #include <unordered_map>
+#include <unordered_set>
 
 /**
  * @brief A strong typedef for IDs to prevent mixing different ID types
@@ -72,6 +73,9 @@ class StrongId final
 
 template <typename StrongId, typename T>
 using unorderedIdMap = std::unordered_map<StrongId, T, typename StrongId::Hash>;
+
+template <typename StrongId>
+using idSet = std::unordered_set<StrongId, typename StrongId::Hash>;
 
 /**
  * @brief A sequence of IDs, used to generate new unique IDs
