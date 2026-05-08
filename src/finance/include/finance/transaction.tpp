@@ -49,10 +49,10 @@ namespace finance
      *
      * @tparam IdType
      * @tparam Proj
-     * @param proj The projection function to apply
+     * @param _proj The projection function to apply
      */
     template <typename IdType, typename Proj>
-    GetIdVisitor<IdType, Proj>::GetIdVisitor(Proj proj) : proj(proj)
+    GetIdVisitor<IdType, Proj>::GetIdVisitor(Proj _proj) : proj(_proj)
     {
     }
 

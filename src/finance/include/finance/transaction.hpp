@@ -109,7 +109,7 @@ namespace finance
         /// The projection function to set the ID on a leg
         using GetIdVisitorBase<IdType>::operator();
 
-        explicit GetIdVisitor(Proj proj);
+        explicit GetIdVisitor(Proj _proj);
 
         std::vector<IdType> operator()(const TradeData& tradeData) const;
     };
