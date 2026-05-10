@@ -1,5 +1,7 @@
 #include "transaction_service.hpp"
 
+#include "app/repos_api/i_transaction_repo.hpp"
+
 namespace app
 {
     /**

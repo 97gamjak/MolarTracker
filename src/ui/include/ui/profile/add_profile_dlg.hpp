@@ -18,6 +18,16 @@ class QVBoxLayout;   // Forward declaration
 namespace ui
 {
     /**
+     * @brief Enum class for actions in the add profile dialog
+     *
+     */
+    enum class AddProfileDialogAction : std::uint8_t
+    {
+        Ok,
+        Cancel
+    };
+
+    /**
      * @brief Dialog for adding a new profile.
      *
      */
@@ -70,16 +80,6 @@ namespace ui
 
         void showNameAlreadyExistsError();
 
-        /**
-         * @brief Enum class for actions in the add profile dialog
-         *
-         */
-        enum class Action : std::uint8_t
-        {
-            Ok,
-            Cancel
-        };
-
        signals:
         /**
          * @brief QT signal for when an action is performed in the add profile
@@ -89,8 +89,8 @@ namespace ui
          * @param profile
          */
         void requested(
-            const Action&               action,
-            const drafts::ProfileDraft& profile
+            const AddProfileDialogAction& action,
+            const drafts::ProfileDraft&   profile
         );
 
        protected:
@@ -106,7 +106,7 @@ namespace ui
 
         [[nodiscard]] struct drafts::ProfileDraft _getProfile() const;
 
-        void _emit(const Action& action);
+        void _emit(const AddProfileDialogAction& action);
         void _emitOk();
         void _emitCancel();
     };

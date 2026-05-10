@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QObject>
+#include <format>
 
 #include "app/store/account_store.hpp"
 #include "commands/account/create_account_command.hpp"

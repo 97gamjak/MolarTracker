@@ -262,7 +262,7 @@ namespace ui
      *
      * @param action
      */
-    void AddProfileDialog::_emit(const Action& action)
+    void AddProfileDialog::_emit(const AddProfileDialogAction& action)
     {
         emit requested(action, _getProfile());
     }
@@ -271,13 +271,16 @@ namespace ui
      * @brief emit the requested signal with the Ok action and profile draft
      *
      */
-    void AddProfileDialog::_emitOk() { _emit(Action::Ok); }
+    void AddProfileDialog::_emitOk() { _emit(AddProfileDialogAction::Ok); }
 
     /**
      * @brief emit the requested signal with the Cancel action
      *
      */
-    void AddProfileDialog::_emitCancel() { _emit(Action::Cancel); }
+    void AddProfileDialog::_emitCancel()
+    {
+        _emit(AddProfileDialogAction::Cancel);
+    }
 
     /**
      * @brief Handle the close event of the dialog. If the dialog is closed

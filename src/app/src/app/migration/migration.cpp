@@ -1,6 +1,7 @@
 #include "app/migration/migration.hpp"
 
 #include <cassert>
+#include <format>
 #include <memory>
 #include <string>
 
@@ -29,7 +30,7 @@ namespace app
      * @param fromVersion The version the migration is being applied from
      * @param version The release version this migration is targeting
      */
-    Migration::Migration(std::size_t fromVersion, utils::SemVer version)
+    Migration::Migration(std::size_t fromVersion, const utils::SemVer& version)
         : _fromVersion(fromVersion), _version(version)
     {
     }

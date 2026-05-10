@@ -10,6 +10,7 @@
 #include "commands/update_debug_flags_command.hpp"
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
+#include "settings/settings.hpp"
 #include "ui/logging/debug_slots_dialog.hpp"
 #include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
