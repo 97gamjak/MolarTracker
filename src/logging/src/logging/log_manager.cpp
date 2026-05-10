@@ -96,7 +96,7 @@ namespace logging
      */
     std::string LogManager::getCurrentLogFilePath() const
     {
-        return std::string(_ringFile->getCurrentLogFilePath());
+        return _ringFile->getCurrentLogFilePath().string();
     }
 
     /**
