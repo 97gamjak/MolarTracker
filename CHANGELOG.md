@@ -5,6 +5,12 @@ All changes and updates, that are relevant for a user will be documented here
 ## Next Release
 
 <!-- insertion marker -->
+## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
+
+### Bug Fix
+
+- Fix: Adding valid tickers did not work anymore after last bug fix
+
 ## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
 
 ### Bug Fix
@@ -116,6 +122,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 
