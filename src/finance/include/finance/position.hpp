@@ -1,6 +1,8 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__POSITION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__POSITION_HPP__
 
+#include <optional>
+
 #include "config/id_types.hpp"
 #include "utils/timestamp.hpp"
 
