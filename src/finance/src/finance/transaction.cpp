@@ -37,6 +37,12 @@ namespace finance
     {
     }
 
+    /**
+     * @brief Get a string representation of the transaction, this is used for
+     * logging and debugging purposes
+     *
+     * @return std::string
+     */
     std::string Transaction::toString() const
     {
         std::string result  = "Transaction {\n";
@@ -62,6 +68,15 @@ namespace finance
         return result;
     }
 
+    /**
+     * @brief Get the legs of the transaction, this is used to get the trade
+     * legs associated with the transaction, which contain information about
+     * the instruments being traded, the quantities, and the unit prices.
+     *
+     * @return std::vector<TradeLeg> A vector of TradeLeg objects representing
+     * the legs of the transaction. If the transaction does not contain trade
+     * data, an empty vector is returned.
+     */
     std::vector<TradeLeg> Transaction::getLegs() const
     {
         if (std::holds_alternative<TradeData>(_data))

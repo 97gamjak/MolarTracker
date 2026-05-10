@@ -16,6 +16,10 @@ namespace finance
     class TransactionFilter
     {
        private:
+        /// An optional position ID to filter transactions by, if set, only
+        /// transactions that are associated with the specified position ID will
+        /// be included in the results when this filter is applied. If
+        /// std::nullopt, no filtering by position ID will be applied.
         std::optional<PositionId> _positionId;
 
        public:

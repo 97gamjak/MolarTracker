@@ -203,6 +203,23 @@ namespace app
         return results;
     }
 
+    /**
+     * @brief Find transactions by position ID, this retrieves all transactions
+     * that are associated with a specific position ID, allowing the caller to
+     * easily find and work with transactions that are related to a particular
+     * position. This is useful for analyzing the history of a position,
+     * generating reports, or performing any other operations that require
+     * access to the transactions associated with a specific position.
+     *
+     * @param positionId The ID of the position for which to find transactions,
+     * this specifies the position that the caller is interested in, and the
+     * returned transactions will be those that are associated with this
+     * position.
+     *
+     * @return std::vector<finance::Transaction> A vector of transactions that
+     * are associated with the specified position ID, this includes both new and
+     * existing transactions that are related to the given position.
+     */
     std::vector<finance::Transaction> TransactionStore::
         findTransactionsByPositionId(PositionId positionId) const
     {
@@ -213,6 +230,27 @@ namespace app
         return transactions;
     }
 
+    /**
+     * @brief Get a mapping of position IDs to sets of instrument IDs, this
+     * retrieves a mapping that associates each position ID with a set of
+     * instrument IDs that are involved in transactions related to that
+     * position. This allows the caller to easily see which instruments are
+     * associated with each position, which can be useful for various purposes
+     * such as reporting, analysis, or further processing of the transactions
+     * and positions.
+     *
+     * @param positionIds A vector of position IDs for which to retrieve the
+     * mapping, this specifies the set of positions that the caller is
+     * interested in, and the resulting mapping will only include entries for
+     * these positions. If a position ID in this vector does not have any
+     * associated transactions, it may still be included in the resulting
+     * mapping with an empty set of instrument IDs.
+     *
+     * @return positionMap<idSet<InstrumentId>> A mapping of position IDs to
+     * sets of instrument IDs, where each key is a position ID and each value is
+     * a set of instrument IDs that are involved in transactions related to that
+     * position.
+     */
     positionMap<idSet<InstrumentId>> TransactionStore::
         getInstrumentIdsByPositionId(
             const std::vector<PositionId>& positionIds

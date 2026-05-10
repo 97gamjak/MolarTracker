@@ -150,6 +150,17 @@ namespace app
         };
     }
 
+    /**
+     * @brief Convert a TransactionFilter to a WhereExpr for querying the
+     * database, this factory method takes a TransactionFilter object as input
+     * and creates a corresponding WhereExpr that can be used to query the
+     * database for transactions that match the criteria specified in the
+     * filter, ensuring that the filtering logic is correctly translated into a
+     * format that can be executed by the database.
+     *
+     * @param filter The TransactionFilter to convert.
+     * @return orm::WhereExpr The resulting WhereExpr for querying the database.
+     */
     orm::WhereExpr TransactionFactory::toWhereExpr(
         const finance::TransactionFilter &filter
     )

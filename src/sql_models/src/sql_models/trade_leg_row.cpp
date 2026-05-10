@@ -16,6 +16,12 @@ orm::WhereExpr TradeLegRow::hasTransactionId(TransactionId transactionId)
     );
 }
 
+/**
+ * @brief Create a where expression to filter trade legs by position ID
+ *
+ * @param positionId The position ID to filter by
+ * @return orm::WhereExpr The where expression
+ */
 orm::WhereExpr TradeLegRow::hasPosition(PositionId positionId)
 {
     return orm::makeWhere(positionIdField(positionId), filter::Operator::Equal);

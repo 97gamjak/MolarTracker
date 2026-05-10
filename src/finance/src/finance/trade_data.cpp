@@ -13,6 +13,7 @@ namespace finance
      * @param quantity The quantity of the instrument being traded in this leg
      * @param unitPrice The unit price of the instrument being traded in this
      * leg
+     * @param positionId The ID of the position associated with this trade leg
      */
     TradeLeg::TradeLeg(
         AccountId       accountId,
@@ -29,6 +30,12 @@ namespace finance
     {
     }
 
+    /**
+     * @brief get a string representation of the trade leg, this is used for
+     * logging and debugging purposes
+     *
+     * @return std::string
+     */
     std::string TradeLeg::toString() const
     {
         return std::format(
