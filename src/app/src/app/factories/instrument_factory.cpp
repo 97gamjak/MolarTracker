@@ -1,5 +1,7 @@
 #include "instrument_factory.hpp"
 
+#include <string>
+
 #include "finance/stock.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/stock_row.hpp"

@@ -1,7 +1,10 @@
 #include "position_factory.hpp"
 
+#include <optional>
+
 #include "finance/position.hpp"
 #include "sql_models/position_row.hpp"
+#include "utils/timestamp.hpp"
 
 namespace app
 {

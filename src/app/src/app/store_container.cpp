@@ -12,6 +12,7 @@
 #include "app/store/profile/profile_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
+#include "connections/connection.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
