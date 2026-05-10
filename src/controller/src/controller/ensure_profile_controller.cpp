@@ -8,6 +8,7 @@
 #include <format>
 
 #include "app/app_context.hpp"
+#include "app/store/profile/profile_store.hpp"
 #include "app/store_container.hpp"
 #include "commands/profile/add_profile_command.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
