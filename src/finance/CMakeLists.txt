@@ -11,6 +11,7 @@ add_library(molartracker_finance STATIC
     src/finance/ticker_info.cpp
     src/finance/yf_client.cpp
     src/finance/position.cpp
+    src/finance/finance_error.cpp
 )
 
 target_include_directories(molartracker_finance

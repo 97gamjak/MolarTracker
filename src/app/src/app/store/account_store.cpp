@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <format>
+#include <ranges>
 
 #include "app/services_api/i_account_service.hpp"
 #include "config/finance.hpp"

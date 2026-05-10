@@ -1,5 +1,7 @@
 #include "logging/log_entry_scope.hpp"
 
+#include <chrono>
+
 #include "logging/log_manager.hpp"
 
 namespace logging
@@ -64,7 +66,8 @@ namespace logging
      * milliseconds
      */
     TimedLogEntryScope::TimedLogEntryScope(const LogObject& logObject)
-        : LogEntryScope(logObject), _start{std::chrono::steady_clock::now()}
+        : LogEntryScope(logObject),
+          _start{std::chrono::steady_clock::now().time_since_epoch().count()}
     {
     }
 
@@ -80,15 +83,14 @@ namespace logging
             using std::chrono::milliseconds;
             using std::chrono::steady_clock;
 
-            const auto timeDifference = steady_clock::now() - _start;
-            const auto _ms     = duration_cast<milliseconds>(timeDifference);
-            const auto time_ms = _ms.count();
+            const auto timeDifference =
+                steady_clock::now().time_since_epoch().count() - _start;
+            const auto _ms = timeDifference / 1'000'000;
 
             auto logObject = getLogObject();
 
             logObject.message = "⧖ exit  " + std::string(logObject.function) +
-                                " (duration: " + std::to_string(time_ms) +
-                                " ms)";
+                                " (duration: " + std::to_string(_ms) + " ms)";
 
             LogManager::getInstance().log(logObject);
         }

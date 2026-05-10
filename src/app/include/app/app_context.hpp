@@ -1,12 +1,25 @@
 #ifndef __APP__INCLUDE__APP__APP_CONTEXT_HPP__
 #define __APP__INCLUDE__APP__APP_CONTEXT_HPP__
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repo_container.hpp"
-#include "app/service_container.hpp"
-#include "app/store_container.hpp"
-#include "db/database.hpp"
-#include "settings/settings.hpp"
+#include <memory>
+
+namespace db
+{
+    class Database;   // Forward declaration
+}   // namespace db
+
+namespace settings
+{
+    class Settings;   // Forward declaration
+}   // namespace settings
+
+namespace app
+{
+    class RepoContainer;      // Forward declaration
+    class ServiceContainer;   // Forward declaration
+    class StoreContainer;     // Forward declaration
+    class MigrationRunner;    // Forward declaration
+}   // namespace app
 
 namespace app
 {
@@ -24,30 +37,34 @@ namespace app
         settings::Settings& _settings;
 
         /// The database instance for the application
-        db::Database _database;
+        std::unique_ptr<db::Database> _database;
 
         /// The migration runner for the application
-        MigrationRunner _migrationRunner;
+        std::unique_ptr<MigrationRunner> _migrationRunner;
 
         /// The repository container for the application
-        RepoContainer _repos;
+        std::unique_ptr<RepoContainer> _repos;
 
         /// The service container for the application
-        ServiceContainer _services;
+        std::unique_ptr<ServiceContainer> _services;
 
         /// The store container for the application, this is where the global
         /// state of the application is stored and can be accessed and modified
         /// by the controllers and other parts of the application
-        StoreContainer _store;
+        std::unique_ptr<StoreContainer> _store;
 
        public:
         explicit AppContext(settings::Settings& settings);
-        ~AppContext() = default;
+        ~AppContext();
 
-        StoreContainer&       getStore();
+        [[nodiscard]]
+        StoreContainer& getStore();
+        [[nodiscard]]
         const StoreContainer& getStore() const;
 
-        settings::Settings&       getSettings();
+        [[nodiscard]]
+        settings::Settings& getSettings();
+        [[nodiscard]]
         const settings::Settings& getSettings() const;
     };
 
