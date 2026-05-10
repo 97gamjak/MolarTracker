@@ -51,9 +51,9 @@ namespace app
 
         ~StoreContainer();
 
-        void commit();
-        void clearPotentiallyDirty();
-        bool isDirty() const;
+        void               commit();
+        void               clearPotentiallyDirty();
+        [[nodiscard]] bool isDirty() const;
 
         Connections subscribeToDirty(
             const OnDirtyChanged::func& func,
