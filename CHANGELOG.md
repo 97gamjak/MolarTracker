@@ -4,6 +4,10 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Bug Fix
+
+- Fix: Adding valid tickers did not work anymore after last bug fix
+
 <!-- insertion marker -->
 ## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
 
