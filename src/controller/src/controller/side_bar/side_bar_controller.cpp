@@ -59,6 +59,7 @@ namespace controller
               appContext.getStore().getAccountStore(),
               appContext.getStore().getTransactionStore(),
               appContext.getStore().getStockStore(),
+              appContext.getStore().getPositionStore(),
               transactionController,
               _securitiesSideBarController,
               mainWindow

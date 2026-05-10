@@ -227,9 +227,11 @@ namespace app
      * @tparam T
      * @tparam IdType
      * @param value
+     *
+     * @return IdType The ID of the newly added entry.
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_addEntry(T value)
+    IdType BaseStore<T, IdType>::_addEntry(T value)
     {
         _markPotentiallyDirty();
 
@@ -239,6 +241,8 @@ namespace app
 
         _added.push_back(value);
         _notifyAdded();
+
+        return value.getId();
     }
 
     /**

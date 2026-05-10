@@ -70,4 +70,25 @@ namespace finance
     {
         _accountId = accountId;
     }
+
+    /**
+     * @brief Converts the transaction entry to a string representation, this is
+     * used for debugging and logging purposes, allowing developers to easily
+     * visualize the contents of a transaction entry when inspecting logs or
+     * debugging the application.
+     *
+     * @return std::string A string representation of the transaction entry,
+     * including its ID, account ID, amount, and currency.
+     */
+    std::string TransactionEntry::toString() const
+    {
+        return std::format(
+            "TransactionEntry(id={}, accountId={}, amount={}, currency={})",
+            _id.value(),
+            _accountId.value(),
+            _cash.getAmount(),
+            CurrencyMeta::toString(_cash.getCurrency())
+        );
+    }
+
 }   // namespace finance

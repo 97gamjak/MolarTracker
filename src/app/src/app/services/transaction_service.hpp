@@ -5,11 +5,6 @@
 
 #include "app/services_api/i_transaction_service.hpp"
 
-namespace finance
-{
-    class Transaction;   // Forward declaration
-}   // namespace finance
-
 namespace app
 {
     class ITransactionRepo;   // Forward declaration
@@ -35,7 +30,9 @@ namespace app
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions() const override;
+        std::vector<finance::Transaction> getTransactions(
+            const finance::TransactionFilter& filter
+        ) override;
     };
 }   // namespace app
 

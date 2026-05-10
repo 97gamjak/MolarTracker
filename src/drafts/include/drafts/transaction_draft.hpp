@@ -60,6 +60,8 @@ namespace drafts
         std::string _ticker;
         /// The instrument ID associated with the trade leg draft.
         InstrumentId _instrumentId;
+        /// The position ID associated with the trade leg draft.
+        PositionId _positionId;
 
        public:
         TradeLegDraft(
@@ -69,17 +71,15 @@ namespace drafts
             std::string   ticker
         );
 
-        [[nodiscard]] AccountId getAccountId() const;
-
-        [[nodiscard]] finance::Cash getUnitPrice() const;
-
-        [[nodiscard]] Quantity getQuantity() const;
-
+        [[nodiscard]] AccountId          getAccountId() const;
+        [[nodiscard]] finance::Cash      getUnitPrice() const;
+        [[nodiscard]] Quantity           getQuantity() const;
         [[nodiscard]] const std::string& getTicker() const;
-
-        [[nodiscard]] InstrumentId getInstrumentId() const;
+        [[nodiscard]] InstrumentId       getInstrumentId() const;
+        [[nodiscard]] PositionId         getPositionId() const;
 
         void setInstrumentId(InstrumentId instrumentId);
+        void setPositionId(PositionId positionId);
     };
 
     /**

@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "app/store/account_store.hpp"
+#include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
@@ -28,6 +29,7 @@ namespace controller
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
      * @param stockStore The stock store for the application
+     * @param positionStore The position store for the application
      * @param transactionController The transaction controller for the
      * application
      * @param stockController The stock controller for the application
@@ -38,6 +40,7 @@ namespace controller
         app::AccountStore&           accountStore,
         app::TransactionStore&       transactionStore,
         app::StockStore&             stockStore,
+        app::PositionStore&          positionStore,
         TransactionController&       transactionController,
         SecuritiesSideBarController& stockController,
         QMainWindow*                 mainWindow
@@ -46,6 +49,7 @@ namespace controller
           _undoStack(undoStack),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
+          _positionStore(positionStore),
           _stockStore(stockStore),
           _createCashTransactionDlg(nullptr),
           _createStockTransactionDlg(nullptr),
@@ -248,6 +252,22 @@ namespace controller
                 );
             }
         }
+
+        const auto openPositions = _positionStore.getAllPositions();
+        std::vector<PositionId> positionIds;
+        for (const auto& position : openPositions)
+            positionIds.push_back(position.getId());
+
+        const auto instrumentIds =
+            _transactionStore.getInstrumentIdsByPositionId(positionIds);
+        // TODO: ask if position is open if it should be added to an existing
+        // position or if a new position should be created
+
+        auto       position   = finance::Position(draft.getTimestamp());
+        const auto positionId = _positionStore.createPosition(position);
+
+        for (auto& leg : draft.getLegs())
+            leg.setPositionId(positionId);
 
         _transactionStore.addTransaction(
             drafts::TransactionMapper::fromCreateStockTransactionDraft(draft)

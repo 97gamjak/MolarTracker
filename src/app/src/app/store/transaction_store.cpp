@@ -9,6 +9,7 @@
 #include "config/id_types.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
+#include "finance/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
@@ -64,12 +65,15 @@ namespace app
             {
                 case StoreState::New:
                 {
+                    LOG_DEBUG(
+                        std::format(
+                            "Adding new transaction to database: {}",
+                            entry.value.toString()
+                        )
+                    );
+
                     const auto id =
                         _transactionService->addTransaction(entry.value);
-
-                    LOG_DEBUG(
-                        std::format("Added transaction with ID: {}", id.value())
-                    );
 
                     auto persisted = entry.value;
                     persisted.setId(id);
@@ -140,17 +144,28 @@ namespace app
      * but they will not be saved to the database until the commit method is
      * called.
      *
+     * @param filter An optional filter to apply when retrieving transactions,
+     * this allows the caller to specify criteria for which transactions to
+     * include in the results, such as filtering by date range, transaction
+     * type, or any other relevant attributes of the transactions. If no filter
+     * is provided, all transactions in the store will be returned.
+     *
      * @return std::vector<finance::Transaction> A vector of transactions
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions() const
+    std::vector<finance::Transaction> TransactionStore::getTransactions(
+        const finance::TransactionFilter& filter
+    ) const
     {
-        const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
+        const auto options = Options{
+            .filter   = filter.getPredicate(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
 
         auto transactions = _getEntries(options);
 
-        auto dbTransactions = _transactionService->getTransactions();
+        auto dbTransactions = _transactionService->getTransactions(filter);
 
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
@@ -186,6 +201,47 @@ namespace app
         }
 
         return results;
+    }
+
+    std::vector<finance::Transaction> TransactionStore::
+        findTransactionsByPositionId(PositionId positionId) const
+    {
+        auto filter = finance::TransactionFilter();
+        filter.setPositionId(positionId);
+        const auto transactions = getTransactions(filter);
+
+        return transactions;
+    }
+
+    positionMap<idSet<InstrumentId>> TransactionStore::
+        getInstrumentIdsByPositionId(
+            const std::vector<PositionId>& positionIds
+        ) const
+    {
+        positionMap<idSet<InstrumentId>> result;
+
+        for (const auto& positionId : positionIds)
+        {
+            const auto transactions = findTransactionsByPositionId(positionId);
+
+            for (const auto& transaction : transactions)
+            {
+                const auto instrumentIds = transaction.getInstrumentIds();
+
+                if (!instrumentIds.empty())
+                {
+                    // This will default construct an
+                    // empty set if the position ID is
+                    // not already in the map
+                    auto& instrumentIdSet = result[positionId];
+
+                    for (const auto& instrumentId : instrumentIds)
+                        instrumentIdSet.insert(instrumentId);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -273,8 +329,8 @@ namespace app
             {
                 case TransactionDataType::Trade:
                 {
-                    auto transaction = entry.value;
-                    auto data =
+                    auto  transaction = entry.value;
+                    auto& data =
                         std::get<finance::TradeData>(transaction.getData());
 
                     bool modified = false;
@@ -335,8 +391,8 @@ namespace app
             {
                 case TransactionDataType::Trade:
                 {
-                    auto transaction = entry.value;
-                    auto data =
+                    auto  transaction = entry.value;
+                    auto& data =
                         std::get<finance::TradeData>(transaction.getData());
 
                     bool modified = false;
@@ -346,6 +402,17 @@ namespace app
                         if (const auto it = remap.find(leg.getPositionId());
                             it != remap.end())
                         {
+                            LOG_DEBUG(
+                                std::format(
+                                    "Remapping position ID in transaction leg "
+                                    "{}: "
+                                    "{} -> "
+                                    "{}",
+                                    leg.toString(),
+                                    leg.getPositionId().toString(),
+                                    it->second.toString()
+                                )
+                            );
                             leg.setPositionId(it->second);
                             modified = true;
                         }

@@ -216,6 +216,8 @@ namespace finance
                     YahooFinanceError::fromError(tickerResult.error())
                 );
             }
+
+            return tickerResult.value();
         }
         catch (const nlohmann::json::exception& ex)
         {

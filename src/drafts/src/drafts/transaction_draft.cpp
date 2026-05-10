@@ -69,6 +69,18 @@ namespace drafts
         return _instrumentId;
     }
 
+    void TradeLegDraft::setPositionId(PositionId positionId)
+    {
+        _positionId = positionId;
+    }
+
+    /**
+     * @brief Get the position ID associated with the trade leg draft.
+     *
+     * @return PositionId The position ID associated with the trade leg draft.
+     */
+    PositionId TradeLegDraft::getPositionId() const { return _positionId; }
+
     /**
      * @brief Set the instrument ID associated with the trade leg draft.
      *

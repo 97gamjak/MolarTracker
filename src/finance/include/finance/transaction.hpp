@@ -68,12 +68,17 @@ namespace finance
         [[nodiscard]] TransactionDataType                  getType() const;
         [[nodiscard]] const TransactionData&               getData() const;
         [[nodiscard]] TransactionData&                     getData();
+        [[nodiscard]] std::vector<InstrumentId> getInstrumentIds() const;
 
         [[nodiscard]] Cash calculateTotalSum() const;
 
         void setId(TransactionId id);
         void addEntry(const TransactionEntry& entry);
         void addLeg(const TradeLeg& leg);
+
+        [[nodiscard]] std::vector<TradeLeg> getLegs() const;
+
+        [[nodiscard]] std::string toString() const;
     };
 
     /**
@@ -120,6 +125,9 @@ namespace finance
         const unorderedIdMap<IdType, IdType>& map,
         Proj                                  proj
     );
+
+    template <typename IdType, typename Proj>
+    bool hasId(const TransactionData& data, IdType id, Proj proj);
 
 }   // namespace finance
 

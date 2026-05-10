@@ -1,5 +1,7 @@
 #include "finance/trade_data.hpp"
 
+#include <format>
+
 namespace finance
 {
 
@@ -16,13 +18,28 @@ namespace finance
         AccountId       accountId,
         InstrumentId    instrumentId,
         const Quantity& quantity,
-        const Cash&     unitPrice
+        const Cash&     unitPrice,
+        PositionId      positionId
     )
         : _accountId(accountId),
           _instrumentId(instrumentId),
           _quantity(quantity),
-          _unitPrice(unitPrice)
+          _unitPrice(unitPrice),
+          _positionId(positionId)
     {
+    }
+
+    std::string TradeLeg::toString() const
+    {
+        return std::format(
+            "TradeLeg(AccountId: {}, InstrumentId: {}, PositionId: {}, "
+            "Quantity: {}, UnitPrice: {})",
+            _accountId.toString(),
+            _instrumentId.toString(),
+            _positionId.toString(),
+            _quantity.toString(),
+            _unitPrice.toString()
+        );
     }
 
     /**

@@ -15,6 +15,7 @@ namespace app
     class AccountStore;       // Forward declaration
     class TransactionStore;   // Forward declaration
     class StockStore;         // Forward declaration
+    class PositionStore;      // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -57,6 +58,8 @@ namespace controller
         app::AccountStore& _accountStore;
         /// The transaction store for the application
         app::TransactionStore& _transactionStore;
+        /// The position store for the application
+        app::PositionStore& _positionStore;
         /// The stock store for the application
         app::StockStore& _stockStore;
 
@@ -81,6 +84,7 @@ namespace controller
             app::AccountStore&           accountStore,
             app::TransactionStore&       transactionStore,
             app::StockStore&             stockStore,
+            app::PositionStore&          positionStore,
             TransactionController&       transactionController,
             SecuritiesSideBarController& stockController,
             QMainWindow*                 mainWindow

@@ -41,4 +41,18 @@ namespace finance
      */
     std::optional<Timestamp> Position::getClosedAt() const { return _closedAt; }
 
+    /**
+     * @brief Predicate to check if a position is open (i.e. has no closing
+     * timestamp)
+     *
+     * @return filter::Predicate<Position>
+     */
+    filter::Predicate<Position> IsPositionOpen()
+    {
+        return filter::Predicate<Position>{
+            [](const Position& position)
+            { return !position.getClosedAt().has_value(); }
+        };
+    }
+
 }   // namespace finance

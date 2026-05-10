@@ -96,6 +96,25 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Checks if a transaction data contains a specific ID
+     *
+     * @tparam IdType
+     * @tparam Proj
+     * @param data The transaction data to check
+     * @param id The ID to check for
+     * @param proj The projection function to apply
+     * @return true if the ID is found, false otherwise
+     */
+    template <typename IdType, typename Proj>
+    bool hasId(const TransactionData& data, IdType id, Proj proj)
+    {
+        return std::ranges::any_of(
+            std::visit(GetIdVisitor<IdType, Proj>{proj}, data),
+            [&id](const IdType& id_) { return id_ == id; }
+        );
+    }
+
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION_TPP__

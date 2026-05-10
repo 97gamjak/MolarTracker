@@ -181,7 +181,7 @@ namespace app
         [[nodiscard]]
         idSet<IdType> _getIds(Options options = Options()) const;
 
-        void        _addEntry(T value);
+        IdType      _addEntry(T value);
         void        _addCleanEntries(const std::vector<T>& value);
         StoreResult _updateEntry(const T& value, StoreState state);
         StoreResult _commitEntry(IdType tempId, const Entry& persistedValue);

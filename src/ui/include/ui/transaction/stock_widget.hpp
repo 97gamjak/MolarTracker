@@ -75,7 +75,7 @@ namespace ui
         explicit StockWidget(
             std::vector<drafts::AccountDraft>        accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
-            std::vector<std::string>                 tickers,
+            const std::vector<std::string>&          tickers,
             QWidget*                                 parent = nullptr
         );
 

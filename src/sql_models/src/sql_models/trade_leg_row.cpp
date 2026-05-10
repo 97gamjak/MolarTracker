@@ -15,3 +15,8 @@ orm::WhereExpr TradeLegRow::hasTransactionId(TransactionId transactionId)
         filter::Operator::Equal
     );
 }
+
+orm::WhereExpr TradeLegRow::hasPosition(PositionId positionId)
+{
+    return orm::makeWhere(positionIdField(positionId), filter::Operator::Equal);
+}

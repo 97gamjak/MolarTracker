@@ -26,11 +26,11 @@ namespace app
             std::shared_ptr<IPositionService> positionService
         );
 
-        [[nodiscard]] PositionId createPosition(
-            const finance::Position& position
-        );
+        [[nodiscard]]
+        PositionId createPosition(const finance::Position& position);
 
         [[nodiscard]] std::vector<finance::Position> getAllPositions() const;
+        [[nodiscard]] std::vector<finance::Position> getOpenPositions() const;
 
         void commit();
     };

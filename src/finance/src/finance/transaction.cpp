@@ -37,6 +37,39 @@ namespace finance
     {
     }
 
+    std::string Transaction::toString() const
+    {
+        std::string result  = "Transaction {\n";
+        result             += "  ID: " + _id.toString() + "\n";
+        result += "  Timestamp: " + _timestamp.humanReadable() + "\n";
+        result +=
+            "  Status: " + std::to_string(static_cast<int>(_status)) + "\n";
+        result += "  Data: ";
+        if (std::holds_alternative<CashData>(_data))
+            result += "CashData\n";
+        else if (std::holds_alternative<TradeData>(_data))
+            result += "TradeData\n";
+        for (const auto& leg : getLegs())
+            result += "    - Leg: " + leg.toString() + "\n";
+
+        result += "  Entries:\n";
+        for (const auto& entry : _entries)
+            result += "    - " + entry.toString() + "\n";
+        if (_comment.has_value())
+            result += "  Comment: " + _comment.value() + "\n";
+        result += "}";
+
+        return result;
+    }
+
+    std::vector<TradeLeg> Transaction::getLegs() const
+    {
+        if (std::holds_alternative<TradeData>(_data))
+            return std::get<TradeData>(_data).getLegs();
+
+        return {};
+    }
+
     /**
      * @brief Gets the ID of the transaction.
      *
@@ -146,14 +179,35 @@ namespace finance
     TransactionData& Transaction::getData() { return _data; }
 
     /**
-     * @brief Calculates the total sum of the transaction by summing the cash
-     * amounts of all entries, this is used to ensure that the transaction is
-     * balanced (i.e., the total sum should be zero for a valid transaction),
-     * and can be used for validation before committing the transaction to the
-     * database.
+     * @brief Gets the instrument IDs associated with the transaction, this is
+     * used to determine which instruments are involved in the transaction, and
+     * can be useful for various operations such as filtering transactions by
+     * instrument or analyzing the instruments involved in a set of
+     * transactions.
      *
-     * @return Cash The total sum of the transaction, calculated by summing the
-     * cash amounts of all entries.
+     * @return std::vector<InstrumentId> A vector of instrument IDs associated
+     * with the transaction, this includes all instruments that are part of the
+     * transaction's data (e.g., trade legs) and any relevant entries.
+     */
+    std::vector<InstrumentId> Transaction::getInstrumentIds() const
+    {
+        return std::visit(
+            GetIdVisitor<InstrumentId, decltype(&TradeLeg::getInstrumentId)>{
+                &TradeLeg::getInstrumentId
+            },
+            _data
+        );
+    }
+
+    /**
+     * @brief Calculates the total sum of the transaction by summing the
+     * cash amounts of all entries, this is used to ensure that the
+     * transaction is balanced (i.e., the total sum should be zero for a
+     * valid transaction), and can be used for validation before committing
+     * the transaction to the database.
+     *
+     * @return Cash The total sum of the transaction, calculated by summing
+     * the cash amounts of all entries.
      */
     Cash Transaction::calculateTotalSum() const
     {

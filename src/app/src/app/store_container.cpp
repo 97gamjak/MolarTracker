@@ -1,8 +1,11 @@
 #include "app/store_container.hpp"
 
 #include <algorithm>
+#include <optional>
+#include <string>
 
 #include "app/service_container.hpp"
+#include "app/store/base/i_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "logging/log_macros.hpp"
 
@@ -56,9 +59,9 @@ namespace app
 
         _positionStore.commit();
 
-        _transactionStore.commit();
-
         _stockStore.commit();
+
+        _transactionStore.commit();
     }
 
     /**

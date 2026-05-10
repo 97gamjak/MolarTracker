@@ -89,6 +89,7 @@ namespace drafts
             draft.getInstrumentId(),
             draft.getQuantity(),
             draft.getUnitPrice(),
+            draft.getPositionId()
         };
     }
 

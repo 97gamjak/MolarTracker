@@ -7,6 +7,7 @@
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction.hpp"
+#include "finance/transaction_filter.hpp"
 
 namespace app
 {
@@ -52,8 +53,19 @@ namespace app
 
         TransactionStoreResult addTransaction(finance::Transaction transaction);
 
-        // TODO (97gamjak): create filter here
-        std::vector<finance::Transaction> getTransactions() const;
+        [[nodiscard]]
+        std::vector<finance::Transaction> getTransactions(
+            const finance::TransactionFilter& filter =
+                finance::TransactionFilter()
+        ) const;
+        [[nodiscard]]
+        positionMap<idSet<InstrumentId>> getInstrumentIdsByPositionId(
+            const std::vector<PositionId>& positionIds
+        ) const;
+        [[nodiscard]]
+        std::vector<finance::Transaction> findTransactionsByPositionId(
+            PositionId positionId
+        ) const;
 
        private:
         void _onAccountIdRemap(const accountMap<AccountId>& remap);
