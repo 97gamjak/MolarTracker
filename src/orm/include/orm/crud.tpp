@@ -281,6 +281,14 @@ namespace orm
         const Model&  row
     )
     {
+        LOG_DEBUG(
+            std::format(
+                "Updating table '{}' with SQL: {}",
+                Model::tableName,
+                row.toString()
+            )
+        );
+
         std::string sqlText;
         sqlText += "UPDATE ";
         sqlText += Model::tableName;
