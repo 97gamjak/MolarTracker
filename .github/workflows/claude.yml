@@ -21,4 +21,5 @@ jobs:
           custom_prompt: |
             Do not check test coverage or if any unit tests were added.
             This will usually be done in a separate PR. And only one of the two files: 
-            CHANGELOG.md or DEV-CHANGELOG.md has to be modified.
+            CHANGELOG.md or DEV-CHANGELOG.md has to be modified. 
+            Please make a todo task for every single point you find (I mean with `-[ ]` instead of `-` or something similar
