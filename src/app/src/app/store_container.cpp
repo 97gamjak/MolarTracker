@@ -44,7 +44,8 @@ namespace app
               *_accountStore,
               *_stockStore,
               *_positionStore
-          )}
+          )},
+          _connections{std::make_unique<Connections>()}
     {
         _allStores.push_back(&*_profileStore);
         _allStores.push_back(&*_accountStore);

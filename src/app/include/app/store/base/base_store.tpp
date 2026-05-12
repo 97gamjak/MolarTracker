@@ -240,7 +240,7 @@ namespace app
         _entries.push_back(Entry{value, StoreState::New});
 
         _added.push_back(value);
-        _notifyAdded();
+        _notifyAdded(false);
 
         return value.getId();
     }
@@ -259,7 +259,7 @@ namespace app
         for (const auto& item : value)
             _entries.push_back(Entry{item, StoreState::Clean});
 
-        this->template notify<StoreChanged<IdType>>();
+        _notifyStoreChanged(false);
     }
 
     /**
@@ -289,7 +289,7 @@ namespace app
         entry->state = state;
 
         _updated.push_back(entry->value);
-        _notifyUpdated();
+        _notifyUpdated(false);
         return StoreResult::Ok;
     }
 
@@ -352,7 +352,7 @@ namespace app
             return result;
 
         _removed.push_back(id);
-        _notifyRemoved();
+        _notifyRemoved(false);
         _markPotentiallyDirty();
 
         return StoreResult::Ok;
@@ -474,10 +474,13 @@ namespace app
      * @tparam IdType
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyIdRemap()
+    void BaseStore<T, IdType>::_notifyIdRemap(bool checkAlreadyNotified)
     {
+        if (_idRemap.empty())
+            return;
+
         this->template notify<OnIdRemap<IdType>>(_idRemap);
-        this->template notify<StoreChanged<IdType>>();
+        _notifyStoreChanged(checkAlreadyNotified);
         _idRemap.clear();
     }
 
@@ -488,10 +491,10 @@ namespace app
      * @tparam IdType
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyUpdated()
+    void BaseStore<T, IdType>::_notifyUpdated(bool checkAlreadyNotified)
     {
         this->template notify<OnStoreItemUpdated<T>>(_updated);
-        this->template notify<StoreChanged<IdType>>();
+        _notifyStoreChanged(checkAlreadyNotified);
         _updated.clear();
     }
 
@@ -502,10 +505,10 @@ namespace app
      * @tparam IdType
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyAdded()
+    void BaseStore<T, IdType>::_notifyAdded(bool checkAlreadyNotified)
     {
         this->template notify<OnStoreItemAdded<T>>(_added);
-        this->template notify<StoreChanged<IdType>>();
+        _notifyStoreChanged(checkAlreadyNotified);
         _added.clear();
     }
 
@@ -516,10 +519,10 @@ namespace app
      * @tparam IdType
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyRemoved()
+    void BaseStore<T, IdType>::_notifyRemoved(bool checkAlreadyNotified)
     {
         this->template notify<OnStoreItemRemoved<IdType>>(_removed);
-        this->template notify<StoreChanged<IdType>>();
+        _notifyStoreChanged(checkAlreadyNotified);
         _removed.clear();
     }
 
@@ -532,10 +535,30 @@ namespace app
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_notifyOnCommit()
     {
-        _notifyAdded();
-        _notifyRemoved();
-        _notifyUpdated();
-        _notifyIdRemap();
+        _notifyAdded(true);
+        _notifyRemoved(true);
+        _notifyUpdated(true);
+        _notifyIdRemap(true);
+        _alreadyNotified = false;
+    }
+
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_notifyStoreChanged(bool checkAlreadyNotified)
+    {
+        if (checkAlreadyNotified)
+        {
+            if (!_alreadyNotified)
+            {
+                this->template notify<StoreChanged<IdType>>();
+                _alreadyNotified = true;
+            }
+        }
+        else
+        {
+            this->template notify<StoreChanged<IdType>>();
+            // if we do not want to check it we even set it back
+            _alreadyNotified = false;
+        }
     }
 
 }   // namespace app

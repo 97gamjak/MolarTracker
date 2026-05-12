@@ -1,17 +1,17 @@
 #include "drafts/position_draft.hpp"
 
-#include <memory>
-
 #include "drafts/stock_draft.hpp"
 
 namespace drafts
 {
     PositionDraft::PositionDraft(
+        PositionId               positionId,
         StockInfoDraft           stockInfo,
         Timestamp                createdAt,
         std::optional<Timestamp> closedAt
     )
-        : _stockDraft(std::make_unique<StockInfoDraft>(std::move(stockInfo))),
+        : _positionId(positionId),
+          _stockInfo(std::move(stockInfo)),
           _createdAt(createdAt),
           _closedAt(closedAt)
     {
@@ -23,5 +23,9 @@ namespace drafts
     {
         return _closedAt;
     }
+
+    StockInfoDraft PositionDraft::getStockInfo() const { return _stockInfo; }
+
+    PositionId PositionDraft::getPositionId() const { return _positionId; }
 
 }   // namespace drafts

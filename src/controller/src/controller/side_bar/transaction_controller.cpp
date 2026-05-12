@@ -9,9 +9,12 @@
 #include "config/finance.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
+#include "drafts/position_draft.hpp"
+#include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
+#include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
 #include "ui/transaction/stock_widget.hpp"
@@ -260,11 +263,56 @@ namespace controller
 
         const auto instrumentIds =
             _transactionStore.getInstrumentIdsByPositionId(positionIds);
-        // TODO: ask if position is open if it should be added to an existing
-        // position or if a new position should be created
 
-        auto       position   = finance::Position(draft.getTimestamp());
-        const auto positionId = _positionStore.createPosition(position);
+        std::vector<drafts::PositionDraft> drafts;
+        for (const auto& position : openPositions)
+        {
+            // TODO: implement error handling
+            if (!instrumentIds.contains(position.getId()))
+                continue;
+
+            if (instrumentIds.at(position.getId()).empty())
+                continue;
+
+            if (instrumentIds.at(position.getId()).size() > 1)
+                continue;
+
+            const auto& stock =
+                _stockStore.getStock(*instrumentIds.at(position.getId()).begin()
+                );
+
+            if (!stock.has_value())
+                continue;
+
+            drafts.emplace_back(
+                position.getId(),
+                drafts::StockMapper::toStockInfoDraft(*stock),
+                position.getCreatedAt()
+            );
+        }
+
+        PositionId positionId = PositionId::invalid();
+        if (drafts.size() > 0)
+        {
+            ui::PositionSelectionDialog dlg{drafts};
+            if (dlg.exec() != QDialog::Accepted)
+                return;
+
+            if (auto pos = dlg.selectedPosition())
+            {
+                positionId = pos->getPositionId();
+            }
+            else
+            {
+                auto position = finance::Position(draft.getTimestamp());
+                positionId    = _positionStore.createPosition(position);
+            }
+        }
+        else
+        {
+            auto position = finance::Position(draft.getTimestamp());
+            positionId    = _positionStore.createPosition(position);
+        }
 
         for (auto& leg : draft.getLegs())
             leg.setPositionId(positionId);

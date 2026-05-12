@@ -65,6 +65,9 @@ namespace app
         std::vector<std::string> getAllTickers() const;
 
         [[nodiscard]]
+        std::optional<finance::Stock> getStock(InstrumentId id) const;
+
+        [[nodiscard]]
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]

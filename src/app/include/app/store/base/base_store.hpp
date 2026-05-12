@@ -143,6 +143,8 @@ namespace app
         /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
 
+        bool _alreadyNotified = false;
+
        public:
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
@@ -204,10 +206,11 @@ namespace app
         void                 _markPotentiallyDirty();
         [[nodiscard]] IdType _generateNewId();
 
-        void _notifyIdRemap();
-        void _notifyUpdated();
-        void _notifyAdded();
-        void _notifyRemoved();
+        void _notifyIdRemap(bool checkAlreadyNotified);
+        void _notifyUpdated(bool checkAlreadyNotified);
+        void _notifyAdded(bool checkAlreadyNotified);
+        void _notifyRemoved(bool checkAlreadyNotified);
+        void _notifyStoreChanged(bool checkAlreadyNotified);
     };
 
     /**

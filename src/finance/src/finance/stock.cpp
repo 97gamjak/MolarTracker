@@ -1,5 +1,7 @@
 #include "finance/stock.hpp"
 
+#include "config/finance.hpp"
+#include "finance/currency.hpp"
 #include "finance/finance_error.hpp"
 #include "finance/ticker_info.hpp"
 #include "yf_client.hpp"
@@ -165,6 +167,25 @@ namespace finance
         _instrumentId = instrumentId;
     }
 
+    std::string Stock::toString() const
+    {
+        return std::format(
+            "Stock{{id: {}, instrumentId: {}, ticker: {}, currency: {}, "
+            "shortName: {}, longName: {}, exchange: {}, industry: {}, sector: "
+            "{}, assetClass: {}}}",
+            _id.toString(),
+            _instrumentId.toString(),
+            _ticker,
+            getSymbol(_currency),
+            _shortName,
+            _longName,
+            _exchange,
+            _industry,
+            _sector,
+            AssetClassMeta::toString(_assetClass)
+        );
+    }
+
     /**
      * @brief Create a Predicate to filter stocks by ticker
      *
@@ -178,4 +199,10 @@ namespace finance
         );
     }
 
+    filter::Predicate<Stock> HasInstrumentId(InstrumentId id)
+    {
+        return filter::makePredicate<Stock>(
+            [id](const Stock& stock) { return stock.getInstrumentId() == id; }
+        );
+    }
 }   // namespace finance

@@ -83,12 +83,17 @@ namespace finance
         void setId(StockId stockId);
         void setInstrumentId(InstrumentId instrumentId);
 
+        [[nodiscard]] std::string toString() const;
+
        private:
         explicit Stock(const TickerInfo& info);
     };
 
     [[nodiscard]]
     filter::Predicate<Stock> HasTicker(const std::string& ticker);
+
+    [[nodiscard]]
+    filter::Predicate<Stock> HasInstrumentId(InstrumentId id);
 
 }   // namespace finance
 

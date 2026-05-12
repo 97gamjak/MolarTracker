@@ -339,6 +339,21 @@ namespace app
         const instrumentMap<InstrumentId>& remap
     )
     {
+        LOG_ENTRY;
+
+        // TODO: make this more efficient
+        LOG_TRACE("Remapping instrument IDs in transaction entries");
+        for (const auto& [oldId, newId] : remap)
+        {
+            LOG_TRACE(
+                std::format(
+                    "Remapping instrument ID: {} -> {}",
+                    oldId.toString(),
+                    newId.toString()
+                )
+            );
+        }
+
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
@@ -378,6 +393,18 @@ namespace app
                         if (const auto it = remap.find(leg.getInstrumentId());
                             it != remap.end())
                         {
+                            LOG_DEBUG(
+                                std::format(
+                                    "Remapping instrument ID in transaction "
+                                    "leg "
+                                    "{}: "
+                                    "{} -> "
+                                    "{}",
+                                    leg.toString(),
+                                    leg.getInstrumentId().toString(),
+                                    it->second.toString()
+                                )
+                            );
                             leg.setInstrumentId(it->second);
                             modified = true;
                         }

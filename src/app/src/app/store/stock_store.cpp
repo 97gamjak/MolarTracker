@@ -7,6 +7,7 @@
 #include "app/store/base/base_store.hpp"
 #include "app/store/base/store_state.hpp"
 #include "exceptions/not_yet_implemented.hpp"
+#include "finance/stock.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StockStore");
@@ -123,6 +124,10 @@ namespace app
     {
         LOG_ENTRY;
 
+        // make an early return to not notify unnecessarily
+        if (!isDirty())
+            return;
+
         instrumentMap<InstrumentId> map{};
         for (const auto& entry : _getEntries())
         {
@@ -133,13 +138,24 @@ namespace app
                     const auto [stockId, instrumentId] =
                         _instrumentService->addStock(entry.value);
 
+                    LOG_DEBUG(
+                        std::format(
+                            "Added new stock: {} with ID: {} and Instrument "
+                            "ID: {}",
+                            entry.value.toString(),
+                            stockId.toString(),
+                            instrumentId.toString()
+                        )
+                    );
+
                     auto stock = entry.value;
                     stock.setId(stockId);
                     stock.setInstrumentId(instrumentId);
+                    const auto oldInstrumentId = entry.value.getInstrumentId();
 
                     const auto result = _commitEntry(
                         entry.value.getId(),
-                        Entry{.value = std::move(stock), .state = entry.state}
+                        Entry{.value = stock, .state = entry.state}
                     );
 
                     if (result != StoreResult::Ok)
@@ -149,8 +165,8 @@ namespace app
                         );
                     }
 
-                    if (entry.value.getInstrumentId() != instrumentId)
-                        map[entry.value.getInstrumentId()] = instrumentId;
+                    if (oldInstrumentId != instrumentId)
+                        map[oldInstrumentId] = instrumentId;
 
                     break;
                 }
@@ -170,7 +186,30 @@ namespace app
         }
 
         _notifyOnCommit();
-        _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
+        if (!map.empty())
+            _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
+    }
+
+    std::optional<finance::Stock> StockStore::getStock(InstrumentId id) const
+    {
+        const auto options = Options{
+            .filter   = finance::HasInstrumentId(id),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+        auto stocksView = _getValues(options);
+
+        if (stocksView.empty())
+            return std::nullopt;
+
+        const std::vector<finance::Stock> stocks = {
+            stocksView.begin(),
+            stocksView.end()
+        };
+
+        if (stocks.size() > 1)
+            throw std::runtime_error("Multiple stocks found");
+
+        return stocks.front();
     }
 
     /**
