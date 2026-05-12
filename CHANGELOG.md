@@ -4,6 +4,11 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Bug Fix
+
+- Fix silent failure when creating a duplicate account — the operation now
+  correctly raises an error instead of throwing an unexpected exception type
+
 ### Tests
 
 - Add unit tests for `AccountRepo` covering `createAccount` and `getAllAccounts`

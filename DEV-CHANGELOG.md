@@ -4,6 +4,13 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Bug Fix
+
+- Fix `orm::Crud::insert` to catch `db::SqliteError` from
+  `executeToCompletion()` and return `std::unexpected(CrudError{...})`
+  instead of propagating the exception, honouring the method's own
+  `std::expected` return-type contract
+
 ### Tests
 
 - Add `tests/app/test_account_repo.cpp` with GoogleTest fixture covering
