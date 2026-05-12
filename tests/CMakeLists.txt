@@ -11,6 +11,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)  # Windows/MSVC only matters
 FetchContent_MakeAvailable(googletest)
 
+add_subdirectory(app)
 add_subdirectory(db)
 add_subdirectory(orm)
 add_subdirectory(utils)
