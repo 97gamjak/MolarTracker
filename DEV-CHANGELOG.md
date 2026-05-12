@@ -34,13 +34,17 @@ All changes and updates, that are relevant for developers will be documented her
   (empty, full set, correct data), `ProfileRepo::update` (name/email change,
   clear email, non-existent ID throws, duplicate name throws), and
   `ProfileRepo::remove` (deletes target, preserves others)
-  
+
 ### Feautres
 
 #### Finance
 
 - Add position store, service and repo
 - Add position creation when creating transactions
+
+### UI
+
+- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
 
 ### Cleanup
 
