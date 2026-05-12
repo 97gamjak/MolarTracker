@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "app/migration/migration_runner.hpp"
 #include "app/repos/account_repo.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
@@ -13,7 +14,6 @@
 #include "finance/account.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
-#include "sql_models/account_row.hpp"
 #include "sql_models/profile_row.hpp"
 
 namespace
@@ -76,16 +76,14 @@ namespace
 
         AccountRepoTest() : _db{_tempFile.path()}, _repo{_db}
         {
-            orm::Crud crud;
-            crud.createTable<ProfileRow>(_db);
-            crud.createTable<AccountRow>(_db);
+            app::MigrationRunner{_db};
         }
 
         [[nodiscard]] ProfileId insertProfile(const std::string& name)
         {
             ProfileRow row;
-            row.name     = name;
-            auto result  = orm::Crud().insert(_db, row);
+            row.name    = name;
+            auto result = orm::Crud().insert(_db, row);
             assert(result.has_value());
             return ProfileId(result.value());
         }
@@ -131,7 +129,7 @@ TEST_F(AccountRepoTest, CreateAccount_DuplicateUniqueKeyThrows)
     const auto profileId = insertProfile("User");
     const auto account   = makeAccount("Savings");
 
-    _repo.createAccount(account, profileId);
+    static_cast<void>(_repo.createAccount(account, profileId));
 
     EXPECT_THROW(
         _repo.createAccount(account, profileId),
@@ -143,9 +141,8 @@ TEST_F(AccountRepoTest, CreateAccount_SameNameDifferentKindSucceeds)
 {
     const auto profileId = insertProfile("User");
 
-    _repo.createAccount(
-        makeAccount("MyAccount", AccountKind::Cash),
-        profileId
+    static_cast<void>(
+        _repo.createAccount(makeAccount("MyAccount", AccountKind::Cash), profileId)
     );
 
     EXPECT_NO_THROW(
@@ -162,7 +159,7 @@ TEST_F(AccountRepoTest, CreateAccount_SameKindAndNameDifferentProfileSucceeds)
     const auto profileId2 = insertProfile("User2");
     const auto account    = makeAccount("SharedName");
 
-    _repo.createAccount(account, profileId1);
+    static_cast<void>(_repo.createAccount(account, profileId1));
 
     EXPECT_NO_THROW(_repo.createAccount(account, profileId2));
 }
@@ -180,14 +177,14 @@ TEST_F(AccountRepoTest, GetAllAccounts_ReturnsAllAccountsForProfile)
 {
     const auto profileId = insertProfile("User");
 
-    _repo.createAccount(makeAccount("Cash", AccountKind::Cash), profileId);
-    _repo.createAccount(
-        makeAccount("Broker", AccountKind::Security),
-        profileId
+    static_cast<void>(
+        _repo.createAccount(makeAccount("Cash", AccountKind::Cash), profileId)
     );
-    _repo.createAccount(
-        makeAccount("External", AccountKind::External),
-        profileId
+    static_cast<void>(
+        _repo.createAccount(makeAccount("Broker", AccountKind::Security), profileId)
+    );
+    static_cast<void>(
+        _repo.createAccount(makeAccount("External", AccountKind::External), profileId)
     );
 
     const auto accounts = _repo.getAllAccounts(profileId);
@@ -200,8 +197,8 @@ TEST_F(AccountRepoTest, GetAllAccounts_IsolatesAccountsByProfile)
     const auto profileId1 = insertProfile("User1");
     const auto profileId2 = insertProfile("User2");
 
-    _repo.createAccount(makeAccount("P1Account"), profileId1);
-    _repo.createAccount(makeAccount("P2Account"), profileId2);
+    static_cast<void>(_repo.createAccount(makeAccount("P1Account"), profileId1));
+    static_cast<void>(_repo.createAccount(makeAccount("P2Account"), profileId2));
 
     const auto accounts1 = _repo.getAllAccounts(profileId1);
     const auto accounts2 = _repo.getAllAccounts(profileId2);
@@ -222,7 +219,7 @@ TEST_F(AccountRepoTest, GetAllAccounts_ReturnsCorrectAccountData)
         AccountKind::Cash
     };
 
-    _repo.createAccount(account, profileId);
+    static_cast<void>(_repo.createAccount(account, profileId));
 
     const auto accounts = _repo.getAllAccounts(profileId);
     ASSERT_EQ(accounts.size(), 1u);
