@@ -6,6 +6,8 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "config/strong_id.hpp"
+#include "finance/cash.hpp"
 #include "finance/trade_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
@@ -74,6 +76,55 @@ namespace finance
         void addLeg(const TradeLeg& leg);
     };
 
+    /**
+     * @brief Base visitor for extracting IDs from transaction data
+     *
+     * @tparam IdType
+     */
+    template <typename IdType>
+    struct GetIdVisitorBase
+    {
+        std::vector<IdType> operator()(const CashData& /*cashData*/) const;
+
+       protected:
+        template <typename Proj>
+        static std::vector<IdType> fromLegs(
+            const TradeData& tradeData,
+            Proj             proj
+        );
+    };
+
+    /**
+     * @brief Visitor for extracting IDs from trade data
+     *
+     * @tparam IdType
+     * @tparam Proj
+     */
+    template <typename IdType, typename Proj>
+    struct GetIdVisitor : GetIdVisitorBase<IdType>
+    {
+        /// The projection function to get the ID from a leg
+        Proj proj;
+
+        /// The projection function to set the ID on a leg
+        using GetIdVisitorBase<IdType>::operator();
+
+        explicit GetIdVisitor(Proj _proj);
+
+        std::vector<IdType> operator()(const TradeData& tradeData) const;
+    };
+
+    template <typename IdType, typename Proj>
+    bool hasId(
+        const TransactionData&                data,
+        const unorderedIdMap<IdType, IdType>& map,
+        Proj                                  proj
+    );
+
 }   // namespace finance
+
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_TPP__
+#include "transaction.tpp"
+#endif
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION_HPP__

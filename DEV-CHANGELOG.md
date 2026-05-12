@@ -11,6 +11,16 @@ All changes and updates, that are relevant for developers will be documented her
   unique constraint, allows differing kind/profile) and
   `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
   correct domain data mapping)
+  
+### Feautres
+
+#### Finance
+
+- Add position store, service and repo
+
+### Cleanup
+
+- Speedup some compilation headers
 
 <!-- insertion marker -->
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10

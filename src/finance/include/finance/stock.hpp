@@ -7,16 +7,11 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
-#include "finance/yf_client.hpp"
-
-namespace http
-{
-    struct HttpError;   // forward declaration
-}   // namespace http
 
 namespace finance
 {
-    struct TickerInfo;   // forward declaration
+    class YahooFinanceError;   // forward declaration
+    struct TickerInfo;         // forward declaration
 
     /**
      * @brief A class representing a stock instrument, this is used to represent

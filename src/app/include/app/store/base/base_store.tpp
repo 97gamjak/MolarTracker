@@ -149,6 +149,26 @@ namespace app
     }
 
     /**
+     * @brief Retrieves a set of IDs from the entries in the store that match
+     * the given options.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param options
+     * @return idSet<IdType>
+     */
+    template <typename T, typename IdType>
+    idSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
+    {
+        idSet<IdType> ids;
+        for (const auto& entry : _entries)
+            if (options.eval(entry))
+                ids.insert(getId(entry.value));
+
+        return ids;
+    }
+
+    /**
      * @brief Retrieves a const reference to the collection of entries in the
      * store.
      *

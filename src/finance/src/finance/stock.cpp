@@ -1,7 +1,8 @@
 #include "finance/stock.hpp"
 
+#include "finance/finance_error.hpp"
 #include "finance/ticker_info.hpp"
-#include "finance/yf_client.hpp"
+#include "yf_client.hpp"
 
 namespace finance
 {

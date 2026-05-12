@@ -32,7 +32,10 @@ namespace app
         utils::SemVer _version;
 
        public:
-        explicit Migration(std::size_t fromVersion, utils::SemVer version);
+        explicit Migration(
+            std::size_t          fromVersion,
+            const utils::SemVer& version
+        );
 
         void migrate(db::Database& db) const;
         void addMigration(std::unique_ptr<SingleMigration> migration);

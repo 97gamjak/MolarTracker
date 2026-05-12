@@ -1,12 +1,19 @@
 #ifndef __APP__SRC__APP__SERVICES__TRANSACTION_SERVICE_HPP__
 #define __APP__SRC__APP__SERVICES__TRANSACTION_SERVICE_HPP__
 
-#include "app/repos_api/i_transaction_repo.hpp"
+#include <memory>
+
 #include "app/services_api/i_transaction_service.hpp"
-#include "finance/transaction.hpp"
+
+namespace finance
+{
+    class Transaction;   // Forward declaration
+}   // namespace finance
 
 namespace app
 {
+    class ITransactionRepo;   // Forward declaration
+
     /**
      * @brief Service for managing transactions.
      *

@@ -1,8 +1,6 @@
 #ifndef __LOGGING__INCLUDE__LOGGING__LOG_ENTRY_SCOPE_HPP__
 #define __LOGGING__INCLUDE__LOGGING__LOG_ENTRY_SCOPE_HPP__
 
-#include <chrono>
-
 #include "logging/log_object.hpp"
 
 namespace logging
@@ -39,7 +37,7 @@ namespace logging
     {
        private:
         /// The start time of the scope
-        std::chrono::steady_clock::time_point _start;
+        std::int64_t _start;
 
        public:
         explicit TimedLogEntryScope(const LogObject& logObject);

@@ -13,6 +13,16 @@ class QDialogButtonBox;   // Forward declaration
 namespace ui
 {
     /**
+     * @brief enum for the actions that can be emitted by the dialog
+     *
+     */
+    enum class ProfileSelectionDialogAction : std::uint8_t
+    {
+        Ok,
+        Cancel
+    };
+
+    /**
      * @brief Dialog for selecting a profile from existing profiles.
      *
      */
@@ -41,19 +51,12 @@ namespace ui
             const std::vector<std::string>& profiles
         );
 
-        /**
-         * @brief enum for the actions that can be emitted by the dialog
-         *
-         */
-        enum class Action : std::uint8_t
-        {
-            Ok,
-            Cancel
-        };
-
        signals:
         /// Signal emitted when the user performs an action in the dialog
-        void requested(const Action& action, const std::string& profileName);
+        void requested(
+            const ProfileSelectionDialogAction& action,
+            const std::string&                  profileName
+        );
 
        protected:
         void reject() override;
@@ -61,8 +64,11 @@ namespace ui
        private:
         void _buildUI(const std::vector<std::string>& profiles);
 
-        void _emit(const Action& action, const std::string& profileName);
-        void _emit(const Action& action);
+        void _emit(
+            const ProfileSelectionDialogAction& action,
+            const std::string&                  profileName
+        );
+        void _emit(const ProfileSelectionDialogAction& action);
         void _emitOk();
         void _emitCancel();
     };
