@@ -18,13 +18,17 @@ All changes and updates, that are relevant for developers will be documented her
   unique constraint, allows differing kind/profile) and
   `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
   correct domain data mapping)
-  
+
 ### Feautres
 
 #### Finance
 
 - Add position store, service and repo
 - Add position creation when creating transactions
+
+### UI
+
+- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
 
 ### Cleanup
 
