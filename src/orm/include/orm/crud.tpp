@@ -341,7 +341,8 @@ namespace orm
             }
         );
 
-        bind(where, statement);
+        auto whereIdx = bindIndex(index);
+        bind(where, statement, whereIdx);
 
         statement.executeToCompletion();
 
@@ -600,7 +601,7 @@ namespace orm
         std::string sqlText;
         sqlText += "DELETE FROM ";
         sqlText += Model::tableName;
-        sqlText += " WHERE ";
+        sqlText += " ";
 
         const auto where = getPkWhere(model);
 

@@ -8,6 +8,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Fix silent failure when creating a duplicate account — the operation now
   correctly raises an error instead of throwing an unexpected exception type
+- Fix profile update silently doing nothing — updates now correctly modify the
+  targeted row
+- Fix profile deletion crashing with a SQL syntax error
 
 ### Tests
 

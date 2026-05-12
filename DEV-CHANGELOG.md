@@ -10,6 +10,12 @@ All changes and updates, that are relevant for developers will be documented her
   `executeToCompletion()` and return `std::unexpected(CrudError{...})`
   instead of propagating the exception, honouring the method's own
   `std::expected` return-type contract
+- Fix `orm::Crud::update` binding the WHERE-clause parameters at index 0
+  instead of after the SET-clause parameters, causing the primary-key
+  predicate to always evaluate to NULL and update zero rows
+- Fix `orm::Crud::deleteByPk` emitting `DELETE FROM <t> WHERE WHERE …`
+  (double `WHERE`) by removing the manually appended `" WHERE "` that
+  duplicated the keyword already produced by `getDBOperations()`
 
 ### Tests
 
