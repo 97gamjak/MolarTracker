@@ -354,9 +354,19 @@ namespace orm
             }
         );
 
-        bind(where, statement);
+        auto whereIdx = bindIndex(index);
+        bind(where, statement, whereIdx);
 
-        statement.executeToCompletion();
+        try
+        {
+            statement.executeToCompletion();
+        }
+        catch (const db::SqliteError& e)
+        {
+            return std::unexpected(
+                CrudError{CrudErrorType::UpdateFailed, e.what()}
+            );
+        }
 
         const auto changes = database.getNumberOfLastChanges();
 
@@ -613,7 +623,7 @@ namespace orm
         std::string sqlText;
         sqlText += "DELETE FROM ";
         sqlText += Model::tableName;
-        sqlText += " WHERE ";
+        sqlText += " ";
 
         const auto where = getPkWhere(model);
 
