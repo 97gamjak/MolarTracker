@@ -4,6 +4,14 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Tests
+
+- Add `tests/app/test_account_repo.cpp` with GoogleTest fixture covering
+  `AccountRepo::createAccount` (returns valid ID, persists data, enforces
+  unique constraint, allows differing kind/profile) and
+  `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
+  correct domain data mapping)
+
 <!-- insertion marker -->
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
