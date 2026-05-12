@@ -1,5 +1,7 @@
 #include "finance/transaction_entry.hpp"
 
+#include <format>
+
 #include "config/id_types.hpp"
 
 namespace finance
