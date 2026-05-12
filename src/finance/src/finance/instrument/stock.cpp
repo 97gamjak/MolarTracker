@@ -1,10 +1,10 @@
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 
 #include "config/finance.hpp"
 #include "finance/currency.hpp"
 #include "finance/finance_error.hpp"
 #include "finance/ticker_info.hpp"
-#include "yf_client.hpp"
+#include "finance/yf_client.hpp"
 
 namespace finance
 {
@@ -167,6 +167,11 @@ namespace finance
         _instrumentId = instrumentId;
     }
 
+    /**
+     * @brief Convert the stock information to a string representation
+     *
+     * @return std::string The string representation of the stock information
+     */
     std::string Stock::toString() const
     {
         return std::format(
@@ -183,26 +188,6 @@ namespace finance
             _industry,
             _sector,
             AssetClassMeta::toString(_assetClass)
-        );
-    }
-
-    /**
-     * @brief Create a Predicate to filter stocks by ticker
-     *
-     * @param ticker The ticker symbol to filter by
-     * @return filter::Predicate<Stock>
-     */
-    filter::Predicate<Stock> HasTicker(const std::string& ticker)
-    {
-        return filter::makePredicate<Stock>(
-            [ticker](const Stock& stock) { return stock.getTicker() == ticker; }
-        );
-    }
-
-    filter::Predicate<Stock> HasInstrumentId(InstrumentId id)
-    {
-        return filter::makePredicate<Stock>(
-            [id](const Stock& stock) { return stock.getInstrumentId() == id; }
         );
     }
 }   // namespace finance

@@ -25,13 +25,18 @@ namespace ui
         PositionSelectionColumns,
         std::uint8_t,
         POSITION_SELECTION_COLUMN_LIST
-    )
+    );
 
+    /**
+     * @brief Table model for selecting a position
+     *
+     */
     class PositionSelectionTableModel : public QAbstractTableModel
     {
         Q_OBJECT
 
        private:
+        /// The list of position drafts
         std::vector<drafts::PositionDraft> _positions;
 
        public:
@@ -59,6 +64,7 @@ namespace ui
        private:
         [[nodiscard]] static QString _columnLabel(int index);
     };
+
 }   // namespace ui
 
 #endif   // __UI__INCLUDE__UI__POSITION__POSITION_SELECTION_TABLE_MODEL_HPP__

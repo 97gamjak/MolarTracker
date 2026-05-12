@@ -231,55 +231,35 @@ namespace app
     }
 
     /**
-     * @brief Get a mapping of position IDs to sets of instrument IDs, this
-     * retrieves a mapping that associates each position ID with a set of
-     * instrument IDs that are involved in transactions related to that
-     * position. This allows the caller to easily see which instruments are
-     * associated with each position, which can be useful for various purposes
-     * such as reporting, analysis, or further processing of the transactions
-     * and positions.
+     * @brief Get a set of instrument IDs associated with a specific position ID
      *
-     * @param positionIds A vector of position IDs for which to retrieve the
-     * mapping, this specifies the set of positions that the caller is
-     * interested in, and the resulting mapping will only include entries for
-     * these positions. If a position ID in this vector does not have any
-     * associated transactions, it may still be included in the resulting
-     * mapping with an empty set of instrument IDs.
-     *
-     * @return positionMap<idSet<InstrumentId>> A mapping of position IDs to
-     * sets of instrument IDs, where each key is a position ID and each value is
-     * a set of instrument IDs that are involved in transactions related to that
-     * position.
+     * @param positionId The ID of the position for which to find instrument IDs
+     * @return idSet<InstrumentId> A set of instrument IDs associated with the
+     * specified position ID
      */
-    positionMap<idSet<InstrumentId>> TransactionStore::
-        getInstrumentIdsByPositionId(
-            const std::vector<PositionId>& positionIds
-        ) const
+    idSet<InstrumentId> TransactionStore::getInstrumentIdsByPositionId(
+        PositionId positionId
+    ) const
     {
-        positionMap<idSet<InstrumentId>> result;
+        idSet<InstrumentId> instrumentIdSet;
 
-        for (const auto& positionId : positionIds)
+        const auto transactions = findTransactionsByPositionId(positionId);
+
+        for (const auto& transaction : transactions)
         {
-            const auto transactions = findTransactionsByPositionId(positionId);
+            const auto instrumentIds = transaction.getInstrumentIds();
 
-            for (const auto& transaction : transactions)
+            if (!instrumentIds.empty())
             {
-                const auto instrumentIds = transaction.getInstrumentIds();
-
-                if (!instrumentIds.empty())
-                {
-                    // This will default construct an
-                    // empty set if the position ID is
-                    // not already in the map
-                    auto& instrumentIdSet = result[positionId];
-
-                    for (const auto& instrumentId : instrumentIds)
-                        instrumentIdSet.insert(instrumentId);
-                }
+                // This will default construct an
+                // empty set if the position ID is
+                // not already in the map
+                for (const auto& instrumentId : instrumentIds)
+                    instrumentIdSet.insert(instrumentId);
             }
         }
 
-        return result;
+        return instrumentIdSet;
     }
 
     /**
@@ -340,19 +320,6 @@ namespace app
     )
     {
         LOG_ENTRY;
-
-        // TODO: make this more efficient
-        LOG_TRACE("Remapping instrument IDs in transaction entries");
-        for (const auto& [oldId, newId] : remap)
-        {
-            LOG_TRACE(
-                std::format(
-                    "Remapping instrument ID: {} -> {}",
-                    oldId.toString(),
-                    newId.toString()
-                )
-            );
-        }
 
         for (const auto& entry : _getEntries())
         {

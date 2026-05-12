@@ -13,17 +13,27 @@ namespace ui
 {
     class PositionSelectionTableModel;
 
+    /**
+     * @brief Dialog for selecting a position from a list of available positions
+     *
+     */
     class PositionSelectionDialog : public Dialog
     {
         Q_OBJECT
 
        private:
+        /// The model for the position selection table
         PositionSelectionTableModel* _model;
-        QTableView*                  _tableView;
-        QPushButton*                 _selectBtn;
-        QPushButton*                 _createBtn;
-        QPushButton*                 _cancelBtn;
+        /// The view for the position selection table
+        QTableView* _tableView;
+        /// The button for selecting a position
+        QPushButton* _selectBtn;
+        /// The button for creating a new position
+        QPushButton* _createBtn;
+        /// The button for canceling the selection
+        QPushButton* _cancelBtn;
 
+        /// The currently selected position
         std::optional<drafts::PositionDraft> _selectedPosition;
 
        public:

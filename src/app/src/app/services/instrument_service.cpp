@@ -1,7 +1,7 @@
 #include "instrument_service.hpp"
 
 #include "app/repos_api/i_instrument_repo.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 
 namespace app
 {

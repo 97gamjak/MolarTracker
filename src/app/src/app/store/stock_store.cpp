@@ -7,10 +7,13 @@
 #include "app/store/base/base_store.hpp"
 #include "app/store/base/store_state.hpp"
 #include "exceptions/not_yet_implemented.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/instrument_predicates.hpp"
+#include "finance/instrument/stock.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StockStore");
+
+using finance::Stock;
 
 namespace app
 {
@@ -38,7 +41,7 @@ namespace app
      * @param stock The Stock object to be added to the store
      * @return StockStoreResult indicating the result of the operation
      */
-    StockStoreResult StockStore::addStock(finance::Stock stock)
+    StockStoreResult StockStore::addStock(Stock stock)
     {
         const auto ticker = stock.getTicker();
 
@@ -88,15 +91,15 @@ namespace app
      * that are not marked as deleted, and will include stocks that are new or
      * modified but not yet saved to the database.
      *
-     * @return std::vector<finance::Stock>
+     * @return std::vector<Stock>
      */
-    std::vector<finance::Stock> StockStore::getStocks() const
+    std::vector<Stock> StockStore::getStocks() const
     {
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
         auto entries = _getValues(options);
 
-        std::vector<finance::Stock> stocks;
+        std::vector<Stock> stocks;
 
         for (const auto& entry : entries)
             stocks.push_back(entry);
@@ -105,7 +108,7 @@ namespace app
         {
             const auto alreadyInStore = std::ranges::any_of(
                 stocks,
-                [&](const finance::Stock& stockInStore)
+                [&](const Stock& stockInStore)
                 { return stockInStore.getId() == stock.getId(); }
             );
 
@@ -190,7 +193,13 @@ namespace app
             _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
     }
 
-    std::optional<finance::Stock> StockStore::getStock(InstrumentId id) const
+    /**
+     * @brief Get a stock by its instrument ID
+     *
+     * @param id The instrument ID
+     * @return std::optional<Stock>
+     */
+    std::optional<Stock> StockStore::getStock(InstrumentId id) const
     {
         const auto options = Options{
             .filter   = finance::HasInstrumentId(id),
@@ -199,9 +208,13 @@ namespace app
         auto stocksView = _getValues(options);
 
         if (stocksView.empty())
+        {
+            // TODO(97gamjak): Handle case where stock is not found and needs to
+            // be searched for in database
             return std::nullopt;
+        }
 
-        const std::vector<finance::Stock> stocks = {
+        const std::vector<Stock> stocks = {
             stocksView.begin(),
             stocksView.end()
         };

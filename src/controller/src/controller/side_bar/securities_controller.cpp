@@ -6,7 +6,7 @@
 #include "app/store/stock_store.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "finance/finance_error.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 #include "ui/securities/stock_info_model.hpp"
 #include "ui/securities/stock_overview.hpp"
 #include "ui/securities/ticker_lookup.hpp"

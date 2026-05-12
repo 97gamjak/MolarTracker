@@ -9,6 +9,7 @@ All changes and updates, that are relevant for developers will be documented her
 #### Finance
 
 - Add position store, service and repo
+- Add position creation when creating transactions
 
 ### Cleanup
 

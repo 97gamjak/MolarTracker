@@ -7,6 +7,13 @@
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Position Selection Table Model:: Position
+     * Selection Table Model object
+     *
+     * @param positions The list of position drafts
+     * @param parent The parent object
+     */
     PositionSelectionTableModel::PositionSelectionTableModel(
         const std::vector<drafts::PositionDraft>& positions,
         QObject*                                  parent
@@ -15,6 +22,12 @@ namespace ui
     {
     }
 
+    /**
+     * @brief Get the number of rows in the model
+     *
+     * @param parent The parent index
+     * @return int The number of rows
+     */
     int PositionSelectionTableModel::rowCount(const QModelIndex& parent) const
     {
         if (parent.isValid())
@@ -22,6 +35,12 @@ namespace ui
         return static_cast<int>(_positions.size());
     }
 
+    /**
+     * @brief Get the number of columns in the model
+     *
+     * @param parent The parent index
+     * @return int The number of columns
+     */
     int PositionSelectionTableModel::columnCount(
         const QModelIndex& parent
     ) const
@@ -32,6 +51,13 @@ namespace ui
         return static_cast<int>(PositionSelectionColumnsMeta::size);
     }
 
+    /**
+     * @brief Get the data for a specific index
+     *
+     * @param index The model index
+     * @param role The data role
+     * @return QVariant The data for the index
+     */
     QVariant PositionSelectionTableModel::data(
         const QModelIndex& index,
         int                role
@@ -85,6 +111,14 @@ namespace ui
         }
     }
 
+    /**
+     * @brief Get the header data for a specific section
+     *
+     * @param section The section index
+     * @param orientation The orientation of the header
+     * @param role The data role
+     * @return QVariant The header data for the section
+     */
     QVariant PositionSelectionTableModel::headerData(
         int             section,
         Qt::Orientation orientation,
@@ -96,6 +130,12 @@ namespace ui
         return _columnLabel(section);
     }
 
+    /**
+     * @brief Get the position draft at a specific row
+     *
+     * @param row The row index
+     * @return const drafts::PositionDraft& The position draft at the row
+     */
     const drafts::PositionDraft& PositionSelectionTableModel::positionAt(
         int row
     ) const
@@ -103,6 +143,12 @@ namespace ui
         return _positions[static_cast<std::size_t>(row)];
     }
 
+    /**
+     * @brief Get the column label for a specific index
+     *
+     * @param index The column index
+     * @return QString The column label
+     */
     QString PositionSelectionTableModel::_columnLabel(int index)
     {
         const auto col = static_cast<PositionSelectionColumns>(index);

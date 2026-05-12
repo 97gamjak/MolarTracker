@@ -8,6 +8,7 @@
 #include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
 #include "controller/side_bar/securities_controller.hpp"
+#include "controller/transaction/transaction_helpers.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_mapper.hpp"
@@ -239,47 +240,41 @@ namespace controller
     {
         LOG_ENTRY;
 
-        for (auto& leg : draft.getLegs())
-        {
-            const auto instrumentId =
-                _stockStore.getInstrumentId(leg.getTicker());
+        const auto result = convertTickerToInstrumentId(draft, _stockStore);
+        if (!result)
+            throw std::logic_error(result.error());
 
-            if (instrumentId.has_value())
-            {
-                leg.setInstrumentId(*instrumentId);
-            }
-            else
-            {
-                throw std::logic_error(
-                    "Invalid stock ticker: " + leg.getTicker()
-                );
-            }
-        }
-
-        const auto openPositions = _positionStore.getAllPositions();
+        const auto openPositions = _positionStore.getOpenPositions();
         std::vector<PositionId> positionIds;
         for (const auto& position : openPositions)
             positionIds.push_back(position.getId());
 
-        const auto instrumentIds =
-            _transactionStore.getInstrumentIdsByPositionId(positionIds);
-
         std::vector<drafts::PositionDraft> drafts;
         for (const auto& position : openPositions)
         {
-            // TODO: implement error handling
-            if (!instrumentIds.contains(position.getId()))
-                continue;
-
-            if (instrumentIds.at(position.getId()).empty())
-                continue;
-
-            if (instrumentIds.at(position.getId()).size() > 1)
-                continue;
-
-            const auto& stock =
-                _stockStore.getStock(*instrumentIds.at(position.getId()).begin()
+            const auto instrumentIds =
+                _transactionStore.getInstrumentIdsByPositionId(position.getId()
                 );
+
+            if (instrumentIds.empty())
+            {
+                LOG_WARNING(
+                    "No instrument ID found for position: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            if (instrumentIds.size() > 1)
+            {
+                LOG_WARNING(
+                    "Multiple instrument IDs found for position: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            const auto& stock = _stockStore.getStock(*instrumentIds.begin());
 
             if (!stock.has_value())
                 continue;
@@ -291,7 +286,7 @@ namespace controller
             );
         }
 
-        PositionId positionId = PositionId::invalid();
+        PositionId positionId;
         if (drafts.size() > 0)
         {
             ui::PositionSelectionDialog dlg{drafts};

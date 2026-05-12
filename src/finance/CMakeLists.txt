@@ -1,18 +1,23 @@
+set(SOURCE_DIR
+    src/finance
+)
+
 add_library(molartracker_finance STATIC
-    src/finance/cash.cpp
-    src/finance/account.cpp
-    src/finance/currency.cpp
-    src/finance/currency_exception.cpp
-    
-    src/finance/transaction.cpp
-    src/finance/transaction_filter.cpp
-    src/finance/transaction_entry.cpp
-    src/finance/trade_data.cpp
-    src/finance/stock.cpp
-    src/finance/ticker_info.cpp
-    src/finance/yf_client.cpp
-    src/finance/position.cpp
-    src/finance/finance_error.cpp
+    ${SOURCE_DIR}/cash.cpp
+    ${SOURCE_DIR}/account.cpp
+    ${SOURCE_DIR}/currency.cpp
+    ${SOURCE_DIR}/currency_exception.cpp
+    ${SOURCE_DIR}/transaction.cpp
+    ${SOURCE_DIR}/transaction_filter.cpp
+    ${SOURCE_DIR}/transaction_entry.cpp
+    ${SOURCE_DIR}/trade_data.cpp
+    ${SOURCE_DIR}/ticker_info.cpp
+    ${SOURCE_DIR}/yf_client.cpp
+    ${SOURCE_DIR}/position.cpp
+    ${SOURCE_DIR}/finance_error.cpp
+
+    ${SOURCE_DIR}/instrument/stock.cpp
+    ${SOURCE_DIR}/instrument/instrument_predicates.cpp
 )
 
 target_include_directories(molartracker_finance

@@ -8,7 +8,7 @@
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 
 namespace app
 {

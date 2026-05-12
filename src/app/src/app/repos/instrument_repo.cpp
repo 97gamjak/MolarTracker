@@ -2,7 +2,7 @@
 
 #include "app/factories/instrument_factory.hpp"
 #include "config/id_types.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "sql_models/stock_row.hpp"
 

@@ -16,6 +16,13 @@ using utils::makeQChild;
 
 namespace ui
 {
+    /**
+     * @brief Construct a new Position Selection Dialog:: Position Selection
+     * Dialog object
+     *
+     * @param positions The list of position drafts to select from
+     * @param parent The parent widget
+     */
     PositionSelectionDialog::PositionSelectionDialog(
         const std::vector<drafts::PositionDraft>& positions,
         QWidget*                                  parent
@@ -88,18 +95,31 @@ namespace ui
         connect(_cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     }
 
+    /**
+     * @brief Get the currently selected position draft
+     *
+     * @return std::optional<drafts::PositionDraft>
+     */
     std::optional<drafts::PositionDraft> PositionSelectionDialog::
         selectedPosition() const
     {
         return _selectedPosition;
     }
 
+    /**
+     * @brief Slot called when the selection changes
+     *
+     */
     void PositionSelectionDialog::_onSelectionChanged()
     {
         const auto rows = _tableView->selectionModel()->selectedRows();
         _selectBtn->setEnabled(rows.size() == 1);
     }
 
+    /**
+     * @brief Slot called when the select button is clicked
+     *
+     */
     void PositionSelectionDialog::_onSelectClicked()
     {
         const auto rows = _tableView->selectionModel()->selectedRows();
@@ -110,6 +130,10 @@ namespace ui
         accept();
     }
 
+    /**
+     * @brief Slot called when the create button is clicked
+     *
+     */
     void PositionSelectionDialog::_onCreateClicked()
     {
         _selectedPosition = std::nullopt;

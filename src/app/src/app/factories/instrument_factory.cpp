@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/stock_row.hpp"
 

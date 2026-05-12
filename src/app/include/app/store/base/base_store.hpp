@@ -143,6 +143,7 @@ namespace app
         /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
 
+        /// Flag indicating whether the store has already notified subscribers
         bool _alreadyNotified = false;
 
        public:
@@ -237,6 +238,9 @@ namespace app
 #endif
 #ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_SUBSCRIPTIONS_TPP__
 #include "base_store_subscriptions.tpp"   // IWYU pragma: keep
+#endif
+#ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_NOTIFICATIONS_TPP__
+#include "base_store_notifications.tpp"   // IWYU pragma: keep
 #endif
 
 #endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__

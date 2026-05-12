@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace ui

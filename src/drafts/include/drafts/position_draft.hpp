@@ -7,10 +7,17 @@
 
 namespace drafts
 {
+    /**
+     * @brief Represents a draft for a position in the trading system
+     *
+     */
     class PositionDraft
     {
        private:
-        PositionId     _positionId;
+        /// The position ID of the position draft
+        PositionId _positionId;
+
+        /// The stock information of the position draft
         StockInfoDraft _stockInfo;
 
         /// The creation timestamp of the position draft

@@ -59,8 +59,8 @@ namespace app
                 finance::TransactionFilter()
         ) const;
         [[nodiscard]]
-        positionMap<idSet<InstrumentId>> getInstrumentIdsByPositionId(
-            const std::vector<PositionId>& positionIds
+        idSet<InstrumentId> getInstrumentIdsByPositionId(
+            PositionId positionId
         ) const;
         [[nodiscard]]
         std::vector<finance::Transaction> findTransactionsByPositionId(
