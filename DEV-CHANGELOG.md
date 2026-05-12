@@ -18,6 +18,12 @@ All changes and updates, that are relevant for developers will be documented her
   unique constraint, allows differing kind/profile) and
   `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
   correct domain data mapping)
+- Add `tests/app/test_profile_repo.cpp` with GoogleTest fixture covering
+  `ProfileRepo::create` (valid ID, duplicate name throws, with/without email),
+  `ProfileRepo::get` by ID and name (hit and miss), `ProfileRepo::getAll`
+  (empty, full set, correct data), `ProfileRepo::update` (name/email change,
+  clear email, non-existent ID throws, duplicate name throws), and
+  `ProfileRepo::remove` (deletes target, preserves others)
   
 ### Feautres
 
