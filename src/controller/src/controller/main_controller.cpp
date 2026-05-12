@@ -118,7 +118,7 @@ namespace controller
         logging::LogManager::getInstance().initializeCategories();
         logging::LogManager::getInstance().initializeRingFileLogger(
             loggingSettings,
-            std::string(Constants::getInstance().getDataPath())
+            Constants::getInstance().getDataPath().string()
         );
 
         _impl = std::make_unique<Impl>(std::move(settings));

@@ -1,6 +1,7 @@
 #include "app/store/stock_store.hpp"
 
 #include <algorithm>
+#include <format>
 #include <utility>
 #include <vector>
 

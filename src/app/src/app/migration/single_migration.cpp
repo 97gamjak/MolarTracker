@@ -1,5 +1,7 @@
 #include "app/migration/single_migration.hpp"
 
+#include <format>
+
 namespace app
 {
 

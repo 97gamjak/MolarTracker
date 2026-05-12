@@ -10,6 +10,7 @@
 
 #include "crud/crud_error.hpp"
 #include "db/database.hpp"
+#include "db/db_exception.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "filter/expr_node.hpp"
@@ -204,7 +205,16 @@ namespace orm
             }
         );
 
-        statement.executeToCompletion();
+        try
+        {
+            statement.executeToCompletion();
+        }
+        catch (const db::SqliteError& e)
+        {
+            return std::unexpected(
+                CrudError{CrudErrorType::InsertFailed, e.what()}
+            );
+        }
 
         const auto lastInsertId = database.getLastInsertRowid();
         if (lastInsertId.has_value())

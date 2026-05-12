@@ -1,6 +1,7 @@
 #include "commands/undo_stack.hpp"
 
 #include <cassert>
+#include <format>
 
 #include "logging/log_macros.hpp"
 

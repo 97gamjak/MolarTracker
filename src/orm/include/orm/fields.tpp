@@ -1,6 +1,7 @@
 #ifndef __ORM__INCLUDE__ORM__FIELDS_TPP__
 #define __ORM__INCLUDE__ORM__FIELDS_TPP__
 
+#include <format>
 #include <mstd/string.hpp>
 
 #include "fields.hpp"

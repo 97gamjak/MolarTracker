@@ -1,6 +1,7 @@
 #include "app/migration/migration.hpp"
 
 #include <cassert>
+#include <format>
 #include <memory>
 #include <string>
 

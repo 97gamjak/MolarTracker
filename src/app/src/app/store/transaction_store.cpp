@@ -1,5 +1,6 @@
 #include "app/store/transaction_store.hpp"
 
+#include <format>
 #include <unordered_map>
 
 #include "app/services_api/i_transaction_service.hpp"
