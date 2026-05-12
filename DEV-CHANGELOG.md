@@ -13,6 +13,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Fix `orm::Crud::update` binding the WHERE-clause parameters at index 0
   instead of after the SET-clause parameters, causing the primary-key
   predicate to always evaluate to NULL and update zero rows
+- Fix `orm::Crud::update` propagating `db::SqliteError` (e.g. from a UNIQUE
+  constraint violation) instead of returning
+  `std::unexpected(CrudError{UpdateFailed, …})` as its return-type contract
+  requires; add `CrudErrorType::UpdateFailed` to support this
 - Fix `orm::Crud::deleteByPk` emitting `DELETE FROM <t> WHERE WHERE …`
   (double `WHERE`) by removing the manually appended `" WHERE "` that
   duplicated the keyword already produced by `getDBOperations()`

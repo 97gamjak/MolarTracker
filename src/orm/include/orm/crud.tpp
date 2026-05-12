@@ -344,7 +344,16 @@ namespace orm
         auto whereIdx = bindIndex(index);
         bind(where, statement, whereIdx);
 
-        statement.executeToCompletion();
+        try
+        {
+            statement.executeToCompletion();
+        }
+        catch (const db::SqliteError& e)
+        {
+            return std::unexpected(
+                CrudError{CrudErrorType::UpdateFailed, e.what()}
+            );
+        }
 
         const auto changes = database.getNumberOfLastChanges();
 
