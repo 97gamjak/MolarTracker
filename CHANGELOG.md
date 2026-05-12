@@ -8,10 +8,15 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Fix silent failure when creating a duplicate account — the operation now
   correctly raises an error instead of throwing an unexpected exception type
+- Fix profile update silently doing nothing — updates now correctly modify the
+  targeted row
+- Fix profile deletion crashing with a SQL syntax error
 
 ### Tests
 
 - Add unit tests for `AccountRepo` covering `createAccount` and `getAllAccounts`
+- Add unit tests for `ProfileRepo` covering `create`, `get` (by ID and name),
+  `getAll`, `update`, and `remove`
 
 <!-- insertion marker -->
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
