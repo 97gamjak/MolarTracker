@@ -218,11 +218,15 @@ namespace controller
 
         if (result != app::TransactionStoreResult::Ok)
         {
+            LOG_ERROR(
+                "Failed to create cash transaction: " +
+                app::TransactionStoreResultMeta::toString(result)
+            );
             ui::ErrorDialog::show("Failed to create cash transaction");
         }
         else
         {
-            // TODO(97gamjak): add here commands and also error handling
+            // TODO(97gamjak): add here commands
             _createCashTransactionDlg->close();
 
             // TODO(97gamjak): handle this via notifications and not explicitly

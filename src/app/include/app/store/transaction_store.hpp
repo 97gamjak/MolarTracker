@@ -16,6 +16,14 @@ namespace app
     class StockStore;            // Forward declaration
     class ITransactionService;   // Forward declaration
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define TRANSACTION_STORE_RESULT(X) \
+    X(Ok)                           \
+    X(Error)                        \
+    X(TransactionSumNotZero)
+
+    MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
+
     /**
      * @brief Result of transaction store operations
      *
