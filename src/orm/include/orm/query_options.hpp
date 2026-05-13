@@ -45,6 +45,9 @@ namespace orm
             filter::Operator operator_
         );
 
+        template <typename Field, std::ranges::input_range Range>
+        [[nodiscard]] Query& in(const Range& values);
+
         [[nodiscard]] std::string getDBOperations() const;
         [[nodiscard]] std::string getWhereDBOperations() const;
 

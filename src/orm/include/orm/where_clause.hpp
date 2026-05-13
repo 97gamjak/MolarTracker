@@ -2,6 +2,7 @@
 #define __ORM__INCLUDE__ORM__WHERE_CLAUSE_HPP__
 
 #include <mstd/enum.hpp>
+#include <vector>
 
 #include "filter/operators.hpp"
 #include "orm/index.hpp"
@@ -61,6 +62,26 @@ namespace orm
 
        public:
         explicit WhereClause(Field field, filter::Operator operator_);
+
+        [[nodiscard]] std::string getDBOperations() const override;
+
+        void bind(db::Statement& statement, BindIndex& index) const override;
+    };
+
+    /**
+     * @brief A where clause for a specific field and operator
+     *
+     * @tparam Field
+     */
+    template <typename Field>
+    class InClause : public IWhereClause
+    {
+       private:
+        /// the fields to compare with
+        std::vector<Field> _fields;
+
+       public:
+        explicit InClause(std::vector<Field> fields);
 
         [[nodiscard]] std::string getDBOperations() const override;
 

@@ -34,6 +34,21 @@ namespace orm
         return *this;
     }
 
+    /**
+     * @brief Add an IN clause for the specified field
+     *
+     * @tparam Field
+     * @tparam Range
+     * @param values
+     * @return Query&
+     */
+    template <typename Field, std::ranges::input_range Range>
+    Query& Query::in(const Range& values)
+    {
+        _whereExpr &= makeInClause<Field>(values);
+        return *this;
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__INCLUDE__ORM__QUERY_OPTIONS_TPP__

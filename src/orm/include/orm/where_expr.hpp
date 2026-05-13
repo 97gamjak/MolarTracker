@@ -29,8 +29,14 @@ namespace orm
 
     WhereExpr makeEmptyWhere();
 
+    // TODO:
     template <typename Field>
+    [[nodiscard]]
     WhereExpr makeWhere(Field field, filter::Operator operator_);
+
+    template <typename Field, typename Value, std::ranges::input_range Range>
+    [[nodiscard]]
+    WhereExpr makeInClause(const Range& values);
 
 }   // namespace orm
 

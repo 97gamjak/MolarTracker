@@ -3,6 +3,7 @@
 
 #include "app/repos/base_repo.hpp"
 #include "app/repos_api/i_instrument_repo.hpp"
+#include "config/id_types.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace app
@@ -19,7 +20,9 @@ namespace app
         std::vector<std::string> getTickers() override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks() override;
+        std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids
+        ) override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(
@@ -36,7 +39,9 @@ namespace app
 
        private:
         [[nodiscard]]
-        std::vector<StockRow> _getStockRows();
+        std::vector<StockRow> _getStockRows(
+            const idSet<InstrumentId>& ids = {}
+        );
     };
 }   // namespace app
 

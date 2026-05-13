@@ -15,6 +15,9 @@ namespace finance
 
     [[nodiscard]]
     filter::Predicate<Stock> HasInstrumentId(InstrumentId id);
+
+    [[nodiscard]]
+    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids);
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__INSTRUMENT__INSTRUMENT_PREDICATES_HPP__

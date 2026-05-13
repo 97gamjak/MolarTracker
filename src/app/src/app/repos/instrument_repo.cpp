@@ -4,6 +4,7 @@
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
+#include "orm/query_options.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace app
@@ -16,11 +17,19 @@ namespace app
      * the data from the database is correctly mapped to the properties of the
      * Stock objects.
      *
+     * @param ids The set of instrument IDs to retrieve stock rows for
      * @return std::vector<StockRow>
      */
-    std::vector<StockRow> InstrumentRepo::_getStockRows()
+    std::vector<StockRow> InstrumentRepo::_getStockRows(
+        const idSet<InstrumentId>& ids
+    )
     {
-        return _getCrud().get<StockRow>(_getDb());
+        orm::Query query{};
+
+        if (!ids.empty())
+            query = query.in<StockRow::instrumentIdField>(ids);
+
+        return _getCrud().get<StockRow>(_getDb(), query);
     }
 
     /**
@@ -42,12 +51,15 @@ namespace app
      * stocks that are not marked as deleted, and will include stocks that are
      * new or modified but not yet saved to the database.
      *
+     * @param ids The set of instrument IDs to retrieve stocks for
      * @return std::vector<finance::Stock>
      */
-    std::vector<finance::Stock> InstrumentRepo::getStocks()
+    std::vector<finance::Stock> InstrumentRepo::getStocks(
+        const idSet<InstrumentId>& ids
+    )
     {
         auto results =
-            _getStockRows() |
+            _getStockRows(ids) |
             std::views::transform([](const StockRow& row)
                                   { return InstrumentFactory::toStock(row); });
 
