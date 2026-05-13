@@ -16,7 +16,7 @@ namespace orm
     template <typename Field>
     Query& Query::orderBy(bool ascending)
     {
-        _orderFields.push_back({Field::name, ascending});
+        _orderFields.emplace_back(std::string(Field::name), ascending);
         return *this;
     }
 

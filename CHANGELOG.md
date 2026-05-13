@@ -5,6 +5,9 @@ All changes and updates, that are relevant for a user will be documented here
 ## Next Release
 
 <!-- insertion marker -->
+### Bug Fix
+
+- Fix three ORM bugs exposed by unit tests: duplicate `WHERE` in `deleteByPk` SQL, wrong bind-parameter index in `update` WHERE clause, and `LIMIT` being silently ignored when no `ORDER BY` was set
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ### Bug Fix

@@ -37,7 +37,7 @@ namespace orm
     template <db_model Model>
     void Crud::createTable(db::Database& database)
     {
-        createTable<Model>(database, Model::tableName);
+        createTable<Model>(database, std::string_view(Model::tableName));
     }
 
     /**
@@ -331,7 +331,8 @@ namespace orm
             }
         );
 
-        bind(where, statement);
+        auto whereIndex = bindIndex(index);
+        bind(where, statement, whereIndex);
 
         statement.executeToCompletion();
 
@@ -590,7 +591,7 @@ namespace orm
         std::string sqlText;
         sqlText += "DELETE FROM ";
         sqlText += Model::tableName;
-        sqlText += " WHERE ";
+        sqlText += " ";
 
         const auto where = getPkWhere(model);
 
