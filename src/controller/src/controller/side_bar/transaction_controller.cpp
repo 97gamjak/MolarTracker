@@ -19,6 +19,7 @@
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
 #include "ui/transaction/stock_widget.hpp"
+#include "ui/utils/error.hpp"
 #include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
@@ -211,13 +212,23 @@ namespace controller
         for (const auto& entry : additionalEntries)
             draft.addEntry(entry);
 
-        _transactionStore.addTransaction(
+        const auto result = _transactionStore.addTransaction(
             drafts::TransactionMapper::fromCreateCashTransactionDraft(draft)
         );
 
-        // TODO(97gamjak): add here commands and also error handling
-        _createCashTransactionDlg->close();
-        _transactionController.transactionOverviewSelected(false);
+        if (result != app::TransactionStoreResult::Ok)
+        {
+            ui::ErrorDialog::show("Failed to create cash transaction");
+        }
+        else
+        {
+            // TODO(97gamjak): add here commands and also error handling
+            _createCashTransactionDlg->close();
+
+            // TODO(97gamjak): handle this via notifications and not explicitly
+            // here
+            _transactionController.transactionOverviewSelected(false);
+        }
     }
 
     /**
