@@ -50,6 +50,7 @@ namespace app
 
         void commit();
 
+        [[nodiscard]]
         TransactionStoreResult addTransaction(finance::Transaction transaction);
 
         [[nodiscard]]
