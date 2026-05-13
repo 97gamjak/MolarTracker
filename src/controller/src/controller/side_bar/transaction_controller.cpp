@@ -6,6 +6,7 @@
 #include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
+#include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction/transaction_helpers.hpp"
@@ -382,17 +383,25 @@ namespace controller
         // Check if the transaction can be added
         const auto result = _transactionStore.addTransaction(transaction);
 
-        if (result != TransactionStoreResult::Ok)
+        switch (result)
         {
-            LOG_ERROR(
-                "Failed to create cash transaction: " +
-                TransactionStoreResultMeta::toString(result)
-            );
-            ErrorDialog::show("Failed to create cash transaction");
-            return false;
+            case TransactionStoreResult::Ok:
+                return true;
+
+            case TransactionStoreResult::Error:
+            case TransactionStoreResult::TransactionSumNotZero:
+            {
+                const auto msg = "Failed to create cash transaction: " +
+                                 TransactionStoreResultMeta::toString(result) +
+                                 ". " + Constants::getCreateIssueError();
+
+                LOG_ERROR(msg);
+                ErrorDialog::show(msg);
+                return false;
+            }
         }
 
-        return true;
+        std::unreachable();
     }
 
 }   // namespace controller

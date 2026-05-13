@@ -124,6 +124,18 @@ std::string Constants::getGithubIssuesUrl()
 }
 
 /**
+ * @brief Get the error message to display when creating a GitHub issue fails
+ *
+ * @return const std::string
+ */
+std::string Constants::getCreateIssueError()
+{
+    return "This should never happen. If you see this message, please report "
+           "it to the developers under " +
+           Constants::getGithubIssuesUrl();
+}
+
+/**
  * @brief Get the application version
  *
  * @return const std::string

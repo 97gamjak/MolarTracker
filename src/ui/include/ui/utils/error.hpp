@@ -27,7 +27,14 @@ namespace ui
             QWidget*       parent = nullptr
         );
 
+        static void show(
+            const std::string& title,
+            const std::string& message,
+            QWidget*           parent = nullptr
+        );
+
         static void show(const QString& message, QWidget* parent = nullptr);
+        static void show(const std::string& message, QWidget* parent = nullptr);
     };
 }   // namespace ui
 
