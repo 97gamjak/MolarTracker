@@ -1,7 +1,9 @@
 #ifndef __APP__INCLUDE__APP__STORE__TRANSACTION_STORE_HPP__
 #define __APP__INCLUDE__APP__STORE__TRANSACTION_STORE_HPP__
 
+#include <cstdint>
 #include <memory>
+#include <mstd/enum.hpp>
 #include <vector>
 
 #include "base/base_store.hpp"
