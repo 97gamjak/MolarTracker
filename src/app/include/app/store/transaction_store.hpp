@@ -25,17 +25,6 @@ namespace app
     MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
 
     /**
-     * @brief Result of transaction store operations
-     *
-     */
-    enum class TransactionStoreResult : std::uint8_t
-    {
-        Ok,
-        Error,
-        TransactionSumNotZero,
-    };
-
-    /**
      * @brief Store for managing transactions
      *
      */
