@@ -1,7 +1,9 @@
 #ifndef __APP__INCLUDE__APP__STORE__TRANSACTION_STORE_HPP__
 #define __APP__INCLUDE__APP__STORE__TRANSACTION_STORE_HPP__
 
+#include <cstdint>
 #include <memory>
+#include <mstd/enum.hpp>
 #include <vector>
 
 #include "base/base_store.hpp"
@@ -16,16 +18,13 @@ namespace app
     class StockStore;            // Forward declaration
     class ITransactionService;   // Forward declaration
 
-    /**
-     * @brief Result of transaction store operations
-     *
-     */
-    enum class TransactionStoreResult : std::uint8_t
-    {
-        Ok,
-        Error,
-        TransactionSumNotZero,
-    };
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define TRANSACTION_STORE_RESULT(X) \
+    X(Ok)                           \
+    X(Error)                        \
+    X(TransactionSumNotZero)
+
+    MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
 
     /**
      * @brief Store for managing transactions
@@ -51,6 +50,7 @@ namespace app
 
         void commit();
 
+        [[nodiscard]]
         TransactionStoreResult addTransaction(finance::Transaction transaction);
 
         [[nodiscard]]

@@ -76,8 +76,7 @@ namespace ui
      */
     void ErrorDialog::show(const QString& message, QWidget* parent)
     {
-        ErrorDialog dlg("Error", message, parent);
-        dlg.exec();
+        show("Error", message, parent);
     }
 
     /**
@@ -95,5 +94,36 @@ namespace ui
     {
         ErrorDialog dlg(title, message, parent);
         dlg.exec();
+    }
+
+    /**
+     * @brief Show the error dialog
+     *
+     * @param message
+     * @param parent
+     */
+    void ErrorDialog::show(const std::string& message, QWidget* parent)
+    {
+        show(QString::fromStdString(message), parent);
+    }
+
+    /**
+     * @brief Show the error dialog
+     *
+     * @param title
+     * @param message
+     * @param parent
+     */
+    void ErrorDialog::show(
+        const std::string& title,
+        const std::string& message,
+        QWidget*           parent
+    )
+    {
+        show(
+            QString::fromStdString(title),
+            QString::fromStdString(message),
+            parent
+        );
     }
 }   // namespace ui

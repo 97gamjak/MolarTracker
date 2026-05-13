@@ -6,6 +6,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 ### Bug Fix
 
+#### ORM
+
 - Fix `orm::Crud::insert` to catch `db::SqliteError` from
   `executeToCompletion()` and return `std::unexpected(CrudError{...})`
   instead of propagating the exception, honouring the method's own
@@ -20,6 +22,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Fix `orm::Crud::deleteByPk` emitting `DELETE FROM <t> WHERE WHERE …`
   (double `WHERE`) by removing the manually appended `" WHERE "` that
   duplicated the keyword already produced by `getDBOperations()`
+
+#### Finance
+
+- Fix handling error if creating cash transaction fails
 
 ### Tests
 
