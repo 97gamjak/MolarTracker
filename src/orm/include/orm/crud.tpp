@@ -41,7 +41,7 @@ namespace orm
     template <db_model Model>
     void Crud::createTable(db::Database& database)
     {
-        createTable<Model>(database, Model::tableName);
+        createTable<Model>(database, std::string_view(Model::tableName));
     }
 
     /**
@@ -354,8 +354,8 @@ namespace orm
             }
         );
 
-        auto whereIdx = bindIndex(index);
-        bind(where, statement, whereIdx);
+        auto whereIndex = bindIndex(index);
+        bind(where, statement, whereIndex);
 
         try
         {
