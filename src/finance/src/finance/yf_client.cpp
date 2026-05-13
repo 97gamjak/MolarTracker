@@ -3,7 +3,6 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "config/error.hpp"
 #include "finance/ticker_info.hpp"
 #include "http/http_client.hpp"
 
@@ -39,48 +38,6 @@ namespace finance
         }
 
     }   // namespace
-
-    /**
-     * @brief Construct a new Yahoo Finance Error:: Yahoo Finance Error object
-     *
-     * @param type
-     * @param message
-     * @param httpError
-     */
-    YahooFinanceError::YahooFinanceError(
-        YahooFinanceError::ErrorType   type,
-        std::string                    message,
-        std::optional<http::HttpError> httpError
-    )
-        : YahooFinanceErrorBase(type, std::move(message)),
-          _httpError(std::move(httpError))
-    {
-    }
-
-    /**
-     * @brief Converts a FinanceError to a YahooFinanceError.
-     *
-     * @param error The FinanceError to convert.
-     * @return YahooFinanceError The converted YahooFinanceError.
-     */
-    YahooFinanceError YahooFinanceError::fromError(const FinanceError& error)
-    {
-        switch (error.getType())
-        {
-            case FinanceErrorType::CurrencyUnknown:
-                return YahooFinanceError{
-                    YahooFinanceErrorType::CurrencyUnknown,
-                    error.getMessage()
-                };
-            case FinanceErrorType::Unknown:
-                return YahooFinanceError{
-                    YahooFinanceErrorType::Unknown,
-                    error.getMessage()
-                };
-        }
-
-        std::unreachable();
-    }
 
     /**
      * @brief Authenticate the Yahoo Finance API session.

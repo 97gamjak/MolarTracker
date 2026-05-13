@@ -11,6 +11,7 @@ namespace app
     class IAccountService;       // Forward declaration
     class ITransactionService;   // Forward declaration
     class IInstrumentService;    // Forward declaration
+    class IPositionService;      // Forward declaration
 
     /**
      * @brief Container for all services
@@ -27,6 +28,8 @@ namespace app
         std::shared_ptr<ITransactionService> _transactionService;
         /// The Instrument service
         std::shared_ptr<IInstrumentService> _instrumentService;
+        /// The Position service
+        std::shared_ptr<IPositionService> _positionService;
 
        public:
         explicit ServiceContainer(RepoContainer& repos);
@@ -47,6 +50,10 @@ namespace app
         [[nodiscard]] std::shared_ptr<IInstrumentService> getInstrumentService(
         );
         [[nodiscard]] std::shared_ptr<const IInstrumentService> getInstrumentService(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<IPositionService> getPositionService();
+        [[nodiscard]] std::shared_ptr<const IPositionService> getPositionService(
         ) const;
     };
 

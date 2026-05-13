@@ -1,18 +1,20 @@
 #ifndef __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__
 #define __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__
 
-#include <filesystem>
+#include <memory>
 #include <string>
+#include <string_view>
 
 #include "config/logging_base.hpp"
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
-#include "utils/ring_file.hpp"
 
 namespace settings
 {
     class LoggingSettings;   // forward declaration
 }   // namespace settings
+
+class RingFile;   // forward declaration
 
 namespace logging
 {
@@ -34,10 +36,10 @@ namespace logging
         LogCategories _startupCategories;
 
         /// The ring file logger instance used for logging to files.
-        RingFile _ringFile;
+        std::unique_ptr<RingFile> _ringFile;
 
         /// The directory where log files are stored.
-        std::filesystem::path _logDirectory;
+        std::string_view _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
         LogLevel _defaultLogLevel = LogLevel::Trace;
@@ -48,7 +50,7 @@ namespace logging
         void initializeCategories();
         void initializeRingFileLogger(
             const settings::LoggingSettings& settings,
-            const std::filesystem::path&     directory
+            std::string_view                 directory
         );
 
         void changeLogLevel(const LogCategory& category, const LogLevel& level);
@@ -62,7 +64,7 @@ namespace logging
         [[nodiscard]] LogCategories getCategories() const;
         [[nodiscard]] LogCategories getDefaultCategories() const;
 
-        std::filesystem::path getCurrentLogFilePath() const;
+        std::string getCurrentLogFilePath() const;
 
         void log(const LogObject& logObject);
 

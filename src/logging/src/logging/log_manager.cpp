@@ -52,12 +52,13 @@ namespace logging
      */
     void LogManager::initializeRingFileLogger(
         const settings::LoggingSettings& settings,
-        const std::filesystem::path&     directory
+        std::string_view                 directory
     )
     {
         RingFileConfig config;
 
-        config.directory = directory / settings.getLogDirectory();
+        const auto path  = std::filesystem::path(directory);
+        config.directory = path / settings.getLogDirectory();
         config.baseName  = settings.getLogFilePrefix() + Timestamp().fileSafe();
         config.extension = settings.getLogFileSuffix();
         config.maxFiles  = settings.getMaxLogFiles();
@@ -66,7 +67,7 @@ namespace logging
         config.symlinkPath = config.directory / (settings.getLogFilePrefix() +
                                                  "latest" + config.extension);
 
-        _ringFile = RingFile(config);
+        _ringFile = std::make_unique<RingFile>(config);
     }
 
     /**
@@ -91,11 +92,11 @@ namespace logging
     /**
      * @brief Get the current log file path
      *
-     * @return std::filesystem::path
+     * @return std::string
      */
-    std::filesystem::path LogManager::getCurrentLogFilePath() const
+    std::string LogManager::getCurrentLogFilePath() const
     {
-        return _ringFile.getCurrentLogFilePath();
+        return _ringFile->getCurrentLogFilePath().string();
     }
 
     /**
@@ -123,7 +124,7 @@ namespace logging
      * @brief Flush the log file
      *
      */
-    void LogManager::flush() { _ringFile.flush(); }
+    void LogManager::flush() { _ringFile->flush(); }
 
     /**
      * @brief Change the log level for a given category
@@ -199,7 +200,7 @@ namespace logging
             buffer += ")";
         }
 
-        _ringFile.writeLine(buffer);
+        _ringFile->writeLine(buffer);
 
         if (logObject.level == LogLevel::Error ||
             logObject.level == LogLevel::Warning)

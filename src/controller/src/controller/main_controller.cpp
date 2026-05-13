@@ -1,6 +1,7 @@
 #include "controller/main_controller.hpp"
 
 #include "app/app_context.hpp"
+#include "app/store_container.hpp"
 #include "commands/undo_stack.hpp"
 #include "config/constants.hpp"
 #include "controller/account_controller.hpp"
@@ -117,7 +118,7 @@ namespace controller
         logging::LogManager::getInstance().initializeCategories();
         logging::LogManager::getInstance().initializeRingFileLogger(
             loggingSettings,
-            Constants::getInstance().getDataPath()
+            Constants::getInstance().getDataPath().string()
         );
 
         _impl = std::make_unique<Impl>(std::move(settings));

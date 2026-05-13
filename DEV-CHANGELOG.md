@@ -4,6 +4,47 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Bug Fix
+
+- Fix `orm::Crud::insert` to catch `db::SqliteError` from
+  `executeToCompletion()` and return `std::unexpected(CrudError{...})`
+  instead of propagating the exception, honouring the method's own
+  `std::expected` return-type contract
+- Fix `orm::Crud::update` binding the WHERE-clause parameters at index 0
+  instead of after the SET-clause parameters, causing the primary-key
+  predicate to always evaluate to NULL and update zero rows
+- Fix `orm::Crud::update` propagating `db::SqliteError` (e.g. from a UNIQUE
+  constraint violation) instead of returning
+  `std::unexpected(CrudError{UpdateFailed, …})` as its return-type contract
+  requires; add `CrudErrorType::UpdateFailed` to support this
+- Fix `orm::Crud::deleteByPk` emitting `DELETE FROM <t> WHERE WHERE …`
+  (double `WHERE`) by removing the manually appended `" WHERE "` that
+  duplicated the keyword already produced by `getDBOperations()`
+
+### Tests
+
+- Add `tests/app/test_account_repo.cpp` with GoogleTest fixture covering
+  `AccountRepo::createAccount` (returns valid ID, persists data, enforces
+  unique constraint, allows differing kind/profile) and
+  `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
+  correct domain data mapping)
+- Add `tests/app/test_profile_repo.cpp` with GoogleTest fixture covering
+  `ProfileRepo::create` (valid ID, duplicate name throws, with/without email),
+  `ProfileRepo::get` by ID and name (hit and miss), `ProfileRepo::getAll`
+  (empty, full set, correct data), `ProfileRepo::update` (name/email change,
+  clear email, non-existent ID throws, duplicate name throws), and
+  `ProfileRepo::remove` (deletes target, preserves others)
+  
+### Feautres
+
+#### Finance
+
+- Add position store, service and repo
+
+### Cleanup
+
+- Speedup some compilation headers
+
 <!-- insertion marker -->
 ### Testing
 

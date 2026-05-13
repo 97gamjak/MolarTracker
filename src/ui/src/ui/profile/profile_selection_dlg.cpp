@@ -136,8 +136,8 @@ namespace ui
      * is Ok)
      */
     void ProfileSelectionDialog::_emit(
-        const Action&      action,
-        const std::string& profileName
+        const ProfileSelectionDialogAction& action,
+        const std::string&                  profileName
     )
     {
         emit requested(action, profileName);
@@ -149,7 +149,9 @@ namespace ui
      *
      * @param action The action performed by the user (Ok or Cancel)
      */
-    void ProfileSelectionDialog::_emit(const Action& action)
+    void ProfileSelectionDialog::_emit(
+        const ProfileSelectionDialogAction& action
+    )
     {
         emit requested(action, "");
     }
@@ -179,7 +181,7 @@ namespace ui
 
         const auto profileName = selectedItems.first()->text().toStdString();
 
-        _emit(Action::Ok, profileName);
+        _emit(ProfileSelectionDialogAction::Ok, profileName);
         accept();
     }
 
@@ -187,6 +189,9 @@ namespace ui
      * @brief Emit the requested signal with the Cancel action
      *
      */
-    void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
+    void ProfileSelectionDialog::_emitCancel()
+    {
+        _emit(ProfileSelectionDialogAction::Cancel);
+    }
 
 }   // namespace ui
