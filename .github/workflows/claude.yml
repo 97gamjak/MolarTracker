@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   review:
+    if: ${{ !startsWith(github.head_ref, 'claude') }}
     runs-on: ubuntu-latest
     steps:
       - uses: drillan/claude-pr-reviewer@v1
