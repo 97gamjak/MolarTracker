@@ -10,6 +10,18 @@
                     }
                 ]
             }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "mcp__github__create_pull_request",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/enforce-pr-base.sh",
+                        "statusMessage": "Enforcing PR base branch..."
+                    }
+                ]
+            }
         ]
     }
 }
