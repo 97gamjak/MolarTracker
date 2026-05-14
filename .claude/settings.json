@@ -1,0 +1,27 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "git fetch origin 2>/dev/null || true",
+                        "statusMessage": "Fetching remote branches..."
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "mcp__github__create_pull_request",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/enforce-pr-base.sh",
+                        "statusMessage": "Enforcing PR base branch..."
+                    }
+                ]
+            }
+        ]
+    }
+}
