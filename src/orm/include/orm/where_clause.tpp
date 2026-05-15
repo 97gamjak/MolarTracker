@@ -69,7 +69,8 @@ namespace orm
     }
 
     /**
-     * @brief Get the SQL operations for this IN clause, e.g. "field IN (?, ?)"
+     * @brief Get the SQL operations for this IN clause, e.g. "table.field IN
+     * (?, ?)"
      *
      * @tparam Field
      * @return std::string

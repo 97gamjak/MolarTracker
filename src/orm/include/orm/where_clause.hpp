@@ -69,7 +69,7 @@ namespace orm
     };
 
     /**
-     * @brief A where clause for a specific field and operator
+     * @brief In Clause for a specific field
      *
      * @tparam Field
      */
