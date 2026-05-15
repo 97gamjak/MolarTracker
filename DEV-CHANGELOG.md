@@ -47,7 +47,7 @@ All changes and updates, that are relevant for developers will be documented her
   clear email, non-existent ID throws, duplicate name throws), and
   `ProfileRepo::remove` (deletes target, preserves others)
 
-### Feautres
+### Features
 
 #### Finance
 

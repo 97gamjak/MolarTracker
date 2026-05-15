@@ -70,9 +70,11 @@ namespace
     class AccountRepoTest : public ::testing::Test
     {
        protected:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         TempDbFile       _tempFile;
         db::Database     _db;
         app::AccountRepo _repo;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         AccountRepoTest() : _db{_tempFile.path()}, _repo{_db}
         {
@@ -101,7 +103,7 @@ namespace
 
 }   // namespace
 
-TEST_F(AccountRepoTest, CreateAccount_ReturnsValidId)
+TEST_F(AccountRepoTest, CreateAccountReturnsValidId)
 {
     const auto profileId = insertProfile("User");
     const auto account   = makeAccount("Savings");
@@ -111,7 +113,7 @@ TEST_F(AccountRepoTest, CreateAccount_ReturnsValidId)
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(AccountRepoTest, CreateAccount_PersistsAccountInDatabase)
+TEST_F(AccountRepoTest, CreateAccountPersistsAccountInDatabase)
 {
     const auto profileId = insertProfile("User");
 
@@ -119,12 +121,12 @@ TEST_F(AccountRepoTest, CreateAccount_PersistsAccountInDatabase)
         _repo.createAccount(makeAccount("Checking"), profileId);
 
     const auto accounts = _repo.getAllAccounts(profileId);
-    ASSERT_EQ(accounts.size(), 1u);
+    ASSERT_EQ(accounts.size(), 1U);
     EXPECT_EQ(accounts[0].getId(), returnedId);
     EXPECT_EQ(accounts[0].getName(), "Checking");
 }
 
-TEST_F(AccountRepoTest, CreateAccount_DuplicateUniqueKeyThrows)
+TEST_F(AccountRepoTest, CreateAccountDuplicateUniqueKeyThrows)
 {
     const auto profileId = insertProfile("User");
     const auto account   = makeAccount("Savings");
@@ -137,7 +139,7 @@ TEST_F(AccountRepoTest, CreateAccount_DuplicateUniqueKeyThrows)
     );
 }
 
-TEST_F(AccountRepoTest, CreateAccount_SameNameDifferentKindSucceeds)
+TEST_F(AccountRepoTest, CreateAccountSameNameDifferentKindSucceeds)
 {
     const auto profileId = insertProfile("User");
 
@@ -154,7 +156,7 @@ TEST_F(AccountRepoTest, CreateAccount_SameNameDifferentKindSucceeds)
     );
 }
 
-TEST_F(AccountRepoTest, CreateAccount_SameKindAndNameDifferentProfileSucceeds)
+TEST_F(AccountRepoTest, CreateAccountSameKindAndNameDifferentProfileSucceeds)
 {
     const auto profileId1 = insertProfile("User1");
     const auto profileId2 = insertProfile("User2");
@@ -167,7 +169,7 @@ TEST_F(AccountRepoTest, CreateAccount_SameKindAndNameDifferentProfileSucceeds)
     );
 }
 
-TEST_F(AccountRepoTest, GetAllAccounts_EmptyWhenNoAccounts)
+TEST_F(AccountRepoTest, GetAllAccountsEmptyWhenNoAccounts)
 {
     const auto profileId = insertProfile("User");
 
@@ -176,7 +178,7 @@ TEST_F(AccountRepoTest, GetAllAccounts_EmptyWhenNoAccounts)
     EXPECT_TRUE(accounts.empty());
 }
 
-TEST_F(AccountRepoTest, GetAllAccounts_ReturnsAllAccountsForProfile)
+TEST_F(AccountRepoTest, GetAllAccountsReturnsAllAccountsForProfile)
 {
     const auto profileId = insertProfile("User");
 
@@ -194,10 +196,10 @@ TEST_F(AccountRepoTest, GetAllAccounts_ReturnsAllAccountsForProfile)
 
     const auto accounts = _repo.getAllAccounts(profileId);
 
-    EXPECT_EQ(accounts.size(), 3u);
+    EXPECT_EQ(accounts.size(), 3U);
 }
 
-TEST_F(AccountRepoTest, GetAllAccounts_IsolatesAccountsByProfile)
+TEST_F(AccountRepoTest, GetAllAccountsIsolatesAccountsByProfile)
 {
     const auto profileId1 = insertProfile("User1");
     const auto profileId2 = insertProfile("User2");
@@ -210,13 +212,13 @@ TEST_F(AccountRepoTest, GetAllAccounts_IsolatesAccountsByProfile)
     const auto accounts1 = _repo.getAllAccounts(profileId1);
     const auto accounts2 = _repo.getAllAccounts(profileId2);
 
-    ASSERT_EQ(accounts1.size(), 1u);
-    ASSERT_EQ(accounts2.size(), 1u);
+    ASSERT_EQ(accounts1.size(), 1U);
+    ASSERT_EQ(accounts2.size(), 1U);
     EXPECT_EQ(accounts1[0].getName(), "P1Account");
     EXPECT_EQ(accounts2[0].getName(), "P2Account");
 }
 
-TEST_F(AccountRepoTest, GetAllAccounts_ReturnsCorrectAccountData)
+TEST_F(AccountRepoTest, GetAllAccountsReturnsCorrectAccountData)
 {
     const auto profileId = insertProfile("User");
     const auto account   = finance::Account{
@@ -229,7 +231,7 @@ TEST_F(AccountRepoTest, GetAllAccounts_ReturnsCorrectAccountData)
     static_cast<void>(_repo.createAccount(account, profileId));
 
     const auto accounts = _repo.getAllAccounts(profileId);
-    ASSERT_EQ(accounts.size(), 1u);
+    ASSERT_EQ(accounts.size(), 1U);
 
     const auto& retrieved = accounts[0];
     EXPECT_EQ(retrieved.getName(), "MyWallet");
