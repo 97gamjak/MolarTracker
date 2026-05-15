@@ -32,6 +32,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Fix handling error if creating cash transaction fails
 - Fix silent continuing for stock transaction creation if position exists but has not suitable instrument
+- Improve error handling when creating a new position during stock transaction creation
 
 ### Tests
 
