@@ -278,32 +278,20 @@ namespace controller
                 _transactionStore.getInstrumentIdsByPositionId(position.getId()
                 );
 
-            if (instrumentIds.empty())
+            const auto& stocks = _stockStore.getStocks(instrumentIds);
+
+            if (stocks.empty())
             {
                 LOG_WARNING(
-                    "No instrument ID found for position: " +
+                    "No stock found for instrument id: " +
                     position.getId().toString()
                 );
                 continue;
             }
-
-            if (instrumentIds.size() > 1)
-            {
-                LOG_WARNING(
-                    "Multiple instrument IDs found for position: " +
-                    position.getId().toString()
-                );
-                continue;
-            }
-
-            const auto& stock = _stockStore.getStock(*instrumentIds.begin());
-
-            if (!stock.has_value())
-                continue;
 
             drafts.emplace_back(
                 position.getId(),
-                drafts::StockMapper::toStockInfoDraft(*stock),
+                drafts::StockMapper::toStockInfoDraft(stocks.front()),
                 position.getCreatedAt()
             );
         }

@@ -36,8 +36,8 @@ namespace app
      */
     std::optional<Profile> ProfileRepo::get(ProfileId id) const
     {
-        const auto query = orm::Query{}.where(
-            ProfileRow::idField{id},
+        const auto query = orm::Query{}.where<ProfileRow::idField>(
+            id,
             filter::Operator::Equal
         );
         const auto profile = orm::Crud().getUnique<ProfileRow>(_getDb(), query);

@@ -88,39 +88,6 @@ namespace app
     }
 
     /**
-     * @brief Get a list of all stocks in the store, this will return all stocks
-     * that are not marked as deleted, and will include stocks that are new or
-     * modified but not yet saved to the database.
-     *
-     * @return std::vector<Stock>
-     */
-    std::vector<Stock> StockStore::getStocks() const
-    {
-        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
-
-        auto entries = _getValues(options);
-
-        std::vector<Stock> stocks;
-
-        for (const auto& entry : entries)
-            stocks.push_back(entry);
-
-        for (const auto& stock : _instrumentService->getStocks())
-        {
-            const auto alreadyInStore = std::ranges::any_of(
-                stocks,
-                [&](const Stock& stockInStore)
-                { return stockInStore.getId() == stock.getId(); }
-            );
-
-            if (!alreadyInStore)
-                stocks.push_back(stock);
-        }
-
-        return stocks;
-    }
-
-    /**
      * @brief Commit the changes in the stock store
      *
      */
@@ -192,6 +159,44 @@ namespace app
         _notifyOnCommit();
         if (!map.empty())
             _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
+    }
+
+    /**
+     * @brief Get a list of all stocks in the store
+     *
+     * @param ids The set of instrument IDs to retrieve stocks for
+     * @return std::vector<finance::Stock>
+     */
+    std::vector<finance::Stock> StockStore::getStocks(
+        const idSet<InstrumentId>& ids
+    ) const
+    {
+        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
+        if (!ids.empty())
+            options.filter = finance::HasInstrumentId(ids);
+
+        auto entries = _getValues(options);
+
+        std::vector<Stock> stocks;
+
+        for (const auto& entry : entries)
+            stocks.push_back(entry);
+
+        options.deletion = DeletionPolicy::IncludeDelete;
+
+        for (const auto& stock : _instrumentService->getStocks(ids))
+        {
+            const auto alreadyInStore = std::ranges::any_of(
+                _getValues(options),
+                [&](const Stock& stockInStore)
+                { return stockInStore.getId() == stock.getId(); }
+            );
+
+            if (!alreadyInStore)
+                stocks.push_back(stock);
+        }
+
+        return stocks;
     }
 
     /**

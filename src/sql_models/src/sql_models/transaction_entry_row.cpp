@@ -12,8 +12,8 @@ orm::WhereExpr TransactionEntryRow::hasTransactionId(
     TransactionId transactionId
 )
 {
-    return orm::makeWhere(
-        transactionIdField{transactionId},
+    return orm::makeWhere<transactionIdField>(
+        transactionId,
         filter::Operator::Equal
     );
 }

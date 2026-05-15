@@ -11,5 +11,5 @@
  */
 orm::WhereExpr PositionRow::IsOpen()
 {
-    return orm::makeWhere(closedAtField{std::nullopt}, filter::Operator::Equal);
+    return orm::makeWhere<closedAtField>(std::nullopt, filter::Operator::Equal);
 }

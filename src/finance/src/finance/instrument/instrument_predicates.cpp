@@ -31,4 +31,18 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Create a Predicate to filter stocks by instrument ID
+     *
+     * @param ids The instrument ID to filter by
+     * @return filter::Predicate<Stock>
+     */
+    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids)
+    {
+        return filter::makePredicate<Stock>(
+            [ids](const Stock& stock)
+            { return ids.contains(stock.getInstrumentId()); }
+        );
+    }
+
 }   // namespace finance
