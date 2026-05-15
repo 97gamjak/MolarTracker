@@ -52,8 +52,6 @@ namespace drafts
         [[nodiscard]] std::string getIndustry() const;
         [[nodiscard]] std::string getSector() const;
         [[nodiscard]] AssetClass  getAssetClass() const;
-
-        [[nodiscard]] std::string toString() const;
     };
 
 }   // namespace drafts
