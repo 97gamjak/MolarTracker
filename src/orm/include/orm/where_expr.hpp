@@ -29,10 +29,9 @@ namespace orm
 
     WhereExpr makeEmptyWhere();
 
-    // TODO:
-    template <typename Field>
+    template <typename Field, typename Value>
     [[nodiscard]]
-    WhereExpr makeWhere(Field field, filter::Operator operator_);
+    WhereExpr makeWhere(const Value& field, filter::Operator operator_);
 
     template <typename Field, typename Value, std::ranges::input_range Range>
     [[nodiscard]]

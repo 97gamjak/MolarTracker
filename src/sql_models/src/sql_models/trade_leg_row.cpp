@@ -10,8 +10,8 @@
  */
 orm::WhereExpr TradeLegRow::hasTransactionId(TransactionId transactionId)
 {
-    return orm::makeWhere(
-        transactionIdField(transactionId),
+    return orm::makeWhere<transactionIdField>(
+        transactionId,
         filter::Operator::Equal
     );
 }
@@ -24,5 +24,5 @@ orm::WhereExpr TradeLegRow::hasTransactionId(TransactionId transactionId)
  */
 orm::WhereExpr TradeLegRow::hasPosition(PositionId positionId)
 {
-    return orm::makeWhere(positionIdField(positionId), filter::Operator::Equal);
+    return orm::makeWhere<positionIdField>(positionId, filter::Operator::Equal);
 }

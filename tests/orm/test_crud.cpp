@@ -33,7 +33,6 @@
 #include "orm/join.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/query_options.hpp"
-#include "orm/where_expr.hpp"
 
 // ---------------------------------------------------------------------------
 // Strong ID types for test models
@@ -423,8 +422,8 @@ TEST_F(CrudTest, GetAssignsAutoIncrementId)
 
 TEST_F(CrudTest, GetUniqueReturnsNulloptOnEmptyTable)
 {
-    const orm::Query query = orm::Query{}.where(
-        ItemRow::labelField{"nonexistent"},
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "nonexistent",
         filter::Operator::Equal
     );
     const auto result = _crud.getUnique<ItemRow>(_db.db, query);
@@ -435,8 +434,8 @@ TEST_F(CrudTest, GetUniqueReturnsSingleMatchingRow)
 {
     (void) _crud.insert(_db.db, makeItem("unique_label"));
 
-    const orm::Query query = orm::Query{}.where(
-        ItemRow::labelField{"unique_label"},
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "unique_label",
         filter::Operator::Equal
     );
     const auto result = _crud.getUnique<ItemRow>(_db.db, query);
@@ -450,7 +449,7 @@ TEST_F(CrudTest, GetUniqueThrowsWhenMultipleRowsMatch)
     (void) _crud.insert(_db.db, makeItem("dup_b", 1.0));
 
     const orm::Query query =
-        orm::Query{}.where(ItemRow::scoreField{1.0}, filter::Operator::Equal);
+        orm::Query{}.where<ItemRow::scoreField>(1.0, filter::Operator::Equal);
 
     EXPECT_THROW(
         (void) _crud.getUnique<ItemRow>(_db.db, query),
@@ -468,8 +467,8 @@ TEST_F(CrudTest, WhereFiltersByLabel)
     insertItem(_crud, _db.db, makeItem("banana"));
     insertItem(_crud, _db.db, makeItem("cherry"));
 
-    const orm::Query query = orm::Query{}.where(
-        ItemRow::labelField{"banana"},
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "banana",
         filter::Operator::Equal
     );
 
@@ -482,8 +481,8 @@ TEST_F(CrudTest, WhereWithNoMatchReturnsEmpty)
 {
     insertItem(_crud, _db.db, makeItem("only_item"));
 
-    const orm::Query query = orm::Query{}.where(
-        ItemRow::labelField{"missing"},
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "missing",
         filter::Operator::Equal
     );
 
@@ -550,7 +549,7 @@ TEST_F(CrudTest, WhereAndOrderByCombined)
     const auto rows = _crud.get<ItemRow>(
         _db.db,
         orm::Query{}
-            .where(ItemRow::activeField{true}, filter::Operator::Equal)
+            .where<ItemRow::activeField>(true, filter::Operator::Equal)
             .orderBy<ItemRow::labelField>(true)
     );
     ASSERT_EQ(rows.size(), 2u);

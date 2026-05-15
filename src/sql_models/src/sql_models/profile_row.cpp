@@ -17,5 +17,5 @@ ProfileRow::ProfileRow(ProfileId _id) : id{_id} {}
  */
 orm::WhereExpr ProfileRow::hasName(const std::string& name)
 {
-    return orm::makeWhere(nameField{name}, filter::Operator::Equal);
+    return orm::makeWhere<nameField>(name, filter::Operator::Equal);
 }

@@ -10,17 +10,15 @@ namespace orm
      * @brief Create a WHERE expression for a specific field and operator
      *
      * @tparam Field
+     * @tparam Value
      * @param field
      * @param operator_
      * @return WhereExpr
      */
-    template <typename Field>
-    WhereExpr makeWhere(Field field, filter::Operator operator_)
+    template <typename Field, typename Value>
+    WhereExpr makeWhere(const Value& field, filter::Operator operator_)
     {
-        return std::make_shared<WhereClause<Field>>(
-            std::move(field),
-            operator_
-        );
+        return std::make_shared<WhereClause<Field>>(Field(field), operator_);
     }
 
     /**
