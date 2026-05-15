@@ -85,8 +85,7 @@ namespace orm
             placeholders += "?";
         }
 
-        return Field::tableName + "." + Field::getFullColumnName() + " IN (" +
-               placeholders + ")";
+        return Field::getFullColumnName() + " IN (" + placeholders + ")";
     }
 
     /**
