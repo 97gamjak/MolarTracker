@@ -296,27 +296,35 @@ namespace controller
             );
         }
 
-        PositionId positionId;
+        PositionId positionId = PositionId::invalid();
         if (drafts.size() > 0)
         {
             PositionSelectionDialog dlg{drafts};
-            if (dlg.exec() != QDialog::Accepted)
-                return;
-
-            if (auto pos = dlg.selectedPosition())
+            if (dlg.exec() == QDialog::Accepted)
             {
-                positionId = pos->getPositionId();
-            }
-            else
-            {
-                auto position = Position(draft.getTimestamp());
-                positionId    = _positionStore.createPosition(position);
+                if (auto pos = dlg.selectedPosition())
+                    positionId = pos->getPositionId();
             }
         }
-        else
+
+        if (!positionId.isValid())
         {
             auto position = Position(draft.getTimestamp());
             positionId    = _positionStore.createPosition(position);
+
+            if (!positionId.isValid())
+            {
+                const auto transaction =
+                    TransactionMapper::fromCreateStockTransactionDraft(draft);
+
+                const auto msg = std::format(
+                    "Failed to create position for stock transaction {}",
+                    transaction.toString()
+                );
+                LOG_ERROR(msg);
+                ErrorDialog::show(msg);
+                return;
+            }
         }
 
         for (auto& leg : draft.getLegs())
