@@ -296,24 +296,23 @@ namespace controller
             );
         }
 
-        PositionId positionId;
+        PositionId positionId = PositionId::invalid();
         if (drafts.size() > 0)
         {
             PositionSelectionDialog dlg{drafts};
-            if (dlg.exec() != QDialog::Accepted)
-                return;
-
-            if (auto pos = dlg.selectedPosition())
+            if (dlg.exec() == QDialog::Accepted)
             {
-                positionId = pos->getPositionId();
+                if (auto pos = dlg.selectedPosition())
+                    positionId = pos->getPositionId();
             }
             else
             {
-                auto position = Position(draft.getTimestamp());
-                positionId    = _positionStore.createPosition(position);
+                LOG_INFO("No position selected");
+                return;
             }
         }
-        else
+
+        if (!positionId.isValid())
         {
             auto position = Position(draft.getTimestamp());
             positionId    = _positionStore.createPosition(position);
