@@ -5,6 +5,12 @@ All changes and updates, that are relevant for a user will be documented here
 ## Next Release
 
 <!-- insertion marker -->
+
+### Testing
+
+- Add unit tests for `TransactionRepo` covering Cash and Trade transaction
+  round-trips, entry/leg persistence, comment handling, and multi-transaction
+  retrieval
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ### Bug Fix

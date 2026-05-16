@@ -5,6 +5,13 @@ All changes and updates, that are relevant for developers will be documented her
 ## Next Release
 
 <!-- insertion marker -->
+
+### Testing
+
+- Add `tests/app/test_transaction_repo.cpp` with 15 GoogleTest cases for
+  `app::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
+  and Trade transactions, entry/leg persistence, comment round-trips, ID
+  sequencing, and empty-database behaviour
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
