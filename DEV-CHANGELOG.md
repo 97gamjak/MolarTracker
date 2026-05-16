@@ -34,6 +34,10 @@ All changes and updates, that are relevant for developers will be documented her
 - Fix silent continuing for stock transaction creation if position exists but has not suitable instrument
 - Improve error handling when creating a new position during stock transaction creation
 
+### UI
+
+- Fix: make `positionAt` in `PositionSelectionTableModel` more robust by returning `std::optional` with boundary checks
+
 ### Tests
 
 - Add `tests/app/test_account_repo.cpp` with GoogleTest fixture covering
