@@ -134,13 +134,22 @@ namespace ui
      * @brief Get the position draft at a specific row
      *
      * @param row The row index
-     * @return const drafts::PositionDraft& The position draft at the row
+     * @return std::optional<drafts::PositionDraft> The position draft at the
+     * row
      */
-    const drafts::PositionDraft& PositionSelectionTableModel::positionAt(
-        int row
-    ) const
+    std::optional<drafts::PositionDraft> PositionSelectionTableModel::
+        positionAt(int row) const
     {
-        return _positions[static_cast<std::size_t>(row)];
+        if (row < 0)
+
+            return std::nullopt;
+
+        const auto index = static_cast<std::size_t>(row);
+
+        if (_positions.size() > index)
+            return _positions[index];
+
+        return std::nullopt;
     }
 
     /**

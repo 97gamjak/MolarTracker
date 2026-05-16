@@ -59,7 +59,9 @@ namespace ui
             int             role
         ) const override;
 
-        [[nodiscard]] const drafts::PositionDraft& positionAt(int row) const;
+        [[nodiscard]] std::optional<drafts::PositionDraft> positionAt(
+            int row
+        ) const;
 
        private:
         [[nodiscard]] static QString _columnLabel(int index);
