@@ -2,6 +2,7 @@
 
 #include <QColor>
 #include <QDateTime>
+#include <optional>
 
 #include "drafts/position_draft.hpp"
 
@@ -141,7 +142,6 @@ namespace ui
         positionAt(int row) const
     {
         if (row < 0)
-
             return std::nullopt;
 
         const auto index = static_cast<std::size_t>(row);

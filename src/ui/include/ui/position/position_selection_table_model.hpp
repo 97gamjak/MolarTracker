@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <cstdint>
 #include <mstd/enum.hpp>
+#include <optional>
 #include <vector>
 
 class Timestamp;   // Forward declaration
