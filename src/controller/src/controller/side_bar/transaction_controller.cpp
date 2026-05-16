@@ -305,26 +305,17 @@ namespace controller
                 if (auto pos = dlg.selectedPosition())
                     positionId = pos->getPositionId();
             }
+            else
+            {
+                LOG_INFO("No position selected");
+                return;
+            }
         }
 
         if (!positionId.isValid())
         {
             auto position = Position(draft.getTimestamp());
             positionId    = _positionStore.createPosition(position);
-
-            if (!positionId.isValid())
-            {
-                const auto transaction =
-                    TransactionMapper::fromCreateStockTransactionDraft(draft);
-
-                const auto msg = std::format(
-                    "Failed to create position for stock transaction {}",
-                    transaction.toString()
-                );
-                LOG_ERROR(msg);
-                ErrorDialog::show(msg);
-                return;
-            }
         }
 
         for (auto& leg : draft.getLegs())
