@@ -22,6 +22,13 @@ All changes and updates, that are relevant for a user will be documented here
 ### Bug Fix
 
 - Fix three ORM bugs exposed by unit tests: duplicate `WHERE` in `deleteByPk` SQL, wrong bind-parameter index in `update` WHERE clause, and `LIMIT` being silently ignored when no `ORDER BY` was set
+
+## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
+
+### Bug Fix
+
+Fix: Adding new stocks and saving does not yield two entries in securities overview page anymore
+
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ### Bug Fix
@@ -139,6 +146,7 @@ All changes and updates, that are relevant for a user will be documented here
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 

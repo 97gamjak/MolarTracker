@@ -121,9 +121,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Merge main back into dev
+      - name: Create PR to merge main back into dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          version="${{ steps.extract_version.outputs.version }}"
           git fetch origin dev
-          git checkout dev
-          git merge origin/main --no-edit
-          git push origin dev
+
+          gh pr create \
+            --base dev \
+            --head main \
+            --title "chore: merge release $version back into dev" \
+            --body "$(printf '🔄 **Automated back-merge after release `%s`**\n\n- Source PR: #${{ github.event.pull_request.number }}\n- Commit: `${{ github.sha }}`\n\nThis PR merges the release changes from `main` back into `dev`.' "$version")"

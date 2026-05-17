@@ -76,6 +76,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`, `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
 
+## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
+
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
@@ -304,6 +306,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 
