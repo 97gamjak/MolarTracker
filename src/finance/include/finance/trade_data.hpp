@@ -39,7 +39,8 @@ namespace finance
             AccountId       accountId,
             InstrumentId    instrumentId,
             const Quantity& quantity,
-            const Cash&     unitPrice
+            const Cash&     unitPrice,
+            PositionId      positionId
         );
 
         [[nodiscard]] Cash         getCash() const;
@@ -51,6 +52,8 @@ namespace finance
 
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
+
+        [[nodiscard]] std::string toString() const;
     };
 
     /**

@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "config/id_types.hpp"
+#include "filter/predicate.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
@@ -25,7 +26,10 @@ namespace finance
         std::optional<Timestamp> _closedAt;
 
        public:
-        Position(Timestamp createdAt, std::optional<Timestamp> closedAt);
+        explicit Position(
+            Timestamp                createdAt,
+            std::optional<Timestamp> closedAt = std::nullopt
+        );
 
         void setId(PositionId id);
 
@@ -33,6 +37,8 @@ namespace finance
         [[nodiscard]] Timestamp                getCreatedAt() const;
         [[nodiscard]] std::optional<Timestamp> getClosedAt() const;
     };
+
+    filter::Predicate<Position> IsPositionOpen();
 
 }   // namespace finance
 

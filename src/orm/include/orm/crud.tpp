@@ -14,6 +14,7 @@
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "filter/expr_node.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
@@ -22,6 +23,8 @@
 #include "orm/type_traits.hpp"
 #include "orm/where_expr.hpp"
 #include "where_clause.hpp"
+
+REGISTER_LOG_CATEGORY("Orm.Crud.Operations");
 
 namespace orm
 {
@@ -130,6 +133,8 @@ namespace orm
         const Model& row
     )
     {
+        LOG_DEBUG(std::format("Inserting {} into DB.", row.toString()));
+
         std::size_t nInsertableFields = 0;
         Model::forEachColumn(
             [&](const auto& field)
@@ -286,6 +291,14 @@ namespace orm
         const Model&  row
     )
     {
+        LOG_DEBUG(
+            std::format(
+                "Updating table '{}' with SQL: {}",
+                Model::tableName,
+                row.toString()
+            )
+        );
+
         std::string sqlText;
         sqlText += "UPDATE ";
         sqlText += Model::tableName;

@@ -39,11 +39,14 @@ namespace orm
 
         [[nodiscard]] Query& where(const WhereExpr& whereExpr);
 
-        template <typename Field>
+        template <typename Field, typename Value>
         [[nodiscard]] Query& where(
-            const Field&     field,
+            const Value&     field,
             filter::Operator operator_
         );
+
+        template <typename Field, std::ranges::input_range Range>
+        [[nodiscard]] Query& in(const Range& values);
 
         [[nodiscard]] std::string getDBOperations() const;
         [[nodiscard]] std::string getWhereDBOperations() const;

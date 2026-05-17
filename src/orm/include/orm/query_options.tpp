@@ -23,14 +23,31 @@ namespace orm
     /**
      * @brief set a WHERE expression for the query
      *
+     * @tparam Field
+     * @tparam Value
      * @param field
      * @param operator_
      * @return Query&
      */
-    template <typename Field>
-    Query& Query::where(const Field& field, filter::Operator operator_)
+    template <typename Field, typename Value>
+    Query& Query::where(const Value& field, filter::Operator operator_)
     {
-        _whereExpr &= makeWhere(field, operator_);
+        _whereExpr &= makeWhere<Field>(field, operator_);
+        return *this;
+    }
+
+    /**
+     * @brief Add an IN clause for the specified field
+     *
+     * @tparam Field
+     * @tparam Range
+     * @param values
+     * @return Query&
+     */
+    template <typename Field, std::ranges::input_range Range>
+    Query& Query::in(const Range& values)
+    {
+        _whereExpr &= makeInClause<Field>(values);
         return *this;
     }
 

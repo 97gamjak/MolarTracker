@@ -1,5 +1,7 @@
 #include "finance/trade_data.hpp"
 
+#include <format>
+
 namespace finance
 {
 
@@ -11,18 +13,40 @@ namespace finance
      * @param quantity The quantity of the instrument being traded in this leg
      * @param unitPrice The unit price of the instrument being traded in this
      * leg
+     * @param positionId The ID of the position associated with this trade leg
      */
     TradeLeg::TradeLeg(
         AccountId       accountId,
         InstrumentId    instrumentId,
         const Quantity& quantity,
-        const Cash&     unitPrice
+        const Cash&     unitPrice,
+        PositionId      positionId
     )
         : _accountId(accountId),
           _instrumentId(instrumentId),
           _quantity(quantity),
-          _unitPrice(unitPrice)
+          _unitPrice(unitPrice),
+          _positionId(positionId)
     {
+    }
+
+    /**
+     * @brief get a string representation of the trade leg, this is used for
+     * logging and debugging purposes
+     *
+     * @return std::string
+     */
+    std::string TradeLeg::toString() const
+    {
+        return std::format(
+            "TradeLeg(AccountId: {}, InstrumentId: {}, PositionId: {}, "
+            "Quantity: {}, UnitPrice: {})",
+            _accountId.toString(),
+            _instrumentId.toString(),
+            _positionId.toString(),
+            _quantity.toString(),
+            _unitPrice.toString()
+        );
     }
 
     /**

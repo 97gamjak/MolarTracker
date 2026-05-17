@@ -35,10 +35,13 @@ namespace app
         /**
          * @brief get a list of all stocks in the database
          *
+         * @param ids The set of instrument IDs to retrieve stocks for
          * @return std::vector<finance::Stock>
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks() = 0;
+        virtual std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids
+        ) = 0;
 
         /**
          * @brief Get a stock by its ticker symbol

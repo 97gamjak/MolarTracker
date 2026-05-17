@@ -227,9 +227,11 @@ namespace app
      * @tparam T
      * @tparam IdType
      * @param value
+     *
+     * @return IdType The ID of the newly added entry.
      */
     template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_addEntry(T value)
+    IdType BaseStore<T, IdType>::_addEntry(T value)
     {
         _markPotentiallyDirty();
 
@@ -238,7 +240,9 @@ namespace app
         _entries.push_back(Entry{value, StoreState::New});
 
         _added.push_back(value);
-        _notifyAdded();
+        _notifyAdded(false);
+
+        return value.getId();
     }
 
     /**
@@ -255,7 +259,7 @@ namespace app
         for (const auto& item : value)
             _entries.push_back(Entry{item, StoreState::Clean});
 
-        this->template notify<StoreChanged<IdType>>();
+        _notifyStoreChanged(false);
     }
 
     /**
@@ -285,7 +289,7 @@ namespace app
         entry->state = state;
 
         _updated.push_back(entry->value);
-        _notifyUpdated();
+        _notifyUpdated(false);
         return StoreResult::Ok;
     }
 
@@ -348,7 +352,7 @@ namespace app
             return result;
 
         _removed.push_back(id);
-        _notifyRemoved();
+        _notifyRemoved(false);
         _markPotentiallyDirty();
 
         return StoreResult::Ok;
@@ -461,77 +465,6 @@ namespace app
 
         // when committing we don't want single notifications
         return StoreResult::Ok;
-    }
-
-    /**
-     * @brief Notifies subscribers of ID remapping events.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyIdRemap()
-    {
-        this->template notify<OnIdRemap<IdType>>(_idRemap);
-        this->template notify<StoreChanged<IdType>>();
-        _idRemap.clear();
-    }
-
-    /**
-     * @brief Notifies subscribers of updated entries.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyUpdated()
-    {
-        this->template notify<OnStoreItemUpdated<T>>(_updated);
-        this->template notify<StoreChanged<IdType>>();
-        _updated.clear();
-    }
-
-    /**
-     * @brief Notifies subscribers of added entries.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyAdded()
-    {
-        this->template notify<OnStoreItemAdded<T>>(_added);
-        this->template notify<StoreChanged<IdType>>();
-        _added.clear();
-    }
-
-    /**
-     * @brief Notifies subscribers of removed entries.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyRemoved()
-    {
-        this->template notify<OnStoreItemRemoved<IdType>>(_removed);
-        this->template notify<StoreChanged<IdType>>();
-        _removed.clear();
-    }
-
-    /**
-     * @brief Notifies subscribers of commit events.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyOnCommit()
-    {
-        _notifyAdded();
-        _notifyRemoved();
-        _notifyUpdated();
-        _notifyIdRemap();
     }
 
 }   // namespace app

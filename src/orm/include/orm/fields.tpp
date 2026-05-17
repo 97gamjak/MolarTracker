@@ -124,7 +124,12 @@ namespace orm
             [&](const auto& field)
             {
                 if (field.isPk)
-                    where &= makeWhere(field, filter::Operator::Equal);
+                {
+                    where &= makeWhere<decltype(field)>(
+                        field.value(),
+                        filter::Operator::Equal
+                    );
+                }
             }
         );
         return where;

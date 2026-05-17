@@ -25,13 +25,12 @@ namespace app
      * @brief Create a new position
      *
      * @param position
+     *
      * @return PositionId
      */
     PositionId PositionStore::createPosition(const finance::Position& position)
     {
-        _addEntry(position);
-
-        return position.getId();
+        return _addEntry(position);
     }
 
     /**
@@ -53,6 +52,34 @@ namespace app
         const auto ids   = _getIds(options);
 
         for (const auto& position : _positionService->getAllPositions())
+            if (!ids.contains(position.getId()))
+                positions.push_back(position);
+
+        return positions;
+    }
+
+    /**
+     * @brief Get all open positions
+     *
+     * @return std::vector<finance::Position>
+     */
+    std::vector<finance::Position> PositionStore::getOpenPositions() const
+    {
+        auto options = Options{
+            .filter   = finance::IsPositionOpen(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        auto                           positionsView = _getValues(options);
+        std::vector<finance::Position> positions     = {
+            positionsView.begin(),
+            positionsView.end()
+        };
+
+        options.deletion = DeletionPolicy::IncludeDelete;
+        const auto ids   = _getIds(options);
+
+        for (const auto& position : _positionService->getAllOpenPositions())
             if (!ids.contains(position.getId()))
                 positions.push_back(position);
 

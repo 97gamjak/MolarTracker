@@ -35,7 +35,7 @@ namespace ui
     StockWidget::StockWidget(
         std::vector<drafts::AccountDraft>        accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
-        std::vector<std::string>                 tickers,
+        const std::vector<std::string>&          tickers,
         QWidget*                                 parent
     )
         : Dialog(parent),
@@ -48,7 +48,7 @@ namespace ui
           _priceRow(makeQChild<AmountRow>(this)),
           _currencyLabel(makeQChild<QLabel>(this)),
           _addButton(makeQChild<QPushButton>("Add Transaction", this)),
-          _tickerField(makeQChild<TickerField>(std::move(tickers), this)),
+          _tickerField(makeQChild<TickerField>(tickers, this)),
           _timestampField(makeQChild<TimestampField>(this)),
           _commentField(makeQChild<CommentField>(this)),
           _referenceAccounts(referenceAccounts)
@@ -284,7 +284,7 @@ namespace ui
             throw std::runtime_error("No ticker selected");
 
         auto tradeLeg = drafts::TradeLegDraft{
-            referenceAccount->id,
+            account->id,
             unitPrice,
             quantity,
             ticker.value()

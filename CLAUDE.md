@@ -100,11 +100,11 @@ cmake -S . -B build -DMOLARTRACKER_ENABLE_DOCS=ON
 
 **Key CMake options:**
 
-| Option | Default | Description |
-|---|---|---|
-| `MOLARTRACKER_ENABLE_TESTING` | `ON` | Build unit tests |
-| `MOLARTRACKER_ENABLE_DOCS` | `OFF` | Build Doxygen documentation |
-| `BUILD_TESTING` | `ON` | CTest infrastructure |
+| Option                        | Default | Description                 |
+| ----------------------------- | ------- | --------------------------- |
+| `MOLARTRACKER_ENABLE_TESTING` | `ON`    | Build unit tests            |
+| `MOLARTRACKER_ENABLE_DOCS`    | `OFF`   | Build Doxygen documentation |
+| `BUILD_TESTING`               | `ON`    | CTest infrastructure        |
 
 ---
 
@@ -175,15 +175,15 @@ ORM / Database (SQLite3)
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---|---|---|
-| Classes / Structs | PascalCase | `ProfileFactory`, `LogManager` |
-| Functions / Methods | camelCase | `getProfile()`, `loadSettings()` |
-| Private members | `_camelCase` | `_profileRepo`, `_settings` |
-| Constants | `UPPER_CASE` or `static inline` | `MAX_RETRY`, `static inline constexpr` |
-| Namespaces | lowercase | `app`, `ui`, `db`, `orm` |
-| Header guards | `__MODULE_NAME_HPP__` | `__APP_PROFILE_HPP__` |
-| Template impls | `.tpp` files | `orm_model.tpp` |
+| Element             | Convention                      | Example                                |
+| ------------------- | ------------------------------- | -------------------------------------- |
+| Classes / Structs   | PascalCase                      | `ProfileFactory`, `LogManager`         |
+| Functions / Methods | camelCase                       | `getProfile()`, `loadSettings()`       |
+| Private members     | `_camelCase`                    | `_profileRepo`, `_settings`            |
+| Constants           | `UPPER_CASE` or `static inline` | `MAX_RETRY`, `static inline constexpr` |
+| Namespaces          | lowercase                       | `app`, `ui`, `db`, `orm`               |
+| Header guards       | `__MODULE_NAME_HPP__`           | `__APP_PROFILE_HPP__`                  |
+| Template impls      | `.tpp` files                    | `orm_model.tpp`                        |
 
 ---
 
@@ -250,15 +250,15 @@ When adding new features, add corresponding tests in `tests/` mirroring the sour
 
 All pipelines are in `.github/workflows/`:
 
-| Workflow | Trigger | Purpose |
-|---|---|---|
-| `build.yml` | PRs, push to `dev`, tags | Linux build + CTest + cppcheck |
-| `build_windows.yml` | PRs, tags | Windows build |
-| `static-analysis.yml` | PRs | DevOps style checks |
-| `doxygen.yml` | PRs | Doxygen documentation build |
-| `changelog.yml` | PRs | Verify changelog entries exist |
-| `check-pr-for-release-version.yml` | PRs | Validate release version format |
-| `create-tag.yml` | Manual | Create a release tag |
+| Workflow                           | Trigger                  | Purpose                         |
+| ---------------------------------- | ------------------------ | ------------------------------- |
+| `build.yml`                        | PRs, push to `dev`, tags | Linux build + CTest + cppcheck  |
+| `build_windows.yml`                | PRs, tags                | Windows build                   |
+| `static-analysis.yml`              | PRs                      | DevOps style checks             |
+| `doxygen.yml`                      | PRs                      | Doxygen documentation build     |
+| `changelog.yml`                    | PRs                      | Verify changelog entries exist  |
+| `check-pr-for-release-version.yml` | PRs                      | Validate release version format |
+| `create-tag.yml`                   | Manual                   | Create a release tag            |
 
 Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger release uploads.
 
@@ -271,8 +271,8 @@ Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger rele
 
 **Current tables:**
 
-| Table | Columns |
-|---|---|
+| Table     | Columns                                                                           |
+| --------- | --------------------------------------------------------------------------------- |
 | `profile` | `id` (PK, AUTOINCREMENT), `name` (TEXT NOT NULL UNIQUE), `email` (TEXT, nullable) |
 
 **ORM conventions:**
@@ -285,24 +285,24 @@ Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger rele
 
 ## Design Patterns in Use
 
-| Pattern | Where |
-|---|---|
-| MVC | `src/ui/controller/` + `src/ui/widgets/` |
-| Repository | `src/app/repos/` |
-| Service Layer | `src/app/services/` |
-| Factory | `src/app/factories/` |
-| Command (undo/redo) | `src/ui/commands/` |
-| Observable / Signal | `src/connections/` |
-| Singleton | `Constants`, `LogManager` |
-| Store (global state) | `src/app/store/` |
-| Draft / Staging | `src/drafts/` |
-| RAII | Transactions, connections, file handles |
+| Pattern              | Where                                    |
+| -------------------- | ---------------------------------------- |
+| MVC                  | `src/ui/controller/` + `src/ui/widgets/` |
+| Repository           | `src/app/repos/`                         |
+| Service Layer        | `src/app/services/`                      |
+| Factory              | `src/app/factories/`                     |
+| Command (undo/redo)  | `src/ui/commands/`                       |
+| Observable / Signal  | `src/connections/`                       |
+| Singleton            | `Constants`, `LogManager`                |
+| Store (global state) | `src/app/store/`                         |
+| Draft / Staging      | `src/drafts/`                            |
+| RAII                 | Transactions, connections, file handles  |
 
 ---
 
 ## Changelogs
 
-Two changelogs must be updated for every meaningful change:
+One of Two changelogs must be updated for every meaningful change:
 
 - **`CHANGELOG.md`** — User-facing, describes behavior changes and new features.
 - **`DEV-CHANGELOG.md`** — Developer-facing, describes API/internal changes.
@@ -346,7 +346,7 @@ Before submitting any change:
 - [ ] Code formatted with `clang-format`
 - [ ] No new compiler warnings introduced
 - [ ] Tests added or updated for changed logic
-- [ ] Both `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
+- [ ] One of `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
 - [ ] Git submodules not accidentally modified
 - [ ] No hardcoded paths — use `Constants` singleton for app paths
 - [ ] Private members prefixed with `_`

@@ -22,7 +22,9 @@ namespace app
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions() override;
+        std::vector<finance::Transaction> getTransactions(
+            const finance::TransactionFilter& filter
+        ) override;
     };
 }   // namespace app
 

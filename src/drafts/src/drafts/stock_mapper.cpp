@@ -1,7 +1,7 @@
 #include "drafts/stock_mapper.hpp"
 
 #include "drafts/stock_draft.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 
 namespace drafts
 {

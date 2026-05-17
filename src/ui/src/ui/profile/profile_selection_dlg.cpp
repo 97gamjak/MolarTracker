@@ -171,10 +171,8 @@ namespace ui
             // profile is selected. But we check it just in case to prevent
             // crashes in case of unexpected issues.
             LOG_ERROR(
-                "No profile selected, but OK button was clicked. This should "
-                "never happen. If you see this message, please report it to "
-                "the developers under " +
-                Constants::getGithubIssuesUrl()
+                "No profile selected, but OK button was clicked. " +
+                Constants::getCreateIssueError()
             );
             return;
         }

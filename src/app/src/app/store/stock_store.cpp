@@ -8,9 +8,13 @@
 #include "app/store/base/base_store.hpp"
 #include "app/store/base/store_state.hpp"
 #include "exceptions/not_yet_implemented.hpp"
+#include "finance/instrument/instrument_predicates.hpp"
+#include "finance/instrument/stock.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StockStore");
+
+using finance::Stock;
 
 namespace app
 {
@@ -38,7 +42,7 @@ namespace app
      * @param stock The Stock object to be added to the store
      * @return StockStoreResult indicating the result of the operation
      */
-    StockStoreResult StockStore::addStock(finance::Stock stock)
+    StockStoreResult StockStore::addStock(Stock stock)
     {
         const auto ticker = stock.getTicker();
 
@@ -84,45 +88,16 @@ namespace app
     }
 
     /**
-     * @brief Get a list of all stocks in the store, this will return all stocks
-     * that are not marked as deleted, and will include stocks that are new or
-     * modified but not yet saved to the database.
-     *
-     * @return std::vector<finance::Stock>
-     */
-    std::vector<finance::Stock> StockStore::getStocks() const
-    {
-        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
-
-        auto entries = _getValues(options);
-
-        std::vector<finance::Stock> stocks;
-
-        for (const auto& entry : entries)
-            stocks.push_back(entry);
-
-        for (const auto& stock : _instrumentService->getStocks())
-        {
-            const auto alreadyInStore = std::ranges::any_of(
-                stocks,
-                [&](const finance::Stock& stockInStore)
-                { return stockInStore.getId() == stock.getId(); }
-            );
-
-            if (!alreadyInStore)
-                stocks.push_back(stock);
-        }
-
-        return stocks;
-    }
-
-    /**
      * @brief Commit the changes in the stock store
      *
      */
     void StockStore::commit()
     {
         LOG_ENTRY;
+
+        // make an early return to not notify unnecessarily
+        if (!isDirty())
+            return;
 
         instrumentMap<InstrumentId> map{};
         for (const auto& entry : _getEntries())
@@ -134,13 +109,24 @@ namespace app
                     const auto [stockId, instrumentId] =
                         _instrumentService->addStock(entry.value);
 
+                    LOG_DEBUG(
+                        std::format(
+                            "Added new stock: {} with ID: {} and Instrument "
+                            "ID: {}",
+                            entry.value.toString(),
+                            stockId.toString(),
+                            instrumentId.toString()
+                        )
+                    );
+
                     auto stock = entry.value;
                     stock.setId(stockId);
                     stock.setInstrumentId(instrumentId);
+                    const auto oldInstrumentId = entry.value.getInstrumentId();
 
                     const auto result = _commitEntry(
                         entry.value.getId(),
-                        Entry{.value = std::move(stock), .state = entry.state}
+                        Entry{.value = stock, .state = entry.state}
                     );
 
                     if (result != StoreResult::Ok)
@@ -150,8 +136,8 @@ namespace app
                         );
                     }
 
-                    if (entry.value.getInstrumentId() != instrumentId)
-                        map[entry.value.getInstrumentId()] = instrumentId;
+                    if (oldInstrumentId != instrumentId)
+                        map[oldInstrumentId] = instrumentId;
 
                     break;
                 }
@@ -171,7 +157,78 @@ namespace app
         }
 
         _notifyOnCommit();
-        _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
+        if (!map.empty())
+            _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
+    }
+
+    /**
+     * @brief Get a list of all stocks in the store
+     *
+     * @param ids The set of instrument IDs to retrieve stocks for
+     * @return std::vector<finance::Stock>
+     */
+    std::vector<finance::Stock> StockStore::getStocks(
+        const idSet<InstrumentId>& ids
+    ) const
+    {
+        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
+        if (!ids.empty())
+            options.filter = finance::HasInstrumentId(ids);
+
+        auto entries = _getValues(options);
+
+        std::vector<Stock> stocks;
+
+        for (const auto& entry : entries)
+            stocks.push_back(entry);
+
+        options.deletion = DeletionPolicy::IncludeDelete;
+
+        for (const auto& stock : _instrumentService->getStocks(ids))
+        {
+            const auto alreadyInStore = std::ranges::any_of(
+                _getValues(options),
+                [&](const Stock& stockInStore)
+                { return stockInStore.getId() == stock.getId(); }
+            );
+
+            if (!alreadyInStore)
+                stocks.push_back(stock);
+        }
+
+        return stocks;
+    }
+
+    /**
+     * @brief Get a stock by its instrument ID
+     *
+     * @param id The instrument ID
+     * @return std::optional<Stock>
+     */
+    std::optional<Stock> StockStore::getStock(InstrumentId id) const
+    {
+        const auto options = Options{
+            .filter   = finance::HasInstrumentId(id),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+        auto stocksView = _getValues(options);
+
+        if (stocksView.empty())
+        {
+            // TODO(97gamjak): Handle case where stock is not found and needs to
+            // be searched for in database
+            return std::nullopt;
+        }
+
+        const std::vector<Stock> stocks = {
+            stocksView.begin(),
+            stocksView.end()
+        };
+
+        if (stocks.size() > 1)
+            throw std::runtime_error("Multiple stocks found");
+
+        return stocks.front();
     }
 
     /**

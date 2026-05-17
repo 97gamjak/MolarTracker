@@ -2,7 +2,6 @@
 
 #include "app/repos/instrument_repo.hpp"
 #include "app/repos/position_repo.hpp"
-#include "db/database.hpp"
 #include "repos/account_repo.hpp"
 #include "repos/profile_repo.hpp"
 #include "repos/transaction_repo.hpp"

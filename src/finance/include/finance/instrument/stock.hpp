@@ -1,12 +1,11 @@
-#ifndef __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
-#define __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
+#define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
 
 #include <expected>
 #include <string>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "filter/predicate.hpp"
 
 namespace finance
 {
@@ -83,13 +82,12 @@ namespace finance
         void setId(StockId stockId);
         void setInstrumentId(InstrumentId instrumentId);
 
+        [[nodiscard]] std::string toString() const;
+
        private:
         explicit Stock(const TickerInfo& info);
     };
 
-    [[nodiscard]]
-    filter::Predicate<Stock> HasTicker(const std::string& ticker);
-
 }   // namespace finance
 
-#endif   // __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__

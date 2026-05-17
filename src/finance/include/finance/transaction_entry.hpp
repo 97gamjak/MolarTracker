@@ -33,6 +33,8 @@ namespace finance
         [[nodiscard]] Cash               getCash() const;
 
         void setAccountId(AccountId accountId);
+
+        [[nodiscard]] std::string toString() const;
     };
 
 }   // namespace finance

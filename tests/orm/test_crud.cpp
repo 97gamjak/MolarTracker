@@ -33,16 +33,19 @@
 #include "orm/join.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/query_options.hpp"
-#include "orm/where_expr.hpp"
 
 // ---------------------------------------------------------------------------
 // Strong ID types for test models
 // ---------------------------------------------------------------------------
 
-struct ItemTag {};
+struct ItemTag
+{
+};
 using ItemId = StrongId<ItemTag>;
 
-struct CategoryTag {};
+struct CategoryTag
+{
+};
 using CategoryId = StrongId<CategoryTag>;
 
 // ---------------------------------------------------------------------------
@@ -56,7 +59,10 @@ using CategoryId = StrongId<CategoryTag>;
 struct ItemRow : orm::ORMModel<"item">
 {
     ORM_FIELD(id, IdField<ItemId>)
-    ORM_FIELD(label, Field<"label", std::string, orm::not_null_t, orm::unique_t>)
+    ORM_FIELD(
+        label,
+        Field<"label", std::string, orm::not_null_t, orm::unique_t>
+    )
     ORM_FIELD(score, Field<"score", double>)
     ORM_FIELD(active, Field<"active", bool, orm::not_null_t>)
     ORM_FIELD(note, Field<"note", std::optional<std::string>>)
@@ -83,8 +89,7 @@ struct CategoryRow : orm::ORMModel<"category">
 //   categoryId  INTEGER NOT NULL  FK → category.id ON DELETE CASCADE
 //   tag         TEXT NOT NULL
 // ---------------------------------------------------------------------------
-struct TaggedItemRow
-    : orm::ORMModel<"tagged_item">
+struct TaggedItemRow : orm::ORMModel<"tagged_item">
 {
     ORM_FIELD(id, IdField<ItemId>)
     ORM_FIELD(
@@ -108,8 +113,7 @@ struct TaggedItemRow
 //   categoryId  INTEGER NOT NULL  FK → category.id ON DELETE RESTRICT
 //   tag         TEXT NOT NULL
 // ---------------------------------------------------------------------------
-struct RestrictedItemRow
-    : orm::ORMModel<"restricted_item">
+struct RestrictedItemRow : orm::ORMModel<"restricted_item">
 {
     ORM_FIELD(id, IdField<ItemId>)
     ORM_FIELD(
@@ -137,12 +141,11 @@ namespace
     {
         const auto tmp = std::filesystem::temp_directory_path();
 
-        std::random_device                           rd;
-        std::mt19937_64                              gen(rd());
+        std::random_device                           random;
+        std::mt19937_64                              gen(random());
         std::uniform_int_distribution<std::uint64_t> dis;
 
-        return tmp /
-               ("orm_test_" + std::to_string(dis(gen)) + ".sqlite");
+        return tmp / ("orm_test_" + std::to_string(dis(gen)) + ".sqlite");
     }
 
     struct TempDb
@@ -155,8 +158,8 @@ namespace
         ~TempDb()
         {
             db.close();
-            std::error_code ec;
-            std::filesystem::remove(path, ec);
+            std::error_code errorCode;
+            std::filesystem::remove(path, errorCode);
         }
 
         TempDb(const TempDb&)            = delete;
@@ -176,13 +179,13 @@ namespace
         row.label  = label;
         row.score  = score;
         row.active = active;
-        row.note   = note;
+        row.note   = std::move(note);
         return row;
     }
 
-    void insertItem(orm::Crud& crud, db::Database& db, ItemRow row)
+    void insertItem(orm::Crud& crud, db::Database& db, const ItemRow& row)
     {
-        (void) crud.insert(db, row);
+        [[maybe_unused]] const auto result = crud.insert(db, row);
     }
 }   // namespace
 
@@ -193,20 +196,21 @@ namespace
 class CrudTest : public ::testing::Test
 {
    protected:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     TempDb    _db;
     orm::Crud _crud;
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-    void SetUp() override
-    {
-        _crud.createTable<ItemRow>(_db.db);
-    }
+    void SetUp() override { _crud.createTable<ItemRow>(_db.db); }
 };
 
 class FkCrudTest : public ::testing::Test
 {
    protected:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     TempDb    _db;
     orm::Crud _crud;
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
     void SetUp() override
     {
@@ -218,8 +222,10 @@ class FkCrudTest : public ::testing::Test
 class RestrictFkCrudTest : public ::testing::Test
 {
    protected:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     TempDb    _db;
     orm::Crud _crud;
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
     void SetUp() override
     {
@@ -326,7 +332,7 @@ TEST_F(CrudTest, SequentialInsertsReturnIncreasingIds)
 
 TEST_F(CrudTest, InsertWithNullOptionalSucceeds)
 {
-    const ItemRow row = makeItem("nullnote", 1.0, true, std::nullopt);
+    const ItemRow row    = makeItem("nullNote", 1.0, true, std::nullopt);
     const auto    result = _crud.insert(_db.db, row);
     EXPECT_TRUE(result.has_value());
 }
@@ -334,15 +340,16 @@ TEST_F(CrudTest, InsertWithNullOptionalSucceeds)
 TEST_F(CrudTest, InsertWithOptionalValueSucceeds)
 {
     const ItemRow row =
-        makeItem("hasnote", 2.0, false, std::string{"some note"});
+        makeItem("hasNote", 2.0, false, std::string{"some note"});
     const auto result = _crud.insert(_db.db, row);
     EXPECT_TRUE(result.has_value());
 }
 
 TEST_F(CrudTest, InsertSqlIsTracked)
 {
-    const std::size_t before = _crud.getExecutedSQL().size();
-    (void) _crud.insert(_db.db, makeItem("tracked"));
+    const std::size_t           before = _crud.getExecutedSQL().size();
+    [[maybe_unused]] const auto result =
+        _crud.insert(_db.db, makeItem("tracked"));
     EXPECT_GT(_crud.getExecutedSQL().size(), before);
 }
 
@@ -358,61 +365,63 @@ TEST_F(CrudTest, GetOnEmptyTableReturnsEmptyVector)
 
 TEST_F(CrudTest, GetReturnsInsertedRow)
 {
-    (void) _crud.insert(_db.db, makeItem("widget"));
+    [[maybe_unused]] const auto result =
+        _crud.insert(_db.db, makeItem("widget"));
     const auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
     EXPECT_EQ(std::string(rows.front().label.value()), "widget");
 }
 
 TEST_F(CrudTest, GetPreservesAllScalarFields)
 {
     const ItemRow row = makeItem("roundtrip", 3.14, false, std::nullopt);
-    (void) _crud.insert(_db.db, row);
+    [[maybe_unused]] const auto result = _crud.insert(_db.db, row);
 
     const auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
 
-    const auto& r = rows.front();
-    EXPECT_EQ(std::string(r.label.value()), "roundtrip");
-    EXPECT_DOUBLE_EQ(r.score.value(), 3.14);
-    EXPECT_FALSE(r.active.value());
+    const auto& frontRow = rows.front();
+    EXPECT_EQ(std::string(frontRow.label.value()), "roundtrip");
+    EXPECT_DOUBLE_EQ(frontRow.score.value(), 3.14);
+    EXPECT_FALSE(frontRow.active.value());
 }
 
 TEST_F(CrudTest, GetPreservesNullOptional)
 {
-    (void) _crud.insert(_db.db, makeItem("nonote", 0.0, true, std::nullopt));
+    [[maybe_unused]] const auto result =
+        _crud.insert(_db.db, makeItem("noNote", 0.0, true, std::nullopt));
     const auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
     EXPECT_FALSE(rows.front().note.value().has_value());
 }
 
 TEST_F(CrudTest, GetPreservesOptionalWithValue)
 {
-    (void) _crud.insert(
+    const auto result = _crud.insert(
         _db.db,
         makeItem("noted", 0.0, true, std::string{"hello orm"})
     );
     const auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
     ASSERT_TRUE(rows.front().note.value().has_value());
     EXPECT_EQ(rows.front().note.value().value(), "hello orm");
 }
 
 TEST_F(CrudTest, GetReturnsAllInsertedRows)
 {
-    (void) _crud.insert(_db.db, makeItem("x"));
-    (void) _crud.insert(_db.db, makeItem("y"));
-    (void) _crud.insert(_db.db, makeItem("z"));
+    auto result = _crud.insert(_db.db, makeItem("x"));
+    result      = _crud.insert(_db.db, makeItem("y"));
+    result      = _crud.insert(_db.db, makeItem("z"));
 
     const auto rows = _crud.get<ItemRow>(_db.db);
-    EXPECT_EQ(rows.size(), 3u);
+    EXPECT_EQ(rows.size(), 3U);
 }
 
 TEST_F(CrudTest, GetAssignsAutoIncrementId)
 {
-    (void) _crud.insert(_db.db, makeItem("idcheck"));
-    const auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    const auto result = _crud.insert(_db.db, makeItem("idCheck"));
+    const auto rows   = _crud.get<ItemRow>(_db.db);
+    ASSERT_EQ(rows.size(), 1U);
     EXPECT_GT(rows.front().id.value().value(), 0);
 }
 
@@ -422,21 +431,22 @@ TEST_F(CrudTest, GetAssignsAutoIncrementId)
 
 TEST_F(CrudTest, GetUniqueReturnsNulloptOnEmptyTable)
 {
-    const orm::Query query =
-        orm::Query{}.where(ItemRow::labelField{"nonexistent"}, filter::Operator::Equal);
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "nonexistent",
+        filter::Operator::Equal
+    );
     const auto result = _crud.getUnique<ItemRow>(_db.db, query);
     EXPECT_FALSE(result.has_value());
 }
 
 TEST_F(CrudTest, GetUniqueReturnsSingleMatchingRow)
 {
-    (void) _crud.insert(_db.db, makeItem("unique_label"));
+    const auto _result = _crud.insert(_db.db, makeItem("unique_label"));
 
-    const orm::Query query =
-        orm::Query{}.where(
-            ItemRow::labelField{"unique_label"},
-            filter::Operator::Equal
-        );
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "unique_label",
+        filter::Operator::Equal
+    );
     const auto result = _crud.getUnique<ItemRow>(_db.db, query);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(std::string(result->label.value()), "unique_label");
@@ -444,11 +454,11 @@ TEST_F(CrudTest, GetUniqueReturnsSingleMatchingRow)
 
 TEST_F(CrudTest, GetUniqueThrowsWhenMultipleRowsMatch)
 {
-    (void) _crud.insert(_db.db, makeItem("dup_a", 1.0));
-    (void) _crud.insert(_db.db, makeItem("dup_b", 1.0));
+    auto result = _crud.insert(_db.db, makeItem("dup_a", 1.0));
+    result      = _crud.insert(_db.db, makeItem("dup_b", 1.0));
 
     const orm::Query query =
-        orm::Query{}.where(ItemRow::scoreField{1.0}, filter::Operator::Equal);
+        orm::Query{}.where<ItemRow::scoreField>(1.0, filter::Operator::Equal);
 
     EXPECT_THROW(
         (void) _crud.getUnique<ItemRow>(_db.db, query),
@@ -466,11 +476,13 @@ TEST_F(CrudTest, WhereFiltersByLabel)
     insertItem(_crud, _db.db, makeItem("banana"));
     insertItem(_crud, _db.db, makeItem("cherry"));
 
-    const orm::Query query =
-        orm::Query{}.where(ItemRow::labelField{"banana"}, filter::Operator::Equal);
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "banana",
+        filter::Operator::Equal
+    );
 
     const auto rows = _crud.get<ItemRow>(_db.db, query);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
     EXPECT_EQ(std::string(rows.front().label.value()), "banana");
 }
 
@@ -478,8 +490,10 @@ TEST_F(CrudTest, WhereWithNoMatchReturnsEmpty)
 {
     insertItem(_crud, _db.db, makeItem("only_item"));
 
-    const orm::Query query =
-        orm::Query{}.where(ItemRow::labelField{"missing"}, filter::Operator::Equal);
+    const orm::Query query = orm::Query{}.where<ItemRow::labelField>(
+        "missing",
+        filter::Operator::Equal
+    );
 
     const auto rows = _crud.get<ItemRow>(_db.db, query);
     EXPECT_TRUE(rows.empty());
@@ -495,7 +509,7 @@ TEST_F(CrudTest, OrderByLabelAscending)
         _db.db,
         orm::Query{}.orderBy<ItemRow::labelField>(true)
     );
-    ASSERT_EQ(rows.size(), 3u);
+    ASSERT_EQ(rows.size(), 3U);
     EXPECT_EQ(std::string(rows[0].label.value()), "apple");
     EXPECT_EQ(std::string(rows[1].label.value()), "kiwi");
     EXPECT_EQ(std::string(rows[2].label.value()), "mango");
@@ -511,7 +525,7 @@ TEST_F(CrudTest, OrderByLabelDescending)
         _db.db,
         orm::Query{}.orderBy<ItemRow::labelField>(false)
     );
-    ASSERT_EQ(rows.size(), 3u);
+    ASSERT_EQ(rows.size(), 3U);
     EXPECT_EQ(std::string(rows[0].label.value()), "mango");
     EXPECT_EQ(std::string(rows[1].label.value()), "kiwi");
     EXPECT_EQ(std::string(rows[2].label.value()), "apple");
@@ -519,14 +533,12 @@ TEST_F(CrudTest, OrderByLabelDescending)
 
 TEST_F(CrudTest, LimitRestrictsNumberOfResults)
 {
-    for (int i = 0; i < 5; ++i)
+    constexpr auto nItems = 5;
+    for (int i = 0; i < nItems; ++i)
         insertItem(_crud, _db.db, makeItem("item_" + std::to_string(i)));
 
-    const auto rows = _crud.get<ItemRow>(
-        _db.db,
-        orm::Query{}.limit(3)
-    );
-    EXPECT_EQ(rows.size(), 3u);
+    const auto rows = _crud.get<ItemRow>(_db.db, orm::Query{}.limit(3));
+    EXPECT_EQ(rows.size(), 3U);
 }
 
 TEST_F(CrudTest, LimitOneReturnsExactlyOneRow)
@@ -534,11 +546,8 @@ TEST_F(CrudTest, LimitOneReturnsExactlyOneRow)
     insertItem(_crud, _db.db, makeItem("first"));
     insertItem(_crud, _db.db, makeItem("second"));
 
-    const auto rows = _crud.get<ItemRow>(
-        _db.db,
-        orm::Query{}.limit(1)
-    );
-    EXPECT_EQ(rows.size(), 1u);
+    const auto rows = _crud.get<ItemRow>(_db.db, orm::Query{}.limit(1));
+    EXPECT_EQ(rows.size(), 1U);
 }
 
 TEST_F(CrudTest, WhereAndOrderByCombined)
@@ -550,10 +559,10 @@ TEST_F(CrudTest, WhereAndOrderByCombined)
     const auto rows = _crud.get<ItemRow>(
         _db.db,
         orm::Query{}
-            .where(ItemRow::activeField{true}, filter::Operator::Equal)
+            .where<ItemRow::activeField>(true, filter::Operator::Equal)
             .orderBy<ItemRow::labelField>(true)
     );
-    ASSERT_EQ(rows.size(), 2u);
+    ASSERT_EQ(rows.size(), 2U);
     EXPECT_EQ(std::string(rows[0].label.value()), "a_active");
     EXPECT_EQ(std::string(rows[1].label.value()), "z_active");
 }
@@ -564,28 +573,32 @@ TEST_F(CrudTest, WhereAndOrderByCombined)
 
 TEST_F(CrudTest, UpdateModifiesExistingRow)
 {
-    (void) _crud.insert(_db.db, makeItem("before"));
+    const auto _result = _crud.insert(_db.db, makeItem("before"));
 
     auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
+
+    constexpr auto score = 99.9;
 
     auto row  = rows.front();
     row.label = "after";
-    row.score = 99.9;
+    row.score = score;
 
     const auto result = _crud.update(_db.db, row);
     ASSERT_TRUE(result.has_value()) << result.error().getMessage();
 
     const auto updated = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(updated.size(), 1u);
+    ASSERT_EQ(updated.size(), 1U);
     EXPECT_EQ(std::string(updated.front().label.value()), "after");
-    EXPECT_DOUBLE_EQ(updated.front().score.value(), 99.9);
+    EXPECT_DOUBLE_EQ(updated.front().score.value(), score);
 }
 
 TEST_F(CrudTest, UpdateNonExistentRowReturnsNoRowsUpdated)
 {
+    constexpr auto id = 999999;
+
     ItemRow row;
-    row.id     = ItemId::from(999999);
+    row.id     = ItemId::from(id);
     row.label  = "ghost";
     row.score  = 0.0;
     row.active = true;
@@ -597,19 +610,20 @@ TEST_F(CrudTest, UpdateNonExistentRowReturnsNoRowsUpdated)
 
 TEST_F(CrudTest, UpdateChangesArePersistedCorrectly)
 {
-    (void) _crud.insert(_db.db, makeItem("persist_me", 1.0, true));
+    const auto insertResult =
+        _crud.insert(_db.db, makeItem("persist_me", 1.0, true));
 
     auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
 
     auto row   = rows.front();
     row.active = false;
     row.note   = std::string{"updated note"};
 
-    (void) _crud.update(_db.db, row);
+    const auto updateResult = _crud.update(_db.db, row);
 
     const auto reloaded = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(reloaded.size(), 1u);
+    ASSERT_EQ(reloaded.size(), 1U);
     EXPECT_FALSE(reloaded.front().active.value());
     ASSERT_TRUE(reloaded.front().note.value().has_value());
     EXPECT_EQ(reloaded.front().note.value().value(), "updated note");
@@ -621,10 +635,10 @@ TEST_F(CrudTest, UpdateChangesArePersistedCorrectly)
 
 TEST_F(CrudTest, DeleteByPkRemovesRow)
 {
-    (void) _crud.insert(_db.db, makeItem("to_delete"));
+    const auto result = _crud.insert(_db.db, makeItem("to_delete"));
 
     auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
 
     _crud.deleteByPk(_db.db, rows.front());
 
@@ -634,19 +648,19 @@ TEST_F(CrudTest, DeleteByPkRemovesRow)
 
 TEST_F(CrudTest, DeleteByPkLeavesOtherRowsIntact)
 {
-    (void) _crud.insert(_db.db, makeItem("keep_a"));
-    (void) _crud.insert(_db.db, makeItem("remove_b"));
-    (void) _crud.insert(_db.db, makeItem("keep_c"));
+    auto result = _crud.insert(_db.db, makeItem("keep_a"));
+    result      = _crud.insert(_db.db, makeItem("remove_b"));
+    result      = _crud.insert(_db.db, makeItem("keep_c"));
 
     auto rows = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(rows.size(), 3u);
+    ASSERT_EQ(rows.size(), 3U);
 
     ItemRow toRemove;
-    for (const auto& r : rows)
+    for (const auto& row : rows)
     {
-        if (std::string(r.label.value()) == "remove_b")
+        if (std::string(row.label.value()) == "remove_b")
         {
-            toRemove = r;
+            toRemove = row;
             break;
         }
     }
@@ -654,9 +668,9 @@ TEST_F(CrudTest, DeleteByPkLeavesOtherRowsIntact)
     _crud.deleteByPk(_db.db, toRemove);
 
     const auto after = _crud.get<ItemRow>(_db.db);
-    ASSERT_EQ(after.size(), 2u);
-    for (const auto& r : after)
-        EXPECT_NE(std::string(r.label.value()), "remove_b");
+    ASSERT_EQ(after.size(), 2U);
+    for (const auto& row : after)
+        EXPECT_NE(std::string(row.label.value()), "remove_b");
 }
 
 // ===========================================================================
@@ -665,25 +679,25 @@ TEST_F(CrudTest, DeleteByPkLeavesOtherRowsIntact)
 
 TEST_F(CrudTest, BatchInsertInsertsAllRows)
 {
-    const ItemRow a = makeItem("batch_a");
-    const ItemRow b = makeItem("batch_b");
-    const ItemRow c = makeItem("batch_c");
+    const ItemRow batch_a = makeItem("batch_a");
+    const ItemRow batch_b = makeItem("batch_b");
+    const ItemRow batch_c = makeItem("batch_c");
 
-    const auto result = _crud.batchInsert(_db.db, a, b, c);
+    const auto result = _crud.batchInsert(_db.db, batch_a, batch_b, batch_c);
     ASSERT_TRUE(result.has_value());
 
     const auto rows = _crud.get<ItemRow>(_db.db);
-    EXPECT_EQ(rows.size(), 3u);
+    EXPECT_EQ(rows.size(), 3U);
 }
 
 TEST_F(CrudTest, BatchInsertReturnsIdForEachRow)
 {
-    const ItemRow a = makeItem("bid_a");
-    const ItemRow b = makeItem("bid_b");
+    const ItemRow bid_a = makeItem("bid_a");
+    const ItemRow bid_b = makeItem("bid_b");
 
-    const auto result = _crud.batchInsert(_db.db, a, b);
+    const auto result = _crud.batchInsert(_db.db, bid_a, bid_b);
     ASSERT_TRUE(result.has_value());
-    ASSERT_EQ(result->size(), 2u);
+    ASSERT_EQ(result->size(), 2U);
 
     EXPECT_GT((*result)[0], 0);
     EXPECT_GT((*result)[1], 0);
@@ -694,13 +708,12 @@ TEST_F(CrudTest, BatchInsertReturnsIdForEachRow)
 // Unique constraint tests
 // ===========================================================================
 
-TEST_F(CrudTest, InsertDuplicateLabelThrowsSqliteError)
+TEST_F(CrudTest, InsertDuplicateLabelError)
 {
-    (void) _crud.insert(_db.db, makeItem("unique_val"));
-    EXPECT_THROW(
-        (void) _crud.insert(_db.db, makeItem("unique_val")),
-        db::SqliteError
-    );
+    auto result = _crud.insert(_db.db, makeItem("unique_val"));
+    result      = _crud.insert(_db.db, makeItem("unique_val"));
+
+    ASSERT_FALSE(result.has_value());
 }
 
 // ===========================================================================
@@ -710,38 +723,40 @@ TEST_F(CrudTest, InsertDuplicateLabelThrowsSqliteError)
 TEST_F(FkCrudTest, InsertChildWithValidFkSucceeds)
 {
     CategoryRow cat;
-    cat.name = "tech";
+    cat.name         = "tech";
     const auto catId = _crud.insert(_db.db, cat).value();
 
     TaggedItemRow item;
     item.categoryId = CategoryId::from(catId);
     item.tag        = "laptop";
 
-    EXPECT_NO_THROW((void) _crud.insert(_db.db, item));
+    EXPECT_NO_THROW(const auto result = _crud.insert(_db.db, item));
 }
 
 TEST_F(FkCrudTest, InsertChildWithInvalidFkThrows)
 {
-    TaggedItemRow item;
-    item.categoryId = CategoryId::from(999999);
+    constexpr auto id = 999999;
+    TaggedItemRow  item;
+    item.categoryId = CategoryId::from(id);
     item.tag        = "orphan";
 
-    EXPECT_THROW((void) _crud.insert(_db.db, item), db::SqliteError);
+    auto result = _crud.insert(_db.db, item);
+    EXPECT_FALSE(result.has_value());
 }
 
 TEST_F(FkCrudTest, DeleteParentWithCascadeAlsoDeletesChild)
 {
     CategoryRow cat;
-    cat.name = "deletable";
+    cat.name         = "deletable";
     const auto catId = _crud.insert(_db.db, cat).value();
 
     TaggedItemRow item;
-    item.categoryId = CategoryId::from(catId);
-    item.tag        = "child";
-    (void) _crud.insert(_db.db, item);
+    item.categoryId   = CategoryId::from(catId);
+    item.tag          = "child";
+    const auto result = _crud.insert(_db.db, item);
 
     auto cats = _crud.get<CategoryRow>(_db.db);
-    ASSERT_EQ(cats.size(), 1u);
+    ASSERT_EQ(cats.size(), 1U);
     _crud.deleteByPk(_db.db, cats.front());
 
     const auto children = _crud.get<TaggedItemRow>(_db.db);
@@ -751,16 +766,16 @@ TEST_F(FkCrudTest, DeleteParentWithCascadeAlsoDeletesChild)
 TEST_F(RestrictFkCrudTest, DeleteParentWithRestrictFkThrows)
 {
     CategoryRow cat;
-    cat.name = "protected";
+    cat.name         = "protected";
     const auto catId = _crud.insert(_db.db, cat).value();
 
     RestrictedItemRow item;
-    item.categoryId = CategoryId::from(catId);
-    item.tag        = "held";
-    (void) _crud.insert(_db.db, item);
+    item.categoryId   = CategoryId::from(catId);
+    item.tag          = "held";
+    const auto result = _crud.insert(_db.db, item);
 
     auto cats = _crud.get<CategoryRow>(_db.db);
-    ASSERT_EQ(cats.size(), 1u);
+    ASSERT_EQ(cats.size(), 1U);
 
     EXPECT_THROW(_crud.deleteByPk(_db.db, cats.front()), db::SqliteError);
 }
@@ -783,8 +798,8 @@ TEST_F(CrudTest, AddDuplicateColumnReturnsError)
     using NewField = ItemRow::Field<"priority", int, orm::not_null_t>;
     const NewField defaultField{0};
 
-    (void) _crud.addColumn(_db.db, defaultField);
-    const auto result = _crud.addColumn(_db.db, defaultField);
+    auto result = _crud.addColumn(_db.db, defaultField);
+    result      = _crud.addColumn(_db.db, defaultField);
 
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(
@@ -797,10 +812,7 @@ TEST_F(CrudTest, DropNonExistentColumnReturnsError)
 {
     const auto result = _crud.dropColumn<ItemRow>(_db.db, "nonexistent_col");
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(
-        result.error().getType(),
-        orm::CrudErrorType::ColumnDoesNotExist
-    );
+    EXPECT_EQ(result.error().getType(), orm::CrudErrorType::ColumnDoesNotExist);
 }
 
 TEST_F(CrudTest, AddThenDropColumnSucceeds)
@@ -822,24 +834,21 @@ TEST_F(CrudTest, AddThenDropColumnSucceeds)
 TEST_F(FkCrudTest, GetJoinedReturnsTuplesForMatchingRows)
 {
     CategoryRow cat;
-    cat.name = "vehicles";
+    cat.name         = "vehicles";
     const auto catId = _crud.insert(_db.db, cat).value();
 
     TaggedItemRow item1;
     item1.categoryId = CategoryId::from(catId);
     item1.tag        = "car";
-    (void) _crud.insert(_db.db, item1);
+    auto result      = _crud.insert(_db.db, item1);
 
     TaggedItemRow item2;
     item2.categoryId = CategoryId::from(catId);
     item2.tag        = "bike";
-    (void) _crud.insert(_db.db, item2);
+    result           = _crud.insert(_db.db, item2);
 
-    orm::Joins joins;
-    (void) joins.add(
-        orm::innerJoin<
-            TaggedItemRow::categoryIdField,
-            CategoryRow::idField>()
+    auto joins = orm::Joins{}.add(
+        orm::innerJoin<TaggedItemRow::categoryIdField, CategoryRow::idField>()
     );
 
     const auto rows = _crud.getJoined<TaggedItemRow, CategoryRow>(
@@ -847,25 +856,22 @@ TEST_F(FkCrudTest, GetJoinedReturnsTuplesForMatchingRows)
         joins,
         orm::Query{}
     );
-    EXPECT_EQ(rows.size(), 2u);
+    EXPECT_EQ(rows.size(), 2U);
 }
 
 TEST_F(FkCrudTest, GetJoinedCategoryNameIsCorrect)
 {
     CategoryRow cat;
-    cat.name = "fruits";
+    cat.name         = "fruits";
     const auto catId = _crud.insert(_db.db, cat).value();
 
     TaggedItemRow item;
-    item.categoryId = CategoryId::from(catId);
-    item.tag        = "apple";
-    (void) _crud.insert(_db.db, item);
+    item.categoryId   = CategoryId::from(catId);
+    item.tag          = "apple";
+    const auto result = _crud.insert(_db.db, item);
 
-    orm::Joins joins;
-    (void) joins.add(
-        orm::innerJoin<
-            TaggedItemRow::categoryIdField,
-            CategoryRow::idField>()
+    auto joins = orm::Joins{}.add(
+        orm::innerJoin<TaggedItemRow::categoryIdField, CategoryRow::idField>()
     );
 
     const auto rows = _crud.getJoined<TaggedItemRow, CategoryRow>(
@@ -873,7 +879,7 @@ TEST_F(FkCrudTest, GetJoinedCategoryNameIsCorrect)
         joins,
         orm::Query{}
     );
-    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows.size(), 1U);
 
     const auto& [taggedItem, category] = rows.front();
     EXPECT_EQ(std::string(taggedItem.tag.value()), "apple");
@@ -896,19 +902,19 @@ TEST(ExecutedSql, TracksSqlForAllOperations)
     orm::Crud crud;
 
     crud.createTable<ItemRow>(tdb.db);
-    EXPECT_EQ(crud.getExecutedSQL().size(), 1u);
+    EXPECT_EQ(crud.getExecutedSQL().size(), 1U);
 
-    (void) crud.insert(tdb.db, makeItem("track_me"));
-    EXPECT_EQ(crud.getExecutedSQL().size(), 2u);
+    const auto insertResult = crud.insert(tdb.db, makeItem("track_me"));
+    EXPECT_EQ(crud.getExecutedSQL().size(), 2U);
 
     const auto rows = crud.get<ItemRow>(tdb.db);
-    EXPECT_EQ(crud.getExecutedSQL().size(), 3u);
+    EXPECT_EQ(crud.getExecutedSQL().size(), 3U);
 
-    auto row  = rows.front();
-    row.label = "track_updated";
-    (void) crud.update(tdb.db, row);
-    EXPECT_EQ(crud.getExecutedSQL().size(), 4u);
+    auto row                = rows.front();
+    row.label               = "track_updated";
+    const auto updateResult = crud.update(tdb.db, row);
+    EXPECT_EQ(crud.getExecutedSQL().size(), 4U);
 
     crud.deleteByPk(tdb.db, row);
-    EXPECT_EQ(crud.getExecutedSQL().size(), 5u);
+    EXPECT_EQ(crud.getExecutedSQL().size(), 5U);
 }
