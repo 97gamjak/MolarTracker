@@ -4,11 +4,13 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
+
 ### Bug Fix
 
 Fix: Adding new stocks and saving does not yield two entries in securities overview page anymore
 
-<!-- insertion marker -->
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ### Bug Fix
@@ -126,6 +128,7 @@ Fix: Adding new stocks and saving does not yield two entries in securities overv
 #### Logging
 
 - Fix formatting issue in log file
+
 
 
 
