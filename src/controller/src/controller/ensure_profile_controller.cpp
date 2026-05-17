@@ -8,12 +8,15 @@
 #include <format>
 
 #include "app/app_context.hpp"
+#include "app/store/profile/profile_store.hpp"
+#include "app/store_container.hpp"
 #include "commands/profile/add_profile_command.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
 #include "commands/profile/set_active_profile_command.hpp"
 #include "commands/profile/set_default_profile_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "logging/log_macros.hpp"
+#include "settings/settings.hpp"
 #include "ui/exceptions/exception_dialog.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
@@ -41,10 +44,20 @@ namespace controller
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
           _appContext(appContext),
-          _undoStack(undoStack)
+          _undoStack(undoStack),
+          _ensureProfileExistsCommand(
+              std::make_unique<cmd::Commands>("Ensure Profile Exists Command")
+          )
     {
-        _ensureProfileExistsCommand.disableUndoRedo();
+        _ensureProfileExistsCommand->disableUndoRedo();
     }
+
+    /**
+     * @brief Destroy the Ensure Profile Controller:: Ensure Profile Controller
+     * object
+     *
+     */
+    EnsureProfileController::~EnsureProfileController() = default;
 
     /**
      * @brief Ensure that a profile exists. If a default profile is configured,
@@ -71,12 +84,12 @@ namespace controller
 
                 if (_activateProfile(name.value()))
                 {
-                    _undoStack.push(std::move(_ensureProfileExistsCommand));
+                    _undoStack.push(std::move(*_ensureProfileExistsCommand));
                     return;
                 }
             }
 
-            _ensureProfileExistsCommand.clearSubCommands();
+            _ensureProfileExistsCommand->clearSubCommands();
 
             if (defaultProfile.has_value())
                 _defaultProfileExists(defaultProfile.value());
@@ -139,7 +152,7 @@ namespace controller
                 _fatalError(errorMessage);
             }
 
-            _ensureProfileExistsCommand << std::move(cmdResult);
+            *_ensureProfileExistsCommand << std::move(cmdResult);
 
             auto* statusBar = _mainWindow.statusBar();
 
@@ -288,11 +301,11 @@ namespace controller
      * is Ok).
      */
     void EnsureProfileController::_onProfileSelectionRequested(
-        const ui::ProfileSelectionDialog::Action& action,
-        const std::string&                        profileName
+        const ui::ProfileSelectionDialogAction& action,
+        const std::string&                      profileName
     )
     {
-        if (action == ui::ProfileSelectionDialog::Action::Ok)
+        if (action == ui::ProfileSelectionDialogAction::Ok)
         {
             auto setDefaultCommand =
                 cmd::Commands::makeAndDo<cmd::SetDefaultProfileCommand>(
@@ -307,7 +320,7 @@ namespace controller
                 "that needs to be addressed."
             );
 
-            _ensureProfileExistsCommand << std::move(setDefaultCommand);
+            *_ensureProfileExistsCommand << std::move(setDefaultCommand);
 
             const auto msg =
                 "Profile '" + profileName + "' selected successfully.";
@@ -349,11 +362,11 @@ namespace controller
      * profile is set.
      */
     void EnsureProfileController::_onAddProfileRequested(
-        const ui::AddProfileDialog::Action& action,
-        const drafts::ProfileDraft&         profileDraft
+        const ui::AddProfileDialogAction& action,
+        const drafts::ProfileDraft&       profileDraft
     )
     {
-        if (action == ui::AddProfileDialog::Action::Ok)
+        if (action == ui::AddProfileDialogAction::Ok)
         {
             // We only need to invoke AddProfileCommand here to add the profile;
             // default/active status is managed by separate commands below.
@@ -399,8 +412,8 @@ namespace controller
                 "that needs to be addressed."
             );
 
-            _ensureProfileExistsCommand << std::move(result)
-                                        << std::move(setDefaultCommand);
+            *_ensureProfileExistsCommand << std::move(result)
+                                         << std::move(setDefaultCommand);
 
             ui::showInfoStatusBar(
                 LOG_INFO_OBJECT(

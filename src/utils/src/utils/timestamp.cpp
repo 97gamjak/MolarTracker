@@ -7,37 +7,55 @@
 #include <chrono>
 #include <format>
 
+using Clock     = std::chrono::system_clock;
+using TimePoint = Clock::time_point;
 using std::chrono::current_zone;
 using std::chrono::duration_cast;
 using std::chrono::floor;
 using std::chrono::milliseconds;
+using std::chrono::nanoseconds;
 using std::chrono::seconds;
 using std::chrono::zoned_time;
+
+namespace
+{
+    /**
+     * @brief Converts an int64 time point to a TimePoint object.
+     *
+     * @param timePoint
+     * @return TimePoint
+     */
+    TimePoint toTimePoint(int64_t timePoint)
+    {
+        return TimePoint{milliseconds{timePoint}};
+    }
+}   // namespace
 
 /**
  * @brief Constructs a Timestamp object representing the current time.
  */
-Timestamp::Timestamp() : _timePoint(Clock::now()) {}
-
-/**
- * @brief Constructs a Timestamp object from a specific time point.
- *
- * @param timePoint The time point to use for the Timestamp.
- */
-Timestamp::Timestamp(const TimePoint& timePoint) : _timePoint(timePoint) {}
+Timestamp::Timestamp()
+    : _timePoint(
+          duration_cast<milliseconds>(Clock::now().time_since_epoch()).count()
+      )
+{
+}
 
 /**
  * @brief Returns the current time point from the system clock
  *
- * @return TimePoint
+ * @return int64_t
  */
-LocalTimePoint Timestamp::_toLocalTime() const
+int64_t Timestamp::_toLocalTime() const
 {
     const auto* timeZone = current_zone();
 
-    zoned_time local_time{timeZone, _timePoint};
+    zoned_time local_time{timeZone, toTimePoint(_timePoint)};
 
-    return local_time.get_local_time();
+    return duration_cast<milliseconds>(
+               local_time.get_local_time().time_since_epoch()
+    )
+        .count();
 }
 
 /**
@@ -49,7 +67,7 @@ LocalTimePoint Timestamp::_toLocalTime() const
  */
 std::string Timestamp::iso8601() const
 {
-    return std::format("{:%FT%T}", floor<seconds>(_toLocalTime()));
+    return std::format("{:%FT%T}", floor<seconds>(toTimePoint(_toLocalTime())));
 }
 
 /**
@@ -62,7 +80,10 @@ std::string Timestamp::iso8601() const
  */
 std::string Timestamp::iso8601TimeMs() const
 {
-    return std::format("{:%T}", floor<milliseconds>(_toLocalTime()));
+    return std::format(
+        "{:%T}",
+        floor<milliseconds>(toTimePoint(_toLocalTime()))
+    );
 }
 
 /**
@@ -74,7 +95,10 @@ std::string Timestamp::iso8601TimeMs() const
  */
 std::string Timestamp::humanReadable() const
 {
-    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(_toLocalTime()));
+    return std::format(
+        "{:%Y-%m-%d %H:%M:%S}",
+        floor<seconds>(toTimePoint(_toLocalTime()))
+    );
 }
 
 /**
@@ -86,7 +110,10 @@ std::string Timestamp::humanReadable() const
  */
 std::string Timestamp::fileSafe() const
 {
-    return std::format("{:%Y%m%d_%H%M%S}", floor<seconds>(_toLocalTime()));
+    return std::format(
+        "{:%Y%m%d_%H%M%S}",
+        floor<seconds>(toTimePoint(_toLocalTime()))
+    );
 }
 
 /**
@@ -94,10 +121,14 @@ std::string Timestamp::fileSafe() const
  *
  * @return int64_t
  */
-[[nodiscard]] int64_t Timestamp::toInt64() const
-{
-    return duration_cast<milliseconds>(_timePoint.time_since_epoch()).count();
-}
+int64_t Timestamp::toInt64() const { return _timePoint; }
+
+/**
+ * @brief Construct a new Timestamp:: Timestamp object
+ *
+ * @param timePoint
+ */
+Timestamp::Timestamp(int64_t timePoint) : _timePoint(timePoint) {}
 
 /**
  * @brief Constructs a Timestamp object from an int64 representation.
@@ -105,10 +136,7 @@ std::string Timestamp::fileSafe() const
  * @param value The int64 representation of the Timestamp.
  * @return Timestamp
  */
-[[nodiscard]] Timestamp Timestamp::fromInt64(int64_t value)
-{
-    return Timestamp{Clock::time_point{milliseconds{value}}};
-}
+Timestamp Timestamp::fromInt64(int64_t value) { return Timestamp(value); }
 
 #ifdef __QT_ENABLED__
 /**
@@ -117,7 +145,7 @@ std::string Timestamp::fileSafe() const
  * @param dateTime The QDateTime object to use for the Timestamp.
  */
 Timestamp::Timestamp(const QDateTime& dateTime)
-    : _timePoint(Clock::time_point{milliseconds{dateTime.toMSecsSinceEpoch()}})
+    : _timePoint(dateTime.toMSecsSinceEpoch())
 {
 }
 
@@ -126,7 +154,7 @@ Timestamp::Timestamp(const QDateTime& dateTime)
  *
  * @return QDateTime
  */
-[[nodiscard]] QDateTime Timestamp::toQDateTime() const
+QDateTime Timestamp::toQDateTime() const
 {
     // TODO(97gamjak): implement this with timezone support
     // https://97gamjak.atlassian.net/browse/MOLTRACK-95

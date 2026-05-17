@@ -1,5 +1,9 @@
 #include "transaction_service.hpp"
 
+#include "app/repos_api/i_transaction_repo.hpp"
+#include "finance/transaction.hpp"
+#include "finance/transaction_filter.hpp"
+
 namespace app
 {
     /**
@@ -30,12 +34,18 @@ namespace app
     /**
      * @brief Retrieves all transactions from the repository.
      *
+     * @param filter The filter to apply to the transactions, this will be
+     * converted to a WhereExpr and applied to the query when fetching
+     * transactions from the database, if no filter is provided all
+     * transactions will be returned
+     *
      * @return std::vector<finance::Transaction> A vector of all transactions.
      */
     std::vector<finance::Transaction> TransactionService::getTransactions(
-    ) const
+        const finance::TransactionFilter& filter
+    )
     {
-        return _transactionRepo->getTransactions();
+        return _transactionRepo->getTransactions(filter);
     }
 
 }   // namespace app

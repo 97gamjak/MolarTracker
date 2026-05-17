@@ -1,7 +1,7 @@
 #include "app/repo_container.hpp"
 
 #include "app/repos/instrument_repo.hpp"
-#include "db/database.hpp"
+#include "app/repos/position_repo.hpp"
 #include "repos/account_repo.hpp"
 #include "repos/profile_repo.hpp"
 #include "repos/transaction_repo.hpp"
@@ -18,7 +18,8 @@ namespace app
         : _profileRepo{std::make_shared<ProfileRepo>(db)},
           _accountRepo{std::make_shared<AccountRepo>(db)},
           _transactionRepo{std::make_shared<TransactionRepo>(db)},
-          _instrumentRepo{std::make_shared<InstrumentRepo>(db)}
+          _instrumentRepo{std::make_shared<InstrumentRepo>(db)},
+          _positionRepo{std::make_shared<PositionRepo>(db)}
     {
     }
 
@@ -102,6 +103,26 @@ namespace app
     ) const
     {
         return _instrumentRepo;
+    }
+
+    /**
+     * @brief Get the Position Repo
+     *
+     * @return std::shared_ptr<IPositionRepo>
+     */
+    std::shared_ptr<IPositionRepo> RepoContainer::getPositionRepo()
+    {
+        return _positionRepo;
+    }
+
+    /**
+     * @brief Get the Position Repo (const version)
+     *
+     * @return std::shared_ptr<const IPositionRepo>
+     */
+    std::shared_ptr<const IPositionRepo> RepoContainer::getPositionRepo() const
+    {
+        return _positionRepo;
     }
 
 }   // namespace app

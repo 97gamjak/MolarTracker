@@ -1,14 +1,13 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TICKER_INFO_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TICKER_INFO_HPP__
 
-#include <cstdint>
 #include <expected>
 #include <mstd/enum.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "config/error.hpp"
 #include "config/finance.hpp"
+#include "finance/finance_error.hpp"
 
 namespace finance
 {
@@ -18,15 +17,6 @@ namespace finance
 
     [[nodiscard]]
     std::string toString(AssetClass assetClass);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define FINANCE_ERROR_LIST(X) \
-    X(CurrencyUnknown)        \
-    X(Unknown)
-
-    MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_LIST);
-
-    using FinanceError = Error<FinanceErrorType>;
 
     /**
      * @brief Structure representing information about a stock ticker.

@@ -1,13 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 #define __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 
-#include <chrono>
 #include <string>
-
-using Clock          = std::chrono::system_clock;
-using Duration       = Clock::duration;
-using TimePoint      = Clock::time_point;
-using LocalTimePoint = std::chrono::local_time<Duration>;
 
 // TODO(97gamjak): migrate to mstd later on
 // https://97gamjak.atlassian.net/browse/MSTD-89
@@ -25,14 +19,13 @@ class Timestamp
 {
    private:
     /// The underlying time point representing the timestamp.
-    TimePoint _timePoint;
+    int64_t _timePoint;
 
     /// Indicates whether the return timestamp should be converted to local time
     bool _localTime = true;
 
    public:
     Timestamp();
-    explicit Timestamp(const TimePoint& timePoint);
     explicit Timestamp(const QDateTime& dateTime);
 
     // ISO-8601 2026-01-20T11:34:05
@@ -54,7 +47,9 @@ class Timestamp
     [[nodiscard]] QDateTime toQDateTime() const;
 
    private:
-    [[nodiscard]] LocalTimePoint _toLocalTime() const;
+    explicit Timestamp(int64_t timePoint);
+
+    [[nodiscard]] int64_t _toLocalTime() const;
 };
 
 #endif   // __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__

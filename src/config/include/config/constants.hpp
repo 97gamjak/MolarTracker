@@ -102,6 +102,7 @@ class Constants
     [[nodiscard]] static std::string getDesktopAppName();
     [[nodiscard]] static std::string getGithubRepoUrl();
     [[nodiscard]] static std::string getGithubIssuesUrl();
+    [[nodiscard]] static std::string getCreateIssueError();
 
     [[nodiscard]] static std::string   getVersion();
     [[nodiscard]] static std::string   getGitTag();

@@ -2,12 +2,14 @@
 #define __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 
 #include "config/id_types.hpp"
+#include "orm/where_expr.hpp"
 
 namespace finance
 {
-    class Transaction;        // forward declaration
-    class TransactionEntry;   // forward declaration
-    class TradeLeg;           // forward declaration
+    class Transaction;         // forward declaration
+    class TransactionEntry;    // forward declaration
+    class TradeLeg;            // forward declaration
+    class TransactionFilter;   // forward declaration
 }   // namespace finance
 
 struct TransactionRow;        // forward declaration
@@ -50,6 +52,11 @@ namespace app
 
         [[nodiscard]]
         static finance::TradeLeg fromLegRow(const TradeLegRow& row);
+
+        [[nodiscard]]
+        static orm::WhereExpr toWhereExpr(
+            const finance::TransactionFilter& filter
+        );
     };
 
 }   // namespace app

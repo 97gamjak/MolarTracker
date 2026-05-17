@@ -22,6 +22,9 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     [[nodiscard]]
     static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 
+    [[nodiscard]]
+    static orm::WhereExpr hasPosition(PositionId positionId);
+
     /// The ID of the trade leg, this is the primary key for the trade_leg table
     ORM_FIELD(id, IdField<TradeLegId>)
 
@@ -102,7 +105,8 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
         instrumentId,
         quantity,
         unitPrice,
-        currency
+        currency,
+        positionId
     )
 };
 

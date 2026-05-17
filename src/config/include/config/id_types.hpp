@@ -24,6 +24,9 @@ using StockId = StrongId<StockTag>;
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
 
+template <typename T>
+using accountMap = unorderedIdMap<AccountId, T>;
+
 struct TransactionTag {};
 using TransactionId = StrongId<TransactionTag>;
 
@@ -35,6 +38,10 @@ using TradeLegId = StrongId<TradeLegTag>;
 
 struct PositionTag {};
 using PositionId = StrongId<PositionTag>;
+
+template <typename T>
+using positionMap = unorderedIdMap<PositionId, T>;
+
 // clang-format on
 
 template <typename T>

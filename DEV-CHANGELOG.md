@@ -4,14 +4,81 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
-<!-- insertion marker -->
+### Bug Fix
 
-### Testing
+#### ORM
 
+- Fix `orm::Crud::insert` to catch `db::SqliteError` from
+  `executeToCompletion()` and return `std::unexpected(CrudError{...})`
+  instead of propagating the exception, honouring the method's own
+  `std::expected` return-type contract
+- Fix `orm::Crud::update` binding the WHERE-clause parameters at index 0
+  instead of after the SET-clause parameters, causing the primary-key
+  predicate to always evaluate to NULL and update zero rows
+- Fix `orm::Crud::update` propagating `db::SqliteError` (e.g. from a UNIQUE
+  constraint violation) instead of returning
+  `std::unexpected(CrudError{UpdateFailed, …})` as its return-type contract
+  requires; add `CrudErrorType::UpdateFailed` to support this
+- Fix `orm::Crud::deleteByPk` emitting `DELETE FROM <t> WHERE WHERE …`
+  (double `WHERE`) by removing the manually appended `" WHERE "` that
+  duplicated the keyword already produced by `getDBOperations()`
+- Fix `orm::Crud::deleteByPk`: SQL contained duplicate `WHERE` keyword because `getDBOperations()` already prepends `WHERE` to the clause
+- Fix `orm::Crud::update`: WHERE-clause parameters were bound at index 1 (overwriting the first SET parameter) instead of after all SET parameters
+- Fix `orm::Query::getDBOperations`: `LIMIT` was silently ignored when no `ORDER BY` field was set due to an early return in the method
+- Fix `orm::Crud::createTable()` (no-arg overload): `fixed_string` tableName was passed where `std::string_view` was expected without an explicit conversion
+- Fix `orm::Query::orderBy()`: `fixed_string` field name was passed to `std::vector<pair<string,bool>>::push_back` without an explicit conversion
+
+#### Finance
+
+- Fix handling error if creating cash transaction fails
+- Fix silent continuing for stock transaction creation if position exists but has not suitable instrument
+- Improve error handling when creating a new position during stock transaction creation
+
+### UI
+
+- Fix: make `positionAt` in `PositionSelectionTableModel` more robust by returning `std::optional` with boundary checks
+
+### Tests
+
+- Add `tests/app/test_account_repo.cpp` with GoogleTest fixture covering
+  `AccountRepo::createAccount` (returns valid ID, persists data, enforces
+  unique constraint, allows differing kind/profile) and
+  `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
+  correct domain data mapping)
+- Add `tests/app/test_profile_repo.cpp` with GoogleTest fixture covering
+  `ProfileRepo::create` (valid ID, duplicate name throws, with/without email),
+  `ProfileRepo::get` by ID and name (hit and miss), `ProfileRepo::getAll`
+  (empty, full set, correct data), `ProfileRepo::update` (name/email change,
+  clear email, non-existent ID throws, duplicate name throws), and
+  `ProfileRepo::remove` (deletes target, preserves others)
 - Add `tests/app/test_transaction_repo.cpp` with 15 GoogleTest cases for
   `app::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
   and Trade transactions, entry/leg persistence, comment round-trips, ID
   sequencing, and empty-database behaviour
+- Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`,     `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
+
+### Features
+
+#### Finance
+
+- Add position store, service and repo
+- Add position creation when creating transactions
+
+#### UI
+
+- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+
+#### ORM
+
+- Introduce `.in` for queries to make it easier to create where clauses for ranges
+
+### Cleanup
+
+- Speedup some compilation headers
+
+<!-- insertion marker -->
+## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
+
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
 
 ## [0.2.1](https://github.com/repo/owner/releases/tag/0.2.1) - 2026-05-07
@@ -240,6 +307,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 

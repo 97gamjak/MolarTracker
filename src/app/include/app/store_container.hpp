@@ -1,17 +1,24 @@
 #ifndef __APP__INCLUDE__APP__STORE_CONTAINER_HPP__
 #define __APP__INCLUDE__APP__STORE_CONTAINER_HPP__
 
-#include "app/store/account_store.hpp"
-#include "app/store/profile/profile_store.hpp"
-#include "app/store/stock_store.hpp"
-#include "app/store/transaction_store.hpp"
+#include <memory>
+#include <vector>
+
+#include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
-#include "connections/connection.hpp"
+
+class Connections;   // Forward declaration
 
 namespace app
 {
 
     class ServiceContainer;   // Forward declaration
+    class ProfileStore;       // Forward declaration
+    class AccountStore;       // Forward declaration
+    class StockStore;         // Forward declaration
+    class PositionStore;      // Forward declaration
+    class TransactionStore;   // Forward declaration
+    class IStore;             // Forward declaration
 
     /**
      * @brief Container for all stores
@@ -22,31 +29,31 @@ namespace app
        private:
         /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
-
         /// The Profile store
-        ProfileStore _profileStore;
-
+        std::unique_ptr<ProfileStore> _profileStore;
         /// The Account store
-        AccountStore _accountStore;
-
+        std::unique_ptr<AccountStore> _accountStore;
         /// The stock store
-        StockStore _stockStore;
-
+        std::unique_ptr<StockStore> _stockStore;
+        /// The Position store
+        std::unique_ptr<PositionStore> _positionStore;
         /// The Transaction store
-        TransactionStore _transactionStore;
+        std::unique_ptr<TransactionStore> _transactionStore;
 
         /// list of all stores
         std::vector<IStore*> _allStores;
 
         /// list of connections for all stores
-        Connections _connections;
+        std::unique_ptr<Connections> _connections;
 
        public:
         explicit StoreContainer(ServiceContainer& services);
 
-        void commit();
-        void clearPotentiallyDirty();
-        bool isDirty() const;
+        ~StoreContainer();
+
+        void               commit();
+        void               clearPotentiallyDirty();
+        [[nodiscard]] bool isDirty() const;
 
         Connections subscribeToDirty(
             const OnDirtyChanged::func& func,
@@ -64,6 +71,9 @@ namespace app
 
         [[nodiscard]] StockStore&       getStockStore();
         [[nodiscard]] const StockStore& getStockStore() const;
+
+        [[nodiscard]] PositionStore&       getPositionStore();
+        [[nodiscard]] const PositionStore& getPositionStore() const;
     };
 
 }   // namespace app

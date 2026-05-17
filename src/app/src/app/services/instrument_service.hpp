@@ -31,7 +31,10 @@ namespace app
 
         [[nodiscard]] std::vector<std::string> getTickers() override;
 
-        [[nodiscard]] std::vector<finance::Stock> getStocks() override;
+        [[nodiscard]]
+        std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids
+        ) override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(

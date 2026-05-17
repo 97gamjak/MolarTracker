@@ -1,13 +1,16 @@
 #include "app/store/transaction_store.hpp"
 
+#include <format>
 #include <unordered_map>
 
 #include "app/services_api/i_transaction_service.hpp"
 #include "app/store/account_store.hpp"
+#include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
+#include "finance/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
@@ -20,11 +23,13 @@ namespace app
      * @param transactionService
      * @param accountStore
      * @param stockStore
+     * @param positionStore
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<ITransactionService>& transactionService,
         AccountStore&                               accountStore,
-        StockStore&                                 stockStore
+        StockStore&                                 stockStore,
+        PositionStore&                              positionStore
     )
         : _transactionService(transactionService)
     {
@@ -37,6 +42,12 @@ namespace app
         _connections.add(stockStore.subscribeToInstrumentIdRemap(
             [this](const instrumentMap<InstrumentId>& remap)
             { _onInstrumentIdRemap(remap); },
+            this
+        ));
+
+        _connections.add(positionStore.subscribeToIdRemap(
+            [this](const PositionStore::IdMap& remap)
+            { _onPositionIdRemap(remap); },
             this
         ));
     }
@@ -55,12 +66,15 @@ namespace app
             {
                 case StoreState::New:
                 {
+                    LOG_DEBUG(
+                        std::format(
+                            "Adding new transaction to database: {}",
+                            entry.value.toString()
+                        )
+                    );
+
                     const auto id =
                         _transactionService->addTransaction(entry.value);
-
-                    LOG_DEBUG(
-                        std::format("Added transaction with ID: {}", id.value())
-                    );
 
                     auto persisted = entry.value;
                     persisted.setId(id);
@@ -131,17 +145,28 @@ namespace app
      * but they will not be saved to the database until the commit method is
      * called.
      *
+     * @param filter An optional filter to apply when retrieving transactions,
+     * this allows the caller to specify criteria for which transactions to
+     * include in the results, such as filtering by date range, transaction
+     * type, or any other relevant attributes of the transactions. If no filter
+     * is provided, all transactions in the store will be returned.
+     *
      * @return std::vector<finance::Transaction> A vector of transactions
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions() const
+    std::vector<finance::Transaction> TransactionStore::getTransactions(
+        const finance::TransactionFilter& filter
+    ) const
     {
-        const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
+        const auto options = Options{
+            .filter   = filter.getPredicate(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
 
         auto transactions = _getEntries(options);
 
-        auto dbTransactions = _transactionService->getTransactions();
+        auto dbTransactions = _transactionService->getTransactions(filter);
 
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
@@ -180,11 +205,70 @@ namespace app
     }
 
     /**
+     * @brief Find transactions by position ID, this retrieves all transactions
+     * that are associated with a specific position ID, allowing the caller to
+     * easily find and work with transactions that are related to a particular
+     * position. This is useful for analyzing the history of a position,
+     * generating reports, or performing any other operations that require
+     * access to the transactions associated with a specific position.
+     *
+     * @param positionId The ID of the position for which to find transactions,
+     * this specifies the position that the caller is interested in, and the
+     * returned transactions will be those that are associated with this
+     * position.
+     *
+     * @return std::vector<finance::Transaction> A vector of transactions that
+     * are associated with the specified position ID, this includes both new and
+     * existing transactions that are related to the given position.
+     */
+    std::vector<finance::Transaction> TransactionStore::
+        findTransactionsByPositionId(PositionId positionId) const
+    {
+        auto filter = finance::TransactionFilter();
+        filter.setPositionId(positionId);
+        const auto transactions = getTransactions(filter);
+
+        return transactions;
+    }
+
+    /**
+     * @brief Get a set of instrument IDs associated with a specific position ID
+     *
+     * @param positionId The ID of the position for which to find instrument IDs
+     * @return idSet<InstrumentId> A set of instrument IDs associated with the
+     * specified position ID
+     */
+    idSet<InstrumentId> TransactionStore::getInstrumentIdsByPositionId(
+        PositionId positionId
+    ) const
+    {
+        idSet<InstrumentId> instrumentIdSet;
+
+        const auto transactions = findTransactionsByPositionId(positionId);
+
+        for (const auto& transaction : transactions)
+        {
+            const auto instrumentIds = transaction.getInstrumentIds();
+
+            if (!instrumentIds.empty())
+            {
+                // This will default construct an
+                // empty set if the position ID is
+                // not already in the map
+                for (const auto& instrumentId : instrumentIds)
+                    instrumentIdSet.insert(instrumentId);
+            }
+        }
+
+        return instrumentIdSet;
+    }
+
+    /**
      * @brief Handle account ID remapping for transaction entries
      *
      * @param remap The mapping of old account IDs to new account IDs
      */
-    void TransactionStore::_onAccountIdRemap(const AccountStore::IdMap& remap)
+    void TransactionStore::_onAccountIdRemap(const accountMap<AccountId>& remap)
     {
         for (const auto& entry : _getEntries())
         {
@@ -236,37 +320,27 @@ namespace app
         const instrumentMap<InstrumentId>& remap
     )
     {
+        LOG_ENTRY;
+
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
             {
                 // check if this committed transaction references the remapped
                 // ID
-                switch (entry.value.getType())
+                const auto hasId = finance::hasId(
+                    entry.value.getData(),
+                    remap,
+                    &finance::TradeLeg::getInstrumentId
+                );
+
+                if (hasId)
                 {
-                    case TransactionDataType::Trade:
-                    {
-                        const auto data =
-                            std::get<finance::TradeData>(entry.value.getData());
-
-                        const auto references = std::ranges::any_of(
-                            data.getLegs(),
-                            [&remap](const auto& leg)
-                            { return remap.contains(leg.getInstrumentId()); }
-                        );
-
-                        if (references)
-                        {
-                            throw std::runtime_error(
-                                "Instrument ID found in already committed "
-                                "transaction "
-                                "entry!"
-                            );
-                        }
-                        break;
-                    }
-                    case TransactionDataType::Cash:
-                        break;
+                    throw std::runtime_error(
+                        "Instrument ID found in already committed "
+                        "transaction "
+                        "entry!"
+                    );
                 }
 
                 continue;
@@ -276,8 +350,8 @@ namespace app
             {
                 case TransactionDataType::Trade:
                 {
-                    auto transaction = entry.value;
-                    auto data =
+                    auto  transaction = entry.value;
+                    auto& data =
                         std::get<finance::TradeData>(transaction.getData());
 
                     bool modified = false;
@@ -287,7 +361,92 @@ namespace app
                         if (const auto it = remap.find(leg.getInstrumentId());
                             it != remap.end())
                         {
+                            LOG_DEBUG(
+                                std::format(
+                                    "Remapping instrument ID in transaction "
+                                    "leg "
+                                    "{}: "
+                                    "{} -> "
+                                    "{}",
+                                    leg.toString(),
+                                    leg.getInstrumentId().toString(),
+                                    it->second.toString()
+                                )
+                            );
                             leg.setInstrumentId(it->second);
+                            modified = true;
+                        }
+                    }
+
+                    if (modified)
+                        _updateEntry(transaction, StoreState::New);
+                    break;
+                }
+                case TransactionDataType::Cash:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * @brief Handle position ID remapping for transaction entries
+     *
+     * @param remap The mapping of old position IDs to new position IDs
+     */
+    void TransactionStore::_onPositionIdRemap(
+        const positionMap<PositionId>& remap
+    )
+    {
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the remapped
+                // ID
+                const auto hasId = finance::hasId(
+                    entry.value.getData(),
+                    remap,
+                    &finance::TradeLeg::getPositionId
+                );
+
+                if (hasId)
+                {
+                    throw std::runtime_error(
+                        "Position ID found in already committed "
+                        "transaction "
+                        "entry!"
+                    );
+                }
+                continue;
+            }
+
+            switch (entry.value.getType())
+            {
+                case TransactionDataType::Trade:
+                {
+                    auto  transaction = entry.value;
+                    auto& data =
+                        std::get<finance::TradeData>(transaction.getData());
+
+                    bool modified = false;
+
+                    for (auto& leg : data.getLegs())
+                    {
+                        if (const auto it = remap.find(leg.getPositionId());
+                            it != remap.end())
+                        {
+                            LOG_DEBUG(
+                                std::format(
+                                    "Remapping position ID in transaction leg "
+                                    "{}: "
+                                    "{} -> "
+                                    "{}",
+                                    leg.toString(),
+                                    leg.getPositionId().toString(),
+                                    it->second.toString()
+                                )
+                            );
+                            leg.setPositionId(it->second);
                             modified = true;
                         }
                     }

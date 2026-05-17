@@ -59,10 +59,9 @@ namespace utils
                 if (valueStr.empty())
                     return std::nullopt;
 
-                int value = 0;
                 try
                 {
-                    value = std::stoi(valueStr);
+                    const auto value = std::stoi(valueStr);
                     if (value < 0)
                         return std::nullopt;
 
@@ -86,10 +85,9 @@ namespace utils
 
         if (!valueStr.empty())
         {
-            int value = 0;
             try
             {
-                value = std::stoi(valueStr);
+                const auto value = std::stoi(valueStr);
                 if (value < 0)
                     return std::nullopt;
 
@@ -162,7 +160,7 @@ namespace utils
         if (lhs._isInvalid != rhs._isInvalid)
             return false;
 
-        if (lhs._isInvalid && rhs._isInvalid)
+        if (lhs._isInvalid)
             return true;
 
         return lhs._major == rhs._major && lhs._minor == rhs._minor &&

@@ -8,7 +8,7 @@
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 
 namespace app
 {
@@ -59,7 +59,11 @@ namespace app
         StockStoreResult addStock(finance::Stock stock);
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks() const;
+        std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids = {}
+        ) const;
+        [[nodiscard]]
+        std::optional<finance::Stock> getStock(InstrumentId id) const;
 
         [[nodiscard]]
         std::vector<std::string> getAllTickers() const;

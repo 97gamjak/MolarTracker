@@ -1,6 +1,11 @@
 #include "app/app_context.hpp"
 
+#include <memory>
+
 #include "app/migration/migration_runner.hpp"
+#include "app/repo_container.hpp"
+#include "app/service_container.hpp"
+#include "app/store_container.hpp"
 #include "config/constants.hpp"
 #include "db/database.hpp"
 
@@ -14,27 +19,35 @@ namespace app
      */
     AppContext::AppContext(settings::Settings& settings)
         : _settings{settings},
-          _database{Constants::getInstance().getDatabasePath()},
-          _migrationRunner{_database},
-          _repos{_database},
-          _services{_repos},
-          _store{_services}
+          _database{std::make_unique<db::Database>(
+              Constants::getInstance().getDatabasePath()
+          )},
+          _migrationRunner{std::make_unique<MigrationRunner>(*_database)},
+          _repos{std::make_unique<RepoContainer>(*_database)},
+          _services{std::make_unique<ServiceContainer>(*_repos)},
+          _store{std::make_unique<StoreContainer>(*_services)}
     {
     }
+
+    /**
+     * @brief Destroy the App Context:: App Context object
+     *
+     */
+    AppContext::~AppContext() = default;
 
     /**
      * @brief Get the store container
      *
      * @return StoreContainer&
      */
-    StoreContainer& AppContext::getStore() { return _store; }
+    StoreContainer& AppContext::getStore() { return *_store; }
 
     /**
      * @brief Get the store container (const version)
      *
      * @return const StoreContainer&
      */
-    const StoreContainer& AppContext::getStore() const { return _store; }
+    const StoreContainer& AppContext::getStore() const { return *_store; }
 
     /**
      * @brief Get the settings object

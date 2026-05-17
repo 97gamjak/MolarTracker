@@ -3,20 +3,43 @@
 #include <stdexcept>
 
 #include "app/store/account_store.hpp"
+#include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
+#include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "controller/side_bar/securities_controller.hpp"
+#include "controller/transaction/transaction_helpers.hpp"
 #include "controller/transaction_controller.hpp"
+#include "drafts/position_draft.hpp"
+#include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
+#include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
 #include "ui/transaction/stock_widget.hpp"
+#include "ui/utils/error.hpp"
 #include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
+
+using drafts::TransactionMapper;
+using finance::Position;
+
+using app::AccountStore;
+using app::PositionStore;
+using app::StockStore;
+using app::TransactionStore;
+using app::TransactionStoreResult;
+using app::TransactionStoreResultMeta;
+
+using ui::DepositWithdrawalWidget;
+using ui::ErrorDialog;
+using ui::PositionSelectionDialog;
+using ui::StockWidget;
+using ui::TransactionCategory;
 
 namespace controller
 {
@@ -28,6 +51,7 @@ namespace controller
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
      * @param stockStore The stock store for the application
+     * @param positionStore The position store for the application
      * @param transactionController The transaction controller for the
      * application
      * @param stockController The stock controller for the application
@@ -35,17 +59,19 @@ namespace controller
      */
     TransactionSideBarController::TransactionSideBarController(
         cmd::UndoStack&              undoStack,
-        app::AccountStore&           accountStore,
-        app::TransactionStore&       transactionStore,
-        app::StockStore&             stockStore,
+        AccountStore&                accountStore,
+        TransactionStore&            transactionStore,
+        StockStore&                  stockStore,
+        PositionStore&               positionStore,
         TransactionController&       transactionController,
         SecuritiesSideBarController& stockController,
         QMainWindow*                 mainWindow
     )
-        : SideBarCategoryController(new ui::TransactionCategory(), mainWindow),
+        : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
+          _positionStore(positionStore),
           _stockStore(stockStore),
           _createCashTransactionDlg(nullptr),
           _createStockTransactionDlg(nullptr),
@@ -53,21 +79,20 @@ namespace controller
           _stockController(stockController),
           _mainWindow(mainWindow)
     {
-        _createCashTransactionDlg =
-            utils::makeQChild<ui::DepositWithdrawalWidget>(
-                TransactionType::Deposit,   // dummy type
-                _accountStore.getCashAccounts(),
-                _mainWindow
-            );
+        _createCashTransactionDlg = utils::makeQChild<DepositWithdrawalWidget>(
+            TransactionType::Deposit,   // dummy type
+            _accountStore.getCashAccounts(),
+            _mainWindow
+        );
 
         connect(
             _createCashTransactionDlg,
-            &ui::DepositWithdrawalWidget::createCashTransactionRequested,
+            &DepositWithdrawalWidget::createCashTransactionRequested,
             this,
             &TransactionSideBarController::_onCreateCashTransactionRequested
         );
 
-        _createStockTransactionDlg = utils::makeQChild<ui::StockWidget>(
+        _createStockTransactionDlg = utils::makeQChild<StockWidget>(
             _accountStore.getAllAccounts(),
             _accountStore.getAllAccounts(),
             _stockStore.getAllTickers(),
@@ -76,14 +101,14 @@ namespace controller
 
         connect(
             _createStockTransactionDlg,
-            &ui::StockWidget::createTickerRequested,
+            &StockWidget::createTickerRequested,
             this,
             &TransactionSideBarController::_onCreateTickerRequested
         );
 
         connect(
             _createStockTransactionDlg,
-            &ui::StockWidget::createStockTransactionRequested,
+            &StockWidget::createStockTransactionRequested,
             this,
             &TransactionSideBarController::_onCreateStockTransactionRequested
         );
@@ -112,8 +137,8 @@ namespace controller
      * @param action The action that was triggered
      */
     void TransactionSideBarController::handleContextMenuAction(
-        const ui::TransactionCategory* item,
-        const QAction*                 action
+        const TransactionCategory* item,
+        const QAction*             action
     )
     {
         if (item == nullptr || action == nullptr)
@@ -203,12 +228,17 @@ namespace controller
         for (const auto& entry : additionalEntries)
             draft.addEntry(entry);
 
-        _transactionStore.addTransaction(
-            drafts::TransactionMapper::fromCreateCashTransactionDraft(draft)
-        );
+        const auto transaction =
+            TransactionMapper::fromCreateCashTransactionDraft(draft);
 
-        // TODO(97gamjak): add here commands and also error handling
+        if (!_checkAddTransaction(transaction))
+            return;
+
+        // TODO(97gamjak): add here commands
         _createCashTransactionDlg->close();
+
+        // TODO(97gamjak): handle this via notifications and not explicitly
+        // here
         _transactionController.transactionOverviewSelected(false);
     }
 
@@ -232,26 +262,70 @@ namespace controller
     {
         LOG_ENTRY;
 
-        for (auto& leg : draft.getLegs())
-        {
-            const auto instrumentId =
-                _stockStore.getInstrumentId(leg.getTicker());
+        const auto result = convertTickerToInstrumentId(draft, _stockStore);
+        if (!result)
+            throw std::logic_error(result.error());
 
-            if (instrumentId.has_value())
+        const auto openPositions = _positionStore.getOpenPositions();
+        std::vector<PositionId> positionIds;
+        for (const auto& position : openPositions)
+            positionIds.push_back(position.getId());
+
+        std::vector<drafts::PositionDraft> drafts;
+        for (const auto& position : openPositions)
+        {
+            const auto instrumentIds =
+                _transactionStore.getInstrumentIdsByPositionId(position.getId()
+                );
+
+            const auto& stocks = _stockStore.getStocks(instrumentIds);
+
+            if (stocks.empty())
             {
-                leg.setInstrumentId(*instrumentId);
+                LOG_WARNING(
+                    "No stock found for instrument id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            drafts.emplace_back(
+                position.getId(),
+                drafts::StockMapper::toStockInfoDraft(stocks.front()),
+                position.getCreatedAt()
+            );
+        }
+
+        PositionId positionId = PositionId::invalid();
+        if (drafts.size() > 0)
+        {
+            PositionSelectionDialog dlg{drafts};
+            if (dlg.exec() == QDialog::Accepted)
+            {
+                if (auto pos = dlg.selectedPosition())
+                    positionId = pos->getPositionId();
             }
             else
             {
-                throw std::logic_error(
-                    "Invalid stock ticker: " + leg.getTicker()
-                );
+                LOG_INFO("No position selected");
+                return;
             }
         }
 
-        _transactionStore.addTransaction(
-            drafts::TransactionMapper::fromCreateStockTransactionDraft(draft)
-        );
+        if (!positionId.isValid())
+        {
+            auto position = Position(draft.getTimestamp());
+            positionId    = _positionStore.createPosition(position);
+        }
+
+        for (auto& leg : draft.getLegs())
+            leg.setPositionId(positionId);
+
+        const auto transaction =
+            TransactionMapper::fromCreateStockTransactionDraft(draft);
+
+        if (!_checkAddTransaction(transaction))
+            return;
 
         // TODO(97gamjak): add here commands and also error handling
         _createStockTransactionDlg->close();
@@ -281,6 +355,40 @@ namespace controller
     )
     {
         _stockController.createStock(ticker);
+    }
+
+    /**
+     * @brief Check if a transaction can be added
+     *
+     * @param transaction The transaction to check
+     * @return true if the transaction can be added, false otherwise
+     */
+    bool TransactionSideBarController::_checkAddTransaction(
+        const finance::Transaction& transaction
+    )
+    {
+        // Check if the transaction can be added
+        const auto result = _transactionStore.addTransaction(transaction);
+
+        switch (result)
+        {
+            case TransactionStoreResult::Ok:
+                return true;
+
+            case TransactionStoreResult::Error:
+            case TransactionStoreResult::TransactionSumNotZero:
+            {
+                const auto msg = "Failed to create cash transaction: " +
+                                 TransactionStoreResultMeta::toString(result) +
+                                 ". " + Constants::getCreateIssueError();
+
+                LOG_ERROR(msg);
+                ErrorDialog::show(msg);
+                return false;
+            }
+        }
+
+        std::unreachable();
     }
 
 }   // namespace controller

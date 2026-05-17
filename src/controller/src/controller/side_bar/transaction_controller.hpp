@@ -15,6 +15,7 @@ namespace app
     class AccountStore;       // Forward declaration
     class TransactionStore;   // Forward declaration
     class StockStore;         // Forward declaration
+    class PositionStore;      // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -34,6 +35,11 @@ namespace drafts
     class CreateCashTransactionDraft;    // Forward declaration
     class CreateStockTransactionDraft;   // Forward declaration
 }   // namespace drafts
+
+namespace finance
+{
+    class Transaction;   // Forward declaration
+}   // namespace finance
 
 class QMainWindow;   // Forward declaration
 
@@ -57,6 +63,8 @@ namespace controller
         app::AccountStore& _accountStore;
         /// The transaction store for the application
         app::TransactionStore& _transactionStore;
+        /// The position store for the application
+        app::PositionStore& _positionStore;
         /// The stock store for the application
         app::StockStore& _stockStore;
 
@@ -81,6 +89,7 @@ namespace controller
             app::AccountStore&           accountStore,
             app::TransactionStore&       transactionStore,
             app::StockStore&             stockStore,
+            app::PositionStore&          positionStore,
             TransactionController&       transactionController,
             SecuritiesSideBarController& stockController,
             QMainWindow*                 mainWindow
@@ -105,6 +114,8 @@ namespace controller
         );
 
         void _onCreateTickerRequested(const std::string& ticker);
+
+        bool _checkAddTransaction(const finance::Transaction& transaction);
     };
 }   // namespace controller
 

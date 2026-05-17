@@ -7,6 +7,8 @@ add_library(molartracker_drafts STATIC
 
     src/drafts/stock_draft.cpp
     src/drafts/stock_mapper.cpp
+
+    src/drafts/position_draft.cpp
 )
 
 target_include_directories(molartracker_drafts

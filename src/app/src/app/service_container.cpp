@@ -1,8 +1,9 @@
 #include "app/service_container.hpp"
 
 #include "app/repo_container.hpp"
-#include "app/services/instrument_service.hpp"
 #include "services/account_service.hpp"
+#include "services/instrument_service.hpp"
+#include "services/position_service.hpp"
 #include "services/profile_service.hpp"
 #include "services/transaction_service.hpp"
 
@@ -24,7 +25,11 @@ namespace app
           },
           _instrumentService{
               std::make_shared<InstrumentService>(repos.getInstrumentRepo())
+          },
+          _positionService{
+              std::make_shared<PositionService>(repos.getPositionRepo())
           }
+
     {
     }
 
@@ -111,6 +116,27 @@ namespace app
         getInstrumentService() const
     {
         return _instrumentService;
+    }
+
+    /**
+     * @brief Get the Position Service
+     *
+     * @return std::shared_ptr<IPositionService>
+     */
+    std::shared_ptr<IPositionService> ServiceContainer::getPositionService()
+    {
+        return _positionService;
+    }
+
+    /**
+     * @brief Get the Position Service (const version)
+     *
+     * @return std::shared_ptr<const IPositionService>
+     */
+    std::shared_ptr<const IPositionService> ServiceContainer::
+        getPositionService() const
+    {
+        return _positionService;
     }
 
 }   // namespace app

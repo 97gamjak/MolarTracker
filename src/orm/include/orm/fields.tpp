@@ -1,6 +1,7 @@
 #ifndef __ORM__INCLUDE__ORM__FIELDS_TPP__
 #define __ORM__INCLUDE__ORM__FIELDS_TPP__
 
+#include <format>
 #include <mstd/string.hpp>
 
 #include "fields.hpp"
@@ -123,7 +124,12 @@ namespace orm
             [&](const auto& field)
             {
                 if (field.isPk)
-                    where &= makeWhere(field, filter::Operator::Equal);
+                {
+                    where &= makeWhere<decltype(field)>(
+                        field.value(),
+                        filter::Operator::Equal
+                    );
+                }
             }
         );
         return where;
