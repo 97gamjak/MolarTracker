@@ -106,7 +106,7 @@ namespace app
             );
         }
 
-        return {stockRow.id.value(), stockRow.instrumentId.value()};
+        return {StockId(result.value()), stockRow.instrumentId.value()};
     }
 
     /**

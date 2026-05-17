@@ -12,7 +12,10 @@ permissions:
 
 jobs:
   review:
-    if: ${{ !startsWith(github.head_ref, 'claude') }}
+    if: |
+      ${{ !startsWith(github.head_ref, 'claude') &&
+          github.head_ref != 'main' }} &&
+          github.head_ref != 'dev'
     runs-on: ubuntu-latest
     steps:
       - uses: drillan/claude-pr-reviewer@v1
