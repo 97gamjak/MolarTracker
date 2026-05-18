@@ -6,6 +6,7 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
 #include "finance/transaction_filter.hpp"
+#include "orm/where_expr.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
@@ -165,7 +166,7 @@ namespace app
         const finance::TransactionFilter &filter
     )
     {
-        orm::WhereExpr where;
+        orm::WhereExpr where = orm::makeEmptyWhere();
 
         if (filter.getPositionId().has_value())
         {
