@@ -34,7 +34,7 @@ namespace app
         /**
          * @brief Construct a new Session object
          *
-         * @param accountSession
+         * @param accountSession_
          */
         explicit Session(const AccountSession& accountSession_)
             : accountSession(accountSession_)
