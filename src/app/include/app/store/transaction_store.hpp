@@ -43,9 +43,6 @@ namespace app
         /// The Transaction service
         std::shared_ptr<ITransactionService> _transactionService;
 
-        /// The available account IDs
-        std::vector<AccountId> _availableAccountIds;
-
         struct Session;
         /// The session object for managing the session state of transactions in
         /// the store

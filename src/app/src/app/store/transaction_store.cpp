@@ -28,15 +28,15 @@ namespace app
     struct TransactionStore::Session
     {
         /// A reference to the AccountSession
-        const AccountSession& _accountSession;
+        const AccountSession& accountSession;
 
         /**
          * @brief Construct a new Session object
          *
          * @param accountSession
          */
-        explicit Session(const AccountSession& accountSession)
-            : _accountSession(accountSession)
+        explicit Session(const AccountSession& accountSession_)
+            : accountSession(accountSession_)
         {
         }
 
@@ -204,7 +204,7 @@ namespace app
         auto transactions = _getEntries(options);
 
         auto dbTransactions = _transactionService->getTransactions(
-            _session->_accountSession.getIds(),
+            _session->accountSession.getIds(),
             filter
         );
 
@@ -310,17 +310,6 @@ namespace app
      */
     void TransactionStore::_onAccountIdRemap(const accountMap<AccountId>& remap)
     {
-        const auto availableAccountIds = _availableAccountIds;
-        _availableAccountIds.clear();
-
-        for (const auto id : availableAccountIds)
-        {
-            if (remap.contains(id))
-                _availableAccountIds.push_back(remap.at(id));
-            else
-                _availableAccountIds.push_back(id);
-        }
-
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
