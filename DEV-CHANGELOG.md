@@ -52,6 +52,11 @@ All changes and updates, that are relevant for developers will be documented her
   (empty, full set, correct data), `ProfileRepo::update` (name/email change,
   clear email, non-existent ID throws, duplicate name throws), and
   `ProfileRepo::remove` (deletes target, preserves others)
+- Add `tests/app/test_transaction_repo.cpp` with 15 GoogleTest cases for
+  `app::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
+  and Trade transactions, entry/leg persistence, comment round-trips, ID
+  sequencing, and empty-database behaviour
+- Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`,     `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
 
 ### Features
 
@@ -73,10 +78,6 @@ All changes and updates, that are relevant for developers will be documented her
 - Speedup some compilation headers
 
 <!-- insertion marker -->
-### Testing
-
-- Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`, `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
-
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10

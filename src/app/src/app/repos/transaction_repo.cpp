@@ -112,26 +112,12 @@ namespace app
         const auto query =
             orm::Query{}.where(TransactionFactory::toWhereExpr(filter));
 
-        const auto joins =
-            orm::Joins{}
-                .add(
-                    orm::join<
-                        TransactionRow::idField,
-                        TransactionEntryRow::transactionIdField>()
-                )
-                .add(
-                    orm::join<
-                        TransactionRow::idField,
-                        TradeLegRow::transactionIdField>()
-                );
-
-        const auto txRows =
-            _getCrud().getJoined<TransactionRow>(_getDb(), joins, query);
+        const auto txRows = _getCrud().get<TransactionRow>(_getDb(), query);
 
         std::vector<finance::Transaction> results;
         results.reserve(txRows.size());
 
-        for (const auto& [txRow] : txRows)
+        for (const auto& txRow : txRows)
         {
             const auto allEntriesQuery = orm::Query{}.where(
                 TransactionEntryRow::hasTransactionId(txRow.id.value())
