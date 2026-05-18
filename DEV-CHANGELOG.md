@@ -55,7 +55,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `tests/app/test_transaction_repo.cpp` with 15 GoogleTest cases for
   `app::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
   and Trade transactions, entry/leg persistence, comment round-trips, ID
-  sequencing, and empty-database behaviour
+  sequencing, and empty-database behavior
 - Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`,     `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
 
 ### Features

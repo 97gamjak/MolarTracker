@@ -132,6 +132,7 @@
         "MSTD",
         "NOMINMAX",
         "remappings",
+        "txrepo",
         "unpolish"
     ],
     "files.watcherExclude": {
