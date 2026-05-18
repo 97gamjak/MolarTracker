@@ -10,8 +10,8 @@
                     },
                     {
                         "type": "command",
-                        "command": "bash .claude/rebase-onto-dev.sh",
-                        "statusMessage": "Rebasing claude branch onto origin/dev..."
+                        "command": "bash .claude/reset-to-dev.sh",
+                        "statusMessage": "Resetting claude branch to origin/dev..."
                     }
                 ]
             }
