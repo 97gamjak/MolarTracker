@@ -9,6 +9,7 @@
 #include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "config/id_types.hpp"
+#include "config/strong_id.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
@@ -211,12 +212,7 @@ namespace app
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
-
-        std::unordered_map<
-            TransactionId,
-            finance::Transaction,
-            TransactionId::Hash>
-            transactionMap;
+        idSet<TransactionId> transactionIds;
 
         std::vector<finance::Transaction> results;
 
@@ -224,22 +220,15 @@ namespace app
         {
             // Only include transactions that are new, for all others the id is
             // already in the database and we will get it from there
-            results.push_back(transaction.value);
-
             if (transaction.state != StoreState::New)
-            {
-                transactionMap.emplace(
-                    transaction.value.getId(),
-                    transaction.value
-                );
-            }
+                transactionIds.insert(transaction.value.getId());
+            else
+                results.push_back(transaction.value);
         }
 
         for (const auto& transaction : dbTransactions)
-        {
-            if (!transactionMap.contains(transaction.getId()))
+            if (!transactionIds.contains(transaction.getId()))
                 results.push_back(transaction);
-        }
 
         return results;
     }
