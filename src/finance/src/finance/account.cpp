@@ -11,8 +11,8 @@ namespace finance
      * @brief Construct a new Account:: Account object
      *
      * @param status the status of the account (e.g., Active, Closed)
-     * @param currency the current currency of the account
      * @param name the current name of the account
+     * @param currency the current currency of the account
      * @param kind the kind of the account (e.g., Cash, External, Security)
      */
     Account::Account(
