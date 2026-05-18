@@ -79,6 +79,7 @@ namespace finance
     filter::Predicate<Account> IsExternal();
     filter::Predicate<Account> HasCurrency(Currency currency);
     filter::Predicate<Account> HasAccountId(AccountId id);
+    filter::Predicate<Account> HasName(const std::string& name);
 
 }   // namespace finance
 

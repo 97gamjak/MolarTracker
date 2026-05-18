@@ -116,6 +116,13 @@ namespace finance
         return getKind() == AccountKind::External;
     }
 
+    /**
+     * @brief Get a predicate for filtering accounts by their type (e.g., Cash,
+     * External, Security)
+     *
+     * @param kind
+     * @return filter::Predicate<Account>
+     */
     filter::Predicate<Account> IsAccountType(AccountKind kind)
     {
         return filter::makePredicate<Account>(
@@ -123,6 +130,11 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Get a predicate for filtering accounts by their active status
+     *
+     * @return filter::Predicate<Account>
+     */
     filter::Predicate<Account> IsAccountActive()
     {
         return filter::makePredicate<Account>(
@@ -131,12 +143,23 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Get a predicate for filtering external accounts
+     *
+     * @return filter::Predicate<Account>
+     */
     filter::Predicate<Account> IsExternal()
     {
         return filter::makePredicate<Account>([](const Account& account)
                                               { return account.isExternal(); });
     }
 
+    /**
+     * @brief Get a predicate for filtering accounts by their currency
+     *
+     * @param currency
+     * @return filter::Predicate<Account>
+     */
     filter::Predicate<Account> HasCurrency(Currency currency)
     {
         return filter::makePredicate<Account>(
@@ -145,10 +168,30 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Get a predicate for filtering accounts by their ID
+     *
+     * @param id
+     * @return filter::Predicate<Account>
+     */
     filter::Predicate<Account> HasAccountId(AccountId id)
     {
         return filter::makePredicate<Account>([id](const Account& account)
                                               { return account.getId() == id; }
+        );
+    }
+
+    /**
+     * @brief Get a predicate for filtering accounts by their name
+     *
+     * @param name
+     * @return filter::Predicate<Account>
+     */
+    filter::Predicate<Account> HasName(const std::string& name)
+    {
+        return filter::makePredicate<Account>(
+            [&name](const Account& account)
+            { return account.getName() == name; }
         );
     }
 
