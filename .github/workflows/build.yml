@@ -245,7 +245,6 @@ jobs:
               --error-exitcode=1 \
               --suppressions-list=.cppcheck \
               --suppress=missingIncludeSystem \
-              --suppress=missingInclude \
               --inline-suppr \
               --inconclusive \
               --library=qt \
