@@ -226,8 +226,11 @@ jobs:
       # -------------------------
       - name: Run cppcheck
         run: |
+          jq '[.[] | select(.file | test("_autogen") | not)]' \
+            build/compile_commands.json > build/compile_commands_filtered.json
+
           cppcheck \
-              --project=build/compile_commands.json \
+              --project=build/compile_commands_filtered.json \
               --quiet \
               --file-filter=src/* \
               --suppress=useStlAlgorithm \
