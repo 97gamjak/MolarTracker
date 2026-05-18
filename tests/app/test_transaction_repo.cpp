@@ -23,11 +23,11 @@
 #include <optional>
 #include <random>
 #include <string>
-#include <variant>
 #include <vector>
 
 #include "app/migration/migration_runner.hpp"
 #include "app/repos/transaction_repo.hpp"
+#include "app/repos_api/i_transaction_repo.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
@@ -36,6 +36,7 @@
 #include "finance/trade_data.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
+#include "finance/transaction_filter.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -84,6 +85,7 @@ namespace
         // Seeded via raw SQL in SetUp; IDs are deterministic (first inserts).
         const AccountId    _accountId{1};
         const InstrumentId _instrumentId{1};
+        const PositionId   _positionId{1};
 
         TempDbFile           _tempFile{unique_temp_db_path()};
         db::Database         _db{_tempFile.path};
@@ -102,6 +104,7 @@ namespace
                 "currency) VALUES (0, 1, 'TestAccount', 0, 0)"
             );
             _db.execute("INSERT INTO instrument (id) VALUES (NULL)");
+            _db.execute("INSERT INTO position (opened_at) VALUES (1)");
         }
 
         [[nodiscard]] finance::Transaction makeCashTx(
@@ -117,18 +120,24 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, amount}}},
-                comment};
+                    finance::Cash{Currency::USD, amount}
+                }},
+                comment
+            };
         }
 
         [[nodiscard]] finance::Transaction makeTradeTx() const
         {
             finance::TradeData data;
-            data.addLeg(finance::TradeLeg{
-                _accountId,
-                _instrumentId,
-                Quantity{100'000'000LL},
-                finance::Cash{Currency::USD, 150'000'000LL}});
+            data.addLeg(
+                finance::TradeLeg{
+                    _accountId,
+                    _instrumentId,
+                    Quantity{100'000'000LL},
+                    finance::Cash{Currency::USD, 150'000'000LL},
+                    _positionId
+                }
+            );
 
             return finance::Transaction{
                 TransactionId::invalid(),
@@ -138,8 +147,10 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, -15'000'000'000LL}}},
-                "trade comment"};
+                    finance::Cash{Currency::USD, -15'000'000'000LL}
+                }},
+                "trade comment"
+            };
         }
     };
 
@@ -151,7 +162,7 @@ namespace
 
 TEST_F(TransactionRepoFixture, GetTransactions_EmptyDatabase_ReturnsEmpty)
 {
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
     EXPECT_TRUE(txs.empty());
 }
@@ -186,9 +197,9 @@ TEST_F(
 
 TEST_F(TransactionRepoFixture, AddTransaction_Cash_SingleTransactionRetrieved)
 {
-    _repo.addTransaction(makeCashTx());
+    const auto result = _repo.addTransaction(makeCashTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
     ASSERT_EQ(txs.size(), 1u);
 }
@@ -198,41 +209,41 @@ TEST_F(
     AddTransaction_Cash_TransactionTypeIsDataTypeCash
 )
 {
-    _repo.addTransaction(makeCashTx());
+    const auto result = _repo.addTransaction(makeCashTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
     ASSERT_EQ(txs.size(), 1u);
     EXPECT_EQ(txs[0].getType(), TransactionDataType::Cash);
 }
 
-TEST_F(TransactionRepoFixture, AddTransaction_Cash_StatusIsPreserved)
+TEST_F(TransactionRepoFixture, AddTransactionCashStatusIsPreserved)
 {
-    _repo.addTransaction(makeCashTx());
+    const auto result = _repo.addTransaction(makeCashTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
     EXPECT_EQ(txs[0].getStatus(), TransactionStatus::Completed);
 }
 
-TEST_F(TransactionRepoFixture, AddTransaction_Cash_TimestampIsPreserved)
+TEST_F(TransactionRepoFixture, AddTransactionCashTimestampIsPreserved)
 {
-    _repo.addTransaction(makeCashTx());
+    const auto result = _repo.addTransaction(makeCashTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
     EXPECT_EQ(txs[0].getTimestamp().toInt64(), TEST_TS);
 }
 
-TEST_F(TransactionRepoFixture, AddTransaction_Cash_AssignedIdMatchesReturnedId)
+TEST_F(TransactionRepoFixture, AddTransactionCashAssignedIdMatchesReturnedId)
 {
     const auto insertedId = _repo.addTransaction(makeCashTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
     EXPECT_EQ(txs[0].getId(), insertedId);
 }
 
@@ -240,24 +251,24 @@ TEST_F(TransactionRepoFixture, AddTransaction_Cash_AssignedIdMatchesReturnedId)
 // addTransaction — comment field
 // ---------------------------------------------------------------------------
 
-TEST_F(TransactionRepoFixture, AddTransaction_WithComment_CommentIsPreserved)
+TEST_F(TransactionRepoFixture, AddTransactionWithCommentCommentIsPreserved)
 {
-    _repo.addTransaction(makeCashTx("my note"));
+    const auto result = _repo.addTransaction(makeCashTx("my note"));
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
     ASSERT_TRUE(txs[0].getComment().has_value());
     EXPECT_EQ(*txs[0].getComment(), "my note");
 }
 
-TEST_F(TransactionRepoFixture, AddTransaction_WithNullComment_CommentIsAbsent)
+TEST_F(TransactionRepoFixture, AddTransactionWithNullCommentCommentIsAbsent)
 {
-    _repo.addTransaction(makeCashTx(std::nullopt));
+    const auto result = _repo.addTransaction(makeCashTx(std::nullopt));
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
     EXPECT_FALSE(txs[0].getComment().has_value());
 }
 
@@ -265,17 +276,15 @@ TEST_F(TransactionRepoFixture, AddTransaction_WithNullComment_CommentIsAbsent)
 // addTransaction — entries
 // ---------------------------------------------------------------------------
 
-TEST_F(
-    TransactionRepoFixture,
-    AddTransaction_Cash_SingleEntry_EntryIsRetrieved
-)
+TEST_F(TransactionRepoFixture, AddTransactionCashSingleEntryEntryIsRetrieved)
 {
-    _repo.addTransaction(makeCashTx(std::nullopt, 250'000LL));
+    const auto result =
+        _repo.addTransaction(makeCashTx(std::nullopt, 250'000LL));
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
-    ASSERT_EQ(txs[0].getEntries().size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
+    ASSERT_EQ(txs[0].getEntries().size(), 1U);
 
     const auto& entry = txs[0].getEntries()[0];
     EXPECT_EQ(entry.getAccountId(), _accountId);
@@ -285,10 +294,10 @@ TEST_F(
 
 TEST_F(
     TransactionRepoFixture,
-    AddTransaction_Cash_MultipleEntries_AllEntriesRetrieved
+    AddTransactionCashMultipleEntriesAllEntriesRetrieved
 )
 {
-    finance::Transaction tx{
+    finance::Transaction transaction{
         TransactionId::invalid(),
         Timestamp::fromInt64(TEST_TS),
         TransactionStatus::Completed,
@@ -296,19 +305,22 @@ TEST_F(
         {finance::TransactionEntry{
              TransactionEntryId::invalid(),
              _accountId,
-             finance::Cash{Currency::USD, 100'000LL}},
+             finance::Cash{Currency::USD, 100'000LL}
+         },
          finance::TransactionEntry{
              TransactionEntryId::invalid(),
              _accountId,
-             finance::Cash{Currency::EUR, 200'000LL}}},
-        std::nullopt};
+             finance::Cash{Currency::EUR, 200'000LL}
+         }},
+        std::nullopt
+    };
 
-    _repo.addTransaction(tx);
+    const auto result = _repo.addTransaction(transaction);
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
-    EXPECT_EQ(txs[0].getEntries().size(), 2u);
+    ASSERT_EQ(txs.size(), 1U);
+    EXPECT_EQ(txs[0].getEntries().size(), 2U);
 }
 
 // ---------------------------------------------------------------------------
@@ -317,42 +329,42 @@ TEST_F(
 
 TEST_F(
     TransactionRepoFixture,
-    AddTransaction_MultipleTransactions_AllAreRetrieved
+    AddTransactionMultipleTransactionsAllAreRetrieved
 )
 {
-    _repo.addTransaction(makeCashTx("first"));
-    _repo.addTransaction(makeCashTx("second"));
-    _repo.addTransaction(makeCashTx("third"));
+    auto result = _repo.addTransaction(makeCashTx("first"));
+    result      = _repo.addTransaction(makeCashTx("second"));
+    result      = _repo.addTransaction(makeCashTx("third"));
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    EXPECT_EQ(txs.size(), 3u);
+    EXPECT_EQ(txs.size(), 3U);
 }
 
 // ---------------------------------------------------------------------------
 // addTransaction — Trade round-trip
 // ---------------------------------------------------------------------------
 
-TEST_F(TransactionRepoFixture, AddTransaction_Trade_TypeIsDataTypeTrade)
+TEST_F(TransactionRepoFixture, AddTransactionTradeTypeIsDataTypeTrade)
 {
-    _repo.addTransaction(makeTradeTx());
+    const auto result = _repo.addTransaction(makeTradeTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
     EXPECT_EQ(txs[0].getType(), TransactionDataType::Trade);
 }
 
-TEST_F(TransactionRepoFixture, AddTransaction_Trade_LegIsRetrieved)
+TEST_F(TransactionRepoFixture, AddTransactionTradeLegIsRetrieved)
 {
-    _repo.addTransaction(makeTradeTx());
+    const auto result = _repo.addTransaction(makeTradeTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
 
     const auto& data = std::get<finance::TradeData>(txs[0].getData());
-    ASSERT_EQ(data.getLegs().size(), 1u);
+    ASSERT_EQ(data.getLegs().size(), 1U);
 
     const auto& leg = data.getLegs()[0];
     EXPECT_EQ(leg.getAccountId(), _accountId);
@@ -364,16 +376,16 @@ TEST_F(TransactionRepoFixture, AddTransaction_Trade_LegIsRetrieved)
 
 TEST_F(
     TransactionRepoFixture,
-    AddTransaction_Trade_EntryAndLegBelongToSameTransaction
+    AddTransactionTradeEntryAndLegBelongToSameTransaction
 )
 {
-    _repo.addTransaction(makeTradeTx());
+    const auto result = _repo.addTransaction(makeTradeTx());
 
-    const auto txs = _repo.getTransactions();
+    const auto txs = _repo.getTransactions(finance::TransactionFilter{});
 
-    ASSERT_EQ(txs.size(), 1u);
-    EXPECT_EQ(txs[0].getEntries().size(), 1u);
+    ASSERT_EQ(txs.size(), 1U);
+    EXPECT_EQ(txs[0].getEntries().size(), 1U);
 
     const auto& data = std::get<finance::TradeData>(txs[0].getData());
-    EXPECT_EQ(data.getLegs().size(), 1u);
+    EXPECT_EQ(data.getLegs().size(), 1U);
 }
