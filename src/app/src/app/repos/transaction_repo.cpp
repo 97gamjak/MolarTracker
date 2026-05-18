@@ -5,6 +5,7 @@
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
 #include "finance/transaction.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/trade_leg_row.hpp"
@@ -137,6 +138,23 @@ namespace app
             if (!std::ranges::all_of(entryRows, inSet) ||
                 !std::ranges::all_of(legRows, inSet))
             {
+                if (std::ranges::any_of(entryRows, inSet) ||
+                    std::ranges::any_of(legRows, inSet))
+                {
+                    LOG_WARNING(
+                        "Skipping transaction with ID " +
+                        txRow.id.value().toString() +
+                        " because not all entries/legs match the account filter"
+                    );
+                }
+                else
+                {
+                    LOG_TRACE(
+                        "Skipping transaction with ID " +
+                        txRow.id.value().toString() +
+                        " because no entries/legs match the account filter"
+                    );
+                }
                 continue;
             }
 
