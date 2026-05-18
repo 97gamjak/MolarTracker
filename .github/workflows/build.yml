@@ -67,20 +67,8 @@ jobs:
               ninja-build             \
               pkg-config              \
               libcurl4-openssl-dev    \
-              cppcheck                \
               clangd-20
           sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.13
-          cache: 'pip'
-      
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install clangd-tidy
 
       # -------------------------
       # Install Qt
@@ -120,7 +108,121 @@ jobs:
           ctest --test-dir build --output-on-failure
 
       # -------------------------
-      # Run cppcheck (on the compile_commands.json from the build, so it has all the correct include paths)
+      # Package for Release assets (ONLY on tags)
+      # -------------------------
+      - name: Package (Linux, tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f build/bin/MolarTracker || test -f build/bin/MolarTracker.exe || true
+          tar -C build/bin -czf "MolarTracker-linux-${GITHUB_REF_NAME}.tar.gz" MolarTracker
+          cp build/compile_commands.json "compile_commands-${GITHUB_REF_NAME}.json"
+
+      # -------------------------
+      # Upload to GitHub Release (ONLY on tags)
+      # -------------------------
+      - name: Upload release assets (Linux)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            MolarTracker-linux-${{ github.ref_name }}.tar.gz
+            compile_commands-${{ github.ref_name }}.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # -------------------------
+      # Upload Actions artifacts (ONLY on tags/dev)
+      # -------------------------
+      - name: Upload Linux artifact (Actions, versioned)
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.LINUX_NAME }}
+          path: |
+            build/bin/MolarTracker*
+            build/compile_commands.json
+          if-no-files-found: error
+
+      - name: Upload Linux artifact (Actions, latest)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.LINUX_LATEST }}
+          path: |
+            build/bin/MolarTracker*
+            build/compile_commands.json
+          if-no-files-found: error
+
+  lint:
+    runs-on: ubuntu-latest
+
+    env:
+      QT_VERSION: "6.8.3"
+      BUILD_TYPE: "Debug"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # -------------------------
+      # Build tools
+      # -------------------------
+      - name: Install build tools (Ubuntu)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y     \
+              ninja-build             \
+              pkg-config              \
+              libcurl4-openssl-dev    \
+              cppcheck                \
+              clangd-20
+          sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install clangd-tidy
+
+      # -------------------------
+      # Install Qt
+      # -------------------------
+      - name: Install Qt (Ubuntu)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+
+      # -------------------------
+      # Configure only (generates compile_commands.json; no build needed)
+      # -------------------------
+      - name: Configure (Ubuntu)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IS_TAG_FLAG=OFF
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then IS_TAG_FLAG=ON; fi
+
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DMOLARTRACKER_IS_TAG="${IS_TAG_FLAG}" \
+            -DMOLARTRACKER_GIT_TAG="${GITHUB_REF_NAME}" \
+            -DMOLARTRACKER_ENABLE_TESTING=ON
+
+      # -------------------------
+      # Run cppcheck
       # -------------------------
       - name: Run cppcheck
         run: |
@@ -143,61 +245,8 @@ jobs:
               -I src
 
       # -------------------------
-      # Run clangd-tidy (also using the compile_commands.json from the build)
+      # Run clangd-tidy
       # -------------------------
       - name: Run clangd-tidy
         run: |
           clangd-tidy $(find src/) -p=build
-
-      # -------------------------
-      # Package for Release assets (ONLY on tags)
-      # -------------------------
-      - name: Package (Linux, tag)
-        if: startsWith(github.ref, 'refs/tags/')
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f build/bin/MolarTracker || test -f build/bin/MolarTracker.exe || true
-          tar -C build/bin -czf "MolarTracker-linux-${GITHUB_REF_NAME}.tar.gz" MolarTracker
-          cp build/compile_commands.json "compile_commands-${GITHUB_REF_NAME}.json"
-
-      # -------------------------
-      # Upload to GitHub Release (ONLY on tags)
-      # Requires the Release to already exist for that tag (your other workflow creates it)
-      # -------------------------
-      - name: Upload release assets (Linux)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: |
-            MolarTracker-linux-${{ github.ref_name }}.tar.gz
-            compile_commands-${{ github.ref_name }}.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # -------------------------
-      # Upload Actions artifacts (ONLY on tags/dev; convenient for quick download)
-      # -------------------------
-      - name: Upload Linux artifact (Actions, versioned)
-        if: (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.LINUX_NAME }}
-          path: |
-            build/bin/MolarTracker*
-            build/compile_commands.json
-          if-no-files-found: error
-
-      # -------------------------
-      # Tag pushes: also upload "latest" Actions artifacts
-      # -------------------------
-      - name: Upload Linux artifact (Actions, latest)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.LINUX_LATEST }}
-          path: |
-            build/bin/MolarTracker*
-            build/compile_commands.json
-          if-no-files-found: error
