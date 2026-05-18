@@ -190,8 +190,7 @@ namespace finance
     filter::Predicate<Account> HasName(const std::string& name)
     {
         return filter::makePredicate<Account>(
-            [&name](const Account& account)
-            { return account.getName() == name; }
+            [name](const Account& account) { return account.getName() == name; }
         );
     }
 
