@@ -1,5 +1,6 @@
 add_executable(tests_app
     test_account_repo.cpp
+    test_instrument_repo.cpp
     test_profile_repo.cpp
     test_transaction_repo.cpp
 )
