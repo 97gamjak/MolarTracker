@@ -19,10 +19,22 @@ REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
 namespace app
 {
 
+    /**
+     * @brief Internal session struct for TransactionStore, this struct holds a
+     * reference to the AccountSession and is used to manage the session state
+     * of transactions in the store.
+     *
+     */
     struct TransactionStore::Session
     {
+        /// A reference to the AccountSession
         const AccountSession& _accountSession;
 
+        /**
+         * @brief Construct a new Session object
+         *
+         * @param accountSession
+         */
         explicit Session(const AccountSession& accountSession)
             : _accountSession(accountSession)
         {

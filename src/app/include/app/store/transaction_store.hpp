@@ -47,6 +47,8 @@ namespace app
         std::vector<AccountId> _availableAccountIds;
 
         struct Session;
+        /// The session object for managing the session state of transactions in
+        /// the store
         std::unique_ptr<Session> _session;
 
         /// Connections for various events

@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_SESSION__HPP__
-#define __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_SESSION__HPP__
+#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_SESSION_HPP__
+#define __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_SESSION_HPP__
 
 #include <vector>
 
@@ -12,9 +12,14 @@ namespace finance
 
 namespace app
 {
+    /**
+     * @brief Manages the session state of active accounts in the application.
+     *
+     */
     class AccountSession
     {
        private:
+        /// A set of active account IDs currently in the session.
         idSet<AccountId> _activeAccounts;
 
        public:
@@ -26,4 +31,4 @@ namespace app
     };
 }   // namespace app
 
-#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_SESSION__HPP__
+#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_SESSION_HPP__

@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
-#define __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_STORE_HPP__
+#define __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_STORE_HPP__
 
 #include <memory>
 #include <vector>
@@ -51,8 +51,11 @@ namespace app
         /// accounts to load and manage in the store
         ProfileId _activeProfileId = ProfileId::invalid();
 
+        /// The session object for managing the session state of accounts in the
+        /// store
         AccountSession _session;
 
+        /// Connections for handling signals related to account store updates
         Connections _connections;
 
        public:
@@ -92,4 +95,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_STORE_HPP__
