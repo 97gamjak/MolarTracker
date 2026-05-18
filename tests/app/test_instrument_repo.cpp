@@ -32,12 +32,12 @@ namespace
         }
 
         std::random_device random;
-        const auto         r1 = static_cast<unsigned>(random());
-        const auto         r2 = static_cast<unsigned>(random());
+        const auto         random1 = static_cast<unsigned>(random());
+        const auto         random2 = static_cast<unsigned>(random());
 
         return base /
-               ("molartracker_instrument_repo_test_" + std::to_string(r1) +
-                "_" + std::to_string(r2) + ".sqlite");
+               ("molartracker_instrument_repo_test_" + std::to_string(random1) +
+                "_" + std::to_string(random2) + ".sqlite");
     }
 
     class TempDbFile
@@ -52,8 +52,8 @@ namespace
 
         ~TempDbFile()
         {
-            std::error_code ec;
-            std::filesystem::remove(_path, ec);
+            std::error_code errorCode;
+            std::filesystem::remove(_path, errorCode);
         }
 
         [[nodiscard]] const std::filesystem::path& path() const noexcept
@@ -80,8 +80,8 @@ namespace
         }
 
         [[nodiscard]] static finance::Stock makeStock(
-            const std::string& ticker    = "AAPL",
-            Currency           currency  = Currency::USD,
+            const std::string& ticker     = "AAPL",
+            Currency           currency   = Currency::USD,
             AssetClass         assetClass = AssetClass::Stock
         )
         {
@@ -104,21 +104,21 @@ namespace
 // addStock — returned IDs
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, AddStock_ReturnsValidStockId)
+TEST_F(InstrumentRepoTest, AddStockReturnsValidStockId)
 {
     const auto [stockId, instrumentId] = _repo.addStock(makeStock());
 
     EXPECT_GT(stockId.value(), 0);
 }
 
-TEST_F(InstrumentRepoTest, AddStock_ReturnsValidInstrumentId)
+TEST_F(InstrumentRepoTest, AddStockReturnsValidInstrumentId)
 {
     const auto [stockId, instrumentId] = _repo.addStock(makeStock());
 
     EXPECT_GT(instrumentId.value(), 0);
 }
 
-TEST_F(InstrumentRepoTest, AddStock_TwoStocks_IdsAreDistinct)
+TEST_F(InstrumentRepoTest, AddStockTwoStocksIdsAreDistinct)
 {
     const auto [stockId1, instrId1] = _repo.addStock(makeStock("AAPL"));
     const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG"));
@@ -131,7 +131,7 @@ TEST_F(InstrumentRepoTest, AddStock_TwoStocks_IdsAreDistinct)
 // addStock — duplicate ticker
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, AddStock_DuplicateTicker_Throws)
+TEST_F(InstrumentRepoTest, AddStockDuplicateTickerThrows)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
@@ -145,14 +145,14 @@ TEST_F(InstrumentRepoTest, AddStock_DuplicateTicker_Throws)
 // stockExists
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, StockExists_NonExistentTicker_ReturnsFalse)
+TEST_F(InstrumentRepoTest, StockExistsNonExistentTickerReturnsFalse)
 {
     const auto exists = _repo.stockExists("AAPL");
 
     EXPECT_FALSE(exists);
 }
 
-TEST_F(InstrumentRepoTest, StockExists_ExistingTicker_ReturnsTrue)
+TEST_F(InstrumentRepoTest, StockExistsExistingTickerReturnsTrue)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
@@ -161,7 +161,7 @@ TEST_F(InstrumentRepoTest, StockExists_ExistingTicker_ReturnsTrue)
     EXPECT_TRUE(exists);
 }
 
-TEST_F(InstrumentRepoTest, StockExists_DifferentTicker_ReturnsFalse)
+TEST_F(InstrumentRepoTest, StockExistsDifferentTickerReturnsFalse)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
@@ -174,14 +174,14 @@ TEST_F(InstrumentRepoTest, StockExists_DifferentTicker_ReturnsFalse)
 // getTickers
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, GetTickers_EmptyDatabase_ReturnsEmpty)
+TEST_F(InstrumentRepoTest, GetTickersEmptyDatabaseReturnsEmpty)
 {
     const auto tickers = _repo.getTickers();
 
     EXPECT_TRUE(tickers.empty());
 }
 
-TEST_F(InstrumentRepoTest, GetTickers_AfterAddingStock_ContainsTicker)
+TEST_F(InstrumentRepoTest, GetTickersAfterAddingStockContainsTicker)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
@@ -191,7 +191,7 @@ TEST_F(InstrumentRepoTest, GetTickers_AfterAddingStock_ContainsTicker)
     EXPECT_EQ(tickers[0], "AAPL");
 }
 
-TEST_F(InstrumentRepoTest, GetTickers_MultipleStocks_ReturnsAllTickers)
+TEST_F(InstrumentRepoTest, GetTickersMultipleStocksReturnsAllTickers)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
     static_cast<void>(_repo.addStock(makeStock("GOOG")));
@@ -202,23 +202,23 @@ TEST_F(InstrumentRepoTest, GetTickers_MultipleStocks_ReturnsAllTickers)
     ASSERT_EQ(tickers.size(), 3U);
 
     const std::set<std::string> tickerSet(tickers.begin(), tickers.end());
-    EXPECT_TRUE(tickerSet.count("AAPL") > 0);
-    EXPECT_TRUE(tickerSet.count("GOOG") > 0);
-    EXPECT_TRUE(tickerSet.count("MSFT") > 0);
+    EXPECT_TRUE(tickerSet.contains("AAPL"));
+    EXPECT_TRUE(tickerSet.contains("GOOG"));
+    EXPECT_TRUE(tickerSet.contains("MSFT"));
 }
 
 // ---------------------------------------------------------------------------
 // getStock (by ticker)
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, GetStock_NonExistentTicker_ReturnsNullopt)
+TEST_F(InstrumentRepoTest, GetStockNonExistentTickerReturnsNullopt)
 {
     const auto result = _repo.getStock("AAPL");
 
     EXPECT_FALSE(result.has_value());
 }
 
-TEST_F(InstrumentRepoTest, GetStock_ExistingTicker_ReturnsStock)
+TEST_F(InstrumentRepoTest, GetStockExistingTickerReturnsStock)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
@@ -228,7 +228,7 @@ TEST_F(InstrumentRepoTest, GetStock_ExistingTicker_ReturnsStock)
     EXPECT_EQ(result->getTicker(), "AAPL");
 }
 
-TEST_F(InstrumentRepoTest, GetStock_PreservesAllFields)
+TEST_F(InstrumentRepoTest, GetStockPreservesAllFields)
 {
     const auto stock = finance::Stock{
         "TSLA",
@@ -256,7 +256,7 @@ TEST_F(InstrumentRepoTest, GetStock_PreservesAllFields)
     EXPECT_EQ(result->getAssetClass(), AssetClass::Stock);
 }
 
-TEST_F(InstrumentRepoTest, GetStock_AssignedIdIsPositive)
+TEST_F(InstrumentRepoTest, GetStockAssignedIdIsPositive)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
@@ -271,14 +271,14 @@ TEST_F(InstrumentRepoTest, GetStock_AssignedIdIsPositive)
 // getStocks (by instrument ID set)
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, GetStocks_EmptyDatabase_ReturnsEmpty)
+TEST_F(InstrumentRepoTest, GetStocksEmptyDatabaseReturnsEmpty)
 {
     const auto stocks = _repo.getStocks({});
 
     EXPECT_TRUE(stocks.empty());
 }
 
-TEST_F(InstrumentRepoTest, GetStocks_EmptyIdSet_ReturnsAllStocks)
+TEST_F(InstrumentRepoTest, GetStocksEmptyIdSetReturnsAllStocks)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
     static_cast<void>(_repo.addStock(makeStock("GOOG")));
@@ -288,7 +288,7 @@ TEST_F(InstrumentRepoTest, GetStocks_EmptyIdSet_ReturnsAllStocks)
     EXPECT_EQ(stocks.size(), 2U);
 }
 
-TEST_F(InstrumentRepoTest, GetStocks_SpecificId_ReturnsOnlyMatchingStock)
+TEST_F(InstrumentRepoTest, GetStocksSpecificIdReturnsOnlyMatchingStock)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
     const auto [stockId, instrId] = _repo.addStock(makeStock("GOOG"));
@@ -300,7 +300,7 @@ TEST_F(InstrumentRepoTest, GetStocks_SpecificId_ReturnsOnlyMatchingStock)
     EXPECT_EQ(stocks[0].getTicker(), "GOOG");
 }
 
-TEST_F(InstrumentRepoTest, GetStocks_MultipleIds_ReturnsMatchingStocks)
+TEST_F(InstrumentRepoTest, GetStocksMultipleIdsReturnsMatchingStocks)
 {
     const auto [stockId1, instrId1] = _repo.addStock(makeStock("AAPL"));
     const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG"));
@@ -312,10 +312,10 @@ TEST_F(InstrumentRepoTest, GetStocks_MultipleIds_ReturnsMatchingStocks)
     ASSERT_EQ(stocks.size(), 2U);
 
     std::set<std::string> tickers;
-    for (const auto& s : stocks)
-        tickers.insert(s.getTicker());
+    for (const auto& stock : stocks)
+        tickers.insert(stock.getTicker());
 
-    EXPECT_TRUE(tickers.count("AAPL") > 0);
-    EXPECT_TRUE(tickers.count("GOOG") > 0);
-    EXPECT_FALSE(tickers.count("MSFT") > 0);
+    EXPECT_TRUE(tickers.contains("AAPL"));
+    EXPECT_TRUE(tickers.contains("GOOG"));
+    EXPECT_FALSE(tickers.contains("MSFT"));
 }

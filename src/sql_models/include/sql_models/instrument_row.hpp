@@ -3,6 +3,7 @@
 
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
+#include "orm/fixed_string.hpp"
 #include "orm/orm_model.hpp"
 
 /**
@@ -33,10 +34,11 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     /// field of the instrument table, this allows for concise definitions of
     /// foreign key fields that reference the instrument table with a specified
     /// deletion behavior (e.g., cascade or restrict)
-    template <orm::DeletionType T>
-    using ForeignId = Field<
+    template <orm::fixed_string tableName, orm::DeletionType T>
+    using ForeignId = orm::Field<
         "instrument_id",
         InstrumentId,
+        tableName,
         orm::foreign_key_t<T, InstrumentRow, decltype(InstrumentRow::id)>,
         orm::not_null_t>;
 };
