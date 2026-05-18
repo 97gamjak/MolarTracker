@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "base/base_store.hpp"
+#include "app/store/base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account.hpp"

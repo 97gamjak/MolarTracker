@@ -164,6 +164,24 @@ namespace app
         );
 
         // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]] Connection subscribeToEntryRemoved(
+            OnStoreItemRemoved<IdType>::func func,
+            void*                            user
+        );
+
+        // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]] Connection subscribeToEntryAdded(
+            OnStoreItemAdded<T>::func func,
+            void*                     user
+        );
+
+        // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]] Connection subscribeToEntryUpdated(
+            OnStoreItemUpdated<T>::func func,
+            void*                       user
+        );
+
+        // cppcheck-suppress functionConst -- false positive
         [[nodiscard]] Connection subscribeToStoreChange(
             StoreChanged<IdType>::func func,
             void*                      user

@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "app/services_api/i_transaction_service.hpp"
-#include "app/store/account_store.hpp"
+#include "app/store/account/account_store.hpp"
 #include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "config/id_types.hpp"
@@ -270,6 +270,17 @@ namespace app
      */
     void TransactionStore::_onAccountIdRemap(const accountMap<AccountId>& remap)
     {
+        const auto availableAccountIds = _availableAccountIds;
+        _availableAccountIds.clear();
+
+        for (const auto id : availableAccountIds)
+        {
+            if (remap.contains(id))
+                _availableAccountIds.push_back(remap.at(id));
+            else
+                _availableAccountIds.push_back(id);
+        }
+
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)

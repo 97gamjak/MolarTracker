@@ -11,6 +11,11 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
 
+namespace finance
+{
+    class Account;   // Forward declaration
+}   // namespace finance
+
 namespace app
 {
     class AccountStore;          // Forward declaration
@@ -36,6 +41,9 @@ namespace app
        private:
         /// The Transaction service
         std::shared_ptr<ITransactionService> _transactionService;
+
+        /// The available account IDs
+        std::vector<AccountId> _availableAccountIds;
 
         /// Connections for various events
         Connections _connections;

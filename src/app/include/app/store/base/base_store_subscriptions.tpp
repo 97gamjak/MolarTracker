@@ -2,6 +2,7 @@
 #define __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_SUBSCRIPTIONS_TPP__
 
 #include "base_store.hpp"
+#include "config/signal_tags.hpp"
 
 namespace app
 {
@@ -43,6 +44,63 @@ namespace app
     )
     {
         return this->template on<OnIdRemap<IdType>>(func, user);
+    }
+
+    /**
+     * @brief Subscribes a callback function to be called when an entry is
+     * removed from the store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param func
+     * @param user
+     * @return Connection
+     */
+    template <typename T, typename IdType>
+    Connection BaseStore<T, IdType>::subscribeToEntryRemoved(
+        OnStoreItemRemoved<IdType>::func func,
+        void*                            user
+    )
+    {
+        return this->template on<OnStoreItemRemoved<IdType>>(func, user);
+    }
+
+    /**
+     * @brief Subscribes a callback function to be called when an entry is
+     * updated in the store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param func
+     * @param user
+     * @return Connection
+     */
+    template <typename T, typename IdType>
+    Connection BaseStore<T, IdType>::subscribeToEntryUpdated(
+        OnStoreItemUpdated<T>::func func,
+        void*                       user
+    )
+    {
+        return this->template on<OnStoreItemUpdated<T>>(func, user);
+    }
+
+    /**
+     * @brief Subscribes a callback function to be called when an entry is added
+     * to the store.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param func
+     * @param user
+     * @return Connection
+     */
+    template <typename T, typename IdType>
+    Connection BaseStore<T, IdType>::subscribeToEntryAdded(
+        OnStoreItemAdded<T>::func func,
+        void*                     user
+    )
+    {
+        return this->template on<OnStoreItemAdded<T>>(func, user);
     }
 
     /**
