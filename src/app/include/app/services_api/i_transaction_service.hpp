@@ -37,6 +37,8 @@ namespace app
         /**
          * @brief Retrieves all transactions from the service.
          *
+         * @param accountIds The IDs of the accounts to retrieve transactions
+         * for.
          * @param filter The filter to apply to the transactions, this will be
          * converted to a WhereExpr and applied to the query when fetching
          * transactions from the database, if no filter is provided all
@@ -46,6 +48,7 @@ namespace app
          */
         [[nodiscard]]
         virtual std::vector<finance::Transaction> getTransactions(
+            const idSet<AccountId>&           accountIds,
             const finance::TransactionFilter& filter
         ) = 0;
     };

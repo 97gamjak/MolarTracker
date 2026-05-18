@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "app/store/account/account_session.hpp"
 #include "app/store/base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "exceptions/base.hpp"
@@ -50,6 +51,10 @@ namespace app
         /// accounts to load and manage in the store
         ProfileId _activeProfileId = ProfileId::invalid();
 
+        AccountSession _session;
+
+        Connections _connections;
+
        public:
         explicit AccountStore(
             const std::shared_ptr<IAccountService>& accountService
@@ -78,6 +83,8 @@ namespace app
         void commit();
 
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);
+
+        [[nodiscard]] const AccountSession& getAccountSession() const;
 
        private:
         void _refresh();

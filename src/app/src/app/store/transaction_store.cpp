@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "app/services_api/i_transaction_service.hpp"
+#include "app/store/account/account_session.hpp"
 #include "app/store/account/account_store.hpp"
 #include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
@@ -17,6 +18,25 @@ REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
 
 namespace app
 {
+
+    struct TransactionStore::Session
+    {
+        const AccountSession& _accountSession;
+
+        explicit Session(const AccountSession& accountSession)
+            : _accountSession(accountSession)
+        {
+        }
+
+        ~Session() = default;
+
+        // delete copy and moving
+        Session(const Session&)            = delete;
+        Session(Session&&)                 = delete;
+        Session& operator=(const Session&) = delete;
+        Session& operator=(Session&&)      = delete;
+    };
+
     /**
      * @brief Construct a new Transaction Store object
      *
@@ -24,14 +44,17 @@ namespace app
      * @param accountStore
      * @param stockStore
      * @param positionStore
+     * @param accountSession
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<ITransactionService>& transactionService,
         AccountStore&                               accountStore,
         StockStore&                                 stockStore,
-        PositionStore&                              positionStore
+        PositionStore&                              positionStore,
+        const AccountSession&                       accountSession
     )
-        : _transactionService(transactionService)
+        : _transactionService(transactionService),
+          _session(std::make_unique<Session>(accountSession))
     {
         _connections.add(accountStore.subscribeToIdRemap(
             [this](const AccountStore::IdMap& remap)
@@ -51,6 +74,8 @@ namespace app
             this
         ));
     }
+
+    TransactionStore::~TransactionStore() = default;
 
     /**
      * @brief Save all temporary changes to the database
@@ -166,7 +191,10 @@ namespace app
 
         auto transactions = _getEntries(options);
 
-        auto dbTransactions = _transactionService->getTransactions(filter);
+        auto dbTransactions = _transactionService->getTransactions(
+            _session->_accountSession.getIds(),
+            filter
+        );
 
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the

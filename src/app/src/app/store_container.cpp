@@ -43,7 +43,8 @@ namespace app
               services.getTransactionService(),
               *_accountStore,
               *_stockStore,
-              *_positionStore
+              *_positionStore,
+              _accountStore->getAccountSession()
           )},
           _connections{std::make_unique<Connections>()}
     {

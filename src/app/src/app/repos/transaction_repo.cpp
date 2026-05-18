@@ -95,6 +95,8 @@ namespace app
     /**
      * @brief get all transactions from the database
      *
+     * @param accountIds The IDs of the accounts to retrieve transactions
+     * for.
      * @param filter The filter to apply to the transactions, this will be
      * converted to a WhereExpr and applied to the query when fetching
      * transactions from the database, if no filter is provided all transactions
@@ -103,6 +105,7 @@ namespace app
      * @return std::vector<finance::Transaction>
      */
     std::vector<finance::Transaction> TransactionRepo::getTransactions(
+        const idSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
     {
@@ -130,17 +133,26 @@ namespace app
 
         for (const auto& [txRow] : txRows)
         {
-            const auto entryQuery = orm::Query{}.where(
+            const auto allEntriesQuery = orm::Query{}.where(
                 TransactionEntryRow::hasTransactionId(txRow.id.value())
             );
-            const auto legQuery = orm::Query{}.where(
+            const auto allLegsQuery = orm::Query{}.where(
                 TradeLegRow::hasTransactionId(txRow.id.value())
             );
 
             const auto entryRows =
-                _getCrud().get<TransactionEntryRow>(_getDb(), entryQuery);
+                _getCrud().get<TransactionEntryRow>(_getDb(), allEntriesQuery);
             const auto legRows =
-                _getCrud().get<TradeLegRow>(_getDb(), legQuery);
+                _getCrud().get<TradeLegRow>(_getDb(), allLegsQuery);
+
+            const auto inSet = [&](const auto& row)
+            { return accountIds.contains(row.accountId.value()); };
+
+            if (!std::ranges::all_of(entryRows, inSet) ||
+                !std::ranges::all_of(legRows, inSet))
+            {
+                continue;
+            }
 
             auto transaction = TransactionFactory::fromRow(txRow);
 

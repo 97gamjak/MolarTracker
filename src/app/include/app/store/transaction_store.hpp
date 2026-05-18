@@ -19,6 +19,7 @@ namespace finance
 namespace app
 {
     class AccountStore;          // Forward declaration
+    class AccountSession;        // Forward declaration
     class PositionStore;         // Forward declaration
     class StockStore;            // Forward declaration
     class ITransactionService;   // Forward declaration
@@ -45,6 +46,9 @@ namespace app
         /// The available account IDs
         std::vector<AccountId> _availableAccountIds;
 
+        struct Session;
+        std::unique_ptr<Session> _session;
+
         /// Connections for various events
         Connections _connections;
 
@@ -53,8 +57,10 @@ namespace app
             const std::shared_ptr<ITransactionService>& transactionService,
             AccountStore&                               accountStore,
             StockStore&                                 stockStore,
-            PositionStore&                              positionStore
+            PositionStore&                              positionStore,
+            const AccountSession&                       accountSession
         );
+        ~TransactionStore() override;
 
         void commit();
 
