@@ -8,57 +8,11 @@
 #include "db/database.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
+#include "test_fixtures.hpp"
 
 namespace
 {
-    // ---------- temp db file (portable; fixes Windows ":memory:" path issues)
-    // ----------
-
-    std::filesystem::path unique_db_file_path()
-    {
-        namespace fs = std::filesystem;
-
-        fs::path base;
-        try
-        {
-            base = fs::temp_directory_path();
-        }
-        catch (...)
-        {
-            base = fs::current_path();
-        }
-
-        std::random_device random;
-        const auto         random1 = static_cast<unsigned>(random());
-        const auto         random2 = static_cast<unsigned>(random());
-
-        return base / ("molartracker_test_" + std::to_string(random1) + "_" +
-                       std::to_string(random2) + ".sqlite");
-    }
-
-    class TempDbFile
-    {
-       public:
-        TempDbFile() : _path(unique_db_file_path()) {}
-
-        TempDbFile(TempDbFile const&)                      = delete;
-        TempDbFile& operator=(TempDbFile const&)           = delete;
-        TempDbFile(TempDbFile&& other) noexcept            = default;
-        TempDbFile& operator=(TempDbFile&& other) noexcept = default;
-
-        ~TempDbFile()
-        {
-            std::error_code errorCode;
-            std::filesystem::remove(_path, errorCode);
-        }
-
-        const std::filesystem::path& path() const noexcept { return _path; }
-
-       private:
-        std::filesystem::path _path;
-    };
-
-    db::Database make_test_db(TempDbFile& file)
+    db::Database make_test_db(tests::TempDbFile& file)
     {
         return db::Database{file.path()};
     }
@@ -95,8 +49,8 @@ namespace
 
 TEST(TransactionTest, CommitPersistsChanges)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -116,8 +70,8 @@ TEST(TransactionTest, CommitPersistsChanges)
 
 TEST(TransactionTest, RollbackDiscardsChanges)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -137,8 +91,8 @@ TEST(TransactionTest, RollbackDiscardsChanges)
 
 TEST(TransactionTest, DestructorRollsBackIfStillActive)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -155,8 +109,8 @@ TEST(TransactionTest, DestructorRollsBackIfStillActive)
 
 TEST(TransactionTest, CommitIsIdempotentAfterFirstCommit)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -176,8 +130,8 @@ TEST(TransactionTest, CommitIsIdempotentAfterFirstCommit)
 
 TEST(TransactionTest, RollbackIsIdempotentAfterFirstRollback)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -197,8 +151,8 @@ TEST(TransactionTest, RollbackIsIdempotentAfterFirstRollback)
 
 TEST(TransactionTest, MoveConstructorTransfersActivityAndDisarmsSource)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -219,8 +173,8 @@ TEST(TransactionTest, MoveConstructorTransfersActivityAndDisarmsSource)
 
 TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 
@@ -248,8 +202,8 @@ TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
 
 TEST(TransactionTest, ImmediateTransactionBehavesLikeTransaction)
 {
-    TempDbFile file;
-    auto       db = make_test_db(file);
+    tests::TempDbFile file;
+    auto              db = make_test_db(file);
 
     create_schema(db);
 

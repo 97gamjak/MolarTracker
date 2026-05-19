@@ -16,6 +16,7 @@ target_link_libraries(tests_app
     molartracker_db
     molartracker_logging
     molartracker_sql_models
+    molartracker_tests
     GTest::gtest_main
 )
 

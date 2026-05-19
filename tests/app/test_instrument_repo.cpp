@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <filesystem>
 #include <optional>
-#include <random>
 #include <set>
 #include <string>
 #include <vector>
@@ -14,63 +12,16 @@
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/instrument/stock.hpp"
+#include "test_fixtures.hpp"
 
 namespace
 {
-
-    std::filesystem::path unique_db_path()
-    {
-        namespace fs = std::filesystem;
-
-        fs::path base;
-        try
-        {
-            base = fs::temp_directory_path();
-        }
-        catch (...)
-        {
-            base = fs::current_path();
-        }
-
-        std::random_device random;
-        const auto         random1 = static_cast<unsigned>(random());
-        const auto         random2 = static_cast<unsigned>(random());
-
-        return base /
-               ("molartracker_instrument_repo_test_" + std::to_string(random1) +
-                "_" + std::to_string(random2) + ".sqlite");
-    }
-
-    class TempDbFile
-    {
-       public:
-        TempDbFile() : _path(unique_db_path()) {}
-
-        TempDbFile(const TempDbFile&)            = delete;
-        TempDbFile& operator=(const TempDbFile&) = delete;
-        TempDbFile(TempDbFile&&)                 = default;
-        TempDbFile& operator=(TempDbFile&&)      = default;
-
-        ~TempDbFile()
-        {
-            std::error_code errorCode;
-            std::filesystem::remove(_path, errorCode);
-        }
-
-        [[nodiscard]] const std::filesystem::path& path() const noexcept
-        {
-            return _path;
-        }
-
-       private:
-        std::filesystem::path _path;
-    };
 
     class InstrumentRepoTest : public ::testing::Test
     {
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        TempDbFile          _tempFile;
+        tests::TempDbFile   _tempFile;
         db::Database        _db;
         app::InstrumentRepo _repo;
         // NOLINTEND(misc-non-private-member-variables-in-classes)

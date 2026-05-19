@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <cassert>
-#include <filesystem>
-#include <random>
 #include <string>
 #include <vector>
 
@@ -15,65 +13,18 @@
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "sql_models/profile_row.hpp"
+#include "test_fixtures.hpp"
 
 namespace
 {
-
-    std::filesystem::path unique_db_path()
-    {
-        namespace fs = std::filesystem;
-
-        fs::path base;
-        try
-        {
-            base = fs::temp_directory_path();
-        }
-        catch (...)
-        {
-            base = fs::current_path();
-        }
-
-        std::random_device random;
-        const auto         random1 = static_cast<unsigned>(random());
-        const auto         random2 = static_cast<unsigned>(random());
-
-        return base /
-               ("molartracker_account_repo_test_" + std::to_string(random1) +
-                "_" + std::to_string(random2) + ".sqlite");
-    }
-
-    class TempDbFile
-    {
-       public:
-        TempDbFile() : _path(unique_db_path()) {}
-
-        TempDbFile(const TempDbFile&)            = delete;
-        TempDbFile& operator=(const TempDbFile&) = delete;
-        TempDbFile(TempDbFile&&)                 = default;
-        TempDbFile& operator=(TempDbFile&&)      = default;
-
-        ~TempDbFile()
-        {
-            std::error_code errorCode;
-            std::filesystem::remove(_path, errorCode);
-        }
-
-        [[nodiscard]] const std::filesystem::path& path() const noexcept
-        {
-            return _path;
-        }
-
-       private:
-        std::filesystem::path _path;
-    };
 
     class AccountRepoTest : public ::testing::Test
     {
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        TempDbFile       _tempFile;
-        db::Database     _db;
-        app::AccountRepo _repo;
+        tests::TempDbFile _tempFile;
+        db::Database      _db;
+        app::AccountRepo  _repo;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         AccountRepoTest() : _db{_tempFile.path()}, _repo{_db}

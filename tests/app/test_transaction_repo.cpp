@@ -37,44 +37,11 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
 #include "finance/transaction_filter.hpp"
+#include "test_fixtures.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
 {
-    std::filesystem::path unique_temp_db_path()
-    {
-        const auto tmp = std::filesystem::temp_directory_path();
-
-        std::random_device                           rd;
-        std::mt19937_64                              gen(rd());
-        std::uniform_int_distribution<std::uint64_t> dis;
-
-        return tmp /
-               ("molartracker_txrepo_" + std::to_string(dis(gen)) + ".sqlite");
-    }
-
-    struct TempDbFile
-    {
-        std::filesystem::path path;
-
-        explicit TempDbFile(std::filesystem::path p) : path(std::move(p)) {}
-
-        ~TempDbFile()
-        {
-            std::error_code ec;
-            std::filesystem::remove(path, ec);
-            std::filesystem::remove(
-                std::filesystem::path(path.string() + ".bck"),
-                ec
-            );
-        }
-
-        TempDbFile(const TempDbFile&)            = delete;
-        TempDbFile& operator=(const TempDbFile&) = delete;
-        TempDbFile(TempDbFile&&)                 = delete;
-        TempDbFile& operator=(TempDbFile&&)      = delete;
-    };
-
     // Fixed epoch value used in all round-trip assertions.
     // Using fromInt64 / toInt64 avoids sub-millisecond precision loss.
     constexpr std::int64_t TEST_TS = 1'715'000'000'000LL;
@@ -87,8 +54,8 @@ namespace
         const InstrumentId _instrumentId{1};
         const PositionId   _positionId{1};
 
-        TempDbFile           _tempFile{unique_temp_db_path()};
-        db::Database         _db{_tempFile.path};
+        tests::TempDbFile    _tempFile{};
+        db::Database         _db{_tempFile.path()};
         app::MigrationRunner _migrationRunner{_db};
         app::TransactionRepo _repo{_db};
 
