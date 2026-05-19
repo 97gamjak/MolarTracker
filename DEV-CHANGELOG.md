@@ -58,6 +58,12 @@ All changes and updates, that are relevant for developers will be documented her
   and Trade transactions, entry/leg persistence, comment round-trips, ID
   sequencing, and empty-database behavior
 - Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`,     `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
+- Add `tests/app/test_instrument_repo.cpp` with GoogleTest fixture covering
+  `InstrumentRepo::addStock` (returns valid IDs, persists data, rejects
+  duplicate tickers), `getTickers` (empty, single, multiple),
+  `getStock` (by ticker: hit, miss, full field round-trip, assigned IDs),
+  `getStocks` (empty DB, empty id-set returns all, filtered by specific IDs),
+  and `stockExists` (existing and non-existing tickers)
 
 ### Features
 

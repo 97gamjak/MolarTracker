@@ -13,62 +13,15 @@
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "orm/crud/crud_error.hpp"
+#include "test_fixtures.hpp"
 
 namespace
 {
 
-    std::filesystem::path unique_db_path()
-    {
-        namespace fs = std::filesystem;
-
-        fs::path base;
-        try
-        {
-            base = fs::temp_directory_path();
-        }
-        catch (...)
-        {
-            base = fs::current_path();
-        }
-
-        std::random_device rd;
-        const auto         r1 = static_cast<unsigned>(rd());
-        const auto         r2 = static_cast<unsigned>(rd());
-
-        return base / ("molartracker_profile_repo_test_" +
-                       std::to_string(r1) + "_" + std::to_string(r2) +
-                       ".sqlite");
-    }
-
-    class TempDbFile
-    {
-       public:
-        TempDbFile() : _path(unique_db_path()) {}
-
-        TempDbFile(const TempDbFile&)            = delete;
-        TempDbFile& operator=(const TempDbFile&) = delete;
-        TempDbFile(TempDbFile&&)                 = default;
-        TempDbFile& operator=(TempDbFile&&)      = default;
-
-        ~TempDbFile()
-        {
-            std::error_code ec;
-            std::filesystem::remove(_path, ec);
-        }
-
-        [[nodiscard]] const std::filesystem::path& path() const noexcept
-        {
-            return _path;
-        }
-
-       private:
-        std::filesystem::path _path;
-    };
-
     class ProfileRepoTest : public ::testing::Test
     {
        protected:
-        TempDbFile        _tempFile;
+        tests::TempDbFile _tempFile;
         db::Database      _db;
         app::ProfileRepo  _repo;
 
@@ -175,8 +128,7 @@ TEST_F(ProfileRepoTest, GetAll_ReturnsAllCreatedProfiles)
 
 TEST_F(ProfileRepoTest, GetAll_ReturnsCorrectProfileData)
 {
-    const auto id =
-        _repo.create("Eve", std::string{"eve@example.com"});
+    const auto id = _repo.create("Eve", std::string{"eve@example.com"});
 
     const auto profiles = _repo.getAll();
     ASSERT_EQ(profiles.size(), 1u);
@@ -224,10 +176,7 @@ TEST_F(ProfileRepoTest, Update_DuplicateNameThrows)
     const auto id1 = _repo.create("Heidi", std::nullopt);
     static_cast<void>(_repo.create("Ivan", std::nullopt));
 
-    EXPECT_THROW(
-        _repo.update(id1, "Ivan", std::nullopt),
-        orm::CrudException
-    );
+    EXPECT_THROW(_repo.update(id1, "Ivan", std::nullopt), orm::CrudException);
 }
 
 TEST_F(ProfileRepoTest, Remove_DeletesProfile)

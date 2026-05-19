@@ -30,7 +30,7 @@ namespace app
         ) override;
 
         [[nodiscard]]
-        std::pair<StockId, InstrumentId> addStock(
+        finance::StockInsertionResult addStock(
             const finance::Stock& stock
         ) override;
 

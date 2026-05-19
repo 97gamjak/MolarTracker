@@ -37,25 +37,28 @@ namespace
     {
         const auto tmp = std::filesystem::temp_directory_path();
 
-        std::random_device                           rd;
-        std::mt19937_64                              gen(rd());
+        std::random_device                           random;
+        std::mt19937_64                              gen(random());
         std::uniform_int_distribution<std::uint64_t> dis;
 
-        const auto r = dis(gen);
+        const auto rand = dis(gen);
 
-        return tmp / (std::string(stem) + "_" + std::to_string(r) + ".sqlite");
+        return tmp /
+               (std::string(stem) + "_" + std::to_string(rand) + ".sqlite");
     }
 
     struct TempDbFile
     {
         std::filesystem::path path;
 
-        explicit TempDbFile(std::filesystem::path p) : path(std::move(p)) {}
+        explicit TempDbFile(std::filesystem::path path) : path(std::move(path))
+        {
+        }
 
         ~TempDbFile()
         {
-            std::error_code ec;
-            std::filesystem::remove(path, ec);
+            std::error_code errorCode;
+            std::filesystem::remove(path, errorCode);
         }
 
         TempDbFile(TempDbFile const&)            = delete;
@@ -71,12 +74,12 @@ namespace
     }
 
     void expect_sqlite_error_contains(
-        db::SqliteError const& ex,
+        db::SqliteError const& exception,
         std::string_view       needle1,
         std::string_view       needle2 = {}
     )
     {
-        const std::string msg = ex.what();
+        const std::string msg = exception.what();
         expect_contains(msg, needle1);
         if (!needle2.empty())
             expect_contains(msg, needle2);
@@ -85,24 +88,24 @@ namespace
 
 TEST(Database, ConstructsAndOpensCreatesFileIsOpenNativeHandleNonNull)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    EXPECT_FALSE(std::filesystem::exists(p));
+    EXPECT_FALSE(std::filesystem::exists(path));
 
-    db::Database db(p);
+    db::Database db(path);
     EXPECT_TRUE(db.isOpen());
     EXPECT_NE(db.nativeHandle(), nullptr);
 
-    EXPECT_TRUE(std::filesystem::exists(p));
+    EXPECT_TRUE(std::filesystem::exists(path));
 }
 
 TEST(Database, ConstructorWithRelativePathCreatesFileAtAbsoluteResolvedLocation)
 {
     const auto tmp_dir = std::filesystem::temp_directory_path() /
-                         "molartracker_db_relpath_test_dir";
-    std::error_code ec;
-    std::filesystem::create_directories(tmp_dir, ec);
+                         "molartracker_db_rel_path_test_dir";
+    std::error_code errorCode;
+    std::filesystem::create_directories(tmp_dir, errorCode);
 
     const auto old_cwd = std::filesystem::current_path();
     std::filesystem::current_path(tmp_dir);
@@ -122,15 +125,15 @@ TEST(Database, ConstructorWithRelativePathCreatesFileAtAbsoluteResolvedLocation)
     EXPECT_TRUE(std::filesystem::exists(abs));
 
     std::filesystem::current_path(old_cwd);
-    std::filesystem::remove_all(tmp_dir, ec);
+    std::filesystem::remove_all(tmp_dir, errorCode);
 }
 
 TEST(Database, CloseIsIdempotentAndClearsOpenState)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
     EXPECT_TRUE(db.isOpen());
 
     db.close();
@@ -144,10 +147,10 @@ TEST(Database, CloseIsIdempotentAndClearsOpenState)
 
 TEST(Database, ExecuteThrowsWhenDatabaseNotOpen)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
     db.close();
 
     try
@@ -163,10 +166,10 @@ TEST(Database, ExecuteThrowsWhenDatabaseNotOpen)
 
 TEST(Database, PrepareThrowsWhenDatabaseNotOpen)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
     db.close();
 
     EXPECT_THROW((void) db.prepare("SELECT 1;"), db::SqliteError);
@@ -174,10 +177,10 @@ TEST(Database, PrepareThrowsWhenDatabaseNotOpen)
 
 TEST(Database, ExecuteValidSqlCreatesTableAndInsertsAndChangesReflectsRows)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
 
     EXPECT_NO_THROW(db.execute(
         "CREATE TABLE test_items(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT);"
@@ -202,10 +205,10 @@ TEST(Database, ExecuteValidSqlCreatesTableAndInsertsAndChangesReflectsRows)
 
 TEST(Database, ExecuteInvalidSqlThrowsAndMessageContainsSql)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
 
     const std::string bad_sql = "CREAT TABLE nope(x);";
 
@@ -222,10 +225,10 @@ TEST(Database, ExecuteInvalidSqlThrowsAndMessageContainsSql)
 
 TEST(Database, PrepareValidSqlDoesNotThrow)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
     db.execute("CREATE TABLE t(id INTEGER PRIMARY KEY, v INTEGER);");
     db.execute("INSERT INTO t(id, v) VALUES(1, 42);");
 
@@ -234,10 +237,10 @@ TEST(Database, PrepareValidSqlDoesNotThrow)
 
 TEST(Database, PrepareInvalidSqlThrowsAndMessageContainsSql)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
 
     const std::string bad_sql = "SELECT FROM;";
 
@@ -254,10 +257,10 @@ TEST(Database, PrepareInvalidSqlThrowsAndMessageContainsSql)
 
 TEST(Database, EnableForeignKeysEnforcesConstraintsWhenOnAndAllowsWhenOff)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
 
     db.execute("CREATE TABLE parent(id INTEGER PRIMARY KEY);");
     db.execute(
@@ -285,65 +288,66 @@ TEST(Database, EnableForeignKeysEnforcesConstraintsWhenOnAndAllowsWhenOff)
 
 TEST(Database, MoveConstructorTransfersOwnershipAndLeavesOtherClosed)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database a(p);
-    ASSERT_TRUE(a.isOpen());
-    ASSERT_NE(a.nativeHandle(), nullptr);
+    db::Database dbA(path);
+    ASSERT_TRUE(dbA.isOpen());
+    ASSERT_NE(dbA.nativeHandle(), nullptr);
 
-    sqlite3* const handle_a = a.nativeHandle();
+    sqlite3* const handle_a = dbA.nativeHandle();
 
-    db::Database b(std::move(a));
+    db::Database dbB(std::move(dbA));
 
-    EXPECT_FALSE(a.isOpen());
-    EXPECT_EQ(a.nativeHandle(), nullptr);
+    EXPECT_FALSE(dbA.isOpen());
+    EXPECT_EQ(dbA.nativeHandle(), nullptr);
 
-    EXPECT_TRUE(b.isOpen());
-    EXPECT_EQ(b.nativeHandle(), handle_a);
+    EXPECT_TRUE(dbB.isOpen());
+    EXPECT_EQ(dbB.nativeHandle(), handle_a);
 
-    EXPECT_NO_THROW(b.execute("CREATE TABLE t(x INTEGER);"));
+    EXPECT_NO_THROW(dbB.execute("CREATE TABLE t(x INTEGER);"));
 }
 
 TEST(Database, MoveAssignmentClosesTargetThenTransfersOwnership)
 {
-    const auto p1 = unique_temp_db_path("db_test_a");
-    const auto p2 = unique_temp_db_path("db_test_b");
-    TempDbFile cleanup1{p1};
-    TempDbFile cleanup2{p2};
+    const auto path1 = unique_temp_db_path("db_test_a");
+    const auto path2 = unique_temp_db_path("db_test_b");
+    TempDbFile cleanup1{path1};
+    TempDbFile cleanup2{path2};
 
-    db::Database a(p1);
-    db::Database b(p2);
+    db::Database dbA(path1);
+    db::Database dbB(path2);
 
-    sqlite3* const handle_a = a.nativeHandle();
-    sqlite3* const handle_b = b.nativeHandle();
+    sqlite3* const handle_a = dbA.nativeHandle();
+    sqlite3* const handle_b = dbB.nativeHandle();
     ASSERT_NE(handle_a, nullptr);
     ASSERT_NE(handle_b, nullptr);
     ASSERT_NE(handle_a, handle_b);
 
-    b = std::move(a);
+    dbB = std::move(dbA);
 
-    EXPECT_FALSE(a.isOpen());
-    EXPECT_EQ(a.nativeHandle(), nullptr);
+    EXPECT_FALSE(dbA.isOpen());
+    EXPECT_EQ(dbA.nativeHandle(), nullptr);
 
-    EXPECT_TRUE(b.isOpen());
-    EXPECT_EQ(b.nativeHandle(), handle_a);
+    EXPECT_TRUE(dbB.isOpen());
+    EXPECT_EQ(dbB.nativeHandle(), handle_a);
 
-    EXPECT_NO_THROW(b.execute("CREATE TABLE t(x INTEGER);"));
+    EXPECT_NO_THROW(dbB.execute("CREATE TABLE t(x INTEGER);"));
 }
 
 TEST(Database, BusyTimeoutUnderWriteLockEventuallyThrows)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database locker(p);
-    db::Database contender(p);
+    db::Database locker(path);
+    db::Database contender(path);
 
     locker.execute("CREATE TABLE t(id INTEGER PRIMARY KEY, v INTEGER);");
     locker.execute("INSERT INTO t(id, v) VALUES(1, 1);");
 
-    contender.setBusyTimeout(50);
+    constexpr auto timeout_ms = 50;
+    contender.setBusyTimeout(timeout_ms);
 
     locker.execute("BEGIN EXCLUSIVE TRANSACTION;");
 
@@ -373,14 +377,14 @@ TEST(Database, BusyTimeoutUnderWriteLockEventuallyThrows)
 
 TEST(Database, OpenAfterCloseReopensAndOperates)
 {
-    const auto p = unique_temp_db_path();
-    TempDbFile cleanup{p};
+    const auto path = unique_temp_db_path();
+    TempDbFile cleanup{path};
 
-    db::Database db(p);
+    db::Database db(path);
     db.close();
     EXPECT_FALSE(db.isOpen());
 
-    EXPECT_NO_THROW(db.open(p.string()));
+    EXPECT_NO_THROW(db.open(path.string()));
     EXPECT_TRUE(db.isOpen());
 
     EXPECT_NO_THROW(db.execute("CREATE TABLE t(x INTEGER);"));
@@ -390,8 +394,8 @@ TEST(Database, OpenInvalidPathThrows)
 {
     const auto dir =
         std::filesystem::temp_directory_path() / "molartracker_db_open_dir";
-    std::error_code ec;
-    std::filesystem::create_directories(dir, ec);
+    std::error_code errorCode;
+    std::filesystem::create_directories(dir, errorCode);
 
     try
     {
@@ -403,5 +407,5 @@ TEST(Database, OpenInvalidPathThrows)
         expect_sqlite_error_contains(ex, "Failed to open sqlite database");
     }
 
-    std::filesystem::remove_all(dir, ec);
+    std::filesystem::remove_all(dir, errorCode);
 }

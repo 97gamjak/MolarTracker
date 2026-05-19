@@ -1,5 +1,6 @@
 add_executable(tests_app
     test_account_repo.cpp
+    test_instrument_repo.cpp
     test_profile_repo.cpp
     test_transaction_repo.cpp
 )
@@ -15,6 +16,7 @@ target_link_libraries(tests_app
     molartracker_db
     molartracker_logging
     molartracker_sql_models
+    molartracker_tests
     GTest::gtest_main
 )
 
