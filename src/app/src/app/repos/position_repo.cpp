@@ -6,6 +6,7 @@
 #include "finance/position.hpp"
 #include "orm/query_options.hpp"
 #include "sql_models/position_row.hpp"
+#include "sql_models/trade_leg_row.hpp"
 
 namespace app
 {
@@ -30,29 +31,81 @@ namespace app
     }
 
     /**
+     * @brief Create a Position Joins object
+     *
+     * @return orm::Joins
+     */
+    orm::Joins PositionRepo::_createPositionJoins()
+    {
+        return std::move(
+            orm::Joins{}.add(
+                orm::join<PositionRow::idField, TradeLegRow::positionIdField>()
+            )
+        );
+    }
+
+    /**
+     * @brief Create a Position Query object
+     *
+     * @param accountIds
+     * @return orm::Query
+     */
+    orm::Query PositionRepo::_createPositionQuery(
+        const idSet<AccountId>& accountIds
+    )
+    {
+        return std::move(
+            orm::Query{}.in<TradeLegRow::accountIdField>(accountIds)
+        );
+    }
+
+    /**
      * @brief Get all Positions
+     *
+     * @param accountIds The IDs of the accounts to retrieve positions for.
      *
      * @return std::vector<finance::Position>
      */
-    std::vector<finance::Position> PositionRepo::getAllPositions()
+    std::vector<finance::Position> PositionRepo::getAllPositions(
+        const idSet<AccountId>& accountIds
+    )
     {
-        auto result = _getCrud().get<PositionRow>(_getDb());
+        const auto joins = _createPositionJoins();
+        const auto query = _createPositionQuery(accountIds);
 
-        return PositionFactory::fromPositionRows(result);
+        auto result = _getCrud().getJoined<PositionRow>(_getDb(), joins, query);
+
+        std::vector<PositionRow> positionRows;
+        positionRows.reserve(result.size());
+        for (const auto& [row] : result)
+            positionRows.push_back(row);
+
+        return PositionFactory::fromPositionRows(positionRows);
     }
 
     /**
      * @brief Get all open Positions
      *
+     * @param accountIds The IDs of the accounts to retrieve positions for.
+     *
      * @return std::vector<finance::Position>
      */
-    std::vector<finance::Position> PositionRepo::getAllOpenPositions()
+    std::vector<finance::Position> PositionRepo::getAllOpenPositions(
+        const idSet<AccountId>& accountIds
+    )
     {
-        const auto query = orm::Query{}.where(PositionRow::IsOpen());
+        const auto joins = _createPositionJoins();
+        const auto query =
+            _createPositionQuery(accountIds).where(PositionRow::IsOpen());
 
-        auto result = _getCrud().get<PositionRow>(_getDb(), query);
+        auto result = _getCrud().getJoined<PositionRow>(_getDb(), joins, query);
 
-        return PositionFactory::fromPositionRows(result);
+        std::vector<PositionRow> positionRows;
+        positionRows.reserve(result.size());
+        for (const auto& [row] : result)
+            positionRows.push_back(row);
+
+        return PositionFactory::fromPositionRows(positionRows);
     }
 
 }   // namespace app

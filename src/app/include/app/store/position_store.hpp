@@ -10,6 +10,7 @@
 namespace app
 {
     class TransactionStore;   // Forward declaration
+    class AccountSession;     // Forward declaration
 
     /**
      * @brief Store for managing Positions
@@ -21,10 +22,17 @@ namespace app
         /// The Position service
         std::shared_ptr<IPositionService> _positionService;
 
+        struct Session;
+        /// The current session data
+        std::unique_ptr<Session> _session;
+
        public:
         explicit PositionStore(
-            std::shared_ptr<IPositionService> positionService
+            std::shared_ptr<IPositionService> positionService,
+            const AccountSession&             session
         );
+
+        ~PositionStore() override;
 
         [[nodiscard]]
         PositionId createPosition(const finance::Position& position);

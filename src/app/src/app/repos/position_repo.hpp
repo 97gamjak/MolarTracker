@@ -5,6 +5,12 @@
 #include "app/repos_api/i_position_repo.hpp"
 #include "config/id_types.hpp"
 
+namespace orm
+{
+    class Joins;   // Forward declaration
+    class Query;   // Forward declaration
+}   // namespace orm
+
 namespace app
 {
     /**
@@ -20,10 +26,23 @@ namespace app
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getAllPositions() override;
+        std::vector<finance::Position> getAllPositions(
+            const idSet<AccountId>& accountIds
+        ) override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getAllOpenPositions() override;
+        std::vector<finance::Position> getAllOpenPositions(
+            const idSet<AccountId>& accountIds
+        ) override;
+
+       private:
+        [[nodiscard]]
+        static orm::Joins _createPositionJoins();
+
+        [[nodiscard]]
+        static orm::Query _createPositionQuery(
+            const idSet<AccountId>& accountIds
+        );
     };
 }   // namespace app
 
