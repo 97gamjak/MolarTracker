@@ -18,15 +18,12 @@ namespace
        public:
         friend settings::ParamContainerMixin<TestContainer>;
 
-        settings::ParamContainer     _core{"tc", "Test Container", "TC desc"};
-        settings::ParamCore<int>     _intParam{"intKey", "Int", "An int"};
-        settings::ParamCore<std::string> _strParam{
-            "strKey",
-            "Str",
-            "A string"
-        };
+        settings::ParamContainer _core{"tc", "Test Container", "TC desc"};
+        settings::ParamCore<int> _intParam{"intKey", "Int", "An int"};
+        settings::ParamCore<std::string> _strParam{"strKey", "Str", "A string"};
 
         template <typename Func>
+        // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
         void forEachParam(Func&& func)
         {
             func(_intParam);
@@ -34,6 +31,7 @@ namespace
         }
 
         template <typename Func>
+        // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
         void forEachParam(Func&& func) const
         {
             func(_intParam);
@@ -48,20 +46,20 @@ namespace
 
 TEST(ParamContainerMixin, GetKeyReturnsContainerKey)
 {
-    TestContainer tc;
-    EXPECT_EQ(tc.getKey(), "tc");
+    TestContainer testContainer;
+    EXPECT_EQ(testContainer.getKey(), "tc");
 }
 
 TEST(ParamContainerMixin, GetTitleReturnsContainerTitle)
 {
-    TestContainer tc;
-    EXPECT_EQ(tc.getTitle(), "Test Container");
+    TestContainer testContainer;
+    EXPECT_EQ(testContainer.getTitle(), "Test Container");
 }
 
 TEST(ParamContainerMixin, GetDescriptionReturnsContainerDescription)
 {
-    TestContainer tc;
-    EXPECT_EQ(tc.getDescription(), "TC desc");
+    TestContainer testContainer;
+    EXPECT_EQ(testContainer.getDescription(), "TC desc");
 }
 
 // ============================================================================
@@ -70,44 +68,48 @@ TEST(ParamContainerMixin, GetDescriptionReturnsContainerDescription)
 
 TEST(ParamContainerMixin, IsDirtyFalseOnFreshContainer)
 {
-    TestContainer tc;
-    EXPECT_FALSE(tc.isDirty());
+    TestContainer testContainer;
+    EXPECT_FALSE(testContainer.isDirty());
 }
 
 TEST(ParamContainerMixin, IsDirtyTrueWhenIntParamChanged)
 {
-    TestContainer tc;
-    tc._intParam.set(42);
-    EXPECT_TRUE(tc.isDirty());
+    const auto    paramValue = 42;
+    TestContainer testContainer;
+    testContainer._intParam.set(paramValue);
+    EXPECT_TRUE(testContainer.isDirty());
 }
 
 TEST(ParamContainerMixin, IsDirtyTrueWhenStrParamChanged)
 {
-    TestContainer tc;
-    tc._strParam.set(std::string("hello"));
-    EXPECT_TRUE(tc.isDirty());
+    const auto    paramValue = std::string("hello");
+    TestContainer testContainer;
+    testContainer._strParam.set(paramValue);
+    EXPECT_TRUE(testContainer.isDirty());
 }
 
 TEST(ParamContainerMixin, CommitClearsDirtyForAllParams)
 {
-    TestContainer tc;
-    tc._intParam.set(1);
-    tc._strParam.set(std::string("world"));
-    EXPECT_TRUE(tc.isDirty());
+    TestContainer testContainer;
+    testContainer._intParam.set(1);
+    testContainer._strParam.set(std::string("world"));
+    EXPECT_TRUE(testContainer.isDirty());
 
-    tc.commit();
-    EXPECT_FALSE(tc.isDirty());
+    testContainer.commit();
+    EXPECT_FALSE(testContainer.isDirty());
 }
 
 TEST(ParamContainerMixin, IsDirtyTrueAfterCommitAndNewChange)
 {
-    TestContainer tc;
-    tc._intParam.set(10);
-    tc.commit();
-    EXPECT_FALSE(tc.isDirty());
+    TestContainer testContainer;
+    const auto    paramValue = 10;
+    testContainer._intParam.set(paramValue);
+    testContainer.commit();
+    EXPECT_FALSE(testContainer.isDirty());
 
-    tc._intParam.set(20);
-    EXPECT_TRUE(tc.isDirty());
+    const auto paramValue2 = 20;
+    testContainer._intParam.set(paramValue2);
+    EXPECT_TRUE(testContainer.isDirty());
 }
 
 // ============================================================================
@@ -116,24 +118,26 @@ TEST(ParamContainerMixin, IsDirtyTrueAfterCommitAndNewChange)
 
 TEST(ParamContainerMixin, ToJsonContainsBothParamKeys)
 {
-    TestContainer tc;
-    tc._intParam.set(7);
-    tc._strParam.set(std::string("test"));
+    TestContainer testContainer;
+    const auto    paramValue = 7;
+    testContainer._intParam.set(paramValue);
+    testContainer._strParam.set(std::string("test"));
 
-    auto json = tc.toJson();
+    auto json = testContainer.toJson();
     EXPECT_TRUE(json.contains("intKey"));
     EXPECT_TRUE(json.contains("strKey"));
 }
 
 TEST(ParamContainerMixin, ToJsonValuesMatchParams)
 {
-    TestContainer tc;
-    tc._intParam.set(99);
-    tc._strParam.set(std::string("abc"));
+    TestContainer testContainer;
+    const auto    paramValue = 99;
+    testContainer._intParam.set(paramValue);
+    testContainer._strParam.set(std::string("abc"));
 
-    auto json  = tc.toJson();
+    auto json  = testContainer.toJson();
     auto intJs = json["intKey"];
-    EXPECT_EQ(intJs["value"].get<int>(), 99);
+    EXPECT_EQ(intJs["value"].get<int>(), paramValue);
 }
 
 // ============================================================================
@@ -143,14 +147,15 @@ TEST(ParamContainerMixin, ToJsonValuesMatchParams)
 TEST(ParamContainerMixin, FromJsonRestoresParamValues)
 {
     TestContainer source;
-    source._intParam.set(123);
+    const auto    paramValue = 123;
+    source._intParam.set(paramValue);
     source._strParam.set(std::string("roundtrip"));
     auto json = source.toJson();
 
     TestContainer target;
     TestContainer::fromJson(json, target);
 
-    EXPECT_EQ(target._intParam.get(), 123);
+    EXPECT_EQ(target._intParam.get(), paramValue);
     EXPECT_EQ(target._strParam.get(), std::string("roundtrip"));
 }
 
@@ -158,7 +163,8 @@ TEST(ParamContainerMixin, FromJsonMissingKeyLeavesParamUntouched)
 {
     // Provide JSON with only one of the two param keys
     TestContainer source;
-    source._intParam.set(50);
+    const auto    paramValue = 50;
+    source._intParam.set(paramValue);
     auto json = source.toJson();
     json.erase("strKey");   // remove strKey entry
 
@@ -166,7 +172,7 @@ TEST(ParamContainerMixin, FromJsonMissingKeyLeavesParamUntouched)
     target._strParam.set(std::string("original"));
     TestContainer::fromJson(json, target);
 
-    EXPECT_EQ(target._intParam.get(), 50);
+    EXPECT_EQ(target._intParam.get(), paramValue);
     // strKey was absent from JSON, so _strParam keeps its previous value
     EXPECT_EQ(target._strParam.get(), std::string("original"));
 }
@@ -177,28 +183,29 @@ TEST(ParamContainerMixin, FromJsonMissingKeyLeavesParamUntouched)
 
 TEST(ParamContainerMixin, SubscribeToDirtyFiresWhenParamChanges)
 {
-    TestContainer tc;
+    TestContainer testContainer;
     bool          lastDirty = false;
 
-    auto conns = tc.subscribeToDirty(
-        [&](const bool& d) { lastDirty = d; },
+    auto conns = testContainer.subscribeToDirty(
+        [&](const bool& value) { lastDirty = value; },
         nullptr
     );
 
-    tc._intParam.set(77);
+    const auto paramValue = 77;
+    testContainer._intParam.set(paramValue);
     EXPECT_TRUE(lastDirty);
 }
 
 TEST(ParamContainerMixin, SubscribeToDirtyFiresForStrParam)
 {
-    TestContainer tc;
+    TestContainer testContainer;
     bool          lastDirty = false;
 
-    auto conns = tc.subscribeToDirty(
-        [&](const bool& d) { lastDirty = d; },
+    auto conns = testContainer.subscribeToDirty(
+        [&](const bool& value) { lastDirty = value; },
         nullptr
     );
 
-    tc._strParam.set(std::string("changed"));
+    testContainer._strParam.set(std::string("changed"));
     EXPECT_TRUE(lastDirty);
 }

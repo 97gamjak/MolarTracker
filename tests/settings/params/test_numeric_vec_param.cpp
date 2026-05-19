@@ -49,9 +49,10 @@ TEST(NumericVecParam, ConstructorSetsDescription)
 TEST(NumericVecParam, SetAndGetByIndex)
 {
     settings::NumericVecParam<int, 3> vec("v", "V", "D");
-    auto                              r = vec.set(0, 10);
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(vec.get(0), 10);
+    const auto                        value  = 10;
+    auto                              result = vec.set(0, value);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(vec.get(0), value);
 }
 
 TEST(NumericVecParam, SetMultipleIndices)
@@ -68,7 +69,9 @@ TEST(NumericVecParam, SetMultipleIndices)
 TEST(NumericVecParam, SetOutOfRangeIndexReturnsError)
 {
     settings::NumericVecParam<int, 2> vec("v", "V", "D");
-    auto                              result = vec.set(2, 99);   // index == N
+    const auto                        paramValue = 99;
+
+    auto result = vec.set(2, paramValue);   // index == N
     EXPECT_FALSE(result.has_value());
     EXPECT_FALSE(result.error().getMessage().empty());
 }
@@ -94,10 +97,15 @@ TEST(NumericVecParam, GetParamOutOfRangeThrows)
 TEST(NumericVecParam, SetDefaultsVectorAppliesDefaults)
 {
     settings::NumericVecParam<int, 3> vec("v", "V", "D");
-    vec.setDefaults(std::vector<int>{10, 20, 30});
-    EXPECT_EQ(vec.get(0), 10);
-    EXPECT_EQ(vec.get(1), 20);
-    EXPECT_EQ(vec.get(2), 30);
+    const auto                        value1 = 10;
+    const auto                        value2 = 20;
+    const auto                        value3 = 30;
+
+    vec.setDefaults(std::vector<int>{value1, value2, value3});
+
+    EXPECT_EQ(vec.get(0), value1);
+    EXPECT_EQ(vec.get(1), value2);
+    EXPECT_EQ(vec.get(2), value3);
 }
 
 TEST(NumericVecParam, SetDefaultsVectorWrongSizeThrows)
@@ -112,9 +120,13 @@ TEST(NumericVecParam, SetDefaultsVectorWrongSizeThrows)
 TEST(NumericVecParam, SetDefaultsPairForSize2)
 {
     settings::NumericVecParam<int, 2> vec("v", "V", "D");
-    vec.setDefaults(std::pair<int, int>{5, 7});
-    EXPECT_EQ(vec.get(0), 5);
-    EXPECT_EQ(vec.get(1), 7);
+    const auto                        value1 = 5;
+    const auto                        value2 = 7;
+
+    vec.setDefaults(std::pair<int, int>{value1, value2});
+
+    EXPECT_EQ(vec.get(0), value1);
+    EXPECT_EQ(vec.get(1), value2);
 }
 
 // ============================================================================
@@ -142,11 +154,15 @@ TEST(NumericVecParam, SetMinValuesVectorWrongSizeThrows)
 TEST(NumericVecParam, SetMinValuesPairForSize2)
 {
     settings::NumericVecParam<int, 2> vec("v", "V", "D");
-    vec.setMinValues(std::pair<int, int>{10, 20});
+    const auto                        value1 = 10;
+    const auto                        value2 = 20;
+
+    vec.setMinValues(std::pair<int, int>{value1, value2});
+
     EXPECT_FALSE(vec.set(0, 5).has_value());
     EXPECT_FALSE(vec.set(1, 15).has_value());
-    EXPECT_TRUE(vec.set(0, 10).has_value());
-    EXPECT_TRUE(vec.set(1, 20).has_value());
+    EXPECT_TRUE(vec.set(0, value1).has_value());
+    EXPECT_TRUE(vec.set(1, value2).has_value());
 }
 
 // ============================================================================
@@ -156,15 +172,19 @@ TEST(NumericVecParam, SetMinValuesPairForSize2)
 TEST(NumericVecParam, XAccessorReturnsFirstElement)
 {
     settings::NumericVecParam<int, 2> vec("v", "V", "D");
-    vec.setDefaults(std::vector<int>{11, 22});
-    EXPECT_EQ(vec.x(), 11);
+    const auto                        value1 = 11;
+    const auto                        value2 = 22;
+    vec.setDefaults(std::vector<int>{value1, value2});
+    EXPECT_EQ(vec.x(), value1);
 }
 
 TEST(NumericVecParam, YAccessorReturnsSecondElement)
 {
     settings::NumericVecParam<int, 2> vec("v", "V", "D");
-    vec.setDefaults(std::vector<int>{11, 22});
-    EXPECT_EQ(vec.y(), 22);
+    const auto                        value1 = 11;
+    const auto                        value2 = 22;
+    vec.setDefaults(std::vector<int>{value1, value2});
+    EXPECT_EQ(vec.y(), value2);
 }
 
 TEST(NumericVecParam, ZAccessorReturnsThirdElement)
@@ -225,14 +245,16 @@ TEST(NumericVecParam, CommitClearsDirtyForAllElements)
 TEST(NumericVecParam, ToStringContainsValues)
 {
     settings::NumericVecParam<int, 2> vec("v", "V", "D");
-    vec.setDefaults(std::vector<int>{4, 8});
+    const auto                        value1 = 4;
+    const auto                        value2 = 8;
+    vec.setDefaults(std::vector<int>{value1, value2});
     const auto str = vec.toString();
-    EXPECT_NE(str.find("4"), std::string::npos);
-    EXPECT_NE(str.find("8"), std::string::npos);
+    EXPECT_NE(str.find(std::to_string(value1)), std::string::npos);
+    EXPECT_NE(str.find(std::to_string(value2)), std::string::npos);
 }
 
 // ============================================================================
-// JSON serialisation
+// JSON serialization
 // ============================================================================
 
 TEST(NumericVecParam, ToJsonContainsParamsArray)
@@ -250,7 +272,10 @@ TEST(NumericVecParam, ToJsonContainsParamsArray)
 TEST(NumericVecParam, ToJsonRoundTrip)
 {
     settings::NumericVecParam<int, 3> original("pos", "Pos", "Position");
-    original.setDefaults(std::vector<int>{10, 20, 30});
+    const auto                        value1 = 10;
+    const auto                        value2 = 20;
+    const auto                        value3 = 30;
+    original.setDefaults(std::vector<int>{value1, value2, value3});
 
     auto json = original.toJson();
 
@@ -258,9 +283,9 @@ TEST(NumericVecParam, ToJsonRoundTrip)
     settings::NumericVecParam<int, 3>::fromJson(json, restored);
 
     EXPECT_EQ(restored.getKey(), "pos");
-    EXPECT_EQ(restored.get(0), 10);
-    EXPECT_EQ(restored.get(1), 20);
-    EXPECT_EQ(restored.get(2), 30);
+    EXPECT_EQ(restored.get(0), value1);
+    EXPECT_EQ(restored.get(1), value2);
+    EXPECT_EQ(restored.get(2), value3);
 }
 
 TEST(NumericVecParam, FromJsonWrongArraySizeThrows)
@@ -271,9 +296,8 @@ TEST(NumericVecParam, FromJsonWrongArraySizeThrows)
     auto json = vec.toJson();
 
     // corrupt the params array to have wrong size
-    json["params"] = nlohmann::json::array(
-        {json["params"][0], json["params"][1]}
-    );
+    json["params"] =
+        nlohmann::json::array({json["params"][0], json["params"][1]});
 
     Vec3 target("v", "V", "D");
     EXPECT_THROW(Vec3::fromJson(json, target), settings::ParamException);

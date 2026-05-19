@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <stdexcept>
 #include <string>
 
 #include "settings/params/param_error.hpp"
@@ -19,8 +18,8 @@ TEST(ParamError, EmptyMessageAllowed)
 
 TEST(ParamException, WhatContainsMessage)
 {
-    settings::ParamException ex("param went wrong");
-    const std::string        what = ex.what();
+    settings::ParamException exception("param went wrong");
+    const std::string        what = exception.what();
     EXPECT_NE(what.find("param went wrong"), std::string::npos);
 }
 
@@ -33,7 +32,7 @@ TEST(ParamException, CanBeCaughtAsStdException)
     }
     catch (const std::exception& e)
     {
-        caught        = true;
+        caught         = true;
         const auto msg = std::string(e.what());
         EXPECT_NE(msg.find("thrown exception"), std::string::npos);
     }
@@ -49,7 +48,7 @@ TEST(ParamException, CanBeCaughtAsParamException)
     }
     catch (const settings::ParamException& e)
     {
-        caught        = true;
+        caught         = true;
         const auto msg = std::string(e.what());
         EXPECT_NE(msg.find("specific type"), std::string::npos);
     }

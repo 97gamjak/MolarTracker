@@ -13,25 +13,32 @@
 
 TEST(ParamUtils, ForEachParamCallsFuncForEveryElement)
 {
-    auto   tup   = std::make_tuple(1, 2.0, std::string("three"));
-    int    count = 0;
-    auto fn  = [&](auto& /*elem*/) { count++; };
-    settings::forEachParam(tup, fn);
+    constexpr auto tuple1 = 1;
+    constexpr auto tuple2 = 2.0;
+    const auto     tuple3 = std::string("three");
+    auto           tup    = std::make_tuple(tuple1, tuple2, tuple3);
+    int            count  = 0;
+    auto           func   = [&](auto& /*elem*/) { count++; };
+    settings::forEachParam(tup, func);
     EXPECT_EQ(count, 3);
 }
 
 TEST(ParamUtils, ForEachParamPassesCorrectElements)
 {
-    auto tup = std::make_tuple(10, 20, 30);
-    int  sum = 0;
-    settings::forEachParam(tup, [&](auto& v) { sum += v; });
+    constexpr auto tuple1 = 10;
+    constexpr auto tuple2 = 20;
+    constexpr auto tuple3 = 30;
+    auto           tup    = std::make_tuple(tuple1, tuple2, tuple3);
+    int            sum    = 0;
+    settings::forEachParam(tup, [&](auto& value) { sum += value; });
     EXPECT_EQ(sum, 60);
 }
 
 TEST(ParamUtils, ForEachParamWorksOnSingleElementTuple)
 {
-    auto tup   = std::make_tuple(42);
-    int  count = 0;
+    constexpr auto tuple1 = 42;
+    auto           tup    = std::make_tuple(tuple1);
+    int            count  = 0;
     settings::forEachParam(tup, [&](auto& /*v*/) { count++; });
     EXPECT_EQ(count, 1);
 }
@@ -42,53 +49,82 @@ TEST(ParamUtils, ForEachParamWorksOnSingleElementTuple)
 
 TEST(ParamUtils, ParamsToJsonCreatesKeyedJson)
 {
-    settings::ParamCore<int>         p1("k1", "T1", "D1");
-    settings::ParamCore<std::string> p2("k2", "T2", "D2");
-    p1.set(7);
-    p2.set(std::string("hello"));
+    constexpr auto                   value1 = "k1";
+    constexpr auto                   value2 = "k2";
+    settings::ParamCore<int>         param1(value1, "T1", "D1");
+    settings::ParamCore<std::string> param2(value2, "T2", "D2");
 
-    auto tup  = std::forward_as_tuple(p1, p2);
+    const auto paramValue = 7;
+    param1.set(paramValue);
+    param2.set(std::string("hello"));
+
+    auto tup  = std::forward_as_tuple(param1, param2);
     auto json = settings::paramsToJson(tup);
 
-    EXPECT_TRUE(json.contains("k1"));
-    EXPECT_TRUE(json.contains("k2"));
+    EXPECT_TRUE(json.contains(value1));
+    EXPECT_TRUE(json.contains(value2));
 }
 
 TEST(ParamUtils, ParamsFromJsonRestoresValues)
 {
-    settings::ParamCore<int>         p1("k1", "T1", "D1");
-    settings::ParamCore<std::string> p2("k2", "T2", "D2");
-    p1.set(55);
-    p2.set(std::string("world"));
+    constexpr auto param1Key   = "k1";
+    constexpr auto param1Title = "T1";
+    constexpr auto param1Desc  = "D1";
+    constexpr auto param1Value = 55;
 
-    auto tup  = std::forward_as_tuple(p1, p2);
+    constexpr auto param2Key   = "k2";
+    constexpr auto param2Title = "T2";
+    constexpr auto param2Desc  = "D2";
+    const auto     param2Value = std::string("world");
+
+    settings::ParamCore<int>         param1(param1Key, param1Title, param1Desc);
+    settings::ParamCore<std::string> param2(param2Key, param2Title, param2Desc);
+
+    param1.set(param1Value);
+    param2.set(param2Value);
+
+    auto tup  = std::forward_as_tuple(param1, param2);
     auto json = settings::paramsToJson(tup);
 
-    settings::ParamCore<int>         r1("k1", "T1", "D1");
-    settings::ParamCore<std::string> r2("k2", "T2", "D2");
-    auto                             restoreTup = std::forward_as_tuple(r1, r2);
+    settings::ParamCore<int> param1Copy(param1Key, param1Title, param1Desc);
+    settings::ParamCore<std::string> param2Copy(
+        param2Key,
+        param2Title,
+        param2Desc
+    );
+    auto restoreTup = std::forward_as_tuple(param1Copy, param2Copy);
     settings::paramsFromJson(restoreTup, json);
 
-    EXPECT_EQ(r1.get(), 55);
-    EXPECT_EQ(r2.get(), std::string("world"));
+    EXPECT_EQ(param1Copy.get(), param1Value);
+    EXPECT_EQ(param2Copy.get(), param2Value);
 }
 
 TEST(ParamUtils, ParamsFromJsonSkipsMissingKeys)
 {
-    settings::ParamCore<int> p("present", "T", "D");
-    p.set(10);
+    constexpr auto param1Key   = "k1";
+    constexpr auto param1Title = "T1";
+    constexpr auto param1Desc  = "D1";
+    constexpr auto param1Value = 10;
 
-    auto tup  = std::forward_as_tuple(p);
+    settings::ParamCore<int> param(param1Key, param1Title, param1Desc);
+    param.set(param1Value);
+
+    auto tup  = std::forward_as_tuple(param);
     auto json = settings::paramsToJson(tup);
 
+    constexpr auto param2Key   = "absent";
+    constexpr auto param2Title = "T";
+    constexpr auto param2Desc  = "D";
+    constexpr auto param2Value = 99;
+
     // Param with key not present in JSON should be left untouched
-    settings::ParamCore<int> r("absent", "T", "D");
-    r.set(99);
-    auto restoreTup = std::forward_as_tuple(r);
+    settings::ParamCore<int> param2(param2Key, param2Title, param2Desc);
+    param2.set(param2Value);
+    auto restoreTup = std::forward_as_tuple(param2);
     settings::paramsFromJson(restoreTup, json);
 
-    // "absent" key not in JSON, so r keeps its original value
-    EXPECT_EQ(r.get(), 99);
+    // "absent" key not in JSON, so param2 keeps its original value
+    EXPECT_EQ(param2.get(), param2Value);
 }
 
 // ============================================================================
@@ -117,12 +153,12 @@ TEST(ParamUtils, IsStringParamFalseForBoolParam)
 
 TEST(ParamUtils, IsNumericParamTrueForIntParam)
 {
-    EXPECT_TRUE((settings::is_numeric_param<settings::NumericParam<int>>));
+    EXPECT_TRUE((settings::is_numeric_param<settings::NumericParam<int>>) );
 }
 
 TEST(ParamUtils, IsNumericParamTrueForDoubleParam)
 {
-    EXPECT_TRUE((settings::is_numeric_param<settings::NumericParam<double>>));
+    EXPECT_TRUE((settings::is_numeric_param<settings::NumericParam<double>>) );
 }
 
 TEST(ParamUtils, IsNumericParamFalseForBoolParam)
@@ -132,9 +168,7 @@ TEST(ParamUtils, IsNumericParamFalseForBoolParam)
 
 TEST(ParamUtils, IsEnumParamTrueForEnumParam)
 {
-    EXPECT_TRUE(
-        (settings::is_enum_param<settings::EnumParam<LogLevel>>)
-    );
+    EXPECT_TRUE((settings::is_enum_param<settings::EnumParam<LogLevel>>) );
 }
 
 TEST(ParamUtils, IsEnumParamFalseForStringParam)
@@ -144,21 +178,20 @@ TEST(ParamUtils, IsEnumParamFalseForStringParam)
 
 TEST(ParamUtils, IsNumericVecParamTrueForVec2)
 {
-    EXPECT_TRUE(
-        (settings::is_numeric_vec_param<settings::NumericVecParam<int, 2>>)
-    );
+    EXPECT_TRUE((
+        settings::is_numeric_vec_param<settings::NumericVecParam<int, 2>>
+    ) );
 }
 
 TEST(ParamUtils, IsNumericVecParamTrueForVec3)
 {
-    EXPECT_TRUE(
-        (settings::is_numeric_vec_param<settings::NumericVecParam<double, 3>>)
-    );
+    EXPECT_TRUE((
+        settings::is_numeric_vec_param<settings::NumericVecParam<double, 3>>
+    ) );
 }
 
 TEST(ParamUtils, IsNumericVecParamFalseForNumericParam)
 {
-    EXPECT_FALSE(
-        (settings::is_numeric_vec_param<settings::NumericParam<int>>)
-    );
+    EXPECT_FALSE((settings::is_numeric_vec_param<settings::NumericParam<int>>
+    ) );
 }

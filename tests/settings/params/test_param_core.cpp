@@ -40,16 +40,18 @@ TEST(ParamCore, GetThrowsWhenNoValueAndNoDefault)
 
 TEST(ParamCore, GetReturnsValueAfterSet)
 {
+    const auto               paramValue = 42;
     settings::ParamCore<int> param("k", "T", "D");
-    param.set(42);
-    EXPECT_EQ(param.get(), 42);
+    param.set(paramValue);
+    EXPECT_EQ(param.get(), paramValue);
 }
 
 TEST(ParamCore, GetReturnsDefaultWhenValueNotSet)
 {
+    const auto               defaultValue = 99;
     settings::ParamCore<int> param("k", "T", "D");
-    param.setDefault(99);
-    EXPECT_EQ(param.get(), 99);
+    param.setDefault(defaultValue);
+    EXPECT_EQ(param.get(), defaultValue);
 }
 
 TEST(ParamCore, SetOverwritesPreviousValue)
@@ -64,19 +66,21 @@ TEST(ParamCore, SetToDefaultValueSkipsSilently)
 {
     // If the current effective value equals the new value, set is a no-op.
     // Setting to the default when _value is null leaves _value as null.
+    const auto               value = 42;
     settings::ParamCore<int> param("k", "T", "D");
-    param.setDefault(42);
-    param.set(42);   // same as default -> early return, _value stays null
+    param.setDefault(value);
+    param.set(value);   // same as default -> early return, _value stays null
     EXPECT_FALSE(param.isDirty());
-    EXPECT_EQ(param.get(), 42);   // still returns default
+    EXPECT_EQ(param.get(), value);   // still returns default
 }
 
 TEST(ParamCore, UnsetClearsValueFallsBackToDefault)
 {
+    const auto               paramValue = 42;
     settings::ParamCore<int> param("k", "T", "D");
     param.setDefault(0);   // required to avoid throw in _notifySubscribers
-    param.set(42);
-    EXPECT_EQ(param.get(), 42);
+    param.set(paramValue);
+    EXPECT_EQ(param.get(), paramValue);
 
     param.unset();
     EXPECT_EQ(param.get(), 0);   // falls back to default
@@ -94,18 +98,20 @@ TEST(ParamCore, GetOptionalReturnsNulloptWhenNothingSet)
 
 TEST(ParamCore, GetOptionalReturnsValueWhenSet)
 {
+    const auto               paramValue = 7;
     settings::ParamCore<int> param("k", "T", "D");
-    param.set(7);
+    param.set(paramValue);
     ASSERT_TRUE(param.getOptional().has_value());
-    EXPECT_EQ(param.getOptional().value(), 7);
+    EXPECT_EQ(param.getOptional().value(), paramValue);
 }
 
 TEST(ParamCore, GetOptionalFallsBackToDefaultWhenValueNotSet)
 {
+    const auto               defaultValue = 55;
     settings::ParamCore<int> param("k", "T", "D");
-    param.setDefault(55);
+    param.setDefault(defaultValue);
     ASSERT_TRUE(param.getOptional().has_value());
-    EXPECT_EQ(param.getOptional().value(), 55);
+    EXPECT_EQ(param.getOptional().value(), defaultValue);
 }
 
 TEST(ParamCore, GetOptionalReturnsNulloptAfterUnsetWithNoDefault)
@@ -113,13 +119,15 @@ TEST(ParamCore, GetOptionalReturnsNulloptAfterUnsetWithNoDefault)
     // After unset with no default the optional is empty.
     // Note: calling unset() without a default ALSO throws inside
     // _notifySubscribers, so we must provide a default.
+    const auto               paramValue   = 5;
+    const auto               defaultValue = 0;
     settings::ParamCore<int> param("k", "T", "D");
-    param.setDefault(0);
-    param.set(5);
+    param.setDefault(defaultValue);
+    param.set(paramValue);
     param.unset();
     // _value is now null; getOptional falls back to default
     ASSERT_TRUE(param.getOptional().has_value());
-    EXPECT_EQ(param.getOptional().value(), 0);
+    EXPECT_EQ(param.getOptional().value(), defaultValue);
 }
 
 // ============================================================================
@@ -158,9 +166,10 @@ TEST(ParamCore, IsDirtyTrueAfterCommitThenNewValue)
 
 TEST(ParamCore, IsDirtyTrueAfterUnsetFollowingCommit)
 {
+    const auto               paramValue = 10;
     settings::ParamCore<int> param("k", "T", "D");
     param.setDefault(0);   // prevent throw in _notifySubscribers
-    param.set(10);
+    param.set(paramValue);
     param.commit();   // baseline = 10
     param.unset();    // value = null, baseline = 10
     EXPECT_TRUE(param.isDirty());
@@ -169,9 +178,10 @@ TEST(ParamCore, IsDirtyTrueAfterUnsetFollowingCommit)
 TEST(ParamCore, IsDirtyFalseAfterUnsetWithoutPriorCommit)
 {
     // set then unset without commit: baseline stays null, value returns to null
+    const auto               paramValue = 10;
     settings::ParamCore<int> param("k", "T", "D");
     param.setDefault(0);
-    param.set(10);
+    param.set(paramValue);
     EXPECT_TRUE(param.isDirty());
     param.unset();   // both baseline and value are null
     EXPECT_FALSE(param.isDirty());
@@ -183,18 +193,20 @@ TEST(ParamCore, IsDirtyFalseAfterUnsetWithoutPriorCommit)
 
 TEST(ParamCore, SetDefaultStoresAndReturnsValue)
 {
+    const auto               defaultValue = 77;
     settings::ParamCore<int> param("k", "T", "D");
     EXPECT_FALSE(param.getDefault().has_value());
 
-    param.setDefault(77);
+    param.setDefault(defaultValue);
     ASSERT_TRUE(param.getDefault().has_value());
-    EXPECT_EQ(param.getDefault().value(), 77);
+    EXPECT_EQ(param.getDefault().value(), defaultValue);
 }
 
 TEST(ParamCore, SetDefaultToNulloptClearsDefault)
 {
+    const auto               paramValue = 10;
     settings::ParamCore<int> param("k", "T", "D");
-    param.setDefault(10);
+    param.setDefault(paramValue);
     param.setDefault(std::nullopt);
     EXPECT_FALSE(param.getDefault().has_value());
 }
@@ -242,14 +254,13 @@ TEST(ParamCore, SetRebootRequiredBackToFalse)
 TEST(ParamCore, SubscribeCallbackFiresOnValueChange)
 {
     settings::ParamCore<int> param("k", "T", "D");
-    int                      received = -1;
+    int                      received   = -1;
+    const auto               paramValue = 42;
 
-    auto conn = param.subscribe(
-        [&](const int& val) { received = val; },
-        nullptr
-    );
-    param.set(42);
-    EXPECT_EQ(received, 42);
+    auto conn =
+        param.subscribe([&](const int& val) { received = val; }, nullptr);
+    param.set(paramValue);
+    EXPECT_EQ(received, paramValue);
 }
 
 TEST(ParamCore, SubscribeCallbackNotFiredForSameValue)
@@ -257,27 +268,27 @@ TEST(ParamCore, SubscribeCallbackNotFiredForSameValue)
     settings::ParamCore<int> param("k", "T", "D");
     int                      callCount = 0;
 
-    param.set(5);
-    auto conn = param.subscribe(
-        [&](const int& /*val*/) { callCount++; },
-        nullptr
-    );
-    param.set(5);   // same value, no notification
+    const auto paramValue = 5;
+    param.set(paramValue);
+    auto conn =
+        param.subscribe([&](const int& /*val*/) { callCount++; }, nullptr);
+    param.set(paramValue);   // same value, no notification
     EXPECT_EQ(callCount, 0);
 }
 
 TEST(ParamCore, SubscribeToOptionalFiresOnChange)
 {
-    settings::ParamCore<int>           param("k", "T", "D");
-    std::optional<int>                 last = std::nullopt;
+    settings::ParamCore<int> param("k", "T", "D");
+    std::optional<int>       last = std::nullopt;
 
     auto conn = param.subscribeToOptional(
-        [&](const std::optional<int>& v) { last = v; },
+        [&](const std::optional<int>& value) { last = value; },
         nullptr
     );
-    param.set(10);
+    const auto paramValue = 10;
+    param.set(paramValue);
     ASSERT_TRUE(last.has_value());
-    EXPECT_EQ(last.value(), 10);
+    EXPECT_EQ(last.value(), paramValue);
 }
 
 TEST(ParamCore, SubscribeToDirtyFiresWithCorrectState)
@@ -286,14 +297,14 @@ TEST(ParamCore, SubscribeToDirtyFiresWithCorrectState)
     bool                     lastDirty = false;
 
     auto conn = param.subscribeToDirty(
-        [&](const bool& d) { lastDirty = d; },
+        [&](const bool& value) { lastDirty = value; },
         nullptr
     );
     param.set(1);
     EXPECT_TRUE(lastDirty);
 
     param.commit();
-    param.set(1);   // same value after commit -> no notification
+    param.set(1);             // same value after commit -> no notification
     EXPECT_TRUE(lastDirty);   // unchanged from last notification
 }
 
@@ -312,22 +323,21 @@ TEST(ParamCore, SubscribeToOptionalThrowsWhenRebootRequired)
     settings::ParamCore<int> param("k", "T", "D");
     param.setRebootRequired(true);
     EXPECT_THROW(
-        (void) param.subscribeToOptional(
-            [](const std::optional<int>&) {},
-            nullptr
-        ),
+        (void
+        ) param.subscribeToOptional([](const std::optional<int>&) {}, nullptr),
         settings::ParamException
     );
 }
 
 // ============================================================================
-// JSON serialisation
+// JSON serialization
 // ============================================================================
 
 TEST(ParamCore, ToJsonContainsExpectedKeys)
 {
     settings::ParamCore<int> param("theKey", "The Title", "The Desc");
-    param.set(7);
+    const auto               paramValue = 7;
+    param.set(paramValue);
     param.setDefault(0);
 
     auto json = param.toJson();
@@ -341,7 +351,8 @@ TEST(ParamCore, ToJsonContainsExpectedKeys)
 TEST(ParamCore, ToJsonRoundTripInt)
 {
     settings::ParamCore<int> original("k", "T", "D");
-    original.set(42);
+    const auto               paramValue = 42;
+    original.set(paramValue);
     original.setDefault(0);
 
     auto json = original.toJson();
@@ -352,7 +363,7 @@ TEST(ParamCore, ToJsonRoundTripInt)
     EXPECT_EQ(restored.getKey(), "k");
     EXPECT_EQ(restored.getTitle(), "T");
     EXPECT_EQ(restored.getDescription(), "D");
-    EXPECT_EQ(restored.get(), 42);
+    EXPECT_EQ(restored.get(), paramValue);
     ASSERT_TRUE(restored.getDefault().has_value());
     EXPECT_EQ(restored.getDefault().value(), 0);
 }
@@ -376,7 +387,8 @@ TEST(ParamCore, ToJsonRoundTripString)
 TEST(ParamCore, FromJsonSetsBaselineToValue)
 {
     settings::ParamCore<int> param("k", "T", "D");
-    param.set(99);
+    const auto               paramValue = 99;
+    param.set(paramValue);
     auto json = param.toJson();
 
     settings::ParamCore<int> restored("", "", "");
@@ -386,7 +398,7 @@ TEST(ParamCore, FromJsonSetsBaselineToValue)
     EXPECT_FALSE(restored.isDirty());
 }
 
-TEST(ParamCore, ToJsonNullValueSerialised)
+TEST(ParamCore, ToJsonNullValueSerialized)
 {
     settings::ParamCore<int> param("k", "T", "D");
     // no value set, no default
@@ -419,7 +431,8 @@ TEST(ParamCore, FloatSetBeyondEpsilonDirtiesParam)
     param.set(val);
     param.commit();
 
-    const double eps = std::numeric_limits<double>::epsilon();
-    param.set(val + 2.0 * eps);   // difference > epsilon => different
+    const auto   scaling = 2.0;
+    const double eps     = std::numeric_limits<double>::epsilon();
+    param.set(val + (scaling * eps));   // difference > epsilon => different
     EXPECT_TRUE(param.isDirty());
 }

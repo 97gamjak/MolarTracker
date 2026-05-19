@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <numbers>
 #include <optional>
 #include <string>
 
@@ -42,9 +43,10 @@ TEST(NumericParam, NoPrecisionByDefault)
 TEST(NumericParam, SetValidValueSucceeds)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    auto                        result = param.set(5);
+    const auto                  value  = 5;
+    auto                        result = param.set(value);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(param.get(), 5);
+    EXPECT_EQ(param.get(), value);
 }
 
 TEST(NumericParam, IsDirtyFalseBeforeSet)
@@ -56,16 +58,18 @@ TEST(NumericParam, IsDirtyFalseBeforeSet)
 TEST(NumericParam, IsDirtyTrueAfterSet)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    auto                        r = param.set(10);
-    ASSERT_TRUE(r.has_value());
+    const auto                  value  = 10;
+    auto                        result = param.set(value);
+    ASSERT_TRUE(result.has_value());
     EXPECT_TRUE(param.isDirty());
 }
 
 TEST(NumericParam, CommitClearsDirty)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    auto                        r = param.set(10);
-    ASSERT_TRUE(r.has_value());
+    const auto                  value  = 10;
+    auto                        result = param.set(value);
+    ASSERT_TRUE(result.has_value());
     param.commit();
     EXPECT_FALSE(param.isDirty());
 }
@@ -77,9 +81,10 @@ TEST(NumericParam, CommitClearsDirty)
 TEST(NumericParam, SetDefaultAndGetDefault)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setDefault(std::optional<int>(100));
+    const auto                  value = 100;
+    param.setDefault(std::optional<int>(value));
     ASSERT_TRUE(param.getDefault().has_value());
-    EXPECT_EQ(param.getDefault().value(), 100);
+    EXPECT_EQ(param.getDefault().value(), value);
 }
 
 // ============================================================================
@@ -89,34 +94,40 @@ TEST(NumericParam, SetDefaultAndGetDefault)
 TEST(NumericParam, SetLimitsStoresMinMax)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(0, 100);
+    const auto                  value = 100;
+    param.setLimits(0, value);
     ASSERT_TRUE(param.getMinValue().has_value());
     ASSERT_TRUE(param.getMaxValue().has_value());
     EXPECT_EQ(param.getMinValue().value(), 0);
-    EXPECT_EQ(param.getMaxValue().value(), 100);
+    EXPECT_EQ(param.getMaxValue().value(), value);
 }
 
 TEST(NumericParam, SetMinValueStoresMin)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setMinValue(5);
+    const auto                  value = 5;
+    param.setMinValue(value);
     ASSERT_TRUE(param.getMinValue().has_value());
-    EXPECT_EQ(param.getMinValue().value(), 5);
+    EXPECT_EQ(param.getMinValue().value(), value);
 }
 
 TEST(NumericParam, SetMaxValueStoresMax)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setMaxValue(200);
+    const auto                  value = 200;
+    param.setMaxValue(value);
     ASSERT_TRUE(param.getMaxValue().has_value());
-    EXPECT_EQ(param.getMaxValue().value(), 200);
+    EXPECT_EQ(param.getMaxValue().value(), value);
 }
 
 TEST(NumericParam, SetBelowMinReturnsError)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(10, 100);
-    auto result = param.set(9);
+    const auto                  limit1 = 10;
+    const auto                  limit2 = 100;
+    const auto                  value  = 9;
+    param.setLimits(limit1, limit2);
+    auto result = param.set(value);
     EXPECT_FALSE(result.has_value());
     EXPECT_FALSE(result.error().getMessage().empty());
 }
@@ -124,8 +135,11 @@ TEST(NumericParam, SetBelowMinReturnsError)
 TEST(NumericParam, SetAboveMaxReturnsError)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(0, 50);
-    auto result = param.set(51);
+    const auto                  limit1 = 0;
+    const auto                  limit2 = 50;
+    const auto                  value  = 51;
+    param.setLimits(limit1, limit2);
+    auto result = param.set(value);
     EXPECT_FALSE(result.has_value());
     EXPECT_FALSE(result.error().getMessage().empty());
 }
@@ -133,46 +147,54 @@ TEST(NumericParam, SetAboveMaxReturnsError)
 TEST(NumericParam, SetAtMinBoundarySucceeds)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(0, 100);
-    auto result = param.set(0);
+    const auto                  limit1 = 0;
+    const auto                  limit2 = 100;
+    param.setLimits(limit1, limit2);
+    auto result = param.set(limit1);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(param.get(), 0);
+    EXPECT_EQ(param.get(), limit1);
 }
 
 TEST(NumericParam, SetAtMaxBoundarySucceeds)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(0, 100);
-    auto result = param.set(100);
+    const auto                  limit1 = 0;
+    const auto                  limit2 = 100;
+    param.setLimits(limit1, limit2);
+    auto result = param.set(limit2);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(param.get(), 100);
+    EXPECT_EQ(param.get(), limit2);
 }
 
 TEST(NumericParam, SetWithOnlyMinAllowsAboveMin)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setMinValue(5);
+    const auto                  minValue = 5;
+    param.setMinValue(minValue);
     EXPECT_TRUE(param.set(1000).has_value());
 }
 
 TEST(NumericParam, SetWithOnlyMinRejectsBelow)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setMinValue(5);
+    const auto                  minValue = 5;
+    param.setMinValue(minValue);
     EXPECT_FALSE(param.set(4).has_value());
 }
 
 TEST(NumericParam, SetWithOnlyMaxAllowsBelowMax)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setMaxValue(100);
+    const auto                  maxValue = 100;
+    param.setMaxValue(maxValue);
     EXPECT_TRUE(param.set(-9999).has_value());
 }
 
 TEST(NumericParam, SetWithOnlyMaxRejectsAbove)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setMaxValue(100);
+    const auto                  maxValue = 100;
+    param.setMaxValue(maxValue);
     EXPECT_FALSE(param.set(101).has_value());
 }
 
@@ -184,7 +206,8 @@ TEST(NumericParam, SetPrecisionRoundsDouble)
 {
     settings::NumericParam<double> param("k", "T", "D");
     param.setPrecision(2);   // 2 decimal places
-    auto result = param.set(3.14159);
+    const auto piValue = std::numbers::pi;
+    auto       result  = param.set(piValue);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(param.get(), 3.14, 1e-9);
 }
@@ -193,7 +216,8 @@ TEST(NumericParam, SetPrecisionRoundsUp)
 {
     settings::NumericParam<double> param("k", "T", "D");
     param.setPrecision(1);
-    auto result = param.set(1.95);
+    const auto value  = 1.95;
+    auto       result = param.set(value);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(param.get(), 2.0, 1e-9);
 }
@@ -217,9 +241,13 @@ TEST(NumericParam, PrecisionAppliedBeforeRangeCheck)
 {
     // After rounding to 2 dp, 2.005 becomes 2.01 which is within [0, 10]
     settings::NumericParam<double> param("k", "T", "D");
-    param.setPrecision(2);
-    param.setLimits(0.0, 10.0);
-    auto result = param.set(2.005);
+    const auto                     limit1    = 0.0;
+    const auto                     limit2    = 10.0;
+    const auto                     precision = 2;
+    const auto                     value     = 2.005;
+    param.setPrecision(precision);
+    param.setLimits(limit1, limit2);
+    auto result = param.set(value);
     EXPECT_TRUE(result.has_value());
 }
 
@@ -229,11 +257,9 @@ TEST(NumericParam, PrecisionAppliedBeforeRangeCheck)
 
 namespace
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
     int  s_numericIntValue = 0;
-    void onNumericIntChanged(const int& v)
-    {
-        s_numericIntValue = v;
-    }
+    void onNumericIntChanged(const int& value) { s_numericIntValue = value; }
 }   // namespace
 
 TEST(NumericParam, SubscribeCallbackFiredOnValidSet)
@@ -242,33 +268,38 @@ TEST(NumericParam, SubscribeCallbackFiredOnValidSet)
     settings::NumericParam<int> param("k", "T", "D");
     auto conn = param.subscribe(onNumericIntChanged, nullptr);
 
-    auto r = param.set(55);
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(s_numericIntValue, 55);
+    const auto value  = 55;
+    auto       result = param.set(value);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(s_numericIntValue, value);
 }
 
 TEST(NumericParam, SubscribeCallbackNotFiredOnOutOfRangeSet)
 {
     s_numericIntValue = -1;
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(0, 10);
+    const auto                  limits = std::pair(0, 10);
+    param.setLimits(limits.first, limits.second);
     auto conn = param.subscribe(onNumericIntChanged, nullptr);
 
-    auto r = param.set(99);   // out of range
-    EXPECT_FALSE(r.has_value());
+    const auto value  = 99;
+    auto       result = param.set(value);   // out of range
+    EXPECT_FALSE(result.has_value());
     EXPECT_EQ(s_numericIntValue, -1);   // callback not fired
 }
 
 // ============================================================================
-// JSON serialisation
+// JSON serialization
 // ============================================================================
 
 TEST(NumericParam, ToJsonRoundTrip)
 {
     settings::NumericParam<int> original("nk", "NT", "ND");
-    original.setLimits(0, 100);
-    auto r = original.set(50);
-    ASSERT_TRUE(r.has_value());
+    const auto                  limits = std::pair(0, 100);
+    original.setLimits(limits.first, limits.second);
+    const auto value  = 50;
+    auto       result = original.set(value);
+    ASSERT_TRUE(result.has_value());
 
     auto json = original.toJson();
 
@@ -287,15 +318,16 @@ TEST(NumericParam, ToJsonRoundTripDouble)
 {
     settings::NumericParam<double> original("dk", "DT", "DD");
     original.setPrecision(2);
-    auto r = original.set(3.14);
-    ASSERT_TRUE(r.has_value());
+    const auto piValue = 3.14;
+    auto       result  = original.set(piValue);
+    ASSERT_TRUE(result.has_value());
 
     auto json = original.toJson();
 
     settings::NumericParam<double> restored("", "", "");
     settings::NumericParam<double>::fromJson(json, restored);
 
-    EXPECT_NEAR(restored.get(), 3.14, 1e-9);
+    EXPECT_NEAR(restored.get(), piValue, 1e-9);
     ASSERT_TRUE(restored.getPrecision().has_value());
     EXPECT_EQ(restored.getPrecision().value(), static_cast<std::size_t>(2));
 }
@@ -303,7 +335,8 @@ TEST(NumericParam, ToJsonRoundTripDouble)
 TEST(NumericParam, ToJsonContainsRangeKeys)
 {
     settings::NumericParam<int> param("k", "T", "D");
-    param.setLimits(1, 9);
+    const auto                  limits = std::pair(1, 9);
+    param.setLimits(limits.first, limits.second);
     auto json = param.toJson();
     EXPECT_TRUE(json.contains("minValue"));
     EXPECT_TRUE(json.contains("maxValue"));

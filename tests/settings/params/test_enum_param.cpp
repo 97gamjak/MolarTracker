@@ -48,9 +48,8 @@ TEST(EnumParam, SetInvalidEnumValueReturnsError)
 {
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
     // Cast an out-of-range integer to LogLevel to produce an invalid value
-    const auto invalid =
-        static_cast<LogLevel>(static_cast<std::int8_t>(127));
-    auto result = param.set(invalid);
+    const auto invalid = static_cast<LogLevel>(static_cast<std::int8_t>(127));
+    auto       result  = param.set(invalid);
     EXPECT_FALSE(result.has_value());
     EXPECT_FALSE(result.error().getMessage().empty());
 }
@@ -81,8 +80,8 @@ TEST(EnumParam, GetOptionalNulloptOnFreshParam)
 TEST(EnumParam, GetOptionalReturnsValueAfterSet)
 {
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
-    auto                          r = param.set(LogLevel::Debug);
-    ASSERT_TRUE(r.has_value());
+    auto                          result = param.set(LogLevel::Debug);
+    ASSERT_TRUE(result.has_value());
     ASSERT_TRUE(param.getOptional().has_value());
     EXPECT_EQ(param.getOptional().value(), LogLevel::Debug);
 }
@@ -100,16 +99,16 @@ TEST(EnumParam, IsDirtyFalseOnFreshParam)
 TEST(EnumParam, IsDirtyTrueAfterSet)
 {
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
-    auto                          r = param.set(LogLevel::Error);
-    ASSERT_TRUE(r.has_value());
+    auto                          result = param.set(LogLevel::Error);
+    ASSERT_TRUE(result.has_value());
     EXPECT_TRUE(param.isDirty());
 }
 
 TEST(EnumParam, CommitClearsDirty)
 {
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
-    auto                          r = param.set(LogLevel::Trace);
-    ASSERT_TRUE(r.has_value());
+    auto                          result = param.set(LogLevel::Trace);
+    ASSERT_TRUE(result.has_value());
     param.commit();
     EXPECT_FALSE(param.isDirty());
 }
@@ -117,12 +116,12 @@ TEST(EnumParam, CommitClearsDirty)
 TEST(EnumParam, IsDirtyTrueAfterCommitAndNewValue)
 {
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
-    auto                          r1 = param.set(LogLevel::Off);
-    ASSERT_TRUE(r1.has_value());
+    auto                          result1 = param.set(LogLevel::Off);
+    ASSERT_TRUE(result1.has_value());
     param.commit();
 
-    auto r2 = param.set(LogLevel::Error);
-    ASSERT_TRUE(r2.has_value());
+    auto result2 = param.set(LogLevel::Error);
+    ASSERT_TRUE(result2.has_value());
     EXPECT_TRUE(param.isDirty());
 }
 
@@ -141,23 +140,20 @@ TEST(EnumParam, SetRebootRequiredPreventsSubscribe)
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
     param.setRebootRequired(true);
     EXPECT_THROW(
-        (void) param.subscribe(
-            [](const LogLevel&) {},
-            nullptr
-        ),
+        (void) param.subscribe([](const LogLevel&) {}, nullptr),
         settings::ParamException
     );
 }
 
 // ============================================================================
-// JSON serialisation
+// JSON serialization
 // ============================================================================
 
 TEST(EnumParam, ToJsonRoundTrip)
 {
     settings::EnumParam<LogLevel> original("lvl", "LT", "LD");
-    auto                          r = original.set(LogLevel::Warning);
-    ASSERT_TRUE(r.has_value());
+    auto                          result = original.set(LogLevel::Warning);
+    ASSERT_TRUE(result.has_value());
 
     auto json = original.toJson();
 
@@ -169,7 +165,7 @@ TEST(EnumParam, ToJsonRoundTrip)
     EXPECT_FALSE(restored.isDirty());   // baseline = value after fromJson
 }
 
-TEST(EnumParam, ToJsonNullValueSerialised)
+TEST(EnumParam, ToJsonNullValueSerialized)
 {
     settings::EnumParam<LogLevel> param("lvl", "L", "D");
     auto                          json = param.toJson();
