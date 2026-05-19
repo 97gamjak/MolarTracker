@@ -11,6 +11,15 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)  # Windows/MSVC only matters
 FetchContent_MakeAvailable(googletest)
 
+add_library(molartracker_tests STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_fixtures.cpp
+)
+
+target_include_directories(molartracker_tests
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_subdirectory(app)
 add_subdirectory(db)
 add_subdirectory(orm)

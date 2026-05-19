@@ -43,7 +43,7 @@ struct StockRow : public orm::ORMModel<"stock">
     /// instruments.
     ORM_FIELD(
         instrumentId,
-        InstrumentRow::template ForeignId<orm::CascadeDelete>
+        InstrumentRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The currency of the stock, this indicates the currency in which the

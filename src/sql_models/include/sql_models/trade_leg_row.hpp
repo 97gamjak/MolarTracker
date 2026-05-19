@@ -63,7 +63,7 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// associate this trade leg with a specific financial instrument.
     ORM_FIELD(
         instrumentId,
-        InstrumentRow::template ForeignId<orm::RestrictDelete>
+        InstrumentRow::template ForeignId<tableName, orm::RestrictDelete>
     )
 
     /// The quantity of the instrument being traded in this leg, this is a

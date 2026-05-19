@@ -5,6 +5,7 @@
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
+#include "repo_errors.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace app
@@ -89,10 +90,10 @@ namespace app
      * @param stock The Stock object containing the details of the stock to be
      * added to the database
      *
-     * @return A pair containing the StockId and InstrumentId of the newly
+     * @return A struct containing the StockId and InstrumentId of the newly
      * added stock
      */
-    std::pair<StockId, InstrumentId> InstrumentRepo::addStock(
+    finance::StockInsertionResult InstrumentRepo::addStock(
         const finance::Stock& stock
     )
     {
@@ -102,7 +103,7 @@ namespace app
 
         if (!result)
         {
-            throw std::runtime_error(
+            throw app::RepositoryException(
                 "Failed to insert instrument row: " +
                 result.error().getMessage()
             );
@@ -113,12 +114,15 @@ namespace app
 
         if (!result)
         {
-            throw std::runtime_error(
+            throw app::RepositoryException(
                 "Failed to insert stock row: " + result.error().getMessage()
             );
         }
 
-        return {StockId(result.value()), stockRow.instrumentId.value()};
+        return {
+            .stockId      = StockId(result.value()),
+            .instrumentId = stockRow.instrumentId.value()
+        };
     }
 
     /**
