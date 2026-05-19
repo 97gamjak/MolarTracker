@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "app/store/account_store.hpp"
+#include "app/store/account/account_store.hpp"
 #include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"

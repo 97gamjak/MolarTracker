@@ -11,9 +11,15 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
 
+namespace finance
+{
+    class Account;   // Forward declaration
+}   // namespace finance
+
 namespace app
 {
     class AccountStore;          // Forward declaration
+    class AccountSession;        // Forward declaration
     class PositionStore;         // Forward declaration
     class StockStore;            // Forward declaration
     class ITransactionService;   // Forward declaration
@@ -37,6 +43,11 @@ namespace app
         /// The Transaction service
         std::shared_ptr<ITransactionService> _transactionService;
 
+        struct Session;
+        /// The session object for managing the session state of transactions in
+        /// the store
+        std::unique_ptr<Session> _session;
+
         /// Connections for various events
         Connections _connections;
 
@@ -45,8 +56,10 @@ namespace app
             const std::shared_ptr<ITransactionService>& transactionService,
             AccountStore&                               accountStore,
             StockStore&                                 stockStore,
-            PositionStore&                              positionStore
+            PositionStore&                              positionStore,
+            const AccountSession&                       accountSession
         );
+        ~TransactionStore() override;
 
         void commit();
 

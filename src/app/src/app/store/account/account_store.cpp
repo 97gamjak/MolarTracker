@@ -1,4 +1,4 @@
-#include "app/store/account_store.hpp"
+#include "app/store/account/account_store.hpp"
 
 #include <cassert>
 #include <format>
@@ -39,6 +39,18 @@ namespace app
     )
         : _accountService(accountService)
     {
+        _connections.add(subscribeToEntryAdded(
+            [this](const std::vector<finance::Account>& accounts)
+            { _session.add(accounts); },
+            this
+        ));
+
+        _connections.add(subscribeToEntryRemoved(
+            [this](const std::vector<AccountId>& accountIds)
+            { _session.remove(accountIds); },
+            this
+        ));
+
         _refresh();
     }
 
@@ -187,6 +199,9 @@ namespace app
         }
 
         _notifyOnCommit();
+
+        // here now we set our ids because they are now clean!
+        _session.set(_getIds());
     }
 
     /**
@@ -266,6 +281,7 @@ namespace app
                 _accountService->getAllAccounts(_activeProfileId);
 
             _addCleanEntries(accounts);
+            _session.set(_getIds());
         }
     }
 
@@ -435,6 +451,16 @@ namespace app
             return drafts::AccountMapper::toDraft(account.value());
 
         return std::nullopt;
+    }
+
+    /**
+     * @brief Get the account session
+     *
+     * @return const AccountSession& The account session
+     */
+    const AccountSession& AccountStore::getAccountSession() const
+    {
+        return _session;
     }
 
 }   // namespace app

@@ -2,7 +2,7 @@
 
 #include <qstackedwidget.h>
 
-#include "app/store/account_store.hpp"
+#include "app/store/account/account_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "drafts/transaction_draft.hpp"
