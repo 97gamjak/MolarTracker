@@ -38,9 +38,13 @@ namespace app
     orm::Joins PositionRepo::_createPositionJoins()
     {
         return std::move(
-            orm::Joins{}.add(
-                orm::join<PositionRow::idField, TradeLegRow::positionIdField>()
-            )
+            orm::Joins{}
+                .add(
+                    orm::join<
+                        PositionRow::idField,
+                        TradeLegRow::positionIdField>()
+                )
+                .distinct()
         );
     }
 

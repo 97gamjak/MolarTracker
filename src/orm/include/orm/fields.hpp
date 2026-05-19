@@ -42,6 +42,10 @@ namespace orm
 
     template <typename... Models>
     requires((db_model<Models> || optional_model<Models>) && ...)
+    std::string getSelection(bool distinct);
+
+    template <typename... Models>
+    requires((db_model<Models> || optional_model<Models>) && ...)
     std::string getSelection();
 
 }   // namespace orm

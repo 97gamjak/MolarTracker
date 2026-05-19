@@ -543,7 +543,7 @@ namespace orm
     )
     {
         std::string sql;
-        sql += getSelection<Models...>();
+        sql += getSelection<Models...>(joins.isDistinct());
         sql += joins.toSQL() + " ";
         sql += query.getDBOperations() + ";";
 
