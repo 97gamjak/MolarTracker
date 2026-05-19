@@ -1,22 +1,16 @@
-#ifndef __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
-#define __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
+#define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
 
 #include <expected>
 #include <string>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "filter/predicate.hpp"
-#include "finance/yf_client.hpp"
-
-namespace http
-{
-    struct HttpError;   // forward declaration
-}   // namespace http
 
 namespace finance
 {
-    struct TickerInfo;   // forward declaration
+    class YahooFinanceError;   // forward declaration
+    struct TickerInfo;         // forward declaration
 
     /**
      * @brief A class representing a stock instrument, this is used to represent
@@ -88,13 +82,12 @@ namespace finance
         void setId(StockId stockId);
         void setInstrumentId(InstrumentId instrumentId);
 
+        [[nodiscard]] std::string toString() const;
+
        private:
         explicit Stock(const TickerInfo& info);
     };
 
-    [[nodiscard]]
-    filter::Predicate<Stock> HasTicker(const std::string& ticker);
-
 }   // namespace finance
 
-#endif   // __FINANCE__INCLUDE__FINANCE__STOCK_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__

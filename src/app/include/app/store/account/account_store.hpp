@@ -1,10 +1,11 @@
-#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
-#define __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_STORE_HPP__
+#define __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_STORE_HPP__
 
 #include <memory>
 #include <vector>
 
-#include "base/base_store.hpp"
+#include "app/store/account/account_session.hpp"
+#include "app/store/base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account.hpp"
@@ -25,6 +26,7 @@ namespace app
         Ok,
         Error,
         AccountNotFound,
+        AccountNameConflict,
     };
 
     class AccountStoreException : MolarTrackerException
@@ -49,6 +51,13 @@ namespace app
         /// The ID of the active profile, this is used to determine which
         /// accounts to load and manage in the store
         ProfileId _activeProfileId = ProfileId::invalid();
+
+        /// The session object for managing the session state of accounts in the
+        /// store
+        AccountSession _session;
+
+        /// Connections for handling signals related to account store updates
+        Connections _connections;
 
        public:
         explicit AccountStore(
@@ -79,10 +88,12 @@ namespace app
 
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);
 
+        [[nodiscard]] const AccountSession& getAccountSession() const;
+
        private:
         void _refresh();
     };
 
 }   // namespace app
 
-#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT_STORE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__ACCOUNT__ACCOUNT_STORE_HPP__

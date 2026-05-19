@@ -143,6 +143,9 @@ namespace app
         /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
 
+        /// Flag indicating whether the store has already notified subscribers
+        bool _alreadyNotified = false;
+
        public:
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
@@ -158,6 +161,24 @@ namespace app
         [[nodiscard]] Connection subscribeToIdRemap(
             OnIdRemap<IdType>::func func,
             void*                   user
+        );
+
+        // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]] Connection subscribeToEntryRemoved(
+            OnStoreItemRemoved<IdType>::func func,
+            void*                            user
+        );
+
+        // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]] Connection subscribeToEntryAdded(
+            OnStoreItemAdded<T>::func func,
+            void*                     user
+        );
+
+        // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]] Connection subscribeToEntryUpdated(
+            OnStoreItemUpdated<T>::func func,
+            void*                       user
         );
 
         // cppcheck-suppress functionConst -- false positive
@@ -178,8 +199,10 @@ namespace app
         std::optional<T> _get(Options options = Options()) const;
         [[nodiscard]]
         auto _getEntry(Options options = Options()) const;
+        [[nodiscard]]
+        idSet<IdType> _getIds(Options options = Options()) const;
 
-        void        _addEntry(T value);
+        IdType      _addEntry(T value);
         void        _addCleanEntries(const std::vector<T>& value);
         StoreResult _updateEntry(const T& value, StoreState state);
         StoreResult _commitEntry(IdType tempId, const Entry& persistedValue);
@@ -202,10 +225,11 @@ namespace app
         void                 _markPotentiallyDirty();
         [[nodiscard]] IdType _generateNewId();
 
-        void _notifyIdRemap();
-        void _notifyUpdated();
-        void _notifyAdded();
-        void _notifyRemoved();
+        void _notifyIdRemap(bool checkAlreadyNotified);
+        void _notifyUpdated(bool checkAlreadyNotified);
+        void _notifyAdded(bool checkAlreadyNotified);
+        void _notifyRemoved(bool checkAlreadyNotified);
+        void _notifyStoreChanged(bool checkAlreadyNotified);
     };
 
     /**
@@ -232,6 +256,9 @@ namespace app
 #endif
 #ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_SUBSCRIPTIONS_TPP__
 #include "base_store_subscriptions.tpp"   // IWYU pragma: keep
+#endif
+#ifndef __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_NOTIFICATIONS_TPP__
+#include "base_store_notifications.tpp"   // IWYU pragma: keep
 #endif
 
 #endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_HPP__

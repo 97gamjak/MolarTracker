@@ -1,7 +1,7 @@
 #include "instrument_service.hpp"
 
 #include "app/repos_api/i_instrument_repo.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 
 namespace app
 {
@@ -30,11 +30,14 @@ namespace app
     /**
      * @brief get a list of all stocks in the database
      *
+     * @param ids The set of instrument IDs to retrieve stocks for
      * @return std::vector<finance::Stock>
      */
-    std::vector<finance::Stock> InstrumentService::getStocks()
+    std::vector<finance::Stock> InstrumentService::getStocks(
+        const idSet<InstrumentId>& ids
+    )
     {
-        return _instrumentRepo->getStocks();
+        return _instrumentRepo->getStocks(ids);
     }
 
     std::optional<finance::Stock> InstrumentService::getStock(

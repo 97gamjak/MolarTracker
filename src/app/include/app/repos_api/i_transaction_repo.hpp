@@ -7,7 +7,8 @@
 
 namespace finance
 {
-    class Transaction;
+    class Transaction;         // Forward declaration
+    class TransactionFilter;   // Forward declaration
 }   // namespace finance
 
 namespace app
@@ -35,9 +36,18 @@ namespace app
         /**
          * @brief Retrieves all transactions from the repository.
          *
+         * @param accountIds The IDs of the accounts to retrieve transactions
+         * for.
+         * @param filter The filter to apply to the transactions, this will be
+         * converted to a WhereExpr and applied to the query when fetching
+         * transactions from the database, if no filter is provided all
+         * transactions will be returned
+         *
          * @return A vector of all transactions.
          */
         [[nodiscard]] virtual std::vector<finance::Transaction> getTransactions(
+            const idSet<AccountId>&           accountIds,
+            const finance::TransactionFilter& filter
         ) = 0;
     };
 }   // namespace app

@@ -9,7 +9,9 @@
 #include "config/constants.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
+#include "settings/params/param_container.hpp"
 #include "settings/params/params.hpp"
+#include "utils/version_json.hpp"   // IWYU pragma: keep -- needed for version param serialization
 
 namespace settings
 {
@@ -167,6 +169,40 @@ namespace settings
                      { isDirty |= param.isDirty(); });
 
         return isDirty;
+    }
+
+    /**
+     * @brief Apply settings changes from JSON data, this will update the
+     * settings parameters based on the provided JSON data, the exact behavior
+     * of this function will depend on the structure of the JSON data and how it
+     * maps to the settings parameters, but it will generally involve parsing
+     * the JSON data and updating the corresponding parameters in the settings
+     *
+     * @param jsonData The JSON data containing the new settings values, this
+     * should be a JSON object with keys corresponding to the parameter keys and
+     * values corresponding to the new parameter values
+     * @param settings The Settings object to apply the changes to, this is the
+     * instance of the Settings class that will be updated with the new values
+     */
+    void Settings::fromJson(const nlohmann::json& jsonData, Settings& settings)
+    {
+        ParamContainerMixin<Settings>::fromJson(jsonData, settings);
+    }
+
+    /**
+     * @brief Serialize settings to JSON, this will create a JSON object
+     * representing the current state of the settings, the exact structure of
+     * the JSON will depend on how the settings parameters serialize themselves,
+     * but it will generally be a JSON object with keys corresponding to the
+     * parameter keys and values corresponding to the parameter values
+     *
+     * @return nlohmann::json A JSON object representing the current state of
+     * the settings, this can be saved to a file or used for other purposes as
+     * needed
+     */
+    nlohmann::json Settings::toJson() const
+    {
+        return ParamContainerMixin<Settings>::toJson();
     }
 
 }   // namespace settings

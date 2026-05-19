@@ -1,7 +1,8 @@
-#include "app/store/account_store.hpp"
+#include "app/store/account/account_store.hpp"
 
 #include <cassert>
 #include <format>
+#include <ranges>
 
 #include "app/services_api/i_account_service.hpp"
 #include "config/finance.hpp"
@@ -16,10 +17,10 @@ REGISTER_LOG_CATEGORY("App.Store.AccountStore");
 using finance::Account;
 using finance::HasAccountId;
 using finance::HasCurrency;
+using finance::HasName;
 using finance::IsAccountActive;
 using finance::IsAccountType;
 using finance::IsExternal;
-using std::vector;
 
 namespace app
 {
@@ -38,6 +39,18 @@ namespace app
     )
         : _accountService(accountService)
     {
+        _connections.add(subscribeToEntryAdded(
+            [this](const std::vector<finance::Account>& accounts)
+            { _session.add(accounts); },
+            this
+        ));
+
+        _connections.add(subscribeToEntryRemoved(
+            [this](const std::vector<AccountId>& accountIds)
+            { _session.remove(accountIds); },
+            this
+        ));
+
         _refresh();
     }
 
@@ -54,7 +67,7 @@ namespace app
      * successfully or if there was an error, and provides information about
      * what went wrong if the creation failed.
      */
-    [[nodiscard]] AccountStoreResult AccountStore::createAccount(
+    AccountStoreResult AccountStore::createAccount(
         const drafts::AccountDraft& account
     )
     {
@@ -71,6 +84,24 @@ namespace app
                 CurrencyMeta::toString(account.currency)
             )
         );
+
+        const auto options = Options{
+            .filter   = IsAccountType(account.kind) && HasName(account.name),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+        const auto existingAccount = _get(options);
+
+        if (existingAccount.has_value())
+        {
+            LOG_ERROR(
+                std::format(
+                    "Account with name '{}' and type '{}' already exists",
+                    account.name,
+                    AccountKindMeta::toString(account.kind)
+                )
+            );
+            return AccountStoreResult::AccountNameConflict;
+        }
 
         const auto newAccount = Account{
             AccountStatus::Active,
@@ -168,6 +199,9 @@ namespace app
         }
 
         _notifyOnCommit();
+
+        // here now we set our ids because they are now clean!
+        _session.set(_getIds());
     }
 
     /**
@@ -247,6 +281,7 @@ namespace app
                 _accountService->getAllAccounts(_activeProfileId);
 
             _addCleanEntries(accounts);
+            _session.set(_getIds());
         }
     }
 
@@ -416,6 +451,16 @@ namespace app
             return drafts::AccountMapper::toDraft(account.value());
 
         return std::nullopt;
+    }
+
+    /**
+     * @brief Get the account session
+     *
+     * @return const AccountSession& The account session
+     */
+    const AccountSession& AccountStore::getAccountSession() const
+    {
+        return _session;
     }
 
 }   // namespace app

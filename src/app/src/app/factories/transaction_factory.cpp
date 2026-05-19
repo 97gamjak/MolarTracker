@@ -5,6 +5,8 @@
 #include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
+#include "finance/transaction_filter.hpp"
+#include "orm/where_expr.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_row.hpp"
@@ -127,6 +129,7 @@ namespace app
         row.quantity      = leg.getQuantity().toMicroUnits();
         row.unitPrice     = leg.getUnitPrice().getAmount();
         row.currency      = leg.getUnitPrice().getCurrency();
+        row.positionId    = leg.getPositionId();
 
         return row;
     }
@@ -143,8 +146,34 @@ namespace app
             row.accountId.value(),
             row.instrumentId.value(),
             Quantity(row.quantity.value()),
-            finance::Cash(row.currency.value(), row.unitPrice.value())
+            finance::Cash(row.currency.value(), row.unitPrice.value()),
+            row.positionId.value()
         };
+    }
+
+    /**
+     * @brief Convert a TransactionFilter to a WhereExpr for querying the
+     * database, this factory method takes a TransactionFilter object as input
+     * and creates a corresponding WhereExpr that can be used to query the
+     * database for transactions that match the criteria specified in the
+     * filter, ensuring that the filtering logic is correctly translated into a
+     * format that can be executed by the database.
+     *
+     * @param filter The TransactionFilter to convert.
+     * @return orm::WhereExpr The resulting WhereExpr for querying the database.
+     */
+    orm::WhereExpr TransactionFactory::toWhereExpr(
+        const finance::TransactionFilter &filter
+    )
+    {
+        orm::WhereExpr where = orm::makeEmptyWhere();
+
+        if (filter.getPositionId().has_value())
+        {
+            where &= TradeLegRow::hasPosition(filter.getPositionId().value());
+        }
+
+        return where;
     }
 
 }   // namespace app

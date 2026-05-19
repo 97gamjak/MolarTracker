@@ -4,6 +4,7 @@
 
 #include "account_controller.hpp"
 #include "app/app_context.hpp"
+#include "app/store_container.hpp"
 #include "controller/account_controller.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/side_bar/account_category.hpp"
@@ -58,6 +59,7 @@ namespace controller
               appContext.getStore().getAccountStore(),
               appContext.getStore().getTransactionStore(),
               appContext.getStore().getStockStore(),
+              appContext.getStore().getPositionStore(),
               transactionController,
               _securitiesSideBarController,
               mainWindow

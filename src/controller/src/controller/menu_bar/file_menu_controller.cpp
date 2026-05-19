@@ -5,6 +5,8 @@
 #include <QStatusBar>
 
 #include "app/app_context.hpp"
+#include "app/store_container.hpp"
+#include "settings/settings.hpp"
 #include "ui/main_window.hpp"
 #include "ui/menu_bar/file_menu.hpp"
 

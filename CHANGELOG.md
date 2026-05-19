@@ -4,6 +4,24 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Bug Fix
+
+- Fix silent failure when creating a duplicate account — the operation now
+  correctly raises an error instead of throwing an unexpected exception type
+- Fix profile update silently doing nothing — updates now correctly modify the
+  targeted row
+- Fix profile deletion crashing with a SQL syntax error
+- Fix three ORM bugs exposed by unit tests: duplicate `WHERE` in `deleteByPk` SQL, wrong bind-parameter index in `update` WHERE clause, and `LIMIT` being silently ignored when no `ORDER BY` was set
+
+### Tests
+
+- Add unit tests for `AccountRepo` covering `createAccount` and `getAllAccounts`
+- Add unit tests for `ProfileRepo` covering `create`, `get` (by ID and name),
+  `getAll`, `update`, and `remove`
+- Add unit tests for `TransactionRepo` covering Cash and Trade transaction
+  round-trips, entry/leg persistence, comment handling, and multi-transaction
+  retrieval
+
 <!-- insertion marker -->
 ### Testing
 

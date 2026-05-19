@@ -31,23 +31,29 @@ namespace finance
         /// The unit price of the instrument being traded in this leg
         Cash _unitPrice;
 
+        /// The ID of the position associated with this trade leg
+        PositionId _positionId;
+
        public:
         TradeLeg(
             AccountId       accountId,
             InstrumentId    instrumentId,
             const Quantity& quantity,
-            const Cash&     unitPrice
+            const Cash&     unitPrice,
+            PositionId      positionId
         );
 
-        [[nodiscard]] Cash getCash() const;
-
+        [[nodiscard]] Cash         getCash() const;
         [[nodiscard]] InstrumentId getInstrumentId() const;
-
-        [[nodiscard]] AccountId getAccountId() const;
-        [[nodiscard]] Quantity  getQuantity() const;
-        [[nodiscard]] Cash      getUnitPrice() const;
+        [[nodiscard]] AccountId    getAccountId() const;
+        [[nodiscard]] Quantity     getQuantity() const;
+        [[nodiscard]] Cash         getUnitPrice() const;
+        [[nodiscard]] PositionId   getPositionId() const;
 
         void setInstrumentId(InstrumentId instrumentId);
+        void setPositionId(PositionId positionId);
+
+        [[nodiscard]] std::string toString() const;
     };
 
     /**

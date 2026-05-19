@@ -1,9 +1,18 @@
 #include "app/store_container.hpp"
 
 #include <algorithm>
+#include <memory>
+#include <optional>
+#include <string>
 
 #include "app/service_container.hpp"
+#include "app/store/account/account_store.hpp"
+#include "app/store/base/i_store.hpp"
+#include "app/store/position_store.hpp"
+#include "app/store/profile/profile_store.hpp"
 #include "app/store/stock_store.hpp"
+#include "app/store/transaction_store.hpp"
+#include "connections/connection.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
@@ -17,26 +26,46 @@ namespace app
      * @param services
      */
     StoreContainer::StoreContainer(ServiceContainer& services)
-        : _profileStore{services.getProfileService()},
-          _accountStore{services.getAccountService()},
-          _stockStore{services.getInstrumentService(), _instrumentIdSeq},
-          _transactionStore{
+        : _profileStore{std::make_unique<ProfileStore>(
+              services.getProfileService()
+          )},
+          _accountStore{
+              std::make_unique<AccountStore>(services.getAccountService())
+          },
+          _stockStore{std::make_unique<StockStore>(
+              services.getInstrumentService(),
+              _instrumentIdSeq
+          )},
+          _positionStore{
+              std::make_unique<PositionStore>(services.getPositionService())
+          },
+          _transactionStore{std::make_unique<TransactionStore>(
               services.getTransactionService(),
-              _accountStore,
-              _stockStore
-          }
+              *_accountStore,
+              *_stockStore,
+              *_positionStore,
+              _accountStore->getAccountSession()
+          )},
+          _connections{std::make_unique<Connections>()}
     {
-        _allStores.push_back(&_profileStore);
-        _allStores.push_back(&_accountStore);
-        _allStores.push_back(&_transactionStore);
-        _allStores.push_back(&_stockStore);
+        _allStores.push_back(&*_profileStore);
+        _allStores.push_back(&*_accountStore);
+        _allStores.push_back(&*_transactionStore);
+        _allStores.push_back(&*_stockStore);
+        _allStores.push_back(&*_positionStore);
 
-        _connections.add(_profileStore.subscribeToProfileChange(
+        _connections->add(_profileStore->subscribeToProfileChange(
             [&](const std::optional<ProfileId>& profileId)
-            { _accountStore.updateActiveProfile(profileId); },
+            { _accountStore->updateActiveProfile(profileId); },
             &_accountStore
         ));
     }
+
+    /**
+     * @brief Destroy the Store Container:: Store Container object
+     *
+     */
+    StoreContainer::~StoreContainer() = default;
 
     /**
      * @brief Save all temporary changes to the database
@@ -46,14 +75,16 @@ namespace app
     {
         LOG_INFO("Saving all temporary changes to database");
 
-        _profileStore.commit();
+        _profileStore->commit();
         // here the id of the active profile store was already updated via
         // the observer in account store
-        _accountStore.commit();
+        _accountStore->commit();
 
-        _transactionStore.commit();
+        _positionStore->commit();
 
-        _stockStore.commit();
+        _stockStore->commit();
+
+        _transactionStore->commit();
     }
 
     /**
@@ -114,7 +145,7 @@ namespace app
      *
      * @return ProfileStore&
      */
-    ProfileStore& StoreContainer::getProfileStore() { return _profileStore; }
+    ProfileStore& StoreContainer::getProfileStore() { return *_profileStore; }
 
     /**
      * @brief Get the ProfileStore (const version)
@@ -123,7 +154,7 @@ namespace app
      */
     const ProfileStore& StoreContainer::getProfileStore() const
     {
-        return _profileStore;
+        return *_profileStore;
     }
 
     /**
@@ -131,7 +162,7 @@ namespace app
      *
      * @return AccountStore&
      */
-    AccountStore& StoreContainer::getAccountStore() { return _accountStore; }
+    AccountStore& StoreContainer::getAccountStore() { return *_accountStore; }
 
     /**
      * @brief Get the AccountStore (const version)
@@ -140,7 +171,7 @@ namespace app
      */
     const AccountStore& StoreContainer::getAccountStore() const
     {
-        return _accountStore;
+        return *_accountStore;
     }
 
     /**
@@ -150,7 +181,7 @@ namespace app
      */
     TransactionStore& StoreContainer::getTransactionStore()
     {
-        return _transactionStore;
+        return *_transactionStore;
     }
 
     /**
@@ -160,7 +191,7 @@ namespace app
      */
     const TransactionStore& StoreContainer::getTransactionStore() const
     {
-        return _transactionStore;
+        return *_transactionStore;
     }
 
     /**
@@ -168,7 +199,7 @@ namespace app
      *
      * @return StockStore&
      */
-    StockStore& StoreContainer::getStockStore() { return _stockStore; }
+    StockStore& StoreContainer::getStockStore() { return *_stockStore; }
 
     /**
      * @brief Get the StockStore (const version)
@@ -177,7 +208,27 @@ namespace app
      */
     const StockStore& StoreContainer::getStockStore() const
     {
-        return _stockStore;
+        return *_stockStore;
+    }
+
+    /**
+     * @brief Get the PositionStore
+     *
+     * @return PositionStore&
+     */
+    PositionStore& StoreContainer::getPositionStore()
+    {
+        return *_positionStore;
+    }
+
+    /**
+     * @brief Get the PositionStore (const version)
+     *
+     * @return const PositionStore&
+     */
+    const PositionStore& StoreContainer::getPositionStore() const
+    {
+        return *_positionStore;
     }
 
 }   // namespace app

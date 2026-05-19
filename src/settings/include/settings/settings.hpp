@@ -86,6 +86,13 @@ namespace settings
         void       notifySaved();
         bool       isDirty() const;
 
+        static void fromJson(
+            const nlohmann::json& jsonData,
+            Settings&             settings
+        );
+        [[nodiscard]]
+        nlohmann::json toJson() const;
+
        private:
         void _toJson() const;
         void _fromJson();
