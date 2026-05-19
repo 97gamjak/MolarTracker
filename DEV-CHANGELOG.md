@@ -5,6 +5,14 @@ All changes and updates, that are relevant for developers will be documented her
 ## Next Release
 
 <!-- insertion marker -->
+### Testing
+
+- Add `tests/settings/params/` test suite (151 tests across 8 files) covering
+  `ParamError`, `ParamContainer`, `ParamCore<T>`, `NumericParam<T>`,
+  `EnumParam<E>`, `NumericVecParam<T,N>`, `ParamContainerMixin<Derived>`,
+  and the `param_utils.hpp` free functions and type traits
+
+
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10

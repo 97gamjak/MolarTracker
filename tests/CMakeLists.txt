@@ -13,4 +13,5 @@ FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(db)
 add_subdirectory(orm)
+add_subdirectory(settings)
 add_subdirectory(utils)
