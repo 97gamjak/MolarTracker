@@ -9,6 +9,7 @@
 
 #include "app/migration/migration_runner.hpp"
 #include "app/repos/instrument_repo.hpp"
+#include "app/repos/repo_errors.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
@@ -137,7 +138,7 @@ TEST_F(InstrumentRepoTest, AddStockDuplicateTickerThrows)
 
     EXPECT_THROW(
         static_cast<void>(_repo.addStock(makeStock("AAPL"))),
-        std::runtime_error
+        app::RepositoryException
     );
 }
 

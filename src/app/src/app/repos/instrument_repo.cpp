@@ -5,6 +5,7 @@
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
+#include "repo_errors.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace app
@@ -102,7 +103,7 @@ namespace app
 
         if (!result)
         {
-            throw std::runtime_error(
+            throw app::RepositoryException(
                 "Failed to insert instrument row: " +
                 result.error().getMessage()
             );
@@ -113,7 +114,7 @@ namespace app
 
         if (!result)
         {
-            throw std::runtime_error(
+            throw app::RepositoryException(
                 "Failed to insert stock row: " + result.error().getMessage()
             );
         }

@@ -25,4 +25,24 @@ namespace app
         return msg;
     }
 
+    /**
+     * @brief Construct a new Repository Exception:: Repository Exception object
+     *
+     * @param message
+     */
+    RepositoryException::RepositoryException(const std::string& message)
+        : MolarTrackerException(message)
+    {
+    }
+
+    /**
+     * @brief Get the error message
+     *
+     * @return const char*
+     */
+    const char* RepositoryException::what() const noexcept
+    {
+        return MolarTrackerException::what();
+    }
+
 }   // namespace app
