@@ -35,14 +35,4 @@ namespace app
     {
     }
 
-    /**
-     * @brief Get the error message
-     *
-     * @return const char*
-     */
-    const char* RepositoryException::what() const noexcept
-    {
-        return MolarTrackerException::what();
-    }
-
 }   // namespace app
