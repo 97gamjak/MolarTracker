@@ -4,10 +4,12 @@
 #include <unordered_map>
 
 #include "app/services_api/i_transaction_service.hpp"
-#include "app/store/account_store.hpp"
+#include "app/store/account/account_session.hpp"
+#include "app/store/account/account_store.hpp"
 #include "app/store/position_store.hpp"
 #include "app/store/stock_store.hpp"
 #include "config/id_types.hpp"
+#include "config/strong_id.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
@@ -17,6 +19,37 @@ REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
 
 namespace app
 {
+
+    /**
+     * @brief Internal session struct for TransactionStore, this struct holds a
+     * reference to the AccountSession and is used to manage the session state
+     * of transactions in the store.
+     *
+     */
+    struct TransactionStore::Session
+    {
+        /// A reference to the AccountSession
+        const AccountSession& accountSession;
+
+        /**
+         * @brief Construct a new Session object
+         *
+         * @param accountSession_
+         */
+        explicit Session(const AccountSession& accountSession_)
+            : accountSession(accountSession_)
+        {
+        }
+
+        ~Session() = default;
+
+        // delete copy and moving
+        Session(const Session&)            = delete;
+        Session(Session&&)                 = delete;
+        Session& operator=(const Session&) = delete;
+        Session& operator=(Session&&)      = delete;
+    };
+
     /**
      * @brief Construct a new Transaction Store object
      *
@@ -24,14 +57,17 @@ namespace app
      * @param accountStore
      * @param stockStore
      * @param positionStore
+     * @param accountSession
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<ITransactionService>& transactionService,
         AccountStore&                               accountStore,
         StockStore&                                 stockStore,
-        PositionStore&                              positionStore
+        PositionStore&                              positionStore,
+        const AccountSession&                       accountSession
     )
-        : _transactionService(transactionService)
+        : _transactionService(transactionService),
+          _session(std::make_unique<Session>(accountSession))
     {
         _connections.add(accountStore.subscribeToIdRemap(
             [this](const AccountStore::IdMap& remap)
@@ -51,6 +87,8 @@ namespace app
             this
         ));
     }
+
+    TransactionStore::~TransactionStore() = default;
 
     /**
      * @brief Save all temporary changes to the database
@@ -166,17 +204,15 @@ namespace app
 
         auto transactions = _getEntries(options);
 
-        auto dbTransactions = _transactionService->getTransactions(filter);
+        auto dbTransactions = _transactionService->getTransactions(
+            _session->accountSession.getIds(),
+            filter
+        );
 
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
-
-        std::unordered_map<
-            TransactionId,
-            finance::Transaction,
-            TransactionId::Hash>
-            transactionMap;
+        idSet<TransactionId> transactionIds;
 
         std::vector<finance::Transaction> results;
 
@@ -184,22 +220,15 @@ namespace app
         {
             // Only include transactions that are new, for all others the id is
             // already in the database and we will get it from there
-            results.push_back(transaction.value);
-
             if (transaction.state != StoreState::New)
-            {
-                transactionMap.emplace(
-                    transaction.value.getId(),
-                    transaction.value
-                );
-            }
+                transactionIds.insert(transaction.value.getId());
+            else
+                results.push_back(transaction.value);
         }
 
         for (const auto& transaction : dbTransactions)
-        {
-            if (!transactionMap.contains(transaction.getId()))
+            if (!transactionIds.contains(transaction.getId()))
                 results.push_back(transaction);
-        }
 
         return results;
     }

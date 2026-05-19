@@ -133,6 +133,7 @@
         "NOMINMAX",
         "remappings",
         "TSLA",
+        "txrepo",
         "unpolish"
     ],
     "files.watcherExclude": {
