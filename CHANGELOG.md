@@ -25,6 +25,13 @@ All changes and updates, that are relevant for a user will be documented here
   `getStock`, `getStocks`, and `stockExists`
 
 <!-- insertion marker -->
+### Testing
+
+- Add unit tests for the settings params subsystem (`ParamError`,
+  `ParamContainer`, `ParamCore`, `NumericParam`, `EnumParam`,
+  `NumericVecParam`, `ParamContainerMixin`, and param utility functions)
+
+
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ### Bug Fix
