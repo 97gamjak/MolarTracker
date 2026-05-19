@@ -7,7 +7,9 @@
 
 namespace finance
 {
-    class Stock;   // forward declaration
+    class Stock;                  // forward declaration
+    class StockInsertionResult;   // forward declaration
+
 }   // namespace finance
 
 namespace app
@@ -42,7 +44,7 @@ namespace app
         ) override;
 
         [[nodiscard]]
-        std::pair<StockId, InstrumentId> addStock(
+        finance::StockInsertionResult addStock(
             const finance::Stock& stock
         ) override;
 

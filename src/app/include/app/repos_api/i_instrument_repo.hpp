@@ -9,6 +9,7 @@
 namespace finance
 {
     class Stock;
+    struct StockInsertionResult;
 }   // namespace finance
 
 namespace app
@@ -62,11 +63,11 @@ namespace app
          * @param stock The Stock object containing the details of the stock to
          * be added to the database
          *
-         * @return A pair containing the StockId and InstrumentId of the newly
+         * @return A struct containing the StockId and InstrumentId of the newly
          * added stock
          */
         [[nodiscard]]
-        virtual std::pair<StockId, InstrumentId> addStock(
+        virtual finance::StockInsertionResult addStock(
             const finance::Stock& stock
         ) = 0;
 

@@ -88,6 +88,18 @@ namespace finance
         explicit Stock(const TickerInfo& info);
     };
 
+    /**
+     * @brief A struct representing the result of inserting a stock into the
+     * database, this includes the stock ID and the instrument ID that was
+     * generated for the stock.
+     *
+     */
+    struct [[nodiscard]] StockInsertionResult
+    {
+        StockId      stockId;
+        InstrumentId instrumentId;
+    };
+
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__

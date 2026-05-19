@@ -106,7 +106,7 @@ namespace app
             {
                 case StoreState::New:
                 {
-                    const auto [stockId, instrumentId] =
+                    const auto insertionResult =
                         _instrumentService->addStock(entry.value);
 
                     LOG_DEBUG(
@@ -114,14 +114,14 @@ namespace app
                             "Added new stock: {} with ID: {} and Instrument "
                             "ID: {}",
                             entry.value.toString(),
-                            stockId.toString(),
-                            instrumentId.toString()
+                            insertionResult.stockId.toString(),
+                            insertionResult.instrumentId.toString()
                         )
                     );
 
                     auto stock = entry.value;
-                    stock.setId(stockId);
-                    stock.setInstrumentId(instrumentId);
+                    stock.setId(insertionResult.stockId);
+                    stock.setInstrumentId(insertionResult.instrumentId);
                     const auto oldInstrumentId = entry.value.getInstrumentId();
 
                     const auto result = _commitEntry(
@@ -136,8 +136,8 @@ namespace app
                         );
                     }
 
-                    if (oldInstrumentId != instrumentId)
-                        map[oldInstrumentId] = instrumentId;
+                    if (oldInstrumentId != insertionResult.instrumentId)
+                        map[oldInstrumentId] = insertionResult.instrumentId;
 
                     break;
                 }
