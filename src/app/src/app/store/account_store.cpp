@@ -17,10 +17,10 @@ REGISTER_LOG_CATEGORY("App.Store.AccountStore");
 using finance::Account;
 using finance::HasAccountId;
 using finance::HasCurrency;
+using finance::HasName;
 using finance::IsAccountActive;
 using finance::IsAccountType;
 using finance::IsExternal;
-using std::vector;
 
 namespace app
 {
@@ -55,7 +55,7 @@ namespace app
      * successfully or if there was an error, and provides information about
      * what went wrong if the creation failed.
      */
-    [[nodiscard]] AccountStoreResult AccountStore::createAccount(
+    AccountStoreResult AccountStore::createAccount(
         const drafts::AccountDraft& account
     )
     {
@@ -72,6 +72,24 @@ namespace app
                 CurrencyMeta::toString(account.currency)
             )
         );
+
+        const auto options = Options{
+            .filter   = IsAccountType(account.kind) && HasName(account.name),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+        const auto existingAccount = _get(options);
+
+        if (existingAccount.has_value())
+        {
+            LOG_ERROR(
+                std::format(
+                    "Account with name '{}' and type '{}' already exists",
+                    account.name,
+                    AccountKindMeta::toString(account.kind)
+                )
+            );
+            return AccountStoreResult::AccountNameConflict;
+        }
 
         const auto newAccount = Account{
             AccountStatus::Active,
