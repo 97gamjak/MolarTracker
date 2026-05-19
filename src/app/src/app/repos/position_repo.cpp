@@ -37,15 +37,11 @@ namespace app
      */
     orm::Joins PositionRepo::_createPositionJoins()
     {
-        return std::move(
-            orm::Joins{}
-                .add(
-                    orm::join<
-                        PositionRow::idField,
-                        TradeLegRow::positionIdField>()
-                )
-                .distinct()
-        );
+        return orm::Joins{}
+            .add(
+                orm::join<PositionRow::idField, TradeLegRow::positionIdField>()
+            )
+            .distinct();
     }
 
     /**
@@ -58,9 +54,7 @@ namespace app
         const idSet<AccountId>& accountIds
     )
     {
-        return std::move(
-            orm::Query{}.in<TradeLegRow::accountIdField>(accountIds)
-        );
+        return orm::Query{}.in<TradeLegRow::accountIdField>(accountIds);
     }
 
     /**
