@@ -57,7 +57,13 @@ All changes and updates, that are relevant for developers will be documented her
   `app::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
   and Trade transactions, entry/leg persistence, comment round-trips, ID
   sequencing, and empty-database behavior
-- Add 48 GoogleTest unit tests for `orm::Crud` covering `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`,     `addColumn`, `dropColumn`, `getJoined`, WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
+- Add 48 GoogleTest unit tests for `orm::Crud` covering 
+  `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`, `addColumn`, `dropColumn`, `getJoined`, 
+  WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
+- Add `tests/settings/params/` test suite (151 tests across 8 files) covering
+  `ParamError`, `ParamContainer`, `ParamCore<T>`, `NumericParam<T>`,
+  `EnumParam<E>`, `NumericVecParam<T,N>`, `ParamContainerMixin<Derived>`,
+  and the `param_utils.hpp` free functions and type traits
 
 ### Features
 
@@ -79,14 +85,6 @@ All changes and updates, that are relevant for developers will be documented her
 - Speedup some compilation headers
 
 <!-- insertion marker -->
-### Testing
-
-- Add `tests/settings/params/` test suite (151 tests across 8 files) covering
-  `ParamError`, `ParamContainer`, `ParamCore<T>`, `NumericParam<T>`,
-  `EnumParam<E>`, `NumericVecParam<T,N>`, `ParamContainerMixin<Derived>`,
-  and the `param_utils.hpp` free functions and type traits
-
-
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
