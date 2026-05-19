@@ -96,7 +96,9 @@ namespace finance
      */
     struct [[nodiscard]] StockInsertionResult
     {
-        StockId      stockId;
+        /// The ID of the stock that was inserted
+        StockId stockId;
+        /// The ID of the instrument that was generated for the stock
         InstrumentId instrumentId;
     };
 
