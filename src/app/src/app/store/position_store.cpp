@@ -51,10 +51,13 @@ namespace app
           _session(std::make_unique<Session>(accountSession))
     {
         const auto accountIds = _session->accountSession.getIds();
-        const auto openPositions =
-            _positionService->getAllOpenPositions(accountIds);
+        if (!accountIds.empty())
+        {
+            const auto openPositions =
+                _positionService->getAllOpenPositions(accountIds);
 
-        _addCleanEntries(openPositions);
+            _addCleanEntries(openPositions);
+        }
     }
 
     PositionStore::~PositionStore() = default;
@@ -78,6 +81,11 @@ namespace app
      */
     std::vector<finance::Position> PositionStore::getAllPositions() const
     {
+        const auto accountIds = _session->accountSession.getIds();
+
+        if (accountIds.empty())
+            return {};
+
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
         auto                           positionsView = _getValues(options);
@@ -89,7 +97,6 @@ namespace app
         options.deletion = DeletionPolicy::IncludeDelete;
         const auto ids   = _getIds(options);
 
-        const auto accountIds  = _session->accountSession.getIds();
         const auto dbPositions = _positionService->getAllPositions(accountIds);
 
         for (const auto& position : dbPositions)
@@ -106,6 +113,11 @@ namespace app
      */
     std::vector<finance::Position> PositionStore::getOpenPositions() const
     {
+        const auto accountIds = _session->accountSession.getIds();
+
+        if (accountIds.empty())
+            return {};
+
         auto options = Options{
             .filter   = finance::IsPositionOpen(),
             .deletion = DeletionPolicy::ExcludeDelete
@@ -120,7 +132,6 @@ namespace app
         options.deletion = DeletionPolicy::IncludeDelete;
         const auto ids   = _getIds(options);
 
-        const auto accountIds = _session->accountSession.getIds();
         const auto openPositions =
             _positionService->getAllOpenPositions(accountIds);
 

@@ -197,6 +197,11 @@ namespace app
         const finance::TransactionFilter& filter
     ) const
     {
+        const auto accountIds = _session->accountSession.getIds();
+
+        if (accountIds.empty())
+            return {};
+
         const auto options = Options{
             .filter   = filter.getPredicate(),
             .deletion = DeletionPolicy::ExcludeDelete
@@ -204,10 +209,8 @@ namespace app
 
         auto transactions = _getEntries(options);
 
-        auto dbTransactions = _transactionService->getTransactions(
-            _session->accountSession.getIds(),
-            filter
-        );
+        auto dbTransactions =
+            _transactionService->getTransactions(accountIds, filter);
 
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
