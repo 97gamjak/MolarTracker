@@ -26,6 +26,7 @@ namespace app
         Ok,
         Error,
         AccountNotFound,
+        AccountNameConflict,
     };
 
     class AccountStoreException : MolarTrackerException

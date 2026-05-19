@@ -66,21 +66,7 @@ jobs:
           sudo apt-get install -y     \
               ninja-build             \
               pkg-config              \
-              libcurl4-openssl-dev    \
-              cppcheck                \
-              clangd-20
-          sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.13
-          cache: 'pip'
-      
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install clangd-tidy
+              libcurl4-openssl-dev
 
       # -------------------------
       # Install Qt
@@ -113,41 +99,11 @@ jobs:
           cmake --build build --verbose
 
       # -------------------------
-      # Run tests (on the built binaries)
+      # Run tests
       # -------------------------
       - name: Run tests (Ubuntu)
         run: |
           ctest --test-dir build --output-on-failure
-
-      # -------------------------
-      # Run cppcheck (on the compile_commands.json from the build, so it has all the correct include paths)
-      # -------------------------
-      - name: Run cppcheck
-        run: |
-          cppcheck \
-              --project=build/compile_commands.json \
-              --quiet \
-              --file-filter=src/* \
-              --suppress=useStlAlgorithm \
-              --enable=all \
-              --enable=performance \
-              --enable=style \
-              --enable=information \
-              --enable=portability \
-              --error-exitcode=1 \
-              --suppressions-list=.cppcheck \
-              --suppress=missingIncludeSystem \
-              --inline-suppr \
-              --inconclusive \
-              --library=qt \
-              -I src
-
-      # -------------------------
-      # Run clangd-tidy (also using the compile_commands.json from the build)
-      # -------------------------
-      - name: Run clangd-tidy
-        run: |
-          clangd-tidy $(find src/) -p=build
 
       # -------------------------
       # Package for Release assets (ONLY on tags)
@@ -163,7 +119,6 @@ jobs:
 
       # -------------------------
       # Upload to GitHub Release (ONLY on tags)
-      # Requires the Release to already exist for that tag (your other workflow creates it)
       # -------------------------
       - name: Upload release assets (Linux)
         if: startsWith(github.ref, 'refs/tags/')
@@ -177,10 +132,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # -------------------------
-      # Upload Actions artifacts (ONLY on tags/dev; convenient for quick download)
+      # Upload Actions artifacts (ONLY on tags/dev)
       # -------------------------
       - name: Upload Linux artifact (Actions, versioned)
-        if: (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev')
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/dev'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.LINUX_NAME }}
@@ -189,9 +144,6 @@ jobs:
             build/compile_commands.json
           if-no-files-found: error
 
-      # -------------------------
-      # Tag pushes: also upload "latest" Actions artifacts
-      # -------------------------
       - name: Upload Linux artifact (Actions, latest)
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
@@ -201,3 +153,106 @@ jobs:
             build/bin/MolarTracker*
             build/compile_commands.json
           if-no-files-found: error
+
+  lint:
+    runs-on: ubuntu-latest
+
+    env:
+      QT_VERSION: "6.8.3"
+      BUILD_TYPE: "Debug"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # -------------------------
+      # Build tools
+      # -------------------------
+      - name: Install build tools (Ubuntu)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y     \
+              ninja-build             \
+              pkg-config              \
+              libcurl4-openssl-dev    \
+              cppcheck                \
+              clangd-20
+          sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install clangd-tidy
+
+      # -------------------------
+      # Install Qt
+      # -------------------------
+      - name: Install Qt (Ubuntu)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+
+      # -------------------------
+      # Configure only (generates compile_commands.json; no build needed)
+      # -------------------------
+      - name: Configure (Ubuntu)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IS_TAG_FLAG=OFF
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then IS_TAG_FLAG=ON; fi
+
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DMOLARTRACKER_IS_TAG="${IS_TAG_FLAG}" \
+            -DMOLARTRACKER_GIT_TAG="${GITHUB_REF_NAME}" \
+            -DMOLARTRACKER_ENABLE_TESTING=ON
+
+      # -------------------------
+      # Generate headers (required by linters; no C++ compiled)
+      # -------------------------
+      - name: Generate headers
+        run: cmake --build build --target generate_log_categories
+
+      # -------------------------
+      # Run cppcheck
+      # -------------------------
+      - name: Run cppcheck
+        run: |
+          jq '[.[] | select(.file | test("_autogen") | not)]' \
+            build/compile_commands.json > build/compile_commands_filtered.json
+
+          cppcheck \
+              --project=build/compile_commands_filtered.json \
+              --quiet \
+              --file-filter=src/* \
+              --suppress=useStlAlgorithm \
+              --enable=all \
+              --enable=performance \
+              --enable=style \
+              --enable=portability \
+              --error-exitcode=1 \
+              --suppressions-list=.cppcheck \
+              --suppress=missingIncludeSystem \
+              --inline-suppr \
+              --inconclusive \
+              --library=qt \
+              -I src
+
+      # -------------------------
+      # Run clangd-tidy
+      # -------------------------
+      - name: Run clangd-tidy
+        run: |
+          clangd-tidy $(find src/) -p=build
