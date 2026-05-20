@@ -5,6 +5,10 @@ All changes and updates, that are relevant for a user will be documented here
 ## Next Release
 
 <!-- insertion marker -->
+
+### Testing
+
+- Add unit tests for the settings folder (GeneralSettings, LoggingSettings, LogViewerSettings, DebugSlotsSettings, ProfileUISettings, UISettings, Settings)
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ### Bug Fix
