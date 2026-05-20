@@ -86,6 +86,7 @@ namespace app
 
         row.amount   = entry.getAmount();
         row.currency = entry.getCurrency();
+        row.type     = entry.getType();
 
         return row;
     }
@@ -104,7 +105,8 @@ namespace app
         return {
             row.id.value(),
             row.accountId.value(),
-            finance::Cash(row.currency.value(), row.amount.value())
+            finance::Cash(row.currency.value(), row.amount.value()),
+            row.type.value()
         };
     }
 

@@ -159,7 +159,11 @@ namespace ui
         auto cash = finance::Cash(account->currency, _amountRow->getAmount());
         cash      = _type == TransactionType::Deposit ? cash : -cash;
 
-        auto entry = drafts::TransactionEntryDraft{account->id, cash};
+        auto entry = drafts::TransactionEntryDraft{
+            account->id,
+            cash,
+            TransactionEntryType::General
+        };
         entry.setNeedsExternal(true);
 
         return {

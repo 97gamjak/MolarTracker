@@ -7,6 +7,7 @@
 #include <qpushbutton.h>
 #include <qwidget.h>
 
+#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/cash.hpp"
@@ -168,13 +169,20 @@ namespace ui
         const auto quantity = Quantity{quantityRow->getAmount()};
         const auto cash     = -quantity * unitPrice;
 
-        auto entry = drafts::TransactionEntryDraft{referenceAccount->id, cash};
+        auto entry = drafts::TransactionEntryDraft{
+            referenceAccount->id,
+            cash,
+            TransactionEntryType::General
+        };
 
         const auto fees =
             finance::Cash(referenceAccount->currency, feesRow->getAmount());
 
-        const auto feesEntry =
-            drafts::TransactionEntryDraft{referenceAccount->id, fees};
+        const auto feesEntry = drafts::TransactionEntryDraft{
+            referenceAccount->id,
+            fees,
+            TransactionEntryType::Fees
+        };
 
         const auto ticker = tickerField->getTicker();
         if (!ticker.has_value())
@@ -189,7 +197,7 @@ namespace ui
 
         return {
             timestampField->getTimestamp(),
-            {entry},
+            {entry, feesEntry},
             {tradeLeg},
             commentField->getComment()
         };

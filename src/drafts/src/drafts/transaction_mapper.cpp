@@ -25,7 +25,11 @@ namespace drafts
         const finance::TransactionEntry& entry
     )
     {
-        return TransactionEntryDraft{entry.getAccountId(), entry.getCash()};
+        return TransactionEntryDraft{
+            entry.getAccountId(),
+            entry.getCash(),
+            entry.getType()
+        };
     }
 
     /**
@@ -42,7 +46,8 @@ namespace drafts
         return finance::TransactionEntry{
             TransactionEntryId::invalid(),
             entryDraft.getAccountId(),
-            entryDraft.getCash()
+            entryDraft.getCash(),
+            entryDraft.getType()
         };
     }
 

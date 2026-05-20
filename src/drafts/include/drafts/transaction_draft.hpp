@@ -43,11 +43,10 @@ namespace drafts
 
         void setNeedsExternal(bool needsExternal);
 
-        [[nodiscard]] AccountId getAccountId() const;
-
-        [[nodiscard]] finance::Cash getCash() const;
-
-        [[nodiscard]] bool needsExternal() const;
+        [[nodiscard]] AccountId            getAccountId() const;
+        [[nodiscard]] finance::Cash        getCash() const;
+        [[nodiscard]] bool                 needsExternal() const;
+        [[nodiscard]] TransactionEntryType getType() const;
     };
 
     /**

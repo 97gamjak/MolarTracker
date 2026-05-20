@@ -87,7 +87,8 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, amount}
+                    finance::Cash{Currency::USD, amount},
+                    TransactionEntryType::General
                 }},
                 std::move(comment)
             };
@@ -117,7 +118,8 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, price2}
+                    finance::Cash{Currency::USD, price2},
+                    TransactionEntryType::General
                 }},
                 "trade comment"
             };
@@ -284,12 +286,14 @@ TEST_F(
         {finance::TransactionEntry{
              TransactionEntryId::invalid(),
              _accountId,
-             finance::Cash{Currency::USD, price1}
+             finance::Cash{Currency::USD, price1},
+             TransactionEntryType::General
          },
          finance::TransactionEntry{
              TransactionEntryId::invalid(),
              _accountId,
-             finance::Cash{Currency::EUR, price2}
+             finance::Cash{Currency::EUR, price2},
+             TransactionEntryType::Fees
          }},
         std::nullopt
     };

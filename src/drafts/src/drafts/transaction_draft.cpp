@@ -213,12 +213,14 @@ namespace drafts
      *
      * @param accountId
      * @param cash
+     * @param type
      */
     TransactionEntryDraft::TransactionEntryDraft(
-        AccountId     accountId,
-        finance::Cash cash
+        AccountId            accountId,
+        finance::Cash        cash,
+        TransactionEntryType type
     )
-        : _accountId(accountId), _cash(cash)
+        : _accountId(accountId), _cash(cash), _type(type)
     {
     }
 
@@ -260,6 +262,16 @@ namespace drafts
      * @return bool
      */
     bool TransactionEntryDraft::needsExternal() const { return _needsExternal; }
+
+    /**
+     * @brief get the type of this transaction entry draft
+     *
+     * @return TransactionEntryType
+     */
+    TransactionEntryType TransactionEntryDraft::getType() const
+    {
+        return _type;
+    }
 
     /**
      * @brief Construct a new Transaction Overview Draft:: Transaction Overview

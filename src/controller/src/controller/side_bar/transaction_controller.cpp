@@ -220,7 +220,8 @@ namespace controller
                     _accountStore.getExternalAccount(
                         entry.getCash().getCurrency()
                     ),
-                    -entry.getCash()
+                    -entry.getCash(),
+                    entry.getType()
                 );
             }
         }
