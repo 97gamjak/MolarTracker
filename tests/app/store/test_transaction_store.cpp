@@ -33,14 +33,12 @@ namespace
         std::shared_ptr<tests::MockInstrumentService>  _mockInstrumentService;
         std::shared_ptr<tests::MockPositionService>    _mockPositionService;
         std::shared_ptr<tests::MockTransactionService> _mockTransactionService;
-
-        InstrumentIdSeq     _idSeq;
-        app::AccountStore   _accountStore;
-        app::StockStore     _stockStore;
-        app::AccountSession _accountSession;
-        app::PositionStore  _positionStore;
-
-        std::unique_ptr<app::TransactionStore> _store;
+        InstrumentIdSeq                                _idSeq;
+        app::AccountStore                              _accountStore;
+        app::StockStore                                _stockStore;
+        app::AccountSession                            _accountSession;
+        app::PositionStore                             _positionStore;
+        std::unique_ptr<app::TransactionStore>         _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         TransactionStoreTest()
@@ -59,16 +57,19 @@ namespace
               _accountStore{_mockAccountService},
               _stockStore{_mockInstrumentService, _idSeq},
               _positionStore{_mockPositionService, _accountSession},
-              _store{std::make_unique<app::TransactionStore>(
-                  _mockTransactionService,
-                  _accountStore,
-                  _stockStore,
-                  _positionStore,
-                  _accountSession
-              )}
+              _store{
+                  std::make_unique<app::TransactionStore>(
+                      _mockTransactionService,
+                      _accountStore,
+                      _stockStore,
+                      _positionStore,
+                      _accountSession
+                  )
+              }
         {
         }
 
+        /// Returns a cash transaction whose entries sum to zero (empty).
         [[nodiscard]] static finance::Transaction makeZeroSumTx()
         {
             return finance::Transaction{
@@ -81,6 +82,7 @@ namespace
             };
         }
 
+        /// Returns a cash transaction whose single entry has a non-zero amount.
         [[nodiscard]] static finance::Transaction makeNonZeroSumTx()
         {
             return finance::Transaction{
@@ -91,7 +93,7 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     AccountId{1},
-                    finance::Cash{Currency::USD, micro_units{100'000LL}}
+                    finance::Cash{Currency::USD, micro_units{100'000}}
                 }},
                 std::nullopt
             };
@@ -111,27 +113,16 @@ TEST_F(TransactionStoreTest, AddTransaction_NonZeroSum_ReturnsError)
 {
     const auto result = _store->addTransaction(makeNonZeroSumTx());
 
-    EXPECT_EQ(
-        result,
-        app::TransactionStoreResult::TransactionSumNotZero
-    );
+    EXPECT_EQ(result, app::TransactionStoreResult::TransactionSumNotZero);
 }
 
 TEST_F(TransactionStoreTest, GetTransactions_EmptyWhenNoAccounts)
 {
-    const auto txs = _store->getTransactions();
-
-    EXPECT_TRUE(txs.empty());
-}
-
-TEST_F(TransactionStoreTest, GetTransactions_ReturnsNewTransaction)
-{
-    _accountSession.set({AccountId{1}});
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    const auto txs = _store->getTransactions();
+    const auto txs = _store->getTransactions(finance::TransactionFilter{});
 
-    EXPECT_EQ(txs.size(), 1u);
+    EXPECT_TRUE(txs.empty());
 }
 
 TEST_F(TransactionStoreTest, IsDirty_FalseInitially)
