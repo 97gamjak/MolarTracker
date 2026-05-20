@@ -86,6 +86,19 @@ All changes and updates, that are relevant for developers will be documented her
 - Speedup some compilation headers
 
 <!-- insertion marker -->
+## [Unreleased]
+
+### Added
+- Unit tests for all five services (`ProfileService`, `AccountService`,
+  `InstrumentService`, `PositionService`, `TransactionService`) using
+  real repo + SQLite database integration fixtures
+- Unit tests for all five stores (`ProfileStore`, `AccountStore`,
+  `StockStore`, `PositionStore`, `TransactionStore`) using hand-rolled
+  mock service implementations
+- Shared `mock_services.hpp` test helper in `tests/app/store/` providing
+  lightweight fakes for all service interfaces
+- New `tests_stores` CMake test executable for store unit tests
+
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10

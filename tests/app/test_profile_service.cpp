@@ -1,0 +1,131 @@
+#include <gtest/gtest.h>
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include "app/domain/profile.hpp"
+#include "app/migration/migration_runner.hpp"
+#include "app/repos/profile_repo.hpp"
+#include "app/services/profile_service.hpp"
+#include "config/id_types.hpp"
+#include "db/database.hpp"
+#include "orm/crud/crud_error.hpp"
+#include "test_fixtures.hpp"
+
+namespace
+{
+
+    class ProfileServiceTest : public ::testing::Test
+    {
+       protected:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        tests::TempDbFile                    _tempFile;
+        db::Database                         _db;
+        std::shared_ptr<app::ProfileRepo>    _repo;
+        std::shared_ptr<app::ProfileService> _service;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+        ProfileServiceTest()
+            : _db{_tempFile.path()},
+              _repo{std::make_shared<app::ProfileRepo>(_db)},
+              _service{std::make_shared<app::ProfileService>(_repo)}
+        {
+            app::MigrationRunner{_db};
+        }
+    };
+
+}   // namespace
+
+TEST_F(ProfileServiceTest, Create_ReturnsValidId)
+{
+    const auto id = _service->create("Alice", std::nullopt);
+
+    EXPECT_GT(id.value(), 0);
+}
+
+TEST_F(ProfileServiceTest, Create_DuplicateNameThrows)
+{
+    static_cast<void>(_service->create("Alice", std::nullopt));
+
+    EXPECT_THROW(
+        static_cast<void>(_service->create("Alice", std::nullopt)),
+        orm::CrudException
+    );
+}
+
+TEST_F(ProfileServiceTest, GetById_ReturnsNulloptForMissingId)
+{
+    const auto profile = _service->get(ProfileId{9999});
+
+    EXPECT_FALSE(profile.has_value());
+}
+
+TEST_F(ProfileServiceTest, GetById_ReturnsCorrectProfile)
+{
+    const auto id = _service->create("Bob", std::string{"bob@example.com"});
+
+    const auto profile = _service->get(id);
+    ASSERT_TRUE(profile.has_value());
+    EXPECT_EQ(profile->getName(), "Bob");
+    EXPECT_EQ(profile->getId(), id);
+}
+
+TEST_F(ProfileServiceTest, GetAll_EmptyWhenNoProfiles)
+{
+    const auto profiles = _service->getAll();
+
+    EXPECT_TRUE(profiles.empty());
+}
+
+TEST_F(ProfileServiceTest, GetAll_ReturnsAllCreatedProfiles)
+{
+    static_cast<void>(_service->create("Alice", std::nullopt));
+    static_cast<void>(_service->create("Bob", std::nullopt));
+
+    const auto profiles = _service->getAll();
+
+    EXPECT_EQ(profiles.size(), 2u);
+}
+
+TEST_F(ProfileServiceTest, Update_ChangesNameAndEmail)
+{
+    const auto id = _service->create("Carol", std::nullopt);
+
+    _service->update(id, "Caroline", std::string{"carol@example.com"});
+
+    const auto profile = _service->get(id);
+    ASSERT_TRUE(profile.has_value());
+    EXPECT_EQ(profile->getName(), "Caroline");
+    ASSERT_TRUE(profile->getEmail().has_value());
+    EXPECT_EQ(profile->getEmail().value(), "carol@example.com");
+}
+
+TEST_F(ProfileServiceTest, Update_ThrowsForNonExistentId)
+{
+    EXPECT_THROW(
+        _service->update(ProfileId{9999}, "Ghost", std::nullopt),
+        std::runtime_error
+    );
+}
+
+TEST_F(ProfileServiceTest, Remove_DeletesProfile)
+{
+    const auto id = _service->create("Dave", std::nullopt);
+
+    _service->remove(id);
+
+    EXPECT_FALSE(_service->get(id).has_value());
+}
+
+TEST_F(ProfileServiceTest, Remove_DoesNotAffectOtherProfiles)
+{
+    const auto id1 = _service->create("Eve", std::nullopt);
+    const auto id2 = _service->create("Frank", std::nullopt);
+
+    _service->remove(id1);
+
+    EXPECT_FALSE(_service->get(id1).has_value());
+    EXPECT_TRUE(_service->get(id2).has_value());
+}
