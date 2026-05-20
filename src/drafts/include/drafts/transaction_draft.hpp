@@ -121,6 +121,7 @@ namespace drafts
         const std::optional<std::string>& getComment() const;
 
         void addEntry(const TransactionEntryDraft& entry);
+        void addEntries(const std::vector<TransactionEntryDraft>& entries);
     };
 
     /**

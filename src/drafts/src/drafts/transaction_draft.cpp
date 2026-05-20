@@ -161,6 +161,19 @@ namespace drafts
     }
 
     /**
+     * @brief Adds multiple entries to the cash transaction draft.
+     *
+     * @param entries The vector of TransactionEntryDraft to add to the cash
+     * transaction draft.
+     */
+    void CreateTransactionDraft::addEntries(
+        const std::vector<TransactionEntryDraft>& entries
+    )
+    {
+        _entries.insert(_entries.end(), entries.begin(), entries.end());
+    }
+
+    /**
      * @brief Create a Stock Transaction Draft:: Create Stock Transaction Draft
      * object
      *

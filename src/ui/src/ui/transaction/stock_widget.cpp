@@ -163,23 +163,23 @@ namespace ui
             referenceAccount.value().id == AccountId::invalid())
             throw std::runtime_error("No reference account selected");
 
-        const auto unitPrice =
-            finance::Cash(referenceAccount->currency, priceRow->getAmount());
+        const auto currency     = referenceAccount->currency;
+        const auto refAccountId = referenceAccount->id;
 
-        const auto quantity = Quantity{quantityRow->getAmount()};
-        const auto cash     = -quantity * unitPrice;
+        const auto unitPrice = finance::Cash(currency, priceRow->getAmount());
+        const auto quantity  = Quantity{quantityRow->getAmount()};
+        const auto cash      = -quantity * unitPrice;
 
         auto entry = drafts::TransactionEntryDraft{
-            referenceAccount->id,
+            refAccountId,
             cash,
             TransactionEntryType::General
         };
 
-        const auto fees =
-            finance::Cash(referenceAccount->currency, feesRow->getAmount());
+        const auto fees = -finance::Cash(currency, feesRow->getAmount());
 
         const auto feesEntry = drafts::TransactionEntryDraft{
-            referenceAccount->id,
+            refAccountId,
             fees,
             TransactionEntryType::Fees
         };
