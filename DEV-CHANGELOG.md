@@ -33,6 +33,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Fix handling error if creating cash transaction fails
 - Fix silent continuing for stock transaction creation if position exists but has not suitable instrument
 - Improve error handling when creating a new position during stock transaction creation
+- Fix retrieving only transactions related to accounts that are loaded for the current profile
 - Fix retrieving only positions related to accounts that are loaded for the current profile
 - Fix account creation now handling duplicated account names already when adding to store instead of throwing exception when trying to commit to database
 

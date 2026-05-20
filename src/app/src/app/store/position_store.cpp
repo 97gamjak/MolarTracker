@@ -1,5 +1,8 @@
 #include "app/store/position_store.hpp"
 
+#include <memory>
+
+#include "app/store/account/account_session.hpp"
 #include "app/store/base/base_store.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 
@@ -7,19 +10,57 @@ namespace app
 {
 
     /**
+     * @brief Session data for PositionStore
+     *
+     */
+    struct PositionStore::Session
+    {
+        /// the account session
+        const AccountSession& accountSession;
+
+        /**
+         * @brief Construct a new Session object
+         *
+         * @param accountSession_
+         */
+        explicit Session(const AccountSession& accountSession_)
+            : accountSession(accountSession_)
+        {
+        }
+
+        ~Session() = default;
+
+        // delete copy and move
+        Session(const Session&)            = delete;
+        Session(Session&&)                 = delete;
+        Session& operator=(const Session&) = delete;
+        Session& operator=(Session&&)      = delete;
+    };
+
+    /**
      * @brief Construct a new Position Store:: Position Store object
      *
      * @param positionService
+     * @param accountSession
      */
     PositionStore::PositionStore(
-        std::shared_ptr<IPositionService> positionService
+        std::shared_ptr<IPositionService> positionService,
+        const AccountSession&             accountSession
     )
-        : _positionService(std::move(positionService))
+        : _positionService(std::move(positionService)),
+          _session(std::make_unique<Session>(accountSession))
     {
-        const auto openPositions = _positionService->getAllOpenPositions();
+        const auto accountIds = _session->accountSession.getIds();
+        if (!accountIds.empty())
+        {
+            const auto openPositions =
+                _positionService->getAllOpenPositions(accountIds);
 
-        _addCleanEntries(openPositions);
+            _addCleanEntries(openPositions);
+        }
     }
+
+    PositionStore::~PositionStore() = default;
 
     /**
      * @brief Create a new position
@@ -40,6 +81,11 @@ namespace app
      */
     std::vector<finance::Position> PositionStore::getAllPositions() const
     {
+        const auto accountIds = _session->accountSession.getIds();
+
+        if (accountIds.empty())
+            return {};
+
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
         auto                           positionsView = _getValues(options);
@@ -51,7 +97,9 @@ namespace app
         options.deletion = DeletionPolicy::IncludeDelete;
         const auto ids   = _getIds(options);
 
-        for (const auto& position : _positionService->getAllPositions())
+        const auto dbPositions = _positionService->getAllPositions(accountIds);
+
+        for (const auto& position : dbPositions)
             if (!ids.contains(position.getId()))
                 positions.push_back(position);
 
@@ -65,6 +113,11 @@ namespace app
      */
     std::vector<finance::Position> PositionStore::getOpenPositions() const
     {
+        const auto accountIds = _session->accountSession.getIds();
+
+        if (accountIds.empty())
+            return {};
+
         auto options = Options{
             .filter   = finance::IsPositionOpen(),
             .deletion = DeletionPolicy::ExcludeDelete
@@ -79,7 +132,10 @@ namespace app
         options.deletion = DeletionPolicy::IncludeDelete;
         const auto ids   = _getIds(options);
 
-        for (const auto& position : _positionService->getAllOpenPositions())
+        const auto openPositions =
+            _positionService->getAllOpenPositions(accountIds);
+
+        for (const auto& position : openPositions)
             if (!ids.contains(position.getId()))
                 positions.push_back(position);
 

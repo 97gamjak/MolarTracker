@@ -36,9 +36,10 @@ namespace app
               services.getInstrumentService(),
               _instrumentIdSeq
           )},
-          _positionStore{
-              std::make_unique<PositionStore>(services.getPositionService())
-          },
+          _positionStore{std::make_unique<PositionStore>(
+              services.getPositionService(),
+              _accountStore->getAccountSession()
+          )},
           _transactionStore{std::make_unique<TransactionStore>(
               services.getTransactionService(),
               *_accountStore,
