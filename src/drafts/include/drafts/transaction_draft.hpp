@@ -31,8 +31,15 @@ namespace drafts
         /// account
         bool _needsExternal = false;
 
+        /// The type of the transaction entry
+        TransactionEntryType _type;
+
        public:
-        TransactionEntryDraft(AccountId accountId, finance::Cash cash);
+        TransactionEntryDraft(
+            AccountId            accountId,
+            finance::Cash        cash,
+            TransactionEntryType type
+        );
 
         void setNeedsExternal(bool needsExternal);
 

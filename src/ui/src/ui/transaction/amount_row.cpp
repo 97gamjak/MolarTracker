@@ -82,4 +82,17 @@ namespace ui
         return _amountField->getAmount();
     }
 
+    /**
+     * @brief Set the default value for the amount row, this will configure the
+     * underlying AmountLineEdit to display the specified default value,
+     * allowing the owning widget to easily set a starting value for the amount
+     * input.
+     *
+     * @param value The default value to set for the amount input
+     */
+    void AmountRow::setDefaultValue(int value) const
+    {
+        _amountField->setText(QString::number(value));
+    }
+
 }   // namespace ui
