@@ -29,7 +29,7 @@ namespace app
        public:
         explicit PositionStore(
             std::shared_ptr<IPositionService> positionService,
-            const AccountSession&             session
+            const AccountSession&             accountSession
         );
 
         ~PositionStore() override;
