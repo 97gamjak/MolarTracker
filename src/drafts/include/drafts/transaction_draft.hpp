@@ -31,6 +31,10 @@ namespace drafts
         /// account
         bool _needsExternal = false;
 
+        /// A flag indicating whether this transaction entry is for an external
+        /// account
+        bool _isExternal = false;
+
         /// The type of the transaction entry
         TransactionEntryType _type;
 
@@ -38,7 +42,8 @@ namespace drafts
         TransactionEntryDraft(
             AccountId            accountId,
             finance::Cash        cash,
-            TransactionEntryType type
+            TransactionEntryType type,
+            bool                 isExternal
         );
 
         void setNeedsExternal(bool needsExternal);
@@ -46,7 +51,9 @@ namespace drafts
         [[nodiscard]] AccountId            getAccountId() const;
         [[nodiscard]] finance::Cash        getCash() const;
         [[nodiscard]] bool                 needsExternal() const;
+        [[nodiscard]] bool                 isExternal() const;
         [[nodiscard]] TransactionEntryType getType() const;
+        [[nodiscard]] Currency             getCurrency() const;
     };
 
     /**
@@ -83,6 +90,7 @@ namespace drafts
         [[nodiscard]] const std::string& getTicker() const;
         [[nodiscard]] InstrumentId       getInstrumentId() const;
         [[nodiscard]] PositionId         getPositionId() const;
+        [[nodiscard]] Currency           getCurrency() const;
 
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
@@ -202,6 +210,10 @@ namespace drafts
         const std::vector<TradeLegDraft>& getLegs() const;
 
         [[nodiscard]] const std::optional<std::string>& getComment() const;
+
+        [[nodiscard]] finance::Cash getTotalFees() const;
+
+        [[nodiscard]] Currency getCurrency() const;
     };
 
 }   // namespace drafts

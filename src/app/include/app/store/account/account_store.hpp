@@ -84,6 +84,9 @@ namespace app
         [[nodiscard]]
         AccountId getExternalAccount(Currency currency) const;
 
+        [[nodiscard]]
+        idSet<AccountId> getExternalAccountIds() const;
+
         void commit();
 
         void updateActiveProfile(const std::optional<ProfileId>& profileIdOpt);

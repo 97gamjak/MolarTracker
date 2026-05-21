@@ -217,7 +217,8 @@ namespace controller
                             entry.getCash().getCurrency()
                         ),
                         -entry.getCash(),
-                        entry.getType()
+                        entry.getType(),
+                        true
                     );
                 }
             }

@@ -110,6 +110,7 @@ namespace ui
         layout->addRow("Stock Price:", amountRowLayout);
         auto* feesRowLayout = makeQChild<QHBoxLayout>();
         feesRowLayout->addWidget(feesRow);
+        feesRowLayout->addWidget(currencyLabel);
         layout->addRow("Fees:", feesRowLayout);
         layout->addRow("Comment:", commentField);
 
@@ -130,10 +131,10 @@ namespace ui
         if (!priceRow->isValid())
             return false;
 
-        if (quantityRow->getAmount() == 0)
+        if (quantityRow->isZero())
             return false;
 
-        if (priceRow->getAmount() == 0)
+        if (priceRow->isZero())
             return false;
 
         return true;
@@ -165,23 +166,29 @@ namespace ui
 
         const auto currency     = referenceAccount->currency;
         const auto refAccountId = referenceAccount->id;
+        const auto microUnits   = finance::getMicroUnit(currency);
 
-        const auto unitPrice = finance::Cash(currency, priceRow->getAmount());
-        const auto quantity  = Quantity{quantityRow->getAmount()};
-        const auto cash      = -quantity * unitPrice;
+        const auto unitPrice_ = priceRow->getAmount(microUnits);
+        const auto unitPrice  = finance::Cash(currency, unitPrice_);
+        const auto quantity_  = quantityRow->getAmount(Quantity::precision);
+        const auto quantity   = Quantity{quantity_};
+        const auto cash       = -quantity * unitPrice;
 
         auto entry = drafts::TransactionEntryDraft{
             refAccountId,
             cash,
-            TransactionEntryType::General
+            TransactionEntryType::General,
+            false
         };
 
-        const auto fees = -finance::Cash(currency, feesRow->getAmount());
+        const auto fees_ = feesRow->getAmount(microUnits);
+        const auto fees  = -finance::Cash(currency, fees_);
 
         const auto feesEntry = drafts::TransactionEntryDraft{
             refAccountId,
             fees,
-            TransactionEntryType::Fees
+            TransactionEntryType::Fees,
+            false
         };
 
         const auto ticker = tickerField->getTicker();
@@ -287,14 +294,18 @@ namespace ui
         using finance::getMicroUnit;
         using finance::getSymbol;
 
-        _fields->priceRow->setNDecimalPlaces(getMicroUnit(account.currency));
-        _fields->currencyLabel->setText(getSymbol(account.currency).c_str());
+        const auto currency   = account.currency;
+        const auto microUnits = getMicroUnit(currency);
+
+        _fields->priceRow->setNDecimalPlaces(microUnits);
+        _fields->feesRow->setNDecimalPlaces(microUnits);
+        _fields->currencyLabel->setText(getSymbol(currency).c_str());
 
         std::vector<drafts::AccountDraft> referenceAccounts;
 
         for (const auto& referenceAccount : _referenceAccounts)
         {
-            if (referenceAccount.currency == account.currency)
+            if (referenceAccount.currency == currency)
                 referenceAccounts.push_back(referenceAccount);
         }
 

@@ -156,13 +156,18 @@ namespace ui
         if (!account.has_value())
             throw std::runtime_error("No account selected");
 
-        auto cash = finance::Cash(account->currency, _amountRow->getAmount());
+        const auto currency   = account->currency;
+        const auto microUnits = finance::getMicroUnit(currency);
+        const auto cash_      = _amountRow->getAmount(microUnits);
+
+        auto cash = finance::Cash(account->currency, cash_);
         cash      = _type == TransactionType::Deposit ? cash : -cash;
 
         auto entry = drafts::TransactionEntryDraft{
             account->id,
             cash,
-            TransactionEntryType::General
+            TransactionEntryType::General,
+            false
         };
         entry.setNeedsExternal(true);
 
@@ -214,8 +219,7 @@ namespace ui
     void DepositWithdrawalWidget::_updateAddButton()
     {
         const auto isValid = _accountCombo->selected().has_value() &&
-                             _amountRow->isValid() &&
-                             _amountRow->getAmount() != 0;
+                             _amountRow->isValid() && !_amountRow->isZero();
 
         _addButton->setEnabled(isValid);
     }

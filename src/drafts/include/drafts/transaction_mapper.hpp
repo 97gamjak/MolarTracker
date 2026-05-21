@@ -42,7 +42,8 @@ namespace drafts
     {
        public:
         static drafts::TransactionEntryDraft toEntryDraft(
-            const finance::TransactionEntry& entry
+            const finance::TransactionEntry& entry,
+            const idSet<AccountId>&          externalAccounts
         );
 
         static finance::TransactionEntry fromEntryDraft(
@@ -75,12 +76,14 @@ namespace drafts
 
         static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
             const std::vector<finance::Transaction>& transactions,
-            const instrumentMap<std::string>&        instrumentNames
+            const instrumentMap<std::string>&        instrumentNames,
+            const idSet<AccountId>&                  externalAccounts
         );
 
         static drafts::TransactionOverviewDraft toOverviewDraft(
             const finance::Transaction&       transaction,
-            const instrumentMap<std::string>& instrumentNames
+            const instrumentMap<std::string>& instrumentNames,
+            const idSet<AccountId>&           externalAccounts
         );
     };
 

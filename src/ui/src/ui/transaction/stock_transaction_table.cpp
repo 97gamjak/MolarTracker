@@ -26,6 +26,7 @@ namespace ui
     X(ReferenceAccount) \
     X(Quantity)         \
     X(Price)            \
+    X(Fees)             \
     X(Description)
 
     MSTD_ENUM(StockTransactionColumn, std::uint8_t, COLUMN_LIST);
@@ -155,7 +156,16 @@ namespace ui
                 return QString::fromStdString(
                     transaction.getLegs().front().getUnitPrice().toString(2)
                 );
+            case StockTransactionColumn::Fees:
+            {
+                const auto& fees = transaction.getTotalFees();
+                if (fees.isZero())
+                    return QStringLiteral("-");
+
+                return QString::fromStdString(fees.toString(2));
+            }
         }
+
         return {};
     }
 

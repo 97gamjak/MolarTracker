@@ -33,7 +33,8 @@ namespace ui
         void setDefaultValue(int value) const;
 
         [[nodiscard]] bool        isValid() const;
-        [[nodiscard]] micro_units getAmount() const;
+        [[nodiscard]] bool        isZero() const;
+        [[nodiscard]] micro_units getAmount(std::size_t precision) const;
 
        signals:
         /**

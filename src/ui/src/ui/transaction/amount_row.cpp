@@ -70,16 +70,31 @@ namespace ui
     bool AmountRow::isValid() const { return _amountField->isValid(); }
 
     /**
+     * @brief Check if the entered amount is zero, this will return true if the
+     * input in the amount field is zero according to the validation rules
+     * defined in the AmountLineEdit (e.g., required, only positive, etc.), and
+     * false otherwise, allowing the owning widget to easily check if the amount
+     * entered by the user is zero before proceeding with any actions that
+     * depend on a valid amount.
+     *
+     * @return true if the entered amount is zero, false otherwise
+     */
+    bool AmountRow::isZero() const { return _amountField->isZero(); }
+
+    /**
      * @brief Get the entered amount as a double, this will retrieve the value
      * from the underlying AmountLineEdit and return it as a double, allowing
      * the owning widget to easily access the entered amount for use in creating
      * transactions or performing calculations.
      *
+     * @param precision The number of decimal places to consider when converting
+     * the input to micro_units.
+     *
      * @return micro_units The entered amount as a double
      */
-    micro_units AmountRow::getAmount() const
+    micro_units AmountRow::getAmount(std::size_t precision) const
     {
-        return _amountField->getAmount();
+        return _amountField->getAmount(precision);
     }
 
     /**

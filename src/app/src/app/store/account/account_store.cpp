@@ -430,6 +430,26 @@ namespace app
     }
 
     /**
+     * @brief Get the IDs of all external accounts
+     *
+     * @return idSet<AccountId>
+     */
+    idSet<AccountId> AccountStore::getExternalAccountIds() const
+    {
+        const auto options = Options{
+            .filter   = IsExternal(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        idSet<AccountId> externalAccountIds;
+
+        for (const auto& account : _getValues(options))
+            externalAccountIds.insert(account.getId());
+
+        return externalAccountIds;
+    }
+
+    /**
      * @brief Get an account by its ID
      *
      * @param id The ID of the account to retrieve
