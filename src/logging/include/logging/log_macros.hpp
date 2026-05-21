@@ -1,6 +1,7 @@
 #ifndef __LOGGING__INCLUDE__LOGGING__LOG_MACROS_HPP__
 #define __LOGGING__INCLUDE__LOGGING__LOG_MACROS_HPP__
 
+#include <format>     // IWYU pragma: keep
 #include <iostream>   // IWYU pragma: keep
 #include <map>
 #include <string_view>
