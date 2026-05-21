@@ -228,14 +228,30 @@ namespace orm
         return loadedModel;
     }
 
+    /**
+     * @brief Load a model from a database statement, reading the field values
+     * from the statement's columns in order
+     *
+     * @tparam Model
+     * @param statement
+     * @return Model
+     */
     template <db_model Model>
     Model loadModelFromStatement(db::Statement const& statement)
     {
         return loadModelFromStatement<Model>(statement, 0);
     }
 
-    template <typename Model>
-    auto loadAnyFromStatement(
+    /**
+     * @brief Load a model from a database statement, reading the field values
+     * from the statement's columns in order
+     *
+     * @tparam Model
+     * @param statement
+     * @return Model
+     */
+    template <db_model Model>
+    Model loadAnyFromStatement(
         const db::Statement& statement,
         std::size_t          offset
     )
@@ -251,6 +267,13 @@ namespace orm
         return loadModelFromStatement<Model>(statement, offset);
     }
 
+    /**
+     * @brief Load a tuple of models from a database statement
+     *
+     * @tparam Models
+     * @param statement
+     * @return std::tuple<Models...>
+     */
     template <db_model... Models>
     std::tuple<Models...> loadTupleFromStatement(const db::Statement& statement)
     {
@@ -265,19 +288,39 @@ namespace orm
         };
     }
 
+    /**
+     * @brief Get the SQL SELECT statement for the given models
+     *
+     * @tparam Models
+     */
     template <typename... Models>
     requires((db_model<Models> || optional_model<Models>) && ...)
     std::string getSelection()
+    {
+        return getSelection<Models...>(false);
+    }
+
+    /**
+     * @brief Get the SQL SELECT statement for the given models
+     *
+     * @tparam Models
+     */
+    template <typename... Models>
+    requires((db_model<Models> || optional_model<Models>) && ...)
+    std::string getSelection(bool distinct)
     {
         using BaseModel = std::tuple_element_t<0, std::tuple<Models...>>;
 
         std::vector<std::string> tables;
         (tables.push_back(std::string(Models::tableName) + ".*"), ...);
 
-        std::string sql  = "SELECT ";
-        sql             += mstd::join(tables, ", ");
-        sql             += " FROM ";
-        sql             += BaseModel::tableName;
+        std::string sql = "SELECT ";
+        if (distinct)
+            sql += "DISTINCT ";
+
+        sql += mstd::join(tables, ", ");
+        sql += " FROM ";
+        sql += BaseModel::tableName;
 
         return sql;
     }

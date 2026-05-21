@@ -35,18 +35,26 @@ namespace app
         /**
          * @brief Get all Positions
          *
-         * @return std::vector<finance::Position>
-         */
-        [[nodiscard]]
-        virtual std::vector<finance::Position> getAllPositions() = 0;
-
-        /**
-         * @brief Get all open Positions
+         * @param accountIds The IDs of the accounts to retrieve positions for.
          *
          * @return std::vector<finance::Position>
          */
         [[nodiscard]]
-        virtual std::vector<finance::Position> getAllOpenPositions() = 0;
+        virtual std::vector<finance::Position> getAllPositions(
+            const idSet<AccountId>& accountIds
+        ) = 0;
+
+        /**
+         * @brief Get all open Positions
+         *
+         * @param accountIds The IDs of the accounts to retrieve positions for.
+         *
+         * @return std::vector<finance::Position>
+         */
+        [[nodiscard]]
+        virtual std::vector<finance::Position> getAllOpenPositions(
+            const idSet<AccountId>& accountIds
+        ) = 0;
     };
 
 }   // namespace app

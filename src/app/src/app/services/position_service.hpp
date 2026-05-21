@@ -26,10 +26,14 @@ namespace app
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getAllPositions() override;
+        std::vector<finance::Position> getAllPositions(
+            const idSet<AccountId>& accountIds
+        ) override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getAllOpenPositions() override;
+        std::vector<finance::Position> getAllOpenPositions(
+            const idSet<AccountId>& accountIds
+        ) override;
     };
 
 }   // namespace app
