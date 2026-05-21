@@ -7,6 +7,7 @@
 #include "finance/transaction.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
+#include "orm/join.hpp"
 #include "repo_errors.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
@@ -113,12 +114,15 @@ namespace app
         const auto query =
             orm::Query{}.where(TransactionFactory::toWhereExpr(filter));
 
-        const auto txRows = _getCrud().get<TransactionRow>(_getDb(), query);
+        const auto join = orm::Joins{}.add(TransactionFactory::toJoin(filter));
+
+        const auto txRows =
+            _getCrud().getJoined<TransactionRow>(_getDb(), join, query);
 
         std::vector<finance::Transaction> results;
         results.reserve(txRows.size());
 
-        for (const auto& txRow : txRows)
+        for (const auto& [txRow] : txRows)
         {
             const auto allEntriesQuery = orm::Query{}.where(
                 TransactionEntryRow::hasTransactionId(txRow.id.value())

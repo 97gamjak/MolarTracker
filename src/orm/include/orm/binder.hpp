@@ -2,6 +2,7 @@
 #define __ORM__INCLUDE__ORM__BINDER_HPP__
 
 #include <cstdint>
+#include <mstd/error.hpp>
 #include <mstd/type_traits.hpp>
 #include <string>
 
@@ -14,7 +15,10 @@
 namespace orm
 {
     template <typename T>
-    struct binder;
+    struct binder
+    {
+        MSTD_COMPILE_FAIL("Unsupported type");
+    };
 
     /**
      * @brief Binder for 64-bit integer values

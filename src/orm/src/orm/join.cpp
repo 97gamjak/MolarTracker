@@ -53,6 +53,18 @@ namespace orm
     }
 
     /**
+     * @brief Add a collection of joins to the existing collection.
+     *
+     * @param joins The collection of joins to add.
+     * @return Joins& A reference to this Joins object.
+     */
+    Joins& Joins::add(const Joins& joins)
+    {
+        _joins.insert(_joins.end(), joins._joins.begin(), joins._joins.end());
+        return *this;
+    }
+
+    /**
      * @brief Set the DISTINCT flag for the joins
      *
      * @return Joins& A reference to this Joins object.

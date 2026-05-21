@@ -108,6 +108,36 @@ namespace orm
         }
     }
 
+    /**
+     * @brief Get the SQL operations for this NULL clause, e.g. "table.field IS
+     * NULL"
+     *
+     * @tparam Field
+     * @return std::string
+     */
+    template <typename Field>
+    [[nodiscard]] std::string NullClause<Field>::getDBOperations() const
+    {
+        return Field::getFullColumnName() + " IS NULL";
+    }
+
+    /**
+     * @brief Bind the values for this NULL clause to the specified statement,
+     * using the specified index for parameter binding
+     *
+     * @tparam Field
+     * @param statement
+     * @param index
+     */
+    template <typename Field>
+    void NullClause<Field>::bind(
+        db::Statement& /*statement*/,
+        BindIndex& /*index*/
+    ) const
+    {
+        // No binding necessary for NULL clauses
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__

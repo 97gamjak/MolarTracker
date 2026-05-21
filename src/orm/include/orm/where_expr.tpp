@@ -25,6 +25,18 @@ namespace orm
      * @brief Create a WHERE expression for a specific field and operator
      *
      * @tparam Field
+     * @return WhereExpr
+     */
+    template <typename Field>
+    WhereExpr makeIsNull()
+    {
+        return std::make_shared<NullClause<Field>>();
+    }
+
+    /**
+     * @brief Create a WHERE expression for a specific field and operator
+     *
+     * @tparam Field
      * @tparam Range
      * @param field
      * @param operator_

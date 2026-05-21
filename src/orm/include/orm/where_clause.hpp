@@ -88,6 +88,20 @@ namespace orm
         void bind(db::Statement& statement, BindIndex& index) const override;
     };
 
+    /**
+     * @brief Null Clause for a specific field
+     *
+     * @tparam Field
+     */
+    template <typename Field>
+    class NullClause : public IWhereClause
+    {
+       public:
+        [[nodiscard]] std::string getDBOperations() const override;
+
+        void bind(db::Statement& statement, BindIndex& index) const override;
+    };
+
 }   // namespace orm
 
 #ifndef __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__

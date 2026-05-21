@@ -171,11 +171,37 @@ namespace app
         orm::WhereExpr where = orm::makeEmptyWhere();
 
         if (filter.getPositionId().has_value())
-        {
             where &= TradeLegRow::hasPosition(filter.getPositionId().value());
-        }
 
         return where;
+    }
+
+    /** @brief Converts a TransactionFilter object to a Join object for
+     * querying the database, this factory method takes a TransactionFilter
+     * object as input and creates a corresponding Join object that can be
+     * used to query the database for transactions that match the criteria
+     * specified in the filter, ensuring that the joining logic is correctly
+     * translated into a format that can be executed by the database.
+     *
+     * @param filter The TransactionFilter to convert.
+     * @return orm::Joins The resulting Join object for querying the database.
+     */
+    orm::Joins TransactionFactory::toJoin(
+        const finance::TransactionFilter &filter
+    )
+    {
+        orm::Joins join;
+
+        if (filter.getPositionId().has_value())
+        {
+            join = join.add(
+                orm::join<
+                    TransactionRow::idField,
+                    TradeLegRow::transactionIdField>()
+            );
+        }
+
+        return join;
     }
 
 }   // namespace app

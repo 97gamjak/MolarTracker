@@ -33,6 +33,10 @@ namespace orm
     [[nodiscard]]
     WhereExpr makeWhere(const Value& field, filter::Operator operator_);
 
+    template <typename Field>
+    [[nodiscard]]
+    WhereExpr makeIsNull();
+
     template <typename Field, typename Value, std::ranges::input_range Range>
     [[nodiscard]]
     WhereExpr makeInClause(const Range& values);

@@ -271,14 +271,17 @@ namespace app
 
         if (_activeProfileId.isValid())
         {
-            LOG_TRACE(
+            LOG_DEBUG(
                 std::format(
                     "Refreshing account store for active profile: {}",
                     _activeProfileId.value()
                 )
             );
+
             const auto accounts =
                 _accountService->getAllAccounts(_activeProfileId);
+
+            LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
             _session.set(_getIds());
