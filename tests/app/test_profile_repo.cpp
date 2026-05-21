@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cassert>
-#include <filesystem>
 #include <optional>
-#include <random>
 #include <string>
 #include <vector>
 
@@ -21,9 +19,11 @@ namespace
     class ProfileRepoTest : public ::testing::Test
     {
        protected:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         tests::TempDbFile _tempFile;
         db::Database      _db;
         app::ProfileRepo  _repo;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         ProfileRepoTest() : _db{_tempFile.path()}, _repo{_db}
         {
@@ -41,21 +41,21 @@ namespace
 
 }   // namespace
 
-TEST_F(ProfileRepoTest, Create_ReturnsValidId)
+TEST_F(ProfileRepoTest, CreateReturnsValidId)
 {
     const auto id = _repo.create("Alice", std::nullopt);
 
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(ProfileRepoTest, Create_DuplicateNameThrows)
+TEST_F(ProfileRepoTest, CreateDuplicateNameThrows)
 {
     static_cast<void>(_repo.create("Alice", std::nullopt));
 
     EXPECT_THROW(_repo.create("Alice", std::nullopt), orm::CrudException);
 }
 
-TEST_F(ProfileRepoTest, Create_WithEmail_PersistsEmail)
+TEST_F(ProfileRepoTest, CreateWithEmailPersistsEmail)
 {
     const auto id = _repo.create("Bob", std::string{"bob@example.com"});
 
@@ -65,7 +65,7 @@ TEST_F(ProfileRepoTest, Create_WithEmail_PersistsEmail)
     EXPECT_EQ(profile->getEmail().value(), "bob@example.com");
 }
 
-TEST_F(ProfileRepoTest, Create_WithoutEmail_EmailIsEmpty)
+TEST_F(ProfileRepoTest, CreateWithoutEmailEmailIsEmpty)
 {
     const auto id = _repo.create("Alice", std::nullopt);
 
@@ -74,14 +74,14 @@ TEST_F(ProfileRepoTest, Create_WithoutEmail_EmailIsEmpty)
     EXPECT_FALSE(profile->getEmail().has_value());
 }
 
-TEST_F(ProfileRepoTest, GetById_ReturnsNulloptForMissingId)
+TEST_F(ProfileRepoTest, GetByIdReturnsNulloptForMissingId)
 {
     const auto profile = _repo.get(ProfileId{9999});
 
     EXPECT_FALSE(profile.has_value());
 }
 
-TEST_F(ProfileRepoTest, GetById_ReturnsCorrectProfile)
+TEST_F(ProfileRepoTest, GetByIdReturnsCorrectProfile)
 {
     const auto id = _repo.create("Carol", std::string{"carol@example.com"});
 
@@ -91,14 +91,14 @@ TEST_F(ProfileRepoTest, GetById_ReturnsCorrectProfile)
     EXPECT_EQ(profile->getId(), id);
 }
 
-TEST_F(ProfileRepoTest, GetByName_ReturnsNulloptForMissingName)
+TEST_F(ProfileRepoTest, GetByNameReturnsNulloptForMissingName)
 {
     const auto profile = _repo.get(std::string{"nonexistent"});
 
     EXPECT_FALSE(profile.has_value());
 }
 
-TEST_F(ProfileRepoTest, GetByName_ReturnsCorrectProfile)
+TEST_F(ProfileRepoTest, GetByNameReturnsCorrectProfile)
 {
     const auto id = _repo.create("Dave", std::nullopt);
 
@@ -108,14 +108,14 @@ TEST_F(ProfileRepoTest, GetByName_ReturnsCorrectProfile)
     EXPECT_EQ(profile->getName(), "Dave");
 }
 
-TEST_F(ProfileRepoTest, GetAll_EmptyWhenNoProfiles)
+TEST_F(ProfileRepoTest, GetAllEmptyWhenNoProfiles)
 {
     const auto profiles = _repo.getAll();
 
     EXPECT_TRUE(profiles.empty());
 }
 
-TEST_F(ProfileRepoTest, GetAll_ReturnsAllCreatedProfiles)
+TEST_F(ProfileRepoTest, GetAllReturnsAllCreatedProfiles)
 {
     static_cast<void>(_repo.create("Alice", std::nullopt));
     static_cast<void>(_repo.create("Bob", std::nullopt));
@@ -123,15 +123,15 @@ TEST_F(ProfileRepoTest, GetAll_ReturnsAllCreatedProfiles)
 
     const auto profiles = _repo.getAll();
 
-    EXPECT_EQ(profiles.size(), 3u);
+    EXPECT_EQ(profiles.size(), 3U);
 }
 
-TEST_F(ProfileRepoTest, GetAll_ReturnsCorrectProfileData)
+TEST_F(ProfileRepoTest, GetAllReturnsCorrectProfileData)
 {
     const auto id = _repo.create("Eve", std::string{"eve@example.com"});
 
     const auto profiles = _repo.getAll();
-    ASSERT_EQ(profiles.size(), 1u);
+    ASSERT_EQ(profiles.size(), 1U);
 
     EXPECT_EQ(profiles[0].getName(), "Eve");
     EXPECT_EQ(profiles[0].getId(), id);
@@ -139,7 +139,7 @@ TEST_F(ProfileRepoTest, GetAll_ReturnsCorrectProfileData)
     EXPECT_EQ(profiles[0].getEmail().value(), "eve@example.com");
 }
 
-TEST_F(ProfileRepoTest, Update_ChangesNameAndEmail)
+TEST_F(ProfileRepoTest, UpdateChangesNameAndEmail)
 {
     const auto id = _repo.create("Frank", std::nullopt);
 
@@ -152,7 +152,7 @@ TEST_F(ProfileRepoTest, Update_ChangesNameAndEmail)
     EXPECT_EQ(profile->getEmail().value(), "frank@example.com");
 }
 
-TEST_F(ProfileRepoTest, Update_ClearsEmail)
+TEST_F(ProfileRepoTest, UpdateClearsEmail)
 {
     const auto id = _repo.create("Grace", std::string{"grace@example.com"});
 
@@ -163,7 +163,7 @@ TEST_F(ProfileRepoTest, Update_ClearsEmail)
     EXPECT_FALSE(profile->getEmail().has_value());
 }
 
-TEST_F(ProfileRepoTest, Update_ThrowsForNonExistentId)
+TEST_F(ProfileRepoTest, UpdateThrowsForNonExistentId)
 {
     EXPECT_THROW(
         _repo.update(ProfileId{9999}, "Ghost", std::nullopt),
@@ -171,7 +171,7 @@ TEST_F(ProfileRepoTest, Update_ThrowsForNonExistentId)
     );
 }
 
-TEST_F(ProfileRepoTest, Update_DuplicateNameThrows)
+TEST_F(ProfileRepoTest, UpdateDuplicateNameThrows)
 {
     const auto id1 = _repo.create("Heidi", std::nullopt);
     static_cast<void>(_repo.create("Ivan", std::nullopt));
@@ -179,7 +179,7 @@ TEST_F(ProfileRepoTest, Update_DuplicateNameThrows)
     EXPECT_THROW(_repo.update(id1, "Ivan", std::nullopt), orm::CrudException);
 }
 
-TEST_F(ProfileRepoTest, Remove_DeletesProfile)
+TEST_F(ProfileRepoTest, RemoveDeletesProfile)
 {
     const auto id = _repo.create("Judy", std::nullopt);
 
@@ -189,10 +189,10 @@ TEST_F(ProfileRepoTest, Remove_DeletesProfile)
     EXPECT_FALSE(profile.has_value());
 }
 
-TEST_F(ProfileRepoTest, Remove_DoesNotAffectOtherProfiles)
+TEST_F(ProfileRepoTest, RemoveDoesNotAffectOtherProfiles)
 {
     const auto id1 = _repo.create("Mallory", std::nullopt);
-    const auto id2 = _repo.create("Niaj", std::nullopt);
+    const auto id2 = _repo.create("Nina", std::nullopt);
 
     _repo.remove(id1);
 

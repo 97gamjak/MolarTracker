@@ -24,6 +24,10 @@ using utils::makeQChild;
 namespace ui
 {
 
+    /**
+     * @brief Struct holding the fields for the stock widget
+     *
+     */
     struct StockWidget::Fields
     {
         /// The combo box for selecting the primary account
@@ -71,6 +75,14 @@ namespace ui
         drafts::CreateStockTransactionDraft getDraft() const;
     };
 
+    /**
+     * @brief Construct a new Stock Widget:: Fields:: Fields object
+     *
+     * @param accounts
+     * @param referenceAccounts
+     * @param tickers
+     * @param parent
+     */
     StockWidget::Fields::Fields(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
@@ -92,6 +104,11 @@ namespace ui
         feesRow->setDefaultValue(0);
     }
 
+    /**
+     * @brief Add the fields to the layout
+     *
+     * @param layout The layout to add the fields to
+     */
     void StockWidget::Fields::addFieldsToLayout(QFormLayout* layout) const
     {
         layout->addRow("Account:", accountCombo);
@@ -117,6 +134,11 @@ namespace ui
         referenceAccountCombo->setEnabled(false);
     }
 
+    /**
+     * @brief Check if the fields are valid
+     *
+     * @return true if all fields are valid, false otherwise
+     */
     bool StockWidget::Fields::isValid() const
     {
         if (!accountCombo->selected().has_value())
@@ -140,6 +162,10 @@ namespace ui
         return true;
     }
 
+    /**
+     * @brief Update the fields
+     *
+     */
     void StockWidget::Fields::update() const
     {
         accountCombo->update();
@@ -151,6 +177,11 @@ namespace ui
         tickerField->update();
     }
 
+    /**
+     * @brief Get the draft for the stock transaction
+     *
+     * @return drafts::CreateStockTransactionDraft
+     */
     drafts::CreateStockTransactionDraft StockWidget::Fields::getDraft() const
     {
         const auto account = accountCombo->selected();

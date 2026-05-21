@@ -42,31 +42,21 @@ namespace ui
         /// The layout for the widget
         QFormLayout* _layout;
 
-        /// The combo box for selecting the account to deposit to or withdraw
-        /// from
-        AccountCombo* _accountCombo;
-
-        /// The field for selecting the transaction timestamp
-        TimestampField* _timestampField;
-
-        /// The row for entering the amount to deposit or withdraw
-        AmountRow* _amountRow;
-
-        /// The label for displaying the currency of the selected account
-        QLabel* _currencyLabel;
-
-        /// The field for entering an optional comment
-        CommentField* _commentField;
-
         /// The button for adding the transaction
         QPushButton* _addButton;
 
+        struct Fields;
+        /// The fields for the deposit/withdrawal widget
+        std::unique_ptr<Fields> _fields;
+
        public:
         explicit DepositWithdrawalWidget(
-            TransactionType                   type,
-            std::vector<drafts::AccountDraft> accounts,
-            QWidget*                          parent = nullptr
+            TransactionType                          type,
+            const std::vector<drafts::AccountDraft>& accounts,
+            QWidget*                                 parent = nullptr
         );
+
+        ~DepositWithdrawalWidget() override;
 
         [[nodiscard]] drafts::CreateCashTransactionDraft getDraft() const;
         [[nodiscard]] TransactionType getTransactionType() const;

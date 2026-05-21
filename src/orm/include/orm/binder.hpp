@@ -14,10 +14,17 @@
 
 namespace orm
 {
+    /**
+     * @brief Binder for database values
+     *
+     * @tparam T The type of the value to bind
+     */
     template <typename T>
     struct binder
     {
+        /// @cond DOXYGEN_IGNORE
         MSTD_COMPILE_FAIL("Unsupported type");
+        /// @endcond
     };
 
     /**

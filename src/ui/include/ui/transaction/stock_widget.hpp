@@ -45,6 +45,7 @@ namespace ui
         QPushButton* _addButton;
 
         struct Fields;
+        /// Pointer to the fields struct
         std::unique_ptr<Fields> _fields;
 
         /// The list of reference accounts

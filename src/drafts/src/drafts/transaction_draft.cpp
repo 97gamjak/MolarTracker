@@ -401,6 +401,25 @@ namespace drafts
     }
 
     /**
+     * @brief get the total general cash of the transaction overview draft
+     *
+     * @return finance::Cash
+     */
+    finance::Cash TransactionOverviewDraft::getTotalGeneralCash() const
+    {
+        auto totalGeneralCash = finance::Cash(getCurrency());
+        for (const auto& entry : _entries)
+        {
+            if (entry.getType() == TransactionEntryType::General &&
+                !entry.isExternal())
+            {
+                totalGeneralCash += entry.getCash();
+            }
+        }
+        return totalGeneralCash;
+    }
+
+    /**
      * @brief get the total fees of the transaction overview draft
      *
      * @return finance::Cash
@@ -454,6 +473,8 @@ namespace drafts
     /**
      * @brief Get the account ID associated with the first entry of the
      * transaction overview draft.
+     *
+     * @param includeExternal Whether to include external entries.
      *
      * @return AccountId The account ID associated with the first entry of the
      * transaction overview draft.

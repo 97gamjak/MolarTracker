@@ -202,8 +202,10 @@ namespace drafts
         [[nodiscard]] TransactionDataType               getType() const;
         [[nodiscard]] const Timestamp&                  getTimestamp() const;
         [[nodiscard]] const std::optional<std::string>& getComment() const;
-        [[nodiscard]] finance::Cash                     getTotalFees() const;
-        [[nodiscard]] Currency                          getCurrency() const;
+
+        [[nodiscard]] finance::Cash getTotalGeneralCash() const;
+        [[nodiscard]] finance::Cash getTotalFees() const;
+        [[nodiscard]] Currency      getCurrency() const;
 
         [[nodiscard]] AccountId getLegAccount() const;
         [[nodiscard]] AccountId getEntryAccountId(bool includeExternal) const;
