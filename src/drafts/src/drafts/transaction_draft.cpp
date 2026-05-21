@@ -419,6 +419,12 @@ namespace drafts
         return totalFees;
     }
 
+    /**
+     * @brief Get the currency associated with this transaction overview draft.
+     *
+     * @return Currency The currency associated with this transaction overview
+     * draft.
+     */
     Currency TransactionOverviewDraft::getCurrency() const
     {
         if (!_entries.empty())
@@ -429,4 +435,38 @@ namespace drafts
 
         return Currency();
     }
+
+    /**
+     * @brief Get the account ID associated with the first leg of the
+     * transaction overview draft.
+     *
+     * @return AccountId The account ID associated with the first leg of the
+     * transaction overview draft.
+     */
+    AccountId TransactionOverviewDraft::getLegAccount() const
+    {
+        if (!_legs.empty())
+            return _legs.front().getAccountId();
+
+        return AccountId::invalid();
+    }
+
+    /**
+     * @brief Get the account ID associated with the first entry of the
+     * transaction overview draft.
+     *
+     * @return AccountId The account ID associated with the first entry of the
+     * transaction overview draft.
+     */
+    AccountId TransactionOverviewDraft::getEntryAccountId(
+        bool includeExternal
+    ) const
+    {
+        for (const auto& entry : _entries)
+            if (!entry.isExternal() || includeExternal)
+                return entry.getAccountId();
+
+        return AccountId::invalid();
+    }
+
 }   // namespace drafts

@@ -199,21 +199,20 @@ namespace drafts
             std::optional<std::string>         comment
         );
 
-        [[nodiscard]] TransactionDataType getType() const;
+        [[nodiscard]] TransactionDataType               getType() const;
+        [[nodiscard]] const Timestamp&                  getTimestamp() const;
+        [[nodiscard]] const std::optional<std::string>& getComment() const;
+        [[nodiscard]] finance::Cash                     getTotalFees() const;
+        [[nodiscard]] Currency                          getCurrency() const;
 
-        [[nodiscard]] const Timestamp& getTimestamp() const;
+        [[nodiscard]] AccountId getLegAccount() const;
+        [[nodiscard]] AccountId getEntryAccountId(bool includeExternal) const;
 
         [[nodiscard]]
         const std::vector<TransactionEntryDraft>& getEntries() const;
 
         [[nodiscard]]
         const std::vector<TradeLegDraft>& getLegs() const;
-
-        [[nodiscard]] const std::optional<std::string>& getComment() const;
-
-        [[nodiscard]] finance::Cash getTotalFees() const;
-
-        [[nodiscard]] Currency getCurrency() const;
     };
 
 }   // namespace drafts

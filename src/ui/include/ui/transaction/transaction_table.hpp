@@ -4,6 +4,7 @@
 #include <qabstractitemmodel.h>
 
 #include "config/id_types.hpp"
+#include "config/strong_id.hpp"
 
 namespace drafts
 {
@@ -21,22 +22,18 @@ namespace ui
     {
         Q_OBJECT
        private:
-        /// alias for the map of account IDs to account names
-        using IdToNameMap =
-            std::unordered_map<AccountId, std::string, AccountId::Hash>;
-
         /// The list of transactions to display in the table
         std::vector<drafts::TransactionOverviewDraft> _transactions;
 
         /// A map of account IDs to account names for display purposes
-        IdToNameMap _accountIdToName;
+        unorderedIdMap<AccountId, std::string> _accountIdToName;
 
        public:
         explicit TransactionTableModel(QObject* parent = nullptr);
 
         void setTransactions(
             std::vector<drafts::TransactionOverviewDraft> transactions,
-            IdToNameMap                                   accountIdToName
+            unorderedIdMap<AccountId, std::string>        accountIdToName
         );
 
         [[nodiscard]]
@@ -114,7 +111,9 @@ namespace ui
         [[nodiscard]]
         virtual QString _getColLabel(int col) const = 0;
 
-        const IdToNameMap& _getAccountIdToNameMap() const;
+        [[nodiscard]]
+        const unorderedIdMap<AccountId, std::string>& _getAccountIdToNameMap(
+        ) const;
     };
 }   // namespace ui
 

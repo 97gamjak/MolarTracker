@@ -124,29 +124,20 @@ namespace ui
                 );
             case StockTransactionColumn::Account:
             {
-                if (!_getAccountIdToNameMap().contains(
-                        transaction.getLegs().front().getAccountId()
-                    ))
+                const auto id = transaction.getLegAccount();
+
+                if (!_getAccountIdToNameMap().contains(id) || !id.isValid())
                     return "";
 
-                return QString::fromStdString(
-                    _getAccountIdToNameMap().at(
-                        transaction.getLegs().front().getAccountId()
-                    )
-                );
+                return QString::fromStdString(_getAccountIdToNameMap().at(id));
             }
             case StockTransactionColumn::ReferenceAccount:
             {
-                if (!_getAccountIdToNameMap().contains(
-                        transaction.getEntries().back().getAccountId()
-                    ))
+                const auto id = transaction.getEntryAccountId(false);
+                if (!_getAccountIdToNameMap().contains(id) || !id.isValid())
                     return "";
 
-                return QString::fromStdString(
-                    _getAccountIdToNameMap().at(
-                        transaction.getEntries().back().getAccountId()
-                    )
-                );
+                return QString::fromStdString(_getAccountIdToNameMap().at(id));
             }
             case StockTransactionColumn::Quantity:
                 return QString::fromStdString(
