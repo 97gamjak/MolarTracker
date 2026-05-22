@@ -83,12 +83,12 @@ namespace finance
             hasProfile ? result.at("assetProfile") : nlohmann::json::object();
 
         TickerInfo info;
-        info.symbol    = json::_safeGet<std::string>(price, "symbol");
-        info.shortName = json::_safeGet<std::string>(price, "shortName");
-        info.longName  = json::_safeGet<std::string>(price, "longName");
-        info.exchange  = json::_safeGet<std::string>(price, "exchangeName");
+        info.symbol    = json::safeGet<std::string>(price, "symbol");
+        info.shortName = json::safeGet<std::string>(price, "shortName");
+        info.longName  = json::safeGet<std::string>(price, "longName");
+        info.exchange  = json::safeGet<std::string>(price, "exchangeName");
 
-        const auto currencyStr = json::_safeGet<std::string>(price, "currency");
+        const auto currencyStr = json::safeGet<std::string>(price, "currency");
         const auto currencyOpt = CurrencyMeta::from_string(currencyStr);
 
         if (!currencyOpt)
@@ -104,9 +104,9 @@ namespace finance
         info.regularMarketPrice = _rawValue(price, "regularMarketPrice");
         info.previousClose = _rawValue(price, "regularMarketPreviousClose");
         info.assetClass =
-            fromQuote(json::_safeGet<std::string>(price, "quoteType"));
-        info.industry = json::_safeGet<std::string>(profile, "industry");
-        info.sector   = json::_safeGet<std::string>(profile, "sector");
+            fromQuote(json::safeGet<std::string>(price, "quoteType"));
+        info.industry = json::safeGet<std::string>(profile, "industry");
+        info.sector   = json::safeGet<std::string>(profile, "sector");
 
         return info;
     }

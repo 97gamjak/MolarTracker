@@ -33,7 +33,7 @@ namespace finance
         const auto& data =
             json.at("quoteSummary").at("result").at(0).at("price");
 
-        const auto currencyStr = json::_safeGet<std::string>(data, "currency");
+        const auto currencyStr = json::safeGet<std::string>(data, "currency");
         const auto currencyOpt = CurrencyMeta::from_string(currencyStr);
 
         if (!currencyOpt)
@@ -46,11 +46,11 @@ namespace finance
         const auto currency = currencyOpt.value();
 
         const auto priceStr =
-            json::_safeGet<std::string>(data, "regularMarketPreviousClose");
+            json::safeGet<std::string>(data, "regularMarketPreviousClose");
         const auto price =
             microUnitsFromString(priceStr, getMicroUnit(currency));
 
-        const auto time = json::_safeGet<int64_t>(data, "regularMarketTime");
+        const auto time = json::safeGet<int64_t>(data, "regularMarketTime");
         const auto timeStamp = Timestamp::fromInt64(time);
 
         return PriceQuote{
