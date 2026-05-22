@@ -33,7 +33,8 @@ namespace ui
         void setNDecimalPlaces(std::uint8_t numberOfDecimalPlaces);
         void setOnlyPositive(bool onlyPositive);
 
-        [[nodiscard]] micro_units getAmount() const;
+        [[nodiscard]] micro_units getAmount(std::size_t precision) const;
+        [[nodiscard]] bool        isZero() const;
 
        protected:
         [[nodiscard]] QString _getRequiredErrorMessage() const override;

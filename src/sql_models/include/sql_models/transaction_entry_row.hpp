@@ -64,7 +64,13 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
     /// for USD) to avoid floating-point precision issues
     ORM_FIELD(amount, Field<"amount", micro_units, orm::not_null_t>)
 
+    /// The currency field, this is a required field that represents the
+    /// currency of the transaction, it is stored as an enum value
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
+
+    /// The type field, this is a required field that represents the type of
+    /// the transaction entry, it is stored as an enum value
+    ORM_FIELD(type, Field<"type", TransactionEntryType, orm::not_null_t>)
 
     /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
@@ -73,7 +79,8 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
         transactionId,
         accountId,
         amount,
-        currency
+        currency,
+        type
     )
     /// @endcond
 

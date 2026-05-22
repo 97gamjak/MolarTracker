@@ -271,14 +271,17 @@ namespace app
 
         if (_activeProfileId.isValid())
         {
-            LOG_TRACE(
+            LOG_DEBUG(
                 std::format(
                     "Refreshing account store for active profile: {}",
                     _activeProfileId.value()
                 )
             );
+
             const auto accounts =
                 _accountService->getAllAccounts(_activeProfileId);
+
+            LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
             _session.set(_getIds());
@@ -411,7 +414,9 @@ namespace app
      * that corresponds to the specified currency, and can be used for various
      * operations that require referencing the external account.
      */
-    AccountId AccountStore::getExternalAccount(Currency currency) const
+    std::optional<AccountId> AccountStore::getExternalAccount(
+        Currency currency
+    ) const
     {
         const auto options = Options{
             .filter   = IsExternal() && HasCurrency(currency),
@@ -423,10 +428,27 @@ namespace app
         if (account.has_value())
             return account->getId();
 
-        throw AccountStoreException(
-            "No external account found for currency " +
-            CurrencyMeta::toString(currency)
-        );
+        return std::nullopt;
+    }
+
+    /**
+     * @brief Get the IDs of all external accounts
+     *
+     * @return idSet<AccountId>
+     */
+    idSet<AccountId> AccountStore::getExternalAccountIds() const
+    {
+        const auto options = Options{
+            .filter   = IsExternal(),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        idSet<AccountId> externalAccountIds;
+
+        for (const auto& account : _getValues(options))
+            externalAccountIds.insert(account.getId());
+
+        return externalAccountIds;
     }
 
     /**

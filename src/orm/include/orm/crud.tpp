@@ -328,7 +328,7 @@ namespace orm
             ));
         }
 
-        sqlText += getDBOperations(where);
+        sqlText += Query{}.where(where).getDBOperations();
         sqlText += ";";
 
         LOG_DEBUG(
@@ -639,7 +639,7 @@ namespace orm
             );
         }
 
-        sqlText += getDBOperations(where);
+        sqlText += Query{}.where(where).getDBOperations();
         sqlText += ";";
 
         LOG_DEBUG(

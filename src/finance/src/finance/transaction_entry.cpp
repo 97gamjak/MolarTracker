@@ -12,13 +12,15 @@ namespace finance
      * @param id
      * @param accountId
      * @param cash
+     * @param type
      */
     TransactionEntry::TransactionEntry(
-        TransactionEntryId id,
-        AccountId          accountId,
-        Cash               cash
+        TransactionEntryId   id,
+        AccountId            accountId,
+        Cash                 cash,
+        TransactionEntryType type
     )
-        : _id(id), _accountId(accountId), _cash(cash)
+        : _id(id), _accountId(accountId), _cash(cash), _type(type)
     {
     }
 
@@ -61,7 +63,14 @@ namespace finance
      *
      * @return Cash The cash associated with the transaction entry.
      */
-    [[nodiscard]] Cash TransactionEntry::getCash() const { return _cash; }
+    Cash TransactionEntry::getCash() const { return _cash; }
+
+    /**
+     * @brief Gets the type of the transaction entry.
+     *
+     * @return TransactionEntryType The type of the transaction entry.
+     */
+    TransactionEntryType TransactionEntry::getType() const { return _type; }
 
     /**
      * @brief Sets the account ID associated with the transaction entry.

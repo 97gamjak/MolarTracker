@@ -16,38 +16,47 @@ namespace drafts
 
     /**
      * @brief Converts a finance::TransactionEntry to a
-     * drafts::TransactionEntryDraft
+     * TransactionEntryDraft
      *
      * @param entry
-     * @return drafts::TransactionEntryDraft
+     * @param externalAccounts
+     *
+     * @return TransactionEntryDraft
      */
-    drafts::TransactionEntryDraft TransactionMapper::toEntryDraft(
-        const finance::TransactionEntry& entry
+    TransactionEntryDraft TransactionMapper::toEntryDraft(
+        const finance::TransactionEntry& entry,
+        const idSet<AccountId>&          externalAccounts
     )
     {
-        return TransactionEntryDraft{entry.getAccountId(), entry.getCash()};
+        return TransactionEntryDraft{
+            entry.getAccountId(),
+            entry.getCash(),
+            entry.getType(),
+            externalAccounts.contains(entry.getAccountId())
+        };
     }
 
     /**
-     * @brief Converts a drafts::TransactionEntryDraft to a
+     * @brief Converts a TransactionEntryDraft to a
      * finance::TransactionEntry
      *
      * @param entryDraft
      * @return finance::TransactionEntry
      */
     finance::TransactionEntry TransactionMapper::fromEntryDraft(
-        const drafts::TransactionEntryDraft& entryDraft
+        const TransactionEntryDraft& entryDraft
     )
     {
         return finance::TransactionEntry{
             TransactionEntryId::invalid(),
             entryDraft.getAccountId(),
-            entryDraft.getCash()
+            entryDraft.getCash(),
+            entryDraft.getType()
         };
     }
 
     /**
-     * @brief Converts a drafts::CreateCashTransactionDraft to a
+     * @brief Converts a CreateCashTransactionDraft to a
      * finance::Transaction
      *
      * @param draft
@@ -75,7 +84,7 @@ namespace drafts
     }
 
     /**
-     * @brief Converts a drafts::TradeLegDraft to a finance::TradeLeg
+     * @brief Converts a TradeLegDraft to a finance::TradeLeg
      *
      * @param draft
      * @return finance::TradeLeg
@@ -94,7 +103,7 @@ namespace drafts
     }
 
     /**
-     * @brief Converts a vector of drafts::TradeLegDraft to a vector of
+     * @brief Converts a vector of TradeLegDraft to a vector of
      * finance::TradeLeg
      *
      * @param drafts
@@ -114,11 +123,11 @@ namespace drafts
     }
 
     /**
-     * @brief Converts a finance::TradeLeg to a drafts::TradeLegDraft
+     * @brief Converts a finance::TradeLeg to a TradeLegDraft
      *
      * @param leg
      * @param instrumentNames
-     * @return drafts::TradeLegDraft
+     * @return TradeLegDraft
      */
     TradeLegDraft TransactionMapper::toTradeLegDraft(
         const finance::TradeLeg&          leg,
@@ -135,7 +144,7 @@ namespace drafts
 
     /**
      * @brief Converts a vector of finance::TradeLeg to a vector of
-     * drafts::TradeLegDraft
+     * TradeLegDraft
      *
      * @param legs
      * @param instrumentNames
@@ -158,7 +167,7 @@ namespace drafts
     }
 
     /**
-     * @brief Converts a drafts::CreateStockTransactionDraft to a
+     * @brief Converts a CreateStockTransactionDraft to a
      * finance::Transaction
      *
      * @param draft
@@ -187,45 +196,52 @@ namespace drafts
 
     /**
      * @brief Converts a vector of finance::Transaction to a vector of
-     * drafts::TransactionOverviewDraft
+     * TransactionOverviewDraft
      *
      * @param transactions
      * @param instrumentNames
-     * @return std::vector<drafts::TransactionOverviewDraft>
+     * @param externalAccounts
+     *
+     * @return std::vector<TransactionOverviewDraft>
      */
-    std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
-        toOverviewDrafts(
-            const std::vector<finance::Transaction>& transactions,
-            const instrumentMap<std::string>&        instrumentNames
-        )
+    std::vector<TransactionOverviewDraft> TransactionMapper::toOverviewDrafts(
+        const std::vector<finance::Transaction>& transactions,
+        const instrumentMap<std::string>&        instrumentNames,
+        const idSet<AccountId>&                  externalAccounts
+    )
     {
-        std::vector<drafts::TransactionOverviewDraft> drafts;
+        std::vector<TransactionOverviewDraft> drafts;
         drafts.reserve(transactions.size());
 
         for (const auto& transaction : transactions)
-            drafts.emplace_back(toOverviewDraft(transaction, instrumentNames));
+            drafts.emplace_back(
+                toOverviewDraft(transaction, instrumentNames, externalAccounts)
+            );
 
         return drafts;
     }
 
     /**
      * @brief Converts a finance::Transaction to a
-     * drafts::TransactionOverviewDraft
+     * TransactionOverviewDraft
      *
      * @param transaction
      * @param instrumentNames
-     * @return drafts::TransactionOverviewDraft
+     * @param externalAccounts
+     *
+     * @return TransactionOverviewDraft
      */
-    drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
+    TransactionOverviewDraft TransactionMapper::toOverviewDraft(
         const finance::Transaction&       transaction,
-        const instrumentMap<std::string>& instrumentNames
+        const instrumentMap<std::string>& instrumentNames,
+        const idSet<AccountId>&           externalAccounts
     )
     {
-        std::vector<drafts::TransactionEntryDraft> entryDrafts;
+        std::vector<TransactionEntryDraft> entryDrafts;
         entryDrafts.reserve(transaction.getEntries().size());
 
         for (const auto& entry : transaction.getEntries())
-            entryDrafts.push_back(toEntryDraft(entry));
+            entryDrafts.push_back(toEntryDraft(entry, externalAccounts));
 
         struct Visitor
         {
@@ -259,7 +275,7 @@ namespace drafts
             }
         };
 
-        return drafts::TransactionOverviewDraft{
+        return TransactionOverviewDraft{
             transaction.getType(),
             transaction.getTimestamp(),
             std::move(entryDrafts),

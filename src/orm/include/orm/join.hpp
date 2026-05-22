@@ -89,6 +89,9 @@ namespace orm
         Joins& add(const Join& join);
 
         [[nodiscard]]
+        Joins& add(const Joins& joins);
+
+        [[nodiscard]]
         Joins& distinct();
 
         [[nodiscard]]

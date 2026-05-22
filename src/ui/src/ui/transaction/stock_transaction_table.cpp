@@ -26,6 +26,7 @@ namespace ui
     X(ReferenceAccount) \
     X(Quantity)         \
     X(Price)            \
+    X(Fees)             \
     X(Description)
 
     MSTD_ENUM(StockTransactionColumn, std::uint8_t, COLUMN_LIST);
@@ -123,29 +124,20 @@ namespace ui
                 );
             case StockTransactionColumn::Account:
             {
-                if (!_getAccountIdToNameMap().contains(
-                        transaction.getLegs().front().getAccountId()
-                    ))
+                const auto id = transaction.getLegAccount();
+
+                if (!_getAccountIdToNameMap().contains(id) || !id.isValid())
                     return "";
 
-                return QString::fromStdString(
-                    _getAccountIdToNameMap().at(
-                        transaction.getLegs().front().getAccountId()
-                    )
-                );
+                return QString::fromStdString(_getAccountIdToNameMap().at(id));
             }
             case StockTransactionColumn::ReferenceAccount:
             {
-                if (!_getAccountIdToNameMap().contains(
-                        transaction.getEntries().back().getAccountId()
-                    ))
+                const auto id = transaction.getEntryAccountId(false);
+                if (!_getAccountIdToNameMap().contains(id) || !id.isValid())
                     return "";
 
-                return QString::fromStdString(
-                    _getAccountIdToNameMap().at(
-                        transaction.getEntries().back().getAccountId()
-                    )
-                );
+                return QString::fromStdString(_getAccountIdToNameMap().at(id));
             }
             case StockTransactionColumn::Quantity:
                 return QString::fromStdString(
@@ -155,7 +147,16 @@ namespace ui
                 return QString::fromStdString(
                     transaction.getLegs().front().getUnitPrice().toString(2)
                 );
+            case StockTransactionColumn::Fees:
+            {
+                const auto& fees = transaction.getTotalFees();
+                if (fees.isZero())
+                    return QStringLiteral("-");
+
+                return QString::fromStdString(fees.toString(2));
+            }
         }
+
         return {};
     }
 

@@ -82,7 +82,10 @@ namespace app
             AccountId::Hash> getAccountIdToNameMap() const;
 
         [[nodiscard]]
-        AccountId getExternalAccount(Currency currency) const;
+        std::optional<AccountId> getExternalAccount(Currency currency) const;
+
+        [[nodiscard]]
+        idSet<AccountId> getExternalAccountIds() const;
 
         void commit();
 

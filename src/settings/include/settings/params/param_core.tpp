@@ -330,7 +330,16 @@ namespace settings
     void ParamCore<T>::_notifySubscribers()
     {
         Base::template notify<OnDirtyChanged>(isDirty());
-        Base::template notify<ParamValueChanged<T>>(get());
+
+        try
+        {
+            Base::template notify<ParamValueChanged<T>>(get());
+        }
+        catch (const ParamException& e)
+        {
+            Base::template notify<ParamUnsetWithoutDefault>();
+        }
+
         Base::template notify<ParamOptionalChanged<T>>(getOptional());
     }
 

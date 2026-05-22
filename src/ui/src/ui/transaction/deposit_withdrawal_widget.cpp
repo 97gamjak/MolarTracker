@@ -8,17 +8,196 @@
 
 #include <stdexcept>
 
+#include "config/finance.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
+#include "ui/utils/error.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
 
 namespace ui
 {
+
+    /**
+     * @brief Struct for holding the fields in the deposit/withdrawal widget
+     *
+     */
+    struct DepositWithdrawalWidget::Fields
+    {
+        /// The combo box for selecting the account to deposit to or withdraw
+        /// from
+        AccountCombo* accountCombo;
+
+        /// The field for selecting the transaction timestamp
+        TimestampField* timestampField;
+
+        /// The row for entering the amount to deposit or withdraw
+        AmountRow* amountRow;
+
+        /// The label for displaying the currency of the selected account
+        QLabel* currencyLabel;
+
+        /// The field for entering an optional comment
+        CommentField* commentField;
+
+        /// The row for entering the fees for the transaction
+        AmountRow* feesRow;
+
+        /// The label for displaying the currency of the fees
+        QLabel* currencyFees;
+
+        Fields(
+            const std::vector<drafts::AccountDraft>& accounts,
+            QWidget*                                 parent
+        );
+
+        void addFieldsToLayout(QFormLayout* layout) const;
+        void updateCurrency(Currency currency) const;
+        void updateFields() const;
+
+        [[nodiscard]]
+        drafts::CreateCashTransactionDraft getDraft(TransactionType type) const;
+    };
+
+    /**
+     * @brief Construct a new Deposit Withdrawal Widget:: Fields:: Fields object
+     *
+     * @param accounts
+     * @param parent
+     */
+    DepositWithdrawalWidget::Fields::Fields(
+        const std::vector<drafts::AccountDraft>& accounts,
+        QWidget*                                 parent
+    )
+        : accountCombo(makeQChild<AccountCombo>(accounts, parent)),
+          timestampField(makeQChild<TimestampField>(parent)),
+          amountRow(makeQChild<AmountRow>(parent)),
+          currencyLabel(makeQChild<QLabel>(parent)),
+          commentField(makeQChild<CommentField>(parent)),
+          feesRow(makeQChild<AmountRow>(parent)),
+          currencyFees(makeQChild<QLabel>(parent))
+    {
+    }
+
+    /**
+     * @brief Update the fields in the deposit/withdrawal widget
+     *
+     */
+    void DepositWithdrawalWidget::Fields::updateFields() const
+    {
+        accountCombo->update();
+        timestampField->update();
+        amountRow->update();
+        currencyLabel->update();
+        commentField->update();
+        feesRow->update();
+    }
+
+    /**
+     * @brief Update the currency labels and decimal places for the amount and
+     * fees rows
+     *
+     * @param currency The currency to update the fields for
+     */
+    void DepositWithdrawalWidget::Fields::updateCurrency(
+        Currency currency
+    ) const
+    {
+        using finance::getMicroUnit;
+        using finance::getSymbol;
+
+        amountRow->setNDecimalPlaces(getMicroUnit(currency));
+        feesRow->setNDecimalPlaces(getMicroUnit(currency));
+        currencyLabel->setText(getSymbol(currency).c_str());
+        currencyFees->setText(getSymbol(currency).c_str());
+    }
+
+    /**
+     * @brief Add the fields to the layout
+     *
+     * @param layout The layout to add the fields to
+     */
+    void DepositWithdrawalWidget::Fields::addFieldsToLayout(
+        QFormLayout* layout
+    ) const
+    {
+        layout->addRow("Account:", accountCombo);
+        layout->addRow("Timestamp:", timestampField);
+
+        auto* amountRowLayout = makeQChild<QHBoxLayout>();
+        amountRowLayout->addWidget(amountRow);
+        amountRowLayout->addWidget(currencyLabel);
+        layout->addRow("Amount:", amountRowLayout);
+
+        auto* feesRowLayout = makeQChild<QHBoxLayout>();
+        feesRowLayout->addWidget(feesRow);
+        feesRowLayout->addWidget(currencyFees);
+        layout->addRow("Fees:", feesRowLayout);
+
+        layout->addRow("Comment:", commentField);
+    }
+
+    /**
+     * @brief Get the transaction draft based on the current input in the
+     * widget, this will generate a CreateCashTransactionDraft based on the
+     * selected account and entered amount, which can then be used by the owning
+     * dialog to create a new cash transaction in the store when the user
+     * submits the form.
+     *
+     * @note The amount in the generated draft will be negative for Withdrawal
+     * transactions and positive for Deposit transactions, reflecting the
+     * direction of the cash flow for each transaction type.
+     *
+     * @param type The type of transaction (Deposit or Withdrawal)
+     *
+     * @return drafts::CreateCashTransactionDraft The transaction draft
+     * generated from the current input in the widget, which can be used to
+     * create a new cash transaction in the store.
+     */
+    drafts::CreateCashTransactionDraft DepositWithdrawalWidget::Fields::
+        getDraft(TransactionType type) const
+    {
+        const auto account = accountCombo->selected();
+
+        if (!account.has_value())
+            throw std::runtime_error("No account selected");
+
+        const auto currency   = account->currency;
+        const auto microUnits = finance::getMicroUnit(currency);
+        const auto cash_      = amountRow->getAmount(microUnits);
+
+        auto cash = finance::Cash(account->currency, cash_);
+        cash      = type == TransactionType::Deposit ? cash : -cash;
+
+        auto fees =
+            finance::Cash(account->currency, feesRow->getAmount(microUnits));
+
+        auto entry = drafts::TransactionEntryDraft{
+            account->id,
+            cash,
+            TransactionEntryType::General,
+            false
+        };
+        entry.setNeedsExternal(true);
+
+        auto feesEntry = drafts::TransactionEntryDraft{
+            account->id,
+            fees,
+            TransactionEntryType::Fees,
+            false
+        };
+        feesEntry.setNeedsExternal(true);
+
+        return {
+            timestampField->getTimestamp(),
+            {entry, feesEntry},
+            commentField->getComment()
+        };
+    }
 
     /**
      * @brief Construct a new Deposit Withdrawal Widget:: Deposit Withdrawal
@@ -30,30 +209,19 @@ namespace ui
      * @param parent The parent widget for this widget
      */
     DepositWithdrawalWidget::DepositWithdrawalWidget(
-        TransactionType                   type,
-        std::vector<drafts::AccountDraft> accounts,
-        QWidget*                          parent
+        TransactionType                          type,
+        const std::vector<drafts::AccountDraft>& accounts,
+        QWidget*                                 parent
     )
         : Dialog(parent),
           _type(type),
           _layout(new QFormLayout(this)),
-          _accountCombo(makeQChild<AccountCombo>(std::move(accounts), this)),
-          _timestampField(makeQChild<TimestampField>(this)),
-          _amountRow(makeQChild<AmountRow>(this)),
-          _currencyLabel(makeQChild<QLabel>(this)),
-          _commentField(makeQChild<CommentField>(this)),
-          _addButton(makeQChild<QPushButton>("Add Transaction", this))
+          _addButton(makeQChild<QPushButton>("Add Transaction", this)),
+          _fields(std::make_unique<Fields>(accounts, this))
     {
         setLayout(_layout);
 
-        _layout->addRow("Account:", _accountCombo);
-        _layout->addRow("Timestamp:", _timestampField);
-
-        auto* amountRowLayout = makeQChild<QHBoxLayout>();
-        amountRowLayout->addWidget(_amountRow);
-        amountRowLayout->addWidget(_currencyLabel);
-        _layout->addRow("Amount:", amountRowLayout);
-        _layout->addRow("Comment:", _commentField);
+        _fields->addFieldsToLayout(_layout);
 
         _addButton->setEnabled(false);
         auto* buttonLayout = makeQChild<QHBoxLayout>();
@@ -61,19 +229,19 @@ namespace ui
         _layout->addRow(buttonLayout);
 
         connect(
-            _accountCombo,
+            _fields->accountCombo,
             &AccountCombo::accountSelected,
             this,
             &DepositWithdrawalWidget::_onAccountSelected
         );
         connect(
-            _amountRow,
+            _fields->amountRow,
             &AmountRow::validityChanged,
             this,
             &DepositWithdrawalWidget::_updateAddButton
         );
         connect(
-            _amountRow,
+            _fields->amountRow,
             &AmountRow::valueChanged,
             this,
             &DepositWithdrawalWidget::_updateAddButton
@@ -86,6 +254,8 @@ namespace ui
         );
     }
 
+    DepositWithdrawalWidget::~DepositWithdrawalWidget() = default;
+
     /**
      * @brief Update the list of accounts in the account combo box
      *
@@ -95,7 +265,7 @@ namespace ui
         std::vector<drafts::AccountDraft> accounts
     )
     {
-        _accountCombo->updateAccounts(std::move(accounts));
+        _fields->accountCombo->updateAccounts(std::move(accounts));
     }
 
     /**
@@ -104,11 +274,7 @@ namespace ui
      */
     void DepositWithdrawalWidget::refresh()
     {
-        _accountCombo->update();
-        _timestampField->update();
-        _amountRow->update();
-        _currencyLabel->update();
-        _commentField->update();
+        _fields->updateFields();
         _addButton->update();
     }
 
@@ -149,24 +315,10 @@ namespace ui
      * generated from the current input in the widget, which can be used to
      * create a new cash transaction in the store.
      */
-    drafts::CreateCashTransactionDraft DepositWithdrawalWidget::getDraft() const
+    drafts::CreateCashTransactionDraft DepositWithdrawalWidget::_getDraft(
+    ) const
     {
-        const auto account = _accountCombo->selected();
-
-        if (!account.has_value())
-            throw std::runtime_error("No account selected");
-
-        auto cash = finance::Cash(account->currency, _amountRow->getAmount());
-        cash      = _type == TransactionType::Deposit ? cash : -cash;
-
-        auto entry = drafts::TransactionEntryDraft{account->id, cash};
-        entry.setNeedsExternal(true);
-
-        return {
-            _timestampField->getTimestamp(),
-            {entry},
-            _commentField->getComment()
-        };
+        return _fields->getDraft(_type);
     }
 
     /**
@@ -186,11 +338,7 @@ namespace ui
         const drafts::AccountDraft& account
     )
     {
-        using finance::getMicroUnit;
-        using finance::getSymbol;
-
-        _amountRow->setNDecimalPlaces(getMicroUnit(account.currency));
-        _currencyLabel->setText(getSymbol(account.currency).c_str());
+        _fields->updateCurrency(account.currency);
         _updateAddButton();
     }
 
@@ -209,9 +357,9 @@ namespace ui
      */
     void DepositWithdrawalWidget::_updateAddButton()
     {
-        const auto isValid = _accountCombo->selected().has_value() &&
-                             _amountRow->isValid() &&
-                             _amountRow->getAmount() != 0;
+        const auto isValid = _fields->accountCombo->selected().has_value() &&
+                             _fields->amountRow->isValid() &&
+                             !_fields->amountRow->isZero();
 
         _addButton->setEnabled(isValid);
     }
@@ -232,7 +380,15 @@ namespace ui
      */
     void DepositWithdrawalWidget::_emitOk()
     {
-        emit createCashTransactionRequested(getDraft());
+        try
+        {
+            const auto draft = _getDraft();
+            emit       createCashTransactionRequested(draft);
+        }
+        catch (const std::exception& e)
+        {
+            ErrorDialog::show(QString(e.what()));
+        }
     }
 
 }   // namespace ui

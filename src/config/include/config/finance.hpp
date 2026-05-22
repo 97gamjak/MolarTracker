@@ -40,6 +40,12 @@ MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST);
 
 MSTD_ENUM(TransactionType, std::uint8_t, TRANSACTION_TYPE_LIST);
 
+#define TRANSACTION_ENTRY_TYPE_LIST(X) \
+    X(General)                         \
+    X(Fees)
+
+MSTD_ENUM(TransactionEntryType, std::uint8_t, TRANSACTION_ENTRY_TYPE_LIST);
+
 #define TRANSACTION_DATA_TYPE_LIST(X) \
     X(Cash)                           \
     X(Trade)

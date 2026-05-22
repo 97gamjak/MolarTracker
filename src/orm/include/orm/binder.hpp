@@ -2,6 +2,7 @@
 #define __ORM__INCLUDE__ORM__BINDER_HPP__
 
 #include <cstdint>
+#include <mstd/error.hpp>
 #include <mstd/type_traits.hpp>
 #include <string>
 
@@ -13,8 +14,18 @@
 
 namespace orm
 {
+    /**
+     * @brief Binder for database values
+     *
+     * @tparam T The type of the value to bind
+     */
     template <typename T>
-    struct binder;
+    struct binder
+    {
+        /// @cond DOXYGEN_IGNORE
+        MSTD_COMPILE_FAIL("Unsupported type");
+        /// @endcond
+    };
 
     /**
      * @brief Binder for 64-bit integer values

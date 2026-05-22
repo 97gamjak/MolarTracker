@@ -1,6 +1,9 @@
 #include "app/store/account/account_session.hpp"
 
 #include "finance/account.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("App.Store.Account.AccountSession");
 
 namespace app
 {
@@ -12,6 +15,9 @@ namespace app
      */
     void AccountSession::set(const idSet<AccountId>& activeAccounts)
     {
+        LOG_DEBUG(
+            std::format("Setting active accounts: {}", activeAccounts.size())
+        );
         _activeAccounts = activeAccounts;
     }
 
