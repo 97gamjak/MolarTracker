@@ -1,6 +1,9 @@
 #include "finance/price_cache.hpp"
 
 #include "finance/yf_client.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("Finance.PriceCache");
 
 namespace finance
 {
@@ -54,7 +57,15 @@ namespace finance
         auto result = YahooFinanceClient::fetchPrice(yahooSymbol);
 
         if (!result)
+        {
+            LOG_ERROR(
+                std::format(
+                    "Could not fetch price info for ticker: {}",
+                    yahooSymbol
+                )
+            );
             return std::nullopt;
+        }
 
         return result.value();
     }
