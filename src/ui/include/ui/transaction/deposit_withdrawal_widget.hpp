@@ -58,7 +58,6 @@ namespace ui
 
         ~DepositWithdrawalWidget() override;
 
-        [[nodiscard]] drafts::CreateCashTransactionDraft getDraft() const;
         [[nodiscard]] TransactionType getTransactionType() const;
         void                          setTransactionType(TransactionType type);
 
@@ -79,6 +78,8 @@ namespace ui
         void _onAccountSelected(const drafts::AccountDraft& account);
         void _updateAddButton();
         void _emitOk();
+
+        [[nodiscard]] drafts::CreateCashTransactionDraft _getDraft() const;
     };
 
 }   // namespace ui

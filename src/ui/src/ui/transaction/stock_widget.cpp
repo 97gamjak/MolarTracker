@@ -17,6 +17,7 @@
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/ticker_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
+#include "ui/utils/error.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -399,7 +400,15 @@ namespace ui
      */
     void StockWidget::_emitOk()
     {
-        emit createStockTransactionRequested(_getDraft());
+        try
+        {
+            const auto draft = _getDraft();
+            emit       createStockTransactionRequested(draft);
+        }
+        catch (const std::exception& e)
+        {
+            ErrorDialog::show(QString(e.what()));
+        }
     }
 
     /**

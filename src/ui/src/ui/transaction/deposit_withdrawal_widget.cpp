@@ -14,6 +14,7 @@
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
+#include "ui/utils/error.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -314,7 +315,8 @@ namespace ui
      * generated from the current input in the widget, which can be used to
      * create a new cash transaction in the store.
      */
-    drafts::CreateCashTransactionDraft DepositWithdrawalWidget::getDraft() const
+    drafts::CreateCashTransactionDraft DepositWithdrawalWidget::_getDraft(
+    ) const
     {
         return _fields->getDraft(_type);
     }
@@ -378,7 +380,15 @@ namespace ui
      */
     void DepositWithdrawalWidget::_emitOk()
     {
-        emit createCashTransactionRequested(getDraft());
+        try
+        {
+            const auto draft = _getDraft();
+            emit       createCashTransactionRequested(draft);
+        }
+        catch (const std::exception& e)
+        {
+            ErrorDialog::show(QString(e.what()));
+        }
     }
 
 }   // namespace ui
