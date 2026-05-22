@@ -73,6 +73,11 @@ class Quantity
 
 [[nodiscard]] micro_units mulDiv(micro_units lhs, Quantity rhs);
 
+[[nodiscard]] micro_units microUnitsFromString(
+    std::string_view value,
+    std::uint8_t     precision
+);
+
 #ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__QUANTITY_TPP__
 #include "details/quantity.tpp"
 #endif
