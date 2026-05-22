@@ -23,14 +23,23 @@ namespace finance
         /// The cash amount associated with the transaction entry
         Cash _cash;
 
-       public:
-        TransactionEntry(TransactionEntryId id, AccountId accountId, Cash cash);
+        /// Transaction type
+        TransactionEntryType _type;
 
-        [[nodiscard]] TransactionEntryId getId() const;
-        [[nodiscard]] AccountId          getAccountId() const;
-        [[nodiscard]] micro_units        getAmount() const;
-        [[nodiscard]] Currency           getCurrency() const;
-        [[nodiscard]] Cash               getCash() const;
+       public:
+        TransactionEntry(
+            TransactionEntryId   id,
+            AccountId            accountId,
+            Cash                 cash,
+            TransactionEntryType type
+        );
+
+        [[nodiscard]] TransactionEntryId   getId() const;
+        [[nodiscard]] AccountId            getAccountId() const;
+        [[nodiscard]] micro_units          getAmount() const;
+        [[nodiscard]] Currency             getCurrency() const;
+        [[nodiscard]] Cash                 getCash() const;
+        [[nodiscard]] TransactionEntryType getType() const;
 
         void setAccountId(AccountId accountId);
 

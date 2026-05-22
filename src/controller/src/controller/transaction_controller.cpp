@@ -80,7 +80,8 @@ namespace controller
         const auto transactions = _transactionStore.getTransactions();
         const auto drafts       = drafts::TransactionMapper::toOverviewDrafts(
             transactions,
-            _stockStore.getInstrumentIdToNameMap()
+            _stockStore.getInstrumentIdToNameMap(),
+            _accountStore.getExternalAccountIds()
         );
 
         std::vector<drafts::TransactionOverviewDraft> cashDrafts;

@@ -31,16 +31,29 @@ namespace drafts
         /// account
         bool _needsExternal = false;
 
+        /// A flag indicating whether this transaction entry is for an external
+        /// account
+        bool _isExternal = false;
+
+        /// The type of the transaction entry
+        TransactionEntryType _type;
+
        public:
-        TransactionEntryDraft(AccountId accountId, finance::Cash cash);
+        TransactionEntryDraft(
+            AccountId            accountId,
+            finance::Cash        cash,
+            TransactionEntryType type,
+            bool                 isExternal
+        );
 
         void setNeedsExternal(bool needsExternal);
 
-        [[nodiscard]] AccountId getAccountId() const;
-
-        [[nodiscard]] finance::Cash getCash() const;
-
-        [[nodiscard]] bool needsExternal() const;
+        [[nodiscard]] AccountId            getAccountId() const;
+        [[nodiscard]] finance::Cash        getCash() const;
+        [[nodiscard]] bool                 needsExternal() const;
+        [[nodiscard]] bool                 isExternal() const;
+        [[nodiscard]] TransactionEntryType getType() const;
+        [[nodiscard]] Currency             getCurrency() const;
     };
 
     /**
@@ -77,6 +90,7 @@ namespace drafts
         [[nodiscard]] const std::string& getTicker() const;
         [[nodiscard]] InstrumentId       getInstrumentId() const;
         [[nodiscard]] PositionId         getPositionId() const;
+        [[nodiscard]] Currency           getCurrency() const;
 
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
@@ -115,6 +129,7 @@ namespace drafts
         const std::optional<std::string>& getComment() const;
 
         void addEntry(const TransactionEntryDraft& entry);
+        void addEntries(const std::vector<TransactionEntryDraft>& entries);
     };
 
     /**
@@ -184,17 +199,22 @@ namespace drafts
             std::optional<std::string>         comment
         );
 
-        [[nodiscard]] TransactionDataType getType() const;
+        [[nodiscard]] TransactionDataType               getType() const;
+        [[nodiscard]] const Timestamp&                  getTimestamp() const;
+        [[nodiscard]] const std::optional<std::string>& getComment() const;
 
-        [[nodiscard]] const Timestamp& getTimestamp() const;
+        [[nodiscard]] finance::Cash getTotalGeneralCash() const;
+        [[nodiscard]] finance::Cash getTotalFees() const;
+        [[nodiscard]] Currency      getCurrency() const;
+
+        [[nodiscard]] AccountId getLegAccount() const;
+        [[nodiscard]] AccountId getEntryAccountId(bool includeExternal) const;
 
         [[nodiscard]]
         const std::vector<TransactionEntryDraft>& getEntries() const;
 
         [[nodiscard]]
         const std::vector<TradeLegDraft>& getLegs() const;
-
-        [[nodiscard]] const std::optional<std::string>& getComment() const;
     };
 
 }   // namespace drafts

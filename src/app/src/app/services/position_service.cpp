@@ -2,6 +2,9 @@
 
 #include "app/repos_api/i_position_repo.hpp"
 #include "finance/position.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("App.Service.PositionService");
 
 namespace app
 {
@@ -41,7 +44,11 @@ namespace app
         const idSet<AccountId>& accountIds
     )
     {
-        return _positionRepo->getAllPositions(accountIds);
+        const auto positions = _positionRepo->getAllPositions(accountIds);
+
+        LOG_DEBUG(std::format("Retrieved positions: {}", positions.size()));
+
+        return positions;
     }
 
     /**
@@ -55,7 +62,13 @@ namespace app
         const idSet<AccountId>& accountIds
     )
     {
-        return _positionRepo->getAllOpenPositions(accountIds);
+        const auto positions = _positionRepo->getAllOpenPositions(accountIds);
+
+        LOG_DEBUG(
+            std::format("Retrieved open positions: {}", positions.size())
+        );
+
+        return positions;
     }
 
 }   // namespace app

@@ -84,6 +84,7 @@ namespace app
         // add migrations
         _migrate_0_0_3();
         _migrate_0_1_0();
+        _migrate_0_2_3();
 
         assert(_migrations.size() == toVersion);
     }
@@ -413,6 +414,34 @@ namespace app
         migration.addMigration(
             std::make_unique<AddColumnMigration<TradeLegRow::positionIdField>>(
                 TradeLegRow::positionIdField{PositionId::invalid()}
+            )
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 0.2.3
+     */
+    void Migrations::_migrate_0_2_3()
+    {
+        _lastReleaseVersion = utils::SemVer(0, 2, 3);
+
+        _migrateV11();
+    }
+
+    /**
+     * @brief Migrate to version 11
+     */
+    void Migrations::_migrateV11()
+    {
+        constexpr std::size_t currentVersion = 10;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<
+                AddColumnMigration<TransactionEntryRow::typeField>>(
+                TransactionEntryRow::typeField{TransactionEntryType::General}
             )
         );
 

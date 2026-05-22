@@ -23,6 +23,7 @@ namespace ui
     X(Account)          \
     X(ReferenceAccount) \
     X(Amount)           \
+    X(Fees)             \
     X(Description)
 
     MSTD_ENUM(CashTransactionColumn, std::uint8_t, COLUMN_LIST);
@@ -116,33 +117,35 @@ namespace ui
                 return QString::fromStdString("");
             case CashTransactionColumn::Account:
             {
-                if (!_getAccountIdToNameMap().contains(
-                        transaction.getEntries().front().getAccountId()
-                    ))
+                const auto id = transaction.getEntryAccountId(false);
+                if (!_getAccountIdToNameMap().contains(id))
                     return "";
 
-                return QString::fromStdString(
-                    _getAccountIdToNameMap().at(
-                        transaction.getEntries().front().getAccountId()
-                    )
-                );
+                return QString::fromStdString(_getAccountIdToNameMap().at(id));
             }
             case CashTransactionColumn::ReferenceAccount:
             {
-                if (!_getAccountIdToNameMap().contains(
-                        transaction.getEntries().back().getAccountId()
-                    ))
-                    return "";
+                for (const auto& entry : transaction.getEntries())
+                {
+                    if (!entry.isExternal())
+                        continue;
 
-                return QString::fromStdString(
-                    _getAccountIdToNameMap().at(
-                        transaction.getEntries().back().getAccountId()
-                    )
-                );
+                    const auto id = entry.getAccountId();
+                    if (_getAccountIdToNameMap().contains(id))
+                        return QString::fromStdString(
+                            _getAccountIdToNameMap().at(id)
+                        );
+                }
+
+                return "";
             }
             case CashTransactionColumn::Amount:
                 return QString::fromStdString(
-                    transaction.getEntries().front().getCash().toString(2)
+                    transaction.getTotalGeneralCash().toString(2)
+                );
+            case CashTransactionColumn::Fees:
+                return QString::fromStdString(
+                    transaction.getTotalFees().toString(2)
                 );
         }
         return {};

@@ -2,6 +2,7 @@
 #define __APP__SRC__APP__FACTORIES__TRANSACTION_FACTORY_HPP__
 
 #include "config/id_types.hpp"
+#include "orm/join.hpp"
 #include "orm/where_expr.hpp"
 
 namespace finance
@@ -57,6 +58,9 @@ namespace app
         static orm::WhereExpr toWhereExpr(
             const finance::TransactionFilter& filter
         );
+
+        [[nodiscard]]
+        static orm::Joins toJoin(const finance::TransactionFilter& filter);
     };
 
 }   // namespace app

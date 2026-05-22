@@ -23,7 +23,7 @@ namespace ui
      */
     void TransactionTableModel::setTransactions(
         std::vector<drafts::TransactionOverviewDraft> transactions,
-        IdToNameMap                                   accountIdToName
+        unorderedIdMap<AccountId, std::string>        accountIdToName
     )
     {
         beginResetModel();
@@ -80,7 +80,7 @@ namespace ui
      * @return const TransactionTableModel::IdToNameMap& The mapping of account
      * IDs to account names.
      */
-    const TransactionTableModel::IdToNameMap& TransactionTableModel::
+    const unorderedIdMap<AccountId, std::string>& TransactionTableModel::
         _getAccountIdToNameMap() const
     {
         return _accountIdToName;

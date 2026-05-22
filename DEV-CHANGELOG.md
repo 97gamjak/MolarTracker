@@ -37,7 +37,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Fix retrieving only positions related to accounts that are loaded for the current profile
 - Fix account creation now handling duplicated account names already when adding to store instead of throwing exception when trying to commit to database
 
-### UI
+#### UI
 
 - Fix: make `positionAt` in `PositionSelectionTableModel` more robust by returning `std::optional` with boundary checks
 
@@ -72,6 +72,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Add position store, service and repo
 - Add position creation when creating transactions
+- Add fees to creating stock and cash transactions
 
 #### UI
 

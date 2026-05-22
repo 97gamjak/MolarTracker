@@ -1,7 +1,5 @@
 #include "sql_models/position_row.hpp"
 
-#include <optional>
-
 #include "orm/where_expr.hpp"
 
 /**
@@ -11,5 +9,5 @@
  */
 orm::WhereExpr PositionRow::IsOpen()
 {
-    return orm::makeWhere<closedAtField>(std::nullopt, filter::Operator::Equal);
+    return orm::makeIsNull<closedAtField>();
 }

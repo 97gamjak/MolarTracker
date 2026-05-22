@@ -168,10 +168,9 @@ namespace orm
      * @param expr The WHERE expression.
      * @return The generated SQL operations.
      */
-    [[nodiscard]] std::string getDBOperations(const WhereExpr& expr)
+    std::string getDBOperations(const WhereExpr& expr)
     {
-        const auto operations = std::visit(DBOperationVisitor{}, expr);
-        return operations.empty() ? "" : "WHERE " + operations;
+        return std::visit(DBOperationVisitor{}, expr);
     }
 
     /**
