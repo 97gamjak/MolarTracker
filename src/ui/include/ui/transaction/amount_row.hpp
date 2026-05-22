@@ -30,7 +30,7 @@ namespace ui
         explicit AmountRow(QWidget* parent = nullptr);
 
         void setNDecimalPlaces(std::uint8_t places);
-        void setDefaultValue(int value) const;
+        void setDefaultValue(int value);
 
         [[nodiscard]] bool        isValid() const;
         [[nodiscard]] bool        isZero() const;

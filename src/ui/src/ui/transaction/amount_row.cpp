@@ -105,7 +105,7 @@ namespace ui
      *
      * @param value The default value to set for the amount input
      */
-    void AmountRow::setDefaultValue(int value) const
+    void AmountRow::setDefaultValue(int value)
     {
         _amountField->setText(QString::number(value));
     }
