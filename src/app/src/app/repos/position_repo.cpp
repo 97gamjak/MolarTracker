@@ -68,6 +68,9 @@ namespace app
         const idSet<AccountId>& accountIds
     )
     {
+        if (accountIds.empty())
+            return {};
+
         const auto joins = _createPositionJoins();
         const auto query = _createPositionQuery(accountIds);
 
@@ -92,6 +95,9 @@ namespace app
         const idSet<AccountId>& accountIds
     )
     {
+        if (accountIds.empty())
+            return {};
+
         const auto joins = _createPositionJoins();
         const auto query =
             _createPositionQuery(accountIds).where(PositionRow::IsOpen());

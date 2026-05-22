@@ -26,10 +26,12 @@ namespace tests
     class MockProfileService : public app::IProfileService
     {
        public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<app::Profile> profiles;
         int                       createCallCount = 0;
         int                       removeCallCount = 0;
         int                       updateCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
@@ -54,10 +56,10 @@ namespace tests
             ProfileId id
         ) const override
         {
-            for (const auto& p : profiles)
+            for (const auto& profile : profiles)
             {
-                if (p.getId() == id)
-                    return p;
+                if (profile.getId() == id)
+                    return profile;
             }
             return std::nullopt;
         }
@@ -68,8 +70,8 @@ namespace tests
         ) override
         {
             createCallCount++;
-            auto profile = app::Profile{name, email};
-            const auto newId = ProfileId{_nextId++};
+            auto       profile = app::Profile{name, email};
+            const auto newId   = ProfileId{_nextId++};
             profile.setId(newId);
             profiles.push_back(profile);
             return newId;
@@ -82,12 +84,12 @@ namespace tests
         ) override
         {
             updateCallCount++;
-            for (auto& p : profiles)
+            for (auto& profile : profiles)
             {
-                if (p.getId() == id)
+                if (profile.getId() == id)
                 {
-                    p.setName(newName);
-                    p.setEmail(newEmail);
+                    profile.setName(newName);
+                    profile.setEmail(newEmail);
                     return;
                 }
             }
@@ -96,22 +98,23 @@ namespace tests
         void remove(ProfileId id) override
         {
             removeCallCount++;
-            profiles.erase(
-                std::remove_if(
-                    profiles.begin(),
-                    profiles.end(),
-                    [id](const auto& p) { return p.getId() == id; }
-                ),
-                profiles.end()
+            const auto it = std::ranges::find_if(
+                profiles,
+                [id](const auto& profile) { return profile.getId() == id; }
             );
+
+            if (it != profiles.end())
+                profiles.erase(it);
         }
     };
 
     class MockAccountService : public app::IAccountService
     {
        public:
+        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Account> preloadedAccounts;
         int                           createCallCount = 0;
+        /// NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
@@ -137,8 +140,10 @@ namespace tests
     class MockInstrumentService : public app::IInstrumentService
     {
        public:
+        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::set<std::string> stocksInDb;
         int                   addStockCallCount = 0;
+        /// NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextStockId      = 1;
@@ -170,21 +175,23 @@ namespace tests
         {
             addStockCallCount++;
             return finance::StockInsertionResult{
-                StockId{_nextStockId++},
-                InstrumentId{_nextInstrumentId++}
+                .stockId      = StockId{_nextStockId++},
+                .instrumentId = InstrumentId{_nextInstrumentId++}
             };
         }
 
         [[nodiscard]] bool stockExists(const std::string& ticker) override
         {
-            return stocksInDb.count(ticker) > 0;
+            return stocksInDb.contains(ticker);
         }
     };
 
     class MockPositionService : public app::IPositionService
     {
        public:
+        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         int createCallCount = 0;
+        /// NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
@@ -216,7 +223,9 @@ namespace tests
     class MockTransactionService : public app::ITransactionService
     {
        public:
+        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         int addCallCount = 0;
+        /// NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;

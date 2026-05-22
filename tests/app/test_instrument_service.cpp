@@ -56,7 +56,7 @@ namespace
 
 }   // namespace
 
-TEST_F(InstrumentServiceTest, AddStock_ReturnsValidIds)
+TEST_F(InstrumentServiceTest, AddStockReturnsValidIds)
 {
     const auto [stockId, instrumentId] = _service->addStock(makeStock());
 
@@ -64,43 +64,43 @@ TEST_F(InstrumentServiceTest, AddStock_ReturnsValidIds)
     EXPECT_GT(instrumentId.value(), 0);
 }
 
-TEST_F(InstrumentServiceTest, GetTickers_EmptyInitially)
+TEST_F(InstrumentServiceTest, GetTickersEmptyInitially)
 {
     const auto tickers = _service->getTickers();
 
     EXPECT_TRUE(tickers.empty());
 }
 
-TEST_F(InstrumentServiceTest, GetTickers_ReturnsAddedTicker)
+TEST_F(InstrumentServiceTest, GetTickersReturnsAddedTicker)
 {
     static_cast<void>(_service->addStock(makeStock("AAPL")));
 
     const auto tickers = _service->getTickers();
 
-    ASSERT_EQ(tickers.size(), 1u);
+    ASSERT_EQ(tickers.size(), 1U);
     EXPECT_EQ(tickers[0], "AAPL");
 }
 
-TEST_F(InstrumentServiceTest, StockExists_ReturnsFalseForUnknown)
+TEST_F(InstrumentServiceTest, StockExistsReturnsFalseForUnknown)
 {
     EXPECT_FALSE(_service->stockExists("UNKNOWN"));
 }
 
-TEST_F(InstrumentServiceTest, StockExists_ReturnsTrueForExisting)
+TEST_F(InstrumentServiceTest, StockExistsReturnsTrueForExisting)
 {
     static_cast<void>(_service->addStock(makeStock("GOOG")));
 
     EXPECT_TRUE(_service->stockExists("GOOG"));
 }
 
-TEST_F(InstrumentServiceTest, GetStock_ReturnsNulloptForUnknown)
+TEST_F(InstrumentServiceTest, GetStockReturnsNulloptForUnknown)
 {
     const auto stock = _service->getStock("UNKNOWN");
 
     EXPECT_FALSE(stock.has_value());
 }
 
-TEST_F(InstrumentServiceTest, GetStock_ReturnsStockForExisting)
+TEST_F(InstrumentServiceTest, GetStockReturnsStockForExisting)
 {
     static_cast<void>(_service->addStock(makeStock("MSFT")));
 
@@ -110,12 +110,12 @@ TEST_F(InstrumentServiceTest, GetStock_ReturnsStockForExisting)
     EXPECT_EQ(stock->getTicker(), "MSFT");
 }
 
-TEST_F(InstrumentServiceTest, GetStocks_ReturnsAllForEmptyIdFilter)
+TEST_F(InstrumentServiceTest, GetStocksReturnsAllForEmptyIdFilter)
 {
     static_cast<void>(_service->addStock(makeStock("AAPL")));
     static_cast<void>(_service->addStock(makeStock("GOOG")));
 
     const auto stocks = _service->getStocks({});
 
-    EXPECT_EQ(stocks.size(), 2u);
+    EXPECT_EQ(stocks.size(), 2U);
 }

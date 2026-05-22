@@ -40,7 +40,7 @@ namespace
               _repo{std::make_shared<app::TransactionRepo>(_db)},
               _service{std::make_shared<app::TransactionService>(_repo)}
         {
-            app::MigrationRunner{_db};
+            auto runner = app::MigrationRunner{_db};
             _db.execute(
                 "INSERT INTO profile (name, email) "
                 "VALUES ('TestProfile', NULL)"
@@ -64,7 +64,8 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, amount}
+                    finance::Cash{Currency::USD, amount},
+                    TransactionEntryType::General
                 }},
                 std::nullopt
             };
@@ -73,14 +74,14 @@ namespace
 
 }   // namespace
 
-TEST_F(TransactionServiceTest, AddTransaction_ReturnsValidId)
+TEST_F(TransactionServiceTest, AddTransactionReturnsValidId)
 {
     const auto id = _service->addTransaction(makeCashTx());
 
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(TransactionServiceTest, GetTransactions_EmptyForEmptyAccountSet)
+TEST_F(TransactionServiceTest, GetTransactionsEmptyForEmptyAccountSet)
 {
     const auto txs =
         _service->getTransactions({}, finance::TransactionFilter{});
@@ -88,19 +89,17 @@ TEST_F(TransactionServiceTest, GetTransactions_EmptyForEmptyAccountSet)
     EXPECT_TRUE(txs.empty());
 }
 
-TEST_F(TransactionServiceTest, GetTransactions_ReturnsAddedTransaction)
+TEST_F(TransactionServiceTest, GetTransactionsReturnsAddedTransaction)
 {
     static_cast<void>(_service->addTransaction(makeCashTx()));
 
-    const auto txs = _service->getTransactions(
-        {_accountId},
-        finance::TransactionFilter{}
-    );
+    const auto txs =
+        _service->getTransactions({_accountId}, finance::TransactionFilter{});
 
-    EXPECT_EQ(txs.size(), 1u);
+    EXPECT_EQ(txs.size(), 1U);
 }
 
-TEST_F(TransactionServiceTest, AddMultipleTransactions_IdsAreDistinct)
+TEST_F(TransactionServiceTest, AddMultipleTransactionsIdsAreDistinct)
 {
     const auto id1 = _service->addTransaction(makeCashTx());
     const auto id2 = _service->addTransaction(makeCashTx());

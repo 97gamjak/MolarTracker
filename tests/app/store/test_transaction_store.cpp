@@ -12,7 +12,6 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
-#include "config/strong_id.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
@@ -42,30 +41,26 @@ namespace
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         TransactionStoreTest()
-            : _mockAccountService{
-                  std::make_shared<tests::MockAccountService>()
-              },
+            : _mockAccountService{std::make_shared<tests::MockAccountService>(
+              )},
               _mockInstrumentService{
                   std::make_shared<tests::MockInstrumentService>()
               },
-              _mockPositionService{
-                  std::make_shared<tests::MockPositionService>()
-              },
+              _mockPositionService{std::make_shared<tests::MockPositionService>(
+              )},
               _mockTransactionService{
                   std::make_shared<tests::MockTransactionService>()
               },
               _accountStore{_mockAccountService},
               _stockStore{_mockInstrumentService, _idSeq},
               _positionStore{_mockPositionService, _accountSession},
-              _store{
-                  std::make_unique<app::TransactionStore>(
-                      _mockTransactionService,
-                      _accountStore,
-                      _stockStore,
-                      _positionStore,
-                      _accountSession
-                  )
-              }
+              _store{std::make_unique<app::TransactionStore>(
+                  _mockTransactionService,
+                  _accountStore,
+                  _stockStore,
+                  _positionStore,
+                  _accountSession
+              )}
         {
         }
 
@@ -85,6 +80,7 @@ namespace
         /// Returns a cash transaction whose single entry has a non-zero amount.
         [[nodiscard]] static finance::Transaction makeNonZeroSumTx()
         {
+            const auto cash = 100'000;
             return finance::Transaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
@@ -93,7 +89,8 @@ namespace
                 {finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     AccountId{1},
-                    finance::Cash{Currency::USD, micro_units{100'000}}
+                    finance::Cash{Currency::USD, micro_units{cash}},
+                    TransactionEntryType::General
                 }},
                 std::nullopt
             };
@@ -102,21 +99,21 @@ namespace
 
 }   // namespace
 
-TEST_F(TransactionStoreTest, AddTransaction_ZeroSum_ReturnsOk)
+TEST_F(TransactionStoreTest, AddTransactionZeroSumReturnsOk)
 {
     const auto result = _store->addTransaction(makeZeroSumTx());
 
     EXPECT_EQ(result, app::TransactionStoreResult::Ok);
 }
 
-TEST_F(TransactionStoreTest, AddTransaction_NonZeroSum_ReturnsError)
+TEST_F(TransactionStoreTest, AddTransactionNonZeroSumReturnsError)
 {
     const auto result = _store->addTransaction(makeNonZeroSumTx());
 
     EXPECT_EQ(result, app::TransactionStoreResult::TransactionSumNotZero);
 }
 
-TEST_F(TransactionStoreTest, GetTransactions_EmptyWhenNoAccounts)
+TEST_F(TransactionStoreTest, GetTransactionsEmptyWhenNoAccounts)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
@@ -125,19 +122,19 @@ TEST_F(TransactionStoreTest, GetTransactions_EmptyWhenNoAccounts)
     EXPECT_TRUE(txs.empty());
 }
 
-TEST_F(TransactionStoreTest, IsDirty_FalseInitially)
+TEST_F(TransactionStoreTest, IsDirtyFalseInitially)
 {
     EXPECT_FALSE(_store->isDirty());
 }
 
-TEST_F(TransactionStoreTest, IsDirty_TrueAfterAddTransaction)
+TEST_F(TransactionStoreTest, IsDirtyTrueAfterAddTransaction)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
     EXPECT_TRUE(_store->isDirty());
 }
 
-TEST_F(TransactionStoreTest, Commit_NewTransaction_CallsService)
+TEST_F(TransactionStoreTest, CommitNewTransactionCallsService)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
@@ -146,7 +143,7 @@ TEST_F(TransactionStoreTest, Commit_NewTransaction_CallsService)
     EXPECT_EQ(_mockTransactionService->addCallCount, 1);
 }
 
-TEST_F(TransactionStoreTest, Commit_MultipleTransactions_CallsServiceForEach)
+TEST_F(TransactionStoreTest, CommitMultipleTransactionsCallsServiceForEach)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));

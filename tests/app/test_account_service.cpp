@@ -64,7 +64,7 @@ namespace
 
 }   // namespace
 
-TEST_F(AccountServiceTest, CreateAccount_ReturnsValidId)
+TEST_F(AccountServiceTest, CreateAccountReturnsValidId)
 {
     const auto profileId = insertProfile("User");
     const auto account   = makeAccount("Savings");
@@ -74,7 +74,7 @@ TEST_F(AccountServiceTest, CreateAccount_ReturnsValidId)
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(AccountServiceTest, GetAllAccounts_EmptyForNewProfile)
+TEST_F(AccountServiceTest, GetAllAccountsEmptyForNewProfile)
 {
     const auto profileId = insertProfile("User");
 
@@ -83,19 +83,21 @@ TEST_F(AccountServiceTest, GetAllAccounts_EmptyForNewProfile)
     EXPECT_TRUE(accounts.empty());
 }
 
-TEST_F(AccountServiceTest, GetAllAccounts_ReturnsCreatedAccount)
+TEST_F(AccountServiceTest, GetAllAccountsReturnsCreatedAccount)
 {
     const auto profileId = insertProfile("User");
 
-    static_cast<void>(_service->createAccount(makeAccount("Checking"), profileId));
+    static_cast<void>(
+        _service->createAccount(makeAccount("Checking"), profileId)
+    );
 
     const auto accounts = _service->getAllAccounts(profileId);
 
-    ASSERT_EQ(accounts.size(), 1u);
+    ASSERT_EQ(accounts.size(), 1U);
     EXPECT_EQ(accounts[0].getName(), "Checking");
 }
 
-TEST_F(AccountServiceTest, GetAllAccounts_IsolatedByProfile)
+TEST_F(AccountServiceTest, GetAllAccountsIsolatedByProfile)
 {
     const auto profileId1 = insertProfile("Alice");
     const auto profileId2 = insertProfile("Bob");
@@ -109,11 +111,12 @@ TEST_F(AccountServiceTest, GetAllAccounts_IsolatedByProfile)
     EXPECT_TRUE(accounts.empty());
 }
 
-TEST_F(AccountServiceTest, CreateAccount_DuplicateNameAndKindThrows)
+TEST_F(AccountServiceTest, CreateAccountDuplicateNameAndKindThrows)
 {
     const auto profileId = insertProfile("User");
 
-    static_cast<void>(_service->createAccount(makeAccount("Savings"), profileId));
+    static_cast<void>(_service->createAccount(makeAccount("Savings"), profileId)
+    );
 
     EXPECT_THROW(
         static_cast<void>(

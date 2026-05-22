@@ -6,7 +6,6 @@
 
 #include "app/store/account/account_session.hpp"
 #include "app/store/position_store.hpp"
-#include "config/id_types.hpp"
 #include "finance/position.hpp"
 #include "mock_services.hpp"
 #include "utils/timestamp.hpp"
@@ -26,9 +25,7 @@ namespace
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         PositionStoreTest()
-            : _mockService{
-                  std::make_shared<tests::MockPositionService>()
-              },
+            : _mockService{std::make_shared<tests::MockPositionService>()},
               _store{
                   std::make_unique<app::PositionStore>(_mockService, _session)
               }
@@ -38,7 +35,7 @@ namespace
 
 }   // namespace
 
-TEST_F(PositionStoreTest, CreatePosition_ReturnsValidLocalId)
+TEST_F(PositionStoreTest, CreatePositionReturnsValidLocalId)
 {
     const finance::Position pos{Timestamp::fromInt64(TEST_TS)};
 
@@ -47,26 +44,26 @@ TEST_F(PositionStoreTest, CreatePosition_ReturnsValidLocalId)
     EXPECT_TRUE(id.isValid());
 }
 
-TEST_F(PositionStoreTest, GetAllPositions_EmptyWhenNoAccounts)
+TEST_F(PositionStoreTest, GetAllPositionsEmptyWhenNoAccounts)
 {
     const auto positions = _store->getAllPositions();
 
     EXPECT_TRUE(positions.empty());
 }
 
-TEST_F(PositionStoreTest, GetOpenPositions_EmptyWhenNoAccounts)
+TEST_F(PositionStoreTest, GetOpenPositionsEmptyWhenNoAccounts)
 {
     const auto positions = _store->getOpenPositions();
 
     EXPECT_TRUE(positions.empty());
 }
 
-TEST_F(PositionStoreTest, IsDirty_FalseInitially)
+TEST_F(PositionStoreTest, IsDirtyFalseInitially)
 {
     EXPECT_FALSE(_store->isDirty());
 }
 
-TEST_F(PositionStoreTest, IsDirty_TrueAfterCreatePosition)
+TEST_F(PositionStoreTest, IsDirtyTrueAfterCreatePosition)
 {
     static_cast<void>(
         _store->createPosition(finance::Position{Timestamp::fromInt64(TEST_TS)})
@@ -75,7 +72,7 @@ TEST_F(PositionStoreTest, IsDirty_TrueAfterCreatePosition)
     EXPECT_TRUE(_store->isDirty());
 }
 
-TEST_F(PositionStoreTest, Commit_NewPosition_CallsService)
+TEST_F(PositionStoreTest, CommitNewPositionCallsService)
 {
     static_cast<void>(
         _store->createPosition(finance::Position{Timestamp::fromInt64(TEST_TS)})
@@ -86,16 +83,14 @@ TEST_F(PositionStoreTest, Commit_NewPosition_CallsService)
     EXPECT_EQ(_mockService->createCallCount, 1);
 }
 
-TEST_F(PositionStoreTest, CreateMultiplePositions_IdsAreDistinct)
+TEST_F(PositionStoreTest, CreateMultiplePositionsIdsAreDistinct)
 {
-    const auto id1 =
-        _store->createPosition(
-            finance::Position{Timestamp::fromInt64(TEST_TS)}
-        );
-    const auto id2 =
-        _store->createPosition(
-            finance::Position{Timestamp::fromInt64(TEST_TS + 1)}
-        );
+    const auto id1 = _store->createPosition(
+        finance::Position{Timestamp::fromInt64(TEST_TS)}
+    );
+    const auto id2 = _store->createPosition(
+        finance::Position{Timestamp::fromInt64(TEST_TS + 1)}
+    );
 
     EXPECT_NE(id1, id2);
 }

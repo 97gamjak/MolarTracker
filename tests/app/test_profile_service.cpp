@@ -38,14 +38,14 @@ namespace
 
 }   // namespace
 
-TEST_F(ProfileServiceTest, Create_ReturnsValidId)
+TEST_F(ProfileServiceTest, CreateReturnsValidId)
 {
     const auto id = _service->create("Alice", std::nullopt);
 
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(ProfileServiceTest, Create_DuplicateNameThrows)
+TEST_F(ProfileServiceTest, CreateDuplicateNameThrows)
 {
     static_cast<void>(_service->create("Alice", std::nullopt));
 
@@ -55,14 +55,14 @@ TEST_F(ProfileServiceTest, Create_DuplicateNameThrows)
     );
 }
 
-TEST_F(ProfileServiceTest, GetById_ReturnsNulloptForMissingId)
+TEST_F(ProfileServiceTest, GetByIdReturnsNulloptForMissingId)
 {
     const auto profile = _service->get(ProfileId{9999});
 
     EXPECT_FALSE(profile.has_value());
 }
 
-TEST_F(ProfileServiceTest, GetById_ReturnsCorrectProfile)
+TEST_F(ProfileServiceTest, GetByIdReturnsCorrectProfile)
 {
     const auto id = _service->create("Bob", std::string{"bob@example.com"});
 
@@ -72,24 +72,24 @@ TEST_F(ProfileServiceTest, GetById_ReturnsCorrectProfile)
     EXPECT_EQ(profile->getId(), id);
 }
 
-TEST_F(ProfileServiceTest, GetAll_EmptyWhenNoProfiles)
+TEST_F(ProfileServiceTest, GetAllEmptyWhenNoProfiles)
 {
     const auto profiles = _service->getAll();
 
     EXPECT_TRUE(profiles.empty());
 }
 
-TEST_F(ProfileServiceTest, GetAll_ReturnsAllCreatedProfiles)
+TEST_F(ProfileServiceTest, GetAllReturnsAllCreatedProfiles)
 {
     static_cast<void>(_service->create("Alice", std::nullopt));
     static_cast<void>(_service->create("Bob", std::nullopt));
 
     const auto profiles = _service->getAll();
 
-    EXPECT_EQ(profiles.size(), 2u);
+    EXPECT_EQ(profiles.size(), 2U);
 }
 
-TEST_F(ProfileServiceTest, Update_ChangesNameAndEmail)
+TEST_F(ProfileServiceTest, UpdateChangesNameAndEmail)
 {
     const auto id = _service->create("Carol", std::nullopt);
 
@@ -102,7 +102,7 @@ TEST_F(ProfileServiceTest, Update_ChangesNameAndEmail)
     EXPECT_EQ(profile->getEmail().value(), "carol@example.com");
 }
 
-TEST_F(ProfileServiceTest, Update_ThrowsForNonExistentId)
+TEST_F(ProfileServiceTest, UpdateThrowsForNonExistentId)
 {
     EXPECT_THROW(
         _service->update(ProfileId{9999}, "Ghost", std::nullopt),
@@ -110,7 +110,7 @@ TEST_F(ProfileServiceTest, Update_ThrowsForNonExistentId)
     );
 }
 
-TEST_F(ProfileServiceTest, Remove_DeletesProfile)
+TEST_F(ProfileServiceTest, RemoveDeletesProfile)
 {
     const auto id = _service->create("Dave", std::nullopt);
 
@@ -119,7 +119,7 @@ TEST_F(ProfileServiceTest, Remove_DeletesProfile)
     EXPECT_FALSE(_service->get(id).has_value());
 }
 
-TEST_F(ProfileServiceTest, Remove_DoesNotAffectOtherProfiles)
+TEST_F(ProfileServiceTest, RemoveDoesNotAffectOtherProfiles)
 {
     const auto id1 = _service->create("Eve", std::nullopt);
     const auto id2 = _service->create("Frank", std::nullopt);

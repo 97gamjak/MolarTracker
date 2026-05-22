@@ -227,6 +227,7 @@ namespace app
                 "call"
             );
             _activeProfileId = ProfileId::invalid();
+            _clearEntries();
             return;
         }
 

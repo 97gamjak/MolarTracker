@@ -7,7 +7,6 @@
 #include "app/migration/migration_runner.hpp"
 #include "app/repos/position_repo.hpp"
 #include "app/services/position_service.hpp"
-#include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/position.hpp"
 #include "test_fixtures.hpp"
@@ -39,7 +38,7 @@ namespace
 
 }   // namespace
 
-TEST_F(PositionServiceTest, CreatePosition_ReturnsValidId)
+TEST_F(PositionServiceTest, CreatePositionReturnsValidId)
 {
     const finance::Position position{Timestamp::fromInt64(TEST_TS)};
 
@@ -48,27 +47,27 @@ TEST_F(PositionServiceTest, CreatePosition_ReturnsValidId)
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(PositionServiceTest, GetAllPositions_EmptyForEmptyAccountSet)
+TEST_F(PositionServiceTest, GetAllPositionsEmptyForEmptyAccountSet)
 {
     const auto positions = _service->getAllPositions({});
 
     EXPECT_TRUE(positions.empty());
 }
 
-TEST_F(PositionServiceTest, GetAllOpenPositions_EmptyForEmptyAccountSet)
+TEST_F(PositionServiceTest, GetAllOpenPositionsEmptyForEmptyAccountSet)
 {
     const auto positions = _service->getAllOpenPositions({});
 
     EXPECT_TRUE(positions.empty());
 }
 
-TEST_F(PositionServiceTest, CreateMultiplePositions_IdsAreDistinct)
+TEST_F(PositionServiceTest, CreateMultiplePositionsIdsAreDistinct)
 {
-    const finance::Position p1{Timestamp::fromInt64(TEST_TS)};
-    const finance::Position p2{Timestamp::fromInt64(TEST_TS + 1)};
+    const finance::Position position1{Timestamp::fromInt64(TEST_TS)};
+    const finance::Position position2{Timestamp::fromInt64(TEST_TS + 1)};
 
-    const auto id1 = _service->createPosition(p1);
-    const auto id2 = _service->createPosition(p2);
+    const auto id1 = _service->createPosition(position1);
+    const auto id2 = _service->createPosition(position2);
 
     EXPECT_NE(id1, id2);
 }
