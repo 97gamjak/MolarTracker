@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "finance/price_quote.hpp"
 #include "finance/ticker_info.hpp"
 #include "http/http_client.hpp"
 
@@ -182,6 +183,28 @@ namespace finance
     }
 
     /**
+     * @brief Send a GET request to the Yahoo Finance API.
+     *
+     * @param path The API endpoint path.
+     * @return std::expected<http::HttpResponse, YahooFinanceError>
+     */
+    std::expected<http::HttpResponse, YahooFinanceError> YahooFinanceClient::
+        _getRequest(const std::string& path)
+    {
+        auto result = http::HttpClient::get(_buildRequest(path));
+        if (result)
+            return result.value();
+
+        return std::unexpected(
+            YahooFinanceError{
+                YahooFinanceErrorType::HttpError,
+                result.error().message,
+                result.error()
+            }
+        );
+    }
+
+    /**
      * @brief Fetch ticker information from Yahoo Finance API.
      *
      * @param ticker The ticker symbol of the stock.
@@ -193,17 +216,9 @@ namespace finance
         const std::string path = "/v10/finance/quoteSummary/" + ticker +
                                  "?modules=price,assetProfile";
 
-        auto result = http::HttpClient::get(_buildRequest(path));
+        const auto result = _getRequest(path);
         if (!result)
-        {
-            return std::unexpected(
-                YahooFinanceError{
-                    YahooFinanceErrorType::HttpError,
-                    result.error().message,
-                    result.error()
-                }
-            );
-        }
+            return std::unexpected(result.error());
 
         try
         {
@@ -228,8 +243,57 @@ namespace finance
                     http::HttpError{
                         .kind            = http::HttpErrorKind::ParseError,
                         .message         = ex.what(),
-                        .responseHeaders = std::move(result->headers),
+                        .responseHeaders = result->headers,
                     }
+                }
+            );
+        }
+
+        std::unreachable();
+    }
+
+    /**
+     * @brief Fetches the latest price quote for a ticker.
+     *
+     * @param ticker The ticker symbol to look up.
+     * @return std::expected<PriceQuote, YahooFinanceError>
+     */
+    std::expected<PriceQuote, YahooFinanceError> YahooFinanceClient::fetchPrice(
+        const std::string& ticker
+    )
+    {
+        const std::string path =
+            "/v10/finance/quoteSummary/" + ticker + "?modules=price";
+
+        auto result = _getRequest(path);
+        if (!result)
+            return std::unexpected(result.error());
+
+        try
+        {
+            const auto json        = nlohmann::json::parse(result->body);
+            const auto quoteResult = PriceQuote::fromJson(json);
+
+            if (!quoteResult)
+            {
+                return std::unexpected(
+                    YahooFinanceError::fromError(quoteResult.error())
+                );
+            }
+
+            return quoteResult.value();
+        }
+        catch (const nlohmann::json::exception& ex)
+        {
+            return std::unexpected(
+                YahooFinanceError{
+                    YahooFinanceErrorType::HttpError,
+                    ex.what(),
+                    http::HttpError{
+                        .kind            = http::HttpErrorKind::ParseError,
+                        .message         = ex.what(),
+                        .responseHeaders = std::move(result->headers),
+                    },
                 }
             );
         }

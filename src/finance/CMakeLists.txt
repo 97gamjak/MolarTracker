@@ -14,6 +14,8 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/ticker_info.cpp
     ${SOURCE_DIR}/yf_client.cpp
     ${SOURCE_DIR}/position.cpp
+    ${SOURCE_DIR}/price_quote.cpp
+    ${SOURCE_DIR}/price_cache.cpp
     ${SOURCE_DIR}/finance_error.cpp
 
     ${SOURCE_DIR}/instrument/stock.cpp
@@ -37,5 +39,6 @@ target_link_libraries(molartracker_finance
     molartracker_exceptions
     molartracker_utils
     molartracker_logging
+    molartracker_json
     mstd
 )

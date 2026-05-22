@@ -93,28 +93,14 @@ namespace ui
     micro_units AmountLineEdit::getAmount(std::size_t precision) const
     {
         const auto text = this->text().trimmed();
+
         if (text.isEmpty())
             return 0;
 
-        const auto sign  = text.startsWith('-') ? -1 : 1;
-        const auto parts = text.mid(sign < 0 ? 1 : 0).split('.');
-
-        const auto scale   = static_cast<int64_t>(std::pow(10, precision));
-        const auto intPart = parts[0].toLongLong() * scale;
-
-        int64_t fracPart = 0;
-        if (parts.size() > 1)
-        {
-            // Truncate or pad to exactly decimalPlaces digits
-            const QString frac =
-                parts[1]
-                    .left(static_cast<std::int64_t>(precision))
-                    .leftJustified(static_cast<std::int64_t>(precision), '0');
-
-            fracPart = frac.toLongLong();
-        }
-
-        return static_cast<micro_units>(sign * (intPart + fracPart));
+        return microUnitsFromString(
+            text.toStdString(),
+            static_cast<std::uint8_t>(precision)
+        );
     }
 
     /**

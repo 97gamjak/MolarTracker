@@ -29,6 +29,8 @@ namespace finance
      */
     YahooFinanceError YahooFinanceError::fromError(const FinanceError& error)
     {
+        // TODO(97gamjak): think here of a better logic rather than adding all
+        // types twice
         switch (error.getType())
         {
             case FinanceErrorType::CurrencyUnknown:
@@ -39,6 +41,16 @@ namespace finance
             case FinanceErrorType::Unknown:
                 return YahooFinanceError{
                     YahooFinanceErrorType::Unknown,
+                    error.getMessage()
+                };
+            case finance::FinanceErrorType::PriceOverflow:
+                return YahooFinanceError{
+                    YahooFinanceErrorType::PriceOverflow,
+                    error.getMessage()
+                };
+            case finance::FinanceErrorType::InvalidPriceString:
+                return YahooFinanceError{
+                    YahooFinanceErrorType::InvalidPriceString,
                     error.getMessage()
                 };
         }

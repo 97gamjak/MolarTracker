@@ -57,7 +57,7 @@ bool Quantity::operator>(const Quantity& other) const
  * @param quantity The quantity to negate.
  * @return A new quantity representing the negated value.
  */
-[[nodiscard]] Quantity operator-(const Quantity& quantity)
+Quantity operator-(const Quantity& quantity)
 {
     return Quantity(-quantity._value);
 }
@@ -70,11 +70,7 @@ bool Quantity::operator>(const Quantity& other) const
  * @param divisor The divisor.
  * @return The result of the multiplication and division.
  */
-[[nodiscard]] micro_units mulDiv(
-    micro_units lhs,
-    micro_units rhs,
-    micro_units divisor
-)
+micro_units mulDiv(micro_units lhs, micro_units rhs, micro_units divisor)
 {
 #if defined(_MSC_VER) && !defined(__clang__)
     int64_t    high;
@@ -101,7 +97,83 @@ bool Quantity::operator>(const Quantity& other) const
  * @param rhs The right-hand side Quantity value.
  * @return The result of the multiplication and division.
  */
-[[nodiscard]] micro_units mulDiv(micro_units lhs, Quantity rhs)
+micro_units mulDiv(micro_units lhs, Quantity rhs)
 {
     return mulDiv(lhs, rhs.toMicroUnits(), Quantity::factor);
+}
+
+/**
+ * @brief Convert a string representation of a quantity to micro_units.
+ *
+ * @param value The string representation of the quantity.
+ * @param precision The number of decimal places to consider.
+ * @return The quantity in micro_units.
+ */
+micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
+{
+    if (value.empty())
+        throw std::invalid_argument("microUnitsFromString: empty string");
+
+    const int sign = value.front() == '-' ? -1 : 1;
+    if (sign < 0)
+        value.remove_prefix(1);
+
+    if (value.empty())
+        throw std::invalid_argument("microUnitsFromString: bare '-'");
+
+    const auto dotPos = value.find('.');
+
+    const std::string_view intStr  = value.substr(0, dotPos);
+    const std::string_view fracStr = dotPos != std::string_view::npos
+                                         ? value.substr(dotPos + 1)
+                                         : std::string_view{};
+
+    // Compute scale = 10^precision in integer arithmetic.
+    const auto base  = 10;
+    int64_t    scale = 1;
+    for (std::size_t i = 0; i < precision; ++i)
+        scale *= base;
+
+    // Parse integer part.
+    // Parse integer part — std::from_chars detects out-of-range for us.
+    int64_t intPart = 0;
+    if (!intStr.empty())
+    {
+        const auto [ptr, ec] = std::from_chars(
+            intStr.data(),
+            intStr.data() + intStr.size(),
+            intPart
+        );
+
+        if (ec == std::errc::result_out_of_range)
+            throw std::overflow_error(
+                "microUnitsFromString: integer part overflows int64_t"
+            );
+
+        if (ec != std::errc{} || ptr != intStr.data() + intStr.size())
+            throw std::invalid_argument(
+                "microUnitsFromString: malformed integer part"
+            );
+    }
+
+    // Parse fractional part: truncate or right-pad with zeros to exactly
+    // `precision` digits — same policy as AmountLineEdit::getAmount.
+    int64_t fracPart  = 0;
+    int64_t fracScale = scale;
+    for (std::size_t i = 0; i < precision; ++i)
+    {
+        fracScale            /= base;
+        const char character  = i < fracStr.size() ? fracStr[i] : '0';
+
+        if (character < '0' || character > '9')
+        {
+            throw std::invalid_argument(
+                std::string{"microUnitsFromString: unexpected char '"} +
+                character + "'"
+            );
+        }
+        fracPart += (character - '0') * fracScale;
+    }
+
+    return sign * (intPart * scale + fracPart);
 }

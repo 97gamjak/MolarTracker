@@ -12,6 +12,8 @@ namespace finance
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define FINANCE_ERROR_LIST(X) \
     X(CurrencyUnknown)        \
+    X(PriceOverflow)          \
+    X(InvalidPriceString)     \
     X(Unknown)
 
     MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_LIST);
@@ -22,6 +24,8 @@ namespace finance
 #define YAHOO_FINANCE_ERROR(X) \
     X(HttpError)               \
     X(CurrencyUnknown)         \
+    X(PriceOverflow)           \
+    X(InvalidPriceString)      \
     X(Unknown)
 
     MSTD_ENUM(YahooFinanceErrorType, std::uint8_t, YAHOO_FINANCE_ERROR);
