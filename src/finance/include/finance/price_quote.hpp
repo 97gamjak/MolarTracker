@@ -14,16 +14,17 @@ namespace finance
      * @brief Represents a price quote for a financial instrument.
      *
      */
-    struct PriceQuote
+    class PriceQuote
     {
+       private:
         /// The price of the financial instrument.
-        finance::Cash price;
+        finance::Cash _price;
 
         /// The timestamp of the price quote.
-        Timestamp timestamp;
+        Timestamp _timestamp;
 
        public:
-        PriceQuote(finance::Cash price_, Timestamp timestamp_);
+        PriceQuote(finance::Cash price, Timestamp timestamp);
 
         [[nodiscard]]
         static std::expected<PriceQuote, FinanceError> fromJson(

@@ -12,11 +12,11 @@ namespace finance
     /**
      * @brief Constructs a PriceQuote object.
      *
-     * @param price_ The price of the financial instrument.
-     * @param timestamp_ The timestamp of the price quote.
+     * @param price The price of the financial instrument.
+     * @param timestamp The timestamp of the price quote.
      */
-    PriceQuote::PriceQuote(finance::Cash price_, Timestamp timestamp_)
-        : price(price_), timestamp(timestamp_)
+    PriceQuote::PriceQuote(finance::Cash price, Timestamp timestamp)
+        : _price(price), _timestamp(timestamp)
     {
     }
 
