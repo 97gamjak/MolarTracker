@@ -87,10 +87,6 @@ All changes and updates, that are relevant for developers will be documented her
 - Speedup some compilation headers
 
 <!-- insertion marker -->
-
-### Testing
-
-- Add `tests/settings/` with GoogleTest unit tests covering all public settings classes: `GeneralSettings`, `LoggingSettings`, `LogViewerSettings`, `DebugSlotsSettings`, `ProfileUISettings`, `UISettings`, and `Settings` (integration)
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10

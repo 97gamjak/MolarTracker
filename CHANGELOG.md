@@ -17,26 +17,7 @@ All changes and updates, that are relevant for a user will be documented here
 
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
 
-### Tests
-
-- Add unit tests for `AccountRepo` covering `createAccount` and `getAllAccounts`
-- Add unit tests for `ProfileRepo` covering `create`, `get` (by ID and name),
-  `getAll`, `update`, and `remove`
-- Add unit tests for `TransactionRepo` covering Cash and Trade transaction
-  round-trips, entry/leg persistence, comment handling, and multi-transaction
-  retrieval
-- Add unit tests for `InstrumentRepo` covering `addStock`, `getTickers`,
-  `getStock`, `getStocks`, and `stockExists`
-- Add unit tests for the settings folder (GeneralSettings, LoggingSettings, LogViewerSettings, DebugSlotsSettings, ProfileUISettings, UISettings, Settings)
-- Add unit tests for the settings params subsystem (`ParamError`,
-  `ParamContainer`, `ParamCore`, `NumericParam`, `EnumParam`,
-  `NumericVecParam`, `ParamContainerMixin`, and param utility functions)
-
 <!-- insertion marker -->
-
-### Testing
-
-- Add unit tests for the settings folder (GeneralSettings, LoggingSettings, LogViewerSettings, DebugSlotsSettings, ProfileUISettings, UISettings, Settings)
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ### Bug Fix
