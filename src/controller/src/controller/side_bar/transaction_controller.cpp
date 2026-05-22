@@ -196,7 +196,7 @@ namespace controller
          * @brief Add external transaction entries for any entries that need
          * them
          *
-         * @param entries The list of transaction entries to modify
+         * @param draft The list of transaction entries to modify
          * @param accountStore The account store to use for looking up external
          * accounts
          *
