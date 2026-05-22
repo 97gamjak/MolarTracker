@@ -8,8 +8,11 @@ add_executable(tests_settings
 
 target_link_libraries(tests_settings
     PRIVATE
-        molartracker_settings
-        GTest::gtest_main
+    molartracker_settings
+    molartracker_utils
+    molartracker_json
+    json
+    GTest::gtest_main
 )
 
 include(GoogleTest)
