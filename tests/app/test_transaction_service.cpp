@@ -1,0 +1,108 @@
+#include <gtest/gtest.h>
+
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+#include "app/migration/migration_runner.hpp"
+#include "app/repos/transaction_repo.hpp"
+#include "app/services/transaction_service.hpp"
+#include "config/finance.hpp"
+#include "config/id_types.hpp"
+#include "config/quantity.hpp"
+#include "db/database.hpp"
+#include "finance/cash.hpp"
+#include "finance/transaction.hpp"
+#include "finance/transaction_entry.hpp"
+#include "finance/transaction_filter.hpp"
+#include "test_fixtures.hpp"
+#include "utils/timestamp.hpp"
+
+namespace
+{
+
+    constexpr std::int64_t TEST_TS = 1'715'000'000'000LL;
+
+    class TransactionServiceTest : public ::testing::Test
+    {
+       protected:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        const AccountId _accountId{1};
+
+        tests::TempDbFile                        _tempFile;
+        db::Database                             _db;
+        std::shared_ptr<app::TransactionRepo>    _repo;
+        std::shared_ptr<app::TransactionService> _service;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+        TransactionServiceTest()
+            : _db{_tempFile.path()},
+              _repo{std::make_shared<app::TransactionRepo>(_db)},
+              _service{std::make_shared<app::TransactionService>(_repo)}
+        {
+            auto runner = app::MigrationRunner{_db};
+            _db.execute(
+                "INSERT INTO profile (name, email) "
+                "VALUES ('TestProfile', NULL)"
+            );
+            _db.execute(
+                "INSERT INTO account "
+                "(kind, profile_id, name, status, currency) "
+                "VALUES (0, 1, 'TestAccount', 0, 0)"
+            );
+        }
+
+        [[nodiscard]] finance::Transaction makeCashTx(
+            micro_units amount = 0
+        ) const
+        {
+            return finance::Transaction{
+                TransactionId::invalid(),
+                Timestamp::fromInt64(TEST_TS),
+                TransactionStatus::Completed,
+                finance::CashData{},
+                {finance::TransactionEntry{
+                    TransactionEntryId::invalid(),
+                    _accountId,
+                    finance::Cash{Currency::USD, amount},
+                    TransactionEntryType::General
+                }},
+                std::nullopt
+            };
+        }
+    };
+
+}   // namespace
+
+TEST_F(TransactionServiceTest, AddTransactionReturnsValidId)
+{
+    const auto id = _service->addTransaction(makeCashTx());
+
+    EXPECT_GT(id.value(), 0);
+}
+
+TEST_F(TransactionServiceTest, GetTransactionsEmptyForEmptyAccountSet)
+{
+    const auto txs =
+        _service->getTransactions({}, finance::TransactionFilter{});
+
+    EXPECT_TRUE(txs.empty());
+}
+
+TEST_F(TransactionServiceTest, GetTransactionsReturnsAddedTransaction)
+{
+    static_cast<void>(_service->addTransaction(makeCashTx()));
+
+    const auto txs =
+        _service->getTransactions({_accountId}, finance::TransactionFilter{});
+
+    EXPECT_EQ(txs.size(), 1U);
+}
+
+TEST_F(TransactionServiceTest, AddMultipleTransactionsIdsAreDistinct)
+{
+    const auto id1 = _service->addTransaction(makeCashTx());
+    const auto id2 = _service->addTransaction(makeCashTx());
+
+    EXPECT_NE(id1, id2);
+}

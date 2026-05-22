@@ -1,0 +1,253 @@
+#ifndef __TESTS__APP__STORE__MOCK_SERVICES_HPP__
+#define __TESTS__APP__STORE__MOCK_SERVICES_HPP__
+
+#include <algorithm>
+#include <optional>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "app/domain/profile.hpp"
+#include "app/services_api/i_account_service.hpp"
+#include "app/services_api/i_instrument_service.hpp"
+#include "app/services_api/i_position_service.hpp"
+#include "app/services_api/i_profile_service.hpp"
+#include "app/services_api/i_transaction_service.hpp"
+#include "config/id_types.hpp"
+#include "finance/account.hpp"
+#include "finance/instrument/stock.hpp"
+#include "finance/position.hpp"
+#include "finance/transaction.hpp"
+#include "finance/transaction_filter.hpp"
+
+namespace tests
+{
+
+    class MockProfileService : public app::IProfileService
+    {
+       public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        std::vector<app::Profile> profiles;
+        int                       createCallCount = 0;
+        int                       removeCallCount = 0;
+        int                       updateCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+       private:
+        int _nextId = 1;
+
+       public:
+        void addTestProfile(
+            const std::string&                name,
+            const std::optional<std::string>& email = std::nullopt
+        )
+        {
+            auto profile = app::Profile{name, email};
+            profile.setId(ProfileId{_nextId++});
+            profiles.push_back(profile);
+        }
+
+        [[nodiscard]] std::vector<app::Profile> getAll() const override
+        {
+            return profiles;
+        }
+
+        [[nodiscard]] std::optional<app::Profile> get(
+            ProfileId id
+        ) const override
+        {
+            for (const auto& profile : profiles)
+            {
+                if (profile.getId() == id)
+                    return profile;
+            }
+            return std::nullopt;
+        }
+
+        [[nodiscard]] ProfileId create(
+            const std::string&                name,
+            const std::optional<std::string>& email
+        ) override
+        {
+            createCallCount++;
+            auto       profile = app::Profile{name, email};
+            const auto newId   = ProfileId{_nextId++};
+            profile.setId(newId);
+            profiles.push_back(profile);
+            return newId;
+        }
+
+        void update(
+            ProfileId                         id,
+            const std::string&                newName,
+            const std::optional<std::string>& newEmail
+        ) override
+        {
+            updateCallCount++;
+            for (auto& profile : profiles)
+            {
+                if (profile.getId() == id)
+                {
+                    profile.setName(newName);
+                    profile.setEmail(newEmail);
+                    return;
+                }
+            }
+        }
+
+        void remove(ProfileId id) override
+        {
+            removeCallCount++;
+            const auto it = std::ranges::find_if(
+                profiles,
+                [id](const auto& profile) { return profile.getId() == id; }
+            );
+
+            if (it != profiles.end())
+                profiles.erase(it);
+        }
+    };
+
+    class MockAccountService : public app::IAccountService
+    {
+       public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        std::vector<finance::Account> preloadedAccounts;
+        int                           createCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+       private:
+        int _nextId = 1;
+
+       public:
+        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
+            const ProfileId& /*profileId*/
+        ) const override
+        {
+            return preloadedAccounts;
+        }
+
+        [[nodiscard]] AccountId createAccount(
+            const finance::Account& /*account*/,
+            const ProfileId& /*profileId*/
+        ) override
+        {
+            createCallCount++;
+            return AccountId{_nextId++};
+        }
+    };
+
+    class MockInstrumentService : public app::IInstrumentService
+    {
+       public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        std::set<std::string> stocksInDb;
+        int                   addStockCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+       private:
+        int _nextStockId      = 1;
+        int _nextInstrumentId = 1;
+
+       public:
+        [[nodiscard]] std::vector<std::string> getTickers() override
+        {
+            return {};
+        }
+
+        [[nodiscard]] std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& /*ids*/
+        ) override
+        {
+            return {};
+        }
+
+        [[nodiscard]] std::optional<finance::Stock> getStock(
+            const std::string& /*ticker*/
+        ) override
+        {
+            return std::nullopt;
+        }
+
+        [[nodiscard]] finance::StockInsertionResult addStock(
+            const finance::Stock& /*stock*/
+        ) override
+        {
+            addStockCallCount++;
+            return finance::StockInsertionResult{
+                .stockId      = StockId{_nextStockId++},
+                .instrumentId = InstrumentId{_nextInstrumentId++}
+            };
+        }
+
+        [[nodiscard]] bool stockExists(const std::string& ticker) override
+        {
+            return stocksInDb.contains(ticker);
+        }
+    };
+
+    class MockPositionService : public app::IPositionService
+    {
+       public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        int createCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+       private:
+        int _nextId = 1;
+
+       public:
+        [[nodiscard]] PositionId createPosition(
+            const finance::Position& /*position*/
+        ) override
+        {
+            createCallCount++;
+            return PositionId{_nextId++};
+        }
+
+        [[nodiscard]] std::vector<finance::Position> getAllPositions(
+            const idSet<AccountId>& /*accountIds*/
+        ) override
+        {
+            return {};
+        }
+
+        [[nodiscard]] std::vector<finance::Position> getAllOpenPositions(
+            const idSet<AccountId>& /*accountIds*/
+        ) override
+        {
+            return {};
+        }
+    };
+
+    class MockTransactionService : public app::ITransactionService
+    {
+       public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        int addCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+       private:
+        int _nextId = 1;
+
+       public:
+        [[nodiscard]] TransactionId addTransaction(
+            const finance::Transaction& /*transaction*/
+        ) override
+        {
+            addCallCount++;
+            return TransactionId{_nextId++};
+        }
+
+        [[nodiscard]] std::vector<finance::Transaction> getTransactions(
+            const idSet<AccountId>& /*accountIds*/,
+            const finance::TransactionFilter& /*filter*/
+        ) override
+        {
+            return {};
+        }
+    };
+
+}   // namespace tests
+
+#endif   // __TESTS__APP__STORE__MOCK_SERVICES_HPP__

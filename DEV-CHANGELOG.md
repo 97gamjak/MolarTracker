@@ -65,6 +65,15 @@ All changes and updates, that are relevant for developers will be documented her
   `ParamError`, `ParamContainer`, `ParamCore<T>`, `NumericParam<T>`,
   `EnumParam<E>`, `NumericVecParam<T,N>`, `ParamContainerMixin<Derived>`,
   and the `param_utils.hpp` free functions and type traits
+- Unit tests for all five services (`ProfileService`, `AccountService`,
+  `InstrumentService`, `PositionService`, `TransactionService`) using
+  real repo + SQLite database integration fixtures
+- Unit tests for all five stores (`ProfileStore`, `AccountStore`,
+  `StockStore`, `PositionStore`, `TransactionStore`) using hand-rolled
+  mock service implementations
+- Shared `mock_services.hpp` test helper in `tests/app/store/` providing
+  lightweight fakes for all service interfaces
+- New `tests_stores` CMake test executable for store unit tests
 
 ### Features
 

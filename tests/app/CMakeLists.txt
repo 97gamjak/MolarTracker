@@ -1,8 +1,13 @@
 add_executable(tests_app
     test_account_repo.cpp
+    test_account_service.cpp
     test_instrument_repo.cpp
+    test_instrument_service.cpp
+    test_position_service.cpp
     test_profile_repo.cpp
+    test_profile_service.cpp
     test_transaction_repo.cpp
+    test_transaction_service.cpp
 )
 
 target_include_directories(tests_app
@@ -22,3 +27,5 @@ target_link_libraries(tests_app
 
 include(GoogleTest)
 gtest_discover_tests(tests_app)
+
+add_subdirectory(store)
