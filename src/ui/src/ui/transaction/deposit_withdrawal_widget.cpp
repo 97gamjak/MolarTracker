@@ -186,7 +186,7 @@ namespace ui
         auto feesEntry = drafts::TransactionEntryDraft{
             account->id,
             fees,
-            TransactionEntryType::General,
+            TransactionEntryType::Fees,
             false
         };
         feesEntry.setNeedsExternal(true);
