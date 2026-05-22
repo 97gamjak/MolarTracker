@@ -46,13 +46,16 @@ namespace ui
         /// The row for entering the fees for the transaction
         AmountRow* feesRow;
 
+        /// The label for displaying the currency of the fees
+        QLabel* currencyFees;
+
         Fields(
             const std::vector<drafts::AccountDraft>& accounts,
             QWidget*                                 parent
         );
 
         void addFieldsToLayout(QFormLayout* layout) const;
-
+        void updateCurrency(Currency currency) const;
         void updateFields() const;
 
         [[nodiscard]]
@@ -74,7 +77,8 @@ namespace ui
           amountRow(makeQChild<AmountRow>(parent)),
           currencyLabel(makeQChild<QLabel>(parent)),
           commentField(makeQChild<CommentField>(parent)),
-          feesRow(makeQChild<AmountRow>(parent))
+          feesRow(makeQChild<AmountRow>(parent)),
+          currencyFees(makeQChild<QLabel>(parent))
     {
     }
 
@@ -90,6 +94,25 @@ namespace ui
         currencyLabel->update();
         commentField->update();
         feesRow->update();
+    }
+
+    /**
+     * @brief Update the currency labels and decimal places for the amount and
+     * fees rows
+     *
+     * @param currency The currency to update the fields for
+     */
+    void DepositWithdrawalWidget::Fields::updateCurrency(
+        Currency currency
+    ) const
+    {
+        using finance::getMicroUnit;
+        using finance::getSymbol;
+
+        amountRow->setNDecimalPlaces(getMicroUnit(currency));
+        feesRow->setNDecimalPlaces(getMicroUnit(currency));
+        currencyLabel->setText(getSymbol(currency).c_str());
+        currencyFees->setText(getSymbol(currency).c_str());
     }
 
     /**
@@ -111,7 +134,7 @@ namespace ui
 
         auto* feesRowLayout = makeQChild<QHBoxLayout>();
         feesRowLayout->addWidget(feesRow);
-        feesRowLayout->addWidget(currencyLabel);
+        feesRowLayout->addWidget(currencyFees);
         layout->addRow("Fees:", feesRowLayout);
 
         layout->addRow("Comment:", commentField);
@@ -313,11 +336,7 @@ namespace ui
         const drafts::AccountDraft& account
     )
     {
-        using finance::getMicroUnit;
-        using finance::getSymbol;
-
-        _fields->amountRow->setNDecimalPlaces(getMicroUnit(account.currency));
-        _fields->currencyLabel->setText(getSymbol(account.currency).c_str());
+        _fields->updateCurrency(account.currency);
         _updateAddButton();
     }
 

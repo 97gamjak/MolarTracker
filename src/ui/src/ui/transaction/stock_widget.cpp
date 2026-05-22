@@ -57,6 +57,9 @@ namespace ui
         /// The field for entering a comment about the transaction
         CommentField* commentField;
 
+        /// The label for displaying the currency of the fees
+        QLabel* currencyFeesLabel;
+
         Fields(
             const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
@@ -99,7 +102,8 @@ namespace ui
           currencyLabel(makeQChild<QLabel>(parent)),
           tickerField(makeQChild<TickerField>(tickers, parent)),
           timestampField(makeQChild<TimestampField>(parent)),
-          commentField(makeQChild<CommentField>(parent))
+          commentField(makeQChild<CommentField>(parent)),
+          currencyFeesLabel(makeQChild<QLabel>(parent))
     {
         feesRow->setDefaultValue(0);
     }
@@ -127,7 +131,7 @@ namespace ui
         layout->addRow("Stock Price:", amountRowLayout);
         auto* feesRowLayout = makeQChild<QHBoxLayout>();
         feesRowLayout->addWidget(feesRow);
-        feesRowLayout->addWidget(currencyLabel);
+        feesRowLayout->addWidget(currencyFeesLabel);
         layout->addRow("Fees:", feesRowLayout);
         layout->addRow("Comment:", commentField);
 
@@ -175,6 +179,7 @@ namespace ui
         feesRow->update();
         currencyLabel->update();
         tickerField->update();
+        currencyFeesLabel->update();
     }
 
     /**
@@ -331,6 +336,7 @@ namespace ui
         _fields->priceRow->setNDecimalPlaces(microUnits);
         _fields->feesRow->setNDecimalPlaces(microUnits);
         _fields->currencyLabel->setText(getSymbol(currency).c_str());
+        _fields->currencyFeesLabel->setText(getSymbol(currency).c_str());
 
         std::vector<drafts::AccountDraft> referenceAccounts;
 
