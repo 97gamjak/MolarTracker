@@ -1,6 +1,7 @@
 #include "finance/price_quote.hpp"
 
 #include <expected>
+#include <stdexcept>
 
 #include "config/finance.hpp"
 #include "finance/currency.hpp"
@@ -47,8 +48,27 @@ namespace finance
 
         const auto priceStr =
             json::safeGet<std::string>(data, "regularMarketPreviousClose");
-        const auto price =
-            microUnitsFromString(priceStr, getMicroUnit(currency));
+
+        micro_units price = 0;
+
+        try
+        {
+            price = microUnitsFromString(priceStr, getMicroUnit(currency));
+        }
+        catch (const std::overflow_error& e)
+        {
+            return std::unexpected(FinanceError(
+                FinanceErrorType::PriceOverflow,
+                "Invalid price " + priceStr + ": " + e.what()
+            ));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            return std::unexpected(FinanceError(
+                FinanceErrorType::InvalidPriceString,
+                "Invalid price " + priceStr + ": " + e.what()
+            ));
+        }
 
         const auto time = json::safeGet<int64_t>(data, "regularMarketTime");
         const auto timeStamp = Timestamp::fromInt64(time);
