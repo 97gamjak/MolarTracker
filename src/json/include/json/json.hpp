@@ -15,7 +15,11 @@ namespace json
      * @return T
      */
     template <typename T>
-    T _safeGet(const nlohmann::json& obj, const char* key, T fallback = {})
+    T _safeGet(
+        const nlohmann::json& obj,
+        const char*           key,
+        const T&              fallback = {}
+    )
     {
         if (const auto it = obj.find(key); it != obj.end() && !it->is_null())
             return it->get<T>();
