@@ -18,114 +18,115 @@
 #include "settings/general_settings.hpp"
 #include "utils/version_json.hpp"   // IWYU pragma: keep
 
-TEST(GeneralSettings, DefaultConstructed_HasNoDefaultProfile)
+TEST(GeneralSettings, DefaultConstructedHasNoDefaultProfile)
 {
-    settings::GeneralSettings gs;
-    EXPECT_FALSE(gs.hasDefaultProfile());
+    settings::GeneralSettings settings;
+    EXPECT_FALSE(settings.hasDefaultProfile());
 }
 
-TEST(GeneralSettings, DefaultConstructed_GetDefaultProfileReturnsNullopt)
+TEST(GeneralSettings, DefaultConstructedGetDefaultProfileReturnsNullopt)
 {
-    settings::GeneralSettings gs;
-    EXPECT_FALSE(gs.getDefaultProfile().has_value());
+    settings::GeneralSettings settings;
+    EXPECT_FALSE(settings.getDefaultProfile().has_value());
 }
 
-TEST(GeneralSettings, DefaultConstructed_VersionMatchesAppVersion)
+TEST(GeneralSettings, DefaultConstructedVersionMatchesAppVersion)
 {
-    settings::GeneralSettings gs;
+    settings::GeneralSettings settings;
     // version is set during construction via Constants::getSemVer()
-    gs.commit();
-    EXPECT_FALSE(gs.isDirty());
+    settings.commit();
+    EXPECT_FALSE(settings.isDirty());
 }
 
-TEST(GeneralSettings, SetDefaultProfile_HasDefaultProfileReturnsTrue)
+TEST(GeneralSettings, SetDefaultProfileHasDefaultProfileReturnsTrue)
 {
-    settings::GeneralSettings gs;
-    gs.setDefaultProfile("MyProfile");
-    EXPECT_TRUE(gs.hasDefaultProfile());
+    settings::GeneralSettings settings;
+    settings.setDefaultProfile("MyProfile");
+    EXPECT_TRUE(settings.hasDefaultProfile());
 }
 
-TEST(GeneralSettings, SetDefaultProfile_GetReturnsSetName)
+TEST(GeneralSettings, SetDefaultProfileGetReturnsSetName)
 {
-    settings::GeneralSettings gs;
-    gs.setDefaultProfile("TestProfile");
-    ASSERT_TRUE(gs.getDefaultProfile().has_value());
-    EXPECT_EQ(gs.getDefaultProfile().value(), "TestProfile");
+    settings::GeneralSettings settings;
+    settings.setDefaultProfile("TestProfile");
+    ASSERT_TRUE(settings.getDefaultProfile().has_value());
+    EXPECT_EQ(settings.getDefaultProfile().value(), "TestProfile");
 }
 
-TEST(GeneralSettings, UnsetDefaultProfile_HasDefaultProfileReturnsFalse)
+TEST(GeneralSettings, UnsetDefaultProfileHasDefaultProfileReturnsFalse)
 {
-    settings::GeneralSettings gs;
-    gs.setDefaultProfile("TestProfile");
-    gs.unsetDefaultProfile();
-    // EXPECT_FALSE(gs.hasDefaultProfile());
+    settings::GeneralSettings settings;
+    settings.setDefaultProfile("TestProfile");
+    settings.unsetDefaultProfile();
+    EXPECT_FALSE(settings.hasDefaultProfile());
 }
 
-TEST(GeneralSettings, UnsetDefaultProfile_GetReturnsNullopt)
+TEST(GeneralSettings, UnsetDefaultProfileGetReturnsNullopt)
 {
-    settings::GeneralSettings gs;
-    gs.setDefaultProfile("TestProfile");
-    gs.unsetDefaultProfile();
-    EXPECT_FALSE(gs.getDefaultProfile().has_value());
+    settings::GeneralSettings settings;
+    settings.setDefaultProfile("TestProfile");
+    settings.unsetDefaultProfile();
+    EXPECT_FALSE(settings.getDefaultProfile().has_value());
 }
 
 TEST(GeneralSettings, IsDirtyAfterConstruction)
 {
     // _version is set in constructor but never committed
-    settings::GeneralSettings gs;
-    EXPECT_TRUE(gs.isDirty());
+    settings::GeneralSettings settings;
+    EXPECT_TRUE(settings.isDirty());
 }
 
 TEST(GeneralSettings, NotDirtyAfterCommit)
 {
-    settings::GeneralSettings gs;
-    gs.commit();
-    EXPECT_FALSE(gs.isDirty());
+    settings::GeneralSettings settings;
+    settings.commit();
+    EXPECT_FALSE(settings.isDirty());
 }
 
 TEST(GeneralSettings, DirtyAfterSetDefaultProfile)
 {
-    settings::GeneralSettings gs;
-    gs.commit();
-    gs.setDefaultProfile("NewProfile");
-    EXPECT_TRUE(gs.isDirty());
+    settings::GeneralSettings settings;
+    settings.commit();
+    settings.setDefaultProfile("NewProfile");
+    EXPECT_TRUE(settings.isDirty());
 }
 
 TEST(GeneralSettings, NotDirtyAfterUnsetWithNoBaseline)
 {
-    settings::GeneralSettings gs;
-    gs.commit();   // commit clears version dirty; defaultProfile baseline=null
-    gs.setDefaultProfile("X");
-    gs.unsetDefaultProfile();
+    settings::GeneralSettings settings;
+    settings.commit(
+    );   // commit clears version dirty; defaultProfile baseline=null
+    settings.setDefaultProfile("X");
+    settings.unsetDefaultProfile();
     // baseline is still null, value is null -> not dirty for defaultProfile
     // version is also committed -> not dirty
-    EXPECT_FALSE(gs.isDirty());
+    EXPECT_FALSE(settings.isDirty());
 }
 
 TEST(GeneralSettings, DirtyAfterUnsetWhenProfileWasCommitted)
 {
-    settings::GeneralSettings gs;
-    gs.setDefaultProfile("X");
-    gs.commit();                // baseline for defaultProfile = "X"
-    gs.unsetDefaultProfile();   // value=null, baseline="X" -> dirty
-    EXPECT_TRUE(gs.isDirty());
+    settings::GeneralSettings settings;
+    settings.setDefaultProfile("X");
+    settings.commit();                // baseline for defaultProfile = "X"
+    settings.unsetDefaultProfile();   // value=null, baseline="X" -> dirty
+    EXPECT_TRUE(settings.isDirty());
 }
 
 TEST(GeneralSettings, KeyIsGeneralSettings)
 {
-    settings::GeneralSettings gs;
-    EXPECT_EQ(gs.getKey(), "generalSettings");
+    settings::GeneralSettings settings;
+    EXPECT_EQ(settings.getKey(), "generalSettings");
 }
 
 TEST(GeneralSettings, ToJsonContainsVersionAndDefaultProfileKeys)
 {
-    settings::GeneralSettings gs;
-    const auto                json = gs.toJson();
+    settings::GeneralSettings settings;
+    const auto                json = settings.toJson();
     EXPECT_TRUE(json.contains("version"));
     EXPECT_TRUE(json.contains("defaultProfile"));
 }
 
-TEST(GeneralSettings, FromJsonRoundTrip_DefaultProfilePreserved)
+TEST(GeneralSettings, FromJsonRoundTripDefaultProfilePreserved)
 {
     settings::GeneralSettings gs1;
     gs1.setDefaultProfile("RoundTrip");
@@ -138,7 +139,7 @@ TEST(GeneralSettings, FromJsonRoundTrip_DefaultProfilePreserved)
     EXPECT_EQ(gs2.getDefaultProfile().value(), "RoundTrip");
 }
 
-TEST(GeneralSettings, FromJsonRoundTrip_UnsetProfileIsNullopt)
+TEST(GeneralSettings, FromJsonRoundTripUnsetProfileIsNullopt)
 {
     settings::GeneralSettings gs1;
     // default profile is not set
@@ -151,7 +152,7 @@ TEST(GeneralSettings, FromJsonRoundTrip_UnsetProfileIsNullopt)
     EXPECT_FALSE(gs2.hasDefaultProfile());
 }
 
-TEST(GeneralSettings, FromJsonRoundTrip_NotDirtyAfterLoad)
+TEST(GeneralSettings, FromJsonRoundTripNotDirtyAfterLoad)
 {
     settings::GeneralSettings gs1;
     gs1.setDefaultProfile("Loaded");

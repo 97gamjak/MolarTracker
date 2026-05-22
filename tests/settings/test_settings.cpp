@@ -30,8 +30,8 @@ namespace
     {
         const auto tmp = std::filesystem::temp_directory_path();
 
-        std::random_device                           rd;
-        std::mt19937_64                              gen(rd());
+        std::random_device                           random;
+        std::mt19937_64                              gen(random());
         std::uniform_int_distribution<std::uint64_t> dis;
 
         return tmp / ("mt_settings_test_" + std::to_string(dis(gen)));
@@ -41,15 +41,15 @@ namespace
     {
         std::filesystem::path path;
 
-        explicit TempDir(std::filesystem::path p) : path(std::move(p))
+        explicit TempDir(std::filesystem::path path_) : path(std::move(path_))
         {
             std::filesystem::create_directories(path);
         }
 
         ~TempDir()
         {
-            std::error_code ec;
-            std::filesystem::remove_all(path, ec);
+            std::error_code errorCode;
+            std::filesystem::remove_all(path, errorCode);
         }
 
         TempDir(TempDir const&)            = delete;
@@ -59,44 +59,44 @@ namespace
     };
 }   // namespace
 
-TEST(Settings, ConstructWithTempDir_NoThrow)
+TEST(Settings, ConstructWithTempDirNoThrow)
 {
     const TempDir tmp{unique_temp_settings_dir()};
     EXPECT_NO_THROW((void) settings::Settings(tmp.path));
 }
 
-TEST(Settings, ConstructWithTempDir_GeneralSettingsAccessible)
-{
-    const TempDir        tmp{unique_temp_settings_dir()};
-    settings::Settings   s(tmp.path);
-    EXPECT_FALSE(s.getGeneralSettings().hasDefaultProfile());
-}
-
-TEST(Settings, ConstructWithTempDir_LoggingSettingsAccessible)
+TEST(Settings, ConstructWithTempDirGeneralSettingsAccessible)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
-    EXPECT_EQ(s.getLoggingSettings().getLogDirectory(), "logs");
+    settings::Settings settings(tmp.path);
+    EXPECT_FALSE(settings.getGeneralSettings().hasDefaultProfile());
 }
 
-TEST(Settings, ConstructWithTempDir_UISettingsAccessible)
+TEST(Settings, ConstructWithTempDirLoggingSettingsAccessible)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
+    settings::Settings settings(tmp.path);
+    EXPECT_EQ(settings.getLoggingSettings().getLogDirectory(), "logs");
+}
+
+TEST(Settings, ConstructWithTempDirUISettingsAccessible)
+{
+    const TempDir      tmp{unique_temp_settings_dir()};
+    settings::Settings settings(tmp.path);
     EXPECT_DOUBLE_EQ(
-        s.getUISettings().getLogViewerSettings().getReloadIntervalSec(),
+        settings.getUISettings().getLogViewerSettings().getReloadIntervalSec(),
         1.0
     );
 }
 
-TEST(Settings, ConstGetters_Work)
+TEST(Settings, ConstGettersWork)
 {
     const TempDir            tmp{unique_temp_settings_dir()};
-    const settings::Settings s(tmp.path);
-    EXPECT_FALSE(s.getGeneralSettings().hasDefaultProfile());
-    EXPECT_EQ(s.getLoggingSettings().getLogDirectory(), "logs");
+    const settings::Settings settings(tmp.path);
+    EXPECT_FALSE(settings.getGeneralSettings().hasDefaultProfile());
+    EXPECT_EQ(settings.getLoggingSettings().getLogDirectory(), "logs");
     EXPECT_DOUBLE_EQ(
-        s.getUISettings().getLogViewerSettings().getReloadIntervalSec(),
+        settings.getUISettings().getLogViewerSettings().getReloadIntervalSec(),
         1.0
     );
 }
@@ -106,26 +106,26 @@ TEST(Settings, IsDirtyAfterConstruction)
     // GeneralSettings sets _version in its constructor but doesn't commit,
     // so the top-level isDirty() returns true.
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
-    EXPECT_TRUE(s.isDirty());
+    settings::Settings settings(tmp.path);
+    EXPECT_TRUE(settings.isDirty());
 }
 
 TEST(Settings, KeyIsSettings)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
-    EXPECT_EQ(s.getKey(), "settings");
+    settings::Settings settings(tmp.path);
+    EXPECT_EQ(settings.getKey(), "settings");
 }
 
 TEST(Settings, SaveCreatesSettingsFile)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
+    settings::Settings settings(tmp.path);
 
     const auto file = tmp.path / "settings.json";
     ASSERT_FALSE(std::filesystem::exists(file));
 
-    s.save();
+    settings.save();
 
     EXPECT_TRUE(std::filesystem::exists(file));
 }
@@ -133,89 +133,96 @@ TEST(Settings, SaveCreatesSettingsFile)
 TEST(Settings, NotDirtyAfterSave)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
-    s.save();
-    EXPECT_FALSE(s.isDirty());
+    settings::Settings settings(tmp.path);
+    settings.save();
+    EXPECT_FALSE(settings.isDirty());
 }
 
 TEST(Settings, SaveFiresOnSavedCallback)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
+    settings::Settings settings(tmp.path);
 
     bool called = false;
-    auto conn   = s.subscribeToSaved([&called]() { called = true; }, nullptr);
+    auto conn =
+        settings.subscribeToSaved([&called]() { called = true; }, nullptr);
 
-    s.save();
+    settings.save();
     EXPECT_TRUE(called);
 }
 
-TEST(Settings, SubscribeToSaved_CallbackNotFiredBeforeSave)
+TEST(Settings, SubscribeToSavedCallbackNotFiredBeforeSave)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
+    settings::Settings settings(tmp.path);
 
     bool called = false;
-    auto conn   = s.subscribeToSaved([&called]() { called = true; }, nullptr);
+    auto conn =
+        settings.subscribeToSaved([&called]() { called = true; }, nullptr);
 
     EXPECT_FALSE(called);
 }
 
-TEST(Settings, IsDirty_TrueAfterSettingDefaultProfile)
+TEST(Settings, IsDirtyTrueAfterSettingDefaultProfile)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
-    s.save();   // clear initial dirty state
-    ASSERT_FALSE(s.isDirty());
+    settings::Settings settings(tmp.path);
+    settings.save();   // clear initial dirty state
+    ASSERT_FALSE(settings.isDirty());
 
-    s.getGeneralSettings().setDefaultProfile("Dirty");
-    EXPECT_TRUE(s.isDirty());
+    settings.getGeneralSettings().setDefaultProfile("Dirty");
+    EXPECT_TRUE(settings.isDirty());
 }
 
-TEST(Settings, IsDirty_FalseAfterSaveWhenDefaultProfileSet)
+TEST(Settings, IsDirtyFalseAfterSaveWhenDefaultProfileSet)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s(tmp.path);
-    s.getGeneralSettings().setDefaultProfile("Persisted");
-    s.save();
-    EXPECT_FALSE(s.isDirty());
+    settings::Settings settings(tmp.path);
+    settings.getGeneralSettings().setDefaultProfile("Persisted");
+    settings.save();
+    EXPECT_FALSE(settings.isDirty());
 }
 
-TEST(Settings, SaveAndReload_DefaultProfilePreserved)
+TEST(Settings, SaveAndReloadDefaultProfilePreserved)
 {
     const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s1(tmp.path);
-    s1.getGeneralSettings().setDefaultProfile("Persisted");
-    s1.save();
+    settings::Settings settings1(tmp.path);
+    settings1.getGeneralSettings().setDefaultProfile("Persisted");
+    settings1.save();
 
-    settings::Settings s2(tmp.path);
-    ASSERT_TRUE(s2.getGeneralSettings().hasDefaultProfile());
-    EXPECT_EQ(s2.getGeneralSettings().getDefaultProfile().value(), "Persisted");
-}
-
-TEST(Settings, SaveAndReload_NotDirtyAfterReload)
-{
-    const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s1(tmp.path);
-    s1.getGeneralSettings().setDefaultProfile("Reload");
-    s1.save();
-
-    settings::Settings s2(tmp.path);
-    EXPECT_FALSE(s2.isDirty());
-}
-
-TEST(Settings, SaveAndReload_LogLevelPreserved)
-{
-    const TempDir      tmp{unique_temp_settings_dir()};
-    settings::Settings s1(tmp.path);
-    const auto result =
-        s1.getLoggingSettings().getDefaultLogLevelParam().set(LogLevel::Debug);
-    ASSERT_TRUE(result.has_value());
-    s1.save();
-
-    settings::Settings s2(tmp.path);
+    settings::Settings settings2(tmp.path);
+    ASSERT_TRUE(settings2.getGeneralSettings().hasDefaultProfile());
     EXPECT_EQ(
-        s2.getLoggingSettings().getDefaultLogLevelParam().get(),
+        settings2.getGeneralSettings().getDefaultProfile().value(),
+        "Persisted"
+    );
+}
+
+TEST(Settings, SaveAndReloadNotDirtyAfterReload)
+{
+    const TempDir      tmp{unique_temp_settings_dir()};
+    settings::Settings settings1(tmp.path);
+    settings1.getGeneralSettings().setDefaultProfile("Reload");
+    settings1.save();
+
+    settings::Settings settings2(tmp.path);
+    EXPECT_FALSE(settings2.isDirty());
+}
+
+TEST(Settings, SaveAndReloadLogLevelPreserved)
+{
+    const TempDir      tmp{unique_temp_settings_dir()};
+    settings::Settings settings1(tmp.path);
+    const auto         result =
+        settings1.getLoggingSettings().getDefaultLogLevelParam().set(
+            LogLevel::Debug
+        );
+    ASSERT_TRUE(result.has_value());
+    settings1.save();
+
+    settings::Settings settings2(tmp.path);
+    EXPECT_EQ(
+        settings2.getLoggingSettings().getDefaultLogLevelParam().get(),
         LogLevel::Debug
     );
 }

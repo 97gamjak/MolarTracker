@@ -15,69 +15,75 @@
 
 #include "settings/ui_settings.hpp"
 
-TEST(UISettings, GetLogViewerSettings_ReturnsAccessibleRef)
+TEST(UISettings, GetLogViewerSettingsReturnsAccessibleRef)
 {
-    settings::UISettings ui;
-    EXPECT_DOUBLE_EQ(ui.getLogViewerSettings().getReloadIntervalSec(), 1.0);
+    settings::UISettings uiSettings;
+    EXPECT_DOUBLE_EQ(
+        uiSettings.getLogViewerSettings().getReloadIntervalSec(),
+        1.0
+    );
 }
 
-TEST(UISettings, GetDebugSlotsSettings_ReturnsAccessibleRef)
+TEST(UISettings, GetDebugSlotsSettingsReturnsAccessibleRef)
 {
-    settings::UISettings ui;
-    const auto           sz = ui.getDebugSlotsSettings().getWindowSize();
-    EXPECT_EQ(sz.first, 800);
-    EXPECT_EQ(sz.second, 600);
+    settings::UISettings uiSettings;
+    const auto size = uiSettings.getDebugSlotsSettings().getWindowSize();
+    EXPECT_EQ(size.first, 800);
+    EXPECT_EQ(size.second, 600);
 }
 
-TEST(UISettings, GetProfileUISettings_ReturnsAccessibleRef)
+TEST(UISettings, GetProfileUISettingsReturnsAccessibleRef)
 {
-    settings::UISettings ui;
-    const auto           sz = ui.getProfileUISettings().getDialogSize();
-    EXPECT_EQ(sz.first, 800);
-    EXPECT_EQ(sz.second, 600);
+    settings::UISettings uiSettings;
+    const auto size = uiSettings.getProfileUISettings().getDialogSize();
+    EXPECT_EQ(size.first, 800);
+    EXPECT_EQ(size.second, 600);
 }
 
-TEST(UISettings, ConstGetLogViewerSettings_Works)
+TEST(UISettings, ConstGetLogViewerSettingsWorks)
 {
-    const settings::UISettings ui;
-    EXPECT_DOUBLE_EQ(ui.getLogViewerSettings().getReloadIntervalSec(), 1.0);
+    const settings::UISettings uiSettings;
+    EXPECT_DOUBLE_EQ(
+        uiSettings.getLogViewerSettings().getReloadIntervalSec(),
+        1.0
+    );
 }
 
-TEST(UISettings, ConstGetDebugSlotsSettings_Works)
+TEST(UISettings, ConstGetDebugSlotsSettingsWorks)
 {
-    const settings::UISettings ui;
-    EXPECT_EQ(ui.getDebugSlotsSettings().getWindowSize().first, 800);
+    const settings::UISettings uiSettings;
+    EXPECT_EQ(uiSettings.getDebugSlotsSettings().getWindowSize().first, 800);
 }
 
-TEST(UISettings, ConstGetProfileUISettings_Works)
+TEST(UISettings, ConstGetProfileUISettingsWorks)
 {
-    const settings::UISettings ui;
-    EXPECT_EQ(ui.getProfileUISettings().getDialogSize().first, 800);
+    const settings::UISettings uiSettings;
+    EXPECT_EQ(uiSettings.getProfileUISettings().getDialogSize().first, 800);
 }
 
 TEST(UISettings, NotDirtyAfterConstruction)
 {
-    settings::UISettings ui;
-    EXPECT_FALSE(ui.isDirty());
+    settings::UISettings uiSettings;
+    EXPECT_FALSE(uiSettings.isDirty());
 }
 
 TEST(UISettings, KeyIsUiSettings)
 {
-    settings::UISettings ui;
-    EXPECT_EQ(ui.getKey(), "uiSettings");
+    settings::UISettings uiSettings;
+    EXPECT_EQ(uiSettings.getKey(), "uiSettings");
 }
 
 TEST(UISettings, ToJsonContainsSubSettingKeys)
 {
-    settings::UISettings ui;
-    const auto           json = ui.toJson();
+    settings::UISettings uiSettings;
+    const auto           json = uiSettings.toJson();
 
     EXPECT_TRUE(json.contains("logViewerSettings"));
     EXPECT_TRUE(json.contains("debugSlotsSettings"));
     EXPECT_TRUE(json.contains("profile_ui_settings"));
 }
 
-TEST(UISettings, FromJsonRoundTrip_SubSettingDefaultsPreserved)
+TEST(UISettings, FromJsonRoundTripSubSettingDefaultsPreserved)
 {
     settings::UISettings ui1;
     const auto           json = ui1.toJson();
@@ -85,15 +91,12 @@ TEST(UISettings, FromJsonRoundTrip_SubSettingDefaultsPreserved)
     settings::UISettings ui2;
     settings::UISettings::fromJson(json, ui2);
 
-    EXPECT_DOUBLE_EQ(
-        ui2.getLogViewerSettings().getReloadIntervalSec(),
-        1.0
-    );
+    EXPECT_DOUBLE_EQ(ui2.getLogViewerSettings().getReloadIntervalSec(), 1.0);
     EXPECT_EQ(ui2.getDebugSlotsSettings().getWindowSize().first, 800);
     EXPECT_EQ(ui2.getProfileUISettings().getDialogSize().second, 600);
 }
 
-TEST(UISettings, FromJsonRoundTrip_NotDirtyAfterLoad)
+TEST(UISettings, FromJsonRoundTripNotDirtyAfterLoad)
 {
     settings::UISettings ui1;
     const auto           json = ui1.toJson();

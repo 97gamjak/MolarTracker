@@ -22,83 +22,85 @@
 
 TEST(LoggingSettings, DefaultLogDirectoryIsLogs)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getLogDirectory(), "logs");
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getLogDirectory(), "logs");
 }
 
 TEST(LoggingSettings, DefaultLogFilePrefixIsMolarTracker)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getLogFilePrefix(), "molar_tracker_");
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getLogFilePrefix(), "molar_tracker_");
 }
 
 TEST(LoggingSettings, DefaultLogFileSuffixIsLog)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getLogFileSuffix(), ".log");
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getLogFileSuffix(), ".log");
 }
 
 TEST(LoggingSettings, DefaultMaxLogFilesIs10)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getMaxLogFiles(), std::size_t{10});
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getMaxLogFiles(), std::size_t{10});
 }
 
 TEST(LoggingSettings, DefaultMaxLogFileSizeMBIs50)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getMaxLogFileSizeMB(), std::size_t{50});
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getMaxLogFileSizeMB(), std::size_t{50});
 }
 
 TEST(LoggingSettings, DefaultLogLevelIsInfo)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getDefaultLogLevelParam().get(), LogLevel::Info);
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getDefaultLogLevelParam().get(), LogLevel::Info);
 }
 
 TEST(LoggingSettings, NotDirtyAfterConstruction)
 {
     // All params are configured via setDefault(), not set(), so value and
     // baseline both remain nullopt -> not dirty.
-    settings::LoggingSettings ls;
-    EXPECT_FALSE(ls.isDirty());
+    settings::LoggingSettings loggingSettings;
+    EXPECT_FALSE(loggingSettings.isDirty());
 }
 
 TEST(LoggingSettings, DefaultLogLevelIsNotRebootRequired)
 {
-    settings::LoggingSettings ls;
-    EXPECT_FALSE(ls.getDefaultLogLevelParam().isRebootRequired());
+    settings::LoggingSettings loggingSettings;
+    EXPECT_FALSE(loggingSettings.getDefaultLogLevelParam().isRebootRequired());
 }
 
 TEST(LoggingSettings, KeyIsLoggingSettings)
 {
-    settings::LoggingSettings ls;
-    EXPECT_EQ(ls.getKey(), "loggingSettings");
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getKey(), "loggingSettings");
 }
 
 TEST(LoggingSettings, DirtyAfterSettingLogLevel)
 {
-    settings::LoggingSettings ls;
-    ASSERT_FALSE(ls.isDirty());
+    settings::LoggingSettings loggingSettings;
+    ASSERT_FALSE(loggingSettings.isDirty());
 
-    const auto result = ls.getDefaultLogLevelParam().set(LogLevel::Debug);
+    const auto result =
+        loggingSettings.getDefaultLogLevelParam().set(LogLevel::Debug);
     EXPECT_TRUE(result.has_value());
-    EXPECT_TRUE(ls.isDirty());
+    EXPECT_TRUE(loggingSettings.isDirty());
 }
 
 TEST(LoggingSettings, NotDirtyAfterSettingThenCommitting)
 {
-    settings::LoggingSettings ls;
-    const auto result = ls.getDefaultLogLevelParam().set(LogLevel::Warning);
+    settings::LoggingSettings loggingSettings;
+    const auto                result =
+        loggingSettings.getDefaultLogLevelParam().set(LogLevel::Warning);
     EXPECT_TRUE(result.has_value());
-    ls.commit();
-    EXPECT_FALSE(ls.isDirty());
+    loggingSettings.commit();
+    EXPECT_FALSE(loggingSettings.isDirty());
 }
 
 TEST(LoggingSettings, ToJsonContainsAllParameterKeys)
 {
-    settings::LoggingSettings ls;
-    const auto                json = ls.toJson();
+    settings::LoggingSettings loggingSettings;
+    const auto                json = loggingSettings.toJson();
 
     EXPECT_TRUE(json.contains("logDirectory"));
     EXPECT_TRUE(json.contains("logFilePrefix"));
@@ -108,7 +110,7 @@ TEST(LoggingSettings, ToJsonContainsAllParameterKeys)
     EXPECT_TRUE(json.contains("defaultLogLevel"));
 }
 
-TEST(LoggingSettings, FromJsonRoundTrip_LogLevelPreserved)
+TEST(LoggingSettings, FromJsonRoundTripLogLevelPreserved)
 {
     settings::LoggingSettings ls1;
     const auto result1 = ls1.getDefaultLogLevelParam().set(LogLevel::Trace);
@@ -121,7 +123,7 @@ TEST(LoggingSettings, FromJsonRoundTrip_LogLevelPreserved)
     EXPECT_EQ(ls2.getDefaultLogLevelParam().get(), LogLevel::Trace);
 }
 
-TEST(LoggingSettings, FromJsonRoundTrip_DefaultsPreserved)
+TEST(LoggingSettings, FromJsonRoundTripDefaultsPreserved)
 {
     settings::LoggingSettings ls1;
     const auto                json = ls1.toJson();
@@ -136,7 +138,7 @@ TEST(LoggingSettings, FromJsonRoundTrip_DefaultsPreserved)
     EXPECT_EQ(ls2.getMaxLogFileSizeMB(), std::size_t{50});
 }
 
-TEST(LoggingSettings, FromJsonRoundTrip_NotDirtyAfterLoad)
+TEST(LoggingSettings, FromJsonRoundTripNotDirtyAfterLoad)
 {
     settings::LoggingSettings ls1;
     const auto result1 = ls1.getDefaultLogLevelParam().set(LogLevel::Error);
@@ -151,8 +153,8 @@ TEST(LoggingSettings, FromJsonRoundTrip_NotDirtyAfterLoad)
 
 TEST(LoggingSettingsException, MessageContainsPrefix)
 {
-    const settings::LoggingSettingsException ex("test error");
-    const std::string                        msg = ex.what();
+    const settings::LoggingSettingsException exception("test error");
+    const std::string                        msg = exception.what();
     EXPECT_NE(msg.find("LoggingSettingsException"), std::string::npos);
     EXPECT_NE(msg.find("test error"), std::string::npos);
 }

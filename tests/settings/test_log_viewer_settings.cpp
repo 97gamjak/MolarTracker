@@ -53,10 +53,10 @@ TEST(LogViewerSettings, DefaultLineWrapIsFalse)
 
 TEST(LogViewerSettings, DefaultDialogSizeIs800x600)
 {
-    settings::LogViewerSettings   lvs;
-    const std::pair<int, int> sz = lvs.getDialogSize();
-    EXPECT_EQ(sz.first, 800);
-    EXPECT_EQ(sz.second, 600);
+    settings::LogViewerSettings lvs;
+    const std::pair<int, int>   size = lvs.getDialogSize();
+    EXPECT_EQ(size.first, 800);
+    EXPECT_EQ(size.second, 600);
 }
 
 TEST(LogViewerSettings, DefaultMaxBlockCountIs50000)
@@ -95,7 +95,7 @@ TEST(LogViewerSettings, ToJsonContainsAllParameterKeys)
     EXPECT_TRUE(json.contains("maxBlockCount"));
 }
 
-TEST(LogViewerSettings, FromJsonRoundTrip_KeysPreserved)
+TEST(LogViewerSettings, FromJsonRoundTripKeysPreserved)
 {
     settings::LogViewerSettings lvs1;
     const auto                  json = lvs1.toJson();
@@ -111,7 +111,7 @@ TEST(LogViewerSettings, FromJsonRoundTrip_KeysPreserved)
     EXPECT_EQ(lvs2.getMaxBlockCount(), 50000);
 }
 
-TEST(LogViewerSettings, FromJsonRoundTrip_NotDirtyAfterLoad)
+TEST(LogViewerSettings, FromJsonRoundTripNotDirtyAfterLoad)
 {
     settings::LogViewerSettings lvs1;
     const auto                  json = lvs1.toJson();
@@ -124,8 +124,8 @@ TEST(LogViewerSettings, FromJsonRoundTrip_NotDirtyAfterLoad)
 
 TEST(LogViewerSettingsException, MessageContainsPrefix)
 {
-    const settings::LogViewerSettingsException ex("viewer error");
-    const std::string                          msg = ex.what();
+    const settings::LogViewerSettingsException exception("viewer error");
+    const std::string                          msg = exception.what();
     EXPECT_NE(msg.find("LogViewerSettingsException"), std::string::npos);
     EXPECT_NE(msg.find("viewer error"), std::string::npos);
 }
@@ -137,9 +137,9 @@ TEST(LogViewerSettingsException, MessageContainsPrefix)
 TEST(DebugSlotsSettings, DefaultWindowSizeIs800x600)
 {
     settings::DebugSlotsSettings dss;
-    const auto                   sz = dss.getWindowSize();
-    EXPECT_EQ(sz.first, 800);
-    EXPECT_EQ(sz.second, 600);
+    const auto                   size = dss.getWindowSize();
+    EXPECT_EQ(size.first, 800);
+    EXPECT_EQ(size.second, 600);
 }
 
 TEST(DebugSlotsSettings, NotDirtyAfterConstruction)
@@ -161,7 +161,7 @@ TEST(DebugSlotsSettings, ToJsonContainsWindowSizeKey)
     EXPECT_TRUE(json.contains("windowSize"));
 }
 
-TEST(DebugSlotsSettings, FromJsonRoundTrip_WindowSizePreserved)
+TEST(DebugSlotsSettings, FromJsonRoundTripWindowSizePreserved)
 {
     settings::DebugSlotsSettings dss1;
     const auto                   json = dss1.toJson();
@@ -180,9 +180,9 @@ TEST(DebugSlotsSettings, FromJsonRoundTrip_WindowSizePreserved)
 TEST(ProfileUISettings, DefaultDialogSizeIs800x600)
 {
     settings::ProfileUISettings pus;
-    const auto                  sz = pus.getDialogSize();
-    EXPECT_EQ(sz.first, 800);
-    EXPECT_EQ(sz.second, 600);
+    const auto                  size = pus.getDialogSize();
+    EXPECT_EQ(size.first, 800);
+    EXPECT_EQ(size.second, 600);
 }
 
 TEST(ProfileUISettings, NotDirtyAfterConstruction)
@@ -204,7 +204,7 @@ TEST(ProfileUISettings, ToJsonContainsDialogSizeKey)
     EXPECT_TRUE(json.contains("dialogSize"));
 }
 
-TEST(ProfileUISettings, FromJsonRoundTrip_DialogSizePreserved)
+TEST(ProfileUISettings, FromJsonRoundTripDialogSizePreserved)
 {
     settings::ProfileUISettings pus1;
     const auto                  json = pus1.toJson();
