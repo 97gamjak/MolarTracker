@@ -135,17 +135,25 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
         scale *= base;
 
     // Parse integer part.
+    // Parse integer part — std::from_chars detects out-of-range for us.
     int64_t intPart = 0;
-    for (const char character : intStr)
+    if (!intStr.empty())
     {
-        if (character < '0' || character > '9')
-        {
-            throw std::invalid_argument(
-                std::string{"microUnitsFromString: unexpected char '"} +
-                character + "'"
+        const auto [ptr, ec] = std::from_chars(
+            intStr.data(),
+            intStr.data() + intStr.size(),
+            intPart
+        );
+
+        if (ec == std::errc::result_out_of_range)
+            throw std::overflow_error(
+                "microUnitsFromString: integer part overflows int64_t"
             );
-        }
-        intPart = intPart * base + (character - '0');
+
+        if (ec != std::errc{} || ptr != intStr.data() + intStr.size())
+            throw std::invalid_argument(
+                "microUnitsFromString: malformed integer part"
+            );
     }
 
     // Parse fractional part: truncate or right-pad with zeros to exactly
