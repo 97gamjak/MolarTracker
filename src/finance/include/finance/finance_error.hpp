@@ -24,6 +24,8 @@ namespace finance
 #define YAHOO_FINANCE_ERROR(X) \
     X(HttpError)               \
     X(CurrencyUnknown)         \
+    X(PriceOverflow)           \
+    X(InvalidPriceString)      \
     X(Unknown)
 
     MSTD_ENUM(YahooFinanceErrorType, std::uint8_t, YAHOO_FINANCE_ERROR);
