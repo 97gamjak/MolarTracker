@@ -111,10 +111,10 @@ namespace tests
     class MockAccountService : public app::IAccountService
     {
        public:
-        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Account> preloadedAccounts;
         int                           createCallCount = 0;
-        /// NOLINTEND(misc-non-private-member-variables-in-classes)
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
@@ -140,10 +140,10 @@ namespace tests
     class MockInstrumentService : public app::IInstrumentService
     {
        public:
-        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::set<std::string> stocksInDb;
         int                   addStockCallCount = 0;
-        /// NOLINTEND(misc-non-private-member-variables-in-classes)
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextStockId      = 1;
@@ -189,9 +189,9 @@ namespace tests
     class MockPositionService : public app::IPositionService
     {
        public:
-        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         int createCallCount = 0;
-        /// NOLINTEND(misc-non-private-member-variables-in-classes)
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
@@ -223,9 +223,9 @@ namespace tests
     class MockTransactionService : public app::ITransactionService
     {
        public:
-        /// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         int addCallCount = 0;
-        /// NOLINTEND(misc-non-private-member-variables-in-classes)
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
