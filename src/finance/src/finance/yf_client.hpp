@@ -3,12 +3,14 @@
 
 #include <string>
 
+#include "finance/price_quote.hpp"
 #include "finance/ticker_info.hpp"
 #include "http/http_error.hpp"
 
 namespace http
 {
-    class HttpRequest;   // Forward declaration
+    class HttpRequest;    // Forward declaration
+    class HttpResponse;   // Forward declaration
 }   // namespace http
 
 namespace finance
@@ -68,9 +70,19 @@ namespace finance
             const std::string& ticker
         );
 
+        [[nodiscard]]
+        static std::expected<PriceQuote, YahooFinanceError> fetchPrice(
+            const std::string& ticker
+        );
+
        private:
         [[nodiscard]]
         static http::HttpRequest _buildRequest(const std::string& path);
+
+        [[nodiscard]]
+        static std::expected<http::HttpResponse, YahooFinanceError> _getRequest(
+            const std::string& path
+        );
     };
 
 }   // namespace finance

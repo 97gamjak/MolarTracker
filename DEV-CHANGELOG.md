@@ -73,6 +73,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add position store, service and repo
 - Add position creation when creating transactions
 - Add fees to creating stock and cash transactions
+- Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
 
 #### UI
 

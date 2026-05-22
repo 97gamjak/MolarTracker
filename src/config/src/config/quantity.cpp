@@ -136,13 +136,16 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
 
     // Parse integer part.
     int64_t intPart = 0;
-    for (const char c : intStr)
+    for (const char character : intStr)
     {
-        if (c < '0' || c > '9')
+        if (character < '0' || character > '9')
+        {
             throw std::invalid_argument(
-                std::string{"microUnitsFromString: unexpected char '"} + c + "'"
+                std::string{"microUnitsFromString: unexpected char '"} +
+                character + "'"
             );
-        intPart = intPart * base + (c - '0');
+        }
+        intPart = intPart * base + (character - '0');
     }
 
     // Parse fractional part: truncate or right-pad with zeros to exactly
@@ -164,5 +167,5 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
         fracPart += (character - '0') * fracScale;
     }
 
-    return static_cast<micro_units>(sign * (intPart * scale + fracPart));
+    return sign * (intPart * scale + fracPart);
 }
