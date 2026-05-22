@@ -414,7 +414,9 @@ namespace app
      * that corresponds to the specified currency, and can be used for various
      * operations that require referencing the external account.
      */
-    AccountId AccountStore::getExternalAccount(Currency currency) const
+    std::optional<AccountId> AccountStore::getExternalAccount(
+        Currency currency
+    ) const
     {
         const auto options = Options{
             .filter   = IsExternal() && HasCurrency(currency),
@@ -426,10 +428,7 @@ namespace app
         if (account.has_value())
             return account->getId();
 
-        throw AccountStoreException(
-            "No external account found for currency " +
-            CurrencyMeta::toString(currency)
-        );
+        return std::nullopt;
     }
 
     /**
