@@ -2,6 +2,7 @@
 #define __FINANCE__INCLUDE__FINANCE__PRICE_CACHE_HPP__
 
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 
@@ -16,6 +17,9 @@ namespace finance
     class PriceCache
     {
        private:
+        /// Mutex for synchronizing access to the cache.
+        mutable std::shared_mutex _mutex;
+
         /// Maps Yahoo Finance symbols to their price quotes.
         std::unordered_map<std::string, PriceQuote> _quotes;
 

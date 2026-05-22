@@ -1,5 +1,7 @@
 #include "finance/price_cache.hpp"
 
+#include <mutex>
+
 #include "finance/yf_client.hpp"
 #include "logging/log_macros.hpp"
 
@@ -16,6 +18,7 @@ namespace finance
         const std::unordered_map<std::string, PriceQuote>& quotes
     )
     {
+        std::unique_lock lock{_mutex};
         for (const auto& [symbol, quote] : quotes)
             _quotes.insert_or_assign(symbol, quote);
     }
@@ -30,6 +33,8 @@ namespace finance
         const std::string& yahooSymbol
     ) const
     {
+        std::shared_lock lock{_mutex};
+
         auto it = _quotes.find(yahooSymbol);
 
         if (it != _quotes.end())
@@ -42,7 +47,11 @@ namespace finance
      * @brief Clears all cached price quotes.
      *
      */
-    void PriceCache::clear() { _quotes.clear(); }
+    void PriceCache::clear()
+    {
+        std::unique_lock lock{_mutex};
+        _quotes.clear();
+    }
 
     /**
      * @brief Fetches a price quote from Yahoo Finance.
