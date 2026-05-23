@@ -88,12 +88,12 @@ namespace app
                                      : DeletionPolicy::ExcludeDelete
         };
 
-        auto stockExists = _getEntry(options).has_value();
+        auto exists = _getEntry(options).has_value();
 
         if (!isFullCache())
-            stockExists |= _instrumentService->stockExists(ticker);
+            exists |= _instrumentService->stockExists(ticker);
 
-        return stockExists;
+        return exists;
     }
 
     /**
