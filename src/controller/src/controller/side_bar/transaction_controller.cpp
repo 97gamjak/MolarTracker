@@ -1,5 +1,6 @@
 #include "transaction_controller.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 
 #include "app/store/account/account_store.hpp"
@@ -304,10 +305,29 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        const auto drafts = getOpenPositionDrafts(
+        auto drafts = getOpenPositionDrafts(
             _positionStore,
             _stockStore,
             _transactionStore
+        );
+
+        // TODO(97gamjak): as soon as coordinators are available this will be
+        // handled by them
+        // TODO(97gamjak): add also check for which account was requested
+        // remove from drafts if ticker does not match
+        std::erase_if(
+            drafts,
+            [&draft](const drafts::PositionDraft& _draft)
+            {
+                return std::ranges::all_of(
+                    draft.getLegs(),
+                    [&_draft](const auto& leg)
+                    {
+                        return leg.getTicker() !=
+                               _draft.getStockInfo().getTicker();
+                    }
+                );
+            }
         );
 
         PositionId positionId = PositionId::invalid();
