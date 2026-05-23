@@ -29,9 +29,14 @@ namespace app
         InstrumentServicePtr instrumentService,
         InstrumentIdSeq&     instrumentIdSeq
     )
-        : _instrumentService(std::move(instrumentService)),
+        : BaseStore<finance::Stock, StockId>(true),
+          _instrumentService(std::move(instrumentService)),
           _instrumentIdSeq(instrumentIdSeq)
     {
+        // empty id set returns all stocks
+        const auto& stocks = _instrumentService->getStocks({});
+
+        _addCleanEntries(stocks);
     }
 
     /**
@@ -83,8 +88,12 @@ namespace app
                                      : DeletionPolicy::ExcludeDelete
         };
 
-        return _getEntry(options).has_value() ||
-               _instrumentService->stockExists(ticker);
+        auto exists = _getEntry(options).has_value();
+
+        if (!isFullCache())
+            exists |= _instrumentService->stockExists(ticker);
+
+        return exists;
     }
 
     /**
@@ -182,18 +191,21 @@ namespace app
         for (const auto& entry : entries)
             stocks.push_back(entry);
 
-        options.deletion = DeletionPolicy::IncludeDelete;
-
-        for (const auto& stock : _instrumentService->getStocks(ids))
+        if (!isFullCache())
         {
-            const auto alreadyInStore = std::ranges::any_of(
-                _getValues(options),
-                [&](const Stock& stockInStore)
-                { return stockInStore.getId() == stock.getId(); }
-            );
+            options.deletion = DeletionPolicy::IncludeDelete;
 
-            if (!alreadyInStore)
-                stocks.push_back(stock);
+            for (const auto& stock : _instrumentService->getStocks(ids))
+            {
+                const auto alreadyInStore = std::ranges::any_of(
+                    _getValues(options),
+                    [&](const Stock& stockInStore)
+                    { return stockInStore.getId() == stock.getId(); }
+                );
+
+                if (!alreadyInStore)
+                    stocks.push_back(stock);
+            }
         }
 
         return stocks;
@@ -213,17 +225,20 @@ namespace app
         };
         auto stocksView = _getValues(options);
 
+        std::vector<Stock> stocks = {stocksView.begin(), stocksView.end()};
+
         if (stocksView.empty())
         {
-            // TODO(97gamjak): Handle case where stock is not found and needs to
-            // be searched for in database
-            return std::nullopt;
-        }
+            if (isFullCache())
+                return std::nullopt;
 
-        const std::vector<Stock> stocks = {
-            stocksView.begin(),
-            stocksView.end()
-        };
+            const auto dbStocks = _instrumentService->getStocks({id});
+
+            stocks.insert(stocks.end(), dbStocks.begin(), dbStocks.end());
+
+            if (stocks.empty())
+                return std::nullopt;
+        }
 
         if (stocks.size() > 1)
             throw std::runtime_error("Multiple stocks found");

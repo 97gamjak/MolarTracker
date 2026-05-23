@@ -146,7 +146,13 @@ namespace app
         /// Flag indicating whether the store has already notified subscribers
         bool _alreadyNotified = false;
 
+        /// Flag indicating whether the store is fully cached
+        bool _fullCache = false;
+
        public:
+        BaseStore() = default;
+        explicit BaseStore(bool fullCache);
+
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
 
@@ -186,6 +192,9 @@ namespace app
             StoreChanged<IdType>::func func,
             void*                      user
         );
+
+        [[nodiscard]]
+        bool isFullCache() const;
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;

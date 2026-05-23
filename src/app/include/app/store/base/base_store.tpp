@@ -16,6 +16,18 @@ namespace app
 {
 
     /**
+     * @brief Construct a new Base Store< T,  Id Type>:: Base Store object
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param fullCache
+     */
+    template <typename T, typename IdType>
+    BaseStore<T, IdType>::BaseStore(bool fullCache) : _fullCache(fullCache)
+    {
+    }
+
+    /**
      * @brief Checks if an entry with the given ID is marked as deleted in the
      * store.
      *
@@ -465,6 +477,19 @@ namespace app
 
         // when committing we don't want single notifications
         return StoreResult::Ok;
+    }
+
+    /**
+     * @brief Checks if the store is fully cached.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @return true if the store is fully cached, false otherwise.
+     */
+    template <typename T, typename IdType>
+    bool BaseStore<T, IdType>::isFullCache() const
+    {
+        return _fullCache;
     }
 
 }   // namespace app
