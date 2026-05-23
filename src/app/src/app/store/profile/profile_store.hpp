@@ -54,7 +54,8 @@ namespace app
         [[nodiscard]]
         std::vector<std::string> getAllProfileNames() const override;
 
-        void setActiveProfile(std::string_view name) override;
+        [[nodiscard]]
+        ProfileStoreResult setActiveProfile(std::string_view name) override;
 
         [[nodiscard]]
         std::optional<drafts::ProfileDraft> getActiveProfile() const override;

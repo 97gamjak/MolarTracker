@@ -117,7 +117,7 @@ TEST_F(ProfileStoreTest, GetAllProfileNamesReturnsAddedNames)
 TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameThrows)
 {
     EXPECT_THROW(
-        _store->setActiveProfile("NonExistent"),
+        const auto result = _store->setActiveProfile("NonExistent"),
         app::ProfileStoreException
     );
 }

@@ -84,19 +84,21 @@ namespace app
      * @brief Set the active profile by name
      *
      * @param name
+     *
+     * @return ProfileStoreResult
      */
-    void ProfileStore::setActiveProfile(std::string_view name)
+    ProfileStoreResult ProfileStore::setActiveProfile(std::string_view name)
     {
         const auto profile = _getProfile(name);
 
         if (!profile)
         {
-            throw ProfileStoreException(
-                std::format("Profile '{}' not found", name)
-            );
+            LOG_ERROR(std::format("Profile '{}' not found", name));
+            return ProfileStoreResult::ProfileNotFound;
         }
 
         _activeProfile.set(profile->getId());
+        return ProfileStoreResult::Ok;
     }
 
     /**

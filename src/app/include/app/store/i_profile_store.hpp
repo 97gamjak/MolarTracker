@@ -83,8 +83,10 @@ namespace app
          * @brief Set the Active Profile
          *
          * @param name
+         * @return ProfileStoreResult
          */
-        virtual void setActiveProfile(std::string_view name) = 0;
+        [[nodiscard]]
+        virtual ProfileStoreResult setActiveProfile(std::string_view name) = 0;
 
         /**
          * @brief Get the Active Profile
