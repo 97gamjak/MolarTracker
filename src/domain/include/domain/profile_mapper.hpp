@@ -17,7 +17,10 @@ namespace domain
     class ProfileMapper
     {
        public:
+        [[nodiscard]]
         static drafts::ProfileDraft toDraft(const Profile& profile);
+
+        [[nodiscard]]
         static Profile toProfile(const drafts::ProfileDraft& draft);
     };
 }   // namespace domain
