@@ -193,6 +193,9 @@ namespace app
             void*                      user
         );
 
+        [[nodiscard]]
+        bool isFullCache() const;
+
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
@@ -218,9 +221,6 @@ namespace app
         void _clearEntries();
 
         void _notifyOnCommit();
-
-        [[nodiscard]]
-        bool isFullCache() const;
 
        private:
         static bool _evalDeletionPolicy(

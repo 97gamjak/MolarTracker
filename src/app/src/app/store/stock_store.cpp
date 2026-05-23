@@ -229,7 +229,7 @@ namespace app
 
         if (stocksView.empty())
         {
-            if (!isFullCache())
+            if (isFullCache())
                 return std::nullopt;
 
             const auto dbStocks = _instrumentService->getStocks({id});
