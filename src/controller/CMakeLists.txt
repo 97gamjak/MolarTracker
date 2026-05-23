@@ -28,7 +28,7 @@ qt_add_library(molartracker_controller STATIC
     src/controller/handlers/dirty_handler.cpp
 
     # transaction
-    src/controller/transaction/transaction_helpers.cpp
+    src/controller/helpers.cpp
 
     src/controller/main_controller.cpp
 )

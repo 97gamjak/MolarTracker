@@ -8,11 +8,10 @@
 #include "app/store/transaction_store.hpp"
 #include "config/constants.hpp"
 #include "config/finance.hpp"
+#include "controller/helpers.hpp"
 #include "controller/side_bar/securities_controller.hpp"
-#include "controller/transaction/transaction_helpers.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/position_draft.hpp"
-#include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
@@ -305,35 +304,11 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        const auto openPositions = _positionStore.getOpenPositions();
-        std::vector<PositionId> positionIds;
-        for (const auto& position : openPositions)
-            positionIds.push_back(position.getId());
-
-        std::vector<drafts::PositionDraft> drafts;
-        for (const auto& position : openPositions)
-        {
-            const auto instrumentIds =
-                _transactionStore.getInstrumentIdsByPositionId(position.getId()
-                );
-
-            const auto& stocks = _stockStore.getStocks(instrumentIds);
-
-            if (stocks.empty())
-            {
-                LOG_WARNING(
-                    "No stock found for instrument id: " +
-                    position.getId().toString()
-                );
-                continue;
-            }
-
-            drafts.emplace_back(
-                position.getId(),
-                drafts::StockMapper::toStockInfoDraft(stocks.front()),
-                position.getCreatedAt()
-            );
-        }
+        const auto drafts = getOpenPositionDrafts(
+            _positionStore,
+            _stockStore,
+            _transactionStore
+        );
 
         PositionId positionId = PositionId::invalid();
         if (drafts.size() > 0)

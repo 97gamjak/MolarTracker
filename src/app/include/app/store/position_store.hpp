@@ -37,8 +37,14 @@ namespace app
         [[nodiscard]]
         PositionId createPosition(const finance::Position& position);
 
-        [[nodiscard]] std::vector<finance::Position> getAllPositions() const;
-        [[nodiscard]] std::vector<finance::Position> getOpenPositions() const;
+        [[nodiscard]]
+        std::vector<finance::Position> getAllPositions() const;
+        [[nodiscard]]
+        std::vector<finance::Position> getOpenPositions() const;
+        [[nodiscard]]
+        std::vector<finance::Position> getOpenPositions(
+            const idSet<AccountId>& accountIds
+        ) const;
 
         void commit();
     };

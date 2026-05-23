@@ -79,4 +79,15 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Get the price of the financial instrument.
+     *
+     * @return const finance::Cash& The price of the financial instrument.
+     */
+    [[nodiscard]]
+    const finance::Cash& PriceQuote::getPrice() const
+    {
+        return _price;
+    }
+
 }   // namespace finance

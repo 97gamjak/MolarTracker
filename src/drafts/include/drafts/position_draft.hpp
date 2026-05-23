@@ -42,6 +42,28 @@ namespace drafts
 
         [[nodiscard]] PositionId getPositionId() const;
     };
+
+    /**
+     * @brief Represents a detailed draft for a position in the trading system
+     *
+     */
+    class PositionDetailDraft : public PositionDraft
+    {
+       private:
+        /// The quantity of the position
+        int _quantity;
+
+       public:
+        explicit PositionDetailDraft(
+            PositionId               positionId,
+            StockInfoDraft           stockInfo,
+            Timestamp                createdAt,
+            int                      quantity,
+            std::optional<Timestamp> closedAt = std::nullopt
+        );
+
+        [[nodiscard]] int getQuantity() const;
+    };
 }   // namespace drafts
 
 #endif   // __DRAFTS__INCLUDE__DRAFTS__POSITION_DRAFT_HPP__

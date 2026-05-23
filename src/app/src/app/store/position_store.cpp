@@ -115,6 +115,20 @@ namespace app
     {
         const auto accountIds = _session->accountSession.getIds();
 
+        return getOpenPositions(accountIds);
+    }
+
+    /**
+     * @brief Get all open positions
+     *
+     * @param accountIds
+     *
+     * @return std::vector<finance::Position>
+     */
+    std::vector<finance::Position> PositionStore::getOpenPositions(
+        const idSet<AccountId>& accountIds
+    ) const
+    {
         if (accountIds.empty())
             return {};
 

@@ -65,6 +65,9 @@ namespace controller
               _accountController(
                   _undoStack,
                   _appContext.getStore().getAccountStore(),
+                  _appContext.getStore().getPositionStore(),
+                  _appContext.getStore().getStockStore(),
+                  _appContext.getStore().getTransactionStore(),
                   _mainWindow.getCentralWidget()
               ),
               _transactionController(
