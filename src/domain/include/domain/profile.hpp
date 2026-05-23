@@ -1,7 +1,5 @@
 #ifndef __DOMAIN__INCLUDE__DOMAIN__PROFILE_HPP__
-
 #define __DOMAIN__INCLUDE__DOMAIN__PROFILE_HPP__
-
 
 #include <optional>
 #include <string>
