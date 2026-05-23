@@ -73,6 +73,7 @@ namespace app
 
         void commit() override;
 
+        [[nodiscard]]
         Connection subscribeToProfileChange(
             const OnProfileChanged::func& func,
             void*                         user
