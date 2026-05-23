@@ -57,7 +57,12 @@ class Quantity
     [[nodiscard]]
     std::string toString() const;
 
+    Quantity&          operator+=(const Quantity& other);
     [[nodiscard]] bool operator>(const Quantity& other) const;
+
+    /********************
+     * friend operators *
+     ********************/
 
     template <typename T>
     friend bool operator>(const Quantity& lhs, const T& rhs);

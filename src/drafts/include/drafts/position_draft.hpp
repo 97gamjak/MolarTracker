@@ -2,6 +2,7 @@
 #define __DRAFTS__INCLUDE__DRAFTS__POSITION_DRAFT_HPP__
 
 #include "config/id_types.hpp"
+#include "config/quantity.hpp"
 #include "drafts/stock_draft.hpp"
 #include "utils/timestamp.hpp"
 
@@ -51,18 +52,18 @@ namespace drafts
     {
        private:
         /// The quantity of the position
-        int _quantity;
+        Quantity _quantity;
 
        public:
         explicit PositionDetailDraft(
             PositionId               positionId,
             StockInfoDraft           stockInfo,
             Timestamp                createdAt,
-            int                      quantity,
+            Quantity                 quantity,
             std::optional<Timestamp> closedAt = std::nullopt
         );
 
-        [[nodiscard]] int getQuantity() const;
+        [[nodiscard]] Quantity getQuantity() const;
     };
 }   // namespace drafts
 

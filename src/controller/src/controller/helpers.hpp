@@ -18,6 +18,7 @@ namespace drafts
 {
     class CreateStockTransactionDraft;   // Forward declaration
     class PositionDraft;                 // Forward declaration
+    class PositionDetailDraft;           // Forward declaration
 }   // namespace drafts
 
 namespace controller
@@ -27,7 +28,7 @@ namespace controller
         const app::StockStore&               stockStore
     );
 
-    std::vector<drafts::PositionDraft> getOpenPositionDrafts(
+    std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
         AccountId                    account,
         const app::PositionStore&    positionStore,
         const app::StockStore&       stockStore,

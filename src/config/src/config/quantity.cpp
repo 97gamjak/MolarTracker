@@ -52,6 +52,18 @@ bool Quantity::operator>(const Quantity& other) const
 }
 
 /**
+ * @brief Adds another quantity to this quantity.
+ *
+ * @param other The other quantity to add.
+ * @return A reference to this quantity.
+ */
+Quantity& Quantity::operator+=(const Quantity& other)
+{
+    _value += other._value;
+    return *this;
+}
+
+/**
  * @brief Negate the quantity.
  *
  * @param quantity The quantity to negate.

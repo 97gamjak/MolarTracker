@@ -186,9 +186,11 @@ namespace logging
             return;
 
         std::string buffer;
+        std::string prefix;
 
-        buffer += _logLevelToString(logObject.level);
-        buffer += " [" + Timestamp().iso8601TimeMs() + "] ";
+        prefix += _logLevelToString(logObject.level);
+        prefix += " [" + Timestamp().iso8601TimeMs() + "] ";
+        buffer += prefix;
         buffer += logObject.message;
         if (logObject.level >= LogLevel::Debug ||
             logObject.level == LogLevel::Error)
@@ -198,6 +200,16 @@ namespace logging
             buffer += " in ";
             buffer += logObject.function;
             buffer += ")";
+        }
+
+        // replace all new lines in buffer with a new line following by n
+        // whitespaces according to the length of the prefix
+        const auto             prefixLength = prefix.length();
+        std::string::size_type pos          = 0;
+        while ((pos = buffer.find('\n', pos)) != std::string::npos)
+        {
+            buffer.insert(pos + 1, prefixLength, ' ');
+            pos += prefixLength + 1;
         }
 
         _ringFile->writeLine(buffer);

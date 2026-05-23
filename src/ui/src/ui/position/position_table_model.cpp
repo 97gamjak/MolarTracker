@@ -87,9 +87,12 @@ namespace ui
                             "yyyy-MM-dd"
                         );
 
-                    // TODO(97gamjak): wire up once PositionDraft (or
+                    // TODO(97gamjak): wire up once PositionDetailDraft (or
                     // PositionSummary) carries aggregated trade-leg fields.
                     case PositionColumns::Quantity:
+                        return QString::fromStdString(
+                            pos.getQuantity().toString()
+                        );
                     case PositionColumns::AvgCost:
                     case PositionColumns::CostBasis:
                         return tr("—");
@@ -184,7 +187,7 @@ namespace ui
     }
 
     void PositionTableModel::setPositions(
-        const std::vector<drafts::PositionDraft>& positions
+        const std::vector<drafts::PositionDetailDraft>& positions
     )
     {
         beginResetModel();
@@ -197,8 +200,8 @@ namespace ui
     // ---------------------------------------------------------------------------
 
     QVariant PositionTableModel::_priceDisplay(
-        const drafts::PositionDraft& pos,
-        PositionColumns              col
+        const drafts::PositionDetailDraft& pos,
+        PositionColumns                    col
     ) const
     {
         // TODO: replace getTicker() with yahooSymbol once available on the

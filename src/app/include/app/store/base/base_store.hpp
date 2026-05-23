@@ -7,11 +7,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "config/logging_base.hpp"
 #include "config/signal_tags.hpp"
 #include "config/strong_id.hpp"
 #include "connections/observable.hpp"
 #include "filter/predicate.hpp"
 #include "i_store.hpp"
+#include "logging/log_category.hpp"
 #include "store_state.hpp"
 
 namespace app
@@ -212,6 +214,8 @@ namespace app
         void _clearEntries();
 
         void _notifyOnCommit();
+
+        void _logCache(const std::string& category, LogLevel level);
 
        private:
         static bool _evalDeletionPolicy(

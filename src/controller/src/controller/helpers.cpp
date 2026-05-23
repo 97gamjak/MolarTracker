@@ -4,6 +4,7 @@
 #include "app/store/stock_store.hpp"
 #include "app/store/transaction_store.hpp"
 #include "drafts/position_draft.hpp"
+#include "drafts/stock_draft.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/position.hpp"
@@ -39,46 +40,34 @@ namespace controller
     namespace
     {
         /**
-         * @brief Get position drafts from the given positions
+         * @brief Get stock info draft by position
          *
-         * @param positions
+         * @param position
          * @param stockStore
          * @param transactionStore
-         * @return std::vector<drafts::PositionDraft>
+         * @return std::optional<drafts::StockInfoDraft>
          */
-        std::vector<drafts::PositionDraft> _getPositionDrafts(
-            const std::vector<finance::Position>& positions,
-            const app::StockStore&                stockStore,
-            const app::TransactionStore&          transactionStore
+        std::optional<drafts::StockInfoDraft> _getStockInfoByPosition(
+            const finance::Position&     position,
+            const app::StockStore&       stockStore,
+            const app::TransactionStore& transactionStore
         )
         {
-            std::vector<drafts::PositionDraft> drafts;
-            for (const auto& position : positions)
+            const auto ids =
+                transactionStore.getInstrumentIdsByPositionId(position.getId());
+
+            const auto& stocks = stockStore.getStocks(ids);
+
+            if (stocks.empty())
             {
-                const auto instrumentIds =
-                    transactionStore.getInstrumentIdsByPositionId(
-                        position.getId()
-                    );
-
-                const auto& stocks = stockStore.getStocks(instrumentIds);
-
-                if (stocks.empty())
-                {
-                    LOG_WARNING(
-                        "No stock found for instrument id: " +
-                        position.getId().toString()
-                    );
-                    continue;
-                }
-
-                drafts.emplace_back(
-                    position.getId(),
-                    drafts::StockMapper::toStockInfoDraft(stocks.front()),
-                    position.getCreatedAt()
+                LOG_WARNING(
+                    "No stock found for instrument id: " +
+                    position.getId().toString()
                 );
+                return std::nullopt;
             }
 
-            return drafts;
+            return drafts::StockMapper::toStockInfoDraft(stocks.front());
         }
     }   // namespace
 
@@ -97,7 +86,24 @@ namespace controller
     )
     {
         const auto positions = positionStore.getOpenPositions();
-        return _getPositionDrafts(positions, stockStore, transactionStore);
+
+        std::vector<drafts::PositionDraft> drafts;
+        for (const auto& position : positions)
+        {
+            const auto& stock =
+                _getStockInfoByPosition(position, stockStore, transactionStore);
+
+            if (!stock)
+                continue;
+
+            drafts.emplace_back(
+                position.getId(),
+                stock.value(),
+                position.getCreatedAt()
+            );
+        }
+
+        return drafts;
     }
 
     /**
@@ -109,7 +115,7 @@ namespace controller
      * @param transactionStore
      * @return std::vector<drafts::PositionDraft>
      */
-    std::vector<drafts::PositionDraft> getOpenPositionDrafts(
+    std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
         AccountId                    account,
         const app::PositionStore&    positionStore,
         const app::StockStore&       stockStore,
@@ -117,7 +123,51 @@ namespace controller
     )
     {
         const auto positions = positionStore.getOpenPositions({account});
-        return _getPositionDrafts(positions, stockStore, transactionStore);
+
+        std::vector<drafts::PositionDetailDraft> drafts;
+        for (const auto& position : positions)
+        {
+            const auto txs =
+                transactionStore.findTransactionsByPositionId(position.getId());
+
+            if (txs.empty())
+            {
+                LOG_ERROR(
+                    "No transactions found for position id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            const auto transactions = finance::Transactions{txs};
+
+            const auto instrumentIds = transactions.getInstrumentIds();
+            const auto instrumentIdSet =
+                idSet<InstrumentId>(instrumentIds.begin(), instrumentIds.end());
+
+            const auto& stocks = stockStore.getStocks(instrumentIdSet);
+
+            if (stocks.empty())
+            {
+                LOG_ERROR(
+                    "No stock found for instrument id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            const auto stockInfo =
+                drafts::StockMapper::toStockInfoDraft(stocks.front());
+
+            drafts.emplace_back(
+                position.getId(),
+                stockInfo,
+                position.getCreatedAt(),
+                transactions.calculateTotalQuantity()
+            );
+        }
+
+        return drafts;
     }
 
 }   // namespace controller

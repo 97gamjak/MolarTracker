@@ -98,6 +98,8 @@ namespace app
     {
         LOG_ENTRY;
 
+        _logCache(LOG_CATEGORY, LogLevel::Trace);
+
         for (const auto& entry : _getEntries())
         {
             switch (entry.state)
@@ -111,13 +113,14 @@ namespace app
                         )
                     );
 
+                    const auto oldId = entry.value.getId();
                     const auto id =
                         _transactionService->addTransaction(entry.value);
 
                     auto persisted = entry.value;
                     persisted.setId(id);
                     _commitEntry(
-                        entry.value.getId(),
+                        oldId,
                         Entry{.value = persisted, .state = entry.state}
                     );
                     break;
@@ -129,6 +132,8 @@ namespace app
                     break;
             }
         }
+
+        _logCache(LOG_CATEGORY, LogLevel::Trace);
 
         _notifyOnCommit();
     }
@@ -193,7 +198,7 @@ namespace app
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions(
+    std::vector<finance::Transaction> TransactionStore::get(
         const finance::TransactionFilter& filter
     ) const
     {
@@ -221,12 +226,8 @@ namespace app
 
         for (const auto& transaction : transactions)
         {
-            // Only include transactions that are new, for all others the id is
-            // already in the database and we will get it from there
-            if (transaction.state != StoreState::New)
-                transactionIds.insert(transaction.value.getId());
-            else
-                results.push_back(transaction.value);
+            transactionIds.insert(transaction.value.getId());
+            results.push_back(transaction.value);
         }
 
         for (const auto& transaction : dbTransactions)
@@ -258,7 +259,7 @@ namespace app
     {
         auto filter = finance::TransactionFilter();
         filter.setPositionId(positionId);
-        const auto transactions = getTransactions(filter);
+        const auto transactions = get(filter);
 
         return transactions;
     }

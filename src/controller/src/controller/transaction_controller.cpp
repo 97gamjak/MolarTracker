@@ -77,7 +77,7 @@ namespace controller
         if (focus)
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
-        const auto transactions = _transactionStore.getTransactions();
+        const auto transactions = _transactionStore.get();
         const auto drafts       = drafts::TransactionMapper::toOverviewDrafts(
             transactions,
             _stockStore.getInstrumentIdToNameMap(),

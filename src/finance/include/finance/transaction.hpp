@@ -9,17 +9,12 @@
 #include "config/strong_id.hpp"
 #include "finance/cash.hpp"
 #include "finance/trade_data.hpp"
+#include "transaction_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
 {
-    struct CashData
-    {
-    };
-
-    using TransactionData = std::variant<CashData, TradeData>;
-
     /**
      * @brief A class representing a financial transaction, which may involve
      * multiple accounts and cash movements. This class serves as a base for
@@ -70,7 +65,8 @@ namespace finance
         [[nodiscard]] TransactionData&                     getData();
         [[nodiscard]] std::vector<InstrumentId> getInstrumentIds() const;
 
-        [[nodiscard]] Cash calculateTotalSum() const;
+        [[nodiscard]] Cash     calculateTotalSum() const;
+        [[nodiscard]] Quantity calculateTotalQuantity() const;
 
         void setId(TransactionId id);
         void addEntry(const TransactionEntry& entry);
@@ -79,6 +75,21 @@ namespace finance
         [[nodiscard]] std::vector<TradeLeg> getLegs() const;
 
         [[nodiscard]] std::string toString() const;
+    };
+
+    class Transactions
+    {
+       private:
+        std::vector<Transaction> _transactions;
+
+       public:
+        explicit Transactions(const std::vector<Transaction>& transactions);
+
+        [[nodiscard]]
+        Quantity calculateTotalQuantity() const;
+
+        [[nodiscard]]
+        std::vector<InstrumentId> getInstrumentIds() const;
     };
 
     /**

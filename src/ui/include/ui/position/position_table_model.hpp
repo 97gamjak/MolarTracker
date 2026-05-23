@@ -9,13 +9,13 @@
 
 namespace drafts
 {
-    class PositionDraft;
-}
+    class PositionDetailDraft;   // Forward declaration
+}   // namespace drafts
 
 namespace finance
 {
-    class PriceCache;
-}
+    class PriceCache;   // Forward declaration
+}   // namespace finance
 
 namespace ui
 {
@@ -28,7 +28,7 @@ namespace ui
     {
         Q_OBJECT
         /// Vector of position drafts
-        std::vector<drafts::PositionDraft> _positions;
+        std::vector<drafts::PositionDetailDraft> _positions;
         /// Pointer to the price cache
         const finance::PriceCache* _priceCache;
 
@@ -56,13 +56,15 @@ namespace ui
 
         void refreshPrices();
 
-        void setPositions(const std::vector<drafts::PositionDraft>& positions);
+        void setPositions(
+            const std::vector<drafts::PositionDetailDraft>& positions
+        );
 
        private:
         [[nodiscard]]
         QVariant _priceDisplay(
-            const drafts::PositionDraft& pos,
-            PositionColumns              col
+            const drafts::PositionDetailDraft& pos,
+            PositionColumns                    col
         ) const;
 
         [[nodiscard]]

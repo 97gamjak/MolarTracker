@@ -467,6 +467,35 @@ namespace app
         return StoreResult::Ok;
     }
 
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_logCache(
+        const std::string& category,
+        LogLevel           level
+    )
+    {
+        if (logging::LogManager::getInstance().isEnabled(category, level))
+        {
+            EXPLICIT_LOG(
+                level,
+                category,
+                std::format("Cache contents ({}):", _entries.size())
+            );
+
+            for (const auto& entry : _entries)
+            {
+                EXPLICIT_LOG(
+                    level,
+                    category,
+                    std::format(
+                        "Cache: {{value: {}, state: {}}}",
+                        entry.value.toString(),
+                        StoreStateMeta::toString(entry.state)
+                    )
+                );
+            }
+        }
+    }
+
 }   // namespace app
 
 #endif   // __APP__INCLUDE__APP__STORE__BASE__BASE_STORE_TPP__

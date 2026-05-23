@@ -139,4 +139,18 @@ namespace finance
      */
     void TradeData::addLeg(const TradeLeg& leg) { _legs.push_back(leg); }
 
+    /**
+     * @brief Gets the quantity of the trade data.
+     *
+     * @return Quantity The quantity of the trade data.
+     */
+    Quantity TradeData::calculateTotalQuantity() const
+    {
+        Quantity totalQuantity{0};
+        for (const auto& leg : _legs)
+            totalQuantity += leg.getQuantity();
+
+        return totalQuantity;
+    }
+
 }   // namespace finance

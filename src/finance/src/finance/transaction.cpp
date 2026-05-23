@@ -6,6 +6,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/trade_data.hpp"
+#include "finance/transaction_data.hpp"
 
 namespace finance
 {
@@ -242,6 +243,16 @@ namespace finance
     }
 
     /**
+     * @brief Calculates the total quantity of the transaction.
+     *
+     * @return Quantity
+     */
+    Quantity Transaction::calculateTotalQuantity() const
+    {
+        return getTotalQuantity(_data);
+    }
+
+    /**
      * @brief Adds a leg to the transaction.
      *
      * @param leg The trade leg to add.
@@ -260,6 +271,47 @@ namespace finance
         };
 
         std::visit(Visitor{leg}, _data);
+    }
+
+    /**
+     * @brief Construct a new Transactions:: Transactions object
+     *
+     * @param transactions
+     */
+    Transactions::Transactions(const std::vector<Transaction>& transactions)
+        : _transactions(transactions)
+    {
+    }
+
+    /**
+     * @brief Calculates the total quantity of all transactions.
+     *
+     * @return Quantity The total quantity of all transactions.
+     */
+    Quantity Transactions::calculateTotalQuantity() const
+    {
+        Quantity total{0};
+        for (const auto& transaction : _transactions)
+            total += transaction.calculateTotalQuantity();
+
+        return total;
+    }
+
+    /**
+     * @brief Gets the instrument IDs associated with all transactions.
+     *
+     * @return std::vector<InstrumentId> A vector of instrument IDs associated
+     * with all transactions.
+     */
+    std::vector<InstrumentId> Transactions::getInstrumentIds() const
+    {
+        std::vector<InstrumentId> ids;
+        for (const auto& transaction : _transactions)
+        {
+            const auto txIds = transaction.getInstrumentIds();
+            ids.insert(ids.end(), txIds.begin(), txIds.end());
+        }
+        return ids;
     }
 
 }   // namespace finance

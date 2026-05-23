@@ -10,6 +10,7 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction.cpp
     ${SOURCE_DIR}/transaction_filter.cpp
     ${SOURCE_DIR}/transaction_entry.cpp
+    ${SOURCE_DIR}/transaction_data.cpp
     ${SOURCE_DIR}/trade_data.cpp
     ${SOURCE_DIR}/ticker_info.cpp
     ${SOURCE_DIR}/yf_client.cpp

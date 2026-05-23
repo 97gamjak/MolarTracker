@@ -144,6 +144,11 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Update the cash account details displayed in the view
+     *
+     * @param account The account data to display
+     */
     void AccountDetailView::updateCashAccount(const AccountDraft& account)
     {
         if (account.kind != AccountKind::Cash)
@@ -165,9 +170,15 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Update the security account details displayed in the view
+     *
+     * @param account The account data to display
+     * @param positions The positions associated with the account
+     */
     void AccountDetailView::updateSecurityAccount(
-        const AccountDraft&                       account,
-        const std::vector<drafts::PositionDraft>& positions
+        const AccountDraft&                             account,
+        const std::vector<drafts::PositionDetailDraft>& positions
     )
     {
         if (account.kind != AccountKind::Security)

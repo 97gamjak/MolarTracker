@@ -67,7 +67,7 @@ namespace app
         TransactionStoreResult addTransaction(finance::Transaction transaction);
 
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions(
+        std::vector<finance::Transaction> get(
             const finance::TransactionFilter& filter =
                 finance::TransactionFilter()
         ) const;

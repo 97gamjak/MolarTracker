@@ -73,6 +73,8 @@ namespace finance
         [[nodiscard]] const std::vector<TradeLeg>& getLegs() const;
         [[nodiscard]] std::vector<TradeLeg>&       getLegs();
 
+        [[nodiscard]] Quantity calculateTotalQuantity() const;
+
         void addLeg(const TradeLeg& leg);
     };
 

@@ -1,5 +1,6 @@
 #include "drafts/position_draft.hpp"
 
+#include "config/quantity.hpp"
 #include "drafts/stock_draft.hpp"
 
 namespace drafts
@@ -55,5 +56,34 @@ namespace drafts
      * @return PositionId The position ID
      */
     PositionId PositionDraft::getPositionId() const { return _positionId; }
+
+    /**
+     * @brief Construct a new Position Detail Draft:: Position Detail Draft
+     * object
+     *
+     * @param positionId
+     * @param stockInfo
+     * @param createdAt
+     * @param quantity
+     * @param closedAt
+     */
+    PositionDetailDraft::PositionDetailDraft(
+        PositionId               positionId,
+        StockInfoDraft           stockInfo,
+        Timestamp                createdAt,
+        Quantity                 quantity,
+        std::optional<Timestamp> closedAt
+    )
+        : PositionDraft(positionId, std::move(stockInfo), createdAt, closedAt),
+          _quantity(quantity)
+    {
+    }
+
+    /**
+     * @brief Get the quantity of the position detail draft
+     *
+     * @return Quantity The quantity
+     */
+    Quantity PositionDetailDraft::getQuantity() const { return _quantity; }
 
 }   // namespace drafts
