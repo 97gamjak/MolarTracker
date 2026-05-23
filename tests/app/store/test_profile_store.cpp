@@ -114,11 +114,11 @@ TEST_F(ProfileStoreTest, GetAllProfileNamesReturnsAddedNames)
     EXPECT_EQ(names.size(), 2U);
 }
 
-TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameThrows)
+TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameRetrnsError)
 {
-    EXPECT_THROW(
-        const auto result = _store->setActiveProfile("NonExistent"),
-        app::ProfileStoreException
+    EXPECT_EQ(
+        _store->setActiveProfile("NonExistent"),
+        app::ProfileStoreResult::ProfileNotFound
     );
 }
 
