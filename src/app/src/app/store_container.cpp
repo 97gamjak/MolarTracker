@@ -95,7 +95,12 @@ namespace app
     void StoreContainer::clearPotentiallyDirty()
     {
         for (auto* store : _allStores)
+        {
+            if (store == nullptr)
+                throw std::runtime_error("Store is null");
+
             store->clearPotentiallyDirty();
+        }
     }
 
     /**
@@ -107,7 +112,13 @@ namespace app
     {
         return std::ranges::any_of(
             _allStores,
-            [](const auto* store) { return store->isDirty(); }
+            [](const auto* store)
+            {
+                if (store == nullptr)
+                    throw std::runtime_error("Store is null");
+
+                return store->isDirty();
+            }
         );
     }
 
@@ -136,7 +147,12 @@ namespace app
         Connections connections;
 
         for (auto* store : _allStores)
+        {
+            if (store == nullptr)
+                throw std::runtime_error("Store is null");
+
             connections.add(store->subscribeToDirty(func, user));
+        }
 
         return connections;
     }
