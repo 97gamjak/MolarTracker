@@ -5,10 +5,11 @@
 #include <ranges>
 #include <utility>
 
-#include "app/domain/profile.hpp"
 #include "app/services_api/i_profile_service.hpp"
 #include "app/store/base/base_store.hpp"
 #include "app/store/profile/exception.hpp"
+#include "domain/profile.hpp"
+#include "domain/profile_mapper.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
 
@@ -86,7 +87,7 @@ namespace app
      */
     void ProfileStore::setActiveProfile(std::string_view name)
     {
-        const auto profile = getProfile(name);
+        const auto profile = _getProfile(name);
 
         if (!profile)
         {
@@ -99,39 +100,16 @@ namespace app
     }
 
     /**
-     * @brief Check if there is an active profile set
-     *
-     * @return true
-     * @return false
-     */
-    bool ProfileStore::hasActiveProfile() const { return _activeProfile.has(); }
-
-    /**
      * @brief Get the currently active profile
      *
-     * @return std::optional<Profile>
+     * @return std::optional<drafts::ProfileDraft>
      */
-    std::optional<Profile> ProfileStore::getActiveProfile() const
+    std::optional<drafts::ProfileDraft> ProfileStore::getActiveProfile() const
     {
         if (!_activeProfile.has())
             return std::nullopt;
 
-        return getProfile(_activeProfile.get().value());
-    }
-
-    /**
-     * @brief Get the name of the currently active profile
-     *
-     * @return std::optional<std::string>
-     */
-    std::optional<std::string> ProfileStore::getActiveProfileName() const
-    {
-        const auto profile = getActiveProfile();
-
-        if (profile.has_value())
-            return profile->getName();
-
-        return std::nullopt;
+        return _getProfile(_activeProfile.get().value());
     }
 
     /**
@@ -140,19 +118,21 @@ namespace app
      * @note Ignores profiles marked as deleted
      *
      * @param id
-     * @return std::optional<Profile>
+     * @return std::optional<drafts::ProfileDraft>
      */
-    std::optional<Profile> ProfileStore::getProfile(ProfileId id) const
+    std::optional<drafts::ProfileDraft> ProfileStore::_getProfile(
+        ProfileId id
+    ) const
     {
         auto profile = _get(
-            {.filter   = HasProfileId(id),
+            {.filter   = domain::HasProfileId(id),
              .deletion = DeletionPolicy::ExcludeDelete}
         );
 
-        if (!profile.has_value())
+        if (!profile)
             return std::nullopt;
 
-        return profile;
+        return domain::ProfileMapper::toDraft(profile.value());
     }
 
     /**
@@ -161,19 +141,21 @@ namespace app
      * @note Ignores profiles marked as deleted
      *
      * @param name
-     * @return std::optional<Profile>
+     * @return std::optional<drafts::ProfileDraft>
      */
-    std::optional<Profile> ProfileStore::getProfile(std::string_view name) const
+    std::optional<drafts::ProfileDraft> ProfileStore::_getProfile(
+        std::string_view name
+    ) const
     {
         auto profile = _get(
-            {.filter   = HasProfileName(name),
+            {.filter   = domain::HasProfileName(name),
              .deletion = DeletionPolicy::ExcludeDelete}
         );
 
-        if (profile.has_value())
-            return profile;
+        if (!profile)
+            return std::nullopt;
 
-        return std::nullopt;
+        return domain::ProfileMapper::toDraft(profile.value());
     }
 
     /**
@@ -187,22 +169,7 @@ namespace app
      */
     bool ProfileStore::profileExists(std::string_view name) const
     {
-        return getProfile(name).has_value();
-    }
-
-    /**
-     * @brief Check if a profile with the same name as the given profile
-     * exists
-     *
-     * @note Ignores profiles marked as deleted
-     *
-     * @param profile
-     * @return true
-     * @return false
-     */
-    bool ProfileStore::profileExists(const Profile& profile) const
-    {
-        return profileExists(profile.getName());
+        return _getProfile(name).has_value();
     }
 
     /**
@@ -220,7 +187,7 @@ namespace app
     )
     {
         auto entry = _getEntry(
-            {.filter   = HasProfileName(draft.name),
+            {.filter   = domain::HasProfileName(draft.getName()),
              .deletion = DeletionPolicy::IncludeDelete}
         );
 
@@ -229,15 +196,23 @@ namespace app
             if (entry->state != StoreState::Deleted)
                 return ProfileStoreResult::NameAlreadyExists;
 
-            entry->value.setName(draft.name);
-            entry->value.setEmail(draft.email);
+            entry->value.setName(draft.getName());
+            entry->value.setEmail(draft.getEmail());
             const auto result =
                 _updateEntry(entry->value, StoreState::Modified);
 
             return toProfileStoreResult(result);
         }
 
-        _addEntry(Profile{draft.name, draft.email});
+        // NOTE: here we can use an invalid ProfileId as the ID will get
+        // overwritten
+        _addEntry(
+            domain::Profile{
+                ProfileId::invalid(),
+                draft.getName(),
+                draft.getEmail()
+            }
+        );
 
         return ProfileStoreResult::Ok;
     }
@@ -256,7 +231,7 @@ namespace app
     )
     {
         const auto entry = _getEntry(
-            {.filter   = HasProfileName(draft.name),
+            {.filter   = domain::HasProfileName(draft.getName()),
              .deletion = DeletionPolicy::IncludeDelete}
         );
 
@@ -281,10 +256,8 @@ namespace app
      */
     void ProfileStore::_commitNewProfile(Entry entry)
     {
-        const auto& name  = entry.value.getName();
-        const auto& email = entry.value.getEmail();
-        const auto  newId = _profileService->create(name, email);
-        const auto  oldId = entry.value.getId();
+        const auto oldId = entry.value.getId();
+        const auto newId = _profileService->create(entry.value);
 
         entry.value.setId(newId);
 
@@ -295,7 +268,7 @@ namespace app
             throw ProfileStoreException(
                 std::format(
                     "Failed to commit new profile {} with error {}",
-                    name,
+                    entry.value.getName(),
                     StoreResultMeta::toString(result)
                 )
             );

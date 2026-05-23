@@ -5,7 +5,7 @@
 #include <memory>
 #include <utility>
 
-#include "app/store/profile/profile_store.hpp"
+#include "app/store/i_profile_store.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
 #include "logging/log_macros.hpp"
 
@@ -20,8 +20,8 @@ namespace cmd
      * @param profileStore
      */
     SetActiveProfileCommand::SetActiveProfileCommand(
-        std::string        profileName,
-        app::ProfileStore& profileStore
+        std::string                                profileName,
+        const std::shared_ptr<app::IProfileStore>& profileStore
     )
         : _profileName(std::move(profileName)), _profileStore(profileStore)
     {
@@ -45,14 +45,14 @@ namespace cmd
             return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
-        _profileStore.setActiveProfile(_previousProfile->getName());
+        _profileStore->setActiveProfile(_previousProfile->getName());
 
         return {};
     }
 
     std::expected<void, CommandErrorPtr> SetActiveProfileCommand::redo()
     {
-        if (!_profileStore.profileExists(_profileName))
+        if (!_profileStore->profileExists(_profileName))
         {
             const auto errorMessage =
                 std::format("Profile '{}' not found", _profileName);
@@ -68,9 +68,9 @@ namespace cmd
             return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
-        _previousProfile = _profileStore.getActiveProfile();
+        _previousProfile = _profileStore->getActiveProfile();
 
-        _profileStore.setActiveProfile(_profileName);
+        _profileStore->setActiveProfile(_profileName);
         return {};
     }
 

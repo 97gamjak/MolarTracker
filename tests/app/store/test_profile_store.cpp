@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "app/domain/profile.hpp"
 #include "app/store/profile/exception.hpp"
 #include "app/store/profile/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
@@ -44,7 +43,7 @@ TEST_F(ProfileStoreTest, HasProfilesFalseWhenEmpty)
 TEST_F(ProfileStoreTest, HasProfilesTrueAfterAdd)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     EXPECT_TRUE(_store->hasProfiles());
@@ -53,7 +52,7 @@ TEST_F(ProfileStoreTest, HasProfilesTrueAfterAdd)
 TEST_F(ProfileStoreTest, AddProfileSuccessReturnsOk)
 {
     const auto result = _store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
     EXPECT_EQ(result, app::ProfileStoreResult::Ok);
@@ -62,11 +61,11 @@ TEST_F(ProfileStoreTest, AddProfileSuccessReturnsOk)
 TEST_F(ProfileStoreTest, AddProfileDuplicateNameReturnsNameAlreadyExists)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     const auto result = _store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
     EXPECT_EQ(result, app::ProfileStoreResult::NameAlreadyExists);
@@ -75,40 +74,23 @@ TEST_F(ProfileStoreTest, AddProfileDuplicateNameReturnsNameAlreadyExists)
 TEST_F(ProfileStoreTest, RemoveProfileSuccessReturnsOk)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
-    const auto result =
-        _store->removeProfile({.name = "Alice", .email = std::nullopt});
+    const auto result = _store->removeProfile(
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+    );
 
     EXPECT_EQ(result, app::ProfileStoreResult::Ok);
 }
 
 TEST_F(ProfileStoreTest, RemoveProfileNotFoundReturnsProfileNotFound)
 {
-    const auto result =
-        _store->removeProfile({.name = "NonExistent", .email = std::nullopt});
+    const auto result = _store->removeProfile(
+        drafts::ProfileDraft{ProfileId::invalid(), "NonExistent", std::nullopt}
+    );
 
     EXPECT_EQ(result, app::ProfileStoreResult::ProfileNotFound);
-}
-
-TEST_F(ProfileStoreTest, GetProfileByNameReturnsProfile)
-{
-    static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
-    ));
-
-    const auto profile = _store->getProfile("Alice");
-
-    ASSERT_TRUE(profile.has_value());
-    EXPECT_EQ(profile->getName(), "Alice");
-}
-
-TEST_F(ProfileStoreTest, GetProfileByNameNulloptWhenNotFound)
-{
-    const auto profile = _store->getProfile("NonExistent");
-
-    EXPECT_FALSE(profile.has_value());
 }
 
 TEST_F(ProfileStoreTest, GetAllProfileNamesEmptyWhenNoProfiles)
@@ -121,30 +103,15 @@ TEST_F(ProfileStoreTest, GetAllProfileNamesEmptyWhenNoProfiles)
 TEST_F(ProfileStoreTest, GetAllProfileNamesReturnsAddedNames)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     ));
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Bob", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Bob", std::nullopt}
     ));
 
     const auto names = _store->getAllProfileNames();
 
     EXPECT_EQ(names.size(), 2U);
-}
-
-TEST_F(ProfileStoreTest, HasActiveProfileFalseInitially)
-{
-    EXPECT_FALSE(_store->hasActiveProfile());
-}
-
-TEST_F(ProfileStoreTest, SetActiveProfileValidNameSetsActiveProfile)
-{
-    _mockService->addTestProfile("Alice");
-    rebuildStore();
-
-    _store->setActiveProfile("Alice");
-
-    EXPECT_TRUE(_store->hasActiveProfile());
 }
 
 TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameThrows)
@@ -155,27 +122,10 @@ TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameThrows)
     );
 }
 
-TEST_F(ProfileStoreTest, GetActiveProfileNameNulloptInitially)
-{
-    EXPECT_FALSE(_store->getActiveProfileName().has_value());
-}
-
-TEST_F(ProfileStoreTest, GetActiveProfileNameReturnsNameAfterSet)
-{
-    _mockService->addTestProfile("Alice");
-    rebuildStore();
-    _store->setActiveProfile("Alice");
-
-    const auto name = _store->getActiveProfileName();
-
-    ASSERT_TRUE(name.has_value());
-    EXPECT_EQ(name.value(), "Alice");
-}
-
 TEST_F(ProfileStoreTest, CommitNewProfileCallsServiceCreate)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     _store->commit();
@@ -187,9 +137,9 @@ TEST_F(ProfileStoreTest, CommitDeletedProfileCallsServiceRemove)
 {
     _mockService->addTestProfile("Alice");
     rebuildStore();
-    static_cast<void>(
-        _store->removeProfile({.name = "Alice", .email = std::nullopt})
-    );
+    static_cast<void>(_store->removeProfile(
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
 
     _store->commit();
 
@@ -203,14 +153,12 @@ TEST_F(ProfileStoreTest, LoadsProfilesFromServiceOnConstruction)
     rebuildStore();
 
     EXPECT_TRUE(_store->hasProfiles());
-    EXPECT_TRUE(_store->getProfile("Alice").has_value());
-    EXPECT_TRUE(_store->getProfile("Bob").has_value());
 }
 
 TEST_F(ProfileStoreTest, ProfileExistsByNameTrueForExisting)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{.name = "Alice", .email = std::nullopt}
+        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     EXPECT_TRUE(_store->profileExists("Alice"));

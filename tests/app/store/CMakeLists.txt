@@ -15,9 +15,10 @@ target_include_directories(tests_app_store
 target_link_libraries(tests_app_store
     PRIVATE
     molartracker_app
+    molartracker_domain
+    molartracker_drafts
     molartracker_logging
     molartracker_tests
-    molartracker_drafts
     GTest::gtest_main
 )
 

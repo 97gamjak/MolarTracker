@@ -1,5 +1,7 @@
-#ifndef __APP__INCLUDE__APP__DOMAIN__PROFILE_HPP__
-#define __APP__INCLUDE__APP__DOMAIN__PROFILE_HPP__
+#ifndef __DOMAIN__INCLUDE__DOMAIN__PROFILE_HPP__
+
+#define __DOMAIN__INCLUDE__DOMAIN__PROFILE_HPP__
+
 
 #include <optional>
 #include <string>
@@ -7,7 +9,7 @@
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
 
-namespace app
+namespace domain
 {
 
     /**
@@ -28,6 +30,7 @@ namespace app
 
        public:
         explicit Profile(
+            ProfileId                         id,
             std::string                       name,
             const std::optional<std::string>& email
         );
@@ -44,6 +47,6 @@ namespace app
     filter::Predicate<Profile> HasProfileId(ProfileId id);
     filter::Predicate<Profile> HasProfileName(std::string_view name);
 
-}   // namespace app
+}   // namespace domain
 
-#endif   // __APP__INCLUDE__APP__DOMAIN__PROFILE_HPP__
+#endif   // __DOMAIN__INCLUDE__DOMAIN__PROFILE_HPP__

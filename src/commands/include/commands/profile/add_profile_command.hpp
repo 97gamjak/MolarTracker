@@ -1,6 +1,7 @@
 #ifndef __COMMANDS__INCLUDE__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__
 #define __COMMANDS__INCLUDE__COMMANDS__PROFILE__ADD_PROFILE_COMMAND_HPP__
 
+#include <memory>
 #include <string>
 
 #include "commands/command.hpp"
@@ -9,7 +10,7 @@
 
 namespace app
 {
-    class ProfileStore;   // Forward declaration
+    class IProfileStore;   // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -22,14 +23,14 @@ namespace cmd
     {
        private:
         /// Reference to the profile store
-        app::ProfileStore& _profileStore;
+        std::shared_ptr<app::IProfileStore> _profileStore;
         /// The profile draft
         drafts::ProfileDraft _profile;
 
        public:
         explicit AddProfileCommand(
-            app::ProfileStore&   profileStore,
-            drafts::ProfileDraft profile
+            const std::shared_ptr<app::IProfileStore>& profileStore,
+            drafts::ProfileDraft                       profile
         );
         ~AddProfileCommand() override                          = default;
         AddProfileCommand(const AddProfileCommand&)            = delete;

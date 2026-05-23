@@ -7,7 +7,7 @@
 
 #include "app/service_container.hpp"
 #include "app/store/account/account_store.hpp"
-#include "app/store/base/i_store.hpp"
+#include "app/store/i_profile_store.hpp"
 #include "app/store/position_store.hpp"
 #include "app/store/profile/profile_store.hpp"
 #include "app/store/stock_store.hpp"
@@ -26,7 +26,7 @@ namespace app
      * @param services
      */
     StoreContainer::StoreContainer(ServiceContainer& services)
-        : _profileStore{std::make_unique<ProfileStore>(
+        : _profileStore{std::make_shared<ProfileStore>(
               services.getProfileService()
           )},
           _accountStore{
@@ -49,7 +49,7 @@ namespace app
           )},
           _connections{std::make_unique<Connections>()}
     {
-        _allStores.push_back(&*_profileStore);
+        _allStores.push_back(dynamic_cast<ProfileStore*>(_profileStore.get()));
         _allStores.push_back(&*_accountStore);
         _allStores.push_back(&*_transactionStore);
         _allStores.push_back(&*_stockStore);
@@ -144,18 +144,22 @@ namespace app
     /**
      * @brief Get the ProfileStore
      *
-     * @return ProfileStore&
+     * @return std::shared_ptr<IProfileStore>&
      */
-    ProfileStore& StoreContainer::getProfileStore() { return *_profileStore; }
+    std::shared_ptr<IProfileStore>& StoreContainer::getProfileStore()
+    {
+        return _profileStore;
+    }
 
     /**
      * @brief Get the ProfileStore (const version)
      *
      * @return const ProfileStore&
      */
-    const ProfileStore& StoreContainer::getProfileStore() const
+    const std::shared_ptr<IProfileStore>& StoreContainer::getProfileStore(
+    ) const
     {
-        return *_profileStore;
+        return _profileStore;
     }
 
     /**

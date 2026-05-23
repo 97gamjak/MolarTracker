@@ -1,6 +1,6 @@
 #include "profile_factory.hpp"
 
-#include "app/domain/profile.hpp"
+#include "domain/profile.hpp"
 #include "sql_models/profile_row.hpp"
 
 namespace app
@@ -9,13 +9,15 @@ namespace app
      * @brief Convert a ProfileRow to a Profile domain object
      *
      * @param row
-     * @return Profile
+     * @return domain::Profile
      */
-    Profile ProfileFactory::toDomain(const ProfileRow& row)
+    domain::Profile ProfileFactory::toDomain(const ProfileRow& row)
     {
-        auto profile = Profile{row.name.value(), row.email.value()};
-        profile.setId(row.id.value());
-        return profile;
+        return domain::Profile{
+            row.id.value(),
+            row.name.value(),
+            row.email.value()
+        };
     }
 
     /**
@@ -23,13 +25,13 @@ namespace app
      * objects
      *
      * @param rows
-     * @return std::vector<Profile>
+     * @return std::vector<domain::Profile>
      */
-    std::vector<Profile> ProfileFactory::toDomains(
+    std::vector<domain::Profile> ProfileFactory::toDomains(
         const std::vector<ProfileRow>& rows
     )
     {
-        std::vector<Profile> profiles;
+        std::vector<domain::Profile> profiles;
         profiles.reserve(rows.size());
 
         for (const auto& row : rows)
@@ -39,12 +41,12 @@ namespace app
     }
 
     /**
-     * @brief Convert a Profile domain object to a ProfileRow
+     * @brief Convert a domain::Profile domain object to a ProfileRow
      *
      * @param profile
      * @return ProfileRow
      */
-    ProfileRow ProfileFactory::toRow(const Profile& profile)
+    ProfileRow ProfileFactory::toRow(const domain::Profile& profile)
     {
         ProfileRow row;
 
