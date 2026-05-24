@@ -3,11 +3,6 @@
 
 #include <memory>
 
-namespace db
-{
-    class Database;   // Forward declaration
-}   // namespace db
-
 namespace repo
 {
     class RepoContainer;   // Forward declaration

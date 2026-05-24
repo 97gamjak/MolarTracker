@@ -25,7 +25,7 @@ namespace app
 {
 
     /**
-     * @brief Application context holding settings, database, repositories,
+     * @brief Application context holding settings,
      * services, and store
      *
      */

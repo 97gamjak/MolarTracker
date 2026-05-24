@@ -97,7 +97,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Speedup some compilation headers
 - split domain profile completely from controllers and introduce profile store interface
-- encapsulate repo to increase modularity
+- Move repository, factory, and migration implementations into separate
+  molartracker_repo CMake target (in src/repo/) for better modularity
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
