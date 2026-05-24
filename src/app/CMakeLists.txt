@@ -1,13 +1,6 @@
 add_library(molartracker_app STATIC
-    src/app/service_container.cpp
     src/app/store_container.cpp
     src/app/app_context.cpp
-
-    src/app/services/account_service.cpp
-    src/app/services/profile_service.cpp
-    src/app/services/transaction_service.cpp
-    src/app/services/instrument_service.cpp
-    src/app/services/position_service.cpp
 
     src/app/store/transaction_store.cpp
     src/app/store/stock_store.cpp
@@ -30,11 +23,11 @@ target_link_libraries(molartracker_app
     PUBLIC
     molartracker_finance
     molartracker_connections
+    molartracker_service # TODO: make this private as soon as store are interfaced
     PRIVATE
     molartracker_logging
     molartracker_settings
     molartracker_config
     molartracker_drafts
     molartracker_domain
-    molartracker_repo
 )

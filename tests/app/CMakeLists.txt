@@ -14,13 +14,14 @@ target_include_directories(tests_app
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src/app/src/
     ${CMAKE_SOURCE_DIR}/src/repo/src/
+    ${CMAKE_SOURCE_DIR}/src/service/src/
 )
 
 target_link_libraries(tests_app
     PRIVATE
     molartracker_app
     molartracker_repo
-    molartracker_db
+    molartracker_service
     molartracker_domain
     molartracker_logging
     molartracker_orm

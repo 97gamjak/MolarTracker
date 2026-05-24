@@ -5,13 +5,13 @@
 #include <ranges>
 #include <utility>
 
-#include "app/services_api/i_profile_service.hpp"
 #include "app/store/base/base_store.hpp"
 #include "app/store/profile/exception.hpp"
 #include "domain/profile.hpp"
 #include "domain/profile_mapper.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "service/i_profile_service.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
 
@@ -43,7 +43,7 @@ namespace app
      * @param profileService
      */
     ProfileStore::ProfileStore(
-        const std::shared_ptr<IProfileService>& profileService
+        const std::shared_ptr<service::IProfileService>& profileService
     )
         : _profileService{profileService}
     {

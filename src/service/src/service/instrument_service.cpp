@@ -3,7 +3,7 @@
 #include "finance/instrument/stock.hpp"
 #include "repo/i_instrument_repo.hpp"
 
-namespace app
+namespace service
 {
     /**
      * @brief Construct a new Instrument Service object
@@ -79,4 +79,4 @@ namespace app
         return _instrumentRepo->stockExists(ticker);
     }
 
-}   // namespace app
+}   // namespace service

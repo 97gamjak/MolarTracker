@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__SERVICES_API__I_POSITION_SERVICE_HPP__
-#define __APP__INCLUDE__APP__SERVICES_API__I_POSITION_SERVICE_HPP__
+#ifndef __SERVICE__INCLUDE__SERVICE__I_POSITION_SERVICE_HPP__
+#define __SERVICE__INCLUDE__SERVICE__I_POSITION_SERVICE_HPP__
 
 #include <vector>
 
@@ -10,7 +10,7 @@ namespace finance
     class Position;   // Forward declaration
 }   // namespace finance
 
-namespace app
+namespace service
 {
 
     /**
@@ -58,6 +58,6 @@ namespace app
         ) = 0;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__INCLUDE__APP__SERVICES_API__I_POSITION_SERVICE_HPP__
+#endif   // __SERVICE__INCLUDE__SERVICE__I_POSITION_SERVICE_HPP__

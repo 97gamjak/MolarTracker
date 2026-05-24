@@ -1,16 +1,16 @@
-#ifndef __APP__SRC__APP__SERVICES__TRANSACTION_SERVICE_HPP__
-#define __APP__SRC__APP__SERVICES__TRANSACTION_SERVICE_HPP__
+#ifndef __SERVICE__SRC__SERVICE__TRANSACTION_SERVICE_HPP__
+#define __SERVICE__SRC__SERVICE__TRANSACTION_SERVICE_HPP__
 
 #include <memory>
 
-#include "app/services_api/i_transaction_service.hpp"
+#include "service/i_transaction_service.hpp"
 
 namespace repo
 {
     class ITransactionRepo;   // Forward declaration
 }   // namespace repo
 
-namespace app
+namespace service
 {
 
     /**
@@ -39,6 +39,6 @@ namespace app
             const finance::TransactionFilter& filter
         ) override;
     };
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__SRC__APP__SERVICES__TRANSACTION_SERVICE_HPP__
+#endif   // __SERVICE__SRC__SERVICE__TRANSACTION_SERVICE_HPP__

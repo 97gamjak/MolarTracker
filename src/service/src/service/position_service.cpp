@@ -4,9 +4,9 @@
 #include "logging/log_macros.hpp"
 #include "repo/i_position_repo.hpp"
 
-REGISTER_LOG_CATEGORY("App.Service.PositionService");
+REGISTER_LOG_CATEGORY("Service.PositionService");
 
-namespace app
+namespace service
 {
     /**
      * @brief Construct a new Position Service:: Position Service object
@@ -71,4 +71,4 @@ namespace app
         return positions;
     }
 
-}   // namespace app
+}   // namespace service

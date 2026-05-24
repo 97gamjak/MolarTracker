@@ -6,7 +6,7 @@
 #include "domain/profile.hpp"
 #include "repo/i_profile_repo.hpp"
 
-namespace app
+namespace service
 {
 
     /**
@@ -76,4 +76,4 @@ namespace app
      */
     void ProfileService::remove(ProfileId id) { _profileRepo->remove(id); }
 
-}   // namespace app
+}   // namespace service

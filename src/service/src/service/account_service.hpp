@@ -1,17 +1,17 @@
-#ifndef __APP__SRC__APP__SERVICES__ACCOUNT_SERVICE_HPP__
-#define __APP__SRC__APP__SERVICES__ACCOUNT_SERVICE_HPP__
+#ifndef __SERVICE__SRC__SERVICE__ACCOUNT_SERVICE_HPP__
+#define __SERVICE__SRC__SERVICE__ACCOUNT_SERVICE_HPP__
 
 #include <memory>
 #include <vector>
 
-#include "app/services_api/i_account_service.hpp"
+#include "service/i_account_service.hpp"
 
 namespace repo
 {
     class IAccountRepo;   // forward declaration
 }   // namespace repo
 
-namespace app
+namespace service
 {
     /**
      * @brief Implementation of Account service
@@ -38,6 +38,6 @@ namespace app
         ) override;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__SRC__APP__SERVICES__ACCOUNT_SERVICE_HPP__
+#endif   // __SERVICE__SRC__SERVICE__ACCOUNT_SERVICE_HPP__

@@ -1,18 +1,18 @@
-#ifndef __APP__SRC__APP__SERVICES__PROFILE_SERVICE_HPP__
-#define __APP__SRC__APP__SERVICES__PROFILE_SERVICE_HPP__
+#ifndef __SERVICE__SRC__SERVICE__PROFILE_SERVICE_HPP__
+#define __SERVICE__SRC__SERVICE__PROFILE_SERVICE_HPP__
 
 #include <memory>
 #include <optional>
 #include <vector>
 
-#include "app/services_api/i_profile_service.hpp"
+#include "service/i_profile_service.hpp"
 
 namespace repo
 {
     class IProfileRepo;   // forward declaration
 }   // namespace repo
 
-namespace app
+namespace service
 {
 
     /**
@@ -48,6 +48,6 @@ namespace app
         void remove(ProfileId id) override;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__SRC__APP__SERVICES__PROFILE_SERVICE_HPP__
+#endif   // __SERVICE__SRC__SERVICE__PROFILE_SERVICE_HPP__

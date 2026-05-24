@@ -48,7 +48,6 @@ target_link_libraries(molartracker_controller
     molartracker_settings
     molartracker_logging
     molartracker_ui
-    molartracker_db
     molartracker_drafts
     molartracker_commands
     molartracker_http

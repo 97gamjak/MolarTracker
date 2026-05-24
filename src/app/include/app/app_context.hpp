@@ -3,11 +3,6 @@
 
 #include <memory>
 
-namespace db
-{
-    class Database;   // Forward declaration
-}   // namespace db
-
 namespace settings
 {
     class Settings;   // Forward declaration
@@ -15,10 +10,7 @@ namespace settings
 
 namespace app
 {
-    class RepoContainer;      // Forward declaration
-    class ServiceContainer;   // Forward declaration
-    class StoreContainer;     // Forward declaration
-    class MigrationRunner;    // Forward declaration
+    class StoreContainer;   // Forward declaration
 }   // namespace app
 
 namespace app
@@ -35,9 +27,6 @@ namespace app
         /// The settings object for the application, which can be used to
         /// subscribe to settings changes
         settings::Settings& _settings;
-
-        /// The service container for the application
-        std::unique_ptr<ServiceContainer> _services;
 
         /// The store container for the application, this is where the global
         /// state of the application is stored and can be accessed and modified

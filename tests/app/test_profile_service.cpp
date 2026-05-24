@@ -5,13 +5,13 @@
 #include <string>
 #include <vector>
 
-#include "app/services/profile_service.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/profile_repo.hpp"
+#include "service/profile_service.hpp"
 #include "test_fixtures.hpp"
 
 namespace
@@ -21,16 +21,16 @@ namespace
     {
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        tests::TempDbFile                    _tempFile;
-        db::Database                         _db;
-        std::shared_ptr<repo::ProfileRepo>   _repo;
-        std::shared_ptr<app::ProfileService> _service;
+        tests::TempDbFile                        _tempFile;
+        db::Database                             _db;
+        std::shared_ptr<repo::ProfileRepo>       _repo;
+        std::shared_ptr<service::ProfileService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         ProfileServiceTest()
             : _db{_tempFile.path()},
               _repo{std::make_shared<repo::ProfileRepo>(_db)},
-              _service{std::make_shared<app::ProfileService>(_repo)}
+              _service{std::make_shared<service::ProfileService>(_repo)}
         {
             repo::MigrationRunner{_db};
         }
