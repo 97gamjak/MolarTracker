@@ -9,10 +9,14 @@
 
 class Connections;   // Forward declaration
 
+namespace service
+{
+    class ServiceContainer;   // Forward declaration
+}   // namespace service
+
 namespace app
 {
 
-    class ServiceContainer;   // Forward declaration
     class IProfileStore;      // Forward declaration
     class AccountStore;       // Forward declaration
     class StockStore;         // Forward declaration
@@ -27,6 +31,8 @@ namespace app
     class StoreContainer
     {
        private:
+        /// The service container
+        std::unique_ptr<service::ServiceContainer> _serviceContainer;
         /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
         /// The Profile store
@@ -47,7 +53,7 @@ namespace app
         std::unique_ptr<Connections> _connections;
 
        public:
-        explicit StoreContainer(ServiceContainer& services);
+        explicit StoreContainer();
 
         ~StoreContainer();
 

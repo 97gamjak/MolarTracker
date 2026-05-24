@@ -3,7 +3,6 @@
 #include <format>
 #include <unordered_map>
 
-#include "app/services_api/i_transaction_service.hpp"
 #include "app/store/account/account_session.hpp"
 #include "app/store/account/account_store.hpp"
 #include "app/store/position_store.hpp"
@@ -14,6 +13,7 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
+#include "service/i_transaction_service.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.TransactionStore");
 
@@ -60,11 +60,11 @@ namespace app
      * @param accountSession
      */
     TransactionStore::TransactionStore(
-        const std::shared_ptr<ITransactionService>& transactionService,
-        AccountStore&                               accountStore,
-        StockStore&                                 stockStore,
-        PositionStore&                              positionStore,
-        const AccountSession&                       accountSession
+        const std::shared_ptr<service::ITransactionService>& transactionService,
+        AccountStore&                                        accountStore,
+        StockStore&                                          stockStore,
+        PositionStore&                                       positionStore,
+        const AccountSession&                                accountSession
     )
         : _transactionService(transactionService),
           _session(std::make_unique<Session>(accountSession))

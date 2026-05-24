@@ -4,11 +4,11 @@
 #include <memory>
 #include <unordered_map>
 
-#include "app/services_api/i_instrument_service.hpp"
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stock.hpp"
+#include "service/i_instrument_service.hpp"
 
 namespace app
 {
@@ -32,7 +32,8 @@ namespace app
     {
        private:
         /// The type of the Instrument service pointer
-        using InstrumentServicePtr = std::shared_ptr<IInstrumentService>;
+        using InstrumentServicePtr =
+            std::shared_ptr<service::IInstrumentService>;
 
         /// The Instrument service
         InstrumentServicePtr _instrumentService;

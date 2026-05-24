@@ -5,7 +5,6 @@
 #include <optional>
 #include <string>
 
-#include "app/service_container.hpp"
 #include "app/store/account/account_store.hpp"
 #include "app/store/i_profile_store.hpp"
 #include "app/store/position_store.hpp"
@@ -14,6 +13,7 @@
 #include "app/store/transaction_store.hpp"
 #include "connections/connection.hpp"
 #include "logging/log_macros.hpp"
+#include "service/service_container.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.StoreContainer");
 
@@ -25,23 +25,24 @@ namespace app
      *
      * @param services
      */
-    StoreContainer::StoreContainer(ServiceContainer& services)
-        : _profileStore{std::make_shared<ProfileStore>(
-              services.getProfileService()
+    StoreContainer::StoreContainer()
+        : _serviceContainer{std::make_unique<service::ServiceContainer>()},
+          _profileStore{std::make_shared<ProfileStore>(
+              _serviceContainer->getProfileService()
           )},
-          _accountStore{
-              std::make_unique<AccountStore>(services.getAccountService())
-          },
+          _accountStore{std::make_unique<AccountStore>(
+              _serviceContainer->getAccountService()
+          )},
           _stockStore{std::make_unique<StockStore>(
-              services.getInstrumentService(),
+              _serviceContainer->getInstrumentService(),
               _instrumentIdSeq
           )},
           _positionStore{std::make_unique<PositionStore>(
-              services.getPositionService(),
+              _serviceContainer->getPositionService(),
               _accountStore->getAccountSession()
           )},
           _transactionStore{std::make_unique<TransactionStore>(
-              services.getTransactionService(),
+              _serviceContainer->getTransactionService(),
               *_accountStore,
               *_stockStore,
               *_positionStore,

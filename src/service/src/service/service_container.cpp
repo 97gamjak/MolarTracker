@@ -1,17 +1,17 @@
-#include "app/service_container.hpp"
+#include "service/service_container.hpp"
 
+#include "account_service.hpp"
+#include "instrument_service.hpp"
 #include "logging/log_macros.hpp"
+#include "position_service.hpp"
+#include "profile_service.hpp"
 #include "repo/exceptions.hpp"
 #include "repo/repo_container.hpp"
-#include "services/account_service.hpp"
-#include "services/instrument_service.hpp"
-#include "services/position_service.hpp"
-#include "services/profile_service.hpp"
-#include "services/transaction_service.hpp"
+#include "transaction_service.hpp"
 
-REGISTER_LOG_CATEGORY("App.ServiceContainer");
+REGISTER_LOG_CATEGORY("Service.ServiceContainer");
 
-namespace app
+namespace service
 {
 
     /**
@@ -155,4 +155,4 @@ namespace app
         return _positionService;
     }
 
-}   // namespace app
+}   // namespace service

@@ -44,8 +44,8 @@ namespace app
      * @param accountSession
      */
     PositionStore::PositionStore(
-        std::shared_ptr<IPositionService> positionService,
-        const AccountSession&             accountSession
+        std::shared_ptr<service::IPositionService> positionService,
+        const AccountSession&                      accountSession
     )
         : _positionService(std::move(positionService)),
           _session(std::make_unique<Session>(accountSession))

@@ -3,7 +3,7 @@
 #include "finance/account.hpp"
 #include "repo/i_account_repo.hpp"
 
-namespace app
+namespace service
 {
 
     /**
@@ -49,4 +49,4 @@ namespace app
         return _accountRepo->createAccount(account, profileId);
     }
 
-}   // namespace app
+}   // namespace service

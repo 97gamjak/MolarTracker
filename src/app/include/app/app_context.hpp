@@ -36,9 +36,6 @@ namespace app
         /// subscribe to settings changes
         settings::Settings& _settings;
 
-        /// The service container for the application
-        std::unique_ptr<ServiceContainer> _services;
-
         /// The store container for the application, this is where the global
         /// state of the application is stored and can be accessed and modified
         /// by the controllers and other parts of the application

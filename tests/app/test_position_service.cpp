@@ -4,11 +4,11 @@
 #include <memory>
 #include <vector>
 
-#include "app/services/position_service.hpp"
 #include "db/database.hpp"
 #include "finance/position.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/position_repo.hpp"
+#include "service/position_service.hpp"
 #include "test_fixtures.hpp"
 #include "utils/timestamp.hpp"
 
@@ -21,16 +21,16 @@ namespace
     {
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        tests::TempDbFile                     _tempFile;
-        db::Database                          _db;
-        std::shared_ptr<repo::PositionRepo>   _repo;
-        std::shared_ptr<app::PositionService> _service;
+        tests::TempDbFile                         _tempFile;
+        db::Database                              _db;
+        std::shared_ptr<repo::PositionRepo>       _repo;
+        std::shared_ptr<service::PositionService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         PositionServiceTest()
             : _db{_tempFile.path()},
               _repo{std::make_shared<repo::PositionRepo>(_db)},
-              _service{std::make_shared<app::PositionService>(_repo)}
+              _service{std::make_shared<service::PositionService>(_repo)}
         {
             repo::MigrationRunner{_db};
         }

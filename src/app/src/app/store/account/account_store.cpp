@@ -4,13 +4,13 @@
 #include <format>
 #include <ranges>
 
-#include "app/services_api/i_account_service.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/account_mapper.hpp"
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
+#include "service/i_account_service.hpp"
 
 REGISTER_LOG_CATEGORY("App.Store.AccountStore");
 
@@ -35,7 +35,7 @@ namespace app
      * and data to manage accounts effectively.
      */
     AccountStore::AccountStore(
-        const std::shared_ptr<IAccountService>& accountService
+        const std::shared_ptr<service::IAccountService>& accountService
     )
         : _accountService(accountService)
     {

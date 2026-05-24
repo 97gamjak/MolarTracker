@@ -1,9 +1,9 @@
-#ifndef __APP__SRC__APP__SERVICES__INSTRUMENT_SERVICE_HPP__
-#define __APP__SRC__APP__SERVICES__INSTRUMENT_SERVICE_HPP__
+#ifndef __SERVICE__SRC__SERVICE__INSTRUMENT_SERVICE_HPP__
+#define __SERVICE__SRC__SERVICE__INSTRUMENT_SERVICE_HPP__
 
 #include <memory>
 
-#include "app/services_api/i_instrument_service.hpp"
+#include "service/i_instrument_service.hpp"
 
 namespace finance
 {
@@ -17,7 +17,7 @@ namespace repo
     class IInstrumentRepo;   // forward declaration
 }   // namespace repo
 
-namespace app
+namespace service
 {
 
     /**
@@ -55,6 +55,6 @@ namespace app
         [[nodiscard]] bool stockExists(const std::string& ticker) override;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__SRC__APP__SERVICES__INSTRUMENT_SERVICE_HPP__
+#endif   // __SERVICE__SRC__SERVICE__INSTRUMENT_SERVICE_HPP__

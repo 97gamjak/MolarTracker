@@ -16,13 +16,17 @@ namespace finance
     class Account;   // Forward declaration
 }   // namespace finance
 
+namespace service
+{
+    class ITransactionService;   // Forward declaration
+}   // namespace service
+
 namespace app
 {
-    class AccountStore;          // Forward declaration
-    class AccountSession;        // Forward declaration
-    class PositionStore;         // Forward declaration
-    class StockStore;            // Forward declaration
-    class ITransactionService;   // Forward declaration
+    class AccountStore;     // Forward declaration
+    class AccountSession;   // Forward declaration
+    class PositionStore;    // Forward declaration
+    class StockStore;       // Forward declaration
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define TRANSACTION_STORE_RESULT(X) \
@@ -41,7 +45,7 @@ namespace app
     {
        private:
         /// The Transaction service
-        std::shared_ptr<ITransactionService> _transactionService;
+        std::shared_ptr<service::ITransactionService> _transactionService;
 
         struct Session;
         /// The session object for managing the session state of transactions in
@@ -53,11 +57,12 @@ namespace app
 
        public:
         explicit TransactionStore(
-            const std::shared_ptr<ITransactionService>& transactionService,
-            AccountStore&                               accountStore,
-            StockStore&                                 stockStore,
-            PositionStore&                              positionStore,
-            const AccountSession&                       accountSession
+            const std::shared_ptr<service::ITransactionService>&
+                                  transactionService,
+            AccountStore&         accountStore,
+            StockStore&           stockStore,
+            PositionStore&        positionStore,
+            const AccountSession& accountSession
         );
         ~TransactionStore() override;
 
