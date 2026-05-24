@@ -3,11 +3,6 @@
 
 #include <memory>
 
-namespace db
-{
-    class Database;   // Forward declaration
-}   // namespace db
-
 namespace settings
 {
     class Settings;   // Forward declaration
@@ -15,10 +10,7 @@ namespace settings
 
 namespace app
 {
-    class RepoContainer;      // Forward declaration
-    class ServiceContainer;   // Forward declaration
-    class StoreContainer;     // Forward declaration
-    class MigrationRunner;    // Forward declaration
+    class StoreContainer;   // Forward declaration
 }   // namespace app
 
 namespace app
