@@ -23,7 +23,6 @@ namespace app
     /**
      * @brief Construct a new Store Container object
      *
-     * @param services
      */
     StoreContainer::StoreContainer()
         : _serviceContainer{std::make_unique<service::ServiceContainer>()},
