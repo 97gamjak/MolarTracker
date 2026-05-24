@@ -19,12 +19,14 @@ namespace service
      *
      */
     ServiceContainer::ServiceContainer()
-        : _profileService{std::make_shared<ProfileService>(
-              _repoContainer->getProfileRepo()
-          )},
+    try
+        : _repoContainer{std::make_unique<repo::RepoContainer>()},
+          _profileService{
+              std::make_shared<ProfileService>(_repoContainer->getProfileRepo()
+              )},
           _accountService{
-              std::make_shared<AccountService>(_repoContainer->getAccountRepo())
-          },
+              std::make_shared<AccountService>(_repoContainer->getAccountRepo()
+              )},
           _transactionService{std::make_shared<TransactionService>(
               _repoContainer->getTransactionRepo()
           )},
@@ -36,15 +38,11 @@ namespace service
           )}
 
     {
-        try
-        {
-            _repoContainer = std::make_unique<repo::RepoContainer>();
-        }
-        catch (const repo::MigrationException& e)
-        {
-            LOG_ERROR("Database migration failed: " + std::string(e.what()));
-            throw;
-        }
+    }
+    catch (const repo::MigrationException& e)
+    {
+        LOG_ERROR("Database migration failed: " + std::string(e.what()));
+        throw;
     }
 
     ServiceContainer::~ServiceContainer() = default;
