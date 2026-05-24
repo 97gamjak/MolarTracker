@@ -1,5 +1,5 @@
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_HPP__
-#define __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_HPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__MIGRATION_HPP__
+#define __REPO__SRC__REPO__MIGRATION__MIGRATION_HPP__
 
 #include <cstddef>
 #include <memory>
@@ -83,4 +83,4 @@ namespace repo
 
 }   // namespace repo
 
-#endif   // __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_HPP__
+#endif   // __REPO__SRC__REPO__MIGRATION__MIGRATION_HPP__

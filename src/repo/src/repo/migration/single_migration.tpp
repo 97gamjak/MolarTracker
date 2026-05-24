@@ -1,5 +1,5 @@
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
-#define __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
+#define __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
 
 #include "orm/crud.hpp"
 #include "orm/type_traits.hpp"
@@ -104,4 +104,4 @@ namespace repo
 
 }   // namespace repo
 
-#endif   // __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
+#endif   // __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_TPP__

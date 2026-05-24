@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__REPO_CONTAINER_HPP__
-#define __APP__INCLUDE__APP__REPO_CONTAINER_HPP__
+#ifndef __REPO__INCLUDE__REPO__REPO_CONTAINER_HPP__
+#define __REPO__INCLUDE__REPO__REPO_CONTAINER_HPP__
 
 #include <memory>
 
@@ -69,4 +69,4 @@ namespace repo
 
 }   // namespace repo
 
-#endif   // __APP__INCLUDE__APP__REPO_CONTAINER_HPP__
+#endif   // __REPO__INCLUDE__REPO__REPO_CONTAINER_HPP__

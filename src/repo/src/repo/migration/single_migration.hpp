@@ -1,5 +1,5 @@
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_HPP__
-#define __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_HPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_HPP__
+#define __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -207,8 +207,8 @@ namespace repo
 
 }   // namespace repo
 
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_TPP__
 #include "single_migration.tpp"
 #endif
 
-#endif   // __REPO__INCLUDE__REPO__MIGRATION__SINGLE_MIGRATION_HPP__
+#endif   // __REPO__SRC__REPO__MIGRATION__SINGLE_MIGRATION_HPP__

@@ -14,7 +14,6 @@ namespace repo
     /**
      * @brief Construct a new Repo Container object
      *
-     * @param db
      */
     RepoContainer::RepoContainer()
         : _database{std::make_unique<db::Database>(

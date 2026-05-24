@@ -1,5 +1,5 @@
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
-#define __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
+#define __REPO__SRC__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
 
 #include "exceptions/base.hpp"
 #include "migration.hpp"
@@ -47,4 +47,4 @@ namespace repo
     };
 }   // namespace repo
 
-#endif   // __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
+#endif   // __REPO__SRC__REPO__MIGRATION__MIGRATION_RUNNER_HPP__

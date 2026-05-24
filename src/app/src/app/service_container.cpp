@@ -13,7 +13,6 @@ namespace app
     /**
      * @brief Construct a new Service Container object
      *
-     * @param repos
      */
     ServiceContainer::ServiceContainer()
         : _repoContainer{std::make_unique<repo::RepoContainer>()},

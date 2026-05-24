@@ -1,5 +1,5 @@
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_HPP__
-#define __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_HPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__MULTI_MIGRATION_HPP__
+#define __REPO__SRC__REPO__MIGRATION__MULTI_MIGRATION_HPP__
 
 #include <memory>
 #include <vector>
@@ -58,8 +58,8 @@ namespace repo
 
 }   // namespace repo
 
-#ifndef __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_TPP__
+#ifndef __REPO__SRC__REPO__MIGRATION__MULTI_MIGRATION_TPP__
 #include "multi_migration.tpp"
 #endif
 
-#endif   // __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_HPP__
+#endif   // __REPO__SRC__REPO__MIGRATION__MULTI_MIGRATION_HPP__
