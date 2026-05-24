@@ -7,6 +7,11 @@
 #include "app/repos/base_repo.hpp"
 #include "app/repos_api/i_profile_repo.hpp"
 
+namespace domain
+{
+    class Profile;   // Forward declaration
+}   // namespace domain
+
 namespace app
 {
 
@@ -19,16 +24,19 @@ namespace app
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] std::vector<Profile>   getAll() const override;
-        [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
-        [[nodiscard]] std::optional<Profile> get(
+        [[nodiscard]]
+        std::vector<domain::Profile> getAll() const override;
+
+        [[nodiscard]]
+        std::optional<domain::Profile> get(ProfileId id) const override;
+
+        [[nodiscard]]
+        std::optional<domain::Profile> get(
             const std::string& name
         ) const override;
 
-        ProfileId create(
-            const std::string&         name,
-            std::optional<std::string> email
-        ) override;
+        [[nodiscard]]
+        ProfileId create(const domain::Profile& profile) override;
 
         void update(
             ProfileId                         id,

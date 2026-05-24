@@ -7,7 +7,7 @@
 
 namespace drafts
 {
-    struct ProfileDraft;   // Forward declaration
+    class ProfileDraft;   // Forward declaration
 }   // namespace drafts
 
 class QLineEdit;     // Forward declaration
@@ -104,7 +104,7 @@ namespace ui
 
         void _updateToggleStates();
 
-        [[nodiscard]] struct drafts::ProfileDraft _getProfile() const;
+        [[nodiscard]] drafts::ProfileDraft _getProfile() const;
 
         void _emit(const AddProfileDialogAction& action);
         void _emitOk();

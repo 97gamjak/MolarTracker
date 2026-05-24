@@ -25,13 +25,14 @@ namespace app
        public:
         explicit ProfileService(const std::shared_ptr<IProfileRepo>& repo);
 
-        [[nodiscard]] std::optional<Profile> get(ProfileId id) const override;
-        [[nodiscard]] std::vector<Profile>   getAll() const override;
+        [[nodiscard]]
+        std::optional<domain::Profile> get(ProfileId id) const override;
 
-        [[nodiscard]] ProfileId create(
-            const std::string&                name,
-            const std::optional<std::string>& email
-        ) override;
+        [[nodiscard]]
+        std::vector<domain::Profile> getAll() const override;
+
+        [[nodiscard]]
+        ProfileId create(const domain::Profile& profile) override;
 
         void update(
             ProfileId                         id,

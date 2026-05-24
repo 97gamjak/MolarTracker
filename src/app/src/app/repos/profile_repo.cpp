@@ -4,8 +4,8 @@
 #include <optional>
 #include <vector>
 
-#include "app/domain/profile.hpp"
 #include "app/factories/profile_factory.hpp"
+#include "domain/profile.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
@@ -14,6 +14,8 @@
 #include "sql_models/profile_row.hpp"
 
 REGISTER_LOG_CATEGORY("App.Repo.ProfileRepo");
+
+using domain::Profile;
 
 namespace app
 {
@@ -80,23 +82,18 @@ namespace app
     /**
      * @brief Create a new profile in the database
      *
-     * @param name
-     * @param email
+     * @param profile
      * @return ProfileId
      */
-    ProfileId ProfileRepo::create(
-        const std::string&         name,
-        std::optional<std::string> email
-    )
+    ProfileId ProfileRepo::create(const domain::Profile& profile)
     {
-        const auto profile = Profile{name, email};
         const auto rowId =
             orm::Crud().insert(_getDb(), ProfileFactory::toRow(profile));
 
         if (rowId.has_value())
             return ProfileId::from(rowId.value());
 
-        const auto whatFailed = "profile with name '" + name + "'";
+        const auto whatFailed = "profile with name '" + profile.getName() + "'";
         const auto msg        = getInsertError(rowId.error(), whatFailed);
 
         LOG_ERROR(msg);

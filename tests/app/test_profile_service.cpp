@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-#include "app/domain/profile.hpp"
 #include "app/migration/migration_runner.hpp"
 #include "app/repos/profile_repo.hpp"
 #include "app/services/profile_service.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
+#include "domain/profile.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "test_fixtures.hpp"
 
@@ -40,17 +40,23 @@ namespace
 
 TEST_F(ProfileServiceTest, CreateReturnsValidId)
 {
-    const auto id = _service->create("Alice", std::nullopt);
+    const auto id = _service->create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    );
 
     EXPECT_GT(id.value(), 0);
 }
 
 TEST_F(ProfileServiceTest, CreateDuplicateNameThrows)
 {
-    static_cast<void>(_service->create("Alice", std::nullopt));
+    static_cast<void>(_service->create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
 
     EXPECT_THROW(
-        static_cast<void>(_service->create("Alice", std::nullopt)),
+        static_cast<void>(_service->create(
+            domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+        )),
         orm::CrudException
     );
 }
@@ -64,7 +70,13 @@ TEST_F(ProfileServiceTest, GetByIdReturnsNulloptForMissingId)
 
 TEST_F(ProfileServiceTest, GetByIdReturnsCorrectProfile)
 {
-    const auto id = _service->create("Bob", std::string{"bob@example.com"});
+    const auto id = _service->create(
+        domain::Profile{
+            ProfileId::invalid(),
+            "Bob",
+            std::string{"bob@example.com"}
+        }
+    );
 
     const auto profile = _service->get(id);
     ASSERT_TRUE(profile.has_value());
@@ -81,8 +93,12 @@ TEST_F(ProfileServiceTest, GetAllEmptyWhenNoProfiles)
 
 TEST_F(ProfileServiceTest, GetAllReturnsAllCreatedProfiles)
 {
-    static_cast<void>(_service->create("Alice", std::nullopt));
-    static_cast<void>(_service->create("Bob", std::nullopt));
+    static_cast<void>(_service->create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
+    static_cast<void>(_service->create(
+        domain::Profile{ProfileId::invalid(), "Bob", std::nullopt}
+    ));
 
     const auto profiles = _service->getAll();
 
@@ -91,7 +107,9 @@ TEST_F(ProfileServiceTest, GetAllReturnsAllCreatedProfiles)
 
 TEST_F(ProfileServiceTest, UpdateChangesNameAndEmail)
 {
-    const auto id = _service->create("Carol", std::nullopt);
+    const auto id = _service->create(
+        domain::Profile{ProfileId::invalid(), "Carol", std::nullopt}
+    );
 
     _service->update(id, "Caroline", std::string{"carol@example.com"});
 
@@ -112,7 +130,9 @@ TEST_F(ProfileServiceTest, UpdateThrowsForNonExistentId)
 
 TEST_F(ProfileServiceTest, RemoveDeletesProfile)
 {
-    const auto id = _service->create("Dave", std::nullopt);
+    const auto id = _service->create(
+        domain::Profile{ProfileId::invalid(), "Dave", std::nullopt}
+    );
 
     _service->remove(id);
 
@@ -121,8 +141,12 @@ TEST_F(ProfileServiceTest, RemoveDeletesProfile)
 
 TEST_F(ProfileServiceTest, RemoveDoesNotAffectOtherProfiles)
 {
-    const auto id1 = _service->create("Eve", std::nullopt);
-    const auto id2 = _service->create("Frank", std::nullopt);
+    const auto id1 = _service->create(
+        domain::Profile{ProfileId::invalid(), "Eve", std::nullopt}
+    );
+    const auto id2 = _service->create(
+        domain::Profile{ProfileId::invalid(), "Frank", std::nullopt}
+    );
 
     _service->remove(id1);
 

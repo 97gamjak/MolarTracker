@@ -7,10 +7,13 @@
 
 #include "config/id_types.hpp"
 
+namespace domain
+{
+    class Profile;   // forward declaration
+}   // namespace domain
+
 namespace app
 {
-
-    class Profile;   // forward declaration
 
     /**
      * @brief Interface for Profile repository
@@ -24,29 +27,30 @@ namespace app
         /**
          * @brief Get all profiles from the repository
          *
-         * @return std::vector<Profile>
+         * @return std::vector<domain::Profile>
          */
-        [[nodiscard]] virtual std::vector<Profile> getAll() const = 0;
+        [[nodiscard]]
+        virtual std::vector<domain::Profile> getAll() const = 0;
 
         /**
          * @brief Get a profile by its ID
          *
          * @param id The ID of the profile to retrieve
-         * @return std::optional<Profile> The profile with the given ID, or
-         * std::nullopt if no such profile exists
+         * @return std::optional<domain::Profile> The profile with the given ID,
+         * or std::nullopt if no such profile exists
          */
-        [[nodiscard]] virtual std::optional<Profile> get(
-            ProfileId id
-        ) const = 0;
+        [[nodiscard]]
+        virtual std::optional<domain::Profile> get(ProfileId id) const = 0;
 
         /**
          * @brief Get a profile by its name
          *
          * @param name The name of the profile to retrieve
-         * @return std::optional<Profile> The profile with the given name, or
-         * std::nullopt if no such profile exists
+         * @return std::optional<domain::Profile> The profile with the given
+         * name, or std::nullopt if no such profile exists
          */
-        [[nodiscard]] virtual std::optional<Profile> get(
+        [[nodiscard]]
+        virtual std::optional<domain::Profile> get(
             const std::string& name
         ) const = 0;
 
@@ -57,14 +61,11 @@ namespace app
          * should throw an exception or return an error to indicate that the
          * profile could not be created.
          *
-         * @param name The name of the profile to create
-         * @param email The email of the profile to create (optional)
+         * @param profile The profile to create
          * @return ProfileId The ID of the newly created profile
          */
-        [[nodiscard]] virtual ProfileId create(
-            const std::string&         name,
-            std::optional<std::string> email
-        ) = 0;
+        [[nodiscard]]
+        virtual ProfileId create(const domain::Profile& profile) = 0;
 
         /**
          * @brief Update an existing profile with the given ID, changing its

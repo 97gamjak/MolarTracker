@@ -96,6 +96,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Speedup some compilation headers
+- split domain profile completely from controllers and introduce profile store interface
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

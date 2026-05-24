@@ -7,11 +7,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "app/store/i_store.hpp"
 #include "config/signal_tags.hpp"
 #include "config/strong_id.hpp"
 #include "connections/observable.hpp"
 #include "filter/predicate.hpp"
-#include "i_store.hpp"
 #include "store_state.hpp"
 
 namespace app

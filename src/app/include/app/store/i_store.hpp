@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__STORE__BASE__I_STORE_HPP__
-#define __APP__INCLUDE__APP__STORE__BASE__I_STORE_HPP__
+#ifndef __APP__INCLUDE__APP__STORE__I_STORE_HPP__
+#define __APP__INCLUDE__APP__STORE__I_STORE_HPP__
 
 #include "config/signal_tags.hpp"
 
@@ -56,4 +56,4 @@ namespace app
 
 }   // namespace app
 
-#endif   // __APP__INCLUDE__APP__STORE__BASE__I_STORE_HPP__
+#endif   // __APP__INCLUDE__APP__STORE__I_STORE_HPP__

@@ -3,8 +3,8 @@
 #include <optional>
 #include <vector>
 
-#include "app/domain/profile.hpp"
 #include "app/repos_api/i_profile_repo.hpp"
+#include "domain/profile.hpp"
 
 namespace app
 {
@@ -23,9 +23,9 @@ namespace app
      * @brief Get a profile by its ID
      *
      * @param id
-     * @return std::optional<Profile>
+     * @return std::optional<domain::Profile>
      */
-    std::optional<Profile> ProfileService::get(ProfileId id) const
+    std::optional<domain::Profile> ProfileService::get(ProfileId id) const
     {
         return _profileRepo->get(id);
     }
@@ -33,9 +33,9 @@ namespace app
     /**
      * @brief Get all profiles
      *
-     * @return std::vector<Profile>
+     * @return std::vector<domain::Profile>
      */
-    std::vector<Profile> ProfileService::getAll() const
+    std::vector<domain::Profile> ProfileService::getAll() const
     {
         return _profileRepo->getAll();
     }
@@ -43,16 +43,12 @@ namespace app
     /**
      * @brief Create a new profile
      *
-     * @param name
-     * @param email
+     * @param profile
      * @return ProfileId
      */
-    ProfileId ProfileService::create(
-        const std::string&                name,
-        const std::optional<std::string>& email
-    )
+    ProfileId ProfileService::create(const domain::Profile& profile)
     {
-        return _profileRepo->create(name, email);
+        return _profileRepo->create(profile);
     }
 
     /**

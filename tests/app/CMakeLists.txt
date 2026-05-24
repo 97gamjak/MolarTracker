@@ -19,6 +19,7 @@ target_link_libraries(tests_app
     PRIVATE
     molartracker_app
     molartracker_db
+    molartracker_domain
     molartracker_logging
     molartracker_sql_models
     molartracker_tests

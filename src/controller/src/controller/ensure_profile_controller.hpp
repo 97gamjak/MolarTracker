@@ -14,7 +14,7 @@ namespace app
 
 namespace drafts
 {
-    struct ProfileDraft;   // Forward declaration
+    class ProfileDraft;   // Forward declaration
 }   // namespace drafts
 
 namespace cmd

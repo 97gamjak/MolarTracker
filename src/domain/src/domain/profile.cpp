@@ -1,17 +1,22 @@
-#include "app/domain/profile.hpp"
+#include "domain/profile.hpp"
 
 #include <utility>
 
-namespace app
+namespace domain
 {
     /**
      * @brief Construct a new Profile:: Profile object
      *
+     * @param id
      * @param name
      * @param email
      */
-    Profile::Profile(std::string name, const std::optional<std::string>& email)
-        : _id{ProfileId::invalid()}, _name{std::move(name)}, _email{email}
+    Profile::Profile(
+        ProfileId                         id,
+        std::string                       name,
+        const std::optional<std::string>& email
+    )
+        : _id{id}, _name{std::move(name)}, _email{email}
     {
     }
 
@@ -63,6 +68,12 @@ namespace app
         _email = newEmail;
     }
 
+    /**
+     * @brief Create a predicate to filter profiles by their ID
+     *
+     * @param id
+     * @return filter::Predicate<Profile>
+     */
     filter::Predicate<Profile> HasProfileId(ProfileId id)
     {
         return filter::makePredicate<Profile>([id](const Profile& profile)
@@ -70,6 +81,12 @@ namespace app
         );
     }
 
+    /**
+     * @brief Create a predicate to filter profiles by their name
+     *
+     * @param name
+     * @return filter::Predicate<Profile>
+     */
     filter::Predicate<Profile> HasProfileName(std::string_view name)
     {
         return filter::makePredicate<Profile>(
@@ -77,4 +94,4 @@ namespace app
         );
     }
 
-}   // namespace app
+}   // namespace domain

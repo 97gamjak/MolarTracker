@@ -7,13 +7,13 @@
 #include <string>
 #include <vector>
 
-#include "app/domain/profile.hpp"
 #include "app/services_api/i_account_service.hpp"
 #include "app/services_api/i_instrument_service.hpp"
 #include "app/services_api/i_position_service.hpp"
 #include "app/services_api/i_profile_service.hpp"
 #include "app/services_api/i_transaction_service.hpp"
 #include "config/id_types.hpp"
+#include "domain/profile.hpp"
 #include "finance/account.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/position.hpp"
@@ -27,10 +27,10 @@ namespace tests
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        std::vector<app::Profile> profiles;
-        int                       createCallCount = 0;
-        int                       removeCallCount = 0;
-        int                       updateCallCount = 0;
+        std::vector<domain::Profile> profiles;
+        int                          createCallCount = 0;
+        int                          removeCallCount = 0;
+        int                          updateCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
@@ -42,17 +42,17 @@ namespace tests
             const std::optional<std::string>& email = std::nullopt
         )
         {
-            auto profile = app::Profile{name, email};
+            auto profile = domain::Profile{ProfileId::invalid(), name, email};
             profile.setId(ProfileId{_nextId++});
             profiles.push_back(profile);
         }
 
-        [[nodiscard]] std::vector<app::Profile> getAll() const override
+        [[nodiscard]] std::vector<domain::Profile> getAll() const override
         {
             return profiles;
         }
 
-        [[nodiscard]] std::optional<app::Profile> get(
+        [[nodiscard]] std::optional<domain::Profile> get(
             ProfileId id
         ) const override
         {
@@ -64,16 +64,13 @@ namespace tests
             return std::nullopt;
         }
 
-        [[nodiscard]] ProfileId create(
-            const std::string&                name,
-            const std::optional<std::string>& email
-        ) override
+        [[nodiscard]] ProfileId create(const domain::Profile& profile) override
         {
             createCallCount++;
-            auto       profile = app::Profile{name, email};
-            const auto newId   = ProfileId{_nextId++};
-            profile.setId(newId);
-            profiles.push_back(profile);
+            auto       newProfile = profile;
+            const auto newId      = ProfileId{_nextId++};
+            newProfile.setId(newId);
+            profiles.push_back(newProfile);
             return newId;
         }
 

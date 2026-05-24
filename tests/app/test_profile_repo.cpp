@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "app/domain/profile.hpp"
 #include "app/migration/migration_runner.hpp"
 #include "app/repos/profile_repo.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
+#include "domain/profile.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "test_fixtures.hpp"
 
@@ -30,12 +30,9 @@ namespace
             app::MigrationRunner{_db};
         }
 
-        [[nodiscard]] ProfileId createProfile(
-            const std::string&                name,
-            const std::optional<std::string>& email = std::nullopt
-        )
+        [[nodiscard]] ProfileId createProfile(const domain::Profile& profile)
         {
-            return _repo.create(name, email);
+            return _repo.create(profile);
         }
     };
 
@@ -43,21 +40,36 @@ namespace
 
 TEST_F(ProfileRepoTest, CreateReturnsValidId)
 {
-    const auto id = _repo.create("Alice", std::nullopt);
+    const auto id = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    );
 
     EXPECT_GT(id.value(), 0);
 }
 
 TEST_F(ProfileRepoTest, CreateDuplicateNameThrows)
 {
-    static_cast<void>(_repo.create("Alice", std::nullopt));
+    auto result = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    );
 
-    EXPECT_THROW(_repo.create("Alice", std::nullopt), orm::CrudException);
+    EXPECT_THROW(
+        result = _repo.create(
+            domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+        ),
+        orm::CrudException
+    );
 }
 
 TEST_F(ProfileRepoTest, CreateWithEmailPersistsEmail)
 {
-    const auto id = _repo.create("Bob", std::string{"bob@example.com"});
+    const auto id = _repo.create(
+        domain::Profile{
+            ProfileId::invalid(),
+            "Bob",
+            std::string{"bob@example.com"}
+        }
+    );
 
     const auto profile = _repo.get(id);
     ASSERT_TRUE(profile.has_value());
@@ -67,7 +79,9 @@ TEST_F(ProfileRepoTest, CreateWithEmailPersistsEmail)
 
 TEST_F(ProfileRepoTest, CreateWithoutEmailEmailIsEmpty)
 {
-    const auto id = _repo.create("Alice", std::nullopt);
+    const auto id = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    );
 
     const auto profile = _repo.get(id);
     ASSERT_TRUE(profile.has_value());
@@ -83,7 +97,13 @@ TEST_F(ProfileRepoTest, GetByIdReturnsNulloptForMissingId)
 
 TEST_F(ProfileRepoTest, GetByIdReturnsCorrectProfile)
 {
-    const auto id = _repo.create("Carol", std::string{"carol@example.com"});
+    const auto id = _repo.create(
+        domain::Profile{
+            ProfileId::invalid(),
+            "Carol",
+            std::string{"carol@example.com"}
+        }
+    );
 
     const auto profile = _repo.get(id);
     ASSERT_TRUE(profile.has_value());
@@ -100,7 +120,9 @@ TEST_F(ProfileRepoTest, GetByNameReturnsNulloptForMissingName)
 
 TEST_F(ProfileRepoTest, GetByNameReturnsCorrectProfile)
 {
-    const auto id = _repo.create("Dave", std::nullopt);
+    const auto id = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Dave", std::nullopt}
+    );
 
     const auto profile = _repo.get(std::string{"Dave"});
     ASSERT_TRUE(profile.has_value());
@@ -117,9 +139,15 @@ TEST_F(ProfileRepoTest, GetAllEmptyWhenNoProfiles)
 
 TEST_F(ProfileRepoTest, GetAllReturnsAllCreatedProfiles)
 {
-    static_cast<void>(_repo.create("Alice", std::nullopt));
-    static_cast<void>(_repo.create("Bob", std::nullopt));
-    static_cast<void>(_repo.create("Carol", std::nullopt));
+    static_cast<void>(_repo.create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
+    static_cast<void>(
+        _repo.create(domain::Profile{ProfileId::invalid(), "Bob", std::nullopt})
+    );
+    static_cast<void>(_repo.create(
+        domain::Profile{ProfileId::invalid(), "Carol", std::nullopt}
+    ));
 
     const auto profiles = _repo.getAll();
 
@@ -128,7 +156,13 @@ TEST_F(ProfileRepoTest, GetAllReturnsAllCreatedProfiles)
 
 TEST_F(ProfileRepoTest, GetAllReturnsCorrectProfileData)
 {
-    const auto id = _repo.create("Eve", std::string{"eve@example.com"});
+    const auto id = _repo.create(
+        domain::Profile{
+            ProfileId::invalid(),
+            "Eve",
+            std::string{"eve@example.com"}
+        }
+    );
 
     const auto profiles = _repo.getAll();
     ASSERT_EQ(profiles.size(), 1U);
@@ -141,7 +175,9 @@ TEST_F(ProfileRepoTest, GetAllReturnsCorrectProfileData)
 
 TEST_F(ProfileRepoTest, UpdateChangesNameAndEmail)
 {
-    const auto id = _repo.create("Frank", std::nullopt);
+    const auto id = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Frank", std::nullopt}
+    );
 
     _repo.update(id, "Franklin", std::string{"frank@example.com"});
 
@@ -154,7 +190,13 @@ TEST_F(ProfileRepoTest, UpdateChangesNameAndEmail)
 
 TEST_F(ProfileRepoTest, UpdateClearsEmail)
 {
-    const auto id = _repo.create("Grace", std::string{"grace@example.com"});
+    const auto id = _repo.create(
+        domain::Profile{
+            ProfileId::invalid(),
+            "Grace",
+            std::string{"grace@example.com"}
+        }
+    );
 
     _repo.update(id, "Grace", std::nullopt);
 
@@ -173,15 +215,21 @@ TEST_F(ProfileRepoTest, UpdateThrowsForNonExistentId)
 
 TEST_F(ProfileRepoTest, UpdateDuplicateNameThrows)
 {
-    const auto id1 = _repo.create("Heidi", std::nullopt);
-    static_cast<void>(_repo.create("Ivan", std::nullopt));
+    const auto id1 = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Heidi", std::nullopt}
+    );
+    static_cast<void>(_repo.create(
+        domain::Profile{ProfileId::invalid(), "Ivan", std::nullopt}
+    ));
 
     EXPECT_THROW(_repo.update(id1, "Ivan", std::nullopt), orm::CrudException);
 }
 
 TEST_F(ProfileRepoTest, RemoveDeletesProfile)
 {
-    const auto id = _repo.create("Judy", std::nullopt);
+    const auto id = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Judy", std::nullopt}
+    );
 
     _repo.remove(id);
 
@@ -191,8 +239,12 @@ TEST_F(ProfileRepoTest, RemoveDeletesProfile)
 
 TEST_F(ProfileRepoTest, RemoveDoesNotAffectOtherProfiles)
 {
-    const auto id1 = _repo.create("Mallory", std::nullopt);
-    const auto id2 = _repo.create("Nina", std::nullopt);
+    const auto id1 = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Mallory", std::nullopt}
+    );
+    const auto id2 = _repo.create(
+        domain::Profile{ProfileId::invalid(), "Nina", std::nullopt}
+    );
 
     _repo.remove(id1);
 

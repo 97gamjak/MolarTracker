@@ -33,8 +33,6 @@ add_library(molartracker_app STATIC
     src/app/factories/instrument_factory.cpp
     src/app/factories/position_factory.cpp
 
-    src/app/domain/profile.cpp
-
     src/app/migration/migration_runner.cpp
     src/app/migration/migration.cpp
     src/app/migration/single_migration.cpp
@@ -60,4 +58,5 @@ target_link_libraries(molartracker_app
     molartracker_config
     molartracker_sql_models
     molartracker_drafts
+    molartracker_domain
 )

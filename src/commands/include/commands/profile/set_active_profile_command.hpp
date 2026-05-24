@@ -4,13 +4,13 @@
 #include <optional>
 #include <string>
 
-#include "app/domain/profile.hpp"
 #include "commands/command.hpp"
 #include "commands/command_error.hpp"
+#include "drafts/profile_draft.hpp"
 
 namespace app
 {
-    class ProfileStore;   // Forward declaration
+    class IProfileStore;   // Forward declaration
 }   // namespace app
 
 namespace cmd
@@ -26,15 +26,15 @@ namespace cmd
         std::string _profileName;
 
         /// The previous active profile, used for undoing the command
-        std::optional<app::Profile> _previousProfile;
+        std::optional<drafts::ProfileDraft> _previousProfile = std::nullopt;
 
         /// Reference to the profile store
-        app::ProfileStore& _profileStore;
+        std::shared_ptr<app::IProfileStore> _profileStore;
 
        public:
         explicit SetActiveProfileCommand(
-            std::string        profileName,
-            app::ProfileStore& profileStore
+            std::string                                profileName,
+            const std::shared_ptr<app::IProfileStore>& profileStore
         );
 
         ~SetActiveProfileCommand() override                           = default;
