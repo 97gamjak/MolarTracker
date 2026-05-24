@@ -1,11 +1,15 @@
 #include "app/service_container.hpp"
 
-#include "app/repo_container.hpp"
+#include "logging/log_macros.hpp"
+#include "repo/exceptions.hpp"
+#include "repo/repo_container.hpp"
 #include "services/account_service.hpp"
 #include "services/instrument_service.hpp"
 #include "services/position_service.hpp"
 #include "services/profile_service.hpp"
 #include "services/transaction_service.hpp"
+
+REGISTER_LOG_CATEGORY("App.ServiceContainer");
 
 namespace app
 {
@@ -13,25 +17,37 @@ namespace app
     /**
      * @brief Construct a new Service Container object
      *
-     * @param repos
      */
-    ServiceContainer::ServiceContainer(RepoContainer& repos)
-        : _profileService{std::make_shared<ProfileService>(repos.getProfileRepo(
-          ))},
-          _accountService{std::make_shared<AccountService>(repos.getAccountRepo(
-          ))},
-          _transactionService{
-              std::make_shared<TransactionService>(repos.getTransactionRepo())
+    ServiceContainer::ServiceContainer()
+        : _profileService{std::make_shared<ProfileService>(
+              _repoContainer->getProfileRepo()
+          )},
+          _accountService{
+              std::make_shared<AccountService>(_repoContainer->getAccountRepo())
           },
-          _instrumentService{
-              std::make_shared<InstrumentService>(repos.getInstrumentRepo())
-          },
-          _positionService{
-              std::make_shared<PositionService>(repos.getPositionRepo())
-          }
+          _transactionService{std::make_shared<TransactionService>(
+              _repoContainer->getTransactionRepo()
+          )},
+          _instrumentService{std::make_shared<InstrumentService>(
+              _repoContainer->getInstrumentRepo()
+          )},
+          _positionService{std::make_shared<PositionService>(
+              _repoContainer->getPositionRepo()
+          )}
 
     {
+        try
+        {
+            _repoContainer = std::make_unique<repo::RepoContainer>();
+        }
+        catch (const repo::MigrationException& e)
+        {
+            LOG_ERROR("Database migration failed: " + std::string(e.what()));
+            throw;
+        }
     }
+
+    ServiceContainer::~ServiceContainer() = default;
 
     /**
      * @brief Get the Profile Service

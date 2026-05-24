@@ -3,10 +3,14 @@
 
 #include <memory>
 
+namespace repo
+{
+    class RepoContainer;   // Forward declaration
+}   // namespace repo
+
 namespace app
 {
 
-    class RepoContainer;         // Forward declaration
     class IProfileService;       // Forward declaration
     class IAccountService;       // Forward declaration
     class ITransactionService;   // Forward declaration
@@ -20,6 +24,8 @@ namespace app
     class ServiceContainer
     {
        private:
+        /// The Repository container
+        std::unique_ptr<repo::RepoContainer> _repoContainer;
         /// The Profile service
         std::shared_ptr<IProfileService> _profileService;
         /// The Account service
@@ -32,7 +38,8 @@ namespace app
         std::shared_ptr<IPositionService> _positionService;
 
        public:
-        explicit ServiceContainer(RepoContainer& repos);
+        explicit ServiceContainer();
+        ~ServiceContainer();
 
         [[nodiscard]] std::shared_ptr<IProfileService> getProfileService();
         [[nodiscard]] std::shared_ptr<const IProfileService> getProfileService(

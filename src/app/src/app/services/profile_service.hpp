@@ -7,10 +7,13 @@
 
 #include "app/services_api/i_profile_service.hpp"
 
+namespace repo
+{
+    class IProfileRepo;   // forward declaration
+}   // namespace repo
+
 namespace app
 {
-
-    class IProfileRepo;   // forward declaration
 
     /**
      * @brief Implementation of Profile service
@@ -20,10 +23,12 @@ namespace app
     {
        private:
         /// reference to the Profile repository
-        std::shared_ptr<IProfileRepo> _profileRepo;
+        std::shared_ptr<repo::IProfileRepo> _profileRepo;
 
        public:
-        explicit ProfileService(const std::shared_ptr<IProfileRepo>& repo);
+        explicit ProfileService(
+            const std::shared_ptr<repo::IProfileRepo>& repo
+        );
 
         [[nodiscard]]
         std::optional<domain::Profile> get(ProfileId id) const override;

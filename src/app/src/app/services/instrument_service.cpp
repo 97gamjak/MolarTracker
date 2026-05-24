@@ -1,7 +1,7 @@
 #include "instrument_service.hpp"
 
-#include "app/repos_api/i_instrument_repo.hpp"
 #include "finance/instrument/stock.hpp"
+#include "repo/i_instrument_repo.hpp"
 
 namespace app
 {
@@ -11,7 +11,7 @@ namespace app
      * @param instrumentRepo
      */
     InstrumentService::InstrumentService(
-        const std::shared_ptr<IInstrumentRepo>& instrumentRepo
+        const std::shared_ptr<repo::IInstrumentRepo>& instrumentRepo
     )
         : _instrumentRepo(instrumentRepo)
     {

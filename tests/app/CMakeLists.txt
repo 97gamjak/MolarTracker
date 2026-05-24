@@ -13,14 +13,17 @@ add_executable(tests_app
 target_include_directories(tests_app
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src/app/src/
+    ${CMAKE_SOURCE_DIR}/src/repo/src/
 )
 
 target_link_libraries(tests_app
     PRIVATE
     molartracker_app
+    molartracker_repo
     molartracker_db
     molartracker_domain
     molartracker_logging
+    molartracker_orm
     molartracker_sql_models
     molartracker_tests
     GTest::gtest_main

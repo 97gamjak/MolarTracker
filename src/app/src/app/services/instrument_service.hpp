@@ -12,9 +12,13 @@ namespace finance
 
 }   // namespace finance
 
-namespace app
+namespace repo
 {
     class IInstrumentRepo;   // forward declaration
+}   // namespace repo
+
+namespace app
+{
 
     /**
      * @brief Implementation of Instrument service
@@ -24,11 +28,11 @@ namespace app
     {
        private:
         /// reference to the instrument repository
-        std::shared_ptr<IInstrumentRepo> _instrumentRepo;
+        std::shared_ptr<repo::IInstrumentRepo> _instrumentRepo;
 
        public:
         explicit InstrumentService(
-            const std::shared_ptr<IInstrumentRepo>& instrumentRepo
+            const std::shared_ptr<repo::IInstrumentRepo>& instrumentRepo
         );
 
         [[nodiscard]] std::vector<std::string> getTickers() override;

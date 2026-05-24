@@ -4,8 +4,6 @@
 #include <memory>
 #include <vector>
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repos/transaction_repo.hpp"
 #include "app/services/transaction_service.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
@@ -15,6 +13,8 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
 #include "finance/transaction_filter.hpp"
+#include "repo/migration/migration_runner.hpp"
+#include "repo/transaction_repo.hpp"
 #include "test_fixtures.hpp"
 #include "utils/timestamp.hpp"
 
@@ -31,16 +31,16 @@ namespace
 
         tests::TempDbFile                        _tempFile;
         db::Database                             _db;
-        std::shared_ptr<app::TransactionRepo>    _repo;
+        std::shared_ptr<repo::TransactionRepo>   _repo;
         std::shared_ptr<app::TransactionService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         TransactionServiceTest()
             : _db{_tempFile.path()},
-              _repo{std::make_shared<app::TransactionRepo>(_db)},
+              _repo{std::make_shared<repo::TransactionRepo>(_db)},
               _service{std::make_shared<app::TransactionService>(_repo)}
         {
-            auto runner = app::MigrationRunner{_db};
+            auto runner = repo::MigrationRunner{_db};
             _db.execute(
                 "INSERT INTO profile (name, email) "
                 "VALUES ('TestProfile', NULL)"

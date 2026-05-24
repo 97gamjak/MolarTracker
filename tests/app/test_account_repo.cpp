@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repos/account_repo.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/account.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
+#include "repo/account_repo.hpp"
+#include "repo/migration/migration_runner.hpp"
 #include "sql_models/profile_row.hpp"
 #include "test_fixtures.hpp"
 
@@ -24,12 +24,12 @@ namespace
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         tests::TempDbFile _tempFile;
         db::Database      _db;
-        app::AccountRepo  _repo;
+        repo::AccountRepo _repo;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         AccountRepoTest() : _db{_tempFile.path()}, _repo{_db}
         {
-            app::MigrationRunner{_db};
+            repo::MigrationRunner{_db};
         }
 
         [[nodiscard]] ProfileId insertProfile(const std::string& name)

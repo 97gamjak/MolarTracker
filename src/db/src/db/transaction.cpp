@@ -1,8 +1,9 @@
 #include "db/transaction.hpp"
 
-#include <iostream>
-
 #include "db/database.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("DB.Transaction");
 
 namespace db
 {
@@ -48,8 +49,12 @@ namespace db
             }
             catch (const std::exception& e)
             {
-                std::cerr << "Failed to rollback transaction in destructor: "
-                          << e.what() << "\n";
+                LOG_ERROR(
+                    std::format(
+                        "Failed to rollback transaction in destructor: {}",
+                        e.what()
+                    )
+                );
             }
         }
     }

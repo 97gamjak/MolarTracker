@@ -1,6 +1,6 @@
 // test_transaction_repo.cpp
 //
-// GoogleTest-based integration tests for app::TransactionRepo.
+// GoogleTest-based integration tests for repo::TransactionRepo.
 //
 // Coverage:
 //  - getTransactions() on empty database
@@ -23,9 +23,6 @@
 #include <string>
 #include <vector>
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repos/transaction_repo.hpp"
-#include "app/repos_api/i_transaction_repo.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
@@ -35,6 +32,9 @@
 #include "finance/transaction.hpp"
 #include "finance/transaction_entry.hpp"
 #include "finance/transaction_filter.hpp"
+#include "repo/i_transaction_repo.hpp"
+#include "repo/migration/migration_runner.hpp"
+#include "repo/transaction_repo.hpp"
 #include "test_fixtures.hpp"
 #include "utils/timestamp.hpp"
 
@@ -53,10 +53,10 @@ namespace
         const InstrumentId _instrumentId{1};
         const PositionId   _positionId{1};
 
-        tests::TempDbFile    _tempFile;
-        db::Database         _db{_tempFile.path()};
-        app::MigrationRunner _migrationRunner{_db};
-        app::TransactionRepo _repo{_db};
+        tests::TempDbFile     _tempFile;
+        db::Database          _db{_tempFile.path()};
+        repo::MigrationRunner _migrationRunner{_db};
+        repo::TransactionRepo _repo{_db};
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         void SetUp() override
