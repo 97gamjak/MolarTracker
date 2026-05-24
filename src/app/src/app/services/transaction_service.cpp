@@ -1,8 +1,8 @@
 #include "transaction_service.hpp"
 
-#include "app/repos_api/i_transaction_repo.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
+#include "repo/i_transaction_repo.hpp"
 
 namespace app
 {
@@ -12,7 +12,7 @@ namespace app
      * @param transactionRepo The transaction repository to use.
      */
     TransactionService::TransactionService(
-        std::shared_ptr<ITransactionRepo> transactionRepo
+        std::shared_ptr<repo::ITransactionRepo> transactionRepo
     )
         : _transactionRepo(std::move(transactionRepo))
     {

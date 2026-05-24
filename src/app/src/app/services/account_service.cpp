@@ -1,7 +1,7 @@
 #include "account_service.hpp"
 
-#include "app/repos_api/i_account_repo.hpp"
 #include "finance/account.hpp"
+#include "repo/i_account_repo.hpp"
 
 namespace app
 {
@@ -12,7 +12,7 @@ namespace app
      * @param accountRepo
      */
     AccountService::AccountService(
-        const std::shared_ptr<IAccountRepo>& accountRepo
+        const std::shared_ptr<repo::IAccountRepo>& accountRepo
     )
         : _accountRepo(accountRepo)
     {

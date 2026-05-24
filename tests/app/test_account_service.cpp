@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repos/account_repo.hpp"
 #include "app/services/account_service.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
@@ -14,6 +12,8 @@
 #include "finance/account.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
+#include "repo/account_repo.hpp"
+#include "repo/migration/migration_runner.hpp"
 #include "sql_models/profile_row.hpp"
 #include "test_fixtures.hpp"
 
@@ -26,16 +26,16 @@ namespace
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         tests::TempDbFile                    _tempFile;
         db::Database                         _db;
-        std::shared_ptr<app::AccountRepo>    _repo;
+        std::shared_ptr<repo::AccountRepo>   _repo;
         std::shared_ptr<app::AccountService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         AccountServiceTest()
             : _db{_tempFile.path()},
-              _repo{std::make_shared<app::AccountRepo>(_db)},
+              _repo{std::make_shared<repo::AccountRepo>(_db)},
               _service{std::make_shared<app::AccountService>(_repo)}
         {
-            app::MigrationRunner{_db};
+            repo::MigrationRunner{_db};
         }
 
         [[nodiscard]] ProfileId insertProfile(const std::string& name)

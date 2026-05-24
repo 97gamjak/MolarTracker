@@ -5,9 +5,13 @@
 
 #include "app/services_api/i_transaction_service.hpp"
 
-namespace app
+namespace repo
 {
     class ITransactionRepo;   // Forward declaration
+}   // namespace repo
+
+namespace app
+{
 
     /**
      * @brief Service for managing transactions.
@@ -17,11 +21,11 @@ namespace app
     {
        private:
         /// Pointer to the transaction repository.
-        std::shared_ptr<ITransactionRepo> _transactionRepo;
+        std::shared_ptr<repo::ITransactionRepo> _transactionRepo;
 
        public:
         explicit TransactionService(
-            std::shared_ptr<ITransactionRepo> transactionRepo
+            std::shared_ptr<repo::ITransactionRepo> transactionRepo
         );
 
         [[nodiscard]]

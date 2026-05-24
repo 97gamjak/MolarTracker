@@ -1,8 +1,8 @@
 #include "position_service.hpp"
 
-#include "app/repos_api/i_position_repo.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
+#include "repo/i_position_repo.hpp"
 
 REGISTER_LOG_CATEGORY("App.Service.PositionService");
 
@@ -14,7 +14,7 @@ namespace app
      * @param positionRepo
      */
     PositionService::PositionService(
-        std::shared_ptr<IPositionRepo> positionRepo
+        std::shared_ptr<repo::IPositionRepo> positionRepo
     )
         : _positionRepo(std::move(positionRepo))
     {

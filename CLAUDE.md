@@ -290,7 +290,7 @@ Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger rele
 | MVC                  | `src/ui/controller/` + `src/ui/widgets/` |
 | Repository           | `src/app/repos/`                         |
 | Service Layer        | `src/app/services/`                      |
-| Factory              | `src/app/factories/`                     |
+| Factory              | `src/repo/factories`                     |
 | Command (undo/redo)  | `src/ui/commands/`                       |
 | Observable / Signal  | `src/connections/`                       |
 | Singleton            | `Constants`, `LogManager`                |

@@ -3,8 +3,8 @@
 #include <optional>
 #include <vector>
 
-#include "app/repos_api/i_profile_repo.hpp"
 #include "domain/profile.hpp"
+#include "repo/i_profile_repo.hpp"
 
 namespace app
 {
@@ -14,7 +14,9 @@ namespace app
      *
      * @param repo
      */
-    ProfileService::ProfileService(const std::shared_ptr<IProfileRepo>& repo)
+    ProfileService::ProfileService(
+        const std::shared_ptr<repo::IProfileRepo>& repo
+    )
         : _profileRepo{repo}
     {
     }

@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repos/profile_repo.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "domain/profile.hpp"
 #include "orm/crud/crud_error.hpp"
+#include "repo/migration/migration_runner.hpp"
+#include "repo/profile_repo.hpp"
 #include "test_fixtures.hpp"
 
 namespace
@@ -22,12 +22,12 @@ namespace
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         tests::TempDbFile _tempFile;
         db::Database      _db;
-        app::ProfileRepo  _repo;
+        repo::ProfileRepo _repo;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         ProfileRepoTest() : _db{_tempFile.path()}, _repo{_db}
         {
-            app::MigrationRunner{_db};
+            repo::MigrationRunner{_db};
         }
 
         [[nodiscard]] ProfileId createProfile(const domain::Profile& profile)
