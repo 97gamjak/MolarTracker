@@ -3,10 +3,14 @@
 #include "account_repo.hpp"
 #include "config/constants.hpp"
 #include "instrument_repo.hpp"
+#include "logging/log_macros.hpp"
 #include "position_repo.hpp"
 #include "profile_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
+#include "repo/repo_errors.hpp"
 #include "transaction_repo.hpp"
+
+REGISTER_LOG_CATEGORY("Repo.Container");
 
 namespace repo
 {
@@ -26,6 +30,13 @@ namespace repo
           _instrumentRepo{std::make_shared<InstrumentRepo>(*_database)},
           _positionRepo{std::make_shared<PositionRepo>(*_database)}
     {
+        if (!_migrationRunner || !_profileRepo || !_accountRepo ||
+            !_transactionRepo || !_instrumentRepo || !_positionRepo)
+        {
+            const auto* const msg = "Failed to initialize repository container";
+            LOG_ERROR(msg);
+            throw RepositoryException(msg);
+        }
     }
 
     RepoContainer::~RepoContainer() = default;
