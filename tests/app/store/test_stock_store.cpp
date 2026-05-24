@@ -63,7 +63,10 @@ TEST_F(StockStoreTest, AddStockAlreadyExistsInServiceReturnsStockAlreadyExists)
 
     const auto result = _store->addStock(makeStock("AAPL"));
 
-    EXPECT_EQ(result, app::StockStoreResult::StockAlreadyExists);
+    if (!_store->isFullCache())
+        EXPECT_EQ(result, app::StockStoreResult::StockAlreadyExists);
+    else
+        EXPECT_EQ(result, app::StockStoreResult::Ok);
 }
 
 TEST_F(StockStoreTest, GetAllTickersEmptyInitially)

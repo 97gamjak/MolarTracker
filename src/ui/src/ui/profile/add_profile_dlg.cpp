@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "config/id_types.hpp"
 #include "drafts/profile_draft.hpp"
 #include "ui/validators/validators.hpp"
 #include "utils/qt_helpers.hpp"
@@ -231,8 +232,9 @@ namespace ui
     drafts::ProfileDraft AddProfileDialog::_getProfile() const
     {
         return drafts::ProfileDraft{
-            .name  = _nameLineEdit->text().toStdString(),
-            .email = _emailLineEdit->text().toStdString()
+            ProfileId::invalid(),
+            _nameLineEdit->text().toStdString(),
+            _emailLineEdit->text().toStdString()
         };
     }
 

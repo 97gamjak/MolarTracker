@@ -8,7 +8,7 @@
 #include <format>
 
 #include "app/app_context.hpp"
-#include "app/store/profile/profile_store.hpp"
+#include "app/store/i_profile_store.hpp"
 #include "app/store_container.hpp"
 #include "commands/profile/add_profile_command.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
@@ -78,7 +78,7 @@ namespace controller
             const auto defaultProfile = settings.getDefaultProfile();
 
             if (defaultProfile.has_value() &&
-                profileStore.profileExists(defaultProfile.value()))
+                profileStore->profileExists(defaultProfile.value()))
             {
                 const auto name = settings.getDefaultProfile();
 
@@ -133,7 +133,7 @@ namespace controller
     {
         auto& profileStore = _appContext.getStore().getProfileStore();
 
-        if (profileStore.profileExists(name))
+        if (profileStore->profileExists(name))
         {
             auto cmdResult =
                 cmd::Commands::makeAndDo<cmd::SetActiveProfileCommand>(
@@ -194,7 +194,7 @@ namespace controller
             &_mainWindow
         );
 
-        if (profileStore.hasProfiles())
+        if (profileStore->hasProfiles())
             _showProfileSelectionDialog();
         else
             _showAddProfileDialog();
@@ -220,7 +220,7 @@ namespace controller
 
         auto& profileStore = _appContext.getStore().getProfileStore();
 
-        if (profileStore.hasProfiles())
+        if (profileStore->hasProfiles())
             _showProfileSelectionDialog();
         else
             _showAddProfileDialog();
@@ -271,7 +271,7 @@ namespace controller
 
         _profileSelectionDialog = utils::makeQChild<ui::ProfileSelectionDialog>(
             &_mainWindow,
-            profileStore.getAllProfileNames(),
+            profileStore->getAllProfileNames(),
             false   // canBeClosed = false to disable the close button
         );
 
@@ -401,7 +401,7 @@ namespace controller
 
             auto setDefaultCommand =
                 cmd::Commands::makeAndDo<cmd::SetDefaultProfileCommand>(
-                    profileDraft.name,
+                    profileDraft.getName(),
                     _appContext.getSettings().getGeneralSettings()
                 );
 
@@ -417,7 +417,8 @@ namespace controller
 
             ui::showInfoStatusBar(
                 LOG_INFO_OBJECT(
-                    "Profile '" + profileDraft.name + "' created successfully."
+                    "Profile '" + profileDraft.getName() +
+                    "' created successfully."
                 ),
                 _mainWindow.statusBar()
             );

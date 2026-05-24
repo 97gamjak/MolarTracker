@@ -7,12 +7,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include "app/store/i_store.hpp"
 #include "config/logging_base.hpp"
 #include "config/signal_tags.hpp"
 #include "config/strong_id.hpp"
 #include "connections/observable.hpp"
 #include "filter/predicate.hpp"
-#include "i_store.hpp"
 #include "logging/log_category.hpp"
 #include "store_state.hpp"
 
@@ -148,7 +148,13 @@ namespace app
         /// Flag indicating whether the store has already notified subscribers
         bool _alreadyNotified = false;
 
+        /// Flag indicating whether the store is fully cached
+        bool _fullCache = false;
+
        public:
+        BaseStore() = default;
+        explicit BaseStore(bool fullCache);
+
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
 
@@ -188,6 +194,9 @@ namespace app
             StoreChanged<IdType>::func func,
             void*                      user
         );
+
+        [[nodiscard]]
+        bool isFullCache() const;
 
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;

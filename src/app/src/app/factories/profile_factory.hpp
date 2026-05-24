@@ -5,9 +5,13 @@
 
 struct ProfileRow;   // Forward declaration
 
-namespace app
+namespace domain
 {
     class Profile;   // Forward declaration
+}   // namespace domain
+
+namespace app
+{
 
     /**
      * @brief Factory for creating Profile instances
@@ -16,12 +20,16 @@ namespace app
     class ProfileFactory
     {
        public:
-        static Profile              toDomain(const ProfileRow& row);
-        static std::vector<Profile> toDomains(
+        [[nodiscard]]
+        static domain::Profile toDomain(const ProfileRow& row);
+
+        [[nodiscard]]
+        static std::vector<domain::Profile> toDomains(
             const std::vector<ProfileRow>& rows
         );
 
-        static ProfileRow toRow(const Profile& profile);
+        [[nodiscard]]
+        static ProfileRow toRow(const domain::Profile& profile);
     };
 
 }   // namespace app

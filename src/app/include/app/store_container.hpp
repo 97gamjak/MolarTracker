@@ -13,7 +13,7 @@ namespace app
 {
 
     class ServiceContainer;   // Forward declaration
-    class ProfileStore;       // Forward declaration
+    class IProfileStore;      // Forward declaration
     class AccountStore;       // Forward declaration
     class StockStore;         // Forward declaration
     class PositionStore;      // Forward declaration
@@ -30,7 +30,7 @@ namespace app
         /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
         /// The Profile store
-        std::unique_ptr<ProfileStore> _profileStore;
+        std::shared_ptr<IProfileStore> _profileStore;
         /// The Account store
         std::unique_ptr<AccountStore> _accountStore;
         /// The stock store
@@ -60,8 +60,9 @@ namespace app
             void*                       user
         );
 
-        [[nodiscard]] ProfileStore&       getProfileStore();
-        [[nodiscard]] const ProfileStore& getProfileStore() const;
+        [[nodiscard]] std::shared_ptr<IProfileStore>&       getProfileStore();
+        [[nodiscard]] const std::shared_ptr<IProfileStore>& getProfileStore(
+        ) const;
 
         [[nodiscard]] AccountStore&       getAccountStore();
         [[nodiscard]] const AccountStore& getAccountStore() const;

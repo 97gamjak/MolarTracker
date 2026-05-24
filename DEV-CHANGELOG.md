@@ -83,6 +83,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add position creation when creating transactions
 - Add fees to creating stock and cash transactions
 - Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
+- Make stock store a fully cached store with possibility to switch to a dirty-only cache store
 
 #### UI
 
@@ -95,6 +96,7 @@ All changes and updates, that are relevant for developers will be documented her
 ### Cleanup
 
 - Speedup some compilation headers
+- split domain profile completely from controllers and introduce profile store interface
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
