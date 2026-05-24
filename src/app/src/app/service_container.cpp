@@ -1,11 +1,15 @@
 #include "app/service_container.hpp"
 
+#include "logging/log_macros.hpp"
+#include "repo/exceptions.hpp"
 #include "repo/repo_container.hpp"
 #include "services/account_service.hpp"
 #include "services/instrument_service.hpp"
 #include "services/position_service.hpp"
 #include "services/profile_service.hpp"
 #include "services/transaction_service.hpp"
+
+REGISTER_LOG_CATEGORY("App.ServiceContainer");
 
 namespace app
 {
@@ -15,10 +19,9 @@ namespace app
      *
      */
     ServiceContainer::ServiceContainer()
-        : _repoContainer{std::make_unique<repo::RepoContainer>()},
-          _profileService{
-              std::make_shared<ProfileService>(_repoContainer->getProfileRepo())
-          },
+        : _profileService{std::make_shared<ProfileService>(
+              _repoContainer->getProfileRepo()
+          )},
           _accountService{
               std::make_shared<AccountService>(_repoContainer->getAccountRepo())
           },
@@ -33,6 +36,15 @@ namespace app
           )}
 
     {
+        try
+        {
+            _repoContainer = std::make_unique<repo::RepoContainer>();
+        }
+        catch (const repo::MigrationException& e)
+        {
+            LOG_ERROR("Database migration failed: " + std::string(e.what()));
+            throw;
+        }
     }
 
     ServiceContainer::~ServiceContainer() = default;

@@ -2,12 +2,14 @@ add_library(molartracker_repo STATIC
     src/repo/repo_container.cpp
 
     src/repo/account_repo.cpp
-    src/repo/profile_repo.cpp
+    src/repo/position_repo.cpp
     src/repo/base_repo.cpp
-    src/repo/repo_errors.cpp
-    src/repo/transaction_repo.cpp
+    src/repo/exceptions.cpp
     src/repo/instrument_repo.cpp
     src/repo/position_repo.cpp
+    src/repo/profile_repo.cpp
+    src/repo/repo_errors.cpp
+    src/repo/transaction_repo.cpp
 
     src/repo/factories/account_factory.cpp
     src/repo/factories/profile_factory.cpp
