@@ -4,7 +4,7 @@
 #include "finance/transaction_filter.hpp"
 #include "repo/i_transaction_repo.hpp"
 
-namespace app
+namespace service
 {
     /**
      * @brief Constructs a TransactionService.
@@ -51,4 +51,4 @@ namespace app
         return _transactionRepo->getTransactions(accountIds, filter);
     }
 
-}   // namespace app
+}   // namespace service

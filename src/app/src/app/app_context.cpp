@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "app/service_container.hpp"
 #include "app/store_container.hpp"
 
 namespace app
@@ -14,9 +13,7 @@ namespace app
      * @param settings The settings object to use for the application context
      */
     AppContext::AppContext(settings::Settings& settings)
-        : _settings{settings},
-          _services{std::make_unique<ServiceContainer>()},
-          _store{std::make_unique<StoreContainer>(*_services)}
+        : _settings{settings}, _store{std::make_unique<StoreContainer>()}
     {
     }
 

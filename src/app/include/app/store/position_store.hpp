@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "app/services_api/i_position_service.hpp"
 #include "base/base_store.hpp"
 #include "finance/position.hpp"
+#include "service/i_position_service.hpp"
 
 namespace app
 {
@@ -20,7 +20,7 @@ namespace app
     {
        private:
         /// The Position service
-        std::shared_ptr<IPositionService> _positionService;
+        std::shared_ptr<service::IPositionService> _positionService;
 
         struct Session;
         /// The current session data
@@ -28,8 +28,8 @@ namespace app
 
        public:
         explicit PositionStore(
-            std::shared_ptr<IPositionService> positionService,
-            const AccountSession&             accountSession
+            std::shared_ptr<service::IPositionService> positionService,
+            const AccountSession&                      accountSession
         );
 
         ~PositionStore() override;

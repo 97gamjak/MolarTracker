@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 
-#include "app/services/transaction_service.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
@@ -15,6 +14,7 @@
 #include "finance/transaction_filter.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/transaction_repo.hpp"
+#include "service/transaction_service.hpp"
 #include "test_fixtures.hpp"
 #include "utils/timestamp.hpp"
 
@@ -29,16 +29,16 @@ namespace
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         const AccountId _accountId{1};
 
-        tests::TempDbFile                        _tempFile;
-        db::Database                             _db;
-        std::shared_ptr<repo::TransactionRepo>   _repo;
-        std::shared_ptr<app::TransactionService> _service;
+        tests::TempDbFile                            _tempFile;
+        db::Database                                 _db;
+        std::shared_ptr<repo::TransactionRepo>       _repo;
+        std::shared_ptr<service::TransactionService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         TransactionServiceTest()
             : _db{_tempFile.path()},
               _repo{std::make_shared<repo::TransactionRepo>(_db)},
-              _service{std::make_shared<app::TransactionService>(_repo)}
+              _service{std::make_shared<service::TransactionService>(_repo)}
         {
             auto runner = repo::MigrationRunner{_db};
             _db.execute(

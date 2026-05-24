@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__SERVICE_CONTAINER_HPP__
-#define __APP__INCLUDE__APP__SERVICE_CONTAINER_HPP__
+#ifndef __SERVICE__INCLUDE__SERVICE__SERVICE_CONTAINER_HPP__
+#define __SERVICE__INCLUDE__SERVICE__SERVICE_CONTAINER_HPP__
 
 #include <memory>
 
@@ -8,7 +8,7 @@ namespace repo
     class RepoContainer;   // Forward declaration
 }   // namespace repo
 
-namespace app
+namespace service
 {
 
     class IProfileService;       // Forward declaration
@@ -64,6 +64,6 @@ namespace app
         ) const;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__INCLUDE__APP__SERVICE_CONTAINER_HPP__
+#endif   // __SERVICE__INCLUDE__SERVICE__SERVICE_CONTAINER_HPP__

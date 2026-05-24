@@ -7,11 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "app/services_api/i_account_service.hpp"
-#include "app/services_api/i_instrument_service.hpp"
-#include "app/services_api/i_position_service.hpp"
-#include "app/services_api/i_profile_service.hpp"
-#include "app/services_api/i_transaction_service.hpp"
 #include "config/id_types.hpp"
 #include "domain/profile.hpp"
 #include "finance/account.hpp"
@@ -19,11 +14,16 @@
 #include "finance/position.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
+#include "service/i_account_service.hpp"
+#include "service/i_instrument_service.hpp"
+#include "service/i_position_service.hpp"
+#include "service/i_profile_service.hpp"
+#include "service/i_transaction_service.hpp"
 
 namespace tests
 {
 
-    class MockProfileService : public app::IProfileService
+    class MockProfileService : public service::IProfileService
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
@@ -105,7 +105,7 @@ namespace tests
         }
     };
 
-    class MockAccountService : public app::IAccountService
+    class MockAccountService : public service::IAccountService
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
@@ -134,7 +134,7 @@ namespace tests
         }
     };
 
-    class MockInstrumentService : public app::IInstrumentService
+    class MockInstrumentService : public service::IInstrumentService
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
@@ -183,7 +183,7 @@ namespace tests
         }
     };
 
-    class MockPositionService : public app::IPositionService
+    class MockPositionService : public service::IPositionService
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
@@ -217,7 +217,7 @@ namespace tests
         }
     };
 
-    class MockTransactionService : public app::ITransactionService
+    class MockTransactionService : public service::ITransactionService
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)

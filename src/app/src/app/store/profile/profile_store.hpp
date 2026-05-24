@@ -20,11 +20,13 @@ namespace drafts
     class ProfileDraft;   // forward declaration
 }   // namespace drafts
 
+namespace service
+{
+    class IProfileService;   // forward declaration
+}   // namespace service
+
 namespace app
 {
-
-    class IProfileService;   // forward declaration
-
     /**
      * @brief Store for managing profiles
      *
@@ -34,7 +36,7 @@ namespace app
     {
        private:
         /// reference to the profile service
-        std::shared_ptr<IProfileService> _profileService;
+        std::shared_ptr<service::IProfileService> _profileService;
 
         /// the ID of the currently active profile, this is used to determine
         /// which profile is currently active in the application and should be
@@ -46,7 +48,7 @@ namespace app
 
        public:
         explicit ProfileStore(
-            const std::shared_ptr<IProfileService>& profileService
+            const std::shared_ptr<service::IProfileService>& profileService
         );
 
         [[nodiscard]] bool hasProfiles() const override;

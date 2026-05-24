@@ -5,13 +5,13 @@
 #include <string>
 #include <vector>
 
-#include "app/services/instrument_service.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/instrument/stock.hpp"
 #include "repo/instrument_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
+#include "service/instrument_service.hpp"
 #include "test_fixtures.hpp"
 
 namespace
@@ -21,16 +21,16 @@ namespace
     {
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        tests::TempDbFile                       _tempFile;
-        db::Database                            _db;
-        std::shared_ptr<repo::InstrumentRepo>   _repo;
-        std::shared_ptr<app::InstrumentService> _service;
+        tests::TempDbFile                           _tempFile;
+        db::Database                                _db;
+        std::shared_ptr<repo::InstrumentRepo>       _repo;
+        std::shared_ptr<service::InstrumentService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         InstrumentServiceTest()
             : _db{_tempFile.path()},
               _repo{std::make_shared<repo::InstrumentRepo>(_db)},
-              _service{std::make_shared<app::InstrumentService>(_repo)}
+              _service{std::make_shared<service::InstrumentService>(_repo)}
         {
             repo::MigrationRunner{_db};
         }

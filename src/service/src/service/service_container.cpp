@@ -1,17 +1,17 @@
-#include "app/service_container.hpp"
+#include "service/service_container.hpp"
 
+#include "account_service.hpp"
+#include "instrument_service.hpp"
 #include "logging/log_macros.hpp"
+#include "position_service.hpp"
+#include "profile_service.hpp"
 #include "repo/exceptions.hpp"
 #include "repo/repo_container.hpp"
-#include "services/account_service.hpp"
-#include "services/instrument_service.hpp"
-#include "services/position_service.hpp"
-#include "services/profile_service.hpp"
-#include "services/transaction_service.hpp"
+#include "transaction_service.hpp"
 
-REGISTER_LOG_CATEGORY("App.ServiceContainer");
+REGISTER_LOG_CATEGORY("Service.ServiceContainer");
 
-namespace app
+namespace service
 {
 
     /**
@@ -19,12 +19,14 @@ namespace app
      *
      */
     ServiceContainer::ServiceContainer()
-        : _profileService{std::make_shared<ProfileService>(
-              _repoContainer->getProfileRepo()
-          )},
+    try
+        : _repoContainer{std::make_unique<repo::RepoContainer>()},
+          _profileService{
+              std::make_shared<ProfileService>(_repoContainer->getProfileRepo()
+              )},
           _accountService{
-              std::make_shared<AccountService>(_repoContainer->getAccountRepo())
-          },
+              std::make_shared<AccountService>(_repoContainer->getAccountRepo()
+              )},
           _transactionService{std::make_shared<TransactionService>(
               _repoContainer->getTransactionRepo()
           )},
@@ -36,15 +38,18 @@ namespace app
           )}
 
     {
-        try
-        {
-            _repoContainer = std::make_unique<repo::RepoContainer>();
-        }
-        catch (const repo::MigrationException& e)
-        {
-            LOG_ERROR("Database migration failed: " + std::string(e.what()));
-            throw;
-        }
+    }
+    catch (const repo::MigrationException& e)
+    {
+        LOG_ERROR("Database migration failed: " + std::string(e.what()));
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR(
+            "Service container initialization failed: " + std::string(e.what())
+        );
+        throw;
     }
 
     ServiceContainer::~ServiceContainer() = default;
@@ -155,4 +160,4 @@ namespace app
         return _positionService;
     }
 
-}   // namespace app
+}   // namespace service

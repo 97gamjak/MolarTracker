@@ -1,5 +1,5 @@
-#ifndef __APP__INCLUDE__APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
-#define __APP__INCLUDE__APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
+#ifndef __SERVICE__INCLUDE__SERVICE__I_PROFILE_SERVICE_HPP__
+#define __SERVICE__INCLUDE__SERVICE__I_PROFILE_SERVICE_HPP__
 
 #include <optional>
 #include <string>
@@ -12,7 +12,7 @@ namespace domain
     class Profile;   // forward declaration
 }   // namespace domain
 
-namespace app
+namespace service
 {
 
     /**
@@ -80,6 +80,6 @@ namespace app
         virtual void remove(ProfileId id) = 0;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__INCLUDE__APP__SERVICES_API__I_PROFILE_SERVICE_HPP__
+#endif   // __SERVICE__INCLUDE__SERVICE__I_PROFILE_SERVICE_HPP__

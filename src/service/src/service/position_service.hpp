@@ -1,16 +1,16 @@
-#ifndef __APP__SRC__APP__SERVICES__POSITION_SERVICE_HPP__
-#define __APP__SRC__APP__SERVICES__POSITION_SERVICE_HPP__
+#ifndef __SERVICE__SRC__SERVICE__POSITION_SERVICE_HPP__
+#define __SERVICE__SRC__SERVICE__POSITION_SERVICE_HPP__
 
 #include <memory>
 
-#include "app/services_api/i_position_service.hpp"
+#include "service/i_position_service.hpp"
 
 namespace repo
 {
     class IPositionRepo;   // Forward declaration
 }   // namespace repo
 
-namespace app
+namespace service
 {
     /**
      * @brief Position Service Implementation
@@ -41,6 +41,6 @@ namespace app
         ) override;
     };
 
-}   // namespace app
+}   // namespace service
 
-#endif   // __APP__SRC__APP__SERVICES__POSITION_SERVICE_HPP__
+#endif   // __SERVICE__SRC__SERVICE__POSITION_SERVICE_HPP__
