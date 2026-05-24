@@ -2,12 +2,8 @@
 
 #include <memory>
 
-#include "app/migration/migration_runner.hpp"
-#include "app/repo_container.hpp"
 #include "app/service_container.hpp"
 #include "app/store_container.hpp"
-#include "config/constants.hpp"
-#include "db/database.hpp"
 
 namespace app
 {
@@ -19,12 +15,7 @@ namespace app
      */
     AppContext::AppContext(settings::Settings& settings)
         : _settings{settings},
-          _database{std::make_unique<db::Database>(
-              Constants::getInstance().getDatabasePath()
-          )},
-          _migrationRunner{std::make_unique<MigrationRunner>(*_database)},
-          _repos{std::make_unique<RepoContainer>(*_database)},
-          _services{std::make_unique<ServiceContainer>(*_repos)},
+          _services{std::make_unique<ServiceContainer>()},
           _store{std::make_unique<StoreContainer>(*_services)}
     {
     }

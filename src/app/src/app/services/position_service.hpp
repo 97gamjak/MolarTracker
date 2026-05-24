@@ -5,10 +5,13 @@
 
 #include "app/services_api/i_position_service.hpp"
 
-namespace app
+namespace repo
 {
     class IPositionRepo;   // Forward declaration
+}   // namespace repo
 
+namespace app
+{
     /**
      * @brief Position Service Implementation
      *
@@ -17,10 +20,12 @@ namespace app
     {
        private:
         /// reference to the position repository
-        std::shared_ptr<IPositionRepo> _positionRepo;
+        std::shared_ptr<repo::IPositionRepo> _positionRepo;
 
        public:
-        explicit PositionService(std::shared_ptr<IPositionRepo> positionRepo);
+        explicit PositionService(
+            std::shared_ptr<repo::IPositionRepo> positionRepo
+        );
 
         [[nodiscard]]
         PositionId createPosition(const finance::Position& position) override;

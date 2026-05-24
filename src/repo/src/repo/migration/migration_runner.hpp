@@ -1,0 +1,50 @@
+#ifndef __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
+#define __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_RUNNER_HPP__
+
+#include "exceptions/base.hpp"
+#include "migration.hpp"
+
+namespace db
+{
+    class Database;   // Forward declaration
+}   // namespace db
+
+namespace repo
+{
+    /**
+     * @brief Exception thrown when a migration fails
+     *
+     */
+    class MigrationException : public MolarTrackerException
+    {
+       private:
+        /// The database path
+        std::string _dbPath;
+
+       public:
+        MigrationException(const std::string& message, std::string dbPath);
+
+        [[nodiscard]] const char* what() const noexcept override;
+    };
+
+    /**
+     * @brief Class responsible for running database migrations
+     */
+    class MigrationRunner
+    {
+       private:
+        /// current db version
+        constexpr static std::size_t DB_VERSION = 11;
+
+        /// The migration states for the application
+        Migrations _migrations;
+
+       public:
+        explicit MigrationRunner(db::Database& db);
+
+       private:
+        void migrate(db::Database& db);
+    };
+}   // namespace repo
+
+#endif   // __REPO__INCLUDE__REPO__MIGRATION__MIGRATION_RUNNER_HPP__

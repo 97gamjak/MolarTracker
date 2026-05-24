@@ -55,7 +55,7 @@ All changes and updates, that are relevant for developers will be documented her
   clear email, non-existent ID throws, duplicate name throws), and
   `ProfileRepo::remove` (deletes target, preserves others)
 - Add `tests/app/test_transaction_repo.cpp` with 15 GoogleTest cases for
-  `app::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
+  `repo::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
   and Trade transactions, entry/leg persistence, comment round-trips, ID
   sequencing, and empty-database behavior
 - Add 48 GoogleTest unit tests for `orm::Crud` covering 
@@ -97,6 +97,7 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Speedup some compilation headers
 - split domain profile completely from controllers and introduce profile store interface
+- encapsulate repo to increase modularity
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

@@ -1,6 +1,6 @@
 #include "app/service_container.hpp"
 
-#include "app/repo_container.hpp"
+#include "repo/repo_container.hpp"
 #include "services/account_service.hpp"
 #include "services/instrument_service.hpp"
 #include "services/position_service.hpp"
@@ -15,23 +15,28 @@ namespace app
      *
      * @param repos
      */
-    ServiceContainer::ServiceContainer(RepoContainer& repos)
-        : _profileService{std::make_shared<ProfileService>(repos.getProfileRepo(
-          ))},
-          _accountService{std::make_shared<AccountService>(repos.getAccountRepo(
-          ))},
-          _transactionService{
-              std::make_shared<TransactionService>(repos.getTransactionRepo())
+    ServiceContainer::ServiceContainer()
+        : _repoContainer{std::make_unique<repo::RepoContainer>()},
+          _profileService{
+              std::make_shared<ProfileService>(_repoContainer->getProfileRepo())
           },
-          _instrumentService{
-              std::make_shared<InstrumentService>(repos.getInstrumentRepo())
+          _accountService{
+              std::make_shared<AccountService>(_repoContainer->getAccountRepo())
           },
-          _positionService{
-              std::make_shared<PositionService>(repos.getPositionRepo())
-          }
+          _transactionService{std::make_shared<TransactionService>(
+              _repoContainer->getTransactionRepo()
+          )},
+          _instrumentService{std::make_shared<InstrumentService>(
+              _repoContainer->getInstrumentRepo()
+          )},
+          _positionService{std::make_shared<PositionService>(
+              _repoContainer->getPositionRepo()
+          )}
 
     {
     }
+
+    ServiceContainer::~ServiceContainer() = default;
 
     /**
      * @brief Get the Profile Service

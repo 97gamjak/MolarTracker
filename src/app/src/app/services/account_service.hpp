@@ -6,11 +6,13 @@
 
 #include "app/services_api/i_account_service.hpp"
 
+namespace repo
+{
+    class IAccountRepo;   // forward declaration
+}   // namespace repo
+
 namespace app
 {
-
-    class IAccountRepo;   // forward declaration
-
     /**
      * @brief Implementation of Account service
      *
@@ -19,11 +21,11 @@ namespace app
     {
        private:
         /// reference to the account repository
-        std::shared_ptr<IAccountRepo> _accountRepo;
+        std::shared_ptr<repo::IAccountRepo> _accountRepo;
 
        public:
         explicit AccountService(
-            const std::shared_ptr<IAccountRepo>& accountRepo
+            const std::shared_ptr<repo::IAccountRepo>& accountRepo
         );
 
         [[nodiscard]] std::vector<finance::Account> getAllAccounts(

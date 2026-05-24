@@ -36,15 +36,6 @@ namespace app
         /// subscribe to settings changes
         settings::Settings& _settings;
 
-        /// The database instance for the application
-        std::unique_ptr<db::Database> _database;
-
-        /// The migration runner for the application
-        std::unique_ptr<MigrationRunner> _migrationRunner;
-
-        /// The repository container for the application
-        std::unique_ptr<RepoContainer> _repos;
-
         /// The service container for the application
         std::unique_ptr<ServiceContainer> _services;
 

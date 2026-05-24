@@ -1,0 +1,43 @@
+#ifndef __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_TPP__
+#define __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_TPP__
+
+#include "multi_migration.hpp"
+#include "orm/type_traits.hpp"
+#include "single_migration.hpp"
+
+namespace repo
+{
+
+    template <orm::db_model Model>
+    CopyDropRenameMigration<Model>::CopyDropRenameMigration()
+    {
+        addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
+
+        const auto  tableName = std::string(Model::tableName);
+        std::string newName   = Model::tableName + "_tmp";
+
+        addMigration(std::make_unique<CreateTableMigration<Model>>(newName));
+        addMigration(std::make_unique<CopyTableMigration>(tableName, newName));
+        addMigration(std::make_unique<DropTableMigration>(tableName));
+        addMigration(
+            std::make_unique<RenameTableMigration>(newName, tableName)
+        );
+
+        addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+    }
+
+    template <orm::db_model Model>
+    DropAndRecreateTableMigration<Model>::DropAndRecreateTableMigration()
+    {
+        addMigration(std::make_unique<ChangeForeignKeyPragma>(false));
+        addMigration(
+            std::make_unique<DropTableMigration>(std::string(Model::tableName))
+        );
+
+        addMigration(std::make_unique<CreateTableMigration<Model>>());
+        addMigration(std::make_unique<ChangeForeignKeyPragma>(true));
+    }
+
+}   // namespace repo
+
+#endif   // __REPO__INCLUDE__REPO__MIGRATION__MULTI_MIGRATION_TPP__
