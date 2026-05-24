@@ -49,7 +49,15 @@ namespace app
           )},
           _connections{std::make_unique<Connections>()}
     {
-        _allStores.push_back(dynamic_cast<ProfileStore*>(_profileStore.get()));
+        auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
+
+        if (profileStore == nullptr || !_profileStore || !_accountStore ||
+            !_stockStore || !_positionStore || !_transactionStore)
+        {
+            throw std::runtime_error("Failed to initialize store container");
+        }
+
+        _allStores.push_back(profileStore);
         _allStores.push_back(&*_accountStore);
         _allStores.push_back(&*_transactionStore);
         _allStores.push_back(&*_stockStore);

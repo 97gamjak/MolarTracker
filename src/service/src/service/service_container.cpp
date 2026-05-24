@@ -44,6 +44,13 @@ namespace service
         LOG_ERROR("Database migration failed: " + std::string(e.what()));
         throw;
     }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR(
+            "Service container initialization failed: " + std::string(e.what())
+        );
+        throw;
+    }
 
     ServiceContainer::~ServiceContainer() = default;
 
