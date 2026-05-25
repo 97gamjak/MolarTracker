@@ -1,13 +1,13 @@
 #include "helpers.hpp"
 
-#include "app/store/position_store.hpp"
-#include "app/store/stock_store.hpp"
-#include "app/store/transaction_store.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/position.hpp"
+#include "store/position_store.hpp"
+#include "store/stock_store.hpp"
+#include "store/transaction_store.hpp"
 
 namespace controller
 {
@@ -20,7 +20,7 @@ namespace controller
      */
     std::expected<void, std::string> convertTickerToInstrumentId(
         drafts::CreateStockTransactionDraft& draft,
-        const app::StockStore&               stockStore
+        const store::StockStore&             stockStore
     )
     {
         for (auto& leg : draft.getLegs())
@@ -48,9 +48,9 @@ namespace controller
          * @return std::optional<drafts::StockInfoDraft>
          */
         std::optional<drafts::StockInfoDraft> _getStockInfoByPosition(
-            const finance::Position&     position,
-            const app::StockStore&       stockStore,
-            const app::TransactionStore& transactionStore
+            const finance::Position&       position,
+            const store::StockStore&       stockStore,
+            const store::TransactionStore& transactionStore
         )
         {
             const auto ids =
@@ -80,9 +80,9 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const app::PositionStore&    positionStore,
-        const app::StockStore&       stockStore,
-        const app::TransactionStore& transactionStore
+        const store::PositionStore&    positionStore,
+        const store::StockStore&       stockStore,
+        const store::TransactionStore& transactionStore
     )
     {
         const auto positions = positionStore.getOpenPositions();
@@ -116,10 +116,10 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
-        AccountId                    account,
-        const app::PositionStore&    positionStore,
-        const app::StockStore&       stockStore,
-        const app::TransactionStore& transactionStore
+        AccountId                      account,
+        const store::PositionStore&    positionStore,
+        const store::StockStore&       stockStore,
+        const store::TransactionStore& transactionStore
     )
     {
         const auto positions = positionStore.getOpenPositions({account});

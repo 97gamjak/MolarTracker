@@ -1,8 +1,7 @@
 #include "dirty_handler.hpp"
 
-#include "app/app_context.hpp"
-#include "app/store_container.hpp"
 #include "settings/settings.hpp"
+#include "store/store_container.hpp"
 #include "ui/main_window.hpp"
 
 namespace controller
@@ -12,13 +11,15 @@ namespace controller
      * @brief Subscribe to dirty state changes in the stores and settings, this
      * will update the window title to indicate that there are unsaved changes
      *
-     * @param appContext The application context to subscribe to for dirty state
+     * @param storeContainer The store container to subscribe to for dirty state
      * changes
+     * @param settings The settings to subscribe to for dirty state changes
      * @param mainWindow The main window to update the title for
      */
     void DirtyStateHandler::subscribe(
-        app::AppContext& appContext,
-        ui::MainWindow*  mainWindow
+        store::StoreContainer& storeContainer,
+        settings::Settings&    settings,
+        ui::MainWindow*        mainWindow
     )
     {
         auto setTitleDirty = [mainWindow](const bool& isDirty)
@@ -32,9 +33,6 @@ namespace controller
                     mainWindow->setWindowTitle(isDirty);
             }
         };
-
-        auto& storeContainer = appContext.getStore();
-        auto& settings       = appContext.getSettings();
 
         _dirtyStoreConnections =
             storeContainer.subscribeToDirty(setTitleDirty, mainWindow);

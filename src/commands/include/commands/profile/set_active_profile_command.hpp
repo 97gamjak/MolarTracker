@@ -8,10 +8,10 @@
 #include "commands/command_error.hpp"
 #include "drafts/profile_draft.hpp"
 
-namespace app
+namespace store
 {
     class IProfileStore;   // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace cmd
 {
@@ -29,12 +29,12 @@ namespace cmd
         std::optional<drafts::ProfileDraft> _previousProfile = std::nullopt;
 
         /// Reference to the profile store
-        std::shared_ptr<app::IProfileStore> _profileStore;
+        std::shared_ptr<store::IProfileStore> _profileStore;
 
        public:
         explicit SetActiveProfileCommand(
-            std::string                                profileName,
-            const std::shared_ptr<app::IProfileStore>& profileStore
+            std::string                                  profileName,
+            const std::shared_ptr<store::IProfileStore>& profileStore
         );
 
         ~SetActiveProfileCommand() override                           = default;

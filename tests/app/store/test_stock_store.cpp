@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "app/store/stock_store.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
 #include "mock_services.hpp"
+#include "store/stock_store.hpp"
 
 namespace
 {
@@ -20,12 +20,12 @@ namespace
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::shared_ptr<tests::MockInstrumentService> _mockService;
         InstrumentIdSeq                               _idSeq;
-        std::unique_ptr<app::StockStore>              _store;
+        std::unique_ptr<store::StockStore>            _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         StockStoreTest()
             : _mockService{std::make_shared<tests::MockInstrumentService>()},
-              _store{std::make_unique<app::StockStore>(_mockService, _idSeq)}
+              _store{std::make_unique<store::StockStore>(_mockService, _idSeq)}
         {
         }
 
@@ -54,7 +54,7 @@ TEST_F(StockStoreTest, AddStockSuccessReturnsOk)
 {
     const auto result = _store->addStock(makeStock());
 
-    EXPECT_EQ(result, app::StockStoreResult::Ok);
+    EXPECT_EQ(result, store::StockStoreResult::Ok);
 }
 
 TEST_F(StockStoreTest, AddStockAlreadyExistsInServiceReturnsStockAlreadyExists)
@@ -64,9 +64,9 @@ TEST_F(StockStoreTest, AddStockAlreadyExistsInServiceReturnsStockAlreadyExists)
     const auto result = _store->addStock(makeStock("AAPL"));
 
     if (!_store->isFullCache())
-        EXPECT_EQ(result, app::StockStoreResult::StockAlreadyExists);
+        EXPECT_EQ(result, store::StockStoreResult::StockAlreadyExists);
     else
-        EXPECT_EQ(result, app::StockStoreResult::Ok);
+        EXPECT_EQ(result, store::StockStoreResult::Ok);
 }
 
 TEST_F(StockStoreTest, GetAllTickersEmptyInitially)

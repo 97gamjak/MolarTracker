@@ -9,16 +9,17 @@ add_executable(tests_app_store
 target_include_directories(tests_app_store
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src/app/src/
+    ${CMAKE_SOURCE_DIR}/src/store/src/
 )
 
 target_link_libraries(tests_app_store
     PRIVATE
-    molartracker_app
+    molartracker_store
     molartracker_domain
     molartracker_drafts
     molartracker_logging
     molartracker_service
+    molartracker_store
     molartracker_tests
     GTest::gtest_main
 )

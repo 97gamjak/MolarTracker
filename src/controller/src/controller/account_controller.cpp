@@ -7,7 +7,6 @@
 #include <QObject>
 #include <format>
 
-#include "app/store/account/account_store.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/helpers.hpp"
@@ -15,6 +14,7 @@
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
+#include "store/account/account_store.hpp"
 #include "ui/account/account_detail_view.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
@@ -28,19 +28,19 @@ namespace controller
     struct AccountController::Stores
     {
         /// Reference to the account store
-        app::AccountStore& accountStore;
+        store::AccountStore& accountStore;
         /// Reference to the position store
-        app::PositionStore& positionStore;
+        store::PositionStore& positionStore;
         /// Reference to the stock store
-        app::StockStore& stockStore;
+        store::StockStore& stockStore;
         /// Reference to the transaction store
-        app::TransactionStore& transactionStore;
+        store::TransactionStore& transactionStore;
 
         Stores(
-            app::AccountStore&     accountStore_,
-            app::PositionStore&    positionStore_,
-            app::StockStore&       stockStore_,
-            app::TransactionStore& transactionStore_
+            store::AccountStore&     accountStore_,
+            store::PositionStore&    positionStore_,
+            store::StockStore&       stockStore_,
+            store::TransactionStore& transactionStore_
         );
         ~Stores() = default;
 
@@ -60,10 +60,10 @@ namespace controller
      * @param transactionStore_
      */
     AccountController::Stores::Stores(
-        app::AccountStore&     accountStore_,
-        app::PositionStore&    positionStore_,
-        app::StockStore&       stockStore_,
-        app::TransactionStore& transactionStore_
+        store::AccountStore&     accountStore_,
+        store::PositionStore&    positionStore_,
+        store::StockStore&       stockStore_,
+        store::TransactionStore& transactionStore_
     )
         : accountStore(accountStore_),
           positionStore(positionStore_),
@@ -83,12 +83,12 @@ namespace controller
      * @param stackedWidget
      */
     AccountController::AccountController(
-        cmd::UndoStack&        undoStack,
-        app::AccountStore&     accountStore,
-        app::PositionStore&    positionStore,
-        app::StockStore&       stockStore,
-        app::TransactionStore& transactionStore,
-        QStackedWidget*        stackedWidget
+        cmd::UndoStack&          undoStack,
+        store::AccountStore&     accountStore,
+        store::PositionStore&    positionStore,
+        store::StockStore&       stockStore,
+        store::TransactionStore& transactionStore,
+        QStackedWidget*          stackedWidget
     )
         : _undoStack(undoStack),
           _stores(

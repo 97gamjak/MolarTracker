@@ -3,12 +3,6 @@
 
 #include <memory>
 
-#include "debug_menu_controller.hpp"
-#include "edit_menu_controller.hpp"
-#include "file_menu_controller.hpp"
-#include "help_menu_controller.hpp"
-#include "settings_menu_controller.hpp"
-
 namespace ui
 {
     class MenuBar;      // Forward declaration
@@ -20,13 +14,24 @@ namespace cmd
     class UndoStack;   // Forward declaration
 }   // namespace cmd
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
+
+namespace settings
+{
+    class Settings;   // Forward declaration
+}   // namespace settings
 
 namespace controller
 {
+    class FileMenuController;
+    class EditMenuController;
+    class DebugMenuController;
+    class SettingsMenuController;
+    class HelpMenuController;
+
     /**
      * @brief Controller for the menu bar, this is responsible for creating and
      * managing the controllers for each menu in the menu bar
@@ -48,17 +53,20 @@ namespace controller
 
        public:
         explicit MenuBarController(
-            ui::MainWindow*  mainWindow,
-            ui::MenuBar&     menuBar,
-            app::AppContext& appContext,
-            cmd::UndoStack&  undoStack
+            ui::MainWindow*        mainWindow,
+            ui::MenuBar&           menuBar,
+            store::StoreContainer& storeContainer,
+            cmd::UndoStack&        undoStack,
+            settings::Settings&    settings
         );
+        ~MenuBarController();
 
         void _makeControllers(
-            ui::MainWindow*  mainWindow,
-            ui::MenuBar&     menuBar,
-            app::AppContext& appContext,
-            cmd::UndoStack&  undoStack
+            ui::MainWindow*        mainWindow,
+            ui::MenuBar&           menuBar,
+            store::StoreContainer& storeContainer,
+            cmd::UndoStack&        undoStack,
+            settings::Settings&    settings
         );
     };
 

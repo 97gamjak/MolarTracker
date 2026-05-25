@@ -17,13 +17,13 @@ namespace drafts
     struct AccountDraft;   // Forward declaration
 }   // namespace drafts
 
-namespace app
+namespace store
 {
     class AccountStore;       // Forward declaration
     class PositionStore;      // Forward declaration
     class StockStore;         // Forward declaration
     class TransactionStore;   // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace ui
 {
@@ -62,12 +62,12 @@ namespace controller
 
        public:
         AccountController(
-            cmd::UndoStack&        undoStack,
-            app::AccountStore&     accountStore,
-            app::PositionStore&    positionStore,
-            app::StockStore&       stockStore,
-            app::TransactionStore& transactionStore,
-            QStackedWidget*        stackedWidget
+            cmd::UndoStack&          undoStack,
+            store::AccountStore&     accountStore,
+            store::PositionStore&    positionStore,
+            store::StockStore&       stockStore,
+            store::TransactionStore& transactionStore,
+            QStackedWidget*          stackedWidget
         );
         ~AccountController() override;
 

@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
-#include "app/store/account/account_session.hpp"
-#include "app/store/position_store.hpp"
 #include "finance/position.hpp"
 #include "mock_services.hpp"
+#include "store/account/account_session.hpp"
+#include "store/position_store.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -20,14 +20,14 @@ namespace
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::shared_ptr<tests::MockPositionService> _mockService;
-        app::AccountSession                         _session;
-        std::unique_ptr<app::PositionStore>         _store;
+        store::AccountSession                       _session;
+        std::unique_ptr<store::PositionStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         PositionStoreTest()
             : _mockService{std::make_shared<tests::MockPositionService>()},
               _store{
-                  std::make_unique<app::PositionStore>(_mockService, _session)
+                  std::make_unique<store::PositionStore>(_mockService, _session)
               }
         {
         }

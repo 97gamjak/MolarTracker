@@ -7,12 +7,12 @@
 
 #include "config/id_types.hpp"
 
-namespace app
+namespace store
 {
     class StockStore;         // Forward declaration
     class TransactionStore;   // Forward declaration
     class PositionStore;      // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace drafts
 {
@@ -25,20 +25,20 @@ namespace controller
 {
     std::expected<void, std::string> convertTickerToInstrumentId(
         drafts::CreateStockTransactionDraft& draft,
-        const app::StockStore&               stockStore
+        const store::StockStore&             stockStore
     );
 
     std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
-        AccountId                    account,
-        const app::PositionStore&    positionStore,
-        const app::StockStore&       stockStore,
-        const app::TransactionStore& transactionStore
+        AccountId                      account,
+        const store::PositionStore&    positionStore,
+        const store::StockStore&       stockStore,
+        const store::TransactionStore& transactionStore
     );
 
     std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const app::PositionStore&    positionStore,
-        const app::StockStore&       stockStore,
-        const app::TransactionStore& transactionStore
+        const store::PositionStore&    positionStore,
+        const store::StockStore&       stockStore,
+        const store::TransactionStore& transactionStore
     );
 
 }   // namespace controller

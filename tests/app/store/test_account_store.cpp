@@ -4,12 +4,12 @@
 #include <optional>
 #include <vector>
 
-#include "app/store/account/account_store.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
 #include "finance/account.hpp"
 #include "mock_services.hpp"
+#include "store/account/account_store.hpp"
 
 namespace
 {
@@ -19,12 +19,12 @@ namespace
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::shared_ptr<tests::MockAccountService> _mockService;
-        std::unique_ptr<app::AccountStore>         _store;
+        std::unique_ptr<store::AccountStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         AccountStoreTest()
             : _mockService{std::make_shared<tests::MockAccountService>()},
-              _store{std::make_unique<app::AccountStore>(_mockService)}
+              _store{std::make_unique<store::AccountStore>(_mockService)}
         {
         }
 
@@ -52,7 +52,7 @@ TEST_F(AccountStoreTest, CreateAccountNoActiveProfileReturnsError)
 {
     const auto result = _store->createAccount(makeDraft("Savings"));
 
-    EXPECT_EQ(result, app::AccountStoreResult::Error);
+    EXPECT_EQ(result, store::AccountStoreResult::Error);
 }
 
 TEST_F(AccountStoreTest, CreateAccountWithActiveProfileReturnsOk)
@@ -61,7 +61,7 @@ TEST_F(AccountStoreTest, CreateAccountWithActiveProfileReturnsOk)
 
     const auto result = _store->createAccount(makeDraft("Savings"));
 
-    EXPECT_EQ(result, app::AccountStoreResult::Ok);
+    EXPECT_EQ(result, store::AccountStoreResult::Ok);
 }
 
 TEST_F(AccountStoreTest, CreateAccountDuplicateNameAndKindReturnsConflict)
@@ -71,7 +71,7 @@ TEST_F(AccountStoreTest, CreateAccountDuplicateNameAndKindReturnsConflict)
 
     const auto result = _store->createAccount(makeDraft("Savings"));
 
-    EXPECT_EQ(result, app::AccountStoreResult::AccountNameConflict);
+    EXPECT_EQ(result, store::AccountStoreResult::AccountNameConflict);
 }
 
 TEST_F(AccountStoreTest, GetAllAccountsEmptyInitially)
