@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "app/store/profile/exception.hpp"
-#include "app/store/profile/profile_store.hpp"
 #include "drafts/profile_draft.hpp"
 #include "mock_services.hpp"
+#include "store/profile/exception.hpp"
+#include "store/profile/profile_store.hpp"
 
 namespace
 {
@@ -18,18 +18,18 @@ namespace
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::shared_ptr<tests::MockProfileService> _mockService;
-        std::unique_ptr<app::ProfileStore>         _store;
+        std::unique_ptr<store::ProfileStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         ProfileStoreTest()
             : _mockService{std::make_shared<tests::MockProfileService>()}
         {
-            _store = std::make_unique<app::ProfileStore>(_mockService);
+            _store = std::make_unique<store::ProfileStore>(_mockService);
         }
 
         void rebuildStore()
         {
-            _store = std::make_unique<app::ProfileStore>(_mockService);
+            _store = std::make_unique<store::ProfileStore>(_mockService);
         }
     };
 
@@ -55,7 +55,7 @@ TEST_F(ProfileStoreTest, AddProfileSuccessReturnsOk)
         drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
-    EXPECT_EQ(result, app::ProfileStoreResult::Ok);
+    EXPECT_EQ(result, store::ProfileStoreResult::Ok);
 }
 
 TEST_F(ProfileStoreTest, AddProfileDuplicateNameReturnsNameAlreadyExists)
@@ -68,7 +68,7 @@ TEST_F(ProfileStoreTest, AddProfileDuplicateNameReturnsNameAlreadyExists)
         drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
-    EXPECT_EQ(result, app::ProfileStoreResult::NameAlreadyExists);
+    EXPECT_EQ(result, store::ProfileStoreResult::NameAlreadyExists);
 }
 
 TEST_F(ProfileStoreTest, RemoveProfileSuccessReturnsOk)
@@ -81,7 +81,7 @@ TEST_F(ProfileStoreTest, RemoveProfileSuccessReturnsOk)
         drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
-    EXPECT_EQ(result, app::ProfileStoreResult::Ok);
+    EXPECT_EQ(result, store::ProfileStoreResult::Ok);
 }
 
 TEST_F(ProfileStoreTest, RemoveProfileNotFoundReturnsProfileNotFound)
@@ -90,7 +90,7 @@ TEST_F(ProfileStoreTest, RemoveProfileNotFoundReturnsProfileNotFound)
         drafts::ProfileDraft{ProfileId::invalid(), "NonExistent", std::nullopt}
     );
 
-    EXPECT_EQ(result, app::ProfileStoreResult::ProfileNotFound);
+    EXPECT_EQ(result, store::ProfileStoreResult::ProfileNotFound);
 }
 
 TEST_F(ProfileStoreTest, GetAllProfileNamesEmptyWhenNoProfiles)
@@ -118,7 +118,7 @@ TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameRetrnsError)
 {
     EXPECT_EQ(
         _store->setActiveProfile("NonExistent"),
-        app::ProfileStoreResult::ProfileNotFound
+        store::ProfileStoreResult::ProfileNotFound
     );
 }
 

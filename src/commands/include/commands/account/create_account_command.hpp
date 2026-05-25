@@ -6,10 +6,10 @@
 #include "commands/command.hpp"
 #include "drafts/account_draft.hpp"
 
-namespace app
+namespace store
 {
     class AccountStore;   // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace cmd
 {
@@ -21,13 +21,13 @@ namespace cmd
     {
        private:
         /// Reference to the account store
-        app::AccountStore& _accountStore;
+        store::AccountStore& _accountStore;
         /// The draft of the account to create
         drafts::AccountDraft _accountDraft;
 
        public:
         CreateAccountCommand(
-            app::AccountStore&   accountStore,
+            store::AccountStore& accountStore,
             drafts::AccountDraft accountDraft
         );
 

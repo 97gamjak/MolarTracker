@@ -77,7 +77,6 @@ target_include_directories(mstd
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
 
-add_subdirectory(app)
 add_subdirectory(commands)
 add_subdirectory(config)
 add_subdirectory(connections)
@@ -96,6 +95,7 @@ add_subdirectory(repo)
 add_subdirectory(service)
 add_subdirectory(settings)
 add_subdirectory(sql_models)
+add_subdirectory(store)
 add_subdirectory(ui)
 add_subdirectory(utils)
 

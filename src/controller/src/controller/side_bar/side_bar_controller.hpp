@@ -11,10 +11,10 @@ class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
 
 namespace ui
 {
@@ -61,7 +61,7 @@ namespace controller
        public:
         explicit SideBarController(
             cmd::UndoStack&        undoStack,
-            app::AppContext&       appContext,
+            store::StoreContainer& storeContainer,
             QMainWindow*           mainWindow,
             ui::SideBar*           sideBar,
             QStackedWidget*        centralStack,

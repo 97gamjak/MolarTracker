@@ -7,10 +7,10 @@
 
 class QMainWindow;   // Forward declaration
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
 
 namespace drafts
 {
@@ -38,6 +38,11 @@ namespace cmd
     class Commands;   // Forward declaration
 }   // namespace cmd
 
+namespace settings
+{
+    class Settings;   // Forward declaration
+}   // namespace settings
+
 namespace controller
 {
     /**
@@ -56,10 +61,12 @@ namespace controller
        private:
         /// Reference to the main window
         QMainWindow& _mainWindow;
-        /// Reference to the application context
-        app::AppContext& _appContext;
+        /// Reference to the store container
+        store::StoreContainer& _storeContainer;
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
+        /// Reference to the settings
+        settings::Settings& _settings;
 
         /// Pointer to the profile selection dialog
         QPointer<ui::ProfileSelectionDialog> _profileSelectionDialog;
@@ -73,9 +80,10 @@ namespace controller
 
        public:
         explicit EnsureProfileController(
-            QMainWindow&     mainWindow,
-            app::AppContext& appContext,
-            cmd::UndoStack&  undoStack
+            QMainWindow&           mainWindow,
+            store::StoreContainer& storeContainer,
+            cmd::UndoStack&        undoStack,
+            settings::Settings&    settings
         );
 
         ~EnsureProfileController() override;

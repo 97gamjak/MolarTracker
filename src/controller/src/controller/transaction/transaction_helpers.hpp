@@ -4,10 +4,10 @@
 #include <expected>
 #include <string>
 
-namespace app
+namespace store
 {
     class StockStore;   // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace drafts
 {
@@ -18,7 +18,7 @@ namespace controller
 {
     std::expected<void, std::string> convertTickerToInstrumentId(
         drafts::CreateStockTransactionDraft& draft,
-        const app::StockStore&               stockStore
+        const store::StockStore&             stockStore
     );
 }   // namespace controller
 

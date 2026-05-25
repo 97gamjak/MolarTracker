@@ -5,10 +5,10 @@
 #include <memory>
 #include <utility>
 
-#include "app/store/i_profile_store.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "store/i_profile_store.hpp"
 
 REGISTER_LOG_CATEGORY("Commands.Profile.AddProfileCommand");
 
@@ -21,8 +21,8 @@ namespace cmd
      * @param profile
      */
     AddProfileCommand::AddProfileCommand(
-        const std::shared_ptr<app::IProfileStore>& profileStore,
-        drafts::ProfileDraft                       profile
+        const std::shared_ptr<store::IProfileStore>& profileStore,
+        drafts::ProfileDraft                         profile
     )
         : _profileStore{profileStore}, _profile{std::move(profile)}
     {
@@ -38,7 +38,7 @@ namespace cmd
     {
         const auto result = _profileStore->removeProfile(_profile);
 
-        if (result == app::ProfileStoreResult::ProfileNotFound)
+        if (result == store::ProfileStoreResult::ProfileNotFound)
         {
             const auto errorMessage = std::format(
                 "Failed to undo add profile: '{}' not found",
@@ -56,7 +56,7 @@ namespace cmd
             return std::unexpected<CommandErrorPtr>(std::move(error));
         }
 
-        if (result == app::ProfileStoreResult::Ok)
+        if (result == store::ProfileStoreResult::Ok)
         {
             LOG_INFO(std::format("Profile removed: '{}'", _profile.getName()));
         }
@@ -90,11 +90,11 @@ namespace cmd
     {
         const auto result = _profileStore->addProfile(_profile);
 
-        if (result == app::ProfileStoreResult::Ok)
+        if (result == store::ProfileStoreResult::Ok)
         {
             LOG_INFO(std::format("Profile created: '{}'", _profile.getName()));
         }
-        else if (result == app::ProfileStoreResult::NameAlreadyExists)
+        else if (result == store::ProfileStoreResult::NameAlreadyExists)
         {
             const auto errorMessage = std::format(
                 "Profile name '{}' already exists",

@@ -3,10 +3,10 @@
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 
-#include "app/store/stock_store.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "finance/finance_error.hpp"
 #include "finance/instrument/stock.hpp"
+#include "store/stock_store.hpp"
 #include "ui/securities/stock_info_model.hpp"
 #include "ui/securities/stock_overview.hpp"
 #include "ui/securities/ticker_lookup.hpp"
@@ -23,9 +23,9 @@ namespace controller
      * @param stackedWidget
      */
     SecuritiesSideBarController::SecuritiesSideBarController(
-        QMainWindow*     mainWindow,
-        app::StockStore& stockStore,
-        QStackedWidget*  stackedWidget
+        QMainWindow*       mainWindow,
+        store::StockStore& stockStore,
+        QStackedWidget*    stackedWidget
     )
         : SideBarCategoryController(new ui::SecuritiesCategory(), mainWindow),
           _stockOverviewWidget(new ui::StockOverviewWidget()),
@@ -123,7 +123,7 @@ namespace controller
         {
             const auto result = _stockStore.addStock(_acceptedQuote.value());
 
-            if (result != app::StockStoreResult::Ok)
+            if (result != store::StockStoreResult::Ok)
                 _tickerLookupWidget->displayError("Failed to add stock");
         }
 

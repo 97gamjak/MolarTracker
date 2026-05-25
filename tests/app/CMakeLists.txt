@@ -19,7 +19,7 @@ target_include_directories(tests_app
 
 target_link_libraries(tests_app
     PRIVATE
-    molartracker_app
+    molartracker_store
     molartracker_repo
     molartracker_service
     molartracker_domain

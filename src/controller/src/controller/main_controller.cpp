@@ -1,7 +1,5 @@
 #include "controller/main_controller.hpp"
 
-#include "app/app_context.hpp"
-#include "app/store_container.hpp"
 #include "commands/undo_stack.hpp"
 #include "config/constants.hpp"
 #include "controller/account_controller.hpp"
@@ -13,6 +11,7 @@
 #include "controller/transaction_controller.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
+#include "store/store_container.hpp"
 #include "ui/main_window.hpp"
 
 namespace controller
@@ -31,7 +30,7 @@ namespace controller
         /// settings component
         settings::Settings _settings;
         /// application context
-        app::AppContext _appContext;
+        store::StoreContainer _storeContainer;
         /// main window of the application
         ui::MainWindow _mainWindow;
         /// undo stack for managing commands
@@ -59,30 +58,30 @@ namespace controller
          */
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
-              _appContext(_settings),
               _centralController(_mainWindow.getCentralWidget()),
               _handlers(_settings),
               _accountController(
                   _undoStack,
-                  _appContext.getStore().getAccountStore(),
+                  _storeContainer.getAccountStore(),
                   _mainWindow.getCentralWidget()
               ),
               _transactionController(
                   _undoStack,
-                  _appContext.getStore().getTransactionStore(),
-                  _appContext.getStore().getAccountStore(),
-                  _appContext.getStore().getStockStore(),
+                  _storeContainer.getTransactionStore(),
+                  _storeContainer.getAccountStore(),
+                  _storeContainer.getStockStore(),
                   _mainWindow.getCentralWidget()
               ),
               _menuBarController(
                   &_mainWindow,
                   _mainWindow.getMenuBar(),
-                  _appContext,
-                  _undoStack
+                  _storeContainer,
+                  _undoStack,
+                  _settings
               ),
               _sideBarController(
                   _undoStack,
-                  _appContext,
+                  _storeContainer,
                   &_mainWindow,
                   &_mainWindow.getSideBar(),
                   _mainWindow.getCentralWidget(),
@@ -90,10 +89,8 @@ namespace controller
                   _transactionController
               )
         {
-            _handlers.getDirtyStateHandler().subscribe(
-                _appContext,
-                &_mainWindow
-            );
+            _handlers.getDirtyStateHandler()
+                .subscribe(_storeContainer, _settings, &_mainWindow);
         }
     };
 
@@ -144,8 +141,9 @@ namespace controller
 
         auto controller = controller::EnsureProfileController{
             _impl->_mainWindow,
-            _impl->_appContext,
-            _impl->_undoStack
+            _impl->_storeContainer,
+            _impl->_undoStack,
+            _impl->_settings
         };
 
         controller.ensureProfileExists();

@@ -1,13 +1,13 @@
 #include "transaction_helpers.hpp"
 
-#include "app/store/stock_store.hpp"
 #include "drafts/transaction_draft.hpp"
+#include "store/stock_store.hpp"
 
 namespace controller
 {
     std::expected<void, std::string> convertTickerToInstrumentId(
         drafts::CreateStockTransactionDraft& draft,
-        const app::StockStore&               stockStore
+        const store::StockStore&             stockStore
     )
     {
         for (auto& leg : draft.getLegs())
