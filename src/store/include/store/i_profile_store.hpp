@@ -25,8 +25,6 @@ namespace domain
 namespace store
 {
 
-    class IProfileService;   // Forward declaration
-
     /**
      * @brief Result of profile store operations
      *

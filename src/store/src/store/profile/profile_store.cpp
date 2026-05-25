@@ -13,7 +13,7 @@
 #include "store/base/base_store.hpp"
 #include "store/profile/exception.hpp"
 
-REGISTER_LOG_CATEGORY("App.Store.ProfileStore");
+REGISTER_LOG_CATEGORY("Store.ProfileStore");
 
 namespace store
 {

@@ -10,7 +10,7 @@
 #include "logging/log_macros.hpp"
 #include "store/base/store_state.hpp"
 
-REGISTER_LOG_CATEGORY("App.Store.BaseStore");
+REGISTER_LOG_CATEGORY("Store.BaseStore");
 
 namespace store
 {

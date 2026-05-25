@@ -3,7 +3,7 @@
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 
-REGISTER_LOG_CATEGORY("App.Store.Account.AccountSession");
+REGISTER_LOG_CATEGORY("Store.Account.AccountSession");
 
 namespace store
 {
