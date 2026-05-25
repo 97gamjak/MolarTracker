@@ -5,12 +5,12 @@
 
 #include <QObject>
 
-namespace app
+namespace store
 {
     class TransactionStore;   // Forward declaration
     class AccountStore;       // Forward declaration
     class StockStore;         // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace cmd
 {
@@ -40,11 +40,11 @@ namespace controller
         cmd::UndoStack& _undoStack;
 
         /// Reference to the transaction store
-        app::TransactionStore& _transactionStore;
+        store::TransactionStore& _transactionStore;
         /// Reference to the account store
-        app::AccountStore& _accountStore;
+        store::AccountStore& _accountStore;
         /// Reference to the stock store
-        app::StockStore& _stockStore;
+        store::StockStore& _stockStore;
 
         /// Pointer to the central stacked widget
         QStackedWidget* _stackedWidget;
@@ -53,11 +53,11 @@ namespace controller
 
        public:
         TransactionController(
-            cmd::UndoStack&        undoStack,
-            app::TransactionStore& transactionStore,
-            app::AccountStore&     accountStore,
-            app::StockStore&       stockStore,
-            QStackedWidget*        stackedWidget
+            cmd::UndoStack&          undoStack,
+            store::TransactionStore& transactionStore,
+            store::AccountStore&     accountStore,
+            store::StockStore&       stockStore,
+            QStackedWidget*          stackedWidget
         );
 
         void transactionOverviewSelected(bool focus);

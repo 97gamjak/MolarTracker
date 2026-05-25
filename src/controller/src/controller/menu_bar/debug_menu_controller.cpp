@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QStatusBar>
 
-#include "app/app_context.hpp"
 #include "commands/undo_stack.hpp"
 #include "commands/update_debug_flags_command.hpp"
 #include "logging/log_macros.hpp"
@@ -26,20 +25,20 @@ namespace controller
      *
      * @param mainWindow
      * @param debugMenu
-     * @param appContext
      * @param undoStack
+     * @param settings
      */
     DebugMenuController::DebugMenuController(
-        QMainWindow&     mainWindow,
-        ui::DebugMenu&   debugMenu,
-        app::AppContext& appContext,
-        cmd::UndoStack&  undoStack
+        QMainWindow&        mainWindow,
+        ui::DebugMenu&      debugMenu,
+        cmd::UndoStack&     undoStack,
+        settings::Settings& settings
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
           _debugMenu(debugMenu),
-          _appContext(appContext),
-          _undoStack(undoStack)
+          _undoStack(undoStack),
+          _settings(settings)
     {
         connect(
             &debugMenu,
@@ -139,10 +138,8 @@ namespace controller
 
         auto debugSlotsSettings =
             std::make_shared<ui::DebugSlotsDialog::Settings>(
-                _appContext.getSettings()
-                    .getUISettings()
-                    .getDebugSlotsSettings()
-                    .getWindowSize()
+                _settings.getUISettings().getDebugSlotsSettings().getWindowSize(
+                )
             );
 
         _debugSlotsDialog = utils::makeQChild<ui::DebugSlotsDialog>(
@@ -194,9 +191,9 @@ namespace controller
     /**
      * @brief Discard debug flag changes and reset to current values
      *
-     * This is used when there was an error while applying the changes, to reset
-     * the dialog to the current values and avoid leaving it in an inconsistent
-     * state.
+     * This is used when there was an error while applying the changes, to
+     * reset the dialog to the current values and avoid leaving it in an
+     * inconsistent state.
      *
      * @param categories The current debug flag categories to reset to
      *
@@ -210,17 +207,18 @@ namespace controller
 
         if (!result)
         {
-            // TODO(97gamjak): create general exception message for unexpected
-            // errors
+            // TODO(97gamjak): create general exception message for
+            // unexpected errors
             // https://97gamjak.atlassian.net/browse/MOLTRACK-112
             LOG_ERROR(
-                "There happened an unexpected error while updating the debug "
+                "There happened an unexpected error while updating the "
+                "debug "
                 "flags! Please contact the developer!"
             );
 
-            // this should not happen, but if it does, we should not leave the
-            // dialog in an inconsistent state, so we will just reset the
-            // categories to the current values and repopulate the tree
+            // this should not happen, but if it does, we should not leave
+            // the dialog in an inconsistent state, so we will just reset
+            // the categories to the current values and repopulate the tree
             const auto& logManager        = logging::LogManager::getInstance();
             const auto  currentCategories = logManager.getCategories();
             _debugSlotsDialog->setCategories(currentCategories, false);
@@ -253,8 +251,7 @@ namespace controller
      */
     void DebugMenuController::_applyLogViewerSettings()
     {
-        const auto& settings =
-            _appContext.getSettings().getUISettings().getLogViewerSettings();
+        const auto& settings = _settings.getUISettings().getLogViewerSettings();
 
         _logViewerSettings = std::make_shared<ui::LogViewerDialog::Settings>(
             settings.getReloadIntervalMs(),

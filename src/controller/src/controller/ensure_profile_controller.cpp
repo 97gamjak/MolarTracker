@@ -7,9 +7,6 @@
 #include <cassert>
 #include <format>
 
-#include "app/app_context.hpp"
-#include "app/store/i_profile_store.hpp"
-#include "app/store_container.hpp"
 #include "commands/profile/add_profile_command.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
 #include "commands/profile/set_active_profile_command.hpp"
@@ -17,6 +14,8 @@
 #include "commands/undo_stack.hpp"
 #include "logging/log_macros.hpp"
 #include "settings/settings.hpp"
+#include "store/i_profile_store.hpp"
+#include "store/store_container.hpp"
 #include "ui/exceptions/exception_dialog.hpp"
 #include "ui/profile/add_profile_dlg.hpp"
 #include "ui/profile/profile_selection_dlg.hpp"
@@ -33,18 +32,21 @@ namespace controller
      * Controller object
      *
      * @param mainWindow
-     * @param appContext
+     * @param storeContainer
      * @param undoStack
+     * @param settings
      */
     EnsureProfileController::EnsureProfileController(
-        QMainWindow&     mainWindow,
-        app::AppContext& appContext,
-        cmd::UndoStack&  undoStack
+        QMainWindow&           mainWindow,
+        store::StoreContainer& storeContainer,
+        cmd::UndoStack&        undoStack,
+        settings::Settings&    settings
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
-          _appContext(appContext),
+          _storeContainer(storeContainer),
           _undoStack(undoStack),
+          _settings(settings),
           _ensureProfileExistsCommand(
               std::make_unique<cmd::Commands>("Ensure Profile Exists Command")
           )
@@ -70,8 +72,8 @@ namespace controller
      */
     void EnsureProfileController::ensureProfileExists()
     {
-        const auto& settings = _appContext.getSettings().getGeneralSettings();
-        auto&       profileStore = _appContext.getStore().getProfileStore();
+        const auto& settings     = _settings.getGeneralSettings();
+        auto&       profileStore = _storeContainer.getProfileStore();
 
         for (std::size_t attempt = 0; attempt < MAX_PROFILE_CHECKS; ++attempt)
         {
@@ -131,7 +133,7 @@ namespace controller
      */
     bool EnsureProfileController::_activateProfile(const std::string& name)
     {
-        auto& profileStore = _appContext.getStore().getProfileStore();
+        auto& profileStore = _storeContainer.getProfileStore();
 
         if (profileStore->profileExists(name))
         {
@@ -178,7 +180,7 @@ namespace controller
         const std::string& defaultProfile
     )
     {
-        auto& profileStore = _appContext.getStore().getProfileStore();
+        auto& profileStore = _storeContainer.getProfileStore();
 
         ui::showWarningMessageBox(
             "Default Profile Not Found",
@@ -218,7 +220,7 @@ namespace controller
             &_mainWindow
         );
 
-        auto& profileStore = _appContext.getStore().getProfileStore();
+        auto& profileStore = _storeContainer.getProfileStore();
 
         if (profileStore->hasProfiles())
             _showProfileSelectionDialog();
@@ -233,10 +235,7 @@ namespace controller
     void EnsureProfileController::_showAddProfileDialog()
     {
         auto settings = std::make_shared<ui::AddProfileDialog::Settings>(
-            _appContext.getSettings()
-                .getUISettings()
-                .getProfileUISettings()
-                .getDialogSize()
+            _settings.getUISettings().getProfileUISettings().getDialogSize()
         );
 
         _addProfileDialog = utils::makeQChild<ui::AddProfileDialog>(
@@ -267,7 +266,7 @@ namespace controller
      */
     void EnsureProfileController::_showProfileSelectionDialog()
     {
-        const auto& profileStore = _appContext.getStore().getProfileStore();
+        const auto& profileStore = _storeContainer.getProfileStore();
 
         _profileSelectionDialog = utils::makeQChild<ui::ProfileSelectionDialog>(
             &_mainWindow,
@@ -310,7 +309,7 @@ namespace controller
             auto setDefaultCommand =
                 cmd::Commands::makeAndDo<cmd::SetDefaultProfileCommand>(
                     profileName,
-                    _appContext.getSettings().getGeneralSettings()
+                    _settings.getGeneralSettings()
                 );
 
             assert(
@@ -371,7 +370,7 @@ namespace controller
             // We only need to invoke AddProfileCommand here to add the profile;
             // default/active status is managed by separate commands below.
             auto result = cmd::Commands::makeAndDo<cmd::AddProfileCommand>(
-                _appContext.getStore().getProfileStore(),
+                _storeContainer.getProfileStore(),
                 profileDraft
             );
 
@@ -402,7 +401,7 @@ namespace controller
             auto setDefaultCommand =
                 cmd::Commands::makeAndDo<cmd::SetDefaultProfileCommand>(
                     profileDraft.getName(),
-                    _appContext.getSettings().getGeneralSettings()
+                    _settings.getGeneralSettings()
                 );
 
             assert(

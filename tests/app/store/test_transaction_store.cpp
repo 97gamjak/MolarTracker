@@ -4,11 +4,6 @@
 #include <memory>
 #include <vector>
 
-#include "app/store/account/account_session.hpp"
-#include "app/store/account/account_store.hpp"
-#include "app/store/position_store.hpp"
-#include "app/store/stock_store.hpp"
-#include "app/store/transaction_store.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
@@ -17,6 +12,11 @@
 #include "finance/transaction_entry.hpp"
 #include "finance/transaction_filter.hpp"
 #include "mock_services.hpp"
+#include "store/account/account_session.hpp"
+#include "store/account/account_store.hpp"
+#include "store/position_store.hpp"
+#include "store/stock_store.hpp"
+#include "store/transaction_store.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -33,11 +33,11 @@ namespace
         std::shared_ptr<tests::MockPositionService>    _mockPositionService;
         std::shared_ptr<tests::MockTransactionService> _mockTransactionService;
         InstrumentIdSeq                                _idSeq;
-        app::AccountStore                              _accountStore;
-        app::StockStore                                _stockStore;
-        app::AccountSession                            _accountSession;
-        app::PositionStore                             _positionStore;
-        std::unique_ptr<app::TransactionStore>         _store;
+        store::AccountStore                            _accountStore;
+        store::StockStore                              _stockStore;
+        store::AccountSession                          _accountSession;
+        store::PositionStore                           _positionStore;
+        std::unique_ptr<store::TransactionStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         TransactionStoreTest()
@@ -54,7 +54,7 @@ namespace
               _accountStore{_mockAccountService},
               _stockStore{_mockInstrumentService, _idSeq},
               _positionStore{_mockPositionService, _accountSession},
-              _store{std::make_unique<app::TransactionStore>(
+              _store{std::make_unique<store::TransactionStore>(
                   _mockTransactionService,
                   _accountStore,
                   _stockStore,
@@ -103,14 +103,14 @@ TEST_F(TransactionStoreTest, AddTransactionZeroSumReturnsOk)
 {
     const auto result = _store->addTransaction(makeZeroSumTx());
 
-    EXPECT_EQ(result, app::TransactionStoreResult::Ok);
+    EXPECT_EQ(result, store::TransactionStoreResult::Ok);
 }
 
 TEST_F(TransactionStoreTest, AddTransactionNonZeroSumReturnsError)
 {
     const auto result = _store->addTransaction(makeNonZeroSumTx());
 
-    EXPECT_EQ(result, app::TransactionStoreResult::TransactionSumNotZero);
+    EXPECT_EQ(result, store::TransactionStoreResult::TransactionSumNotZero);
 }
 
 TEST_F(TransactionStoreTest, GetTransactionsEmptyWhenNoAccounts)

@@ -10,13 +10,13 @@
 #include "connections/connection.hpp"
 #include "side_bar_category_controller.hpp"
 
-namespace app
+namespace store
 {
     class AccountStore;       // Forward declaration
     class TransactionStore;   // Forward declaration
     class StockStore;         // Forward declaration
     class PositionStore;      // Forward declaration
-}   // namespace app
+}   // namespace store
 
 namespace cmd
 {
@@ -60,13 +60,13 @@ namespace controller
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
         /// The account store for the application
-        app::AccountStore& _accountStore;
+        store::AccountStore& _accountStore;
         /// The transaction store for the application
-        app::TransactionStore& _transactionStore;
+        store::TransactionStore& _transactionStore;
         /// The position store for the application
-        app::PositionStore& _positionStore;
+        store::PositionStore& _positionStore;
         /// The stock store for the application
-        app::StockStore& _stockStore;
+        store::StockStore& _stockStore;
 
         /// Pointer to the create transaction dialog
         QPointer<ui::DepositWithdrawalWidget> _createCashTransactionDlg;
@@ -86,10 +86,10 @@ namespace controller
        public:
         TransactionSideBarController(
             cmd::UndoStack&              undoStack,
-            app::AccountStore&           accountStore,
-            app::TransactionStore&       transactionStore,
-            app::StockStore&             stockStore,
-            app::PositionStore&          positionStore,
+            store::AccountStore&         accountStore,
+            store::TransactionStore&     transactionStore,
+            store::StockStore&           stockStore,
+            store::PositionStore&        positionStore,
             TransactionController&       transactionController,
             SecuritiesSideBarController& stockController,
             QMainWindow*                 mainWindow

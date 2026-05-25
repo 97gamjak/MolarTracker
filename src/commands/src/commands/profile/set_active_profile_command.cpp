@@ -5,9 +5,9 @@
 #include <memory>
 #include <utility>
 
-#include "app/store/i_profile_store.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
 #include "logging/log_macros.hpp"
+#include "store/i_profile_store.hpp"
 
 REGISTER_LOG_CATEGORY("Commands.SetActiveProfileCommand");
 
@@ -20,8 +20,8 @@ namespace cmd
      * @param profileStore
      */
     SetActiveProfileCommand::SetActiveProfileCommand(
-        std::string                                profileName,
-        const std::shared_ptr<app::IProfileStore>& profileStore
+        std::string                                  profileName,
+        const std::shared_ptr<store::IProfileStore>& profileStore
     )
         : _profileName(std::move(profileName)), _profileStore(profileStore)
     {
@@ -54,7 +54,7 @@ namespace cmd
         const auto result =
             _profileStore->setActiveProfile(_previousProfile->getName());
 
-        if (result != app::ProfileStoreResult::Ok)
+        if (result != store::ProfileStoreResult::Ok)
         {
             const auto errorMessage = baseMsg + _previousProfile->getName();
 
@@ -100,7 +100,7 @@ namespace cmd
 
         const auto result = _profileStore->setActiveProfile(_profileName);
 
-        if (result != app::ProfileStoreResult::Ok)
+        if (result != store::ProfileStoreResult::Ok)
         {
             LOG_ERROR(
                 baseMsg + std::format("Profile '{}' not found", _profileName)

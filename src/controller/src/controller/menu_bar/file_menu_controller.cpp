@@ -4,9 +4,8 @@
 #include <QObject>
 #include <QStatusBar>
 
-#include "app/app_context.hpp"
-#include "app/store_container.hpp"
 #include "settings/settings.hpp"
+#include "store/store_container.hpp"
 #include "ui/main_window.hpp"
 #include "ui/menu_bar/file_menu.hpp"
 
@@ -17,17 +16,20 @@ namespace controller
      *
      * @param mainWindow The main window of the application
      * @param fileMenu The file menu containing save/quit actions
-     * @param appContext The application context
+     * @param storeContainer The store container for managing application state
+     * @param settings The application settings
      */
     FileMenuController::FileMenuController(
-        ui::MainWindow&  mainWindow,
-        ui::FileMenu&    fileMenu,
-        app::AppContext& appContext
+        ui::MainWindow&        mainWindow,
+        ui::FileMenu&          fileMenu,
+        store::StoreContainer& storeContainer,
+        settings::Settings&    settings
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
           _fileMenu(fileMenu),
-          _appContext(appContext)
+          _storeContainer(storeContainer),
+          _settings(settings)
     {
         connect(
             &_fileMenu,
@@ -50,9 +52,9 @@ namespace controller
      */
     void FileMenuController::_onRequestSave()
     {
-        _appContext.getSettings().save();
-        _appContext.getStore().commit();
-        _appContext.getStore().clearPotentiallyDirty();
+        _settings.save();
+        _storeContainer.commit();
+        _storeContainer.clearPotentiallyDirty();
 
         _mainWindow.setWindowTitle(false);
 

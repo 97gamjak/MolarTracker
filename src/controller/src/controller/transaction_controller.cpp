@@ -2,11 +2,11 @@
 
 #include <qstackedwidget.h>
 
-#include "app/store/account/account_store.hpp"
-#include "app/store/stock_store.hpp"
-#include "app/store/transaction_store.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
+#include "store/account/account_store.hpp"
+#include "store/stock_store.hpp"
+#include "store/transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
 
 namespace controller
@@ -23,11 +23,11 @@ namespace controller
      * @param stackedWidget
      */
     TransactionController::TransactionController(
-        cmd::UndoStack&        undoStack,
-        app::TransactionStore& transactionStore,
-        app::AccountStore&     accountStore,
-        app::StockStore&       stockStore,
-        QStackedWidget*        stackedWidget
+        cmd::UndoStack&          undoStack,
+        store::TransactionStore& transactionStore,
+        store::AccountStore&     accountStore,
+        store::StockStore&       stockStore,
+        QStackedWidget*          stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),

@@ -3,12 +3,10 @@
 #include <QMainWindow>
 #include <format>
 
-#include "app/app_context.hpp"
-#include "app/store/account/account_store.hpp"
-#include "app/store_container.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "logging/log_macros.hpp"
+#include "store/account/account_store.hpp"
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
@@ -26,12 +24,10 @@ namespace controller
      * commands that are created as a result of actions in the account category
      * (e.g. creating a new account), this allows the user to undo and redo
      * actions related to accounts using the undo stack.
-     * @param appContext A reference to the application context, this is used to
-     * access the stores and services needed to perform operations related to
-     * accounts (e.g. creating a new account), this allows the controller to
-     * interact with the underlying data and business logic for accounts, and
-     * ensures that the controller can perform the necessary operations to
-     * manage accounts effectively.
+     * @param accountStore A reference to the account store, this is used to
+     * access the account data and perform operations on it (e.g. creating,
+     * deleting, or modifying accounts), this allows the account side bar
+     * controller to interact with the account data in a consistent way.
      * @param accountController A reference to the account controller, this is
      * used to delegate account-related actions (e.g. when an account is
      * selected in the side bar), this allows the account side bar controller to
@@ -47,14 +43,14 @@ namespace controller
      *
      */
     AccountSideBarController::AccountSideBarController(
-        cmd::UndoStack&    undoStack,
-        app::AppContext&   appContext,
-        AccountController& accountController,
-        QMainWindow*       mainWindow
+        cmd::UndoStack&      undoStack,
+        store::AccountStore& accountStore,
+        AccountController&   accountController,
+        QMainWindow*         mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
-          _appContext(appContext),
+          _accountStore(accountStore),
           _accountController(accountController)
     {
     }
@@ -73,8 +69,7 @@ namespace controller
             return;
 
         category->clearAccounts();
-        const auto accounts =
-            _appContext.getStore().getAccountStore().getAllAccounts();
+        const auto accounts = _accountStore.getAllAccounts();
 
         for (const auto& account : accounts)
         {
@@ -153,7 +148,7 @@ namespace controller
         cmd::Commands command("Create Account");
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
-            _appContext.getStore().getAccountStore(),
+            _accountStore,
             account
         );
 

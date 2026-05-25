@@ -2,10 +2,6 @@
 
 #include <stdexcept>
 
-#include "app/store/account/account_store.hpp"
-#include "app/store/position_store.hpp"
-#include "app/store/stock_store.hpp"
-#include "app/store/transaction_store.hpp"
 #include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "controller/side_bar/securities_controller.hpp"
@@ -16,6 +12,10 @@
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
+#include "store/account/account_store.hpp"
+#include "store/position_store.hpp"
+#include "store/stock_store.hpp"
+#include "store/transaction_store.hpp"
 #include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
@@ -28,12 +28,12 @@ REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 using drafts::TransactionMapper;
 using finance::Position;
 
-using app::AccountStore;
-using app::PositionStore;
-using app::StockStore;
-using app::TransactionStore;
-using app::TransactionStoreResult;
-using app::TransactionStoreResultMeta;
+using store::AccountStore;
+using store::PositionStore;
+using store::StockStore;
+using store::TransactionStore;
+using store::TransactionStoreResult;
+using store::TransactionStoreResultMeta;
 
 using ui::DepositWithdrawalWidget;
 using ui::ErrorDialog;
