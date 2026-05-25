@@ -5,7 +5,7 @@
 
 #include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
-#include "store/account/account_store.hpp"
+#include "store/i_account_store.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Commands.CreateAccountCommand");
 
@@ -19,8 +19,8 @@ namespace cmd
      * @param accountDraft
      */
     CreateAccountCommand::CreateAccountCommand(
-        store::AccountStore& accountStore,
-        drafts::AccountDraft accountDraft
+        std::shared_ptr<store::IAccountStore>& accountStore,
+        drafts::AccountDraft                   accountDraft
     )
         : _accountStore(accountStore), _accountDraft(std::move(accountDraft))
     {
@@ -57,7 +57,7 @@ namespace cmd
      */
     std::expected<void, CommandErrorPtr> CreateAccountCommand::redo()
     {
-        const auto result = _accountStore.createAccount(_accountDraft);
+        const auto result = _accountStore->createAccount(_accountDraft);
         if (result != store::AccountStoreResult::Ok)
         {
             const auto errorMessage = std::format(

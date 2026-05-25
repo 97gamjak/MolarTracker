@@ -373,22 +373,21 @@ namespace store
      * and provides a convenient way to access the account names without having
      * to retrieve the full account data for each account.
      *
-     * @return std::unordered_map<AccountId, std::string, AccountId::Hash> A
+     * @return unorderedIdMap<AccountId, std::string> A
      * map where the keys are account IDs and the values are the corresponding
      * account names for all active accounts in the store, this allows for
      * efficient lookups of account names based on their IDs and can be used in
      * various parts of the application where such mappings are needed.
      */
-    std::unordered_map<AccountId, std::string, AccountId::Hash> AccountStore::
-        getAccountIdToNameMap() const
+    unorderedIdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap(
+    ) const
     {
         const auto options = Options{
             .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        std::unordered_map<AccountId, std::string, AccountId::Hash>
-            accountIdToName;
+        unorderedIdMap<AccountId, std::string> accountIdToName;
 
         for (const auto& account : _getValues(options))
         {
@@ -484,6 +483,16 @@ namespace store
     const AccountSession& AccountStore::getAccountSession() const
     {
         return _session;
+    }
+
+    /**
+     * @brief Get the ID remapping for accounts
+     *
+     * @return const unorderedIdMap<AccountId, AccountId>& The ID remapping
+     */
+    const unorderedIdMap<AccountId, AccountId>& AccountStore::getIdRemap() const
+    {
+        return _getIdRemap();
     }
 
 }   // namespace store
