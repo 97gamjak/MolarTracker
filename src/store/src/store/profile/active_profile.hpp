@@ -1,5 +1,5 @@
-#ifndef __APP__SRC__APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
-#define __APP__SRC__APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
+#ifndef __STORE__SRC__STORE__PROFILE__ACTIVE_PROFILE_HPP__
+#define __STORE__SRC__STORE__PROFILE__ACTIVE_PROFILE_HPP__
 
 #include <optional>
 
@@ -36,4 +36,4 @@ namespace store
 
 }   // namespace store
 
-#endif   // __APP__SRC__APP__STORE__PROFILE__ACTIVE_PROFILE_HPP__
+#endif   // __STORE__SRC__STORE__PROFILE__ACTIVE_PROFILE_HPP__

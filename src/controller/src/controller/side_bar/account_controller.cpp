@@ -36,8 +36,7 @@ namespace controller
      * responsibilities for managing accounts are properly separated between the
      * side bar controller and the account controller.
      * @param mainWindow A pointer to the main window, this is used as the
-     * parent widget #include "app/app_context.hpp"
-for dialogs that are opened as a result of actions in the
+     * parent widget for dialogs that are opened as a result of actions in the
      * account category (e.g. the create account dialog), this ensures that the
      * dialogs are properly parented in the UI and will be modal to the main
      * window when opened.

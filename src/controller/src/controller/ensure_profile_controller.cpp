@@ -34,6 +34,7 @@ namespace controller
      * @param mainWindow
      * @param storeContainer
      * @param undoStack
+     * @param settings
      */
     EnsureProfileController::EnsureProfileController(
         QMainWindow&           mainWindow,

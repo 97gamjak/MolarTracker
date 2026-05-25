@@ -1,5 +1,5 @@
-#ifndef __STORE__INCLUDE__STORE_CONTAINER_HPP__
-#define __STORE__INCLUDE__STORE_CONTAINER_HPP__
+#ifndef __STORE__INCLUDE__STORE__STORE_CONTAINER_HPP__
+#define __STORE__INCLUDE__STORE__STORE_CONTAINER_HPP__
 
 #include <memory>
 #include <vector>
@@ -85,4 +85,4 @@ namespace store
 
 }   // namespace store
 
-#endif   // __STORE__INCLUDE__STORE_CONTAINER_HPP__
+#endif   // __STORE__INCLUDE__STORE__STORE_CONTAINER_HPP__

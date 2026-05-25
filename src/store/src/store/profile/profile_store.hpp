@@ -1,5 +1,5 @@
-#ifndef __APP__SRC__APP__STORE__PROFILE__PROFILE_STORE_HPP__
-#define __APP__SRC__APP__STORE__PROFILE__PROFILE_STORE_HPP__
+#ifndef __STORE__SRC__STORE__PROFILE__PROFILE_STORE_HPP__
+#define __STORE__SRC__STORE__PROFILE__PROFILE_STORE_HPP__
 
 #include <memory>
 #include <optional>
@@ -95,4 +95,4 @@ namespace store
 
 }   // namespace store
 
-#endif   // __APP__SRC__APP__STORE__PROFILE__PROFILE_STORE_HPP__
+#endif   // __STORE__SRC__STORE__PROFILE__PROFILE_STORE_HPP__

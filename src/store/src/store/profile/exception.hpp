@@ -1,5 +1,5 @@
-#ifndef __APP__SRC__APP__STORE__PROFILE__EXCEPTION_HPP__
-#define __APP__SRC__APP__STORE__PROFILE__EXCEPTION_HPP__
+#ifndef __STORE__SRC__STORE__PROFILE__EXCEPTION_HPP__
+#define __STORE__SRC__STORE__PROFILE__EXCEPTION_HPP__
 
 #include "exceptions/base.hpp"
 
@@ -20,4 +20,4 @@ namespace store
     };
 }   // namespace store
 
-#endif   // __APP__SRC__APP__STORE__PROFILE__EXCEPTION_HPP__
+#endif   // __STORE__SRC__STORE__PROFILE__EXCEPTION_HPP__
