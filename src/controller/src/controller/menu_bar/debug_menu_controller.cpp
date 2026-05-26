@@ -87,10 +87,12 @@ namespace controller
      *
      * @param action The action to perform (reset, apply, apply and close)
      * @param categories The new debug flag categories to set
+     * @param persistChanges Whether to persist changes
      */
     void DebugMenuController::_onDebugSlotsChangeRequested(
         const ui::DebugSlotsDialog::Action& action,
-        const logging::LogCategories&       categories
+        const logging::LogCategories&       categories,
+        bool                                persistChanges
     )
     {
         using enum ui::DebugSlotsDialog::Action;
@@ -101,10 +103,10 @@ namespace controller
                 _resetDefaultDebugFlags();
                 break;
             case Apply:
-                _applyDebugFlagChanges(categories);
+                _applyDebugFlagChanges(categories, persistChanges);
                 break;
             case ApplyAndClose:
-                _applyDebugFlagChangesAndClose(categories);
+                _applyDebugFlagChangesAndClose(categories, persistChanges);
                 break;
         }
     }
@@ -196,14 +198,18 @@ namespace controller
      * inconsistent state.
      *
      * @param categories The current debug flag categories to reset to
+     * @param persistChanges Whether to persist the changes
      *
      */
     void DebugMenuController::_applyDebugFlagChanges(
-        const logging::LogCategories& categories
+        const logging::LogCategories& categories,
+        bool                          persistChanges
     )
     {
-        auto result =
-            cmd::Commands::makeAndDo<cmd::UpdateDebugFlagsCommand>(categories);
+        auto result = cmd::Commands::makeAndDo<cmd::UpdateDebugFlagsCommand>(
+            categories,
+            persistChanges
+        );
 
         if (!result)
         {
@@ -236,12 +242,14 @@ namespace controller
      * @brief Apply debug flag changes and close the dialog
      *
      * @param categories The new debug flag categories to set
+     * @param persistChanges Whether to persist the changes
      */
     void DebugMenuController::_applyDebugFlagChangesAndClose(
-        const logging::LogCategories& categories
+        const logging::LogCategories& categories,
+        bool                          persistChanges
     )
     {
-        _applyDebugFlagChanges(categories);
+        _applyDebugFlagChanges(categories, persistChanges);
         _debugSlotsDialog->accept();
     }
 

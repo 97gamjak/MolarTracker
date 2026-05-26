@@ -52,6 +52,9 @@ namespace ui
         /// Checkbox to show only modified categories
         QCheckBox* _showOnlyModifiedCheckBox{};
 
+        /// Checkbox to persist changes
+        QCheckBox* _persistChangesCheckBox{};
+
         /// Button box to hold the buttons
         QDialogButtonBox* _buttonBox{};
 
@@ -83,7 +86,8 @@ namespace ui
         /// Signal emitted when the user requests to apply changes
         void requested(
             const Action&                 action,
-            const logging::LogCategories& categories
+            const logging::LogCategories& categories,
+            bool                          persistChanges
         );
 
        private:
