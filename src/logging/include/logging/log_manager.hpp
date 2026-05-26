@@ -50,10 +50,9 @@ namespace logging
        public:
         static LogManager& getInstance();
 
-        void initializeCategories();
+        void initializeCategories(std::string_view directory);
         void initializeRingFileLogger(
-            const settings::LoggingSettings& settings,
-            std::string_view                 directory
+            const settings::LoggingSettings& settings
         );
 
         void changeLogLevel(
