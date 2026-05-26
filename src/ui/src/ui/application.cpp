@@ -27,4 +27,32 @@ namespace ui
         setDesktopFileName(desktopAppName);
     }
 
+    /**
+     * @brief Handles unhandled exceptions
+     *
+     * @param what The exception message
+     */
+    bool MolarTrackerApplication::notify(QObject* receiver, QEvent* event)
+    {
+        try
+        {
+            return QApplication::notify(receiver, event);
+        }
+        catch (const std::exception& e)
+        {
+            handleException(e.what());
+        }
+        return false;
+    }
+
+    /**
+     * @brief Handles exceptions thrown within the application
+     *
+     * @param what The exception message
+     */
+    void MolarTrackerApplication::handleException(const char* what)
+    {
+        qCritical().noquote() << "Unhandled exception:" << what;
+    }
+
 }   // namespace ui

@@ -1,7 +1,6 @@
 #ifndef __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__
 #define __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__
 
-#include <exception>
 #include <stacktrace>
 #include <stdexcept>
 #include <string>
