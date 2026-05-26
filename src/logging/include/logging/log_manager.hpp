@@ -27,6 +27,9 @@ namespace logging
     class LogManager
     {
        private:
+        /// The name of the file where the persisted log levels are stored.
+        static constexpr auto _persistedLogLevelFile = "log_levels.json";
+
         /// The collection of log categories, organized in a hierarchical
         /// structure
         LogCategories _categories;
@@ -53,7 +56,13 @@ namespace logging
             std::string_view                 directory
         );
 
-        void changeLogLevel(const LogCategory& category, const LogLevel& level);
+        void changeLogLevel(
+            const LogCategory& category,
+            const LogLevel&    level,
+            bool               withLogging = true
+        );
+
+        [[nodiscard]]
         bool isEnabled(
             const std::string& categoryName,
             const LogLevel&    level
@@ -75,12 +84,19 @@ namespace logging
 
         LogCategory getCategory(const std::string& name) const;
 
+        void saveOverrides() const;
+        void loadOverrides();
+
        private:
         LogManager() = default;
 
-        [[nodiscard]] static std::string _logLevelToString(
-            const LogLevel& level
-        );
+        [[nodiscard]]
+        std::optional<LogCategory> _getCategoryOpt(
+            const std::string& name
+        ) const;
+
+        [[nodiscard]]
+        static std::string _logLevelToString(const LogLevel& level);
     };
 
 }   // namespace logging
