@@ -45,10 +45,10 @@ namespace controller
      *
      */
     AccountSideBarController::AccountSideBarController(
-        cmd::UndoStack&                        undoStack,
-        std::shared_ptr<store::IAccountStore>& accountStore,
-        AccountController&                     accountController,
-        QMainWindow*                           mainWindow
+        cmd::UndoStack&                              undoStack,
+        const std::shared_ptr<store::IAccountStore>& accountStore,
+        AccountController&                           accountController,
+        QMainWindow*                                 mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),

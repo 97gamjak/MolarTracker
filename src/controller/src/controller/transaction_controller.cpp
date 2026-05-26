@@ -23,11 +23,11 @@ namespace controller
      * @param stackedWidget
      */
     TransactionController::TransactionController(
-        cmd::UndoStack&                        undoStack,
-        store::TransactionStore&               transactionStore,
-        std::shared_ptr<store::IAccountStore>& accountStore,
-        store::StockStore&                     stockStore,
-        QStackedWidget*                        stackedWidget
+        cmd::UndoStack&                              undoStack,
+        store::TransactionStore&                     transactionStore,
+        const std::shared_ptr<store::IAccountStore>& accountStore,
+        store::StockStore&                           stockStore,
+        QStackedWidget*                              stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),
