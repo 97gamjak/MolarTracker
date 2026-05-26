@@ -5,10 +5,10 @@
 
 #include "config/id_types.hpp"
 
-namespace finance
+namespace domain
 {
     class Account;   // Forward declaration
-}   // namespace finance
+}   // namespace domain
 
 namespace store
 {
@@ -24,10 +24,14 @@ namespace store
 
        public:
         void set(const idSet<AccountId>& activeAccounts);
-        void add(const std::vector<finance::Account>& accounts);
         void remove(const std::vector<AccountId>& accountIds);
 
         [[nodiscard]] const idSet<AccountId>& getIds() const;
+
+        friend class AccountStore;
+
+       private:
+        void _add(const std::vector<domain::Account>& accounts);
     };
 }   // namespace store
 

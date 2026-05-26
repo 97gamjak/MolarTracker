@@ -1,16 +1,19 @@
 #ifndef __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 
+#include <optional>
+#include <vector>
+
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "exceptions/base.hpp"
-#include "finance/account.hpp"
 
-namespace drafts
+namespace finance
 {
-    struct AccountDraft;   // Forward declaration
+    class Account;   // Forward declaration
 
-}   // namespace drafts
+}   // namespace finance
 
 namespace store
 {
@@ -50,7 +53,7 @@ namespace store
          */
         [[nodiscard]]
         virtual AccountStoreResult createAccount(
-            const drafts::AccountDraft& account
+            const finance::Account& account
         ) = 0;
 
         /**
@@ -66,37 +69,36 @@ namespace store
          * @brief Get an account by its ID
          *
          * @param id
-         * @return std::optional<drafts::AccountDraft>
+         * @return std::optional<finance::Account>
          */
         [[nodiscard]]
-        virtual std::optional<drafts::AccountDraft> getAccount(
+        virtual std::optional<finance::Account> getAccount(
             AccountId id
         ) const = 0;
 
         /**
          * @brief Get all accounts
          *
-         * @return std::vector<drafts::AccountDraft>
+         * @return std::vector<finance::Account>
          */
         [[nodiscard]]
-        virtual std::vector<drafts::AccountDraft> getAllAccounts() const = 0;
+        virtual std::vector<finance::Account> getAllAccounts() const = 0;
 
         /**
          * @brief Get all cash accounts
          *
-         * @return std::vector<drafts::AccountDraft>
+         * @return std::vector<finance::Account>
          */
         [[nodiscard]]
-        virtual std::vector<drafts::AccountDraft> getCashAccounts() const = 0;
+        virtual std::vector<finance::Account> getCashAccounts() const = 0;
 
         /**
          * @brief Get all security accounts
          *
-         * @return std::vector<drafts::AccountDraft>
+         * @return std::vector<finance::Account>
          */
         [[nodiscard]]
-        virtual std::vector<drafts::AccountDraft> getSecurityAccounts(
-        ) const = 0;
+        virtual std::vector<finance::Account> getSecurityAccounts() const = 0;
 
         /**
          * @brief Get a mapping of account IDs to their names

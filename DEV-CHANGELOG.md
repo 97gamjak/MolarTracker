@@ -102,6 +102,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Move service implementations into separate molartracker_service CMake target (in src/service/)
 - remove app namespace and introduce store namespace
 - make `AccountStore` only accessible via `IAccountStore` interface
+- make dedicated draft/logic/domain split for `Account` types
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

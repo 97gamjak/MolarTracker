@@ -4,23 +4,14 @@
 #include <format>
 #include <ranges>
 
+#include "account_mapper.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "drafts/account_draft.hpp"
-#include "drafts/account_mapper.hpp"
-#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
+#include "logic/finance/account.hpp"
 #include "service/i_account_service.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
-
-using finance::Account;
-using finance::HasAccountId;
-using finance::HasCurrency;
-using finance::HasName;
-using finance::IsAccountActive;
-using finance::IsAccountType;
-using finance::IsExternal;
 
 namespace store
 {
@@ -40,8 +31,8 @@ namespace store
         : _accountService(accountService)
     {
         _connections.add(subscribeToEntryAdded(
-            [this](const std::vector<finance::Account>& accounts)
-            { _session.add(accounts); },
+            [this](const std::vector<domain::Account>& accounts)
+            { _session._add(accounts); },
             this
         ));
 
@@ -68,7 +59,7 @@ namespace store
      * what went wrong if the creation failed.
      */
     AccountStoreResult AccountStore::createAccount(
-        const drafts::AccountDraft& account
+        const finance::Account& account
     )
     {
         if (_activeProfileId == ProfileId::invalid())
@@ -80,13 +71,16 @@ namespace store
         LOG_DEBUG(
             std::format(
                 "Creating account with name '{}' and currency '{}'",
-                account.name,
-                CurrencyMeta::toString(account.currency)
+                account.getName(),
+                CurrencyMeta::toString(account.getCurrency())
             )
         );
 
+        const auto domainAccount = AccountMapper::toDomain(account);
+
         const auto options = Options{
-            .filter   = IsAccountType(account.kind) && HasName(account.name),
+            .filter = domain::IsAccountType(domainAccount.getKind()) &&
+                      domain::HasName(domainAccount.getName()),
             .deletion = DeletionPolicy::ExcludeDelete
         };
         const auto existingAccount = _get(options);
@@ -96,29 +90,23 @@ namespace store
             LOG_ERROR(
                 std::format(
                     "Account with name '{}' and type '{}' already exists",
-                    account.name,
-                    AccountKindMeta::toString(account.kind)
+                    account.getName(),
+                    AccountKindMeta::toString(account.getKind())
                 )
             );
             return AccountStoreResult::AccountNameConflict;
         }
 
-        const auto newAccount = Account{
-            AccountStatus::Active,
-            account.name,
-            account.currency,
-            account.kind
-        };
-
-        _addEntry(newAccount);
+        _addEntry(domainAccount);
 
         // special case for cash accounts
-        if (account.kind == AccountKind::Cash)
+        if (domainAccount.getKind() == AccountKind::Cash)
         {
             // check if we already have an external account for this profile id
             // and currency
             const auto existingEntry = _get(
-                {.filter   = IsExternal() && HasCurrency(account.currency),
+                {.filter = domain::IsExternal() &&
+                           domain::HasCurrency(domainAccount.getCurrency()),
                  .deletion = DeletionPolicy::ExcludeDelete}
             );
 
@@ -126,10 +114,12 @@ namespace store
             {
                 // If no existing entry is found, we can create a new external
                 // account
-                const auto externalAccount = Account{
+                const auto externalAccount = domain::Account{
+                    AccountId::invalid(),
                     AccountStatus::Active,
-                    "External " + CurrencyMeta::toString(account.currency),
-                    account.currency,
+                    "External " +
+                        CurrencyMeta::toString(domainAccount.getCurrency()),
+                    domainAccount.getCurrency(),
                     AccountKind::External
                 };
 
@@ -297,17 +287,17 @@ namespace store
      * a collection of drafts that can be used for various purposes such as
      * populating UI elements or performing operations on the accounts.
      *
-     * @return std::vector<drafts::AccountDraft>
+     * @return std::vector<finance::Account>
      */
-    std::vector<drafts::AccountDraft> AccountStore::getAllAccounts() const
+    std::vector<finance::Account> AccountStore::getAllAccounts() const
     {
         const auto options = Options{
-            .filter   = !IsExternal() && IsAccountActive(),
+            .filter   = !domain::IsExternal() && domain::IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
         auto accounts = _getValues(options) |
-                        std::views::transform(drafts::AccountMapper::toDraft);
+                        std::views::transform(AccountMapper::fromDomain);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -319,21 +309,22 @@ namespace store
      * accounts, and provides a way to filter the accounts based on their type
      * and status.
      *
-     * @return std::vector<drafts::AccountDraft> A vector of account drafts
+     * @return std::vector<finance::Account> A vector of account drafts
      * representing the cash accounts currently in the store, each draft
      * contains the necessary information about a cash account that can be used
      * for display or further processing, and the caller can use this vector to
      * access the cash account data as needed.
      */
-    std::vector<drafts::AccountDraft> AccountStore::getCashAccounts() const
+    std::vector<finance::Account> AccountStore::getCashAccounts() const
     {
         const auto options = Options{
-            .filter   = IsAccountType(AccountKind::Cash) && IsAccountActive(),
+            .filter = domain::IsAccountType(AccountKind::Cash) &&
+                      domain::IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
         auto accounts = _getValues(options) |
-                        std::views::transform(drafts::AccountMapper::toDraft);
+                        std::views::transform(AccountMapper::fromDomain);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -346,21 +337,22 @@ namespace store
      * specifically involve security accounts, and provides a way to filter the
      * accounts based on their type and status.
      *
-     * @return std::vector<drafts::AccountDraft> A vector of account drafts
+     * @return std::vector<finance::Account> A vector of account drafts
      * representing the security accounts currently in the store, each draft
      * contains the necessary information about a security account that can be
      * used for display or further processing, and the caller can use this
      * vector to access the security account data as needed.
      */
-    std::vector<drafts::AccountDraft> AccountStore::getSecurityAccounts() const
+    std::vector<finance::Account> AccountStore::getSecurityAccounts() const
     {
         const auto options = Options{
-            .filter = IsAccountType(AccountKind::Security) && IsAccountActive(),
+            .filter = domain::IsAccountType(AccountKind::Security) &&
+                      domain::IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
         auto accounts = _getValues(options) |
-                        std::views::transform(drafts::AccountMapper::toDraft);
+                        std::views::transform(AccountMapper::fromDomain);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -383,7 +375,7 @@ namespace store
     ) const
     {
         const auto options = Options{
-            .filter   = IsAccountActive(),
+            .filter   = domain::IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -419,7 +411,7 @@ namespace store
     ) const
     {
         const auto options = Options{
-            .filter   = IsExternal() && HasCurrency(currency),
+            .filter   = domain::IsExternal() && domain::HasCurrency(currency),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -439,7 +431,7 @@ namespace store
     idSet<AccountId> AccountStore::getExternalAccountIds() const
     {
         const auto options = Options{
-            .filter   = IsExternal(),
+            .filter   = domain::IsExternal(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -455,22 +447,20 @@ namespace store
      * @brief Get an account by its ID
      *
      * @param id The ID of the account to retrieve
-     * @return std::optional<drafts::AccountDraft> The account if
+     * @return std::optional<finance::Account> The account if
      * found, or an empty optional if not found
      */
-    std::optional<drafts::AccountDraft> AccountStore::getAccount(
-        AccountId id
-    ) const
+    std::optional<finance::Account> AccountStore::getAccount(AccountId id) const
     {
         const auto options = Options{
-            .filter   = HasAccountId(id) && IsAccountActive(),
+            .filter   = domain::HasAccountId(id) && domain::IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
         const auto account = _get(options);
 
         if (account.has_value())
-            return drafts::AccountMapper::toDraft(account.value());
+            return AccountMapper::fromDomain(account.value());
 
         return std::nullopt;
     }

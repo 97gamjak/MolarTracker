@@ -12,11 +12,6 @@ class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 class QStackedWidget;   // Forward declaration
 
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-}   // namespace drafts
-
 namespace store
 {
     class IAccountStore;   // Forward declaration

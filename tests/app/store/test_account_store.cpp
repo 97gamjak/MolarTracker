@@ -6,8 +6,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "drafts/account_draft.hpp"
-#include "finance/account.hpp"
+#include "logic/finance/account.hpp"
 #include "mock_services.hpp"
 #include "store/account/account_store.hpp"
 
@@ -28,18 +27,18 @@ namespace
         {
         }
 
-        [[nodiscard]] static drafts::AccountDraft makeDraft(
+        [[nodiscard]] static finance::Account makeAccount(
             const std::string& name,
             AccountKind        kind     = AccountKind::Security,
             Currency           currency = Currency::EUR
         )
         {
-            return drafts::AccountDraft{
+            return finance::Account{
                 AccountId::invalid(),
+                AccountStatus::Active,
                 name,
-                kind,
                 currency,
-                std::nullopt
+                kind,
             };
         }
 
@@ -50,7 +49,7 @@ namespace
 
 TEST_F(AccountStoreTest, CreateAccountNoActiveProfileReturnsError)
 {
-    const auto result = _store->createAccount(makeDraft("Savings"));
+    const auto result = _store->createAccount(makeAccount("Savings"));
 
     EXPECT_EQ(result, store::AccountStoreResult::Error);
 }
@@ -59,7 +58,7 @@ TEST_F(AccountStoreTest, CreateAccountWithActiveProfileReturnsOk)
 {
     setActiveProfile();
 
-    const auto result = _store->createAccount(makeDraft("Savings"));
+    const auto result = _store->createAccount(makeAccount("Savings"));
 
     EXPECT_EQ(result, store::AccountStoreResult::Ok);
 }
@@ -67,9 +66,9 @@ TEST_F(AccountStoreTest, CreateAccountWithActiveProfileReturnsOk)
 TEST_F(AccountStoreTest, CreateAccountDuplicateNameAndKindReturnsConflict)
 {
     setActiveProfile();
-    static_cast<void>(_store->createAccount(makeDraft("Savings")));
+    static_cast<void>(_store->createAccount(makeAccount("Savings")));
 
-    const auto result = _store->createAccount(makeDraft("Savings"));
+    const auto result = _store->createAccount(makeAccount("Savings"));
 
     EXPECT_EQ(result, store::AccountStoreResult::AccountNameConflict);
 }
@@ -84,67 +83,67 @@ TEST_F(AccountStoreTest, GetAllAccountsEmptyInitially)
 TEST_F(AccountStoreTest, GetAllAccountsReturnsCreatedAccount)
 {
     setActiveProfile();
-    static_cast<void>(_store->createAccount(makeDraft("Savings")));
+    static_cast<void>(_store->createAccount(makeAccount("Savings")));
 
     const auto accounts = _store->getAllAccounts();
 
     ASSERT_EQ(accounts.size(), 1U);
-    EXPECT_EQ(accounts[0].name, "Savings");
+    EXPECT_EQ(accounts[0].getName(), "Savings");
 }
 
 TEST_F(AccountStoreTest, GetCashAccountsReturnsOnlyCashAccounts)
 {
     setActiveProfile();
     static_cast<void>(
-        _store->createAccount(makeDraft("CashAcc", AccountKind::Cash))
+        _store->createAccount(makeAccount("CashAcc", AccountKind::Cash))
     );
     static_cast<void>(
-        _store->createAccount(makeDraft("SecAcc", AccountKind::Security))
+        _store->createAccount(makeAccount("SecAcc", AccountKind::Security))
     );
 
     const auto cashAccounts = _store->getCashAccounts();
 
     ASSERT_EQ(cashAccounts.size(), 1U);
-    EXPECT_EQ(cashAccounts[0].name, "CashAcc");
+    EXPECT_EQ(cashAccounts[0].getName(), "CashAcc");
 }
 
 TEST_F(AccountStoreTest, GetSecurityAccountsReturnsOnlySecurityAccounts)
 {
     setActiveProfile();
     static_cast<void>(
-        _store->createAccount(makeDraft("CashAcc", AccountKind::Cash))
+        _store->createAccount(makeAccount("CashAcc", AccountKind::Cash))
     );
     static_cast<void>(
-        _store->createAccount(makeDraft("SecAcc", AccountKind::Security))
+        _store->createAccount(makeAccount("SecAcc", AccountKind::Security))
     );
 
     const auto secAccounts = _store->getSecurityAccounts();
 
     ASSERT_EQ(secAccounts.size(), 1U);
-    EXPECT_EQ(secAccounts[0].name, "SecAcc");
+    EXPECT_EQ(secAccounts[0].getName(), "SecAcc");
 }
 
 TEST_F(AccountStoreTest, UpdateActiveProfileLoadsAccountsFromService)
 {
     _mockService->preloadedAccounts.emplace_back(
+        AccountId::invalid(),
         AccountStatus::Active,
         "LoadedAcc",
         Currency::EUR,
         AccountKind::Security
-
     );
 
     setActiveProfile();
 
     const auto accounts = _store->getAllAccounts();
     ASSERT_EQ(accounts.size(), 1U);
-    EXPECT_EQ(accounts[0].name, "LoadedAcc");
+    EXPECT_EQ(accounts[0].getName(), "LoadedAcc");
 }
 
 TEST_F(AccountStoreTest, UpdateActiveProfileNulloptClearsActiveProfile)
 {
     setActiveProfile();
-    static_cast<void>(_store->createAccount(makeDraft("Savings")));
+    static_cast<void>(_store->createAccount(makeAccount("Savings")));
 
     _store->updateActiveProfile(std::nullopt);
 
@@ -154,7 +153,7 @@ TEST_F(AccountStoreTest, UpdateActiveProfileNulloptClearsActiveProfile)
 TEST_F(AccountStoreTest, CommitNewAccountCallsService)
 {
     setActiveProfile();
-    static_cast<void>(_store->createAccount(makeDraft("Savings")));
+    static_cast<void>(_store->createAccount(makeAccount("Savings")));
 
     _store->commit();
 
@@ -165,7 +164,7 @@ TEST_F(AccountStoreTest, CreateCashAccountAlsoCreatesExternalAccount)
 {
     setActiveProfile();
     static_cast<void>(_store->createAccount(
-        makeDraft("CashAcc", AccountKind::Cash, Currency::EUR)
+        makeAccount("CashAcc", AccountKind::Cash, Currency::EUR)
     ));
 
     EXPECT_NO_THROW(
@@ -181,7 +180,7 @@ TEST_F(AccountStoreTest, IsDirtyFalseInitially)
 TEST_F(AccountStoreTest, IsDirtyTrueAfterCreateAccount)
 {
     setActiveProfile();
-    static_cast<void>(_store->createAccount(makeDraft("Savings")));
+    static_cast<void>(_store->createAccount(makeAccount("Savings")));
 
     EXPECT_TRUE(_store->isDirty());
 }

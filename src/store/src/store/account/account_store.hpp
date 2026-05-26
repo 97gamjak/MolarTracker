@@ -6,7 +6,7 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
-#include "finance/account.hpp"
+#include "domain/account.hpp"
 #include "store/account/account_session.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_account_store.hpp"
@@ -19,8 +19,13 @@ namespace drafts
 
 namespace service
 {
-    class IAccountService;   // forward declaration
+    class IAccountService;   // Forward declaration
 }   // namespace service
+
+namespace finance
+{
+    class Account;   // Forward declaration
+}   // namespace finance
 
 namespace store
 {
@@ -28,7 +33,7 @@ namespace store
      * @brief Store for managing accounts
      *
      */
-    class AccountStore : public BaseStore<finance::Account, AccountId>,
+    class AccountStore : public BaseStore<domain::Account, AccountId>,
                          public IAccountStore
     {
        private:
@@ -53,19 +58,17 @@ namespace store
 
         [[nodiscard]]
         AccountStoreResult createAccount(
-            const drafts::AccountDraft& account
+            const finance::Account& account
         ) override;
 
         [[nodiscard]]
-        std::optional<drafts::AccountDraft> getAccount(
-            AccountId id
-        ) const override;
+        std::optional<finance::Account> getAccount(AccountId id) const override;
         [[nodiscard]]
-        std::vector<drafts::AccountDraft> getAllAccounts() const override;
+        std::vector<finance::Account> getAllAccounts() const override;
         [[nodiscard]]
-        std::vector<drafts::AccountDraft> getCashAccounts() const override;
+        std::vector<finance::Account> getCashAccounts() const override;
         [[nodiscard]]
-        std::vector<drafts::AccountDraft> getSecurityAccounts() const override;
+        std::vector<finance::Account> getSecurityAccounts() const override;
         [[nodiscard]]
         unorderedIdMap<AccountId, std::string> getAccountIdToNameMap(
         ) const override;

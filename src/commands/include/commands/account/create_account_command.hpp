@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "commands/command.hpp"
-#include "drafts/account_draft.hpp"
+#include "logic/finance/account.hpp"
 
 namespace store
 {
@@ -23,12 +23,12 @@ namespace cmd
         /// Reference to the account store
         std::shared_ptr<store::IAccountStore> _accountStore;
         /// The draft of the account to create
-        drafts::AccountDraft _accountDraft;
+        finance::Account _account;
 
        public:
         CreateAccountCommand(
             std::shared_ptr<store::IAccountStore>& accountStore,
-            drafts::AccountDraft                   accountDraft
+            finance::Account                       account
         );
 
         ~CreateAccountCommand() override                             = default;

@@ -4,6 +4,7 @@
 
 #include "config/constants.hpp"
 #include "config/finance.hpp"
+#include "controller/mapper/account_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction/transaction_helpers.hpp"
 #include "controller/transaction_controller.hpp"
@@ -81,7 +82,7 @@ namespace controller
     {
         _createCashTransactionDlg = utils::makeQChild<DepositWithdrawalWidget>(
             TransactionType::Deposit,   // dummy type
-            _accountStore->getCashAccounts(),
+            AccountMapper::toDrafts(_accountStore->getCashAccounts()),
             _mainWindow
         );
 
@@ -93,8 +94,8 @@ namespace controller
         );
 
         _createStockTransactionDlg = utils::makeQChild<StockWidget>(
-            _accountStore->getAllAccounts(),
-            _accountStore->getAllAccounts(),
+            AccountMapper::toDrafts(_accountStore->getAllAccounts()),
+            AccountMapper::toDrafts(_accountStore->getAllAccounts()),
             _stockStore.getAllTickers(),
             _mainWindow
         );
@@ -161,7 +162,7 @@ namespace controller
 
             _createCashTransactionDlg->setTransactionType(type);
             _createCashTransactionDlg->updateAccounts(
-                _accountStore->getCashAccounts()
+                AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
             _createCashTransactionDlg->refresh();
 
@@ -170,10 +171,10 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _createStockTransactionDlg->updateAccounts(
-                _accountStore->getSecurityAccounts()
+                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
             );
             _createStockTransactionDlg->updateReferenceAccounts(
-                _accountStore->getCashAccounts()
+                AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
             _createStockTransactionDlg->updateTickers(_stockStore.getAllTickers(
             ));
