@@ -15,11 +15,11 @@ int main(int argc, char** argv)
     std::set_terminate(
         []
         {
-            if (auto eptr = std::current_exception())
+            if (auto exception = std::current_exception())
             {
                 try
                 {
-                    std::rethrow_exception(eptr);
+                    std::rethrow_exception(exception);
                 }
                 catch (const std::exception& e)
                 {
