@@ -4,7 +4,10 @@
 #include <QWidget>
 #include <memory>
 
-#include "drafts/account_draft.hpp"
+namespace drafts
+{
+    struct AccountDraft;   // Forward declaration
+}   // namespace drafts
 
 namespace ui
 {

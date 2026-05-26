@@ -1,7 +1,7 @@
 #include "account_factory.hpp"
 
 #include "config/id_types.hpp"
-#include "finance/account.hpp"
+#include "domain/account.hpp"
 #include "sql_models/account_row.hpp"
 
 namespace repo
@@ -12,21 +12,19 @@ namespace repo
      * CashAccount
      *
      * @param accountRow
-     * @return finance::CashAccount
+     * @return domain::CashAccount
      */
-    finance::Account AccountFactory::toAccountDomain(
+    domain::Account AccountFactory::toAccountDomain(
         const AccountRow& accountRow
     )
     {
-        auto account = finance::Account{
+        return domain::Account{
+            accountRow.id.value(),
             accountRow.status.value(),
             accountRow.name.value(),
             accountRow.currency.value(),
             accountRow.kind.value()
         };
-
-        account.setId(accountRow.id.value());
-        return account;
     }
 
     /**
@@ -34,13 +32,13 @@ namespace repo
      * Account domain models
      *
      * @param accountRows
-     * @return std::vector<finance::Account>
+     * @return std::vector<domain::Account>
      */
-    std::vector<finance::Account> AccountFactory::toAccountDomains(
+    std::vector<domain::Account> AccountFactory::toAccountDomains(
         const std::vector<AccountRow>& accountRows
     )
     {
-        std::vector<finance::Account> accounts;
+        std::vector<domain::Account> accounts;
         accounts.reserve(accountRows.size());
 
         for (const auto& row : accountRows)
@@ -57,8 +55,8 @@ namespace repo
      * @return AccountRow
      */
     AccountRow AccountFactory::toAccountRow(
-        const finance::Account& account,
-        const ProfileId&        profileId
+        const domain::Account& account,
+        const ProfileId&       profileId
     )
     {
         AccountRow accountRow;

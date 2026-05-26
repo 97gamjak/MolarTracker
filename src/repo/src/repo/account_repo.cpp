@@ -1,7 +1,7 @@
 #include "account_repo.hpp"
 
+#include "domain/account.hpp"
 #include "factories/account_factory.hpp"
-#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
@@ -26,8 +26,8 @@ namespace repo
      * @return AccountId The ID of the newly created account
      */
     AccountId AccountRepo::createAccount(
-        const finance::Account& account,
-        const ProfileId&        profileId
+        const domain::Account& account,
+        const ProfileId&       profileId
     )
     {
         db::Transaction transaction{_getDb()};
@@ -59,9 +59,9 @@ namespace repo
      * @brief Get the All Accounts
      *
      * @param profileId
-     * @return std::vector<finance::Account>
+     * @return std::vector<domain::Account>
      */
-    [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllAccounts(
+    [[nodiscard]] std::vector<domain::Account> AccountRepo::getAllAccounts(
         const ProfileId& profileId
     )
     {

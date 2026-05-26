@@ -8,7 +8,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
-#include "finance/account.hpp"
+#include "domain/account.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "repo/account_repo.hpp"
@@ -47,13 +47,14 @@ namespace
             return ProfileId(result.value());
         }
 
-        [[nodiscard]] static finance::Account makeAccount(
+        [[nodiscard]] static domain::Account makeAccount(
             const std::string& name,
             AccountKind        kind     = AccountKind::Cash,
             Currency           currency = Currency::EUR
         )
         {
-            return finance::Account{
+            return domain::Account{
+                AccountId::invalid(),
                 AccountStatus::Active,
                 name,
                 currency,

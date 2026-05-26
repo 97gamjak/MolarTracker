@@ -1,6 +1,5 @@
 add_library(molartracker_drafts STATIC
-    src/drafts/account_mapper.cpp
-    src/drafts/account_draft.cpp
+    src/drafts/account/account_draft.cpp
 
     src/drafts/transaction_draft.cpp
     src/drafts/transaction_mapper.cpp
@@ -25,7 +24,8 @@ target_link_libraries(molartracker_drafts
     molartracker_config
     molartracker_utils
     PRIVATE
+    molartracker_exceptions
     molartracker_finance
     molartracker_logging
-    molartracker_exceptions
+    molartracker_logic
 )

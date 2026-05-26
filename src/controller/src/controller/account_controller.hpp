@@ -12,14 +12,9 @@ class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 class QStackedWidget;   // Forward declaration
 
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-}   // namespace drafts
-
 namespace store
 {
-    class AccountStore;   // Forward declaration
+    class IAccountStore;   // Forward declaration
 }   // namespace store
 
 namespace ui
@@ -48,7 +43,7 @@ namespace controller
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
         /// Reference to the account store
-        store::AccountStore& _accountStore;
+        std::shared_ptr<store::IAccountStore> _accountStore;
         /// Pointer to the stacked widget
         QStackedWidget* _stackedWidget;
         /// Pointer to the account detail view
@@ -56,9 +51,9 @@ namespace controller
 
        public:
         AccountController(
-            cmd::UndoStack&      undoStack,
-            store::AccountStore& accountStore,
-            QStackedWidget*      stackedWidget
+            cmd::UndoStack&                        undoStack,
+            std::shared_ptr<store::IAccountStore>& accountStore,
+            QStackedWidget*                        stackedWidget
         );
 
         void accountSelected(AccountId id);

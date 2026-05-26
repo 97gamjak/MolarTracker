@@ -18,6 +18,7 @@ target_link_libraries(tests_app_store
     molartracker_domain
     molartracker_drafts
     molartracker_logging
+    molartracker_logic
     molartracker_service
     molartracker_store
     molartracker_tests
