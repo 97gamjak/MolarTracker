@@ -112,10 +112,11 @@ namespace controller
         auto& loggingSettings = settings.getLoggingSettings();
 
         // initialize ring file buffered logger
-        logging::LogManager::getInstance().initializeCategories();
-        logging::LogManager::getInstance().initializeRingFileLogger(
-            loggingSettings,
+        logging::LogManager::getInstance().initializeCategories(
             Constants::getInstance().getDataPath().string()
+        );
+        logging::LogManager::getInstance().initializeRingFileLogger(
+            loggingSettings
         );
 
         _impl = std::make_unique<Impl>(std::move(settings));

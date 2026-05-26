@@ -9,12 +9,15 @@ namespace cmd
      * Command object
      *
      * @param categories The new debug flag categories to set
+     * @param persistChanges Whether to persist the changes
      */
     UpdateDebugFlagsCommand::UpdateDebugFlagsCommand(
-        logging::LogCategories categories
+        logging::LogCategories categories,
+        bool                   persistChanges
     )
         : _oldCategories(logging::LogManager::getInstance().getCategories()),
-          _categories(std::move(categories))
+          _categories(std::move(categories)),
+          _persistChanges(persistChanges)
     {
     }
 
@@ -33,6 +36,9 @@ namespace cmd
             );
         }
 
+        if (_persistChanges)
+            logging::LogManager::getInstance().saveOverrides();
+
         return {};
     }
 
@@ -50,6 +56,9 @@ namespace cmd
                 category.getLogLevel()
             );
         }
+
+        if (_persistChanges)
+            logging::LogManager::getInstance().saveOverrides();
 
         return {};
     }

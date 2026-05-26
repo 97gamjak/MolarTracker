@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <format>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 
@@ -32,15 +34,21 @@ namespace logging
     /**
      * @brief Initialize the logging categories based on the registered
      * categories and the default log level
+     *
+     * @param directory The directory where log files will be stored
      */
-    void LogManager::initializeCategories()
+    void LogManager::initializeCategories(std::string_view directory)
     {
+        _logDirectory = directory;
+
         _categories = LogCategories{
             CategoryRegistry::getInstance().categories,
             _defaultLogLevel
         };
 
         _startupCategories = _categories;
+
+        loadOverrides();
     }
 
     /**
@@ -48,16 +56,14 @@ namespace logging
      *
      * @param settings Logging settings containing the configuration for the
      * ring file logger
-     * @param directory Directory where the log files will be stored
      */
     void LogManager::initializeRingFileLogger(
-        const settings::LoggingSettings& settings,
-        std::string_view                 directory
+        const settings::LoggingSettings& settings
     )
     {
         RingFileConfig config;
 
-        const auto path  = std::filesystem::path(directory);
+        const auto path  = std::filesystem::path(_logDirectory);
         config.directory = path / settings.getLogDirectory();
         config.baseName  = settings.getLogFilePrefix() + Timestamp().fileSafe();
         config.extension = settings.getLogFileSuffix();
@@ -131,10 +137,12 @@ namespace logging
      *
      * @param category
      * @param level
+     * @param withLogging
      */
     void LogManager::changeLogLevel(
         const LogCategory& category,
-        const LogLevel&    level
+        const LogLevel&    level,
+        bool               withLogging
     )
     {
         const auto categoryOpt = _categories.getCategory(category.getName());
@@ -149,22 +157,25 @@ namespace logging
 
         _categories.setLogLevel(category.getName(), level);
 
-        const auto logObject = LogObject{
-            LogLevel::Info,
-            category.getName(),
-            std::format(
-                "Log level for category '{}' changed from '{}' to '{}'",
-                std::string{_categories.getCategory(category.getName())
-                                .value()
-                                .getName()},
-                std::string{LogLevelMeta::name(previousLevel)},
-                std::string{LogLevelMeta::name(level)}
-            ),
-            __FILE__,
-            __LINE__,
-            __func__
-        };
-        log(logObject);
+        if (withLogging)
+        {
+            const auto logObject = LogObject{
+                LogLevel::Info,
+                category.getName(),
+                std::format(
+                    "Log level for category '{}' changed from '{}' to '{}'",
+                    std::string{_categories.getCategory(category.getName())
+                                    .value()
+                                    .getName()},
+                    std::string{LogLevelMeta::name(previousLevel)},
+                    std::string{LogLevelMeta::name(level)}
+                ),
+                __FILE__,
+                __LINE__,
+                __func__
+            };
+            log(logObject);
+        }
     }
 
     /**
@@ -259,7 +270,92 @@ namespace logging
      */
     void LogManager::setDefaultLogLevel(const LogLevel& level)
     {
+        for (const auto& category : _categories.getCategories())
+            if (category.getLogLevel() == _defaultLogLevel)
+                _categories.setLogLevel(category.getName(), level);
+
         _defaultLogLevel = level;
+    }
+
+    /**
+     * @brief Get a log category by its name
+     *
+     * @param name The name of the log category to retrieve
+     * @return LogCategory The log category with the specified name, or a root
+     * category with the default log level if the category is not found
+     */
+    std::optional<LogCategory> LogManager::_getCategoryOpt(
+        const std::string& name
+    ) const
+    {
+        auto categoryOpt = _categories.getCategory(name);
+
+        if (!categoryOpt.has_value())
+            return std::nullopt;
+
+        return categoryOpt;
+    }
+
+    /**
+     * @brief Save log level overrides to a file
+     *
+     */
+    void LogManager::saveOverrides() const
+    {
+        nlohmann::json json;
+
+        for (const auto& category : _categories.getCategories())
+        {
+            if (category.getLogLevel() != _defaultLogLevel)
+            {
+                json[category.getName()] =
+                    static_cast<int>(category.getLogLevel());
+            }
+        }
+
+        const auto path =
+            std::filesystem::path(_logDirectory) / _persistedLogLevelFile;
+
+        std::ofstream file(path);
+
+        if (file.is_open())
+        {
+            file << json.dump(4);
+            file.close();
+        }
+    }
+
+    /**
+     * @brief Load log level overrides from a file
+     *
+     */
+    void LogManager::loadOverrides()
+    {
+        const auto path =
+            std::filesystem::path(_logDirectory) / _persistedLogLevelFile;
+
+        std::ifstream file(path);
+
+        if (file.is_open())
+        {
+            // Load the log level overrides from the file
+            nlohmann::json json;
+            file >> json;
+
+            for (const auto& [name, level] : json.items())
+            {
+                const auto category = _getCategoryOpt(name);
+
+                if (category)
+                {
+                    changeLogLevel(
+                        *category,
+                        static_cast<LogLevel>(level),
+                        false
+                    );
+                }
+            }
+        }
     }
 
 }   // namespace logging

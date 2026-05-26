@@ -123,6 +123,10 @@ namespace ui
             utils::makeQChild<QCheckBox>("Show only modified", this);
         _showOnlyModifiedCheckBox->setChecked(false);
 
+        _persistChangesCheckBox =
+            utils::makeQChild<QCheckBox>("Persist changes", this);
+        _persistChangesCheckBox->setChecked(false);
+
         _buttonBox = utils::makeQChild<QDialogButtonBox>(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
                 QDialogButtonBox::Apply,
@@ -131,6 +135,7 @@ namespace ui
 
         auto* upperBottomRow = utils::makeQChild<QHBoxLayout>();
         upperBottomRow->addWidget(_showOnlyModifiedCheckBox);
+        upperBottomRow->addWidget(_persistChangesCheckBox);
         upperBottomRow->addStretch(1);
 
         auto* bottomRow = utils::makeQChild<QHBoxLayout>();
@@ -227,7 +232,11 @@ namespace ui
      */
     void DebugSlotsDialog::_emit(const Action& action)
     {
-        emit requested(action, _currentCategories);
+        emit requested(
+            action,
+            _currentCategories,
+            _persistChangesCheckBox->isChecked()
+        );
     }
 
     /**
