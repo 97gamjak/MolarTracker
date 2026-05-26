@@ -12,6 +12,28 @@ REGISTER_LOG_CATEGORY("Application");
 
 int main(int argc, char** argv)
 {
+    std::set_terminate(
+        []
+        {
+            if (auto eptr = std::current_exception())
+            {
+                try
+                {
+                    std::rethrow_exception(eptr);
+                }
+                catch (const std::exception& e)
+                {
+                    qCritical() << "Terminated:" << e.what();
+                }
+                catch (...)
+                {
+                    qCritical() << "Terminated: unknown exception";
+                }
+            }
+            std::abort();
+        }
+    );
+
     ui::MolarTrackerApplication app{argc, argv};
 
     try
