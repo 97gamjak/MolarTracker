@@ -46,9 +46,9 @@ namespace logging
             _defaultLogLevel
         };
 
-        loadOverrides();
-
         _startupCategories = _categories;
+
+        loadOverrides();
     }
 
     /**
