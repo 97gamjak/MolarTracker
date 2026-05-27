@@ -32,7 +32,7 @@ namespace store
           _accountStore{std::make_shared<AccountStore>(
               _serviceContainer->getAccountService()
           )},
-          _stockStore{std::make_unique<StockStore>(
+          _stockStore{std::make_shared<StockStore>(
               _serviceContainer->getInstrumentService(),
               _instrumentIdSeq
           )},
@@ -42,7 +42,6 @@ namespace store
           )},
           _transactionStore{std::make_unique<TransactionStore>(
               _serviceContainer->getTransactionService(),
-              *_stockStore,
               *_positionStore,
               _accountStore->getAccountSession()
           )},
@@ -50,10 +49,12 @@ namespace store
     {
         auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
         auto* accountStore = dynamic_cast<AccountStore*>(_accountStore.get());
+        auto* stockStore   = dynamic_cast<StockStore*>(_stockStore.get());
 
         if (profileStore == nullptr || !_profileStore ||
-            accountStore == nullptr || !_accountStore || !_stockStore ||
-            !_positionStore || !_transactionStore)
+            accountStore == nullptr || !_accountStore ||
+            stockStore == nullptr || !_stockStore || !_positionStore ||
+            !_transactionStore)
         {
             throw std::runtime_error("Failed to initialize store container");
         }
@@ -61,7 +62,7 @@ namespace store
         _allStores.push_back(profileStore);
         _allStores.push_back(accountStore);
         _allStores.push_back(&*_transactionStore);
-        _allStores.push_back(&*_stockStore);
+        _allStores.push_back(stockStore);
         _allStores.push_back(&*_positionStore);
 
         _connections->add(_profileStore->subscribeToProfileChange(
@@ -94,7 +95,10 @@ namespace store
 
         _stockStore->commit();
 
-        _transactionStore->commit(_accountStore->getIdRemap());
+        _transactionStore->commit(
+            _accountStore->getIdRemap(),
+            _stockStore->getInstrumentIdMap()
+        );
     }
 
     /**
@@ -231,18 +235,21 @@ namespace store
     /**
      * @brief Get the StockStore
      *
-     * @return StockStore&
+     * @return std::shared_ptr<IStockStore>&
      */
-    StockStore& StoreContainer::getStockStore() { return *_stockStore; }
+    std::shared_ptr<IStockStore>& StoreContainer::getStockStore()
+    {
+        return _stockStore;
+    }
 
     /**
      * @brief Get the StockStore (const version)
      *
-     * @return const StockStore&
+     * @return const std::shared_ptr<IStockStore>&
      */
-    const StockStore& StoreContainer::getStockStore() const
+    const std::shared_ptr<IStockStore>& StoreContainer::getStockStore() const
     {
-        return *_stockStore;
+        return _stockStore;
     }
 
     /**

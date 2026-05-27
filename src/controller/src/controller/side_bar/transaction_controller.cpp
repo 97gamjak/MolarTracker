@@ -14,8 +14,8 @@
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
+#include "store/i_stock_store.hpp"
 #include "store/position_store.hpp"
-#include "store/stock_store.hpp"
 #include "store/transaction_store.hpp"
 #include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
@@ -30,8 +30,8 @@ using drafts::TransactionMapper;
 using finance::Position;
 
 using store::IAccountStore;
+using store::IStockStore;
 using store::PositionStore;
-using store::StockStore;
 using store::TransactionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
@@ -62,7 +62,7 @@ namespace controller
         cmd::UndoStack&                       undoStack,
         const std::shared_ptr<IAccountStore>& accountStore,
         TransactionStore&                     transactionStore,
-        StockStore&                           stockStore,
+        const std::shared_ptr<IStockStore>&   stockStore,
         PositionStore&                        positionStore,
         TransactionController&                transactionController,
         SecuritiesSideBarController&          stockController,
@@ -101,7 +101,7 @@ namespace controller
         _createStockTransactionDlg = utils::makeQChild<StockWidget>(
             accounts,
             accounts,
-            _stockStore.getAllTickers(),
+            _stockStore->getAllTickers(),
             _mainWindow
         );
 
@@ -119,11 +119,11 @@ namespace controller
             &TransactionSideBarController::_onCreateStockTransactionRequested
         );
 
-        _connections.add(_stockStore.subscribeToStoreChange(
+        _connections.add(_stockStore->subscribeToStoreChange(
             [&]()
             {
                 _createStockTransactionDlg->updateTickers(
-                    _stockStore.getAllTickers()
+                    _stockStore->getAllTickers()
                 );
             },
             this
@@ -185,8 +185,9 @@ namespace controller
                 drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
                 )
             );
-            _createStockTransactionDlg->updateTickers(_stockStore.getAllTickers(
-            ));
+            _createStockTransactionDlg->updateTickers(
+                _stockStore->getAllTickers()
+            );
             _createStockTransactionDlg->refresh();
 
             _createStockTransactionDlg->show();

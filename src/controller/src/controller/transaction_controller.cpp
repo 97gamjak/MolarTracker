@@ -5,7 +5,7 @@
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "store/i_account_store.hpp"
-#include "store/stock_store.hpp"
+#include "store/i_stock_store.hpp"
 #include "store/transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
 
@@ -23,11 +23,11 @@ namespace controller
      * @param stackedWidget
      */
     TransactionController::TransactionController(
-        cmd::UndoStack&                        undoStack,
-        store::TransactionStore&               transactionStore,
-        std::shared_ptr<store::IAccountStore>& accountStore,
-        store::StockStore&                     stockStore,
-        QStackedWidget*                        stackedWidget
+        cmd::UndoStack&                              undoStack,
+        store::TransactionStore&                     transactionStore,
+        const std::shared_ptr<store::IAccountStore>& accountStore,
+        const std::shared_ptr<store::IStockStore>&   stockStore,
+        QStackedWidget*                              stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),
@@ -80,7 +80,7 @@ namespace controller
         const auto transactions = _transactionStore.get();
         const auto drafts       = drafts::TransactionMapper::toOverviewDrafts(
             transactions,
-            _stockStore.getInstrumentIdToNameMap(),
+            _stockStore->getInstrumentIdToNameMap(),
             _accountStore->getExternalAccountIds()
         );
 

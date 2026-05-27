@@ -33,14 +33,14 @@ namespace controller
         /// Reference to the position store
         store::PositionStore& positionStore;
         /// Reference to the stock store
-        store::StockStore& stockStore;
+        std::shared_ptr<store::IStockStore> stockStore;
         /// Reference to the transaction store
         store::TransactionStore& transactionStore;
 
         Stores(
             const std::shared_ptr<store::IAccountStore>& accountStore_,
             store::PositionStore&                        positionStore_,
-            store::StockStore&                           stockStore_,
+            const std::shared_ptr<store::IStockStore>&   stockStore_,
             store::TransactionStore&                     transactionStore_
         );
         ~Stores() = default;
@@ -63,7 +63,7 @@ namespace controller
     AccountController::Stores::Stores(
         const std::shared_ptr<store::IAccountStore>& accountStore_,
         store::PositionStore&                        positionStore_,
-        store::StockStore&                           stockStore_,
+        const std::shared_ptr<store::IStockStore>&   stockStore_,
         store::TransactionStore&                     transactionStore_
     )
         : accountStore(accountStore_),
@@ -87,7 +87,7 @@ namespace controller
         cmd::UndoStack&                              undoStack,
         const std::shared_ptr<store::IAccountStore>& accountStore,
         store::PositionStore&                        positionStore,
-        store::StockStore&                           stockStore,
+        const std::shared_ptr<store::IStockStore>&   stockStore,
         store::TransactionStore&                     transactionStore,
         QStackedWidget*                              stackedWidget
     )

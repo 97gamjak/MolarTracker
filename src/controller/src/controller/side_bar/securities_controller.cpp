@@ -6,7 +6,7 @@
 #include "drafts/stock_mapper.hpp"
 #include "finance/finance_error.hpp"
 #include "finance/instrument/stock.hpp"
-#include "store/stock_store.hpp"
+#include "store/i_stock_store.hpp"
 #include "ui/securities/stock_info_model.hpp"
 #include "ui/securities/stock_overview.hpp"
 #include "ui/securities/ticker_lookup.hpp"
@@ -23,9 +23,9 @@ namespace controller
      * @param stackedWidget
      */
     SecuritiesSideBarController::SecuritiesSideBarController(
-        QMainWindow*       mainWindow,
-        store::StockStore& stockStore,
-        QStackedWidget*    stackedWidget
+        QMainWindow*                               mainWindow,
+        const std::shared_ptr<store::IStockStore>& stockStore,
+        QStackedWidget*                            stackedWidget
     )
         : SideBarCategoryController(new ui::SecuritiesCategory(), mainWindow),
           _stockOverviewWidget(new ui::StockOverviewWidget()),
@@ -63,7 +63,7 @@ namespace controller
     void SecuritiesSideBarController::onSecuritiesSelected()
     {
         const auto stocks =
-            drafts::StockMapper::toStockInfoDrafts(_stockStore.getStocks());
+            drafts::StockMapper::toStockInfoDrafts(_stockStore->getStocks());
 
         _stockOverviewWidget->getModel()->setRows(stocks);
         _stackedWidget->setCurrentWidget(_stockOverviewWidget);
@@ -121,7 +121,7 @@ namespace controller
     {
         if (_acceptedQuote)
         {
-            const auto result = _stockStore.addStock(_acceptedQuote.value());
+            const auto result = _stockStore->addStock(_acceptedQuote.value());
 
             if (result != store::StockStoreResult::Ok)
                 _tickerLookupWidget->displayError("Failed to add stock");

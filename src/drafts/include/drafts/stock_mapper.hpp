@@ -3,10 +3,7 @@
 
 #include <vector>
 
-namespace finance
-{
-    class Stock;   // forward declaration
-}   // namespace finance
+#include "finance/instrument/stock.hpp"
 
 namespace drafts
 {

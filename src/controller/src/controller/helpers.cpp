@@ -5,8 +5,8 @@
 #include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/position.hpp"
+#include "store/i_stock_store.hpp"
 #include "store/position_store.hpp"
-#include "store/stock_store.hpp"
 #include "store/transaction_store.hpp"
 
 namespace controller
@@ -19,14 +19,14 @@ namespace controller
      * @return std::expected<void, std::string>
      */
     std::expected<void, std::string> convertTickerToInstrumentId(
-        drafts::CreateStockTransactionDraft& draft,
-        const store::StockStore&             stockStore
+        drafts::CreateStockTransactionDraft&       draft,
+        const std::shared_ptr<store::IStockStore>& stockStore
     )
     {
         for (auto& leg : draft.getLegs())
         {
             const auto& ticker       = leg.getTicker();
-            const auto& instrumentId = stockStore.getInstrumentId(ticker);
+            const auto& instrumentId = stockStore->getInstrumentId(ticker);
 
             if (instrumentId)
                 leg.setInstrumentId(*instrumentId);
@@ -48,15 +48,15 @@ namespace controller
          * @return std::optional<drafts::StockInfoDraft>
          */
         std::optional<drafts::StockInfoDraft> _getStockInfoByPosition(
-            const finance::Position&       position,
-            const store::StockStore&       stockStore,
-            const store::TransactionStore& transactionStore
+            const finance::Position&                   position,
+            const std::shared_ptr<store::IStockStore>& stockStore,
+            const store::TransactionStore&             transactionStore
         )
         {
             const auto ids =
                 transactionStore.getInstrumentIdsByPositionId(position.getId());
 
-            const auto& stocks = stockStore.getStocks(ids);
+            const auto& stocks = stockStore->getStocks(ids);
 
             if (stocks.empty())
             {
@@ -80,9 +80,9 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const store::PositionStore&    positionStore,
-        const store::StockStore&       stockStore,
-        const store::TransactionStore& transactionStore
+        const store::PositionStore&                positionStore,
+        const std::shared_ptr<store::IStockStore>& stockStore,
+        const store::TransactionStore&             transactionStore
     )
     {
         const auto positions = positionStore.getOpenPositions();
@@ -116,10 +116,10 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
-        AccountId                      account,
-        const store::PositionStore&    positionStore,
-        const store::StockStore&       stockStore,
-        const store::TransactionStore& transactionStore
+        AccountId                                  account,
+        const store::PositionStore&                positionStore,
+        const std::shared_ptr<store::IStockStore>& stockStore,
+        const store::TransactionStore&             transactionStore
     )
     {
         const auto positions = positionStore.getOpenPositions({account});
@@ -145,7 +145,7 @@ namespace controller
             const auto instrumentIdSet =
                 idSet<InstrumentId>(instrumentIds.begin(), instrumentIds.end());
 
-            const auto& stocks = stockStore.getStocks(instrumentIdSet);
+            const auto& stocks = stockStore->getStocks(instrumentIdSet);
 
             if (stocks.empty())
             {

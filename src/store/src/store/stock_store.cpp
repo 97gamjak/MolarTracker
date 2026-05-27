@@ -108,7 +108,8 @@ namespace store
         if (!isDirty())
             return;
 
-        instrumentMap<InstrumentId> map{};
+        _instrumentIdMap.clear();
+
         for (const auto& entry : _getEntries())
         {
             switch (entry.state)
@@ -146,7 +147,8 @@ namespace store
                     }
 
                     if (oldInstrumentId != insertionResult.instrumentId)
-                        map[oldInstrumentId] = insertionResult.instrumentId;
+                        _instrumentIdMap[oldInstrumentId] =
+                            insertionResult.instrumentId;
 
                     break;
                 }
@@ -166,8 +168,16 @@ namespace store
         }
 
         _notifyOnCommit();
-        if (!map.empty())
-            _onInstrumentIdRemap.notify<OnIdRemap<InstrumentId>>(map);
+    }
+
+    /**
+     * @brief Get a list of all stocks in the store
+     *
+     * @return std::vector<finance::Stock>
+     */
+    std::vector<finance::Stock> StockStore::getStocks() const
+    {
+        return getStocks({});
     }
 
     /**
@@ -310,20 +320,40 @@ namespace store
     }
 
     /**
-     * @brief Subscribe to instrument ID remapping events
+     * @brief Get the mapping of old instrument IDs to new instrument IDs after
+     * a commit
      *
-     * @param func The callback function to be called on remapping
-     * @param userData User data to be passed to the callback
-     * @return Connection
+     * @return const unorderedIdMap<InstrumentId, InstrumentId>&
      */
-    Connection StockStore::subscribeToInstrumentIdRemap(
-        OnIdRemap<InstrumentId>::func func,
-        void*                         userData
+    const unorderedIdMap<InstrumentId, InstrumentId>& StockStore::
+        getInstrumentIdMap() const
+    {
+        return _instrumentIdMap;
+    }
+
+    /**
+     * @brief Subscribe to changes in the stock store, this will notify the
+     * subscriber whenever a stock is added, modified or deleted in the store.
+     *
+     * @param func The function to be called when a change occurs, this function
+     * should take a StockId as a parameter and return void, it will be called
+     * with the ID of the stock that was changed.
+     * @param subscriber A pointer to the subscriber object, this is used to
+     * identify the subscriber and manage the subscription, it can be any
+     * pointer (e.g. to a class instance) and is not used by the store itself,
+     * but it should be unique for each subscriber to avoid conflicts.
+     * @return Connection An object representing the subscription, this can be
+     * used to manage the subscription (e.g. to unsubscribe) and should be
+     * stored by the subscriber if they want to manage their subscriptions.
+     */
+    Connection StockStore::subscribeToStoreChange(
+        StoreChanged<StockId>::func func,
+        void*                       subscriber
     )
     {
-        return _onInstrumentIdRemap.on<OnIdRemap<InstrumentId>>(
-            std::move(func),
-            userData
+        return BaseStore<finance::Stock, StockId>::subscribeToStoreChange(
+            func,
+            subscriber
         );
     }
 

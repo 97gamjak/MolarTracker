@@ -2,6 +2,7 @@
 #define __CONTROLLER__SRC__CONTROLLER__HELPERS_HPP__
 
 #include <expected>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -9,7 +10,7 @@
 
 namespace store
 {
-    class StockStore;         // Forward declaration
+    class IStockStore;        // Forward declaration
     class TransactionStore;   // Forward declaration
     class PositionStore;      // Forward declaration
 }   // namespace store
@@ -24,21 +25,21 @@ namespace drafts
 namespace controller
 {
     std::expected<void, std::string> convertTickerToInstrumentId(
-        drafts::CreateStockTransactionDraft& draft,
-        const store::StockStore&             stockStore
+        drafts::CreateStockTransactionDraft&       draft,
+        const std::shared_ptr<store::IStockStore>& stockStore
     );
 
     std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
-        AccountId                      account,
-        const store::PositionStore&    positionStore,
-        const store::StockStore&       stockStore,
-        const store::TransactionStore& transactionStore
+        AccountId                                  account,
+        const store::PositionStore&                positionStore,
+        const std::shared_ptr<store::IStockStore>& stockStore,
+        const store::TransactionStore&             transactionStore
     );
 
     std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const store::PositionStore&    positionStore,
-        const store::StockStore&       stockStore,
-        const store::TransactionStore& transactionStore
+        const store::PositionStore&                positionStore,
+        const std::shared_ptr<store::IStockStore>& stockStore,
+        const store::TransactionStore&             transactionStore
     );
 
 }   // namespace controller

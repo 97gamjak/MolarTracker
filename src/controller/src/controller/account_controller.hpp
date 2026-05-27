@@ -21,7 +21,7 @@ namespace store
 {
     class IAccountStore;      // Forward declaration
     class PositionStore;      // Forward declaration
-    class StockStore;         // Forward declaration
+    class IStockStore;        // Forward declaration
     class TransactionStore;   // Forward declaration
 }   // namespace store
 
@@ -65,7 +65,7 @@ namespace controller
             cmd::UndoStack&                              undoStack,
             const std::shared_ptr<store::IAccountStore>& accountStore,
             store::PositionStore&                        positionStore,
-            store::StockStore&                           stockStore,
+            const std::shared_ptr<store::IStockStore>&   stockStore,
             store::TransactionStore&                     transactionStore,
             QStackedWidget*                              stackedWidget
         );
