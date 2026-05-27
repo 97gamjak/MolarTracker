@@ -59,14 +59,14 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&                 undoStack,
-        std::shared_ptr<IAccountStore>& accountStore,
-        TransactionStore&               transactionStore,
-        StockStore&                     stockStore,
-        PositionStore&                  positionStore,
-        TransactionController&          transactionController,
-        SecuritiesSideBarController&    stockController,
-        QMainWindow*                    mainWindow
+        cmd::UndoStack&                       undoStack,
+        const std::shared_ptr<IAccountStore>& accountStore,
+        TransactionStore&                     transactionStore,
+        StockStore&                           stockStore,
+        PositionStore&                        positionStore,
+        TransactionController&                transactionController,
+        SecuritiesSideBarController&          stockController,
+        QMainWindow*                          mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
