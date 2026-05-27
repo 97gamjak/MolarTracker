@@ -1,5 +1,5 @@
-#ifndef __STORE__INCLUDE__STORE__STOCK_STORE_HPP__
-#define __STORE__INCLUDE__STORE__STOCK_STORE_HPP__
+#ifndef __STORE__SRC__STORE__STOCK_STORE_HPP__
+#define __STORE__SRC__STORE__STOCK_STORE_HPP__
 
 #include <memory>
 #include <unordered_map>
@@ -92,4 +92,4 @@ namespace store
     };
 }   // namespace store
 
-#endif   // __STORE__INCLUDE__STORE__STOCK_STORE_HPP__
+#endif   // __STORE__SRC__STORE__STOCK_STORE_HPP__
