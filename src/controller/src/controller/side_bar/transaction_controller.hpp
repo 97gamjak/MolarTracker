@@ -12,7 +12,7 @@
 
 namespace store
 {
-    class AccountStore;       // Forward declaration
+    class IAccountStore;      // Forward declaration
     class TransactionStore;   // Forward declaration
     class StockStore;         // Forward declaration
     class PositionStore;      // Forward declaration
@@ -60,7 +60,7 @@ namespace controller
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
         /// The account store for the application
-        store::AccountStore& _accountStore;
+        std::shared_ptr<store::IAccountStore> _accountStore;
         /// The transaction store for the application
         store::TransactionStore& _transactionStore;
         /// The position store for the application
@@ -85,14 +85,14 @@ namespace controller
 
        public:
         TransactionSideBarController(
-            cmd::UndoStack&              undoStack,
-            store::AccountStore&         accountStore,
-            store::TransactionStore&     transactionStore,
-            store::StockStore&           stockStore,
-            store::PositionStore&        positionStore,
-            TransactionController&       transactionController,
-            SecuritiesSideBarController& stockController,
-            QMainWindow*                 mainWindow
+            cmd::UndoStack&                              undoStack,
+            const std::shared_ptr<store::IAccountStore>& accountStore,
+            store::TransactionStore&                     transactionStore,
+            store::StockStore&                           stockStore,
+            store::PositionStore&                        positionStore,
+            TransactionController&                       transactionController,
+            SecuritiesSideBarController&                 stockController,
+            QMainWindow*                                 mainWindow
         );
 
         void refresh() override;

@@ -6,8 +6,6 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "drafts/account_draft.hpp"
-#include "drafts/account_mapper.hpp"
 #include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_account_service.hpp"
@@ -68,7 +66,7 @@ namespace store
      * what went wrong if the creation failed.
      */
     AccountStoreResult AccountStore::createAccount(
-        const drafts::AccountDraft& account
+        const finance::Account& account
     )
     {
         if (_activeProfileId == ProfileId::invalid())
@@ -80,13 +78,14 @@ namespace store
         LOG_DEBUG(
             std::format(
                 "Creating account with name '{}' and currency '{}'",
-                account.name,
-                CurrencyMeta::toString(account.currency)
+                account.getName(),
+                CurrencyMeta::toString(account.getCurrency())
             )
         );
 
         const auto options = Options{
-            .filter   = IsAccountType(account.kind) && HasName(account.name),
+            .filter =
+                IsAccountType(account.getKind()) && HasName(account.getName()),
             .deletion = DeletionPolicy::ExcludeDelete
         };
         const auto existingAccount = _get(options);
@@ -96,29 +95,30 @@ namespace store
             LOG_ERROR(
                 std::format(
                     "Account with name '{}' and type '{}' already exists",
-                    account.name,
-                    AccountKindMeta::toString(account.kind)
+                    account.getName(),
+                    AccountKindMeta::toString(account.getKind())
                 )
             );
             return AccountStoreResult::AccountNameConflict;
         }
 
         const auto newAccount = Account{
+            AccountId::invalid(),
             AccountStatus::Active,
-            account.name,
-            account.currency,
-            account.kind
+            account.getName(),
+            account.getCurrency(),
+            account.getKind()
         };
 
         _addEntry(newAccount);
 
         // special case for cash accounts
-        if (account.kind == AccountKind::Cash)
+        if (account.getKind() == AccountKind::Cash)
         {
             // check if we already have an external account for this profile id
             // and currency
             const auto existingEntry = _get(
-                {.filter   = IsExternal() && HasCurrency(account.currency),
+                {.filter   = IsExternal() && HasCurrency(account.getCurrency()),
                  .deletion = DeletionPolicy::ExcludeDelete}
             );
 
@@ -126,10 +126,11 @@ namespace store
             {
                 // If no existing entry is found, we can create a new external
                 // account
-                const auto externalAccount = Account{
+                const auto externalAccount = finance::Account{
+                    AccountId::invalid(),
                     AccountStatus::Active,
-                    "External " + CurrencyMeta::toString(account.currency),
-                    account.currency,
+                    "External " + CurrencyMeta::toString(account.getCurrency()),
+                    account.getCurrency(),
                     AccountKind::External
                 };
 
@@ -297,17 +298,16 @@ namespace store
      * a collection of drafts that can be used for various purposes such as
      * populating UI elements or performing operations on the accounts.
      *
-     * @return std::vector<drafts::AccountDraft>
+     * @return std::vector<finance::Account>
      */
-    std::vector<drafts::AccountDraft> AccountStore::getAllAccounts() const
+    std::vector<finance::Account> AccountStore::getAllAccounts() const
     {
         const auto options = Options{
             .filter   = !IsExternal() && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto accounts = _getValues(options) |
-                        std::views::transform(drafts::AccountMapper::toDraft);
+        auto accounts = _getValues(options);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -319,21 +319,20 @@ namespace store
      * accounts, and provides a way to filter the accounts based on their type
      * and status.
      *
-     * @return std::vector<drafts::AccountDraft> A vector of account drafts
+     * @return std::vector<finance::Account> A vector of account drafts
      * representing the cash accounts currently in the store, each draft
      * contains the necessary information about a cash account that can be used
      * for display or further processing, and the caller can use this vector to
      * access the cash account data as needed.
      */
-    std::vector<drafts::AccountDraft> AccountStore::getCashAccounts() const
+    std::vector<finance::Account> AccountStore::getCashAccounts() const
     {
         const auto options = Options{
             .filter   = IsAccountType(AccountKind::Cash) && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto accounts = _getValues(options) |
-                        std::views::transform(drafts::AccountMapper::toDraft);
+        auto accounts = _getValues(options);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -346,21 +345,20 @@ namespace store
      * specifically involve security accounts, and provides a way to filter the
      * accounts based on their type and status.
      *
-     * @return std::vector<drafts::AccountDraft> A vector of account drafts
+     * @return std::vector<finance::Account> A vector of account drafts
      * representing the security accounts currently in the store, each draft
      * contains the necessary information about a security account that can be
      * used for display or further processing, and the caller can use this
      * vector to access the security account data as needed.
      */
-    std::vector<drafts::AccountDraft> AccountStore::getSecurityAccounts() const
+    std::vector<finance::Account> AccountStore::getSecurityAccounts() const
     {
         const auto options = Options{
             .filter = IsAccountType(AccountKind::Security) && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto accounts = _getValues(options) |
-                        std::views::transform(drafts::AccountMapper::toDraft);
+        auto accounts = _getValues(options);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -373,22 +371,21 @@ namespace store
      * and provides a convenient way to access the account names without having
      * to retrieve the full account data for each account.
      *
-     * @return std::unordered_map<AccountId, std::string, AccountId::Hash> A
+     * @return unorderedIdMap<AccountId, std::string> A
      * map where the keys are account IDs and the values are the corresponding
      * account names for all active accounts in the store, this allows for
      * efficient lookups of account names based on their IDs and can be used in
      * various parts of the application where such mappings are needed.
      */
-    std::unordered_map<AccountId, std::string, AccountId::Hash> AccountStore::
-        getAccountIdToNameMap() const
+    unorderedIdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap(
+    ) const
     {
         const auto options = Options{
             .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        std::unordered_map<AccountId, std::string, AccountId::Hash>
-            accountIdToName;
+        unorderedIdMap<AccountId, std::string> accountIdToName;
 
         for (const auto& account : _getValues(options))
         {
@@ -456,24 +453,17 @@ namespace store
      * @brief Get an account by its ID
      *
      * @param id The ID of the account to retrieve
-     * @return std::optional<drafts::AccountDraft> The account if
+     * @return std::optional<finance::Account> The account if
      * found, or an empty optional if not found
      */
-    std::optional<drafts::AccountDraft> AccountStore::getAccount(
-        AccountId id
-    ) const
+    std::optional<finance::Account> AccountStore::getAccount(AccountId id) const
     {
         const auto options = Options{
             .filter   = HasAccountId(id) && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        const auto account = _get(options);
-
-        if (account.has_value())
-            return drafts::AccountMapper::toDraft(account.value());
-
-        return std::nullopt;
+        return _get(options);
     }
 
     /**
@@ -484,6 +474,16 @@ namespace store
     const AccountSession& AccountStore::getAccountSession() const
     {
         return _session;
+    }
+
+    /**
+     * @brief Get the ID remapping for accounts
+     *
+     * @return const unorderedIdMap<AccountId, AccountId>& The ID remapping
+     */
+    const unorderedIdMap<AccountId, AccountId>& AccountStore::getIdRemap() const
+    {
+        return _getIdRemap();
     }
 
 }   // namespace store

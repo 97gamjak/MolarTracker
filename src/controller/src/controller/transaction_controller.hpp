@@ -8,7 +8,7 @@
 namespace store
 {
     class TransactionStore;   // Forward declaration
-    class AccountStore;       // Forward declaration
+    class IAccountStore;      // Forward declaration
     class StockStore;         // Forward declaration
 }   // namespace store
 
@@ -42,7 +42,7 @@ namespace controller
         /// Reference to the transaction store
         store::TransactionStore& _transactionStore;
         /// Reference to the account store
-        store::AccountStore& _accountStore;
+        std::shared_ptr<store::IAccountStore> _accountStore;
         /// Reference to the stock store
         store::StockStore& _stockStore;
 
@@ -53,11 +53,11 @@ namespace controller
 
        public:
         TransactionController(
-            cmd::UndoStack&          undoStack,
-            store::TransactionStore& transactionStore,
-            store::AccountStore&     accountStore,
-            store::StockStore&       stockStore,
-            QStackedWidget*          stackedWidget
+            cmd::UndoStack&                        undoStack,
+            store::TransactionStore&               transactionStore,
+            std::shared_ptr<store::IAccountStore>& accountStore,
+            store::StockStore&                     stockStore,
+            QStackedWidget*                        stackedWidget
         );
 
         void transactionOverviewSelected(bool focus);

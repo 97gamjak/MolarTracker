@@ -192,17 +192,18 @@ namespace ui
     {
         const auto account = accountCombo->selected();
 
-        if (!account.has_value() || account.value().id == AccountId::invalid())
+        if (!account.has_value() ||
+            account.value().getId() == AccountId::invalid())
             throw std::runtime_error("No account selected");
 
         const auto referenceAccount = referenceAccountCombo->selected();
 
         if (!referenceAccount.has_value() ||
-            referenceAccount.value().id == AccountId::invalid())
+            referenceAccount.value().getId() == AccountId::invalid())
             throw std::runtime_error("No reference account selected");
 
-        const auto currency     = referenceAccount->currency;
-        const auto refAccountId = referenceAccount->id;
+        const auto currency     = referenceAccount->getCurrency();
+        const auto refAccountId = referenceAccount->getId();
         const auto microUnits   = finance::getMicroUnit(currency);
 
         const auto unitPrice_ = priceRow->getAmount(microUnits);
@@ -233,7 +234,7 @@ namespace ui
             throw std::runtime_error("No ticker selected");
 
         auto tradeLeg = drafts::TradeLegDraft{
-            account->id,
+            account->getId(),
             unitPrice,
             quantity,
             ticker.value()
@@ -331,7 +332,7 @@ namespace ui
         using finance::getMicroUnit;
         using finance::getSymbol;
 
-        const auto currency   = account.currency;
+        const auto currency   = account.getCurrency();
         const auto microUnits = getMicroUnit(currency);
 
         _fields->priceRow->setNDecimalPlaces(microUnits);
@@ -343,7 +344,7 @@ namespace ui
 
         for (const auto& referenceAccount : _referenceAccounts)
         {
-            if (referenceAccount.currency == currency)
+            if (referenceAccount.getCurrency() == currency)
                 referenceAccounts.push_back(referenceAccount);
         }
 
