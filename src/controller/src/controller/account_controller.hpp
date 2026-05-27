@@ -14,7 +14,7 @@ class QStackedWidget;   // Forward declaration
 
 namespace drafts
 {
-    struct AccountDraft;   // Forward declaration
+    class AccountDraft;   // Forward declaration
 }   // namespace drafts
 
 namespace store

@@ -9,7 +9,7 @@ namespace finance
 
 namespace drafts
 {
-    struct AccountDraft;   // Forward declaration
+    class AccountDraft;   // Forward declaration
 
     /**
      * @brief Mapper class for converting between Account and AccountDraft

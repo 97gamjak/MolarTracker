@@ -255,4 +255,4 @@ jobs:
       # -------------------------
       - name: Run clangd-tidy
         run: |
-          clangd-tidy $(find src/) -p=build
+          run: clangd-tidy $(find src/ -name "*.cpp" ! -name "moc_*.cpp") -p=build
