@@ -1,6 +1,10 @@
 #include "ui/application.hpp"
 
 #include "config/constants.hpp"
+#include "logging/log_macros.hpp"
+#include "ui/exceptions/exception_dialog.hpp"
+
+REGISTER_LOG_CATEGORY("UI.Application");
 
 namespace ui
 {
@@ -52,7 +56,11 @@ namespace ui
      */
     void MolarTrackerApplication::handleException(const char* what)
     {
-        qCritical().noquote() << "Unhandled exception:" << what;
+        const auto& logObject = LOG_ERROR_OBJECT(what);
+        ui::ExceptionDialog::showFatal(
+            "An unexpected error occurred",
+            logObject
+        );
     }
 
 }   // namespace ui
