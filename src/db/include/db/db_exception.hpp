@@ -1,18 +1,17 @@
 #ifndef __DB__INCLUDE__DB__DB_EXCEPTION_HPP__
 #define __DB__INCLUDE__DB__DB_EXCEPTION_HPP__
 
-#include <stdexcept>
 #include <string>
+
+#include "exceptions/base.hpp"
 
 namespace db
 {
-    // TODO(97gamjak): use here MolarTracker's own exception hierarchy, e.g. by
-    // deriving from a base MolarTrackerException class
     /**
      * @brief Exception type for SQLite-related errors
      *
      */
-    class SqliteError : public std::runtime_error
+    class SqliteError : public MolarTrackerException
     {
        public:
         explicit SqliteError(const std::string& message);

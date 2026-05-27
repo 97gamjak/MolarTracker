@@ -8,7 +8,7 @@ namespace db
      * @param message The error message
      */
     SqliteError::SqliteError(const std::string& message)
-        : std::runtime_error(message)
+        : MolarTrackerException(message)
     {
     }
 

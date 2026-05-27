@@ -5,6 +5,10 @@ All changes and updates, that are relevant for developers will be documented her
 ## Next Release
 
 <!-- insertion marker -->
+### Error Handling
+
+- `db::SqliteError` now derives from `MolarTrackerException` instead of `std::runtime_error`, integrating it into the application exception hierarchy
+
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
