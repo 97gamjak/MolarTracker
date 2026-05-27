@@ -3,13 +3,20 @@ add_library(molartracker_finance STATIC
     src/finance/account.cpp
     src/finance/currency.cpp
     src/finance/currency_exception.cpp
-    
+
     src/finance/transaction.cpp
     src/finance/transaction_entry.cpp
     src/finance/trade_data.cpp
     src/finance/stock.cpp
     src/finance/ticker_info.cpp
     src/finance/yf_client.cpp
+)
+
+# GCC false-positive null-dereference inside nlohmann/json when compiling
+# ticker_info.cpp; the json header is included via -isystem but -Wnull-dereference
+# still fires in inlined template code.
+set_source_files_properties(src/finance/ticker_info.cpp
+    PROPERTIES COMPILE_OPTIONS "-Wno-null-dereference"
 )
 
 target_include_directories(molartracker_finance

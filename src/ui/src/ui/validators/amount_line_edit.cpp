@@ -139,7 +139,7 @@ namespace ui
             )
         );
 
-        if (!amountRegex.matchView(trimmedText).hasMatch())
+        if (!amountRegex.match(trimmedText.toString()).hasMatch())
         {
             return {false, "Invalid amount format"};
         }

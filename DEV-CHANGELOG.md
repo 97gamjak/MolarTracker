@@ -5,6 +5,13 @@ All changes and updates, that are relevant for developers will be documented her
 ## Next Release
 
 <!-- insertion marker -->
+
+### Testing
+
+- Add `tests/ui/` suite with 151 GoogleTest cases covering `ui::EmailLineEdit`, `ui::NameLineEdit`, `ui::AmountLineEdit`, `ui::StockInfoTableModel`, `ui::LogCategoryModel`, `ui::CashTransactionTableModel`, `ui::StockTransactionTableModel`, `ui::AccountItem`, and `ui::AccountCategory`
+- Fix pre-existing `QRegularExpression::matchView` call in `amount_line_edit.cpp` (incompatible with Qt < 6.5) — replaced with `match(text.toString())`
+- Suppress GCC false-positive `-Wnull-dereference` in `ticker_info.cpp` triggered by nlohmann/json inlined templates
+- Add `Qt6::Test` component to root `find_package` to enable `QSignalSpy` in test targets
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
