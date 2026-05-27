@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration

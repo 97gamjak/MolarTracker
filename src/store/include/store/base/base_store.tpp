@@ -492,19 +492,6 @@ namespace store
         return _fullCache;
     }
 
-    /**
-     * @brief Gets the ID remapping map for the store.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @return const IdMap&
-     */
-    template <typename T, typename IdType>
-    auto BaseStore<T, IdType>::_getIdRemap() const -> const IdMap&
-    {
-        return _idRemap;
-    }
-
 }   // namespace store
 
 #endif   // __STORE__INCLUDE__STORE__BASE__BASE_STORE_TPP__

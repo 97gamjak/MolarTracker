@@ -4,11 +4,6 @@
 #include "base_repo.hpp"
 #include "repo/i_account_repo.hpp"
 
-namespace domain
-{
-    class Account;   // Forward declaration
-}   // namespace domain
-
 namespace repo
 {
 
@@ -21,13 +16,13 @@ namespace repo
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] std::vector<domain::Account> getAllAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) override;
 
         [[nodiscard]] AccountId createAccount(
-            const domain::Account& account,
-            const ProfileId&       profileId
+            const finance::Account& account,
+            const ProfileId&        profileId
         ) override;
     };
 

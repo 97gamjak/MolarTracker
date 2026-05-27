@@ -23,11 +23,6 @@ namespace drafts
     struct AccountDraft;   // Forward declaration
 }   // namespace drafts
 
-namespace store
-{
-    class IAccountStore;   // Forward declaration
-}   // namespace store
-
 class QAction;   // Forward declaration
 
 namespace controller
@@ -47,7 +42,7 @@ namespace controller
         cmd::UndoStack& _undoStack;
 
         /// Reference to the account store
-        std::shared_ptr<store::IAccountStore> _accountStore;
+        store::AccountStore& _accountStore;
 
         /// Reference to the account controller
         AccountController& _accountController;
@@ -57,10 +52,10 @@ namespace controller
 
        public:
         explicit AccountSideBarController(
-            cmd::UndoStack&                              undoStack,
-            const std::shared_ptr<store::IAccountStore>& accountStore,
-            AccountController&                           accountController,
-            QMainWindow*                                 mainWindow
+            cmd::UndoStack&      undoStack,
+            store::AccountStore& accountStore,
+            AccountController&   accountController,
+            QMainWindow*         mainWindow
         );
 
         void refresh() override;

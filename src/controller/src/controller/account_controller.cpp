@@ -9,10 +9,9 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "controller/mapper/account_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
-#include "store/i_account_store.hpp"
+#include "store/account/account_store.hpp"
 #include "ui/account/account_detail_view.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
@@ -27,9 +26,9 @@ namespace controller
      * @param stackedWidget
      */
     AccountController::AccountController(
-        cmd::UndoStack&                        undoStack,
-        std::shared_ptr<store::IAccountStore>& accountStore,
-        QStackedWidget*                        stackedWidget
+        cmd::UndoStack&      undoStack,
+        store::AccountStore& accountStore,
+        QStackedWidget*      stackedWidget
     )
         : _undoStack(undoStack),
           _accountStore(accountStore),
@@ -48,7 +47,7 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto account = _accountStore->getAccount(id);
+        const auto account = _accountStore.getAccount(id);
 
         if (!account.has_value())
         {
@@ -58,9 +57,7 @@ namespace controller
             return;
         }
 
-        _accountDetailView->updateAccount(
-            AccountMapper::toDraft(account.value())
-        );
+        _accountDetailView->updateAccount(account.value());
         _stackedWidget->setCurrentWidget(_accountDetailView);
     }
 

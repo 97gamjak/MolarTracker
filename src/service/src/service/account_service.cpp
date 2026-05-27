@@ -1,6 +1,6 @@
 #include "account_service.hpp"
 
-#include "domain/account.hpp"
+#include "finance/account.hpp"
 #include "repo/i_account_repo.hpp"
 
 namespace service
@@ -25,7 +25,7 @@ namespace service
      *
      * @return std::vector<finance::AccountVariant>
      */
-    std::vector<domain::Account> AccountService::getAllAccounts(
+    std::vector<finance::Account> AccountService::getAllAccounts(
         const ProfileId& profileId
     ) const
     {
@@ -42,8 +42,8 @@ namespace service
      * @return AccountId
      */
     AccountId AccountService::createAccount(
-        const domain::Account& account,
-        const ProfileId&       profileId
+        const finance::Account& account,
+        const ProfileId&        profileId
     )
     {
         return _accountRepo->createAccount(account, profileId);

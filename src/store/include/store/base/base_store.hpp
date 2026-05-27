@@ -222,8 +222,6 @@ namespace store
 
         void _notifyOnCommit();
 
-        [[nodiscard]] const IdMap& _getIdRemap() const;
-
        private:
         static bool _evalDeletionPolicy(
             const Entry&   entry,

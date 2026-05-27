@@ -8,7 +8,7 @@
 #include <qwidget.h>
 
 #include "config/finance.hpp"
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/cash.hpp"
 #include "finance/currency.hpp"

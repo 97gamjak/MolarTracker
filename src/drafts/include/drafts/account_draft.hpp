@@ -1,5 +1,5 @@
-#ifndef __DRAFTS__INCLUDE__DRAFTS__ACCOUNT__ACCOUNT_DRAFT_HPP__
-#define __DRAFTS__INCLUDE__DRAFTS__ACCOUNT__ACCOUNT_DRAFT_HPP__
+#ifndef __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_DRAFT_HPP__
+#define __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_DRAFT_HPP__
 
 #include <optional>
 #include <string>
@@ -42,4 +42,4 @@ namespace drafts
     };
 }   // namespace drafts
 
-#endif   // __DRAFTS__INCLUDE__DRAFTS__ACCOUNT__ACCOUNT_DRAFT_HPP__
+#endif   // __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_DRAFT_HPP__

@@ -4,6 +4,7 @@ set(SOURCE_DIR
 
 add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/cash.cpp
+    ${SOURCE_DIR}/account.cpp
     ${SOURCE_DIR}/currency.cpp
     ${SOURCE_DIR}/currency_exception.cpp
     ${SOURCE_DIR}/transaction.cpp

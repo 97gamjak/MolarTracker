@@ -1,8 +1,5 @@
 qt_add_library(molartracker_controller STATIC
 
-    # mapper
-    src/controller/mapper/account_mapper.cpp
-
     # menu bar
     src/controller/menu_bar/menu_bar_controller.cpp
     src/controller/menu_bar/file_menu_controller.cpp
@@ -50,7 +47,6 @@ target_link_libraries(molartracker_controller
     molartracker_connections
     molartracker_settings
     molartracker_logging
-    molartracker_logic
     molartracker_ui
     molartracker_drafts
     molartracker_commands

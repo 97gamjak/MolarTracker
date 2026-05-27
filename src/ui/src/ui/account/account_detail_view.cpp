@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 
 #include "config/finance.hpp"
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
