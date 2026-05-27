@@ -14,7 +14,7 @@ namespace store
     class ProfileStoreException : public MolarTrackerException
     {
        public:
-        explicit ProfileStoreException(std::string message);
+        explicit ProfileStoreException(const std::string& message);
 
         [[nodiscard]] const char* what() const noexcept override;
     };

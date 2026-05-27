@@ -32,7 +32,11 @@ namespace db::test
         SqliteDb(SqliteDb&& other) noexcept            = default;
         SqliteDb& operator=(SqliteDb&& other) noexcept = default;
 
-        sqlite3* native() const noexcept { return _db; }
+        [[nodiscard]]
+        sqlite3* native() const noexcept
+        {
+            return _db;
+        }
 
         void exec(const std::string& sql) const
         {

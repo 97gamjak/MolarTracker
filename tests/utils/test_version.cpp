@@ -22,78 +22,78 @@
 
 TEST(UtilsSemVer, ConstructFromNumbersAccessors)
 {
-    const utils::SemVer v(1, 2, 3);
-    EXPECT_EQ(v.getMajor(), 1u);
-    EXPECT_EQ(v.getMinor(), 2u);
-    EXPECT_EQ(v.getPatch(), 3u);
+    const utils::SemVer version(1, 2, 3);
+    EXPECT_EQ(version.getMajor(), 1U);
+    EXPECT_EQ(version.getMinor(), 2U);
+    EXPECT_EQ(version.getPatch(), 3U);
 }
 
 TEST(UtilsSemVer, ConstructFromValidStringAccessors)
 {
-    const utils::SemVer v(std::string{"4.5.6"});
-    EXPECT_EQ(v.getMajor(), 4u);
-    EXPECT_EQ(v.getMinor(), 5u);
-    EXPECT_EQ(v.getPatch(), 6u);
+    const utils::SemVer version(std::string{"4.5.6"});
+    EXPECT_EQ(version.getMajor(), 4U);
+    EXPECT_EQ(version.getMinor(), 5U);
+    EXPECT_EQ(version.getPatch(), 6U);
 }
 
 TEST(UtilsSemVer, ToStringRoundTrip)
 {
-    const utils::SemVer v(1, 0, 0);
-    EXPECT_EQ(v.toString(), "1.0.0");
+    const utils::SemVer version(1, 0, 0);
+    EXPECT_EQ(version.toString(), "1.0.0");
 }
 
 TEST(UtilsSemVer, ToStringMultiDigit)
 {
-    const utils::SemVer v(10, 20, 30);
-    EXPECT_EQ(v.toString(), "10.20.30");
+    const utils::SemVer version(10, 20, 30);
+    EXPECT_EQ(version.toString(), "10.20.30");
 }
 
 TEST(UtilsSemVer, ParsedToStringMatchesInput)
 {
     const std::string   input{"3.14.159"};
-    const utils::SemVer v(input);
-    EXPECT_EQ(v.toString(), "3.14.159");
+    const utils::SemVer version(input);
+    EXPECT_EQ(version.toString(), "3.14.159");
 }
 
 TEST(UtilsSemVer, EqualVersionsCompareEqual)
 {
-    const utils::SemVer a(2, 3, 4);
-    const utils::SemVer b(2, 3, 4);
-    EXPECT_EQ(a, b);
+    const utils::SemVer versionA(2, 3, 4);
+    const utils::SemVer versionB(2, 3, 4);
+    EXPECT_EQ(versionA, versionB);
 }
 
 TEST(UtilsSemVer, DifferentMajorNotEqual)
 {
-    const utils::SemVer a(1, 0, 0);
-    const utils::SemVer b(2, 0, 0);
-    EXPECT_NE(a, b);
+    const utils::SemVer versionA(1, 0, 0);
+    const utils::SemVer versionB(2, 0, 0);
+    EXPECT_NE(versionA, versionB);
 }
 
 TEST(UtilsSemVer, DifferentMinorNotEqual)
 {
-    const utils::SemVer a(1, 0, 0);
-    const utils::SemVer b(1, 1, 0);
-    EXPECT_NE(a, b);
+    const utils::SemVer versionA(1, 0, 0);
+    const utils::SemVer versionB(1, 1, 0);
+    EXPECT_NE(versionA, versionB);
 }
 
 TEST(UtilsSemVer, DifferentPatchNotEqual)
 {
-    const utils::SemVer a(1, 0, 0);
-    const utils::SemVer b(1, 0, 1);
-    EXPECT_NE(a, b);
+    const utils::SemVer versionA(1, 0, 0);
+    const utils::SemVer versionB(1, 0, 1);
+    EXPECT_NE(versionA, versionB);
 }
 
 TEST(UtilsSemVer, InvalidVersionStringProducesInvalid)
 {
-    const utils::SemVer v(std::string{"not-a-version"});
-    EXPECT_EQ(v, utils::SemVer::getInvalidVersion());
+    const utils::SemVer version(std::string{"not-a-version"});
+    EXPECT_EQ(version, utils::SemVer::getInvalidVersion());
 }
 
 TEST(UtilsSemVer, TwoInvalidVersionsCompareEqual)
 {
-    const utils::SemVer a(std::string{"bad"});
-    const utils::SemVer b(std::string{"also-bad"});
-    EXPECT_EQ(a, b);
+    const utils::SemVer versionA(std::string{"bad"});
+    const utils::SemVer versionB(std::string{"also-bad"});
+    EXPECT_EQ(versionA, versionB);
 }
 
 TEST(UtilsSemVer, InvalidNotEqualToValid)
@@ -105,17 +105,17 @@ TEST(UtilsSemVer, InvalidNotEqualToValid)
 
 TEST(UtilsSemVer, BuildMetadataSuffixAccepted)
 {
-    const utils::SemVer v(std::string{"1.2.3+build.42"});
-    EXPECT_EQ(v.getMajor(), 1u);
-    EXPECT_EQ(v.getMinor(), 2u);
-    EXPECT_EQ(v.getPatch(), 3u);
+    const utils::SemVer version(std::string{"1.2.3+build.42"});
+    EXPECT_EQ(version.getMajor(), 1U);
+    EXPECT_EQ(version.getMinor(), 2U);
+    EXPECT_EQ(version.getPatch(), 3U);
 }
 
 TEST(UtilsSemVer, ZeroVersionParsesCorrectly)
 {
-    const utils::SemVer v(std::string{"0.0.0"});
-    EXPECT_EQ(v.getMajor(), 0u);
-    EXPECT_EQ(v.getMinor(), 0u);
-    EXPECT_EQ(v.getPatch(), 0u);
-    EXPECT_EQ(v, utils::SemVer(0, 0, 0));
+    const utils::SemVer version(std::string{"0.0.0"});
+    EXPECT_EQ(version.getMajor(), 0U);
+    EXPECT_EQ(version.getMinor(), 0U);
+    EXPECT_EQ(version.getPatch(), 0U);
+    EXPECT_EQ(version, utils::SemVer(0, 0, 0));
 }

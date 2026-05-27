@@ -5,7 +5,7 @@
 /**
  * @brief Constructs a new Molar Tracker Exception object
  *
- * @param message The exception message
+ * @param msg The exception message
  * @param trace The stack trace at the point the exception was thrown,
  * defaulting to the current stack trace
  */

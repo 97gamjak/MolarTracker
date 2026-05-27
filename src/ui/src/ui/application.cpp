@@ -34,7 +34,9 @@ namespace ui
     /**
      * @brief Handles unhandled exceptions
      *
-     * @param what The exception message
+     * @param receiver The object receiving the event
+     * @param event The event being processed
+     * @return true if the event was handled, false otherwise
      */
     bool MolarTrackerApplication::notify(QObject* receiver, QEvent* event)
     {

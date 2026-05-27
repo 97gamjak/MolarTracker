@@ -6,10 +6,10 @@ namespace store
      * @brief Construct a new Profile Store Exception:: Profile Store Exception
      * object
      *
-     * @param message
+     * @param message The exception message
      */
-    ProfileStoreException::ProfileStoreException(std::string message)
-        : MolarTrackerException(std::move(message))
+    ProfileStoreException::ProfileStoreException(const std::string& message)
+        : MolarTrackerException(message)
     {
     }
 

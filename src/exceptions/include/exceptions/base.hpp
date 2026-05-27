@@ -18,8 +18,11 @@
 class MolarTrackerException : public std::runtime_error
 {
    private:
+    /// The stack trace captured at the point where the exception was thrown.
     std::stacktrace _trace;
-    std::string     _what;
+    /// The full exception message, including the stack trace, returned by
+    /// what().
+    std::string _what;
 
    public:
     explicit MolarTrackerException(
