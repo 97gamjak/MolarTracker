@@ -1,19 +1,10 @@
 #ifndef __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 
-#include <optional>
-#include <vector>
-
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "exceptions/base.hpp"
-
-namespace finance
-{
-    class Account;   // Forward declaration
-
-}   // namespace finance
+#include "finance/account.hpp"
 
 namespace store
 {
@@ -81,24 +72,24 @@ namespace store
          *
          * @return std::vector<finance::Account>
          */
-        [[nodiscard]]
-        virtual std::vector<finance::Account> getAllAccounts() const = 0;
+        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
+        ) const = 0;
 
         /**
          * @brief Get all cash accounts
          *
          * @return std::vector<finance::Account>
          */
-        [[nodiscard]]
-        virtual std::vector<finance::Account> getCashAccounts() const = 0;
+        [[nodiscard]] virtual std::vector<finance::Account> getCashAccounts(
+        ) const = 0;
 
         /**
          * @brief Get all security accounts
          *
          * @return std::vector<finance::Account>
          */
-        [[nodiscard]]
-        virtual std::vector<finance::Account> getSecurityAccounts() const = 0;
+        [[nodiscard]] virtual std::vector<finance::Account> getSecurityAccounts(
+        ) const = 0;
 
         /**
          * @brief Get a mapping of account IDs to their names

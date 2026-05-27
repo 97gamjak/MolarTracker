@@ -24,13 +24,13 @@ namespace
     {
         const auto tmp = std::filesystem::temp_directory_path();
 
-        std::random_device                           rd;
-        std::mt19937_64                              gen(rd());
+        std::random_device                           randomDevice;
+        std::mt19937_64                              gen(randomDevice());
         std::uniform_int_distribution<std::uint64_t> dis;
 
-        const auto r = dis(gen);
+        const auto random = dis(gen);
 
-        return tmp / (std::string(stem) + "_" + std::to_string(r));
+        return tmp / (std::string(stem) + "_" + std::to_string(random));
     }
 }   // namespace
 
@@ -82,8 +82,8 @@ TEST(UtilsPaths, EnsureDirCreatesDirectoryAndReturnsPath)
     EXPECT_EQ(result.value(), dir);
     EXPECT_TRUE(std::filesystem::is_directory(dir));
 
-    std::error_code ec;
-    std::filesystem::remove_all(dir, ec);
+    std::error_code errorCode;
+    std::filesystem::remove_all(dir, errorCode);
 }
 
 TEST(UtilsPaths, EnsureDirEmptyPathReturnsEmpty)
@@ -104,8 +104,8 @@ TEST(UtilsPaths, EnsureDirIdempotentOnExistingDirectory)
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), dir);
 
-    std::error_code ec;
-    std::filesystem::remove_all(dir, ec);
+    std::error_code errorCode;
+    std::filesystem::remove_all(dir, errorCode);
 }
 
 TEST(UtilsPaths, ConfigDirCreatesDirectoryAndReturnsPath)
@@ -115,8 +115,8 @@ TEST(UtilsPaths, ConfigDirCreatesDirectoryAndReturnsPath)
     EXPECT_FALSE(result.value().empty());
     EXPECT_TRUE(std::filesystem::is_directory(result.value()));
 
-    std::error_code ec;
-    std::filesystem::remove_all(result.value(), ec);
+    std::error_code errorCode;
+    std::filesystem::remove_all(result.value(), errorCode);
 }
 
 TEST(UtilsPaths, DataDirCreatesDirectoryAndReturnsPath)
@@ -126,8 +126,8 @@ TEST(UtilsPaths, DataDirCreatesDirectoryAndReturnsPath)
     EXPECT_FALSE(result.value().empty());
     EXPECT_TRUE(std::filesystem::is_directory(result.value()));
 
-    std::error_code ec;
-    std::filesystem::remove_all(result.value(), ec);
+    std::error_code errorCode;
+    std::filesystem::remove_all(result.value(), errorCode);
 }
 
 TEST(UtilsPaths, ConfigDirInvalidAppNameReturnsInvalidAppName)

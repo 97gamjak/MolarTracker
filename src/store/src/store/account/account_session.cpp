@@ -1,6 +1,6 @@
 #include "store/account/account_session.hpp"
 
-#include "domain/account.hpp"
+#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("Store.Account.AccountSession");
@@ -27,7 +27,7 @@ namespace store
      *
      * @param accounts
      */
-    void AccountSession::_add(const std::vector<domain::Account>& accounts)
+    void AccountSession::add(const std::vector<finance::Account>& accounts)
     {
         for (const auto& account : accounts)
             _activeAccounts.insert(account.getId());

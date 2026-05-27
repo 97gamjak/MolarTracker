@@ -11,11 +11,6 @@ namespace repo
     class IAccountRepo;   // forward declaration
 }   // namespace repo
 
-namespace domain
-{
-    class Account;   // forward declaration
-}   // namespace domain
-
 namespace service
 {
     /**
@@ -33,13 +28,13 @@ namespace service
             const std::shared_ptr<repo::IAccountRepo>& accountRepo
         );
 
-        [[nodiscard]] std::vector<domain::Account> getAllAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const override;
 
         [[nodiscard]] AccountId createAccount(
-            const domain::Account& account,
-            const ProfileId&       profileId
+            const finance::Account& account,
+            const ProfileId&        profileId
         ) override;
     };
 

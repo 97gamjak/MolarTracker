@@ -6,9 +6,9 @@
 #include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "controller/helpers.hpp"
-#include "controller/mapper/account_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
+#include "drafts/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
@@ -59,14 +59,14 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&                 undoStack,
-        std::shared_ptr<IAccountStore>& accountStore,
-        TransactionStore&               transactionStore,
-        StockStore&                     stockStore,
-        PositionStore&                  positionStore,
-        TransactionController&          transactionController,
-        SecuritiesSideBarController&    stockController,
-        QMainWindow*                    mainWindow
+        cmd::UndoStack&                       undoStack,
+        const std::shared_ptr<IAccountStore>& accountStore,
+        TransactionStore&                     transactionStore,
+        StockStore&                           stockStore,
+        PositionStore&                        positionStore,
+        TransactionController&                transactionController,
+        SecuritiesSideBarController&          stockController,
+        QMainWindow*                          mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
@@ -80,9 +80,11 @@ namespace controller
           _stockController(stockController),
           _mainWindow(mainWindow)
     {
+        const auto cashAccounts =
+            drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts());
         _createCashTransactionDlg = utils::makeQChild<DepositWithdrawalWidget>(
             TransactionType::Deposit,   // dummy type
-            AccountMapper::toDrafts(_accountStore->getCashAccounts()),
+            cashAccounts,
             _mainWindow
         );
 
@@ -93,9 +95,12 @@ namespace controller
             &TransactionSideBarController::_onCreateCashTransactionRequested
         );
 
+        const auto accounts =
+            drafts::AccountMapper::toDrafts(_accountStore->getAllAccounts());
+
         _createStockTransactionDlg = utils::makeQChild<StockWidget>(
-            AccountMapper::toDrafts(_accountStore->getAllAccounts()),
-            AccountMapper::toDrafts(_accountStore->getAllAccounts()),
+            accounts,
+            accounts,
             _stockStore.getAllTickers(),
             _mainWindow
         );
@@ -162,7 +167,8 @@ namespace controller
 
             _createCashTransactionDlg->setTransactionType(type);
             _createCashTransactionDlg->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _createCashTransactionDlg->refresh();
 
@@ -171,10 +177,13 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _createStockTransactionDlg->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                drafts::AccountMapper::toDrafts(
+                    _accountStore->getSecurityAccounts()
+                )
             );
             _createStockTransactionDlg->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _createStockTransactionDlg->updateTickers(_stockStore.getAllTickers(
             ));

@@ -5,10 +5,10 @@
 
 #include "config/id_types.hpp"
 
-namespace domain
+namespace finance
 {
     class Account;   // forward declaration
-}   // namespace domain
+}   // namespace finance
 
 namespace repo
 {
@@ -34,8 +34,8 @@ namespace repo
          * @return AccountId The ID of the newly created account
          */
         [[nodiscard]] virtual AccountId createAccount(
-            const domain::Account& account,
-            const ProfileId&       profileId
+            const finance::Account& account,
+            const ProfileId&        profileId
         ) = 0;
 
         /**
@@ -45,10 +45,10 @@ namespace repo
          *
          * @param profileId The ID of the profile whose accounts are to
          * be retrieved
-         * @return std::vector<domain::Account> A vector containing all
+         * @return std::vector<finance::Account> A vector containing all
          * accounts in the repository
          */
-        [[nodiscard]] virtual std::vector<domain::Account> getAllAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) = 0;
     };

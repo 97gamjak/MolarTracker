@@ -5,8 +5,8 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "controller/mapper/account_mapper.hpp"
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
+#include "drafts/account_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
 #include "ui/account/create_account_dlg.hpp"
@@ -45,10 +45,10 @@ namespace controller
      *
      */
     AccountSideBarController::AccountSideBarController(
-        cmd::UndoStack&                              undoStack,
-        const std::shared_ptr<store::IAccountStore>& accountStore,
-        AccountController&                           accountController,
-        QMainWindow*                                 mainWindow
+        cmd::UndoStack&                        undoStack,
+        std::shared_ptr<store::IAccountStore>& accountStore,
+        AccountController&                     accountController,
+        QMainWindow*                           mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
@@ -145,13 +145,13 @@ namespace controller
         const drafts::AccountDraft& account
     )
     {
-        LOG_INFO("Create Account requested with name: " + account.name);
+        LOG_INFO("Create Account requested with name: " + account.getName());
 
         cmd::Commands command("Create Account");
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
             _accountStore,
-            AccountMapper::fromDraft(account)
+            drafts::AccountMapper::toAccount(account)
         );
 
         if (!result)

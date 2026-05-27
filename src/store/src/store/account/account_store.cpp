@@ -4,14 +4,21 @@
 #include <format>
 #include <ranges>
 
-#include "account_mapper.hpp"
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
-#include "logic/finance/account.hpp"
 #include "service/i_account_service.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
+
+using finance::Account;
+using finance::HasAccountId;
+using finance::HasCurrency;
+using finance::HasName;
+using finance::IsAccountActive;
+using finance::IsAccountType;
+using finance::IsExternal;
 
 namespace store
 {
@@ -31,8 +38,8 @@ namespace store
         : _accountService(accountService)
     {
         _connections.add(subscribeToEntryAdded(
-            [this](const std::vector<domain::Account>& accounts)
-            { _session._add(accounts); },
+            [this](const std::vector<finance::Account>& accounts)
+            { _session.add(accounts); },
             this
         ));
 
@@ -76,11 +83,9 @@ namespace store
             )
         );
 
-        const auto domainAccount = AccountMapper::toDomain(account);
-
         const auto options = Options{
-            .filter = domain::IsAccountType(domainAccount.getKind()) &&
-                      domain::HasName(domainAccount.getName()),
+            .filter =
+                IsAccountType(account.getKind()) && HasName(account.getName()),
             .deletion = DeletionPolicy::ExcludeDelete
         };
         const auto existingAccount = _get(options);
@@ -97,16 +102,23 @@ namespace store
             return AccountStoreResult::AccountNameConflict;
         }
 
-        _addEntry(domainAccount);
+        const auto newAccount = Account{
+            AccountId::invalid(),
+            AccountStatus::Active,
+            account.getName(),
+            account.getCurrency(),
+            account.getKind()
+        };
+
+        _addEntry(newAccount);
 
         // special case for cash accounts
-        if (domainAccount.getKind() == AccountKind::Cash)
+        if (account.getKind() == AccountKind::Cash)
         {
             // check if we already have an external account for this profile id
             // and currency
             const auto existingEntry = _get(
-                {.filter = domain::IsExternal() &&
-                           domain::HasCurrency(domainAccount.getCurrency()),
+                {.filter   = IsExternal() && HasCurrency(account.getCurrency()),
                  .deletion = DeletionPolicy::ExcludeDelete}
             );
 
@@ -114,12 +126,11 @@ namespace store
             {
                 // If no existing entry is found, we can create a new external
                 // account
-                const auto externalAccount = domain::Account{
+                const auto externalAccount = finance::Account{
                     AccountId::invalid(),
                     AccountStatus::Active,
-                    "External " +
-                        CurrencyMeta::toString(domainAccount.getCurrency()),
-                    domainAccount.getCurrency(),
+                    "External " + CurrencyMeta::toString(account.getCurrency()),
+                    account.getCurrency(),
                     AccountKind::External
                 };
 
@@ -292,12 +303,11 @@ namespace store
     std::vector<finance::Account> AccountStore::getAllAccounts() const
     {
         const auto options = Options{
-            .filter   = !domain::IsExternal() && domain::IsAccountActive(),
+            .filter   = !IsExternal() && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto accounts = _getValues(options) |
-                        std::views::transform(AccountMapper::fromDomain);
+        auto accounts = _getValues(options);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -318,13 +328,11 @@ namespace store
     std::vector<finance::Account> AccountStore::getCashAccounts() const
     {
         const auto options = Options{
-            .filter = domain::IsAccountType(AccountKind::Cash) &&
-                      domain::IsAccountActive(),
+            .filter   = IsAccountType(AccountKind::Cash) && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto accounts = _getValues(options) |
-                        std::views::transform(AccountMapper::fromDomain);
+        auto accounts = _getValues(options);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -346,13 +354,11 @@ namespace store
     std::vector<finance::Account> AccountStore::getSecurityAccounts() const
     {
         const auto options = Options{
-            .filter = domain::IsAccountType(AccountKind::Security) &&
-                      domain::IsAccountActive(),
+            .filter = IsAccountType(AccountKind::Security) && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto accounts = _getValues(options) |
-                        std::views::transform(AccountMapper::fromDomain);
+        auto accounts = _getValues(options);
 
         return {accounts.begin(), accounts.end()};
     }
@@ -375,7 +381,7 @@ namespace store
     ) const
     {
         const auto options = Options{
-            .filter   = domain::IsAccountActive(),
+            .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -411,7 +417,7 @@ namespace store
     ) const
     {
         const auto options = Options{
-            .filter   = domain::IsExternal() && domain::HasCurrency(currency),
+            .filter   = IsExternal() && HasCurrency(currency),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -431,7 +437,7 @@ namespace store
     idSet<AccountId> AccountStore::getExternalAccountIds() const
     {
         const auto options = Options{
-            .filter   = domain::IsExternal(),
+            .filter   = IsExternal(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -453,16 +459,11 @@ namespace store
     std::optional<finance::Account> AccountStore::getAccount(AccountId id) const
     {
         const auto options = Options{
-            .filter   = domain::HasAccountId(id) && domain::IsAccountActive(),
+            .filter   = HasAccountId(id) && IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        const auto account = _get(options);
-
-        if (account.has_value())
-            return AccountMapper::fromDomain(account.value());
-
-        return std::nullopt;
+        return _get(options);
     }
 
     /**

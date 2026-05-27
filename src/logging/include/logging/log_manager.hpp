@@ -42,7 +42,7 @@ namespace logging
         std::unique_ptr<RingFile> _ringFile;
 
         /// The directory where log files are stored.
-        std::string_view _logDirectory;
+        std::string _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
         LogLevel _defaultLogLevel = LogLevel::Trace;

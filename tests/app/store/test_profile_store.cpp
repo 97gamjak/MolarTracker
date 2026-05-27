@@ -7,7 +7,6 @@
 
 #include "drafts/profile_draft.hpp"
 #include "mock_services.hpp"
-#include "store/profile/exception.hpp"
 #include "store/profile/profile_store.hpp"
 
 namespace
@@ -114,7 +113,7 @@ TEST_F(ProfileStoreTest, GetAllProfileNamesReturnsAddedNames)
     EXPECT_EQ(names.size(), 2U);
 }
 
-TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameRetrnsError)
+TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameReturnsError)
 {
     EXPECT_EQ(
         _store->setActiveProfile("NonExistent"),

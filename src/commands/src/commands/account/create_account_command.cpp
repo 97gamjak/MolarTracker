@@ -3,6 +3,7 @@
 #include <expected>
 #include <format>
 
+#include "finance/account.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
 
@@ -18,8 +19,8 @@ namespace cmd
      * @param account
      */
     CreateAccountCommand::CreateAccountCommand(
-        std::shared_ptr<store::IAccountStore>& accountStore,
-        finance::Account                       account
+        const std::shared_ptr<store::IAccountStore>& accountStore,
+        finance::Account                             account
     )
         : _accountStore(accountStore), _account(std::move(account))
     {

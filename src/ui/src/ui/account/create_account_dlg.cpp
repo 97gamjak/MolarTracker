@@ -8,7 +8,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
 #include "ui/validators/name_line_edit.hpp"
 #include "ui/validators/validators.hpp"
 #include "utils/qt_helpers.hpp"
@@ -152,10 +152,10 @@ namespace ui
 
         return drafts::AccountDraft{
             AccountId::invalid(),
+            AccountStatus::Active,
             _nameLineEdit->text().toStdString(),
-            type,
             currency,
-            AccountStatus::Active
+            type
         };
     }
 

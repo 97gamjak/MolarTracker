@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "domain/account.hpp"
 #include "domain/profile.hpp"
+#include "finance/account.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/position.hpp"
 #include "finance/transaction.hpp"
@@ -109,15 +109,15 @@ namespace tests
     {
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        std::vector<domain::Account> preloadedAccounts;
-        int                          createCallCount = 0;
+        std::vector<finance::Account> preloadedAccounts;
+        int                           createCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
 
        public:
-        [[nodiscard]] std::vector<domain::Account> getAllAccounts(
+        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
             const ProfileId& /*profileId*/
         ) const override
         {
@@ -125,7 +125,7 @@ namespace tests
         }
 
         [[nodiscard]] AccountId createAccount(
-            const domain::Account& /*account*/,
+            const finance::Account& /*account*/,
             const ProfileId& /*profileId*/
         ) override
         {

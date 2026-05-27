@@ -7,7 +7,7 @@
 #include <optional>
 #include <vector>
 
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
 
 class QComboBox;   // Forward declaration
 

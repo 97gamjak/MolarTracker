@@ -15,11 +15,10 @@ qt_add_library(molartracker_commands STATIC
 target_link_libraries(molartracker_commands
     PRIVATE
     Qt6::Widgets
-    molartracker_drafts # TODO: remove this from here
     molartracker_logging
-    molartracker_logic
-    molartracker_settings
+    molartracker_drafts
     molartracker_store
+    molartracker_settings
 )
 
 target_include_directories(molartracker_commands

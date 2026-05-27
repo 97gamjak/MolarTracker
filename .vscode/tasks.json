@@ -42,12 +42,41 @@
             "group": "build"
         },
         {
-            "label": "clang-tidy",
+            "label": "clang-tidy (changed)",
             "type": "shell",
             "command": "bash",
             "args": [
                 "-c",
-                "scripts/clangd.sh"
+                "scripts/clang_tidy.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "clang-tidy",
+                    "fileLocation": [
+                        "absolute"
+                    ],
+                    "pattern": {
+                        "regexp": "^(.*?):(\\d+):(\\d+):\\s*(warning|error|note):\\s*(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": "build"
+        },
+        {
+            "label": "clang-tidy (all)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "scripts/clang_tidy.sh --all"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

@@ -6,26 +6,15 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
-#include "domain/account.hpp"
+#include "finance/account.hpp"
 #include "store/account/account_session.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_account_store.hpp"
 
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-
-}   // namespace drafts
-
 namespace service
 {
-    class IAccountService;   // Forward declaration
+    class IAccountService;   // forward declaration
 }   // namespace service
-
-namespace finance
-{
-    class Account;   // Forward declaration
-}   // namespace finance
 
 namespace store
 {
@@ -33,7 +22,7 @@ namespace store
      * @brief Store for managing accounts
      *
      */
-    class AccountStore : public BaseStore<domain::Account, AccountId>,
+    class AccountStore : public BaseStore<finance::Account, AccountId>,
                          public IAccountStore
     {
        private:

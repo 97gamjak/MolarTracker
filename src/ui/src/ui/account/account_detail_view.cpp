@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 
 #include "config/finance.hpp"
-#include "drafts/account/account_draft.hpp"
+#include "drafts/account_draft.hpp"
 #include "ui/position/position_table_model.hpp"
 #include "ui/position/position_table_view.hpp"
 #include "ui/utils/error.hpp"
@@ -136,11 +136,13 @@ namespace ui
 
         // Update the UI elements with the new account details
         _uiElements->nameLabel->setText(
-            "Name: " + QString::fromStdString(_account->name)
+            "Name: " + QString::fromStdString(_account->getName())
         );
         _uiElements->balanceLabel->setText(
             "Balance: " + QString::number(0) + " " +
-            QString::fromStdString(CurrencyMeta::toString(_account->currency))
+            QString::fromStdString(
+                CurrencyMeta::toString(_account->getCurrency())
+            )
         );
     }
 
@@ -151,13 +153,13 @@ namespace ui
      */
     void AccountDetailView::updateCashAccount(const AccountDraft& account)
     {
-        if (account.kind != AccountKind::Cash)
+        if (account.getKind() != AccountKind::Cash)
         {
             ErrorDialog::show(
                 std::format(
                     "Invalid account type for account '{}' with id '{}'",
-                    account.name,
-                    account.id.toString()
+                    account.getName(),
+                    account.getId().toString()
                 )
             );
             return;
@@ -181,13 +183,13 @@ namespace ui
         const std::vector<drafts::PositionDetailDraft>& positions
     )
     {
-        if (account.kind != AccountKind::Security)
+        if (account.getKind() != AccountKind::Security)
         {
             ErrorDialog::show(
                 std::format(
                     "Invalid account type for account '{}' with id '{}'",
-                    account.name,
-                    account.id.toString()
+                    account.getName(),
+                    account.getId().toString()
                 )
             );
             return;

@@ -4,11 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-
-namespace domain
-{
-    class Account;   // Forward declaration
-}   // namespace domain
+#include "finance/account.hpp"
 
 namespace service
 {
@@ -27,10 +23,10 @@ namespace service
          * @param profileId The ID of the profile whose accounts are to be
          * retrieved
          *
-         * @return std::vector<domain::Account> A vector containing all
+         * @return std::vector<finance::Account> A vector containing all
          * accounts
          */
-        [[nodiscard]] virtual std::vector<domain::Account> getAllAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const = 0;
 
@@ -48,8 +44,8 @@ namespace service
          */
         [[nodiscard]]
         virtual AccountId createAccount(
-            const domain::Account& account,
-            const ProfileId&       profileId
+            const finance::Account& account,
+            const ProfileId&        profileId
         ) = 0;
     };
 

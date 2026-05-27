@@ -65,7 +65,7 @@ namespace ui
         const auto it = std::ranges::find_if(
             _accounts,
             [id](const drafts::AccountDraft& account)
-            { return account.id == id; }
+            { return account.getId() == id; }
         );
 
         return it != _accounts.end() ? std::optional{*it} : std::nullopt;
@@ -90,8 +90,8 @@ namespace ui
         for (const auto& account : _accounts)
         {
             _combo->addItem(
-                QString::fromStdString(account.name),
-                QVariant::fromValue(account.id)
+                QString::fromStdString(account.getName()),
+                QVariant::fromValue(account.getId())
             );
         }
 

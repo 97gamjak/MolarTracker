@@ -1,17 +1,34 @@
-#ifndef __LOGIC__INCLUDE__LOGIC__FINANCE__ACCOUNT_HPP__
-#define __LOGIC__INCLUDE__LOGIC__FINANCE__ACCOUNT_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
+#define __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
 
 #include <cstdint>
 #include <string>
+#include <variant>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "filter/predicate.hpp"
 
 enum class Currency : std::uint8_t;        // Forward declaration
 enum class AccountStatus : std::uint8_t;   // Forward declaration
 
 namespace finance
 {
+
+    class CashAccount
+    {
+    };
+
+    class SecurityAccount
+    {
+    };
+
+    class ExternalAccount
+    {
+    };
+
+    using AccountDetails =
+        std::variant<CashAccount, SecurityAccount, ExternalAccount>;
 
     /**
      * @brief A base class representing a financial account, which can be
@@ -35,8 +52,9 @@ namespace finance
         /// The current currency of the account
         Currency _currency;
 
-        /// The kind of the account (e.g., Cash, External, Security)
-        AccountKind _kind;
+        /// The details of the account (e.g., cash account details, external
+        /// account details, etc.)
+        AccountDetails _details;
 
        public:
         Account(
@@ -57,6 +75,13 @@ namespace finance
         [[nodiscard]] bool          isExternal() const;
     };
 
+    filter::Predicate<Account> IsAccountType(AccountKind kind);
+    filter::Predicate<Account> IsAccountActive();
+    filter::Predicate<Account> IsExternal();
+    filter::Predicate<Account> HasCurrency(Currency currency);
+    filter::Predicate<Account> HasAccountId(AccountId id);
+    filter::Predicate<Account> HasName(const std::string& name);
+
 }   // namespace finance
 
-#endif   // __LOGIC__INCLUDE__LOGIC__FINANCE__ACCOUNT_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__

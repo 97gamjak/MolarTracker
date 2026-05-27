@@ -1,10 +1,9 @@
-#include "account_mapper.hpp"
+#include "drafts/account_mapper.hpp"
 
-#include "config/id_types.hpp"
-#include "drafts/account/account_draft.hpp"
-#include "logic/finance/account.hpp"
+#include "drafts/account_draft.hpp"
+#include "finance/account.hpp"
 
-namespace controller
+namespace drafts
 {
 
     /**
@@ -19,29 +18,34 @@ namespace controller
      * as the finance::Account but may be structured differently to better suit
      * the needs of the UI.
      */
-    drafts::AccountDraft AccountMapper::toDraft(const finance::Account& account)
+    AccountDraft AccountMapper::toDraft(const finance::Account& account)
     {
-        return drafts::AccountDraft{
+        return AccountDraft{
             account.getId(),
+            account.getStatus(),
             account.getName(),
-            account.getKind(),
             account.getCurrency(),
-            account.getStatus()
+            account.getKind()
         };
     }
 
     /**
      * @brief Convert a vector of finance::Account to a vector of AccountDraft
      *
-     * @param accounts The vector of finance::Account to convert
-     * @return std::vector<drafts::AccountDraft> The vector of corresponding
-     * AccountDraft
+     * @param accounts The vector of finance::Account to convert, these are the
+     * domain model representations of accounts, and contain all the details of
+     * the accounts as they exist in the business logic layer.
+     * @return std::vector<AccountDraft> A vector of corresponding
+     * AccountDrafts, these are the draft model representations of accounts, and
+     * are used for transferring data between the business logic and the UI,
+     * they contain the same information as the finance::Account but may be
+     * structured differently to better suit the needs of the UI.
      */
-    std::vector<drafts::AccountDraft> AccountMapper::toDrafts(
+    std::vector<AccountDraft> AccountMapper::toDrafts(
         const std::vector<finance::Account>& accounts
     )
     {
-        std::vector<drafts::AccountDraft> drafts;
+        std::vector<AccountDraft> drafts;
         drafts.reserve(accounts.size());
         for (const auto& account : accounts)
             drafts.push_back(toDraft(account));
@@ -61,17 +65,16 @@ namespace controller
      * domain model representation of an account, and contains all the details
      * of the account as it exists in the business logic layer.
      */
-    finance::Account AccountMapper::fromDraft(const drafts::AccountDraft& draft)
+    finance::Account AccountMapper::toAccount(const AccountDraft& draft)
     {
         auto account = finance::Account{
-            AccountId::invalid(),
-            draft.status.value_or(AccountStatus::Active),
-            draft.name,
-            draft.currency,
-            draft.kind
+            draft.getId(),
+            draft.getStatus().value_or(AccountStatus::Active),
+            draft.getName(),
+            draft.getCurrency(),
+            draft.getKind()
         };
-        account.setId(draft.id);
         return account;
     }
 
-}   // namespace controller
+}   // namespace drafts

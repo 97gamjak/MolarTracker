@@ -1,16 +1,16 @@
-#include "domain/account.hpp"
+#include "finance/account.hpp"
 
 #include <utility>
 
 #include "config/finance.hpp"
 
-namespace domain
+namespace finance
 {
 
     /**
      * @brief Construct a new Account:: Account object
      *
-     * @param id the id of the account
+     * @param id the unique identifier for the account
      * @param status the status of the account (e.g., Active, Closed)
      * @param name the current name of the account
      * @param currency the current currency of the account
@@ -28,14 +28,20 @@ namespace domain
         switch (kind)
         {
             case AccountKind::Cash:
+            {
                 _details = CashAccount{};
                 break;
+            }
             case AccountKind::Security:
+            {
                 _details = SecurityAccount{};
                 break;
+            }
             case AccountKind::External:
+            {
                 _details = ExternalAccount{};
                 break;
+            }
         }
     }
 
@@ -81,25 +87,22 @@ namespace domain
      */
     AccountKind Account::getKind() const
     {
-        struct KindVisitor
+        struct Visitor
         {
-            AccountKind operator()(const CashAccount& /*cash*/) const
+            AccountKind operator()(const CashAccount& /*details*/) const
             {
                 return AccountKind::Cash;
             }
-
-            AccountKind operator()(const SecurityAccount& /*security*/) const
-            {
-                return AccountKind::Security;
-            }
-
-            AccountKind operator()(const ExternalAccount& /*external*/) const
+            AccountKind operator()(const ExternalAccount& /*details*/) const
             {
                 return AccountKind::External;
             }
+            AccountKind operator()(const SecurityAccount& /*details*/) const
+            {
+                return AccountKind::Security;
+            }
         };
-
-        return std::visit(KindVisitor{}, _details);
+        return std::visit(Visitor{}, _details);
     }
 
     /**
@@ -190,4 +193,4 @@ namespace domain
         );
     }
 
-}   // namespace domain
+}   // namespace finance
