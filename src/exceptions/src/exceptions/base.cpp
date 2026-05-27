@@ -14,10 +14,10 @@ MolarTrackerException::MolarTrackerException(
     std::stacktrace    trace
 )
     : std::runtime_error(msg),
-      m_trace(std::move(trace)),
-      m_what(
+      _trace(std::move(trace)),
+      _what(
           std::runtime_error::what() + std::string("\nStack trace:\n") +
-          std::to_string(m_trace)
+          std::to_string(_trace)
       )
 {
 }
@@ -29,7 +29,7 @@ MolarTrackerException::MolarTrackerException(
  */
 const char* MolarTrackerException::what() const noexcept
 {
-    return m_what.c_str();
+    return _what.c_str();
 }
 
 /**
@@ -39,5 +39,5 @@ const char* MolarTrackerException::what() const noexcept
  */
 const std::stacktrace& MolarTrackerException::stacktrace() const noexcept
 {
-    return m_trace;
+    return _trace;
 }

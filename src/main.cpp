@@ -23,7 +23,7 @@ int main(int argc, char** argv)
                 }
                 catch (const std::exception& e)
                 {
-                    qCritical() << "Terminated:" << e.what();
+                    qCritical() << "Terminated: " << e.what();
                 }
                 catch (...)
                 {

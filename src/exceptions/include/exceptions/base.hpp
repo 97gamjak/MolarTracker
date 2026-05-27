@@ -18,8 +18,8 @@
 class MolarTrackerException : public std::runtime_error
 {
    private:
-    std::stacktrace m_trace;   // must be declared before m_what
-    std::string     m_what;
+    std::stacktrace _trace;
+    std::string     _what;
 
    public:
     explicit MolarTrackerException(
