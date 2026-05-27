@@ -3,9 +3,8 @@
 #include <expected>
 #include <format>
 
-#include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
-#include "store/account/account_store.hpp"
+#include "store/i_account_store.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Commands.CreateAccountCommand");
 
@@ -16,13 +15,13 @@ namespace cmd
      * object
      *
      * @param accountStore
-     * @param accountDraft
+     * @param account
      */
     CreateAccountCommand::CreateAccountCommand(
-        store::AccountStore& accountStore,
-        drafts::AccountDraft accountDraft
+        std::shared_ptr<store::IAccountStore>& accountStore,
+        finance::Account                       account
     )
-        : _accountStore(accountStore), _accountDraft(std::move(accountDraft))
+        : _accountStore(accountStore), _account(std::move(account))
     {
     }
 
@@ -57,12 +56,12 @@ namespace cmd
      */
     std::expected<void, CommandErrorPtr> CreateAccountCommand::redo()
     {
-        const auto result = _accountStore.createAccount(_accountDraft);
+        const auto result = _accountStore->createAccount(_account);
         if (result != store::AccountStoreResult::Ok)
         {
             const auto errorMessage = std::format(
                 "Failed to create account '{}'",
-                _accountDraft.name
+                _account.getName()
             );
 
             LOG_ERROR(errorMessage);

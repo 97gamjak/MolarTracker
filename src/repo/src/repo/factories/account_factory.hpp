@@ -5,10 +5,10 @@
 
 #include "sql_models/account_row.hpp"
 
-namespace finance
+namespace domain
 {
     class Account;   // Forward declaration
-}   // namespace finance
+}   // namespace domain
 
 namespace repo
 {
@@ -22,17 +22,17 @@ namespace repo
     class AccountFactory
     {
        public:
-        [[nodiscard]] static finance::Account toAccountDomain(
+        [[nodiscard]] static domain::Account toAccountDomain(
             const AccountRow& accountRow
         );
 
-        [[nodiscard]] static std::vector<finance::Account> toAccountDomains(
+        [[nodiscard]] static std::vector<domain::Account> toAccountDomains(
             const std::vector<AccountRow>& accountRows
         );
 
         [[nodiscard]] static AccountRow toAccountRow(
-            const finance::Account& account,
-            const ProfileId&        profileId
+            const domain::Account& account,
+            const ProfileId&       profileId
         );
     };
 

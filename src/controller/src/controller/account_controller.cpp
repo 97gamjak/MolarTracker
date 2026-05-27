@@ -10,11 +10,12 @@
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/helpers.hpp"
+#include "controller/mapper/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
-#include "store/account/account_store.hpp"
+#include "store/i_account_store.hpp"
 #include "ui/account/account_detail_view.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
@@ -28,7 +29,7 @@ namespace controller
     struct AccountController::Stores
     {
         /// Reference to the account store
-        store::AccountStore& accountStore;
+        std::shared_ptr<store::IAccountStore> accountStore;
         /// Reference to the position store
         store::PositionStore& positionStore;
         /// Reference to the stock store
@@ -37,10 +38,10 @@ namespace controller
         store::TransactionStore& transactionStore;
 
         Stores(
-            store::AccountStore&     accountStore_,
-            store::PositionStore&    positionStore_,
-            store::StockStore&       stockStore_,
-            store::TransactionStore& transactionStore_
+            const std::shared_ptr<store::IAccountStore>& accountStore_,
+            store::PositionStore&                        positionStore_,
+            store::StockStore&                           stockStore_,
+            store::TransactionStore&                     transactionStore_
         );
         ~Stores() = default;
 
@@ -60,10 +61,10 @@ namespace controller
      * @param transactionStore_
      */
     AccountController::Stores::Stores(
-        store::AccountStore&     accountStore_,
-        store::PositionStore&    positionStore_,
-        store::StockStore&       stockStore_,
-        store::TransactionStore& transactionStore_
+        const std::shared_ptr<store::IAccountStore>& accountStore_,
+        store::PositionStore&                        positionStore_,
+        store::StockStore&                           stockStore_,
+        store::TransactionStore&                     transactionStore_
     )
         : accountStore(accountStore_),
           positionStore(positionStore_),
@@ -83,12 +84,12 @@ namespace controller
      * @param stackedWidget
      */
     AccountController::AccountController(
-        cmd::UndoStack&          undoStack,
-        store::AccountStore&     accountStore,
-        store::PositionStore&    positionStore,
-        store::StockStore&       stockStore,
-        store::TransactionStore& transactionStore,
-        QStackedWidget*          stackedWidget
+        cmd::UndoStack&                              undoStack,
+        const std::shared_ptr<store::IAccountStore>& accountStore,
+        store::PositionStore&                        positionStore,
+        store::StockStore&                           stockStore,
+        store::TransactionStore&                     transactionStore,
+        QStackedWidget*                              stackedWidget
     )
         : _undoStack(undoStack),
           _stores(
@@ -116,7 +117,7 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto account = _stores->accountStore.getAccount(id);
+        const auto account = _stores->accountStore->getAccount(id);
 
         if (!account.has_value())
         {
@@ -126,16 +127,18 @@ namespace controller
             return;
         }
 
-        switch (account->kind)
+        switch (account->getKind())
         {
             case AccountKind::Cash:
-                _accountDetailView->updateCashAccount(account.value());
+                _accountDetailView->updateCashAccount(
+                    AccountMapper::toDraft(account.value())
+                );
                 break;
             case AccountKind::Security:
             {
                 const std::vector<drafts::PositionDetailDraft> drafts =
                     getOpenPositionDrafts(
-                        account->id,
+                        account->getId(),
                         _stores->positionStore,
                         _stores->stockStore,
                         _stores->transactionStore
@@ -145,12 +148,12 @@ namespace controller
                     std::format(
                         "Retrieved {} open position drafts for account {}",
                         drafts.size(),
-                        account->name
+                        account->getName()
                     )
                 );
 
                 _accountDetailView->updateSecurityAccount(
-                    account.value(),
+                    AccountMapper::toDraft(account.value()),
                     drafts
                 );
                 break;

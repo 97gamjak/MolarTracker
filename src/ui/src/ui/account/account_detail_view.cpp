@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 
 #include "config/finance.hpp"
-#include "drafts/account_draft.hpp"
+#include "drafts/account/account_draft.hpp"
 #include "ui/position/position_table_model.hpp"
 #include "ui/position/position_table_view.hpp"
 #include "ui/utils/error.hpp"

@@ -29,7 +29,7 @@ namespace store
           _profileStore{std::make_shared<ProfileStore>(
               _serviceContainer->getProfileService()
           )},
-          _accountStore{std::make_unique<AccountStore>(
+          _accountStore{std::make_shared<AccountStore>(
               _serviceContainer->getAccountService()
           )},
           _stockStore{std::make_unique<StockStore>(
@@ -42,7 +42,6 @@ namespace store
           )},
           _transactionStore{std::make_unique<TransactionStore>(
               _serviceContainer->getTransactionService(),
-              *_accountStore,
               *_stockStore,
               *_positionStore,
               _accountStore->getAccountSession()
@@ -50,15 +49,17 @@ namespace store
           _connections{std::make_unique<Connections>()}
     {
         auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
+        auto* accountStore = dynamic_cast<AccountStore*>(_accountStore.get());
 
-        if (profileStore == nullptr || !_profileStore || !_accountStore ||
-            !_stockStore || !_positionStore || !_transactionStore)
+        if (profileStore == nullptr || !_profileStore ||
+            accountStore == nullptr || !_accountStore || !_stockStore ||
+            !_positionStore || !_transactionStore)
         {
             throw std::runtime_error("Failed to initialize store container");
         }
 
         _allStores.push_back(profileStore);
-        _allStores.push_back(&*_accountStore);
+        _allStores.push_back(accountStore);
         _allStores.push_back(&*_transactionStore);
         _allStores.push_back(&*_stockStore);
         _allStores.push_back(&*_positionStore);
@@ -93,7 +94,7 @@ namespace store
 
         _stockStore->commit();
 
-        _transactionStore->commit();
+        _transactionStore->commit(_accountStore->getIdRemap());
     }
 
     /**
@@ -189,18 +190,22 @@ namespace store
     /**
      * @brief Get the AccountStore
      *
-     * @return AccountStore&
+     * @return std::shared_ptr<IAccountStore>&
      */
-    AccountStore& StoreContainer::getAccountStore() { return *_accountStore; }
+    std::shared_ptr<IAccountStore>& StoreContainer::getAccountStore()
+    {
+        return _accountStore;
+    }
 
     /**
      * @brief Get the AccountStore (const version)
      *
-     * @return const AccountStore&
+     * @return const std::shared_ptr<IAccountStore>&
      */
-    const AccountStore& StoreContainer::getAccountStore() const
+    const std::shared_ptr<IAccountStore>& StoreContainer::getAccountStore(
+    ) const
     {
-        return *_accountStore;
+        return _accountStore;
     }
 
     /**

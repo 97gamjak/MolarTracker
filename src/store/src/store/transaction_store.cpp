@@ -11,7 +11,6 @@
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
 #include "store/account/account_session.hpp"
-#include "store/account/account_store.hpp"
 #include "store/position_store.hpp"
 #include "store/stock_store.hpp"
 
@@ -54,14 +53,12 @@ namespace store
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
-     * @param accountStore
      * @param stockStore
      * @param positionStore
      * @param accountSession
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<service::ITransactionService>& transactionService,
-        AccountStore&                                        accountStore,
         StockStore&                                          stockStore,
         PositionStore&                                       positionStore,
         const AccountSession&                                accountSession
@@ -69,12 +66,6 @@ namespace store
         : _transactionService(transactionService),
           _session(std::make_unique<Session>(accountSession))
     {
-        _connections.add(accountStore.subscribeToIdRemap(
-            [this](const AccountStore::IdMap& remap)
-            { _onAccountIdRemap(remap); },
-            this
-        ));
-
         _connections.add(stockStore.subscribeToInstrumentIdRemap(
             [this](const instrumentMap<InstrumentId>& remap)
             { _onInstrumentIdRemap(remap); },
@@ -93,12 +84,17 @@ namespace store
     /**
      * @brief Save all temporary changes to the database
      *
+     * @param accountIdRemap The account ID remapping to apply during the commit
      */
-    void TransactionStore::commit()
+    void TransactionStore::commit(
+        const unorderedIdMap<AccountId, AccountId>& accountIdRemap
+    )
     {
         LOG_ENTRY;
 
         _logCache(LOG_CATEGORY, LogLevel::Trace);
+
+        _onAccountIdRemap(accountIdRemap);
 
         for (const auto& entry : _getEntries())
         {

@@ -60,7 +60,8 @@ namespace controller
         void _onRequestDebugSlots();
         void _onDebugSlotsChangeRequested(
             const ui::DebugSlotsDialog::Action& action,
-            const logging::LogCategories&       categories
+            const logging::LogCategories&       categories,
+            bool                                persistChanges
         );
         void _onRequestLogViewer();
 
@@ -76,9 +77,13 @@ namespace controller
         void _ensureDebugSlotsDialog();
         void _ensureLogViewerDialog();
         void _resetDefaultDebugFlags();
-        void _applyDebugFlagChanges(const logging::LogCategories& categories);
+        void _applyDebugFlagChanges(
+            const logging::LogCategories& categories,
+            bool                          persistChanges
+        );
         void _applyDebugFlagChangesAndClose(
-            const logging::LogCategories& categories
+            const logging::LogCategories& categories,
+            bool                          persistChanges
         );
         void _applyLogViewerSettings();
     };

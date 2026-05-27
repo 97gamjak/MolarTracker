@@ -7,7 +7,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
-#include "finance/account.hpp"
+#include "domain/account.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "repo/account_repo.hpp"
@@ -41,14 +41,20 @@ namespace
             return ProfileId(result.value());
         }
 
-        [[nodiscard]] static finance::Account makeAccount(
+        [[nodiscard]] static domain::Account makeAccount(
             const std::string& name,
             AccountKind        kind     = AccountKind::Cash,
             AccountStatus      status   = AccountStatus::Active,
             Currency           currency = Currency::EUR
         )
         {
-            return finance::Account{status, name, currency, kind};
+            return domain::Account{
+                AccountId::invalid(),
+                status,
+                name,
+                currency,
+                kind
+            };
         }
     };
 
@@ -172,7 +178,8 @@ TEST_F(AccountRepoTest, GetAllAccountsIsolatesAccountsByProfile)
 TEST_F(AccountRepoTest, GetAllAccountsReturnsCorrectAccountData)
 {
     const auto profileId = insertProfile("User");
-    const auto account   = finance::Account{
+    const auto account   = domain::Account{
+        AccountId::invalid(),
         AccountStatus::Active,
         "MyWallet",
         Currency::CHF,

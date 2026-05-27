@@ -12,14 +12,9 @@ class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 class QStackedWidget;   // Forward declaration
 
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-}   // namespace drafts
-
 namespace store
 {
-    class AccountStore;       // Forward declaration
+    class IAccountStore;      // Forward declaration
     class PositionStore;      // Forward declaration
     class StockStore;         // Forward declaration
     class TransactionStore;   // Forward declaration
@@ -62,12 +57,12 @@ namespace controller
 
        public:
         AccountController(
-            cmd::UndoStack&          undoStack,
-            store::AccountStore&     accountStore,
-            store::PositionStore&    positionStore,
-            store::StockStore&       stockStore,
-            store::TransactionStore& transactionStore,
-            QStackedWidget*          stackedWidget
+            cmd::UndoStack&                              undoStack,
+            const std::shared_ptr<store::IAccountStore>& accountStore,
+            store::PositionStore&                        positionStore,
+            store::StockStore&                           stockStore,
+            store::TransactionStore&                     transactionStore,
+            QStackedWidget*                              stackedWidget
         );
         ~AccountController() override;
 

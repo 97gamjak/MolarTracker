@@ -1,4 +1,6 @@
 add_library(molartracker_domain STATIC
+    src/domain/account.cpp
+
     src/domain/profile.cpp
     src/domain/profile_mapper.cpp
 )

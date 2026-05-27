@@ -16,6 +16,7 @@ All changes and updates, that are relevant for a user will be documented here
 ### Features
 
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
+- Add possibility to persist different log levels for different categories
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
