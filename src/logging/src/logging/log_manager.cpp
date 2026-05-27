@@ -31,13 +31,23 @@ namespace logging
         return instance;
     }
 
+    void LogManager::initialize(
+        std::string_view                 directory,
+        const settings::LoggingSettings& loggingSettings
+    )
+    {
+        _defaultLogLevel = loggingSettings.getDefaultLogLevelParam().get();
+        _initializeCategories(directory);
+        _initializeRingFileLogger(loggingSettings);
+    }
+
     /**
      * @brief Initialize the logging categories based on the registered
      * categories and the default log level
      *
      * @param directory The directory where log files will be stored
      */
-    void LogManager::initializeCategories(std::string_view directory)
+    void LogManager::_initializeCategories(std::string_view directory)
     {
         _logDirectory = directory;
 
@@ -57,7 +67,7 @@ namespace logging
      * @param settings Logging settings containing the configuration for the
      * ring file logger
      */
-    void LogManager::initializeRingFileLogger(
+    void LogManager::_initializeRingFileLogger(
         const settings::LoggingSettings& settings
     )
     {

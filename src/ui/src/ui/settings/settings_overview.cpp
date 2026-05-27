@@ -96,7 +96,7 @@ namespace ui
         constexpr size_t cardHeight = 64;
         card->setFixedHeight(cardHeight);
 
-        auto* cardLayout = utils::makeQChild<QHBoxLayout>(card);
+        auto* cardLayout = utils::makeQChild<QHBoxLayout>();
 
         constexpr std::array<int, 4> cardMargins = {16, 12, 16, 12};
         constexpr std::size_t        cardSpacing = 12;
@@ -108,7 +108,7 @@ namespace ui
         );
         cardLayout->setSpacing(cardSpacing);
 
-        auto* textLayout = utils::makeQChild<QVBoxLayout>(card);
+        auto* textLayout = utils::makeQChild<QVBoxLayout>();
 
         constexpr std::size_t textSpacing = 2;
         textLayout->setSpacing(textSpacing);

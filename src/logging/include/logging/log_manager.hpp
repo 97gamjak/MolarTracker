@@ -45,14 +45,14 @@ namespace logging
         std::string _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
-        LogLevel _defaultLogLevel = LogLevel::Trace;
+        LogLevel _defaultLogLevel = LogLevel::Info;
 
        public:
         static LogManager& getInstance();
 
-        void initializeCategories(std::string_view directory);
-        void initializeRingFileLogger(
-            const settings::LoggingSettings& settings
+        void initialize(
+            std::string_view                 directory,
+            const settings::LoggingSettings& loggingSettings
         );
 
         void changeLogLevel(
@@ -96,6 +96,11 @@ namespace logging
 
         [[nodiscard]]
         static std::string _logLevelToString(const LogLevel& level);
+
+        void _initializeCategories(std::string_view directory);
+        void _initializeRingFileLogger(
+            const settings::LoggingSettings& settings
+        );
     };
 
 }   // namespace logging
