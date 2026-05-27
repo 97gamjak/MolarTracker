@@ -26,7 +26,6 @@ namespace store
     class AccountStore;     // Forward declaration
     class AccountSession;   // Forward declaration
     class PositionStore;    // Forward declaration
-    class StockStore;       // Forward declaration
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define TRANSACTION_STORE_RESULT(X) \
@@ -60,13 +59,14 @@ namespace store
             const std::shared_ptr<service::ITransactionService>&
                                   transactionService,
             AccountStore&         accountStore,
-            StockStore&           stockStore,
             PositionStore&        positionStore,
             const AccountSession& accountSession
         );
         ~TransactionStore() override;
 
-        void commit();
+        void commit(
+            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
+        );
 
         [[nodiscard]]
         TransactionStoreResult addTransaction(finance::Transaction transaction);

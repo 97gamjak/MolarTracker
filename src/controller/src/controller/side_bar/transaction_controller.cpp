@@ -13,8 +13,8 @@
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "store/account/account_store.hpp"
+#include "store/i_stock_store.hpp"
 #include "store/position_store.hpp"
-#include "store/stock_store.hpp"
 #include "store/transaction_store.hpp"
 #include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
@@ -29,8 +29,8 @@ using drafts::TransactionMapper;
 using finance::Position;
 
 using store::AccountStore;
+using store::IStockStore;
 using store::PositionStore;
-using store::StockStore;
 using store::TransactionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
@@ -58,14 +58,14 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&              undoStack,
-        AccountStore&                accountStore,
-        TransactionStore&            transactionStore,
-        StockStore&                  stockStore,
-        PositionStore&               positionStore,
-        TransactionController&       transactionController,
-        SecuritiesSideBarController& stockController,
-        QMainWindow*                 mainWindow
+        cmd::UndoStack&                     undoStack,
+        AccountStore&                       accountStore,
+        TransactionStore&                   transactionStore,
+        const std::shared_ptr<IStockStore>& stockStore,
+        PositionStore&                      positionStore,
+        TransactionController&              transactionController,
+        SecuritiesSideBarController&        stockController,
+        QMainWindow*                        mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
@@ -95,7 +95,7 @@ namespace controller
         _createStockTransactionDlg = utils::makeQChild<StockWidget>(
             _accountStore.getAllAccounts(),
             _accountStore.getAllAccounts(),
-            _stockStore.getAllTickers(),
+            _stockStore->getAllTickers(),
             _mainWindow
         );
 
@@ -113,11 +113,11 @@ namespace controller
             &TransactionSideBarController::_onCreateStockTransactionRequested
         );
 
-        _connections.add(_stockStore.subscribeToStoreChange(
+        _connections.add(_stockStore->subscribeToStoreChange(
             [&]()
             {
                 _createStockTransactionDlg->updateTickers(
-                    _stockStore.getAllTickers()
+                    _stockStore->getAllTickers()
                 );
             },
             this
@@ -175,8 +175,9 @@ namespace controller
             _createStockTransactionDlg->updateReferenceAccounts(
                 _accountStore.getCashAccounts()
             );
-            _createStockTransactionDlg->updateTickers(_stockStore.getAllTickers(
-            ));
+            _createStockTransactionDlg->updateTickers(
+                _stockStore->getAllTickers()
+            );
             _createStockTransactionDlg->refresh();
 
             _createStockTransactionDlg->show();
@@ -317,7 +318,7 @@ namespace controller
                 _transactionStore.getInstrumentIdsByPositionId(position.getId()
                 );
 
-            const auto& stocks = _stockStore.getStocks(instrumentIds);
+            const auto& stocks = _stockStore->getStocks(instrumentIds);
 
             if (stocks.empty())
             {
