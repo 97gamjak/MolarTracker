@@ -7,12 +7,13 @@
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction/transaction_helpers.hpp"
 #include "controller/transaction_controller.hpp"
+#include "drafts/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
 #include "logging/log_macros.hpp"
-#include "store/account/account_store.hpp"
+#include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/position_store.hpp"
 #include "store/transaction_store.hpp"
@@ -28,7 +29,7 @@ REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 using drafts::TransactionMapper;
 using finance::Position;
 
-using store::AccountStore;
+using store::IAccountStore;
 using store::IStockStore;
 using store::PositionStore;
 using store::TransactionStore;
@@ -58,14 +59,14 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&                     undoStack,
-        AccountStore&                       accountStore,
-        TransactionStore&                   transactionStore,
-        const std::shared_ptr<IStockStore>& stockStore,
-        PositionStore&                      positionStore,
-        TransactionController&              transactionController,
-        SecuritiesSideBarController&        stockController,
-        QMainWindow*                        mainWindow
+        cmd::UndoStack&                       undoStack,
+        const std::shared_ptr<IAccountStore>& accountStore,
+        TransactionStore&                     transactionStore,
+        const std::shared_ptr<IStockStore>&   stockStore,
+        PositionStore&                        positionStore,
+        TransactionController&                transactionController,
+        SecuritiesSideBarController&          stockController,
+        QMainWindow*                          mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
@@ -79,9 +80,11 @@ namespace controller
           _stockController(stockController),
           _mainWindow(mainWindow)
     {
+        const auto cashAccounts =
+            drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts());
         _createCashTransactionDlg = utils::makeQChild<DepositWithdrawalWidget>(
             TransactionType::Deposit,   // dummy type
-            _accountStore.getCashAccounts(),
+            cashAccounts,
             _mainWindow
         );
 
@@ -92,9 +95,12 @@ namespace controller
             &TransactionSideBarController::_onCreateCashTransactionRequested
         );
 
+        const auto accounts =
+            drafts::AccountMapper::toDrafts(_accountStore->getAllAccounts());
+
         _createStockTransactionDlg = utils::makeQChild<StockWidget>(
-            _accountStore.getAllAccounts(),
-            _accountStore.getAllAccounts(),
+            accounts,
+            accounts,
             _stockStore->getAllTickers(),
             _mainWindow
         );
@@ -161,7 +167,8 @@ namespace controller
 
             _createCashTransactionDlg->setTransactionType(type);
             _createCashTransactionDlg->updateAccounts(
-                _accountStore.getCashAccounts()
+                drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _createCashTransactionDlg->refresh();
 
@@ -170,10 +177,13 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _createStockTransactionDlg->updateAccounts(
-                _accountStore.getSecurityAccounts()
+                drafts::AccountMapper::toDrafts(
+                    _accountStore->getSecurityAccounts()
+                )
             );
             _createStockTransactionDlg->updateReferenceAccounts(
-                _accountStore.getCashAccounts()
+                drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _createStockTransactionDlg->updateTickers(
                 _stockStore->getAllTickers()
@@ -206,8 +216,8 @@ namespace controller
          */
         [[nodiscard]]
         bool addExternalTransactionEntries(
-            drafts::CreateTransactionDraft* draft,
-            const AccountStore&             accountStore
+            drafts::CreateTransactionDraft*              draft,
+            const std::shared_ptr<store::IAccountStore>& accountStore
         )
         {
             std::vector<drafts::TransactionEntryDraft> additionalEntries;
@@ -219,7 +229,7 @@ namespace controller
                 {
                     const auto currency = entry.getCash().getCurrency();
                     const auto accountId =
-                        accountStore.getExternalAccount(currency);
+                        accountStore->getExternalAccount(currency);
 
                     if (!accountId.has_value())
                         return false;

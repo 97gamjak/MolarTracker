@@ -23,7 +23,6 @@ namespace service
 
 namespace store
 {
-    class AccountStore;     // Forward declaration
     class AccountSession;   // Forward declaration
     class PositionStore;    // Forward declaration
 
@@ -58,13 +57,13 @@ namespace store
         explicit TransactionStore(
             const std::shared_ptr<service::ITransactionService>&
                                   transactionService,
-            AccountStore&         accountStore,
             PositionStore&        positionStore,
             const AccountSession& accountSession
         );
         ~TransactionStore() override;
 
         void commit(
+            const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
             const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
         );
 

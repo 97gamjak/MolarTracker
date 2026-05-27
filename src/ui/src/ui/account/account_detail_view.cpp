@@ -73,11 +73,13 @@ namespace ui
 
         // Update the UI elements with the new account details
         _uiElements->nameLabel->setText(
-            "Name: " + QString::fromStdString(_account->name)
+            "Name: " + QString::fromStdString(_account->getName())
         );
         _uiElements->balanceLabel->setText(
             "Balance: " + QString::number(0) + " " +
-            QString::fromStdString(CurrencyMeta::toString(_account->currency))
+            QString::fromStdString(
+                CurrencyMeta::toString(_account->getCurrency())
+            )
         );
     }
 

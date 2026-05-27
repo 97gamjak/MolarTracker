@@ -10,21 +10,20 @@ namespace finance
     /**
      * @brief Construct a new Account:: Account object
      *
+     * @param id the unique identifier for the account
      * @param status the status of the account (e.g., Active, Closed)
      * @param name the current name of the account
      * @param currency the current currency of the account
      * @param kind the kind of the account (e.g., Cash, External, Security)
      */
     Account::Account(
+        AccountId     id,
         AccountStatus status,
         std::string   name,
         Currency      currency,
         AccountKind   kind
     )
-        : _id(AccountId::invalid()),
-          _status(status),
-          _name(std::move(name)),
-          _currency(currency)
+        : _id(id), _status(status), _name(std::move(name)), _currency(currency)
     {
         switch (kind)
         {

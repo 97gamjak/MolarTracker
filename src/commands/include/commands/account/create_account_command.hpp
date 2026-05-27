@@ -4,11 +4,11 @@
 #include <expected>
 
 #include "commands/command.hpp"
-#include "drafts/account_draft.hpp"
+#include "finance/account.hpp"
 
 namespace store
 {
-    class AccountStore;   // Forward declaration
+    class IAccountStore;   // Forward declaration
 }   // namespace store
 
 namespace cmd
@@ -21,14 +21,14 @@ namespace cmd
     {
        private:
         /// Reference to the account store
-        store::AccountStore& _accountStore;
-        /// The draft of the account to create
-        drafts::AccountDraft _accountDraft;
+        std::shared_ptr<store::IAccountStore> _accountStore;
+        /// The account to create
+        finance::Account _account;
 
        public:
         CreateAccountCommand(
-            store::AccountStore& accountStore,
-            drafts::AccountDraft accountDraft
+            const std::shared_ptr<store::IAccountStore>& accountStore,
+            finance::Account                             account
         );
 
         ~CreateAccountCommand() override                             = default;

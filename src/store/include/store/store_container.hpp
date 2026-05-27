@@ -18,7 +18,7 @@ namespace store
 {
 
     class IProfileStore;      // Forward declaration
-    class AccountStore;       // Forward declaration
+    class IAccountStore;      // Forward declaration
     class IStockStore;        // Forward declaration
     class PositionStore;      // Forward declaration
     class TransactionStore;   // Forward declaration
@@ -38,7 +38,7 @@ namespace store
         /// The Profile store
         std::shared_ptr<IProfileStore> _profileStore;
         /// The Account store
-        std::unique_ptr<AccountStore> _accountStore;
+        std::shared_ptr<IAccountStore> _accountStore;
         /// The stock store
         std::shared_ptr<IStockStore> _stockStore;
         /// The Position store
@@ -70,8 +70,9 @@ namespace store
         [[nodiscard]] const std::shared_ptr<IProfileStore>& getProfileStore(
         ) const;
 
-        [[nodiscard]] AccountStore&       getAccountStore();
-        [[nodiscard]] const AccountStore& getAccountStore() const;
+        [[nodiscard]] std::shared_ptr<IAccountStore>&       getAccountStore();
+        [[nodiscard]] const std::shared_ptr<IAccountStore>& getAccountStore(
+        ) const;
 
         [[nodiscard]] TransactionStore&       getTransactionStore();
         [[nodiscard]] const TransactionStore& getTransactionStore() const;

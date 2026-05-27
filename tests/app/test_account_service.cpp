@@ -54,6 +54,7 @@ namespace
         )
         {
             return finance::Account{
+                AccountId::invalid(),
                 AccountStatus::Active,
                 name,
                 currency,

@@ -11,7 +11,6 @@
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
 #include "store/account/account_session.hpp"
-#include "store/account/account_store.hpp"
 #include "store/position_store.hpp"
 
 REGISTER_LOG_CATEGORY("Store.TransactionStore");
@@ -53,25 +52,17 @@ namespace store
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
-     * @param accountStore
      * @param positionStore
      * @param accountSession
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<service::ITransactionService>& transactionService,
-        AccountStore&                                        accountStore,
         PositionStore&                                       positionStore,
         const AccountSession&                                accountSession
     )
         : _transactionService(transactionService),
           _session(std::make_unique<Session>(accountSession))
     {
-        _connections.add(accountStore.subscribeToIdRemap(
-            [this](const AccountStore::IdMap& remap)
-            { _onAccountIdRemap(remap); },
-            this
-        ));
-
         _connections.add(positionStore.subscribeToIdRemap(
             [this](const PositionStore::IdMap& remap)
             { _onPositionIdRemap(remap); },
@@ -84,6 +75,7 @@ namespace store
     /**
      * @brief Save all temporary changes to the database
      *
+     * @param accountIdRemap The account ID remapping to apply during the commit
      * @param instrumentIdRemap A mapping of old instrument IDs to new
      * instrument IDs, this is used to update any transactions in the store that
      * reference instrument IDs that have been remapped, ensuring that the
@@ -94,10 +86,13 @@ namespace store
      * instruments, even when instrument IDs are changed during a commit.
      */
     void TransactionStore::commit(
+        const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
         const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
     )
     {
         LOG_ENTRY;
+
+        _onAccountIdRemap(accountIdRemap);
 
         _onInstrumentIdRemap(instrumentIdRemap);
 

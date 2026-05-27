@@ -8,25 +8,62 @@ namespace drafts
     /**
      * @brief Construct a new Account Draft:: Account Draft object
      *
-     * @param _id
-     * @param _name
-     * @param _kind
-     * @param _currency
-     * @param _status
+     * @param id
+     * @param name
+     * @param kind
+     * @param currency
+     * @param status
      */
     AccountDraft::AccountDraft(
-        AccountId                    _id,
-        std::string                  _name,
-        AccountKind                  _kind,
-        Currency                     _currency,
-        std::optional<AccountStatus> _status
+        AccountId                    id,
+        std::optional<AccountStatus> status,
+        std::string                  name,
+        Currency                     currency,
+        AccountKind                  kind
     )
-        : id(_id),
-          name(std::move(_name)),
-          kind(_kind),
-          currency(_currency),
-          status(_status)
+        : _id(id),
+          _status(status),
+          _name(std::move(name)),
+          _currency(currency),
+          _kind(kind)
     {
     }
+
+    /**
+     * @brief get the ID of the account draft
+     * @return AccountId
+     */
+    AccountId AccountDraft::getId() const { return _id; }
+
+    /**
+     * @brief get the status of the account draft
+     *
+     * @return std::optional<AccountStatus>
+     */
+    std::optional<AccountStatus> AccountDraft::getStatus() const
+    {
+        return _status;
+    }
+
+    /**
+     * @brief get the name of the account draft
+     *
+     * @return const std::string&
+     */
+    const std::string& AccountDraft::getName() const { return _name; }
+
+    /**
+     * @brief get the kind of the account draft
+     *
+     * @return AccountKind
+     */
+    AccountKind AccountDraft::getKind() const { return _kind; }
+
+    /**
+     * @brief get the currency of the account draft
+     *
+     * @return Currency
+     */
+    Currency AccountDraft::getCurrency() const { return _currency; }
 
 }   // namespace drafts

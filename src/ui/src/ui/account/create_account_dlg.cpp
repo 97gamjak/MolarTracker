@@ -152,10 +152,10 @@ namespace ui
 
         return drafts::AccountDraft{
             AccountId::invalid(),
+            AccountStatus::Active,
             _nameLineEdit->text().toStdString(),
-            type,
             currency,
-            AccountStatus::Active
+            type
         };
     }
 

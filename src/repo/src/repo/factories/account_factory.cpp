@@ -18,15 +18,13 @@ namespace repo
         const AccountRow& accountRow
     )
     {
-        auto account = finance::Account{
+        return finance::Account{
+            accountRow.id.value(),
             accountRow.status.value(),
             accountRow.name.value(),
             accountRow.currency.value(),
             accountRow.kind.value()
         };
-
-        account.setId(accountRow.id.value());
-        return account;
     }
 
     /**
