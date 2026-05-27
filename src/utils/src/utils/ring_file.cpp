@@ -279,9 +279,15 @@ void RingFile::_openCurrent()
 
     // determine initial size before open if append
     if (_config.append && std::filesystem::exists(path))
-        _initialFileSize = std::filesystem::file_size(path);
+    {
+        std::error_code errorCode;
+        const auto      size = std::filesystem::file_size(path, errorCode);
+        _initialFileSize     = errorCode ? 0 : size;
+    }
     else
+    {
         _initialFileSize = 0;
+    }
 
     _bytesWritten = 0;
 

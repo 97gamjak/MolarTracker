@@ -17,11 +17,11 @@ namespace db::test
     {
         Prepared prep{db.native(), "SELECT 1;"};
 
-        db::Statement a = make_statement(db.native(), prep, "SELECT 1;");
-        db::Statement b{std::move(a)};
+        db::Statement stmtA = make_statement(db.native(), prep, "SELECT 1;");
+        db::Statement stmtB{std::move(stmtA)};
 
-        EXPECT_TRUE(b.isValid());
-        EXPECT_FALSE(a.isValid());
+        EXPECT_TRUE(stmtB.isValid());
+        EXPECT_FALSE(stmtA.isValid());
     }
 
     TEST_F(StatementFixture, MoveAssignmentTransfersOwnership)
@@ -29,13 +29,13 @@ namespace db::test
         Prepared prep1{db.native(), "SELECT 1;"};
         Prepared prep2{db.native(), "SELECT 2;"};
 
-        db::Statement a = make_statement(db.native(), prep1, "SELECT 1;");
-        db::Statement b = make_statement(db.native(), prep2, "SELECT 2;");
+        db::Statement stmtA = make_statement(db.native(), prep1, "SELECT 1;");
+        db::Statement stmtB = make_statement(db.native(), prep2, "SELECT 2;");
 
-        b = std::move(a);
+        stmtB = std::move(stmtA);
 
-        EXPECT_TRUE(b.isValid());
-        EXPECT_FALSE(a.isValid());
+        EXPECT_TRUE(stmtB.isValid());
+        EXPECT_FALSE(stmtA.isValid());
     }
 
     TEST_F(StatementFixture, StepReturnsRowAndDone)
@@ -80,8 +80,10 @@ namespace db::test
                 "INSERT INTO items(i,d,t) VALUES(?,?,?);"
             );
 
-            stmt.bindInt64(1, 42);
-            stmt.bindDouble(2, 3.5);
+            const auto intValue    = 42;
+            const auto doubleValue = 3.5;
+            stmt.bindInt64(1, intValue);
+            stmt.bindDouble(2, doubleValue);
             stmt.bindText(3, "hello");
 
             stmt.executeToCompletion();
@@ -138,7 +140,7 @@ namespace db::test
         }
     }
 
-    TEST_F(StatementFixture, ResetAllowsReexecutionAndClearsBindings)
+    TEST_F(StatementFixture, ResetAllowsReExecutionAndClearsBindings)
     {
         db.exec("CREATE TABLE t(x INTEGER);");
         db.exec("INSERT INTO t VALUES (1),(2),(3);");

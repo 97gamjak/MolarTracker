@@ -131,6 +131,7 @@
         "MOLTRACK",
         "MSTD",
         "NOMINMAX",
+        "noquote",
         "remappings",
         "TSLA",
         "txrepo",
