@@ -15,7 +15,7 @@ namespace ui
 
 namespace store
 {
-    class StockStore;   // Forward declaration
+    class IStockStore;   // Forward declaration
 }   // namespace store
 
 class QStackedWidget;   // Forward declaration
@@ -44,16 +44,16 @@ namespace controller
         std::optional<finance::Stock> _acceptedQuote = std::nullopt;
 
         /// Reference to the stock store
-        store::StockStore& _stockStore;
+        std::shared_ptr<store::IStockStore> _stockStore;
 
         /// Pointer to the stacked widget
         QStackedWidget* _stackedWidget;
 
        public:
         explicit SecuritiesSideBarController(
-            QMainWindow*       mainWindow,
-            store::StockStore& stockStore,
-            QStackedWidget*    stackedWidget
+            QMainWindow*                               mainWindow,
+            const std::shared_ptr<store::IStockStore>& stockStore,
+            QStackedWidget*                            stackedWidget
         );
 
         void refresh() override;

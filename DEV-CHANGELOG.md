@@ -101,7 +101,8 @@ All changes and updates, that are relevant for developers will be documented her
   molartracker_repo CMake target (in src/repo/) for better modularity
 - Move service implementations into separate molartracker_service CMake target (in src/service/)
 - remove app namespace and introduce store namespace
-- make account store and interface
+- make account store an interface
+- make stock store an interface
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

@@ -14,7 +14,7 @@ namespace store
 {
     class IAccountStore;      // Forward declaration
     class TransactionStore;   // Forward declaration
-    class StockStore;         // Forward declaration
+    class IStockStore;        // Forward declaration
     class PositionStore;      // Forward declaration
 }   // namespace store
 
@@ -66,7 +66,7 @@ namespace controller
         /// The position store for the application
         store::PositionStore& _positionStore;
         /// The stock store for the application
-        store::StockStore& _stockStore;
+        std::shared_ptr<store::IStockStore> _stockStore;
 
         /// Pointer to the create transaction dialog
         QPointer<ui::DepositWithdrawalWidget> _createCashTransactionDlg;
@@ -88,7 +88,7 @@ namespace controller
             cmd::UndoStack&                              undoStack,
             const std::shared_ptr<store::IAccountStore>& accountStore,
             store::TransactionStore&                     transactionStore,
-            store::StockStore&                           stockStore,
+            const std::shared_ptr<store::IStockStore>&   stockStore,
             store::PositionStore&                        positionStore,
             TransactionController&                       transactionController,
             SecuritiesSideBarController&                 stockController,

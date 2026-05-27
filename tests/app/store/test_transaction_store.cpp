@@ -15,7 +15,6 @@
 #include "store/account/account_session.hpp"
 #include "store/account/account_store.hpp"
 #include "store/position_store.hpp"
-#include "store/stock_store.hpp"
 #include "store/transaction_store.hpp"
 #include "utils/timestamp.hpp"
 
@@ -34,7 +33,6 @@ namespace
         std::shared_ptr<tests::MockTransactionService> _mockTransactionService;
         InstrumentIdSeq                                _idSeq;
         store::AccountStore                            _accountStore;
-        store::StockStore                              _stockStore;
         store::AccountSession                          _accountSession;
         store::PositionStore                           _positionStore;
         std::unique_ptr<store::TransactionStore>       _store;
@@ -52,11 +50,9 @@ namespace
                   std::make_shared<tests::MockTransactionService>()
               },
               _accountStore{_mockAccountService},
-              _stockStore{_mockInstrumentService, _idSeq},
               _positionStore{_mockPositionService, _accountSession},
               _store{std::make_unique<store::TransactionStore>(
                   _mockTransactionService,
-                  _stockStore,
                   _positionStore,
                   _accountSession
               )}
@@ -137,7 +133,7 @@ TEST_F(TransactionStoreTest, CommitNewTransactionCallsService)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    _store->commit({});
+    _store->commit({}, {});
 
     EXPECT_EQ(_mockTransactionService->addCallCount, 1);
 }
@@ -147,7 +143,7 @@ TEST_F(TransactionStoreTest, CommitMultipleTransactionsCallsServiceForEach)
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    _store->commit({});
+    _store->commit({}, {});
 
     EXPECT_EQ(_mockTransactionService->addCallCount, 2);
 }
