@@ -27,11 +27,11 @@ namespace drafts
         /// The name of the account (required)
         std::string _name;
 
-        /// The kind of the account (required)
-        AccountKind _kind;
-
         /// The currency of the account (required)
         Currency _currency;
+
+        /// The kind of the account (required)
+        AccountKind _kind;
 
        public:
         explicit AccountDraft(
