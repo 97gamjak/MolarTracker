@@ -5,6 +5,8 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
+#include "drafts/account_draft.hpp"
+#include "drafts/account_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
 #include "ui/account/create_account_dlg.hpp"
@@ -74,8 +76,8 @@ namespace controller
         for (const auto& account : accounts)
         {
             category->addAccount(
-                account.id,
-                QString::fromStdString(account.name)
+                account.getId(),
+                QString::fromStdString(account.getName())
             );
         }
     }
@@ -143,13 +145,13 @@ namespace controller
         const drafts::AccountDraft& account
     )
     {
-        LOG_INFO("Create Account requested with name: " + account.name);
+        LOG_INFO("Create Account requested with name: " + account.getName());
 
         cmd::Commands command("Create Account");
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
             _accountStore,
-            account
+            drafts::AccountMapper::toAccount(account)
         );
 
         if (!result)

@@ -1,6 +1,7 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
 
+#include <vector>
 namespace finance
 {
     class Account;   // Forward declaration
@@ -22,7 +23,15 @@ namespace drafts
     class AccountMapper
     {
        public:
-        static AccountDraft     toDraft(const finance::Account& account);
+        [[nodiscard]]
+        static AccountDraft toDraft(const finance::Account& account);
+
+        [[nodiscard]]
+        static std::vector<AccountDraft> toDrafts(
+            const std::vector<finance::Account>& accounts
+        );
+
+        [[nodiscard]]
         static finance::Account toAccount(const AccountDraft& draft);
     };
 

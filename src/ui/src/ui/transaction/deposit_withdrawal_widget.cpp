@@ -166,18 +166,17 @@ namespace ui
         if (!account.has_value())
             throw std::runtime_error("No account selected");
 
-        const auto currency   = account->currency;
+        const auto currency   = account->getCurrency();
         const auto microUnits = finance::getMicroUnit(currency);
         const auto cash_      = amountRow->getAmount(microUnits);
 
-        auto cash = finance::Cash(account->currency, cash_);
+        auto cash = finance::Cash(currency, cash_);
         cash      = type == TransactionType::Deposit ? cash : -cash;
 
-        auto fees =
-            finance::Cash(account->currency, feesRow->getAmount(microUnits));
+        auto fees = finance::Cash(currency, feesRow->getAmount(microUnits));
 
         auto entry = drafts::TransactionEntryDraft{
-            account->id,
+            account->getId(),
             cash,
             TransactionEntryType::General,
             false
@@ -185,7 +184,7 @@ namespace ui
         entry.setNeedsExternal(true);
 
         auto feesEntry = drafts::TransactionEntryDraft{
-            account->id,
+            account->getId(),
             fees,
             TransactionEntryType::Fees,
             false
@@ -338,7 +337,7 @@ namespace ui
         const drafts::AccountDraft& account
     )
     {
-        _fields->updateCurrency(account.currency);
+        _fields->updateCurrency(account.getCurrency());
         _updateAddButton();
     }
 

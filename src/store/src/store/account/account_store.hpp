@@ -11,12 +11,6 @@
 #include "store/base/base_store.hpp"
 #include "store/i_account_store.hpp"
 
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-
-}   // namespace drafts
-
 namespace service
 {
     class IAccountService;   // forward declaration
@@ -53,19 +47,17 @@ namespace store
 
         [[nodiscard]]
         AccountStoreResult createAccount(
-            const drafts::AccountDraft& account
+            const finance::Account& account
         ) override;
 
         [[nodiscard]]
-        std::optional<drafts::AccountDraft> getAccount(
-            AccountId id
-        ) const override;
+        std::optional<finance::Account> getAccount(AccountId id) const override;
         [[nodiscard]]
-        std::vector<drafts::AccountDraft> getAllAccounts() const override;
+        std::vector<finance::Account> getAllAccounts() const override;
         [[nodiscard]]
-        std::vector<drafts::AccountDraft> getCashAccounts() const override;
+        std::vector<finance::Account> getCashAccounts() const override;
         [[nodiscard]]
-        std::vector<drafts::AccountDraft> getSecurityAccounts() const override;
+        std::vector<finance::Account> getSecurityAccounts() const override;
         [[nodiscard]]
         unorderedIdMap<AccountId, std::string> getAccountIdToNameMap(
         ) const override;

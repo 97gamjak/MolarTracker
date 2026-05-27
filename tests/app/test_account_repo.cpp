@@ -48,7 +48,13 @@ namespace
             Currency           currency = Currency::EUR
         )
         {
-            return finance::Account{status, name, currency, kind};
+            return finance::Account{
+                AccountId::invalid(),
+                status,
+                name,
+                currency,
+                kind
+            };
         }
     };
 
@@ -173,6 +179,7 @@ TEST_F(AccountRepoTest, GetAllAccountsReturnsCorrectAccountData)
 {
     const auto profileId = insertProfile("User");
     const auto account   = finance::Account{
+        AccountId::invalid(),
         AccountStatus::Active,
         "MyWallet",
         Currency::CHF,

@@ -6,12 +6,6 @@
 #include "exceptions/base.hpp"
 #include "finance/account.hpp"
 
-namespace drafts
-{
-    struct AccountDraft;   // Forward declaration
-
-}   // namespace drafts
-
 namespace store
 {
     class AccountSession;   // Forward declaration
@@ -50,7 +44,7 @@ namespace store
          */
         [[nodiscard]]
         virtual AccountStoreResult createAccount(
-            const drafts::AccountDraft& account
+            const finance::Account& account
         ) = 0;
 
         /**
@@ -66,36 +60,35 @@ namespace store
          * @brief Get an account by its ID
          *
          * @param id
-         * @return std::optional<drafts::AccountDraft>
+         * @return std::optional<finance::Account>
          */
         [[nodiscard]]
-        virtual std::optional<drafts::AccountDraft> getAccount(
+        virtual std::optional<finance::Account> getAccount(
             AccountId id
         ) const = 0;
 
         /**
          * @brief Get all accounts
          *
-         * @return std::vector<drafts::AccountDraft>
+         * @return std::vector<finance::Account>
          */
-        [[nodiscard]]
-        virtual std::vector<drafts::AccountDraft> getAllAccounts() const = 0;
+        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
+        ) const = 0;
 
         /**
          * @brief Get all cash accounts
          *
-         * @return std::vector<drafts::AccountDraft>
+         * @return std::vector<finance::Account>
          */
-        [[nodiscard]]
-        virtual std::vector<drafts::AccountDraft> getCashAccounts() const = 0;
+        [[nodiscard]] virtual std::vector<finance::Account> getCashAccounts(
+        ) const = 0;
 
         /**
          * @brief Get all security accounts
          *
-         * @return std::vector<drafts::AccountDraft>
+         * @return std::vector<finance::Account>
          */
-        [[nodiscard]]
-        virtual std::vector<drafts::AccountDraft> getSecurityAccounts(
+        [[nodiscard]] virtual std::vector<finance::Account> getSecurityAccounts(
         ) const = 0;
 
         /**

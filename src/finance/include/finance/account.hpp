@@ -58,6 +58,7 @@ namespace finance
 
        public:
         Account(
+            AccountId     id,
             AccountStatus status,
             std::string   name,
             Currency      currency,
