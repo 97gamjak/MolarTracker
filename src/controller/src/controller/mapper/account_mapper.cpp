@@ -1,9 +1,9 @@
-#include "drafts/account_mapper.hpp"
+#include "account_mapper.hpp"
 
 #include "drafts/account_draft.hpp"
 #include "finance/account.hpp"
 
-namespace drafts
+namespace controller
 {
 
     /**
@@ -18,9 +18,9 @@ namespace drafts
      * as the finance::Account but may be structured differently to better suit
      * the needs of the UI.
      */
-    AccountDraft AccountMapper::toDraft(const finance::Account& account)
+    drafts::AccountDraft AccountMapper::toDraft(const finance::Account& account)
     {
-        return AccountDraft{
+        return drafts::AccountDraft{
             account.getId(),
             account.getStatus(),
             account.getName(),
@@ -41,11 +41,11 @@ namespace drafts
      * they contain the same information as the finance::Account but may be
      * structured differently to better suit the needs of the UI.
      */
-    std::vector<AccountDraft> AccountMapper::toDrafts(
+    std::vector<drafts::AccountDraft> AccountMapper::toDrafts(
         const std::vector<finance::Account>& accounts
     )
     {
-        std::vector<AccountDraft> drafts;
+        std::vector<drafts::AccountDraft> drafts;
         drafts.reserve(accounts.size());
         for (const auto& account : accounts)
             drafts.push_back(toDraft(account));
@@ -65,7 +65,7 @@ namespace drafts
      * domain model representation of an account, and contains all the details
      * of the account as it exists in the business logic layer.
      */
-    finance::Account AccountMapper::toAccount(const AccountDraft& draft)
+    finance::Account AccountMapper::toAccount(const drafts::AccountDraft& draft)
     {
         auto account = finance::Account{
             draft.getId(),
@@ -77,4 +77,4 @@ namespace drafts
         return account;
     }
 
-}   // namespace drafts
+}   // namespace controller

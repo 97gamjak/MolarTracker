@@ -1,7 +1,8 @@
-#ifndef __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
-#define __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__ACCOUNT_MAPPER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__MAPPER__ACCOUNT_MAPPER_HPP__
 
 #include <vector>
+
 namespace finance
 {
     class Account;   // Forward declaration
@@ -10,7 +11,10 @@ namespace finance
 namespace drafts
 {
     class AccountDraft;   // Forward declaration
+}   // namespace drafts
 
+namespace controller
+{
     /**
      * @brief Mapper class for converting between Account and AccountDraft
      *
@@ -24,17 +28,17 @@ namespace drafts
     {
        public:
         [[nodiscard]]
-        static AccountDraft toDraft(const finance::Account& account);
+        static drafts::AccountDraft toDraft(const finance::Account& account);
 
         [[nodiscard]]
-        static std::vector<AccountDraft> toDrafts(
+        static std::vector<drafts::AccountDraft> toDrafts(
             const std::vector<finance::Account>& accounts
         );
 
         [[nodiscard]]
-        static finance::Account toAccount(const AccountDraft& draft);
+        static finance::Account toAccount(const drafts::AccountDraft& draft);
     };
 
-}   // namespace drafts
+}   // namespace controller
 
-#endif   // __DRAFTS__INCLUDE__DRAFTS__ACCOUNT_MAPPER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__ACCOUNT_MAPPER_HPP__

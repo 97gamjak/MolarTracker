@@ -3,7 +3,7 @@
 #include <qstackedwidget.h>
 
 #include "drafts/transaction_draft.hpp"
-#include "drafts/transaction_mapper.hpp"
+#include "mapper/transaction_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
@@ -78,7 +78,7 @@ namespace controller
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
         const auto transactions = _transactionStore->getTransactions();
-        const auto drafts       = drafts::TransactionMapper::toOverviewDrafts(
+        const auto drafts       = TransactionMapper::toOverviewDrafts(
             transactions,
             _stockStore->getInstrumentIdToNameMap(),
             _accountStore->getExternalAccountIds()

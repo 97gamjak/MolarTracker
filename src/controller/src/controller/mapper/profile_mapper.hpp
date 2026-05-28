@@ -1,10 +1,10 @@
-#ifndef __DRAFTS__INCLUDE__DRAFTS__PROFILE_MAPPER_HPP__
-#define __DRAFTS__INCLUDE__DRAFTS__PROFILE_MAPPER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__PROFILE_MAPPER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__MAPPER__PROFILE_MAPPER_HPP__
 
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
 
-namespace drafts
+namespace controller
 {
     /**
      * @brief Mapper class for converting between Profile and ProfileDraft
@@ -19,6 +19,6 @@ namespace drafts
         [[nodiscard]]
         static domain::Profile toProfile(const drafts::ProfileDraft& draft);
     };
-}   // namespace drafts
+}   // namespace controller
 
-#endif   // __DRAFTS__INCLUDE__DRAFTS__PROFILE_MAPPER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__PROFILE_MAPPER_HPP__
