@@ -108,7 +108,7 @@ namespace ui
         );
         cardLayout->setSpacing(cardSpacing);
 
-        auto* textLayout = utils::makeQChild<QVBoxLayout>(card);
+        auto* textLayout = utils::makeQChild<QVBoxLayout>();
 
         constexpr std::size_t textSpacing = 2;
         textLayout->setSpacing(textSpacing);
