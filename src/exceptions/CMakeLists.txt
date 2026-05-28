@@ -11,6 +11,6 @@ target_include_directories(molartracker_exceptions
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(molartracker_exceptions PUBLIC stdc++exp)
 endif()
