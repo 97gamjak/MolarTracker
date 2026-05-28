@@ -2,8 +2,8 @@
 
 #include <qstackedwidget.h>
 
+#include "controller/mapper/transaction_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "mapper/transaction_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"

@@ -9,8 +9,8 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
+#include "controller/mapper/account_mapper.hpp"
 #include "logging/log_macros.hpp"
-#include "mapper/account_mapper.hpp"
 #include "side_bar/account_controller.hpp"
 #include "store/i_account_store.hpp"
 #include "ui/account/account_detail_view.hpp"
