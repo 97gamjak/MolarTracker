@@ -5,7 +5,6 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
-#include "drafts/transaction_mapper.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
@@ -52,22 +51,15 @@ namespace store
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
-     * @param positionStore
      * @param accountSession
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<service::ITransactionService>& transactionService,
-        PositionStore&                                       positionStore,
         const AccountSession&                                accountSession
     )
         : _transactionService(transactionService),
           _session(std::make_unique<Session>(accountSession))
     {
-        _connections.add(positionStore.subscribeToIdRemap(
-            [this](const PositionStore::IdMap& remap)
-            { _onPositionIdRemap(remap); },
-            this
-        ));
     }
 
     TransactionStore::~TransactionStore() = default;
@@ -84,17 +76,19 @@ namespace store
      * resulted in changes to instrument IDs. This allows the TransactionStore
      * to maintain the integrity of its transactions and their references to
      * instruments, even when instrument IDs are changed during a commit.
+     * @param positionIdRemap Mapping of position IDs
      */
     void TransactionStore::commit(
         const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-        const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
+        const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
+        const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
     )
     {
         LOG_ENTRY;
 
         _onAccountIdRemap(accountIdRemap);
-
         _onInstrumentIdRemap(instrumentIdRemap);
+        _onPositionIdRemap(positionIdRemap);
 
         for (const auto& entry : _getEntries())
         {

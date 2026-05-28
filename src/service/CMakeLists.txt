@@ -16,8 +16,6 @@ target_include_directories(molartracker_service
 )
 
 target_link_libraries(molartracker_service
-    PUBLIC
-    molartracker_finance # TODO: remove this form here
     PRIVATE
     molartracker_logging
     molartracker_repo

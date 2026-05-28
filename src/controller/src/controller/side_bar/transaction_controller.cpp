@@ -12,11 +12,12 @@
 #include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "drafts/transaction_mapper.hpp"
+#include "finance/position.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
+#include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
-#include "store/position_store.hpp"
 #include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
@@ -30,9 +31,9 @@ using drafts::TransactionMapper;
 using finance::Position;
 
 using store::IAccountStore;
+using store::IPositionStore;
 using store::IStockStore;
 using store::ITransactionStore;
-using store::PositionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
 
@@ -63,7 +64,7 @@ namespace controller
         const std::shared_ptr<IAccountStore>&     accountStore,
         const std::shared_ptr<ITransactionStore>& transactionStore,
         const std::shared_ptr<IStockStore>&       stockStore,
-        PositionStore&                            positionStore,
+        const std::shared_ptr<IPositionStore>&    positionStore,
         TransactionController&                    transactionController,
         SecuritiesSideBarController&              stockController,
         QMainWindow*                              mainWindow
@@ -316,8 +317,10 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        const auto openPositions = _positionStore.getOpenPositions();
+        const auto openPositions = _positionStore->getOpenPositions();
+
         std::vector<PositionId> positionIds;
+        positionIds.reserve(openPositions.size());
         for (const auto& position : openPositions)
             positionIds.push_back(position.getId());
 
@@ -365,7 +368,7 @@ namespace controller
         if (!positionId.isValid())
         {
             auto position = Position(draft.getTimestamp());
-            positionId    = _positionStore.createPosition(position);
+            positionId    = _positionStore->createPosition(position);
         }
 
         for (auto& leg : draft.getLegs())

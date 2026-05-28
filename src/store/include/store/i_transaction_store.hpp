@@ -38,10 +38,12 @@ namespace store
          *
          * @param accountIdRemap Mapping of account IDs
          * @param instrumentIdRemap Mapping of instrument IDs
+         * @param positionIdRemap Mapping of position IDs
          */
         virtual void commit(
             const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
+            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
+            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
         ) = 0;
 
         /**

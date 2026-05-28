@@ -15,11 +15,6 @@
 #include "store/base/base_store.hpp"
 #include "store/i_profile_store.hpp"
 
-namespace drafts
-{
-    class ProfileDraft;   // forward declaration
-}   // namespace drafts
-
 namespace service
 {
     class IProfileService;   // forward declaration
@@ -60,19 +55,15 @@ namespace store
         ProfileStoreResult setActiveProfile(std::string_view name) override;
 
         [[nodiscard]]
-        std::optional<drafts::ProfileDraft> getActiveProfile() const override;
+        std::optional<domain::Profile> getActiveProfile() const override;
 
         [[nodiscard]] bool profileExists(std::string_view name) const override;
 
         [[nodiscard]]
-        ProfileStoreResult addProfile(
-            const drafts::ProfileDraft& draft
-        ) override;
+        ProfileStoreResult addProfile(const domain::Profile& draft) override;
 
         [[nodiscard]]
-        ProfileStoreResult removeProfile(
-            const drafts::ProfileDraft& draft
-        ) override;
+        ProfileStoreResult removeProfile(const domain::Profile& draft) override;
 
         void commit() override;
 
@@ -88,9 +79,9 @@ namespace store
         void _commitDeletedProfile(const Entry& entry);
 
         [[nodiscard]]
-        std::optional<drafts::ProfileDraft> _getProfile(ProfileId id) const;
+        std::optional<domain::Profile> _getProfile(ProfileId id) const;
         [[nodiscard]]
-        std::optional<drafts::ProfileDraft> _getProfile(std::string_view) const;
+        std::optional<domain::Profile> _getProfile(std::string_view) const;
     };
 
 }   // namespace store

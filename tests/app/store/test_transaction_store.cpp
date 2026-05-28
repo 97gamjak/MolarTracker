@@ -53,7 +53,6 @@ namespace
               _positionStore{_mockPositionService, _accountSession},
               _store{std::make_unique<store::TransactionStore>(
                   _mockTransactionService,
-                  _positionStore,
                   _accountSession
               )}
         {
@@ -133,7 +132,7 @@ TEST_F(TransactionStoreTest, CommitNewTransactionCallsService)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    _store->commit({}, {});
+    _store->commit({}, {}, {});
 
     EXPECT_EQ(_mockTransactionService->addCallCount, 1);
 }
@@ -143,7 +142,7 @@ TEST_F(TransactionStoreTest, CommitMultipleTransactionsCallsServiceForEach)
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    _store->commit({}, {});
+    _store->commit({}, {}, {});
 
     EXPECT_EQ(_mockTransactionService->addCallCount, 2);
 }

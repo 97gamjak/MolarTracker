@@ -6,7 +6,7 @@
 
 #include "commands/command.hpp"
 #include "commands/command_error.hpp"
-#include "drafts/profile_draft.hpp"
+#include "domain/profile.hpp"
 
 namespace store
 {
@@ -24,13 +24,13 @@ namespace cmd
        private:
         /// Reference to the profile store
         std::shared_ptr<store::IProfileStore> _profileStore;
-        /// The profile draft
-        drafts::ProfileDraft _profile;
+        /// The profile
+        domain::Profile _profile;
 
        public:
         explicit AddProfileCommand(
             const std::shared_ptr<store::IProfileStore>& profileStore,
-            drafts::ProfileDraft                         profile
+            domain::Profile                              profile
         );
         ~AddProfileCommand() override                          = default;
         AddProfileCommand(const AddProfileCommand&)            = delete;

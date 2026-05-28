@@ -6,7 +6,7 @@
 
 #include "commands/command.hpp"
 #include "commands/command_error.hpp"
-#include "drafts/profile_draft.hpp"
+#include "domain/profile.hpp"
 
 namespace store
 {
@@ -26,7 +26,7 @@ namespace cmd
         std::string _profileName;
 
         /// The previous active profile, used for undoing the command
-        std::optional<drafts::ProfileDraft> _previousProfile = std::nullopt;
+        std::optional<domain::Profile> _previousProfile = std::nullopt;
 
         /// Reference to the profile store
         std::shared_ptr<store::IProfileStore> _profileStore;
