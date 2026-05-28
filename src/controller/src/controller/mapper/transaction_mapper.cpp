@@ -134,11 +134,24 @@ namespace controller
         const instrumentMap<std::string>& instrumentNames
     )
     {
+        std::string instrumentName = "UNKNOWN";
+
+        if (instrumentNames.contains(leg.getInstrumentId()))
+        {
+            instrumentName = instrumentNames.at(leg.getInstrumentId());
+        }
+        else
+        {
+            LOG_WARNING(
+                "Unknown instrument ID: " + leg.getInstrumentId().toString()
+            );
+        }
+
         return drafts::TradeLegDraft{
             leg.getAccountId(),
             leg.getUnitPrice(),
             leg.getQuantity(),
-            instrumentNames.at(leg.getInstrumentId())
+            instrumentName
         };
     }
 
