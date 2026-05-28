@@ -31,6 +31,12 @@ namespace logging
         return instance;
     }
 
+    /**
+     * @brief Initialize the logging system
+     *
+     * @param directory The directory where log files will be stored
+     * @param loggingSettings The logging settings to apply
+     */
     void LogManager::initialize(
         std::string_view                 directory,
         const settings::LoggingSettings& loggingSettings
