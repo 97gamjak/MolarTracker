@@ -9,7 +9,7 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "drafts/account_mapper.hpp"
+#include "controller/mapper/account_mapper.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
 #include "store/i_account_store.hpp"
@@ -59,7 +59,7 @@ namespace controller
         }
 
         _accountDetailView->updateAccount(
-            drafts::AccountMapper::toDraft(account.value())
+            AccountMapper::toDraft(account.value())
         );
         _stackedWidget->setCurrentWidget(_accountDetailView);
     }

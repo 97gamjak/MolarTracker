@@ -1,9 +1,9 @@
-#include "drafts/profile_mapper.hpp"
+#include "profile_mapper.hpp"
 
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
 
-namespace drafts
+namespace controller
 {
     /**
      * @brief Convert a Profile to a ProfileDraft
@@ -35,4 +35,4 @@ namespace drafts
         };
     }
 
-}   // namespace drafts
+}   // namespace controller

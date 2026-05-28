@@ -4,14 +4,14 @@
 
 #include "config/constants.hpp"
 #include "config/finance.hpp"
+#include "controller/mapper/account_mapper.hpp"
+#include "controller/mapper/stock_mapper.hpp"
+#include "controller/mapper/transaction_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction/transaction_helpers.hpp"
 #include "controller/transaction_controller.hpp"
-#include "drafts/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
-#include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "drafts/transaction_mapper.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
@@ -27,7 +27,6 @@
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
-using drafts::TransactionMapper;
 using finance::Position;
 
 using store::IAccountStore;
@@ -82,7 +81,7 @@ namespace controller
           _mainWindow(mainWindow)
     {
         const auto cashAccounts =
-            drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts());
+            AccountMapper::toDrafts(_accountStore->getCashAccounts());
         _createCashTransactionDlg = utils::makeQChild<DepositWithdrawalWidget>(
             TransactionType::Deposit,   // dummy type
             cashAccounts,
@@ -97,7 +96,7 @@ namespace controller
         );
 
         const auto accounts =
-            drafts::AccountMapper::toDrafts(_accountStore->getAllAccounts());
+            AccountMapper::toDrafts(_accountStore->getAllAccounts());
 
         _createStockTransactionDlg = utils::makeQChild<StockWidget>(
             accounts,
@@ -168,8 +167,7 @@ namespace controller
 
             _createCashTransactionDlg->setTransactionType(type);
             _createCashTransactionDlg->updateAccounts(
-                drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
-                )
+                AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
             _createCashTransactionDlg->refresh();
 
@@ -178,13 +176,10 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _createStockTransactionDlg->updateAccounts(
-                drafts::AccountMapper::toDrafts(
-                    _accountStore->getSecurityAccounts()
-                )
+                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
             );
             _createStockTransactionDlg->updateReferenceAccounts(
-                drafts::AccountMapper::toDrafts(_accountStore->getCashAccounts()
-                )
+                AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
             _createStockTransactionDlg->updateTickers(
                 _stockStore->getAllTickers()
@@ -344,7 +339,7 @@ namespace controller
 
             drafts.emplace_back(
                 position.getId(),
-                drafts::StockMapper::toStockInfoDraft(stocks.front()),
+                StockMapper::toStockInfoDraft(stocks.front()),
                 position.getCreatedAt()
             );
         }
