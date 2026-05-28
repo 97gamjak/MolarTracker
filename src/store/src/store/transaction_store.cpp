@@ -10,7 +10,6 @@
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
 #include "store/account/account_session.hpp"
-#include "store/position_store.hpp"
 
 REGISTER_LOG_CATEGORY("Store.TransactionStore");
 
