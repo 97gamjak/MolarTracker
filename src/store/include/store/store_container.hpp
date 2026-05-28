@@ -17,12 +17,12 @@ namespace service
 namespace store
 {
 
-    class IProfileStore;      // Forward declaration
-    class IAccountStore;      // Forward declaration
-    class IStockStore;        // Forward declaration
-    class PositionStore;      // Forward declaration
-    class TransactionStore;   // Forward declaration
-    class IStore;             // Forward declaration
+    class IProfileStore;       // Forward declaration
+    class IAccountStore;       // Forward declaration
+    class IStockStore;         // Forward declaration
+    class PositionStore;       // Forward declaration
+    class ITransactionStore;   // Forward declaration
+    class IStore;              // Forward declaration
 
     /**
      * @brief Container for all stores
@@ -44,7 +44,7 @@ namespace store
         /// The Position store
         std::unique_ptr<PositionStore> _positionStore;
         /// The Transaction store
-        std::unique_ptr<TransactionStore> _transactionStore;
+        std::shared_ptr<ITransactionStore> _transactionStore;
 
         /// list of all stores
         std::vector<IStore*> _allStores;
@@ -74,8 +74,9 @@ namespace store
         [[nodiscard]] const std::shared_ptr<IAccountStore>& getAccountStore(
         ) const;
 
-        [[nodiscard]] TransactionStore&       getTransactionStore();
-        [[nodiscard]] const TransactionStore& getTransactionStore() const;
+        [[nodiscard]] std::shared_ptr<ITransactionStore>& getTransactionStore();
+        [[nodiscard]] const std::shared_ptr<ITransactionStore>& getTransactionStore(
+        ) const;
 
         [[nodiscard]] std::shared_ptr<IStockStore>&       getStockStore();
         [[nodiscard]] const std::shared_ptr<IStockStore>& getStockStore() const;

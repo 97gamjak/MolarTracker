@@ -15,8 +15,8 @@
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
+#include "store/i_transaction_store.hpp"
 #include "store/position_store.hpp"
-#include "store/transaction_store.hpp"
 #include "ui/position/position_selection_dialog.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/transaction/deposit_withdrawal_widget.hpp"
@@ -31,8 +31,8 @@ using finance::Position;
 
 using store::IAccountStore;
 using store::IStockStore;
+using store::ITransactionStore;
 using store::PositionStore;
-using store::TransactionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
 
@@ -59,14 +59,14 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&                       undoStack,
-        const std::shared_ptr<IAccountStore>& accountStore,
-        TransactionStore&                     transactionStore,
-        const std::shared_ptr<IStockStore>&   stockStore,
-        PositionStore&                        positionStore,
-        TransactionController&                transactionController,
-        SecuritiesSideBarController&          stockController,
-        QMainWindow*                          mainWindow
+        cmd::UndoStack&                           undoStack,
+        const std::shared_ptr<IAccountStore>&     accountStore,
+        const std::shared_ptr<ITransactionStore>& transactionStore,
+        const std::shared_ptr<IStockStore>&       stockStore,
+        PositionStore&                            positionStore,
+        TransactionController&                    transactionController,
+        SecuritiesSideBarController&              stockController,
+        QMainWindow*                              mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
@@ -325,7 +325,7 @@ namespace controller
         for (const auto& position : openPositions)
         {
             const auto instrumentIds =
-                _transactionStore.getInstrumentIdsByPositionId(position.getId()
+                _transactionStore->getInstrumentIdsByPositionId(position.getId()
                 );
 
             const auto& stocks = _stockStore->getStocks(instrumentIds);
@@ -426,7 +426,7 @@ namespace controller
     )
     {
         // Check if the transaction can be added
-        const auto result = _transactionStore.addTransaction(transaction);
+        const auto result = _transactionStore->addTransaction(transaction);
 
         switch (result)
         {

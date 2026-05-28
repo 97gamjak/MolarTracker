@@ -12,10 +12,10 @@
 
 namespace store
 {
-    class IAccountStore;      // Forward declaration
-    class TransactionStore;   // Forward declaration
-    class IStockStore;        // Forward declaration
-    class PositionStore;      // Forward declaration
+    class IAccountStore;       // Forward declaration
+    class ITransactionStore;   // Forward declaration
+    class IStockStore;         // Forward declaration
+    class PositionStore;       // Forward declaration
 }   // namespace store
 
 namespace cmd
@@ -62,7 +62,7 @@ namespace controller
         /// The account store for the application
         std::shared_ptr<store::IAccountStore> _accountStore;
         /// The transaction store for the application
-        store::TransactionStore& _transactionStore;
+        std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// The position store for the application
         store::PositionStore& _positionStore;
         /// The stock store for the application
@@ -85,14 +85,14 @@ namespace controller
 
        public:
         TransactionSideBarController(
-            cmd::UndoStack&                              undoStack,
-            const std::shared_ptr<store::IAccountStore>& accountStore,
-            store::TransactionStore&                     transactionStore,
-            const std::shared_ptr<store::IStockStore>&   stockStore,
-            store::PositionStore&                        positionStore,
-            TransactionController&                       transactionController,
-            SecuritiesSideBarController&                 stockController,
-            QMainWindow*                                 mainWindow
+            cmd::UndoStack&                                  undoStack,
+            const std::shared_ptr<store::IAccountStore>&     accountStore,
+            const std::shared_ptr<store::ITransactionStore>& transactionStore,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
+            store::PositionStore&                            positionStore,
+            TransactionController&       transactionController,
+            SecuritiesSideBarController& stockController,
+            QMainWindow*                 mainWindow
         );
 
         void refresh() override;
