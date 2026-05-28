@@ -50,14 +50,14 @@ namespace store
         explicit TransactionStore(
             const std::shared_ptr<service::ITransactionService>&
                                   transactionService,
-            PositionStore&        positionStore,
             const AccountSession& accountSession
         );
         ~TransactionStore() override;
 
         void commit(
             const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
+            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
+            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
         ) override;
 
         [[nodiscard]]

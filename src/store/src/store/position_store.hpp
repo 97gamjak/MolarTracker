@@ -1,11 +1,14 @@
-#ifndef __STORE__INCLUDE__STORE__POSITION_STORE_HPP__
-#define __STORE__INCLUDE__STORE__POSITION_STORE_HPP__
+#ifndef __STORE__SRC__STORE__POSITION_STORE_HPP__
+#define __STORE__SRC__STORE__POSITION_STORE_HPP__
 
 #include <vector>
 
 #include "base/base_store.hpp"
+#include "config/id_types.hpp"
+#include "config/strong_id.hpp"
 #include "finance/position.hpp"
 #include "service/i_position_service.hpp"
+#include "store/i_position_store.hpp"
 
 namespace store
 {
@@ -16,7 +19,8 @@ namespace store
      * @brief Store for managing Positions
      *
      */
-    class PositionStore : public BaseStore<finance::Position, PositionId>
+    class PositionStore : public BaseStore<finance::Position, PositionId>,
+                          public IPositionStore
     {
        private:
         /// The Position service
@@ -35,14 +39,21 @@ namespace store
         ~PositionStore() override;
 
         [[nodiscard]]
-        PositionId createPosition(const finance::Position& position);
+        PositionId createPosition(const finance::Position& position) override;
 
-        [[nodiscard]] std::vector<finance::Position> getAllPositions() const;
-        [[nodiscard]] std::vector<finance::Position> getOpenPositions() const;
+        [[nodiscard]]
+        std::vector<finance::Position> getAllPositions() const override;
 
-        void commit();
+        [[nodiscard]]
+        std::vector<finance::Position> getOpenPositions() const override;
+
+        void commit() override;
+
+        [[nodiscard]]
+        const unorderedIdMap<PositionId, PositionId>& getIdRemap(
+        ) const override;
     };
 
 }   // namespace store
 
-#endif   // __STORE__INCLUDE__STORE__POSITION_STORE_HPP__
+#endif   // __STORE__SRC__STORE__POSITION_STORE_HPP__

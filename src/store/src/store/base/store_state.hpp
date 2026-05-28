@@ -1,5 +1,5 @@
-#ifndef __STORE__INCLUDE__STORE__BASE__STORE_STATE_HPP__
-#define __STORE__INCLUDE__STORE__BASE__STORE_STATE_HPP__
+#ifndef __STORE__SRC__STORE__BASE__STORE_STATE_HPP__
+#define __STORE__SRC__STORE__BASE__STORE_STATE_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -22,4 +22,4 @@ namespace store
 
 }   // namespace store
 
-#endif   // __STORE__INCLUDE__STORE__BASE__STORE_STATE_HPP__
+#endif   // __STORE__SRC__STORE__BASE__STORE_STATE_HPP__

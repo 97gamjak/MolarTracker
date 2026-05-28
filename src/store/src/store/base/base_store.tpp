@@ -1,5 +1,5 @@
-#ifndef __STORE__INCLUDE__STORE__BASE__BASE_STORE_TPP__
-#define __STORE__INCLUDE__STORE__BASE__BASE_STORE_TPP__
+#ifndef __STORE__SRC__STORE__BASE__BASE_STORE_TPP__
+#define __STORE__SRC__STORE__BASE__BASE_STORE_TPP__
 
 #include <algorithm>
 #include <ranges>
@@ -507,4 +507,4 @@ namespace store
 
 }   // namespace store
 
-#endif   // __STORE__INCLUDE__STORE__BASE__BASE_STORE_TPP__
+#endif   // __STORE__SRC__STORE__BASE__BASE_STORE_TPP__

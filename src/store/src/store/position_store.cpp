@@ -177,4 +177,15 @@ namespace store
         _notifyOnCommit();
     }
 
+    /**
+     * @brief Get the ID remapping for positions
+     *
+     * @return const unorderedIdMap<PositionId, PositionId>&
+     */
+    const unorderedIdMap<PositionId, PositionId>& PositionStore::getIdRemap(
+    ) const
+    {
+        return _getIdRemap();
+    }
+
 }   // namespace store

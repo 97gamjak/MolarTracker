@@ -22,10 +22,9 @@ target_link_libraries(molartracker_store
     PUBLIC
     molartracker_finance
     molartracker_connections
-    molartracker_service # TODO: make this private as soon as store are interfaced
+    molartracker_domain
     PRIVATE
+    molartracker_service
     molartracker_logging
     molartracker_config
-    molartracker_drafts
-    molartracker_domain
 )

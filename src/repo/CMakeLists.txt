@@ -32,7 +32,7 @@ target_include_directories(molartracker_repo
 
 target_link_libraries(molartracker_repo
     PUBLIC
-    molartracker_finance # TODO: remove this form here
+    molartracker_finance # needed for service bounded forwarding
     molartracker_exceptions # needed because exception is provided in public interface
     molartracker_domain # needed for service bounded forwarding
     PRIVATE
@@ -42,5 +42,4 @@ target_link_libraries(molartracker_repo
     molartracker_settings
     molartracker_config
     molartracker_sql_models
-    molartracker_drafts
 )

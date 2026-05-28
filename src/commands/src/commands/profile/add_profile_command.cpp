@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "commands/profile/add_profile_command_error.hpp"
-#include "drafts/profile_draft.hpp"
+#include "domain/profile.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_profile_store.hpp"
 
@@ -22,7 +22,7 @@ namespace cmd
      */
     AddProfileCommand::AddProfileCommand(
         const std::shared_ptr<store::IProfileStore>& profileStore,
-        drafts::ProfileDraft                         profile
+        domain::Profile                              profile
     )
         : _profileStore{profileStore}, _profile{std::move(profile)}
     {

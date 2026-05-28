@@ -11,6 +11,7 @@ add_library(molartracker_drafts STATIC
     src/drafts/position_draft.cpp
 
     src/drafts/profile_draft.cpp
+    src/drafts/profile_mapper.cpp
 )
 
 target_include_directories(molartracker_drafts
@@ -25,6 +26,7 @@ target_link_libraries(molartracker_drafts
     molartracker_config
     molartracker_utils
     PRIVATE
+    molartracker_domain
     molartracker_finance
     molartracker_logging
     molartracker_exceptions
