@@ -186,6 +186,22 @@ namespace store
      * but they will not be saved to the database until the commit method is
      * called.
      *
+     * @return std::vector<finance::Transaction>
+     */
+    std::vector<finance::Transaction> TransactionStore::getTransactions() const
+    {
+        return getTransactions(finance::TransactionFilter());
+    }
+
+    /**
+     * @brief Get all transactions from the store, this retrieves all
+     * transactions that are currently in the store, including both new
+     * transactions that have not yet been committed to the database and
+     * existing transactions that have been loaded from the database. The
+     * returned transactions will reflect any changes made to them in the store,
+     * but they will not be saved to the database until the commit method is
+     * called.
+     *
      * @param filter An optional filter to apply when retrieving transactions,
      * this allows the caller to specify criteria for which transactions to
      * include in the results, such as filtering by date range, transaction
@@ -196,7 +212,7 @@ namespace store
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::Transaction> TransactionStore::get(
+    std::vector<finance::Transaction> TransactionStore::getTransactions(
         const finance::TransactionFilter& filter
     ) const
     {
@@ -257,7 +273,7 @@ namespace store
     {
         auto filter = finance::TransactionFilter();
         filter.setPositionId(positionId);
-        const auto transactions = get(filter);
+        const auto transactions = getTransactions(filter);
 
         return transactions;
     }

@@ -6,8 +6,8 @@
 #include "drafts/transaction_draft.hpp"
 #include "finance/position.hpp"
 #include "store/i_stock_store.hpp"
+#include "store/i_transaction_store.hpp"
 #include "store/position_store.hpp"
-#include "store/transaction_store.hpp"
 
 namespace controller
 {
@@ -48,13 +48,14 @@ namespace controller
          * @return std::optional<drafts::StockInfoDraft>
          */
         std::optional<drafts::StockInfoDraft> _getStockInfoByPosition(
-            const finance::Position&                   position,
-            const std::shared_ptr<store::IStockStore>& stockStore,
-            const store::TransactionStore&             transactionStore
+            const finance::Position&                         position,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
+            const std::shared_ptr<store::ITransactionStore>& transactionStore
         )
         {
             const auto ids =
-                transactionStore.getInstrumentIdsByPositionId(position.getId());
+                transactionStore->getInstrumentIdsByPositionId(position.getId()
+                );
 
             const auto& stocks = stockStore->getStocks(ids);
 
@@ -80,9 +81,9 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const store::PositionStore&                positionStore,
-        const std::shared_ptr<store::IStockStore>& stockStore,
-        const store::TransactionStore&             transactionStore
+        const store::PositionStore&                      positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
         const auto positions = positionStore.getOpenPositions();
@@ -116,10 +117,10 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
-        AccountId                                  account,
-        const store::PositionStore&                positionStore,
-        const std::shared_ptr<store::IStockStore>& stockStore,
-        const store::TransactionStore&             transactionStore
+        AccountId                                        account,
+        const store::PositionStore&                      positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
         const auto positions = positionStore.getOpenPositions({account});
@@ -128,7 +129,8 @@ namespace controller
         for (const auto& position : positions)
         {
             const auto txs =
-                transactionStore.findTransactionsByPositionId(position.getId());
+                transactionStore->findTransactionsByPositionId(position.getId()
+                );
 
             if (txs.empty())
             {

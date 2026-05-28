@@ -40,7 +40,7 @@ namespace store
               _serviceContainer->getPositionService(),
               _accountStore->getAccountSession()
           )},
-          _transactionStore{std::make_unique<TransactionStore>(
+          _transactionStore{std::make_shared<TransactionStore>(
               _serviceContainer->getTransactionService(),
               *_positionStore,
               _accountStore->getAccountSession()
@@ -50,18 +50,20 @@ namespace store
         auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
         auto* accountStore = dynamic_cast<AccountStore*>(_accountStore.get());
         auto* stockStore   = dynamic_cast<StockStore*>(_stockStore.get());
+        auto* transactionStore =
+            dynamic_cast<TransactionStore*>(_transactionStore.get());
 
         if (profileStore == nullptr || !_profileStore ||
             accountStore == nullptr || !_accountStore ||
             stockStore == nullptr || !_stockStore || !_positionStore ||
-            !_transactionStore)
+            transactionStore == nullptr || !_transactionStore)
         {
             throw std::runtime_error("Failed to initialize store container");
         }
 
         _allStores.push_back(profileStore);
         _allStores.push_back(accountStore);
-        _allStores.push_back(&*_transactionStore);
+        _allStores.push_back(transactionStore);
         _allStores.push_back(stockStore);
         _allStores.push_back(&*_positionStore);
 
@@ -215,21 +217,22 @@ namespace store
     /**
      * @brief Get the TransactionStore
      *
-     * @return TransactionStore&
+     * @return std::shared_ptr<ITransactionStore>&
      */
-    TransactionStore& StoreContainer::getTransactionStore()
+    std::shared_ptr<ITransactionStore>& StoreContainer::getTransactionStore()
     {
-        return *_transactionStore;
+        return _transactionStore;
     }
 
     /**
      * @brief Get the TransactionStore (const version)
      *
-     * @return const TransactionStore&
+     * @return const std::shared_ptr<ITransactionStore>&
      */
-    const TransactionStore& StoreContainer::getTransactionStore() const
+    const std::shared_ptr<ITransactionStore>& StoreContainer::
+        getTransactionStore() const
     {
-        return *_transactionStore;
+        return _transactionStore;
     }
 
     /**

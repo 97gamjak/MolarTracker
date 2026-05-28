@@ -1,15 +1,15 @@
-#ifndef __STORE__INCLUDE__STORE__TRANSACTION_STORE_HPP__
-#define __STORE__INCLUDE__STORE__TRANSACTION_STORE_HPP__
+#ifndef __STORE__SRC__STORE__TRANSACTION_STORE_HPP__
+#define __STORE__SRC__STORE__TRANSACTION_STORE_HPP__
 
-#include <cstdint>
 #include <memory>
 #include <mstd/enum.hpp>
 #include <vector>
 
-#include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
+#include "store/base/base_store.hpp"
+#include "store/i_transaction_store.hpp"
 
 namespace finance
 {
@@ -26,20 +26,13 @@ namespace store
     class AccountSession;   // Forward declaration
     class PositionStore;    // Forward declaration
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define TRANSACTION_STORE_RESULT(X) \
-    X(Ok)                           \
-    X(Error)                        \
-    X(TransactionSumNotZero)
-
-    MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
-
     /**
      * @brief Store for managing transactions
      *
      */
     class TransactionStore
-        : public BaseStore<finance::Transaction, TransactionId>
+        : public BaseStore<finance::Transaction, TransactionId>,
+          public ITransactionStore
     {
        private:
         /// The Transaction service
@@ -65,24 +58,29 @@ namespace store
         void commit(
             const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
             const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap
-        );
+        ) override;
 
         [[nodiscard]]
-        TransactionStoreResult addTransaction(finance::Transaction transaction);
+        TransactionStoreResult addTransaction(
+            finance::Transaction transaction
+        ) override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> get(
-            const finance::TransactionFilter& filter =
-                finance::TransactionFilter()
-        ) const;
+        std::vector<finance::Transaction> getTransactions(
+            const finance::TransactionFilter& filter
+        ) const override;
+        [[nodiscard]]
+        std::vector<finance::Transaction> getTransactions() const override;
+
         [[nodiscard]]
         idSet<InstrumentId> getInstrumentIdsByPositionId(
             PositionId positionId
-        ) const;
+        ) const override;
+
         [[nodiscard]]
         std::vector<finance::Transaction> findTransactionsByPositionId(
             PositionId positionId
-        ) const;
+        ) const override;
 
        private:
         void _onAccountIdRemap(const accountMap<AccountId>& remap);
@@ -92,4 +90,4 @@ namespace store
 
 }   // namespace store
 
-#endif   // __STORE__INCLUDE__STORE__TRANSACTION_STORE_HPP__
+#endif   // __STORE__SRC__STORE__TRANSACTION_STORE_HPP__

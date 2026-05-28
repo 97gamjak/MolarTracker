@@ -112,7 +112,7 @@ TEST_F(TransactionStoreTest, GetTransactionsEmptyWhenNoAccounts)
 {
     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    const auto txs = _store->get(finance::TransactionFilter{});
+    const auto txs = _store->getTransactions(finance::TransactionFilter{});
 
     EXPECT_TRUE(txs.empty());
 }

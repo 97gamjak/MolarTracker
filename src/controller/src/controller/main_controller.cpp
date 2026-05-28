@@ -115,10 +115,8 @@ namespace controller
         auto& loggingSettings = settings.getLoggingSettings();
 
         // initialize ring file buffered logger
-        logging::LogManager::getInstance().initializeCategories(
-            Constants::getInstance().getDataPath().string()
-        );
-        logging::LogManager::getInstance().initializeRingFileLogger(
+        logging::LogManager::getInstance().initialize(
+            Constants::getInstance().getDataPath().string(),
             loggingSettings
         );
 

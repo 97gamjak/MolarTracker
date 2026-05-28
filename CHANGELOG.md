@@ -12,6 +12,7 @@ All changes and updates, that are relevant for a user will be documented here
   targeted row
 - Fix profile deletion crashing with a SQL syntax error
 - Fix three ORM bugs exposed by unit tests: duplicate `WHERE` in `deleteByPk` SQL, wrong bind-parameter index in `update` WHERE clause, and `LIMIT` being silently ignored when no `ORDER BY` was set
+- Fix default log level of settings is now also applied at startup
 
 ### Features
 

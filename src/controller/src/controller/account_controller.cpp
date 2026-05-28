@@ -35,13 +35,13 @@ namespace controller
         /// Reference to the stock store
         std::shared_ptr<store::IStockStore> stockStore;
         /// Reference to the transaction store
-        store::TransactionStore& transactionStore;
+        std::shared_ptr<store::ITransactionStore> transactionStore;
 
         Stores(
-            const std::shared_ptr<store::IAccountStore>& accountStore_,
-            store::PositionStore&                        positionStore_,
-            const std::shared_ptr<store::IStockStore>&   stockStore_,
-            store::TransactionStore&                     transactionStore_
+            const std::shared_ptr<store::IAccountStore>&     accountStore_,
+            store::PositionStore&                            positionStore_,
+            const std::shared_ptr<store::IStockStore>&       stockStore_,
+            const std::shared_ptr<store::ITransactionStore>& transactionStore_
         );
         ~Stores() = default;
 
@@ -61,10 +61,10 @@ namespace controller
      * @param transactionStore_
      */
     AccountController::Stores::Stores(
-        const std::shared_ptr<store::IAccountStore>& accountStore_,
-        store::PositionStore&                        positionStore_,
-        const std::shared_ptr<store::IStockStore>&   stockStore_,
-        store::TransactionStore&                     transactionStore_
+        const std::shared_ptr<store::IAccountStore>&     accountStore_,
+        store::PositionStore&                            positionStore_,
+        const std::shared_ptr<store::IStockStore>&       stockStore_,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore_
     )
         : accountStore(accountStore_),
           positionStore(positionStore_),
@@ -84,12 +84,12 @@ namespace controller
      * @param stackedWidget
      */
     AccountController::AccountController(
-        cmd::UndoStack&                              undoStack,
-        const std::shared_ptr<store::IAccountStore>& accountStore,
-        store::PositionStore&                        positionStore,
-        const std::shared_ptr<store::IStockStore>&   stockStore,
-        store::TransactionStore&                     transactionStore,
-        QStackedWidget*                              stackedWidget
+        cmd::UndoStack&                                  undoStack,
+        const std::shared_ptr<store::IAccountStore>&     accountStore,
+        store::PositionStore&                            positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore,
+        QStackedWidget*                                  stackedWidget
     )
         : _undoStack(undoStack),
           _stores(
