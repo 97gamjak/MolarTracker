@@ -1,5 +1,5 @@
-#ifndef __STORE__INCLUDE__STORE__BASE__BASE_STORE_HPP__
-#define __STORE__INCLUDE__STORE__BASE__BASE_STORE_HPP__
+#ifndef __STORE__SRC__STORE__BASE__BASE_STORE_HPP__
+#define __STORE__SRC__STORE__BASE__BASE_STORE_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -265,14 +265,14 @@ namespace store
 
 }   // namespace store
 
-#ifndef __STORE__INCLUDE__STORE__BASE__BASE_STORE_TPP__
+#ifndef __STORE__SRC__STORE__BASE__BASE_STORE_TPP__
 #include "base_store.tpp"
 #endif
-#ifndef __STORE__INCLUDE__STORE__BASE__BASE_STORE_SUBSCRIPTIONS_TPP__
+#ifndef __STORE__SRC__STORE__BASE__BASE_STORE_SUBSCRIPTIONS_TPP__
 #include "base_store_subscriptions.tpp"   // IWYU pragma: keep
 #endif
-#ifndef __STORE__INCLUDE__STORE__BASE__BASE_STORE_NOTIFICATIONS_TPP__
+#ifndef __STORE__SRC__STORE__BASE__BASE_STORE_NOTIFICATIONS_TPP__
 #include "base_store_notifications.tpp"   // IWYU pragma: keep
 #endif
 
-#endif   // __STORE__INCLUDE__STORE__BASE__BASE_STORE_HPP__
+#endif   // __STORE__SRC__STORE__BASE__BASE_STORE_HPP__

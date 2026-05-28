@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "drafts/profile_draft.hpp"
 #include "mock_services.hpp"
 #include "store/profile/profile_store.hpp"
 
@@ -42,7 +41,7 @@ TEST_F(ProfileStoreTest, HasProfilesFalseWhenEmpty)
 TEST_F(ProfileStoreTest, HasProfilesTrueAfterAdd)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     EXPECT_TRUE(_store->hasProfiles());
@@ -51,7 +50,7 @@ TEST_F(ProfileStoreTest, HasProfilesTrueAfterAdd)
 TEST_F(ProfileStoreTest, AddProfileSuccessReturnsOk)
 {
     const auto result = _store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
     EXPECT_EQ(result, store::ProfileStoreResult::Ok);
@@ -60,11 +59,11 @@ TEST_F(ProfileStoreTest, AddProfileSuccessReturnsOk)
 TEST_F(ProfileStoreTest, AddProfileDuplicateNameReturnsNameAlreadyExists)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     const auto result = _store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
     EXPECT_EQ(result, store::ProfileStoreResult::NameAlreadyExists);
@@ -73,11 +72,11 @@ TEST_F(ProfileStoreTest, AddProfileDuplicateNameReturnsNameAlreadyExists)
 TEST_F(ProfileStoreTest, RemoveProfileSuccessReturnsOk)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     const auto result = _store->removeProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
     EXPECT_EQ(result, store::ProfileStoreResult::Ok);
@@ -86,7 +85,7 @@ TEST_F(ProfileStoreTest, RemoveProfileSuccessReturnsOk)
 TEST_F(ProfileStoreTest, RemoveProfileNotFoundReturnsProfileNotFound)
 {
     const auto result = _store->removeProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "NonExistent", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "NonExistent", std::nullopt}
     );
 
     EXPECT_EQ(result, store::ProfileStoreResult::ProfileNotFound);
@@ -102,10 +101,10 @@ TEST_F(ProfileStoreTest, GetAllProfileNamesEmptyWhenNoProfiles)
 TEST_F(ProfileStoreTest, GetAllProfileNamesReturnsAddedNames)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Bob", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Bob", std::nullopt}
     ));
 
     const auto names = _store->getAllProfileNames();
@@ -124,7 +123,7 @@ TEST_F(ProfileStoreTest, SetActiveProfileInvalidNameReturnsError)
 TEST_F(ProfileStoreTest, CommitNewProfileCallsServiceCreate)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     _store->commit();
@@ -137,7 +136,7 @@ TEST_F(ProfileStoreTest, CommitDeletedProfileCallsServiceRemove)
     _mockService->addTestProfile("Alice");
     rebuildStore();
     static_cast<void>(_store->removeProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     _store->commit();
@@ -157,7 +156,7 @@ TEST_F(ProfileStoreTest, LoadsProfilesFromServiceOnConstruction)
 TEST_F(ProfileStoreTest, ProfileExistsByNameTrueForExisting)
 {
     static_cast<void>(_store->addProfile(
-        drafts::ProfileDraft{ProfileId::invalid(), "Alice", std::nullopt}
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
     EXPECT_TRUE(_store->profileExists("Alice"));

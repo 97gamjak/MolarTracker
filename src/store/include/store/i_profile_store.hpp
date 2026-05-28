@@ -12,11 +12,6 @@
 
 class Connection;
 
-namespace drafts
-{
-    class ProfileDraft;   // Forward declaration
-}   // namespace drafts
-
 namespace domain
 {
     class Profile;   // Forward declaration
@@ -89,12 +84,11 @@ namespace store
         /**
          * @brief Get the Active Profile
          *
-         * @return std::optional<drafts::ProfileDraft> containing the active
+         * @return std::optional<domain::Profile> containing the active
          * profile, if it exists
          */
         [[nodiscard]]
-        virtual std::optional<drafts::ProfileDraft> getActiveProfile(
-        ) const = 0;
+        virtual std::optional<domain::Profile> getActiveProfile() const = 0;
 
         /**
          * @brief Add a profile
@@ -103,9 +97,7 @@ namespace store
          * @return ProfileStoreResult indicating the result of the operation
          */
         [[nodiscard]]
-        virtual ProfileStoreResult addProfile(
-            const drafts::ProfileDraft& draft
-        ) = 0;
+        virtual ProfileStoreResult addProfile(const domain::Profile& draft) = 0;
 
         /**
          * @brief Remove a profile
@@ -115,7 +107,7 @@ namespace store
          */
         [[nodiscard]]
         virtual ProfileStoreResult removeProfile(
-            const drafts::ProfileDraft& draft
+            const domain::Profile& draft
         ) = 0;
 
         /**

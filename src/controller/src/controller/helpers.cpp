@@ -1,13 +1,18 @@
 #include "helpers.hpp"
 
+#include <expected>
+
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
 #include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/position.hpp"
+#include "logging/log_macros.hpp"
+#include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
-#include "store/position_store.hpp"
+
+REGISTER_LOG_CATEGORY("Controller.Helpers");
 
 namespace controller
 {
@@ -81,12 +86,12 @@ namespace controller
      * @return std::vector<drafts::PositionDraft>
      */
     std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const store::PositionStore&                      positionStore,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
-        const auto positions = positionStore.getOpenPositions();
+        const auto positions = positionStore->getOpenPositions();
 
         std::vector<drafts::PositionDraft> drafts;
         for (const auto& position : positions)
@@ -118,12 +123,12 @@ namespace controller
      */
     std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
         AccountId                                        account,
-        const store::PositionStore&                      positionStore,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
-        const auto positions = positionStore.getOpenPositions({account});
+        const auto positions = positionStore->getOpenPositions({account});
 
         std::vector<drafts::PositionDetailDraft> drafts;
         for (const auto& position : positions)

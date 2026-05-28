@@ -1,9 +1,9 @@
-#include "domain/profile_mapper.hpp"
+#include "drafts/profile_mapper.hpp"
 
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
 
-namespace domain
+namespace drafts
 {
     /**
      * @brief Convert a Profile to a ProfileDraft
@@ -11,7 +11,7 @@ namespace domain
      * @param profile
      * @return drafts::ProfileDraft
      */
-    drafts::ProfileDraft ProfileMapper::toDraft(const Profile& profile)
+    drafts::ProfileDraft ProfileMapper::toDraft(const domain::Profile& profile)
     {
         return drafts::ProfileDraft{
             profile.getId(),
@@ -26,9 +26,13 @@ namespace domain
      * @param draft
      * @return Profile
      */
-    Profile ProfileMapper::toProfile(const drafts::ProfileDraft& draft)
+    domain::Profile ProfileMapper::toProfile(const drafts::ProfileDraft& draft)
     {
-        return Profile{draft.getId(), draft.getName(), draft.getEmail()};
+        return domain::Profile{
+            draft.getId(),
+            draft.getName(),
+            draft.getEmail()
+        };
     }
 
-}   // namespace domain
+}   // namespace drafts

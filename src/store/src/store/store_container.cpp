@@ -36,13 +36,12 @@ namespace store
               _serviceContainer->getInstrumentService(),
               _instrumentIdSeq
           )},
-          _positionStore{std::make_unique<PositionStore>(
+          _positionStore{std::make_shared<PositionStore>(
               _serviceContainer->getPositionService(),
               _accountStore->getAccountSession()
           )},
           _transactionStore{std::make_shared<TransactionStore>(
               _serviceContainer->getTransactionService(),
-              *_positionStore,
               _accountStore->getAccountSession()
           )},
           _connections{std::make_unique<Connections>()}
@@ -50,22 +49,27 @@ namespace store
         auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
         auto* accountStore = dynamic_cast<AccountStore*>(_accountStore.get());
         auto* stockStore   = dynamic_cast<StockStore*>(_stockStore.get());
+        auto* positionStore =
+            dynamic_cast<PositionStore*>(_positionStore.get());
         auto* transactionStore =
             dynamic_cast<TransactionStore*>(_transactionStore.get());
 
-        if (profileStore == nullptr || !_profileStore ||
-            accountStore == nullptr || !_accountStore ||
-            stockStore == nullptr || !_stockStore || !_positionStore ||
-            transactionStore == nullptr || !_transactionStore)
-        {
-            throw std::runtime_error("Failed to initialize store container");
-        }
+        if (profileStore == nullptr || !_profileStore)
+            throw std::runtime_error("Failed to initialize profile store");
+        if (accountStore == nullptr || !_accountStore)
+            throw std::runtime_error("Failed to initialize account store");
+        if (stockStore == nullptr || !_stockStore)
+            throw std::runtime_error("Failed to initialize stock store");
+        if (positionStore == nullptr || !_positionStore)
+            throw std::runtime_error("Failed to initialize position store");
+        if (transactionStore == nullptr || !_transactionStore)
+            throw std::runtime_error("Failed to initialize transaction store");
 
         _allStores.push_back(profileStore);
         _allStores.push_back(accountStore);
         _allStores.push_back(transactionStore);
         _allStores.push_back(stockStore);
-        _allStores.push_back(&*_positionStore);
+        _allStores.push_back(positionStore);
 
         _connections->add(_profileStore->subscribeToProfileChange(
             [&](const std::optional<ProfileId>& profileId)
@@ -99,7 +103,8 @@ namespace store
 
         _transactionStore->commit(
             _accountStore->getIdRemap(),
-            _stockStore->getInstrumentIdMap()
+            _stockStore->getInstrumentIdMap(),
+            _positionStore->getIdRemap()
         );
     }
 
@@ -258,21 +263,22 @@ namespace store
     /**
      * @brief Get the PositionStore
      *
-     * @return PositionStore&
+     * @return std::shared_ptr<IPositionStore>&
      */
-    PositionStore& StoreContainer::getPositionStore()
+    std::shared_ptr<IPositionStore>& StoreContainer::getPositionStore()
     {
-        return *_positionStore;
+        return _positionStore;
     }
 
     /**
      * @brief Get the PositionStore (const version)
      *
-     * @return const PositionStore&
+     * @return const std::shared_ptr<IPositionStore>&
      */
-    const PositionStore& StoreContainer::getPositionStore() const
+    const std::shared_ptr<IPositionStore>& StoreContainer::getPositionStore(
+    ) const
     {
-        return *_positionStore;
+        return _positionStore;
     }
 
 }   // namespace store

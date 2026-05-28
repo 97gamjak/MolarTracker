@@ -6,8 +6,6 @@
 #include <utility>
 
 #include "domain/profile.hpp"
-#include "domain/profile_mapper.hpp"
-#include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_profile_service.hpp"
 #include "store/base/base_store.hpp"
@@ -104,9 +102,9 @@ namespace store
     /**
      * @brief Get the currently active profile
      *
-     * @return std::optional<drafts::ProfileDraft>
+     * @return std::optional<domain::Profile>
      */
-    std::optional<drafts::ProfileDraft> ProfileStore::getActiveProfile() const
+    std::optional<domain::Profile> ProfileStore::getActiveProfile() const
     {
         if (!_activeProfile.has())
             return std::nullopt;
@@ -120,21 +118,14 @@ namespace store
      * @note Ignores profiles marked as deleted
      *
      * @param id
-     * @return std::optional<drafts::ProfileDraft>
+     * @return std::optional<domain::Profile>
      */
-    std::optional<drafts::ProfileDraft> ProfileStore::_getProfile(
-        ProfileId id
-    ) const
+    std::optional<domain::Profile> ProfileStore::_getProfile(ProfileId id) const
     {
-        auto profile = _get(
+        return _get(
             {.filter   = domain::HasProfileId(id),
              .deletion = DeletionPolicy::ExcludeDelete}
         );
-
-        if (!profile)
-            return std::nullopt;
-
-        return domain::ProfileMapper::toDraft(profile.value());
     }
 
     /**
@@ -143,21 +134,16 @@ namespace store
      * @note Ignores profiles marked as deleted
      *
      * @param name
-     * @return std::optional<drafts::ProfileDraft>
+     * @return std::optional<domain::Profile>
      */
-    std::optional<drafts::ProfileDraft> ProfileStore::_getProfile(
+    std::optional<domain::Profile> ProfileStore::_getProfile(
         std::string_view name
     ) const
     {
-        auto profile = _get(
+        return _get(
             {.filter   = domain::HasProfileName(name),
              .deletion = DeletionPolicy::ExcludeDelete}
         );
-
-        if (!profile)
-            return std::nullopt;
-
-        return domain::ProfileMapper::toDraft(profile.value());
     }
 
     /**
@@ -184,9 +170,7 @@ namespace store
      * @param draft
      * @return ProfileStoreResult
      */
-    ProfileStoreResult ProfileStore::addProfile(
-        const drafts::ProfileDraft& draft
-    )
+    ProfileStoreResult ProfileStore::addProfile(const domain::Profile& draft)
     {
         auto entry = _getEntry(
             {.filter   = domain::HasProfileName(draft.getName()),
@@ -228,9 +212,7 @@ namespace store
      * @param draft
      * @return ProfileStoreResult
      */
-    ProfileStoreResult ProfileStore::removeProfile(
-        const drafts::ProfileDraft& draft
-    )
+    ProfileStoreResult ProfileStore::removeProfile(const domain::Profile& draft)
     {
         const auto entry = _getEntry(
             {.filter   = domain::HasProfileName(draft.getName()),

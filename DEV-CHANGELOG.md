@@ -105,6 +105,7 @@ All changes and updates, that are relevant for developers will be documented her
 - make stock store an interface
 - move account_session.hpp to src dir of store to disallow access from outside of stores
 - make transaction store an interface
+- make position store an interface and cleanup deps to remove drafts from store deps
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

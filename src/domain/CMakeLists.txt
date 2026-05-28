@@ -1,6 +1,5 @@
 add_library(molartracker_domain STATIC
     src/domain/profile.cpp
-    src/domain/profile_mapper.cpp
 )
 
 target_include_directories(molartracker_domain
@@ -13,6 +12,5 @@ target_include_directories(molartracker_domain
 target_link_libraries(molartracker_domain
     PRIVATE
     molartracker_config
-    molartracker_drafts
     molartracker_filter
 )
