@@ -8,7 +8,7 @@
 
 namespace finance
 {
-    class Transaction;
+    class DomainTransaction;
 
     /**
      * @brief Filter for transactions, used to filter transactions when querying
@@ -31,10 +31,10 @@ namespace finance
         [[nodiscard]] std::optional<PositionId> getPositionId() const;
 
         [[nodiscard]]
-        filter::Predicate<Transaction> getPredicate() const;
+        filter::Predicate<DomainTransaction> getPredicate() const;
     };
 
-    filter::Predicate<Transaction> HasPositionId(PositionId positionId);
+    filter::Predicate<DomainTransaction> HasPositionId(PositionId positionId);
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION_FILTER_HPP__

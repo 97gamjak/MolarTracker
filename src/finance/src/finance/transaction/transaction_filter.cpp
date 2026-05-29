@@ -1,6 +1,6 @@
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 
-#include "finance/transaction.hpp"
+#include "finance/transaction/transaction.hpp"
 
 namespace finance
 {
@@ -33,10 +33,11 @@ namespace finance
      * position ID is set, the returned predicate will not filter out any
      * transactions based on position ID.
      *
-     * @return filter::Predicate<Transaction> A predicate function that can be
-     * used to filter transactions based on the criteria set in this filter.
+     * @return filter::Predicate<DomainTransaction> A predicate function that
+     * can be used to filter transactions based on the criteria set in this
+     * filter.
      */
-    filter::Predicate<Transaction> TransactionFilter::getPredicate() const
+    filter::Predicate<DomainTransaction> TransactionFilter::getPredicate() const
     {
         if (_positionId.has_value())
             return HasPositionId(_positionId.value());
@@ -56,14 +57,14 @@ namespace finance
      * specifies the position that the returned predicate will filter
      * transactions for.
      *
-     * @return filter::Predicate<Transaction> A predicate function that can be
-     * used to filter transactions based on whether they are associated with the
-     * specified position ID.
+     * @return filter::Predicate<DomainTransaction> A predicate function that
+     * can be used to filter transactions based on whether they are associated
+     * with the specified position ID.
      */
-    filter::Predicate<Transaction> HasPositionId(PositionId positionId)
+    filter::Predicate<DomainTransaction> HasPositionId(PositionId positionId)
     {
-        return filter::makePredicate<Transaction>(
-            [positionId](const Transaction& transaction)
+        return filter::makePredicate<DomainTransaction>(
+            [positionId](const DomainTransaction& transaction)
             {
                 return hasId(
                     transaction.getData(),

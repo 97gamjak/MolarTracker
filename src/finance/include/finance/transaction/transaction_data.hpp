@@ -3,7 +3,7 @@
 
 #include <variant>
 
-#include "finance/trade_data.hpp"
+#include "finance/transaction/trade_data.hpp"
 
 namespace finance
 {

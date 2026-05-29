@@ -8,7 +8,8 @@
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/cash.hpp"
-#include "finance/trade_data.hpp"
+#include "finance/transaction/base_transaction.hpp"
+#include "trade_data.hpp"
 #include "transaction_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
@@ -21,18 +22,9 @@ namespace finance
      * more specific transaction types (e.g., deposits, withdrawals, transfers).
      *
      */
-    class Transaction
+    class DomainTransaction : public Transaction
     {
        private:
-        /// The unique identifier for the transaction
-        TransactionId _id;
-
-        /// The timestamp when the transaction was created
-        Timestamp _timestamp;
-
-        /// The status of the transaction (e.g., completed, deleted)
-        TransactionStatus _status;
-
         /// The data associated with the transaction
         TransactionData _data;
 
@@ -41,11 +33,8 @@ namespace finance
         /// transaction
         std::vector<TransactionEntry> _entries;
 
-        /// An optional comment or description for the transaction
-        std::optional<std::string> _comment;
-
        public:
-        explicit Transaction(
+        explicit DomainTransaction(
             TransactionId                 id,
             Timestamp                     timestamp,
             TransactionStatus             status,
@@ -54,10 +43,6 @@ namespace finance
             std::optional<std::string>    comment = std::nullopt
         );
 
-        [[nodiscard]] TransactionId                        getId() const;
-        [[nodiscard]] Timestamp                            getTimestamp() const;
-        [[nodiscard]] TransactionStatus                    getStatus() const;
-        [[nodiscard]] std::optional<std::string>           getComment() const;
         [[nodiscard]] const std::vector<TransactionEntry>& getEntries() const;
         [[nodiscard]] std::vector<TransactionEntry>&       getEntries();
         [[nodiscard]] TransactionDataType                  getType() const;
@@ -68,28 +53,12 @@ namespace finance
         [[nodiscard]] Cash     calculateTotalSum() const;
         [[nodiscard]] Quantity calculateTotalQuantity() const;
 
-        void setId(TransactionId id);
         void addEntry(const TransactionEntry& entry);
         void addLeg(const TradeLeg& leg);
 
         [[nodiscard]] std::vector<TradeLeg> getLegs() const;
 
         [[nodiscard]] std::string toString() const;
-    };
-
-    class Transactions
-    {
-       private:
-        std::vector<Transaction> _transactions;
-
-       public:
-        explicit Transactions(const std::vector<Transaction>& transactions);
-
-        [[nodiscard]]
-        Quantity calculateTotalQuantity() const;
-
-        [[nodiscard]]
-        std::vector<InstrumentId> getInstrumentIds() const;
     };
 
     /**

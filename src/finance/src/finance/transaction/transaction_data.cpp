@@ -1,4 +1,4 @@
-#include "finance/transaction_data.hpp"
+#include "finance/transaction/transaction_data.hpp"
 
 namespace finance
 {

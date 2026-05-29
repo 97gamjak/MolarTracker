@@ -38,7 +38,7 @@ namespace drafts
 
 namespace finance
 {
-    class Transaction;   // Forward declaration
+    class DomainTransaction;   // Forward declaration
 }   // namespace finance
 
 class QMainWindow;   // Forward declaration
@@ -115,7 +115,9 @@ namespace controller
 
         void _onCreateTickerRequested(const std::string& ticker);
 
-        bool _checkAddTransaction(const finance::Transaction& transaction);
+        bool _checkAddTransaction(
+            const finance::DomainTransaction& transaction
+        );
     };
 }   // namespace controller
 

@@ -8,9 +8,9 @@
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
 #include "finance/cash.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_entry.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "mock_services.hpp"
 #include "store/account/account_session.hpp"
 #include "store/account/account_store.hpp"
@@ -59,9 +59,9 @@ namespace
         }
 
         /// Returns a cash transaction whose entries sum to zero (empty).
-        [[nodiscard]] static finance::Transaction makeZeroSumTx()
+        [[nodiscard]] static finance::DomainTransaction makeZeroSumTx()
         {
-            return finance::Transaction{
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
@@ -72,10 +72,10 @@ namespace
         }
 
         /// Returns a cash transaction whose single entry has a non-zero amount.
-        [[nodiscard]] static finance::Transaction makeNonZeroSumTx()
+        [[nodiscard]] static finance::DomainTransaction makeNonZeroSumTx()
         {
             const auto cash = 100'000;
-            return finance::Transaction{
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,

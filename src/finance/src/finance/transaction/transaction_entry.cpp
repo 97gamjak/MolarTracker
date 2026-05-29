@@ -1,4 +1,4 @@
-#include "finance/transaction_entry.hpp"
+#include "finance/transaction/transaction_entry.hpp"
 
 #include <format>
 

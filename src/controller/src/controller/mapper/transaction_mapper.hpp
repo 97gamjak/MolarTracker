@@ -10,11 +10,11 @@
 
 namespace finance
 {
-    struct CashData;          // forward declaration
-    class TradeData;          // forward declaration
-    class TransactionEntry;   // forward declaration
-    class Transaction;        // forward declaration
-    class TradeLeg;           // forward declaration
+    struct CashData;           // forward declaration
+    class TradeData;           // forward declaration
+    class TransactionEntry;    // forward declaration
+    class DomainTransaction;   // forward declaration
+    class TradeLeg;            // forward declaration
 
     using TransactionData =
         std::variant<CashData, TradeData>;   // forward declaration
@@ -38,10 +38,10 @@ namespace controller
      * TransactionDraft
      *
      * This class provides static methods to convert between the domain model
-     * (finance::Transaction) and the draft model (drafts::TransactionDraft).
-     * This is useful for separating the concerns of the business logic and the
-     * UI, and allows us to have a clear mapping between the two representations
-     * of a transaction.
+     * (finance::DomainTransaction) and the draft model
+     * (drafts::TransactionDraft). This is useful for separating the concerns of
+     * the business logic and the UI, and allows us to have a clear mapping
+     * between the two representations of a transaction.
      */
     class TransactionMapper
     {
@@ -58,12 +58,12 @@ namespace controller
         );
 
         [[nodiscard]]
-        static finance::Transaction fromCreateCashTransactionDraft(
+        static finance::DomainTransaction fromCreateCashTransactionDraft(
             const drafts::CreateCashTransactionDraft& draft
         );
 
         [[nodiscard]]
-        static finance::Transaction fromCreateStockTransactionDraft(
+        static finance::DomainTransaction fromCreateStockTransactionDraft(
             const drafts::CreateStockTransactionDraft& draft
         );
 
@@ -91,14 +91,14 @@ namespace controller
 
         [[nodiscard]]
         static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
-            const std::vector<finance::Transaction>& transactions,
-            const instrumentMap<std::string>&        instrumentNames,
-            const idSet<AccountId>&                  externalAccounts
+            const std::vector<finance::DomainTransaction>& transactions,
+            const instrumentMap<std::string>&              instrumentNames,
+            const idSet<AccountId>&                        externalAccounts
         );
 
         [[nodiscard]]
         static drafts::TransactionOverviewDraft toOverviewDraft(
-            const finance::Transaction&       transaction,
+            const finance::DomainTransaction& transaction,
             const instrumentMap<std::string>& instrumentNames,
             const idSet<AccountId>&           externalAccounts
         );

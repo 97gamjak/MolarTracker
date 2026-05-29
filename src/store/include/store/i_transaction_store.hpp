@@ -6,12 +6,12 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction.hpp"   // needed for vector
 
 namespace finance
 {
-    class Account;   // Forward declaration
+    class Account;             // Forward declaration
+    class TransactionFilter;   // Forward declaration
 }   // namespace finance
 
 namespace store
@@ -54,7 +54,7 @@ namespace store
          */
         [[nodiscard]]
         virtual TransactionStoreResult addTransaction(
-            finance::Transaction transaction
+            finance::DomainTransaction transaction
         ) = 0;
 
         /**
@@ -62,20 +62,23 @@ namespace store
          *
          * @param filter The filter to apply
          *
-         * @return std::vector<finance::Transaction> The list of transactions
+         * @return std::vector<finance::DomainTransaction> The list of
+         * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Transaction> getTransactions(
+        virtual std::vector<finance::DomainTransaction> getTransactions(
             const finance::TransactionFilter& filter
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
-         * @return std::vector<finance::Transaction> The list of transactions
+         * @return std::vector<finance::DomainTransaction> The list of
+         * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Transaction> getTransactions() const = 0;
+        virtual std::vector<finance::DomainTransaction> getTransactions(
+        ) const = 0;
 
         /**
          * @brief Get all instrument IDs associated with a position ID
@@ -92,12 +95,14 @@ namespace store
          * @brief Find all transactions associated with a position ID
          *
          * @param positionId The position ID to filter by
-         * @return std::vector<finance::Transaction> The list of transactions
+         * @return std::vector<finance::DomainTransaction> The list of
+         * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Transaction> findTransactionsByPositionId(
-            PositionId positionId
-        ) const = 0;
+        virtual std::
+            vector<finance::DomainTransaction> findTransactionsByPositionId(
+                PositionId positionId
+            ) const = 0;
     };
 
 }   // namespace store

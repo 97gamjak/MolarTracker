@@ -5,8 +5,8 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
 #include "store/account/account_session.hpp"
@@ -146,7 +146,7 @@ namespace store
      * an error (e.g., if the transaction sum is not zero).
      */
     TransactionStoreResult TransactionStore::addTransaction(
-        finance::Transaction transaction
+        finance::DomainTransaction transaction
     )
     {
         LOG_ENTRY;
@@ -179,9 +179,10 @@ namespace store
      * but they will not be saved to the database until the commit method is
      * called.
      *
-     * @return std::vector<finance::Transaction>
+     * @return std::vector<finance::DomainTransaction>
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions() const
+    std::vector<finance::DomainTransaction> TransactionStore::getTransactions(
+    ) const
     {
         return getTransactions(finance::TransactionFilter());
     }
@@ -201,11 +202,11 @@ namespace store
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
      *
-     * @return std::vector<finance::Transaction> A vector of transactions
+     * @return std::vector<finance::DomainTransaction> A vector of transactions
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions(
+    std::vector<finance::DomainTransaction> TransactionStore::getTransactions(
         const finance::TransactionFilter& filter
     ) const
     {
@@ -229,7 +230,7 @@ namespace store
         // store
         idSet<TransactionId> transactionIds;
 
-        std::vector<finance::Transaction> results;
+        std::vector<finance::DomainTransaction> results;
 
         for (const auto& transaction : transactions)
         {
@@ -257,11 +258,11 @@ namespace store
      * returned transactions will be those that are associated with this
      * position.
      *
-     * @return std::vector<finance::Transaction> A vector of transactions that
-     * are associated with the specified position ID, this includes both new and
-     * existing transactions that are related to the given position.
+     * @return std::vector<finance::DomainTransaction> A vector of transactions
+     * that are associated with the specified position ID, this includes both
+     * new and existing transactions that are related to the given position.
      */
-    std::vector<finance::Transaction> TransactionStore::
+    std::vector<finance::DomainTransaction> TransactionStore::
         findTransactionsByPositionId(PositionId positionId) const
     {
         auto filter = finance::TransactionFilter();

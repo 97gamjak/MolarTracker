@@ -7,7 +7,7 @@
 
 namespace finance
 {
-    class Transaction;         // forward declaration
+    class DomainTransaction;   // forward declaration
     class TransactionEntry;    // forward declaration
     class TradeLeg;            // forward declaration
     class TransactionFilter;   // forward declaration
@@ -29,10 +29,12 @@ namespace repo
     {
        public:
         [[nodiscard]]
-        static TransactionRow toRow(const finance::Transaction& transaction);
+        static TransactionRow toRow(
+            const finance::DomainTransaction& transaction
+        );
 
         [[nodiscard]]
-        static finance::Transaction fromRow(const TransactionRow& row);
+        static finance::DomainTransaction fromRow(const TransactionRow& row);
 
         [[nodiscard]]
         static TransactionEntryRow toEntryRow(

@@ -28,10 +28,10 @@
 #include "config/quantity.hpp"
 #include "db/database.hpp"
 #include "finance/cash.hpp"
-#include "finance/trade_data.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_entry.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "repo/i_transaction_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/transaction_repo.hpp"
@@ -74,12 +74,12 @@ namespace
             _db.execute("INSERT INTO position (opened_at) VALUES (1)");
         }
 
-        [[nodiscard]] finance::Transaction makeCashTx(
+        [[nodiscard]] finance::DomainTransaction makeCashTx(
             std::optional<std::string> comment = std::nullopt,
             micro_units                amount  = 100'000LL
         ) const
         {
-            return finance::Transaction{
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
@@ -94,7 +94,7 @@ namespace
             };
         }
 
-        [[nodiscard]] finance::Transaction makeTradeTx() const
+        [[nodiscard]] finance::DomainTransaction makeTradeTx() const
         {
             constexpr auto     quantity = 100'000'000LL;   // 1.0 in micro-units
             constexpr auto     price = 150'000'000LL;   // $1.50 in micro-units
@@ -110,7 +110,7 @@ namespace
             );
 
             constexpr auto price2 = -15'000'000'000LL;
-            return finance::Transaction{
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
@@ -278,7 +278,7 @@ TEST_F(
     const auto price1 = 100'000LL;   // $1.00 in micro-units
     const auto price2 = 200'000LL;   // $2.00 in
 
-    finance::Transaction transaction{
+    finance::DomainTransaction transaction{
         TransactionId::invalid(),
         Timestamp::fromInt64(TEST_TS),
         TransactionStatus::Completed,

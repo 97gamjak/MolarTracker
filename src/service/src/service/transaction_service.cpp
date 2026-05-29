@@ -1,7 +1,7 @@
 #include "transaction_service.hpp"
 
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "repo/i_transaction_repo.hpp"
 
 namespace service
@@ -25,7 +25,7 @@ namespace service
      * @return TransactionId The ID of the added transaction.
      */
     TransactionId TransactionService::addTransaction(
-        const finance::Transaction& transaction
+        const finance::DomainTransaction& transaction
     )
     {
         return _transactionRepo->addTransaction(transaction);
@@ -41,9 +41,10 @@ namespace service
      * transactions from the database, if no filter is provided all
      * transactions will be returned
      *
-     * @return std::vector<finance::Transaction> A vector of all transactions.
+     * @return std::vector<finance::DomainTransaction> A vector of all
+     * transactions.
      */
-    std::vector<finance::Transaction> TransactionService::getTransactions(
+    std::vector<finance::DomainTransaction> TransactionService::getTransactions(
         const idSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )

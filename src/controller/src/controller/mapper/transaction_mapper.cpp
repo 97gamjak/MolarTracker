@@ -5,8 +5,8 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction_draft.hpp"
-#include "finance/trade_data.hpp"
-#include "finance/transaction.hpp"
+#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/transaction.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.Mapper.TransactionMapper");
@@ -57,21 +57,22 @@ namespace controller
 
     /**
      * @brief Converts a drafts::CreateCashTransactionDraft to a
-     * finance::Transaction
+     * finance::DomainTransaction
      *
      * @param draft
-     * @return finance::Transaction
+     * @return finance::DomainTransaction
      */
-    finance::Transaction TransactionMapper::fromCreateCashTransactionDraft(
-        const drafts::CreateCashTransactionDraft& draft
-    )
+    finance::DomainTransaction TransactionMapper::
+        fromCreateCashTransactionDraft(
+            const drafts::CreateCashTransactionDraft& draft
+        )
     {
         std::vector<finance::TransactionEntry> entries;
 
         for (const auto& entryDraft : draft.getEntries())
             entries.push_back(fromEntryDraft(entryDraft));
 
-        finance::Transaction transaction{
+        finance::DomainTransaction transaction{
             TransactionId::invalid(),
             draft.getTimestamp(),
             TransactionStatus::Completed,
@@ -181,21 +182,22 @@ namespace controller
 
     /**
      * @brief Converts a drafts::CreateStockTransactionDraft to a
-     * finance::Transaction
+     * finance::DomainTransaction
      *
      * @param draft
-     * @return finance::Transaction
+     * @return finance::DomainTransaction
      */
-    finance::Transaction TransactionMapper::fromCreateStockTransactionDraft(
-        const drafts::CreateStockTransactionDraft& draft
-    )
+    finance::DomainTransaction TransactionMapper::
+        fromCreateStockTransactionDraft(
+            const drafts::CreateStockTransactionDraft& draft
+        )
     {
         std::vector<finance::TransactionEntry> entries;
 
         for (const auto& entryDraft : draft.getEntries())
             entries.push_back(fromEntryDraft(entryDraft));
 
-        finance::Transaction transaction{
+        finance::DomainTransaction transaction{
             TransactionId::invalid(),
             draft.getTimestamp(),
             TransactionStatus::Completed,
@@ -208,7 +210,7 @@ namespace controller
     }
 
     /**
-     * @brief Converts a vector of finance::Transaction to a vector of
+     * @brief Converts a vector of finance::DomainTransaction to a vector of
      * drafts::TransactionOverviewDraft
      *
      * @param transactions
@@ -219,9 +221,9 @@ namespace controller
      */
     std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
         toOverviewDrafts(
-            const std::vector<finance::Transaction>& transactions,
-            const instrumentMap<std::string>&        instrumentNames,
-            const idSet<AccountId>&                  externalAccounts
+            const std::vector<finance::DomainTransaction>& transactions,
+            const instrumentMap<std::string>&              instrumentNames,
+            const idSet<AccountId>&                        externalAccounts
         )
     {
         std::vector<drafts::TransactionOverviewDraft> drafts;
@@ -236,7 +238,7 @@ namespace controller
     }
 
     /**
-     * @brief Converts a finance::Transaction to a
+     * @brief Converts a finance::DomainTransaction to a
      * drafts::TransactionOverviewDraft
      *
      * @param transaction
@@ -246,7 +248,7 @@ namespace controller
      * @return drafts::TransactionOverviewDraft
      */
     drafts::TransactionOverviewDraft TransactionMapper::toOverviewDraft(
-        const finance::Transaction&       transaction,
+        const finance::DomainTransaction& transaction,
         const instrumentMap<std::string>& instrumentNames,
         const idSet<AccountId>&           externalAccounts
     )

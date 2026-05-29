@@ -12,8 +12,8 @@
 #include "finance/account.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/position.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "service/i_account_service.hpp"
 #include "service/i_instrument_service.hpp"
 #include "service/i_position_service.hpp"
@@ -229,14 +229,14 @@ namespace tests
 
        public:
         [[nodiscard]] TransactionId addTransaction(
-            const finance::Transaction& /*transaction*/
+            const finance::DomainTransaction& /*transaction*/
         ) override
         {
             addCallCount++;
             return TransactionId{_nextId++};
         }
 
-        [[nodiscard]] std::vector<finance::Transaction> getTransactions(
+        [[nodiscard]] std::vector<finance::DomainTransaction> getTransactions(
             const idSet<AccountId>& /*accountIds*/,
             const finance::TransactionFilter& /*filter*/
         ) override

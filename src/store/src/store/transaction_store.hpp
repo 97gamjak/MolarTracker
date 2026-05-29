@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"
 
@@ -31,7 +31,7 @@ namespace store
      *
      */
     class TransactionStore
-        : public BaseStore<finance::Transaction, TransactionId>,
+        : public BaseStore<finance::DomainTransaction, TransactionId>,
           public ITransactionStore
     {
        private:
@@ -62,15 +62,16 @@ namespace store
 
         [[nodiscard]]
         TransactionStoreResult addTransaction(
-            finance::Transaction transaction
+            finance::DomainTransaction transaction
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions(
+        std::vector<finance::DomainTransaction> getTransactions(
             const finance::TransactionFilter& filter
         ) const override;
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions() const override;
+        std::vector<finance::DomainTransaction> getTransactions(
+        ) const override;
 
         [[nodiscard]]
         idSet<InstrumentId> getInstrumentIdsByPositionId(
@@ -78,7 +79,7 @@ namespace store
         ) const override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> findTransactionsByPositionId(
+        std::vector<finance::DomainTransaction> findTransactionsByPositionId(
             PositionId positionId
         ) const override;
 

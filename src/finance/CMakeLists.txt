@@ -7,17 +7,19 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/account.cpp
     ${SOURCE_DIR}/currency.cpp
     ${SOURCE_DIR}/currency_exception.cpp
-    ${SOURCE_DIR}/transaction.cpp
-    ${SOURCE_DIR}/transaction_filter.cpp
-    ${SOURCE_DIR}/transaction_entry.cpp
-    ${SOURCE_DIR}/transaction_data.cpp
-    ${SOURCE_DIR}/trade_data.cpp
     ${SOURCE_DIR}/ticker_info.cpp
     ${SOURCE_DIR}/yf_client.cpp
     ${SOURCE_DIR}/position.cpp
     ${SOURCE_DIR}/price_quote.cpp
     ${SOURCE_DIR}/price_cache.cpp
     ${SOURCE_DIR}/finance_error.cpp
+
+    ${SOURCE_DIR}/transaction/base_transaction.cpp
+    ${SOURCE_DIR}/transaction/trade_data.cpp
+    ${SOURCE_DIR}/transaction/transaction.cpp
+    ${SOURCE_DIR}/transaction/transaction_filter.cpp
+    ${SOURCE_DIR}/transaction/transaction_entry.cpp
+    ${SOURCE_DIR}/transaction/transaction_data.cpp
 
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp

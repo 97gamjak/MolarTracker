@@ -414,7 +414,7 @@ namespace controller
      * @return true if the transaction can be added, false otherwise
      */
     bool TransactionSideBarController::_checkAddTransaction(
-        const finance::Transaction& transaction
+        const finance::DomainTransaction& transaction
     )
     {
         // Check if the transaction can be added
