@@ -1,5 +1,11 @@
 qt_add_library(molartracker_controller STATIC
 
+    # mappers
+    src/controller/mapper/account_mapper.cpp
+    src/controller/mapper/profile_mapper.cpp
+    src/controller/mapper/stock_mapper.cpp
+    src/controller/mapper/transaction_mapper.cpp
+
     # menu bar
     src/controller/menu_bar/menu_bar_controller.cpp
     src/controller/menu_bar/file_menu_controller.cpp

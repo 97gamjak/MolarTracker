@@ -1,20 +1,22 @@
-#include "drafts/stock_mapper.hpp"
+#include "stock_mapper.hpp"
 
 #include "drafts/stock_draft.hpp"
 #include "finance/instrument/stock.hpp"
 
-namespace drafts
+namespace controller
 {
 
     /**
-     * @brief Convert a finance::Stock to a StockInfoDraft.
+     * @brief Convert a finance::Stock to a drafts::StockInfoDraft.
      *
      * @param stock
-     * @return StockInfoDraft
+     * @return drafts::StockInfoDraft
      */
-    StockInfoDraft StockMapper::toStockInfoDraft(const finance::Stock& stock)
+    drafts::StockInfoDraft StockMapper::toStockInfoDraft(
+        const finance::Stock& stock
+    )
     {
-        return StockInfoDraft{
+        return drafts::StockInfoDraft{
             stock.getTicker(),
             stock.getShortName(),
             stock.getLongName(),
@@ -27,16 +29,17 @@ namespace drafts
     }
 
     /**
-     * @brief Convert a vector of finance::Stock to a vector of StockInfoDraft.
+     * @brief Convert a vector of finance::Stock to a vector of
+     * drafts::StockInfoDraft.
      *
      * @param stocks
-     * @return std::vector<StockInfoDraft>
+     * @return std::vector<drafts::StockInfoDraft>
      */
-    std::vector<StockInfoDraft> StockMapper::toStockInfoDrafts(
+    std::vector<drafts::StockInfoDraft> StockMapper::toStockInfoDrafts(
         const std::vector<finance::Stock>& stocks
     )
     {
-        std::vector<StockInfoDraft> drafts;
+        std::vector<drafts::StockInfoDraft> drafts;
         drafts.reserve(stocks.size());
 
         for (const auto& stock : stocks)
@@ -45,4 +48,4 @@ namespace drafts
         return drafts;
     }
 
-}   // namespace drafts
+}   // namespace controller

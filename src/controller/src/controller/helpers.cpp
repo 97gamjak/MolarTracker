@@ -2,9 +2,9 @@
 
 #include <expected>
 
+#include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
-#include "drafts/stock_mapper.hpp"
 #include "drafts/transaction_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
@@ -73,7 +73,7 @@ namespace controller
                 return std::nullopt;
             }
 
-            return drafts::StockMapper::toStockInfoDraft(stocks.front());
+            return StockMapper::toStockInfoDraft(stocks.front());
         }
     }   // namespace
 
@@ -164,7 +164,7 @@ namespace controller
             }
 
             const auto stockInfo =
-                drafts::StockMapper::toStockInfoDraft(stocks.front());
+                StockMapper::toStockInfoDraft(stocks.front());
 
             drafts.emplace_back(
                 position.getId(),

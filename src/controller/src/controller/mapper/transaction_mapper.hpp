@@ -1,5 +1,6 @@
-#ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
-#define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION_MAPPER_HPP__
+
+#define __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION_MAPPER_HPP__
 
 #include <string>
 #include <variant>
@@ -27,6 +28,10 @@ namespace drafts
     class TransactionEntryDraft;         // forward declaration
     class TradeLegDraft;                 // forward declaration
     class CreateStockTransactionDraft;   // forward declaration
+}   // namespace drafts
+
+namespace controller
+{
 
     /**
      * @brief Mapper class for converting between Transaction and
@@ -41,45 +46,57 @@ namespace drafts
     class TransactionMapper
     {
        public:
+        [[nodiscard]]
         static drafts::TransactionEntryDraft toEntryDraft(
             const finance::TransactionEntry& entry,
             const idSet<AccountId>&          externalAccounts
         );
 
+        [[nodiscard]]
         static finance::TransactionEntry fromEntryDraft(
             const drafts::TransactionEntryDraft& entryDraft
         );
 
+        [[nodiscard]]
         static finance::Transaction fromCreateCashTransactionDraft(
-            const CreateCashTransactionDraft& draft
+            const drafts::CreateCashTransactionDraft& draft
         );
 
+        [[nodiscard]]
         static finance::Transaction fromCreateStockTransactionDraft(
-            const CreateStockTransactionDraft& draft
+            const drafts::CreateStockTransactionDraft& draft
         );
 
-        static finance::TradeLeg fromTradeLegDraft(const TradeLegDraft& draft);
+        [[nodiscard]]
+        static finance::TradeLeg fromTradeLegDraft(
+            const drafts::TradeLegDraft& draft
+        );
 
+        [[nodiscard]]
         static std::vector<finance::TradeLeg> fromTradeLegDrafts(
-            const std::vector<TradeLegDraft>& drafts
+            const std::vector<drafts::TradeLegDraft>& drafts
         );
 
-        static TradeLegDraft toTradeLegDraft(
+        [[nodiscard]]
+        static drafts::TradeLegDraft toTradeLegDraft(
             const finance::TradeLeg&          leg,
             const instrumentMap<std::string>& instrumentNames
         );
 
-        static std::vector<TradeLegDraft> toTradeLegDrafts(
+        [[nodiscard]]
+        static std::vector<drafts::TradeLegDraft> toTradeLegDrafts(
             const std::vector<finance::TradeLeg>& legs,
             const instrumentMap<std::string>&     instrumentNames
         );
 
+        [[nodiscard]]
         static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
             const std::vector<finance::Transaction>& transactions,
             const instrumentMap<std::string>&        instrumentNames,
             const idSet<AccountId>&                  externalAccounts
         );
 
+        [[nodiscard]]
         static drafts::TransactionOverviewDraft toOverviewDraft(
             const finance::Transaction&       transaction,
             const instrumentMap<std::string>& instrumentNames,
@@ -87,6 +104,6 @@ namespace drafts
         );
     };
 
-}   // namespace drafts
+}   // namespace controller
 
-#endif   // __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_MAPPER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION_MAPPER_HPP__

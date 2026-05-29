@@ -10,7 +10,7 @@
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/helpers.hpp"
-#include "drafts/account_mapper.hpp"
+#include "controller/mapper/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
@@ -131,7 +131,7 @@ namespace controller
         {
             case AccountKind::Cash:
                 _accountDetailView->updateCashAccount(
-                    drafts::AccountMapper::toDraft(account.value())
+                    AccountMapper::toDraft(account.value())
                 );
                 break;
             case AccountKind::Security:
@@ -153,7 +153,7 @@ namespace controller
                 );
 
                 _accountDetailView->updateSecurityAccount(
-                    drafts::AccountMapper::toDraft(account.value()),
+                    AccountMapper::toDraft(account.value()),
                     drafts
                 );
                 break;
