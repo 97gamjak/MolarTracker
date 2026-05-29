@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"

@@ -12,7 +12,7 @@
 #include "finance/account.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/position.hpp"
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "service/i_account_service.hpp"
 #include "service/i_instrument_service.hpp"

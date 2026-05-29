@@ -5,7 +5,7 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"

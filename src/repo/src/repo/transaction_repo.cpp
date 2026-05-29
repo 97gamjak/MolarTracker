@@ -3,7 +3,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"

@@ -8,7 +8,7 @@
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
 #include "finance/cash.hpp"
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "mock_services.hpp"

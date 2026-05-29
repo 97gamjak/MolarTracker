@@ -15,8 +15,8 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/finance_error.cpp
 
     ${SOURCE_DIR}/transaction/base_transaction.cpp
+    ${SOURCE_DIR}/transaction/domain_transaction.cpp
     ${SOURCE_DIR}/transaction/trade_data.cpp
-    ${SOURCE_DIR}/transaction/transaction.cpp
     ${SOURCE_DIR}/transaction/transaction_filter.cpp
     ${SOURCE_DIR}/transaction/transaction_entry.cpp
     ${SOURCE_DIR}/transaction/transaction_data.cpp

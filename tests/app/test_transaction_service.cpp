@@ -9,7 +9,7 @@
 #include "config/quantity.hpp"
 #include "db/database.hpp"
 #include "finance/cash.hpp"
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "repo/migration/migration_runner.hpp"

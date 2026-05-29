@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "transaction.hpp"
+#include "domain_transaction.hpp"
 
 namespace finance
 {

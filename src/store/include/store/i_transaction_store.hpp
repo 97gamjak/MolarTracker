@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/transaction/transaction.hpp"   // needed for vector
+#include "finance/transaction/domain_transaction.hpp"   // needed for vector
 
 namespace finance
 {

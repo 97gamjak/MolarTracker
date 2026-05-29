@@ -1,6 +1,6 @@
 #include "finance/transaction/transaction_filter.hpp"
 
-#include "finance/transaction/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 
 namespace finance
 {
