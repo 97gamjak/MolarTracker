@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__ITERABLE_HPP__
 #define __UTILS__INCLUDE__UTILS__ITERABLE_HPP__
 
+#include <ranges>
 #include <unordered_set>
 #include <vector>
 
