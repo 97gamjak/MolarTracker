@@ -6,6 +6,31 @@
 #include <vector>
 
 /**
+ * @brief concept to check if a type has a getId() method that returns a
+ * specific type.
+ *
+ * @tparam T
+ * @tparam IdType
+ */
+template <typename T, typename IdType>
+concept HasId = requires(T type) {
+    { type.getId() } -> std::same_as<IdType>;
+};
+
+/**
+ * @brief concept to check if a type has a getId() method that returns a type
+ * that is the same as the value type of a given range.
+ *
+ * @tparam IdContainer
+ * @tparam T
+ * @tparam IdType
+ */
+template <typename IdContainer, typename T>
+concept HasIdRange = requires(IdContainer ids, T type) {
+    { type.getId() } -> std::same_as<std::ranges::range_value_t<IdContainer>>;
+};
+
+/**
  * @brief A container that provides iterable functionality.
  *
  * @tparam T The type of elements in the container.
@@ -30,41 +55,35 @@ class Iterable
 
     const T& operator[](std::size_t index) const;
 
+    [[nodiscard]] bool empty() const;
+    [[nodiscard]] auto size() const;
+
     void set(const Container& items);
 
-    const Container& getItems() const;
+    [[nodiscard]] const Container& getItems() const;
 
     void add(const T& item)
     requires std::same_as<Container, std::vector<T>>;
-
     void add(const Container& items)
     requires std::same_as<Container, std::vector<T>>;
 
     template <typename IdType>
-    requires requires(T type) {
-        { type.getId() } -> std::same_as<IdType>;
-    }
+    requires HasId<T, IdType>
     bool remove(IdType id);
-
     template <typename IdContainer>
-    requires std::ranges::range<IdContainer> && requires(T type) {
-        {
-            type.getId()
-        } -> std::same_as<std::ranges::range_value_t<IdContainer>>;
-    }
+    requires HasIdRange<IdContainer, T>
     void remove(const IdContainer& ids);
 
     template <typename IdType>
-    requires requires(T type) {
-        { type.getId() } -> std::same_as<IdType>;
-    }
-    bool contains();
+    requires HasId<T, IdType>
+    bool contains(IdType id) const;
 
    protected:
-    Container& getItems();
+    [[nodiscard]] Container& getItems();
 
     template <typename IdType, typename Hash = std::hash<IdType>>
-    [[nodiscard]] std::unordered_set<IdType, Hash> _getIds() const;
+    [[nodiscard]]
+    std::unordered_set<IdType, Hash> _getIds() const;
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__ITERABLE_TPP__

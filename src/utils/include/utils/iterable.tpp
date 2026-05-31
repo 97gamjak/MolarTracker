@@ -78,6 +78,28 @@ const T& Iterable<T, Container>::operator[](std::size_t index) const
 }
 
 /**
+ * @brief Checks if the container is empty.
+ *
+ * @return true if the container is empty, false otherwise.
+ */
+template <typename T, typename Container>
+bool Iterable<T, Container>::empty() const
+{
+    return _items.empty();
+}
+
+/**
+ * @brief Returns the number of items in the container.
+ *
+ * @return The number of items in the container.
+ */
+template <typename T, typename Container>
+auto Iterable<T, Container>::size() const
+{
+    return _items.size();
+}
+
+/**
  * @brief Sets the items in the container.
  *
  * @param items The container of items to set.
@@ -142,9 +164,7 @@ requires std::same_as<Container, std::vector<T>>
  */
 template <typename T, typename Container>
 template <typename IdType>
-requires requires(T type) {
-    { type.getId() } -> std::same_as<IdType>;
-}
+requires HasId<T, IdType>
 bool Iterable<T, Container>::remove(IdType id)
 {
     auto it = std::ranges::find_if(
@@ -167,14 +187,29 @@ bool Iterable<T, Container>::remove(IdType id)
  */
 template <typename T, typename Container>
 template <typename IdContainer>
-requires std::ranges::range<IdContainer> && requires(T type) {
-    { type.getId() } -> std::same_as<std::ranges::range_value_t<IdContainer>>;
-}
+requires HasIdRange<IdContainer, T>
 void Iterable<T, Container>::remove(const IdContainer& ids)
 {
     std::erase_if(
         _items,
         [&](const T& item) { return std::ranges::contains(ids, item.getId()); }
+    );
+}
+
+/**
+ * @brief Checks if an item with the specified id exists in the container.
+ *
+ * @param id The id of the item to check for.
+ * @return true if an item with the specified id exists, false otherwise.
+ */
+template <typename T, typename Container>
+template <typename IdType>
+requires HasId<T, IdType>
+bool Iterable<T, Container>::contains(IdType id) const
+{
+    return std::ranges::any_of(
+        _items,
+        [id](const T& type) { return type.getId() == id; }
     );
 }
 
