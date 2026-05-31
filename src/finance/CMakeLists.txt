@@ -4,7 +4,6 @@ set(SOURCE_DIR
 
 add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/cash.cpp
-    ${SOURCE_DIR}/account.cpp
     ${SOURCE_DIR}/currency.cpp
     ${SOURCE_DIR}/currency_exception.cpp
     ${SOURCE_DIR}/ticker_info.cpp
@@ -26,6 +25,9 @@ add_library(molartracker_finance STATIC
 
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp
+
+    ${SOURCE_DIR}/account/account.cpp
+    ${SOURCE_DIR}/account/accounts.cpp
 )
 
 target_include_directories(molartracker_finance

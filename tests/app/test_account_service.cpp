@@ -8,7 +8,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "repo/account_repo.hpp"

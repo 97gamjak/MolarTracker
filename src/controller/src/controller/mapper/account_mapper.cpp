@@ -1,7 +1,7 @@
 #include "account_mapper.hpp"
 
 #include "drafts/account_draft.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 
 namespace controller
 {

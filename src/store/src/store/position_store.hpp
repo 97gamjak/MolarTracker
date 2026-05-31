@@ -10,10 +10,14 @@
 #include "service/i_position_service.hpp"
 #include "store/i_position_store.hpp"
 
+namespace finance
+{
+    class Accounts;   // Forward declaration
+}   // namespace finance
+
 namespace store
 {
     class TransactionStore;   // Forward declaration
-    class AccountSession;     // Forward declaration
 
     /**
      * @brief Store for managing Positions
@@ -33,7 +37,7 @@ namespace store
        public:
         explicit PositionStore(
             std::shared_ptr<service::IPositionService> positionService,
-            const AccountSession&                      accountSession
+            const finance::Accounts&                   accountSession
         );
 
         ~PositionStore() override;

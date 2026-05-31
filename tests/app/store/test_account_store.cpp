@@ -6,7 +6,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "mock_services.hpp"
 #include "store/account/account_store.hpp"
 

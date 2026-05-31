@@ -3,7 +3,7 @@
 #include <expected>
 #include <format>
 
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
 

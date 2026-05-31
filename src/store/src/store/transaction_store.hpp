@@ -13,7 +13,8 @@
 
 namespace finance
 {
-    class Account;   // Forward declaration
+    class Account;    // Forward declaration
+    class Accounts;   // Forward declaration
 }   // namespace finance
 
 namespace service
@@ -23,8 +24,7 @@ namespace service
 
 namespace store
 {
-    class AccountSession;   // Forward declaration
-    class PositionStore;    // Forward declaration
+    class PositionStore;   // Forward declaration
 
     /**
      * @brief Store for managing transactions
@@ -49,8 +49,8 @@ namespace store
        public:
         explicit TransactionStore(
             const std::shared_ptr<service::ITransactionService>&
-                                  transactionService,
-            const AccountSession& accountSession
+                                     transactionService,
+            const finance::Accounts& accountSession
         );
         ~TransactionStore() override;
 
