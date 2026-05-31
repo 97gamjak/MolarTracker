@@ -93,6 +93,10 @@ All changes and updates, that are relevant for developers will be documented her
 
 - Introduce `.in` for queries to make it easier to create where clauses for ranges
 
+#### Utils
+
+- Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+
 ### Cleanup
 
 - Speedup some compilation headers
@@ -107,6 +111,7 @@ All changes and updates, that are relevant for developers will be documented her
 - make transaction store an interface
 - make position store an interface and cleanup deps to remove drafts from store deps
 - move mappers from drafts into controller
+- remove `AccountSession` type and change it to `Accounts`
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

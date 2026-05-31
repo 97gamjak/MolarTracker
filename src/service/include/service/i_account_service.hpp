@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 
 namespace service
 {

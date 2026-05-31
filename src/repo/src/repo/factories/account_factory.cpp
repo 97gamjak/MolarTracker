@@ -1,7 +1,7 @@
 #include "account_factory.hpp"
 
 #include "config/id_types.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "sql_models/account_row.hpp"
 
 namespace repo

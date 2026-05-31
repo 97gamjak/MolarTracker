@@ -4,7 +4,7 @@
 #include <expected>
 
 #include "commands/command.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 
 namespace store
 {

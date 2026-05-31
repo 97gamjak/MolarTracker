@@ -1,6 +1,6 @@
 #include "account_service.hpp"
 
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "repo/i_account_repo.hpp"
 
 namespace service

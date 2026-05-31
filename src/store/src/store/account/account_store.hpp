@@ -6,8 +6,8 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
-#include "finance/account.hpp"
-#include "store/account/account_session.hpp"
+#include "finance/account/account.hpp"
+#include "finance/account/accounts.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_account_store.hpp"
 
@@ -35,7 +35,7 @@ namespace store
 
         /// The session object for managing the session state of accounts in the
         /// store
-        AccountSession _session;
+        finance::Accounts _session;
 
         /// Connections for handling signals related to account store updates
         Connections _connections;
@@ -77,7 +77,7 @@ namespace store
         ) override;
 
         [[nodiscard]]
-        const AccountSession& getAccountSession() const override;
+        const finance::Accounts& getAccountSession() const override;
 
         [[nodiscard]]
         const unorderedIdMap<AccountId, AccountId>& getIdRemap() const override;

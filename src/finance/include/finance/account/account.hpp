@@ -1,5 +1,5 @@
-#ifndef __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
-#define __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNT_HPP__
+#define __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNT_HPP__
 
 #include <cstdint>
 #include <string>
@@ -84,4 +84,4 @@ namespace finance
 
 }   // namespace finance
 
-#endif   // __FINANCE__INCLUDE__FINANCE__ACCOUNT_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNT_HPP__

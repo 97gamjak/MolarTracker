@@ -5,11 +5,11 @@
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
+#include "finance/account/accounts.hpp"
 #include "finance/transaction.hpp"
 #include "finance/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
-#include "store/account/account_session.hpp"
 
 REGISTER_LOG_CATEGORY("Store.TransactionStore");
 
@@ -25,14 +25,14 @@ namespace store
     struct TransactionStore::Session
     {
         /// A reference to the AccountSession
-        const AccountSession& accountSession;
+        const finance::Accounts& accountSession;
 
         /**
          * @brief Construct a new Session object
          *
          * @param accountSession_
          */
-        explicit Session(const AccountSession& accountSession_)
+        explicit Session(const finance::Accounts& accountSession_)
             : accountSession(accountSession_)
         {
         }
@@ -54,7 +54,7 @@ namespace store
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<service::ITransactionService>& transactionService,
-        const AccountSession&                                accountSession
+        const finance::Accounts&                             accountSession
     )
         : _transactionService(transactionService),
           _session(std::make_unique<Session>(accountSession))

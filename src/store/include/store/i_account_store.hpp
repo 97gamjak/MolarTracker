@@ -4,12 +4,11 @@
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "exceptions/base.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
+#include "finance/account/accounts.hpp"
 
 namespace store
 {
-    class AccountSession;   // Forward declaration
-
     enum class AccountStoreResult : std::uint8_t
     {
         Ok,
@@ -137,10 +136,10 @@ namespace store
         /**
          * @brief Get the current account session
          *
-         * @return const AccountSession&
+         * @return const finance::Accounts&
          */
         [[nodiscard]]
-        virtual const AccountSession& getAccountSession() const = 0;
+        virtual const finance::Accounts& getAccountSession() const = 0;
     };
 
 }   // namespace store
