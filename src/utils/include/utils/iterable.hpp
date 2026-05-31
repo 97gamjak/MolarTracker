@@ -28,6 +28,8 @@ class Iterable
     auto begin() const;
     auto end() const;
 
+    const T& operator[](std::size_t index) const;
+
     void set(const Container& items);
 
     const Container& getItems() const;
@@ -51,6 +53,12 @@ class Iterable
         } -> std::same_as<std::ranges::range_value_t<IdContainer>>;
     }
     void remove(const IdContainer& ids);
+
+    template <typename IdType>
+    requires requires(T type) {
+        { type.getId() } -> std::same_as<IdType>;
+    }
+    bool contains();
 
    protected:
     Container& getItems();

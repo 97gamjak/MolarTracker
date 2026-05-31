@@ -66,6 +66,18 @@ auto Iterable<T, Container>::end() const
 }
 
 /**
+ * @brief Returns a const reference to the item at the specified index.
+ *
+ * @param index The index of the item to retrieve.
+ * @return A const reference to the item at the specified index.
+ */
+template <typename T, typename Container>
+const T& Iterable<T, Container>::operator[](std::size_t index) const
+{
+    return _items[index];
+}
+
+/**
  * @brief Sets the items in the container.
  *
  * @param items The container of items to set.

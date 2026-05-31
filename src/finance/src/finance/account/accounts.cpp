@@ -11,4 +11,14 @@ namespace finance
     {
         return Iterable<Account>::_getIds<AccountId, AccountId::Hash>();
     }
+
+    Accounts Accounts::filterExternal(bool external) const
+    {
+        Accounts filtered;
+        for (const auto& account : *this)
+            if (account.isExternal() == external)
+                filtered.add(account);
+
+        return filtered;
+    }
 }   // namespace finance

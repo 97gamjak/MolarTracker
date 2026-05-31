@@ -16,6 +16,9 @@ namespace finance
 
         [[nodiscard]]
         idSet<AccountId> getIds() const;
+
+        [[nodiscard]]
+        Accounts filterExternal(bool external) const;
     };
 }   // namespace finance
 

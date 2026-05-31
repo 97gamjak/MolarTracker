@@ -10,7 +10,6 @@
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "finance/transaction/transaction_entry.hpp"
 
 namespace finance
 {
@@ -41,10 +40,7 @@ namespace finance
     }
 
     std::expected<CashTransaction, TransactionConversionError> TransactionConverter::
-        toCash(
-            const DomainTransaction& transaction,
-            const std::vector<Account>& /*accounts*/
-        )
+        toCash(const DomainTransaction& transaction, const Accounts& accounts)
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
@@ -57,8 +53,22 @@ namespace finance
         auto amountEntries = entries.filter(TransactionEntryType::General);
         auto feeEntries    = entries.filter(TransactionEntryType::Fees);
 
-        const TransactionEntries nonExternalAmountEntries;
-        const TransactionEntries nonExternalAmountEntries;
+        if (amountEntries.size() != 2)
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of amount entries"}
+            );
+        }
+
+        if (feeEntries.size() != 2 || !feeEntries.empty())
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of fee entries"}
+            );
+        }
+
+        const auto filteredAccounts = accounts.filterExternal(false);
+        const auto externalAccounts = accounts.filterExternal(true);
 
         return CashTransaction{
             transaction.getId(),
