@@ -10,6 +10,7 @@
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
+#include "finance/transaction_entry.hpp"
 
 namespace finance
 {
@@ -72,16 +73,19 @@ namespace finance
 
         AccountId internalAccountId;
         AccountId externalAccountId;
+        Cash      amount{amountEntries[0].getCurrency(), 0};
 
         if (filteredAccounts.contains(amountEntries[0].getAccountId()))
         {
-            internalAccountId = amountEntries[0].getAccountId();
-            externalAccountId = amountEntries[1].getAccountId();
+            internalAccountId  = amountEntries[0].getAccountId();
+            externalAccountId  = amountEntries[1].getAccountId();
+            amount            += amountEntries[0].getCash();
         }
         else if (filteredAccounts.contains(amountEntries[1].getAccountId()))
         {
-            internalAccountId = amountEntries[1].getAccountId();
-            externalAccountId = amountEntries[0].getAccountId();
+            internalAccountId  = amountEntries[1].getAccountId();
+            externalAccountId  = amountEntries[0].getAccountId();
+            amount            += amountEntries[1].getCash();
         }
         else
         {
@@ -97,12 +101,41 @@ namespace finance
             );
         }
 
+        Cash fees{amountEntries[0].getCurrency(), 0};
+
+        if (feeEntries.size() == 2)
+        {
+            if (internalAccountId != feeEntries[0].getAccountId() &&
+                internalAccountId != feeEntries[1].getAccountId())
+            {
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
+            }
+
+            if (externalAccountId != feeEntries[0].getAccountId() &&
+                externalAccountId != feeEntries[1].getAccountId())
+            {
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
+            }
+
+            if (internalAccountId == feeEntries[0].getAccountId())
+                fees += feeEntries[0].getCash();
+            else
+                fees += feeEntries[1].getCash();
+        }
+
         return CashTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
-            CashData{},
-            transaction.getEntries()
+            internalAccountId,
+            externalAccountId,
+            amount,
+            fees,
+            transaction.getComment()
         };
     }
 
