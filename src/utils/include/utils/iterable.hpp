@@ -29,7 +29,6 @@ class Iterable
 
     void set(const Container& items);
 
-    Container&       getItems();
     const Container& getItems() const;
 
     void add(const T& item)
@@ -53,6 +52,8 @@ class Iterable
     void remove(const IdContainer& ids);
 
    protected:
+    Container& getItems();
+
     template <typename IdType, typename Hash = std::hash<IdType>>
     [[nodiscard]] std::unordered_set<IdType, Hash> _getIds() const;
 };
