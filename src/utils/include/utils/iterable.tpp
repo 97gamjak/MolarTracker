@@ -173,7 +173,7 @@ void Iterable<T, Container>::remove(const IdContainer& ids)
  */
 template <typename T, typename Container>
 template <typename IdType, typename Hash>
-std::unordered_set<IdType, Hash> Iterable<T, Container>::getIds() const
+std::unordered_set<IdType, Hash> Iterable<T, Container>::_getIds() const
 {
     std::unordered_set<IdType, Hash> idSet;
     for (const auto& item : _items)

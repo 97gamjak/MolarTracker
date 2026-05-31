@@ -52,8 +52,9 @@ class Iterable
     }
     void remove(const IdContainer& ids);
 
+   protected:
     template <typename IdType, typename Hash = std::hash<IdType>>
-    [[nodiscard]] std::unordered_set<IdType, Hash> getIds() const;
+    [[nodiscard]] std::unordered_set<IdType, Hash> _getIds() const;
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__ITERABLE_TPP__

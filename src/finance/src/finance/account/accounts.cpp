@@ -9,6 +9,6 @@ namespace finance
      */
     idSet<AccountId> Accounts::getIds() const
     {
-        return Iterable<Account>::getIds<AccountId, AccountId::Hash>();
+        return Iterable<Account>::_getIds<AccountId, AccountId::Hash>();
     }
 }   // namespace finance
