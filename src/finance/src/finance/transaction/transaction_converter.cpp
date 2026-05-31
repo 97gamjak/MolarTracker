@@ -70,6 +70,33 @@ namespace finance
         const auto filteredAccounts = accounts.filterExternal(false);
         const auto externalAccounts = accounts.filterExternal(true);
 
+        AccountId internalAccountId;
+        AccountId externalAccountId;
+
+        if (filteredAccounts.contains(amountEntries[0].getAccountId()))
+        {
+            internalAccountId = amountEntries[0].getAccountId();
+            externalAccountId = amountEntries[1].getAccountId();
+        }
+        else if (filteredAccounts.contains(amountEntries[1].getAccountId()))
+        {
+            internalAccountId = amountEntries[1].getAccountId();
+            externalAccountId = amountEntries[0].getAccountId();
+        }
+        else
+        {
+            return std::unexpected(
+                TransactionConversionError{"No internal account found"}
+            );
+        }
+
+        if (!externalAccounts.contains(externalAccountId))
+        {
+            return std::unexpected(
+                TransactionConversionError{"No external account found"}
+            );
+        }
+
         return CashTransaction{
             transaction.getId(),
             transaction.getTimestamp(),

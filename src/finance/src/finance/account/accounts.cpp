@@ -3,22 +3,20 @@
 namespace finance
 {
     /**
-     * @brief Get the IDs of all accounts.
+     * @brief Filter accounts based on whether they are external or not.
      *
-     * @return idSet<AccountId>
+     * @param external If true, returns only external accounts; if false,
+     * returns only internal accounts.
+     * @return Accounts A new Accounts object containing the filtered accounts.
      */
-    idSet<AccountId> Accounts::getIds() const
-    {
-        return Iterable<Account>::_getIds<AccountId, AccountId::Hash>();
-    }
-
     Accounts Accounts::filterExternal(bool external) const
     {
         Accounts filtered;
-        for (const auto& account : *this)
+        for (const auto& [id, account] : *this)
             if (account.isExternal() == external)
-                filtered.add(account);
+                filtered.addUnchecked(account);
 
         return filtered;
     }
+
 }   // namespace finance
