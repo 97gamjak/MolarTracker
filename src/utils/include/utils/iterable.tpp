@@ -17,7 +17,7 @@
  * @param items The container to initialize the Iterable with.
  */
 template <typename T, typename Container>
-Iterable<T, Container>::Iterable(Container& items) : _items(items)
+Iterable<T, Container>::Iterable(const Container& items) : _items(items)
 {
 }
 

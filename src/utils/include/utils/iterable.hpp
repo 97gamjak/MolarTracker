@@ -20,7 +20,7 @@ class Iterable
 
    public:
     Iterable() = default;
-    explicit Iterable(Container& items);
+    explicit Iterable(const Container& items);
 
     auto begin();
     auto end();
