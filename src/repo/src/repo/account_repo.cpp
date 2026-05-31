@@ -1,7 +1,7 @@
 #include "account_repo.hpp"
 
 #include "factories/account_factory.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"

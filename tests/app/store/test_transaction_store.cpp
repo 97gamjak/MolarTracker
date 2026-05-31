@@ -12,7 +12,6 @@
 #include "finance/transaction_entry.hpp"
 #include "finance/transaction_filter.hpp"
 #include "mock_services.hpp"
-#include "store/account/account_session.hpp"
 #include "store/account/account_store.hpp"
 #include "store/position_store.hpp"
 #include "store/transaction_store.hpp"
@@ -33,7 +32,7 @@ namespace
         std::shared_ptr<tests::MockTransactionService> _mockTransactionService;
         InstrumentIdSeq                                _idSeq;
         store::AccountStore                            _accountStore;
-        store::AccountSession                          _accountSession;
+        finance::Accounts                              _accountSession;
         store::PositionStore                           _positionStore;
         std::unique_ptr<store::TransactionStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)

@@ -4,9 +4,9 @@
 #include <memory>
 #include <vector>
 
+#include "finance/account/accounts.hpp"
 #include "finance/position.hpp"
 #include "mock_services.hpp"
-#include "store/account/account_session.hpp"
 #include "store/position_store.hpp"
 #include "utils/timestamp.hpp"
 
@@ -20,7 +20,7 @@ namespace
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::shared_ptr<tests::MockPositionService> _mockService;
-        store::AccountSession                       _session;
+        finance::Accounts                           _session;
         std::unique_ptr<store::PositionStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 

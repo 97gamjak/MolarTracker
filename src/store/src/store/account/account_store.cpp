@@ -6,13 +6,12 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_account_service.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
 
-using finance::Account;
 using finance::HasAccountId;
 using finance::HasCurrency;
 using finance::HasName;
@@ -102,7 +101,7 @@ namespace store
             return AccountStoreResult::AccountNameConflict;
         }
 
-        const auto newAccount = Account{
+        const auto newAccount = finance::Account{
             AccountId::invalid(),
             AccountStatus::Active,
             account.getName(),
@@ -202,7 +201,8 @@ namespace store
         _notifyOnCommit();
 
         // here now we set our ids because they are now clean!
-        _session.set(_getIds());
+        auto values = _getValues();
+        _session.set({values.begin(), values.end()});
     }
 
     /**
@@ -286,7 +286,8 @@ namespace store
             LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
-            _session.set(_getIds());
+            auto values = _getValues();
+            _session.set({values.begin(), values.end()});
         }
     }
 
@@ -469,9 +470,9 @@ namespace store
     /**
      * @brief Get the account session
      *
-     * @return const AccountSession& The account session
+     * @return const finance::Accounts& The account session
      */
-    const AccountSession& AccountStore::getAccountSession() const
+    const finance::Accounts& AccountStore::getAccountSession() const
     {
         return _session;
     }

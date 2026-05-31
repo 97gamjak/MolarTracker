@@ -9,7 +9,7 @@
 
 #include "config/id_types.hpp"
 #include "domain/profile.hpp"
-#include "finance/account.hpp"
+#include "finance/account/account.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/position.hpp"
 #include "finance/transaction.hpp"

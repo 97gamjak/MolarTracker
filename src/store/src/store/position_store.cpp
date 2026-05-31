@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "exceptions/not_yet_implemented.hpp"
-#include "store/account/account_session.hpp"
+#include "finance/account/accounts.hpp"
 #include "store/base/base_store.hpp"
 
 namespace store
@@ -16,14 +16,14 @@ namespace store
     struct PositionStore::Session
     {
         /// the account session
-        const AccountSession& accountSession;
+        const finance::Accounts& accountSession;
 
         /**
          * @brief Construct a new Session object
          *
          * @param accountSession_
          */
-        explicit Session(const AccountSession& accountSession_)
+        explicit Session(const finance::Accounts& accountSession_)
             : accountSession(accountSession_)
         {
         }
@@ -45,7 +45,7 @@ namespace store
      */
     PositionStore::PositionStore(
         std::shared_ptr<service::IPositionService> positionService,
-        const AccountSession&                      accountSession
+        const finance::Accounts&                   accountSession
     )
         : _positionService(std::move(positionService)),
           _session(std::make_unique<Session>(accountSession))
