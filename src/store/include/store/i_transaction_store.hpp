@@ -12,6 +12,7 @@ namespace finance
 {
     class Account;             // Forward declaration
     class TransactionFilter;   // Forward declaration
+    class Transactions;        // Forward declaration
 }   // namespace finance
 
 namespace store
@@ -62,23 +63,22 @@ namespace store
          *
          * @param filter The filter to apply
          *
-         * @return std::vector<finance::DomainTransaction> The list of
+         * @return finance::Transactions The list of
          * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::DomainTransaction> getTransactions(
+        virtual finance::Transactions getTransactions(
             const finance::TransactionFilter& filter
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
-         * @return std::vector<finance::DomainTransaction> The list of
+         * @return finance::Transactions The list of
          * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::DomainTransaction> getTransactions(
-        ) const = 0;
+        virtual finance::Transactions getTransactions() const = 0;
 
         /**
          * @brief Get all instrument IDs associated with a position ID

@@ -202,7 +202,8 @@ namespace store
         _notifyOnCommit();
 
         // here now we set our ids because they are now clean!
-        _session.set(_getIds());
+        auto values = _getValues();
+        _session.set({values.begin(), values.end()});
     }
 
     /**
@@ -286,7 +287,8 @@ namespace store
             LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
-            _session.set(_getIds());
+            auto values = _getValues();
+            _session.set({values.begin(), values.end()});
         }
     }
 

@@ -7,6 +7,7 @@
 #include "drafts/transaction_draft.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/transaction_entries.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.Mapper.TransactionMapper");
@@ -77,7 +78,7 @@ namespace controller
             draft.getTimestamp(),
             TransactionStatus::Completed,
             finance::CashData{},
-            entries,
+            finance::TransactionEntries{entries},
             draft.getComment()
         };
 
@@ -202,7 +203,7 @@ namespace controller
             draft.getTimestamp(),
             TransactionStatus::Completed,
             finance::TradeData{fromTradeLegDrafts(draft.getLegs())},
-            entries,
+            finance::TransactionEntries{entries},
             draft.getComment()
         };
 

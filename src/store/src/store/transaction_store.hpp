@@ -66,12 +66,11 @@ namespace store
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::DomainTransaction> getTransactions(
+        finance::Transactions getTransactions(
             const finance::TransactionFilter& filter
         ) const override;
         [[nodiscard]]
-        std::vector<finance::DomainTransaction> getTransactions(
-        ) const override;
+        finance::Transactions getTransactions() const override;
 
         [[nodiscard]]
         idSet<InstrumentId> getInstrumentIdsByPositionId(

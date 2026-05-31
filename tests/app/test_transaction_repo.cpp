@@ -30,6 +30,7 @@
 #include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "repo/i_transaction_repo.hpp"
@@ -84,12 +85,12 @@ namespace
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 finance::CashData{},
-                {finance::TransactionEntry{
+                finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
                     finance::Cash{Currency::USD, amount},
                     TransactionEntryType::General
-                }},
+                }}},
                 std::move(comment)
             };
         }
@@ -115,12 +116,12 @@ namespace
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 data,
-                {finance::TransactionEntry{
+                finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
                     finance::Cash{Currency::USD, price2},
                     TransactionEntryType::General
-                }},
+                }}},
                 "trade comment"
             };
         }
@@ -264,7 +265,7 @@ TEST_F(TransactionRepoFixture, AddTransactionCashSingleEntryEntryIsRetrieved)
     ASSERT_EQ(txs.size(), 1U);
     ASSERT_EQ(txs[0].getEntries().size(), 1U);
 
-    const auto& entry = txs[0].getEntries()[0];
+    const auto& entry = txs[0].getEntries().front();
     EXPECT_EQ(entry.getAccountId(), _accountId);
     EXPECT_EQ(entry.getAmount(), 250'000LL);
     EXPECT_EQ(entry.getCurrency(), Currency::USD);
@@ -283,18 +284,20 @@ TEST_F(
         Timestamp::fromInt64(TEST_TS),
         TransactionStatus::Completed,
         finance::CashData{},
-        {finance::TransactionEntry{
-             TransactionEntryId::invalid(),
-             _accountId,
-             finance::Cash{Currency::USD, price1},
-             TransactionEntryType::General
-         },
-         finance::TransactionEntry{
-             TransactionEntryId::invalid(),
-             _accountId,
-             finance::Cash{Currency::EUR, price2},
-             TransactionEntryType::Fees
-         }},
+        finance::TransactionEntries{
+            {finance::TransactionEntry{
+                 TransactionEntryId::invalid(),
+                 _accountId,
+                 finance::Cash{Currency::USD, price1},
+                 TransactionEntryType::General
+             },
+             finance::TransactionEntry{
+                 TransactionEntryId::invalid(),
+                 _accountId,
+                 finance::Cash{Currency::EUR, price2},
+                 TransactionEntryType::Fees
+             }}
+        },
         std::nullopt
     };
 

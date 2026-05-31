@@ -22,12 +22,12 @@ namespace finance
      * @param comment
      */
     DomainTransaction::DomainTransaction(
-        TransactionId                 id,
-        Timestamp                     timestamp,
-        TransactionStatus             status,
-        TransactionData               data,
-        std::vector<TransactionEntry> entries,
-        std::optional<std::string>    comment
+        TransactionId              id,
+        Timestamp                  timestamp,
+        TransactionStatus          status,
+        TransactionData            data,
+        TransactionEntries         entries,
+        std::optional<std::string> comment
     )
         : Transaction(id, timestamp, status, std::move(comment)),
           _data(std::move(data)),
@@ -83,10 +83,10 @@ namespace finance
     /**
      * @brief Gets the entries associated with the transaction.
      *
-     * @return const std::vector<TransactionEntry>& The entries of the
+     * @return const TransactionEntries& The entries of the
      * transaction.
      */
-    const std::vector<TransactionEntry>& DomainTransaction::getEntries() const
+    const TransactionEntries& DomainTransaction::getEntries() const
     {
         return _entries;
     }
@@ -94,13 +94,10 @@ namespace finance
     /**
      * @brief Gets the entries associated with the transaction.
      *
-     * @return std::vector<TransactionEntry>& The entries of the
+     * @return TransactionEntries& The entries of the
      * transaction.
      */
-    std::vector<TransactionEntry>& DomainTransaction::getEntries()
-    {
-        return _entries;
-    }
+    TransactionEntries& DomainTransaction::getEntries() { return _entries; }
 
     /**
      * @brief Adds an entry to the transaction.
@@ -109,7 +106,7 @@ namespace finance
      */
     void DomainTransaction::addEntry(const TransactionEntry& entry)
     {
-        _entries.push_back(entry);
+        _entries.addTransactionEntry(entry);
     }
 
     /**

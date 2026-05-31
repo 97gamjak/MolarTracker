@@ -61,12 +61,12 @@ namespace
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 finance::CashData{},
-                {finance::TransactionEntry{
+                finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
                     finance::Cash{Currency::USD, amount},
                     TransactionEntryType::General
-                }},
+                }}},
                 std::nullopt
             };
         }

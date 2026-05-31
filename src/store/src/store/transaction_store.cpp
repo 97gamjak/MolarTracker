@@ -7,6 +7,7 @@
 #include "config/strong_id.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
+#include "finance/transaction/transactions.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
 #include "store/account/account_session.hpp"
@@ -179,10 +180,9 @@ namespace store
      * but they will not be saved to the database until the commit method is
      * called.
      *
-     * @return std::vector<finance::DomainTransaction>
+     * @return finance::Transactions
      */
-    std::vector<finance::DomainTransaction> TransactionStore::getTransactions(
-    ) const
+    finance::Transactions TransactionStore::getTransactions() const
     {
         return getTransactions(finance::TransactionFilter());
     }
@@ -202,11 +202,11 @@ namespace store
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
      *
-     * @return std::vector<finance::DomainTransaction> A vector of transactions
+     * @return finance::Transactions A vector of transactions
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::DomainTransaction> TransactionStore::getTransactions(
+    finance::Transactions TransactionStore::getTransactions(
         const finance::TransactionFilter& filter
     ) const
     {

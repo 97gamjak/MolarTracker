@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "config/strong_id.hpp"
 
 namespace finance
 {
@@ -20,14 +21,19 @@ namespace store
     {
        private:
         /// A set of active account IDs currently in the session.
-        idSet<AccountId> _activeAccounts;
+        std::vector<finance::Account> _activeAccounts;
 
        public:
-        void set(const idSet<AccountId>& activeAccounts);
+        void set(const std::vector<finance::Account>& activeAccounts);
         void add(const std::vector<finance::Account>& accounts);
-        void remove(const std::vector<AccountId>& accountIds);
+        void remove(const std::vector<finance::Account>& accounts);
+        void remove(const std::vector<AccountId>& ids);
 
-        [[nodiscard]] const idSet<AccountId>& getIds() const;
+        [[nodiscard]] bool contains(const finance::Account& account) const;
+
+        [[nodiscard]] const std::vector<finance::Account>& getAccounts() const;
+        [[nodiscard]] idSet<AccountId>                     getIds() const;
+        [[nodiscard]] idSet<AccountId> getNonExternalIds() const;
     };
 }   // namespace store
 

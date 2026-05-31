@@ -9,6 +9,7 @@
 #include "config/strong_id.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction/transaction.hpp"
+#include "finance/transaction/transaction_entries.hpp"
 #include "trade_data.hpp"
 #include "transaction_data.hpp"
 #include "transaction_entry.hpp"
@@ -28,26 +29,24 @@ namespace finance
         /// The data associated with the transaction
         TransactionData _data;
 
-        /// A list of entries associated with the transaction, each entry
-        /// represents a specific cash movement or account change related to the
-        /// transaction
-        std::vector<TransactionEntry> _entries;
+        /// A container for all entries associated with the transaction
+        TransactionEntries _entries;
 
        public:
         explicit DomainTransaction(
-            TransactionId                 id,
-            Timestamp                     timestamp,
-            TransactionStatus             status,
-            TransactionData               data,
-            std::vector<TransactionEntry> entries,
-            std::optional<std::string>    comment = std::nullopt
+            TransactionId              id,
+            Timestamp                  timestamp,
+            TransactionStatus          status,
+            TransactionData            data,
+            TransactionEntries         entries,
+            std::optional<std::string> comment = std::nullopt
         );
 
-        [[nodiscard]] const std::vector<TransactionEntry>& getEntries() const;
-        [[nodiscard]] std::vector<TransactionEntry>&       getEntries();
-        [[nodiscard]] TransactionDataType                  getType() const;
-        [[nodiscard]] const TransactionData&               getData() const;
-        [[nodiscard]] TransactionData&                     getData();
+        [[nodiscard]] const TransactionEntries& getEntries() const;
+        [[nodiscard]] TransactionEntries&       getEntries();
+        [[nodiscard]] TransactionDataType       getType() const;
+        [[nodiscard]] const TransactionData&    getData() const;
+        [[nodiscard]] TransactionData&          getData();
         [[nodiscard]] std::vector<InstrumentId> getInstrumentIds() const;
 
         [[nodiscard]] Cash     calculateTotalSum() const;
