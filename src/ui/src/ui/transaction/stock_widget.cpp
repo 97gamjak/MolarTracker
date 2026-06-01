@@ -9,7 +9,7 @@
 
 #include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_draft.hpp"
 #include "finance/cash.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"

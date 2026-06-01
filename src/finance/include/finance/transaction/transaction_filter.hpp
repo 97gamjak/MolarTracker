@@ -1,5 +1,5 @@
-#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION_FILTER_HPP__
-#define __FINANCE__INCLUDE__FINANCE__TRANSACTION_FILTER_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__
+#define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__
 
 #include <optional>
 
@@ -37,4 +37,4 @@ namespace finance
     filter::Predicate<DomainTransaction> HasPositionId(PositionId positionId);
 }   // namespace finance
 
-#endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION_FILTER_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__

@@ -11,6 +11,11 @@
 
 namespace finance
 {
+    /**
+     * @brief A stock transaction represents a financial transaction involving
+     * stocks.
+     *
+     */
     class StockTransaction : public Transaction
     {
        private:

@@ -2,38 +2,39 @@
 
 namespace finance
 {
-    TransactionEntries::TransactionEntries(
-        const std::vector<TransactionEntry>& entries
-    )
-        : _entries(entries)
-    {
-    }
 
-    void TransactionEntries::addTransactionEntry(const TransactionEntry& entry)
-    {
-        _entries.push_back(entry);
-    }
-
+    /**
+     * @brief Filters the transaction entries by type.
+     *
+     * @param type The type to filter by.
+     * @return TransactionEntries The filtered transaction entries.
+     */
     TransactionEntries TransactionEntries::filter(
         TransactionEntryType type
     ) const
     {
         TransactionEntries filtered;
-        for (const auto& entry : _entries)
+        for (const auto& entry : *this)
             if (entry.getType() == type)
-                filtered.addTransactionEntry(entry);
+                filtered.add(entry);
 
         return filtered;
     }
 
+    /**
+     * @brief Filters the transaction entries by account ID.
+     *
+     * @param accountIds The account IDs to filter by.
+     * @return TransactionEntries The filtered transaction entries.
+     */
     TransactionEntries TransactionEntries::filter(
         const idSet<AccountId>& accountIds
     ) const
     {
         TransactionEntries filtered;
-        for (const auto& entry : _entries)
+        for (const auto& entry : *this)
             if (accountIds.contains(entry.getAccountId()))
-                filtered.addTransactionEntry(entry);
+                filtered.add(entry);
 
         return filtered;
     }

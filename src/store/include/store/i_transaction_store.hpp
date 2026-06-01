@@ -5,7 +5,8 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
-#include "finance/transaction/domain_transaction.hpp"   // needed for vector
+#include "finance/transaction/domain_transaction.hpp"   // needed for vector TODO: remove this as soon as transition is done
+#include "finance/transaction/transactions.hpp"   // needed for vector
 
 namespace finance
 {

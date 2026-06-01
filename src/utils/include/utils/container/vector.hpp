@@ -5,6 +5,12 @@
 
 #include "iterable.hpp"
 
+/**
+ * @brief A vector container that provides additional functionality on top of
+ * std::vector.
+ *
+ * @tparam T The type of elements stored in the vector.
+ */
 template <typename T>
 class Vector : public Iterable<std::vector<T>>
 {

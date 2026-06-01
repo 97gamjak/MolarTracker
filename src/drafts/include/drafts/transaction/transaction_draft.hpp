@@ -1,5 +1,5 @@
-#ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_DRAFT_HPP__
-#define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_DRAFT_HPP__
+#ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_DRAFT_HPP__
+#define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_DRAFT_HPP__
 
 #include <optional>
 #include <string>
@@ -165,58 +165,6 @@ namespace drafts
         [[nodiscard]] std::vector<TradeLegDraft>& getLegs();
     };
 
-    /**
-     * @brief A draft representation of a transaction overview, this is used
-     * to display a summary of a transaction in the UI, and contains the
-     * necessary information to provide an overview of the transaction
-     * without needing to load the full transaction details.
-     *
-     */
-    class TransactionOverviewDraft
-    {
-       private:
-        /// The type of the transaction
-        TransactionDataType _type;
-
-        /// The timestamp of the transaction
-        Timestamp _timestamp;
-
-        /// The entries of the transaction
-        std::vector<TransactionEntryDraft> _entries;
-
-        /// The legs of the transaction
-        std::vector<TradeLegDraft> _legs;
-
-        /// An optional comment associated with the transaction
-        std::optional<std::string> _comment;
-
-       public:
-        explicit TransactionOverviewDraft(
-            TransactionDataType                type,
-            Timestamp                          timestamp,
-            std::vector<TransactionEntryDraft> entries,
-            std::vector<TradeLegDraft>         legs,
-            std::optional<std::string>         comment
-        );
-
-        [[nodiscard]] TransactionDataType               getType() const;
-        [[nodiscard]] const Timestamp&                  getTimestamp() const;
-        [[nodiscard]] const std::optional<std::string>& getComment() const;
-
-        [[nodiscard]] finance::Cash getTotalGeneralCash() const;
-        [[nodiscard]] finance::Cash getTotalFees() const;
-        [[nodiscard]] Currency      getCurrency() const;
-
-        [[nodiscard]] AccountId getLegAccount() const;
-        [[nodiscard]] AccountId getEntryAccountId(bool includeExternal) const;
-
-        [[nodiscard]]
-        const std::vector<TransactionEntryDraft>& getEntries() const;
-
-        [[nodiscard]]
-        const std::vector<TradeLegDraft>& getLegs() const;
-    };
-
 }   // namespace drafts
 
-#endif   // __DRAFTS__INCLUDE__DRAFTS__TRANSACTION_DRAFT_HPP__
+#endif   // __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_DRAFT_HPP__

@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__ITERABLE_HPP__
-#define __UTILS__INCLUDE__UTILS__ITERABLE_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__
+#define __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__
 
 #include <unordered_set>
 
@@ -41,8 +41,8 @@ class Iterable
     std::unordered_set<IdType, Hash> _getIds() const;
 };
 
-#ifndef __UTILS__INCLUDE__UTILS__ITERABLE_TPP__
+#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_TPP__
 #include "iterable.tpp"
 #endif
 
-#endif   // __UTILS__INCLUDE__UTILS__ITERABLE_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__

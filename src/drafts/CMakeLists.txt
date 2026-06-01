@@ -1,13 +1,14 @@
 add_library(molartracker_drafts STATIC
     src/drafts/account_draft.cpp
 
-    src/drafts/transaction_draft.cpp
-
     src/drafts/stock_draft.cpp
-
+    
     src/drafts/position_draft.cpp
-
+    
     src/drafts/profile_draft.cpp
+
+    src/drafts/transaction/transaction_draft.cpp
+    src/drafts/transaction/transaction_overview_draft.cpp
 )
 
 target_include_directories(molartracker_drafts

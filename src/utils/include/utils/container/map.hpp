@@ -5,14 +5,14 @@
 
 #include "iterable.hpp"
 
-template <typename T>
-concept HasId = requires(T item) {
-    { item.getId() };
-};
-
-template <typename T>
-using IdOf = decltype(std::declval<T>().getId());
-
+/**
+ * @brief A map that associates keys with values.
+ *
+ * @tparam Key The type of the keys in the map.
+ * @tparam Value The type of the values in the map.
+ * @tparam Hash The type of the hash function to use (default is
+ * std::hash<Key>).
+ */
 template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class Map : public Iterable<std::unordered_map<Key, Value, Hash>>
 {

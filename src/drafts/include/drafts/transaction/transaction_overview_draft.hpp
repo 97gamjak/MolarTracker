@@ -1,0 +1,105 @@
+#ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_OVERVIEW_DRAFT_HPP__
+#define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_OVERVIEW_DRAFT_HPP__
+
+#include <optional>
+#include <string>
+
+#include "config/id_types.hpp"
+#include "config/quantity.hpp"
+#include "finance/cash.hpp"
+#include "utils/timestamp.hpp"
+
+namespace drafts
+{
+
+    /**
+     * @brief A draft representation of a transaction overview
+     *
+     */
+    class TransactionOverviewDraft
+    {
+       private:
+        /// The timestamp of the transaction
+        Timestamp _timestamp;
+
+        /// An optional comment associated with the transaction
+        std::optional<std::string> _comment;
+
+       public:
+        explicit TransactionOverviewDraft(
+            Timestamp                  timestamp,
+            std::optional<std::string> comment
+        );
+
+        [[nodiscard]] const Timestamp&                  getTimestamp() const;
+        [[nodiscard]] const std::optional<std::string>& getComment() const;
+    };
+
+    /**
+     * @brief A draft representation of a cash transaction overview
+     *
+     */
+    class CashTransactionOverview : public TransactionOverviewDraft
+    {
+       private:
+        finance::Cash _amount;
+        finance::Cash _fees;
+
+        AccountId _cashAccount;
+        AccountId _externalAccount;
+
+       public:
+        explicit CashTransactionOverview(
+            Timestamp                  timestamp,
+            std::optional<std::string> comment,
+            finance::Cash              amount,
+            finance::Cash              fees,
+            AccountId                  cashAccount,
+            AccountId                  externalAccount
+        );
+
+        [[nodiscard]] const finance::Cash& getAmount() const;
+        [[nodiscard]] const finance::Cash& getFees() const;
+        [[nodiscard]] AccountId            getCashAccount() const;
+        [[nodiscard]] AccountId            getExternalAccount() const;
+    };
+
+    /**
+     * @brief A draft representation of a stock transaction overview
+     *
+     */
+    class StockTransactionOverview : public TransactionOverviewDraft
+    {
+       private:
+        Quantity      _quantity;
+        finance::Cash _unitPrice;
+        finance::Cash _fees;
+
+        std::string _ticker;
+
+        AccountId _securityAccount;
+        AccountId _cashAccount;
+
+       public:
+        explicit StockTransactionOverview(
+            Timestamp                  timestamp,
+            std::optional<std::string> comment,
+            Quantity                   quantity,
+            finance::Cash              unitPrice,
+            finance::Cash              fees,
+            std::string                ticker,
+            AccountId                  securityAccount,
+            AccountId                  cashAccount
+        );
+
+        [[nodiscard]] std::string getTicker() const;
+        [[nodiscard]] AccountId   getSecurityAccount() const;
+        [[nodiscard]] AccountId   getCashAccount() const;
+
+        [[nodiscard]] const Quantity&      getQuantity() const;
+        [[nodiscard]] const finance::Cash& getUnitPrice() const;
+        [[nodiscard]] const finance::Cash& getTotalFees() const;
+    };
+}   // namespace drafts
+
+#endif   // __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_OVERVIEW_DRAFT_HPP__

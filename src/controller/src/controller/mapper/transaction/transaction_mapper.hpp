@@ -1,6 +1,5 @@
-#ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION_MAPPER_HPP__
-
-#define __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION_MAPPER_HPP__
+#ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_MAPPER_HPP__
+#define __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_MAPPER_HPP__
 
 #include <string>
 #include <variant>
@@ -88,22 +87,8 @@ namespace controller
             const std::vector<finance::TradeLeg>& legs,
             const instrumentMap<std::string>&     instrumentNames
         );
-
-        [[nodiscard]]
-        static std::vector<drafts::TransactionOverviewDraft> toOverviewDrafts(
-            const std::vector<finance::DomainTransaction>& transactions,
-            const instrumentMap<std::string>&              instrumentNames,
-            const idSet<AccountId>&                        externalAccounts
-        );
-
-        [[nodiscard]]
-        static drafts::TransactionOverviewDraft toOverviewDraft(
-            const finance::DomainTransaction& transaction,
-            const instrumentMap<std::string>& instrumentNames,
-            const idSet<AccountId>&           externalAccounts
-        );
     };
 
 }   // namespace controller
 
-#endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION_MAPPER_HPP__
+#endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_MAPPER_HPP__

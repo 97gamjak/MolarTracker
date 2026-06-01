@@ -8,7 +8,7 @@
 
 #include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration

@@ -3,15 +3,28 @@
 
 #include "map.hpp"
 
+template <typename T>
+concept HasId = requires(T item) {
+    { item.getId() };
+};
+
+template <typename T>
+using IdOf = decltype(std::declval<T>().getId());
+
+/**
+ * @brief A map that associates IDs with values.
+ *
+ * @tparam Value The type of the values in the map.
+ */
 template <typename Value>
 requires HasId<Value>
 class IdMap : public Map<IdOf<Value>, Value, typename IdOf<Value>::Hash>
 {
    private:
+    /// The base class type
     using Base = Map<IdOf<Value>, Value, typename IdOf<Value>::Hash>;
 
-    using Base::_items;
-
+    /// The key type
     using Key = IdOf<Value>;
 
    public:

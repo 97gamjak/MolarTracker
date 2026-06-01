@@ -1,8 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__CASH_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__CASH_TRANSACTION_HPP__
 
-#include <vector>
-
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction/transaction.hpp"
@@ -11,6 +9,11 @@
 
 namespace finance
 {
+    /**
+     * @brief A cash transaction represents a financial transaction involving
+     * cash.
+     *
+     */
     class CashTransaction : public Transaction
     {
        private:

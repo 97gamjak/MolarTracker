@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"

@@ -5,7 +5,7 @@
 #include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_position_store.hpp"

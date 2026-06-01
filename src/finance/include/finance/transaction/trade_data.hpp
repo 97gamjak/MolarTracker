@@ -1,5 +1,5 @@
-#ifndef __FINANCE__INCLUDE__FINANCE__TRADE_DATA_HPP__
-#define __FINANCE__INCLUDE__FINANCE__TRADE_DATA_HPP__
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_HPP__
+#define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_HPP__
 
 #include <vector>
 
@@ -80,4 +80,4 @@ namespace finance
 
 }   // namespace finance
 
-#endif   // __FINANCE__INCLUDE__FINANCE__TRADE_DATA_HPP__
+#endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_HPP__

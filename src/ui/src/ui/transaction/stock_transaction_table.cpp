@@ -12,7 +12,7 @@
 #include <mstd/enum.hpp>
 
 #include "config/quantity.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_overview_draft.hpp"
 
 namespace ui
 {
@@ -62,6 +62,114 @@ namespace ui
     }   // namespace
 
     /**
+     * @brief Construct a new Stock Transaction Table Model:: Stock Transaction
+     * Table Model object
+     *
+     * @param parent
+     */
+    StockTransactionTableModel::StockTransactionTableModel(QObject* parent)
+        : QAbstractTableModel(parent)
+    {
+    }
+
+    StockTransactionTableModel::~StockTransactionTableModel() = default;
+
+    /**
+     * @brief Sets the transactions for the model.
+     *
+     * @param transactions The transactions to set.
+     * @param accountIdToName The mapping of account IDs to account names.
+     */
+    void StockTransactionTableModel::setTransactions(
+        std::vector<drafts::StockTransactionOverview> transactions,
+        unorderedIdMap<AccountId, std::string>        accountIdToName
+    )
+    {
+        beginResetModel();
+        _transactions    = std::move(transactions);
+        _accountIdToName = std::move(accountIdToName);
+        endResetModel();
+    }
+
+    /**
+     * @brief get the number of rows in the table model
+     *
+     * @param parent
+     * @return int
+     */
+    int StockTransactionTableModel::rowCount(const QModelIndex& parent) const
+    {
+        return parent.isValid() ? 0 : static_cast<int>(_transactions.size());
+    }
+
+    /**
+     * @brief data method for the table model
+     *
+     * @param index
+     * @param role
+     * @return QVariant
+     */
+    QVariant StockTransactionTableModel::data(
+        const QModelIndex& index,
+        int                role
+    ) const
+    {
+        if (!index.isValid() || index.row() >= rowCount({}))
+            return {};
+
+        const auto& transaction =
+            _transactions[static_cast<std::size_t>(index.row())];
+
+        switch (role)
+        {
+            case Qt::DisplayRole:
+                return _displayData(transaction, index.column());
+            case Qt::DecorationRole:
+                return _decorationData(transaction, index.column());
+            case Qt::TextAlignmentRole:
+                return _textAlignmentData(index.column());
+            default:
+                return {};
+        }
+    }
+
+    /**
+     * @brief header data for the table model
+     *
+     * @param section
+     * @param orientation
+     * @param role
+     * @return QVariant
+     */
+    QVariant StockTransactionTableModel::headerData(
+        int             section,
+        Qt::Orientation orientation,
+        int             role
+    ) const
+    {
+        if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+            return {};
+
+        return _getColLabel(section);
+    }
+
+    /**
+     * @brief the item flags for the table model
+     *
+     * @param index
+     * @return Qt::ItemFlags
+     */
+    Qt::ItemFlags StockTransactionTableModel::flags(
+        const QModelIndex& index
+    ) const
+    {
+        if (!index.isValid())
+            return Qt::NoItemFlags;
+
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
+
+    /**
      * @brief get the number of columns in the table model
      *
      * @param parent
@@ -77,7 +185,7 @@ namespace ui
      *
      * @return int The index of the description column.
      */
-    int StockTransactionTableModel::getDescriptionIndex() const
+    int StockTransactionTableModel::getDescriptionIndex()
     {
         return static_cast<int>(StockTransactionColumn::Description);
     }
@@ -87,7 +195,7 @@ namespace ui
      *
      * @return int The index of the date column.
      */
-    int StockTransactionTableModel::getDateIndex() const
+    int StockTransactionTableModel::getDateIndex()
     {
         return static_cast<int>(StockTransactionColumn::Date);
     }
@@ -100,7 +208,7 @@ namespace ui
      * @return QVariant
      */
     QVariant StockTransactionTableModel::_displayData(
-        const drafts::TransactionOverviewDraft& transaction,
+        const drafts::StockTransactionOverview& transaction,
         int                                     col
     ) const
     {
@@ -119,33 +227,31 @@ namespace ui
             case StockTransactionColumn::Type:
                 return QString::fromStdString("");
             case StockTransactionColumn::Stock:
-                return QString::fromStdString(
-                    transaction.getLegs().front().getTicker()
-                );
+                return QString::fromStdString(transaction.getTicker());
             case StockTransactionColumn::Account:
             {
-                const auto id = transaction.getLegAccount();
+                const auto id = transaction.getSecurityAccount();
 
-                if (!_getAccountIdToNameMap().contains(id) || !id.isValid())
+                if (!_accountIdToName.contains(id) || !id.isValid())
                     return "";
 
-                return QString::fromStdString(_getAccountIdToNameMap().at(id));
+                return QString::fromStdString(_accountIdToName.at(id));
             }
             case StockTransactionColumn::ReferenceAccount:
             {
-                const auto id = transaction.getEntryAccountId(false);
-                if (!_getAccountIdToNameMap().contains(id) || !id.isValid())
+                const auto id = transaction.getCashAccount();
+                if (!_accountIdToName.contains(id) || !id.isValid())
                     return "";
 
-                return QString::fromStdString(_getAccountIdToNameMap().at(id));
+                return QString::fromStdString(_accountIdToName.at(id));
             }
             case StockTransactionColumn::Quantity:
                 return QString::fromStdString(
-                    transaction.getLegs().front().getQuantity().toString()
+                    transaction.getQuantity().toString()
                 );
             case StockTransactionColumn::Price:
                 return QString::fromStdString(
-                    transaction.getLegs().front().getUnitPrice().toString(2)
+                    transaction.getUnitPrice().toString(2)
                 );
             case StockTransactionColumn::Fees:
             {
@@ -168,16 +274,15 @@ namespace ui
      * @return QVariant
      */
     QVariant StockTransactionTableModel::_decorationData(
-        const drafts::TransactionOverviewDraft& transaction,
+        const drafts::StockTransactionOverview& transaction,
         int                                     col
-    ) const
+    )
     {
         if (getColFromIndex(col) != StockTransactionColumn::Quantity)
             return {};
 
-        return transaction.getLegs().front().getQuantity() > 0
-                   ? QColor(Qt::GlobalColor::green)
-                   : QColor(Qt::GlobalColor::red);
+        return transaction.getQuantity() > 0 ? QColor(Qt::GlobalColor::green)
+                                             : QColor(Qt::GlobalColor::red);
     }
     /**
      * @brief text alignment data for the table model
@@ -185,7 +290,7 @@ namespace ui
      * @param col
      * @return QVariant
      */
-    QVariant StockTransactionTableModel::_textAlignmentData(int col) const
+    QVariant StockTransactionTableModel::_textAlignmentData(int col)
     {
         if (getColFromIndex(col) == StockTransactionColumn::Quantity ||
             getColFromIndex(col) == StockTransactionColumn::Price)
@@ -199,7 +304,7 @@ namespace ui
      * @param col The column to get the label for.
      * @return QString The label for the column.
      */
-    QString StockTransactionTableModel::_getColLabel(int col) const
+    QString StockTransactionTableModel::_getColLabel(int col)
     {
         return getColLabel(static_cast<StockTransactionColumn>(col));
     }
