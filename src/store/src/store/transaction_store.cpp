@@ -242,7 +242,9 @@ namespace store
             if (!transactionIds.contains(transaction.getId()))
                 results.push_back(transaction);
 
-        return results;
+        finance::Transactions result;
+        result.addTransactions(results, _session->accountSession);
+        return result;
     }
 
     /**
@@ -258,18 +260,16 @@ namespace store
      * returned transactions will be those that are associated with this
      * position.
      *
-     * @return std::vector<finance::DomainTransaction> A vector of transactions
-     * that are associated with the specified position ID, this includes both
-     * new and existing transactions that are related to the given position.
+     * @return finance::Transactions
      */
-    std::vector<finance::DomainTransaction> TransactionStore::
-        findTransactionsByPositionId(PositionId positionId) const
+    finance::Transactions TransactionStore::findTransactionsByPositionId(
+        PositionId positionId
+    ) const
     {
         auto filter = finance::TransactionFilter();
         filter.setPositionId(positionId);
-        const auto transactions = getTransactions(filter);
 
-        return transactions;
+        return getTransactions(filter);
     }
 
     /**
@@ -287,18 +287,12 @@ namespace store
 
         const auto transactions = findTransactionsByPositionId(positionId);
 
-        for (const auto& transaction : transactions)
+        // TODO: fix this as this will never work in general
+        for (const auto& transaction : transactions.getStockTransactions())
         {
-            const auto instrumentIds = transaction.getInstrumentIds();
+            const auto instrumentId = transaction.getInstrumentId();
 
-            if (!instrumentIds.empty())
-            {
-                // This will default construct an
-                // empty set if the position ID is
-                // not already in the map
-                for (const auto& instrumentId : instrumentIds)
-                    instrumentIdSet.insert(instrumentId);
-            }
+            instrumentIdSet.insert(instrumentId);
         }
 
         return instrumentIdSet;

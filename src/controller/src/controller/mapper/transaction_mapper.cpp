@@ -8,6 +8,7 @@
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/trade_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
+#include "finance/transaction/transactions.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.Mapper.TransactionMapper");
@@ -222,9 +223,9 @@ namespace controller
      */
     std::vector<drafts::TransactionOverviewDraft> TransactionMapper::
         toOverviewDrafts(
-            const std::vector<finance::DomainTransaction>& transactions,
-            const instrumentMap<std::string>&              instrumentNames,
-            const idSet<AccountId>&                        externalAccounts
+            const finance::Transactions&      transactions,
+            const instrumentMap<std::string>& instrumentNames,
+            const idSet<AccountId>&           externalAccounts
         )
     {
         std::vector<drafts::TransactionOverviewDraft> drafts;

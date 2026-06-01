@@ -11,6 +11,7 @@
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
+#include "finance/transaction/transactions.hpp"
 #include "mock_services.hpp"
 #include "store/account/account_store.hpp"
 #include "store/position_store.hpp"

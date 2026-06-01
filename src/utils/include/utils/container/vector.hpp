@@ -13,8 +13,11 @@ class Vector : public Iterable<std::vector<T>>
 
    public:
     using Iterable<std::vector<T>>::Iterable;
+    Vector(std::initializer_list<T> items);
 
     const T& operator[](std::size_t index) const;
+
+    auto front() const;
 
     void add(const T& item);
     void add(const std::vector<T>& items);

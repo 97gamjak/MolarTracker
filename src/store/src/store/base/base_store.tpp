@@ -213,8 +213,9 @@ namespace store
     auto BaseStore<T, IdType>::_getValues(Options options) const
     {
         return _getEntries(options) |
-               std::views::transform([](const auto& entry)
-                                     { return entry.value; });
+               std::views::transform(
+                   [](const auto& entry) -> const T& { return entry.value; }
+               );
     }
 
     /**

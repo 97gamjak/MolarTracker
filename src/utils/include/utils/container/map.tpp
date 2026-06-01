@@ -17,6 +17,12 @@ const Value& Map<Key, Value, Hash>::operator[](const Key& key) const
 }
 
 template <typename Key, typename Value, typename Hash>
+const Value& Map<Key, Value, Hash>::at(const Key& key) const
+{
+    return _items.at(key);
+}
+
+template <typename Key, typename Value, typename Hash>
 bool Map<Key, Value, Hash>::add(const Key& key, const Value& value)
 {
     auto [_, inserted] = _items.emplace(key, value);
@@ -33,6 +39,20 @@ template <typename Key, typename Value, typename Hash>
 bool Map<Key, Value, Hash>::remove(const Key& key)
 {
     return _items.erase(key) > 0;
+}
+
+template <typename Key, typename Value, typename Hash>
+void Map<Key, Value, Hash>::removeUnchecked(const Key& key)
+{
+    _items.erase(key);
+}
+
+template <typename Key, typename Value, typename Hash>
+template <std::ranges::range R>
+void Map<Key, Value, Hash>::removeUnchecked(const R& keys)
+{
+    for (const auto& key : keys)
+        _items.erase(key);
 }
 
 template <typename Key, typename Value, typename Hash>

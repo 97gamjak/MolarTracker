@@ -1,8 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 
-#include <vector>
-
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
 #include "finance/cash.hpp"

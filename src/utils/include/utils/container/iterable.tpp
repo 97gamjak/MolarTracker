@@ -17,6 +17,19 @@ Iterable<Container>::Iterable(const Container& items) : _items(items)
 }
 
 /**
+ * @brief Constructs an Iterable from an rvalue container.
+ *
+ * @tparam T The type of elements in the container.
+ * @tparam Container The type of the underlying container (default is
+ * std::vector<T>).
+ * @param items The container to initialize the Iterable with.
+ */
+template <typename Container>
+Iterable<Container>::Iterable(Container&& items) : _items(std::move(items))
+{
+}
+
+/**
  * @brief Returns an iterator to the beginning of the container.
  *
  * @return An iterator to the beginning of the container.

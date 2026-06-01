@@ -64,9 +64,13 @@ namespace finance
     {
         TransactionEntries entries;
 
-        entries.addTransactionEntry(_getAmountEntry());
-        entries.addTransactionEntry(_getFeeEntry(false));
-        entries.addTransactionEntry(_getFeeEntry(true));
+        entries.add(_getAmountEntry());
+
+        if (_externalAccount.isValid())
+        {
+            entries.add(_getFeeEntry(false));
+            entries.add(_getFeeEntry(true));
+        }
 
         return entries;
     }

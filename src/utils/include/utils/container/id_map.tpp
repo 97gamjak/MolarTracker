@@ -5,9 +5,26 @@
 
 template <typename Value>
 requires HasId<Value>
+template <std::ranges::range R>
+void IdMap<Value>::setUnchecked(R&& values)
+{
+    addUnchecked(std::forward<R>(values));
+}
+
+template <typename Value>
+requires HasId<Value>
 bool IdMap<Value>::add(const Value& value)
 {
     return Base::add(value.getId(), value);
+}
+
+template <typename Value>
+requires HasId<Value>
+template <std::ranges::range R>
+void IdMap<Value>::addUnchecked(R&& values)
+{
+    for (const auto& value : std::forward<R>(values))
+        Base::addUnchecked(value.getId(), value);
 }
 
 template <typename Value>

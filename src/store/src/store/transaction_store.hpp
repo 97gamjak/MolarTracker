@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <mstd/enum.hpp>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -78,7 +77,7 @@ namespace store
         ) const override;
 
         [[nodiscard]]
-        std::vector<finance::DomainTransaction> findTransactionsByPositionId(
+        finance::Transactions findTransactionsByPositionId(
             PositionId positionId
         ) const override;
 

@@ -39,10 +39,10 @@ namespace finance
     {
         TransactionEntries entries;
 
-        entries.addTransactionEntry(_getAmountEntry(false));
-        entries.addTransactionEntry(_getAmountEntry(true));
-        entries.addTransactionEntry(_getFeeEntry(false));
-        entries.addTransactionEntry(_getFeeEntry(true));
+        entries.add(_getAmountEntry(false));
+        entries.add(_getAmountEntry(true));
+        entries.add(_getFeeEntry(false));
+        entries.add(_getFeeEntry(true));
 
         return entries;
     }

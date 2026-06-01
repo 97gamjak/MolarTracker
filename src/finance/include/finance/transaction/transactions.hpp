@@ -9,6 +9,8 @@
 
 namespace finance
 {
+    class Accounts;
+
     class Transactions
     {
        private:
@@ -17,8 +19,20 @@ namespace finance
 
        public:
         void addTransactions(
-            const std::vector<DomainTransaction>& transactions
+            const std::vector<DomainTransaction>& transactions,
+            const Accounts&                       accounts
         );
+
+        [[nodiscard]]
+        const std::vector<CashTransaction>& getCashTransactions() const;
+
+        [[nodiscard]]
+        const std::vector<StockTransaction>& getStockTransactions() const;
+
+        [[nodiscard]] bool empty() const;
+
+       private:
+        [[nodiscard]] std::vector<const Transaction*> _getTransactions() const;
     };
 }   // namespace finance
 

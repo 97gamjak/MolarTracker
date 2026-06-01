@@ -106,7 +106,7 @@ namespace finance
      */
     void DomainTransaction::addEntry(const TransactionEntry& entry)
     {
-        _entries.addTransactionEntry(entry);
+        _entries.add(entry);
     }
 
     /**

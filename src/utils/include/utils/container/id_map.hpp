@@ -10,13 +10,20 @@ class IdMap : public Map<IdOf<Value>, Value, typename IdOf<Value>::Hash>
    private:
     using Base = Map<IdOf<Value>, Value, typename IdOf<Value>::Hash>;
 
+    using Base::_items;
+
     using Key = IdOf<Value>;
 
    public:
     using Base::Base;
 
+    template <std::ranges::range R>
+    void setUnchecked(R&& values);
+
     [[nodiscard]] bool add(const Value& value);
     void               addUnchecked(const Value& value);
+    template <std::ranges::range R>
+    void addUnchecked(R&& values);
 
     [[nodiscard]] std::unordered_set<Key, typename Key::Hash> getIds() const;
 };

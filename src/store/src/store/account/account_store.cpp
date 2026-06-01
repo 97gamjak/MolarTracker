@@ -36,15 +36,17 @@ namespace store
     )
         : _accountService(accountService)
     {
+        // we use the unchecked versions as ids are unique due to store
+        // handling!
         _connections.add(subscribeToEntryAdded(
             [this](const std::vector<finance::Account>& accounts)
-            { _session.add(accounts); },
+            { _session.addUnchecked(accounts); },
             this
         ));
 
         _connections.add(subscribeToEntryRemoved(
             [this](const std::vector<AccountId>& accountIds)
-            { _session.remove(accountIds); },
+            { _session.removeUnchecked(accountIds); },
             this
         ));
 
@@ -201,8 +203,8 @@ namespace store
         _notifyOnCommit();
 
         // here now we set our ids because they are now clean!
-        auto values = _getValues();
-        _session.set({values.begin(), values.end()});
+        // we use the unchecked version as ids are unique due to store handling!
+        _session.setUnchecked(_getValues());
     }
 
     /**
@@ -286,8 +288,7 @@ namespace store
             LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
-            auto values = _getValues();
-            _session.set({values.begin(), values.end()});
+            _session.setUnchecked(_getValues());
         }
     }
 

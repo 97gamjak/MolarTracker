@@ -1,16 +1,15 @@
 #include "finance/transaction/transaction_converter.hpp"
 
 #include <expected>
-#include <vector>
+#include <variant>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/account.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
+#include "finance/transaction/trade_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "finance/transaction_entry.hpp"
 
 namespace finance
 {
@@ -61,38 +60,34 @@ namespace finance
             );
         }
 
-        if (feeEntries.size() != 2 || !feeEntries.empty())
+        if (feeEntries.size() != 2 && !feeEntries.empty())
         {
             return std::unexpected(
                 TransactionConversionError{"Invalid number of fee entries"}
             );
         }
 
-        const auto filteredAccounts = accounts.filterExternal(false);
+        const auto internalAccounts = accounts.filterExternal(false);
         const auto externalAccounts = accounts.filterExternal(true);
 
-        AccountId internalAccountId;
-        AccountId externalAccountId;
-        Cash      amount{amountEntries[0].getCurrency(), 0};
+        size_t internalIndex{};
 
-        if (filteredAccounts.contains(amountEntries[0].getAccountId()))
-        {
-            internalAccountId  = amountEntries[0].getAccountId();
-            externalAccountId  = amountEntries[1].getAccountId();
-            amount            += amountEntries[0].getCash();
-        }
-        else if (filteredAccounts.contains(amountEntries[1].getAccountId()))
-        {
-            internalAccountId  = amountEntries[1].getAccountId();
-            externalAccountId  = amountEntries[0].getAccountId();
-            amount            += amountEntries[1].getCash();
-        }
+        if (internalAccounts.contains(amountEntries[0].getAccountId()))
+            internalIndex = 0;
+        else if (internalAccounts.contains(amountEntries[1].getAccountId()))
+            internalIndex = 1;
         else
         {
             return std::unexpected(
                 TransactionConversionError{"No internal account found"}
             );
         }
+
+        const auto internalAccountId =
+            amountEntries[internalIndex].getAccountId();
+        const auto externalAccountId =
+            amountEntries[1 - internalIndex].getAccountId();
+        const auto amount = amountEntries[internalIndex].getCash();
 
         if (!externalAccounts.contains(externalAccountId))
         {
@@ -139,16 +134,102 @@ namespace finance
         };
     }
 
-    StockTransaction TransactionConverter::toStock(
-        const DomainTransaction& transaction
-    )
+    std::expected<StockTransaction, TransactionConversionError> TransactionConverter::
+        toStock(const DomainTransaction& transaction, const Accounts& accounts)
     {
+        const auto& entries = transaction.getEntries();
+        if (entries.empty())
+        {
+            return std::unexpected(
+                TransactionConversionError{"No cash entries found"}
+            );
+        }
+
+        auto amountEntries = entries.filter(TransactionEntryType::General);
+        auto feeEntries    = entries.filter(TransactionEntryType::Fees);
+
+        if (amountEntries.size() != 1)
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of amount entries"}
+            );
+        }
+
+        const auto cashAccountId = amountEntries[0].getAccountId();
+
+        if (feeEntries.size() != 2 && !feeEntries.empty())
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of fee entries"}
+            );
+        }
+
+        const auto internalAccounts = accounts.filterExternal(false);
+        const auto externalAccounts = accounts.filterExternal(true);
+
+        Cash fees{amountEntries[0].getCurrency(), 0};
+        auto externalAccountId = AccountId::invalid();
+
+        if (feeEntries.size() == 2)
+        {
+            if (cashAccountId != feeEntries[0].getAccountId() &&
+                cashAccountId != feeEntries[1].getAccountId())
+            {
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
+            }
+
+            if (cashAccountId != feeEntries[0].getAccountId() &&
+                cashAccountId != feeEntries[1].getAccountId())
+            {
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
+            }
+
+            if (cashAccountId == feeEntries[0].getAccountId())
+            {
+                externalAccountId  = feeEntries[1].getAccountId();
+                fees              += feeEntries[0].getCash();
+            }
+            else
+            {
+                externalAccountId  = feeEntries[0].getAccountId();
+                fees              += feeEntries[1].getCash();
+            }
+        }
+
+        if (!std::holds_alternative<TradeData>(transaction.getData()))
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid transaction data"}
+            );
+        }
+
+        const auto data = std::get<TradeData>(transaction.getData());
+
+        const auto& legs = data.getLegs();
+        if (legs.size() != 1)
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid trade legs"}
+            );
+        }
+
         return StockTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
-            transaction.getTradeData(),
-            transaction.getTransactionEntries()
+            legs[0].getInstrumentId(),
+            legs[0].getAccountId(),
+            amountEntries[0].getAccountId(),
+            externalAccountId,
+            legs[0].getQuantity(),
+            legs[0].getUnitPrice(),
+            fees,
+            legs[0].getPositionId(),
+            transaction.getComment()
         };
     }
 

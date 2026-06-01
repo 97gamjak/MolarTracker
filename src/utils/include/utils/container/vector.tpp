@@ -4,6 +4,18 @@
 #include "vector.hpp"
 
 /**
+ * @brief Construct a new Vector< T>:: Vector object
+ *
+ * @tparam T
+ * @param items
+ */
+template <typename T>
+Vector<T>::Vector(std::initializer_list<T> items)
+    : Iterable<std::vector<T>>(items)
+{
+}
+
+/**
  * @brief Returns a const reference to the item at the specified index.
  *
  * @param index The index of the item to retrieve.
@@ -13,6 +25,17 @@ template <typename T>
 const T& Vector<T>::operator[](std::size_t index) const
 {
     return _items[index];
+}
+
+/**
+ * @brief Returns a reference to the first item in the container.
+ *
+ * @return A reference to the first item in the container.
+ */
+template <typename T>
+auto Vector<T>::front() const
+{
+    return _items.front();
 }
 
 /**

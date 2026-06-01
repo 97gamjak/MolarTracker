@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <mstd/enum.hpp>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"   // needed for vector
@@ -95,14 +94,13 @@ namespace store
          * @brief Find all transactions associated with a position ID
          *
          * @param positionId The position ID to filter by
-         * @return std::vector<finance::DomainTransaction> The list of
+         * @return finance::Transactions The list of
          * transactions
          */
         [[nodiscard]]
-        virtual std::
-            vector<finance::DomainTransaction> findTransactionsByPositionId(
-                PositionId positionId
-            ) const = 0;
+        virtual finance::Transactions findTransactionsByPositionId(
+            PositionId positionId
+        ) const = 0;
     };
 
 }   // namespace store
