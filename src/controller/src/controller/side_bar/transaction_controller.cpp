@@ -8,10 +8,12 @@
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
 #include "controller/mapper/stock_mapper.hpp"
+#include "controller/mapper/transaction/transaction_create_mapper.hpp"
 #include "controller/mapper/transaction/transaction_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/position_draft.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
@@ -198,55 +200,6 @@ namespace controller
         }
     }
 
-    namespace
-    {
-        /**
-         * @brief Add external transaction entries for any entries that need
-         * them
-         *
-         * @param draft The list of transaction entries to modify
-         * @param accountStore The account store to use for looking up external
-         * accounts
-         *
-         * @return true if external transaction entries were added, false
-         * otherwise
-         */
-        [[nodiscard]]
-        bool addExternalTransactionEntries(
-            drafts::CreateTransactionDraft*              draft,
-            const std::shared_ptr<store::IAccountStore>& accountStore
-        )
-        {
-            std::vector<drafts::TransactionEntryDraft> additionalEntries;
-
-            for (const auto& entry : draft->getEntries())
-            {
-                if (entry.needsExternal() ||
-                    entry.getType() != TransactionEntryType::General)
-                {
-                    const auto currency = entry.getCash().getCurrency();
-                    const auto accountId =
-                        accountStore->getExternalAccount(currency);
-
-                    if (!accountId.has_value())
-                        return false;
-
-                    additionalEntries.emplace_back(
-                        accountId.value(),
-                        -entry.getCash(),
-                        entry.getType(),
-                        true
-                    );
-                }
-            }
-
-            for (const auto& entry : additionalEntries)
-                draft->addEntry(entry);
-
-            return true;
-        }
-    }   // namespace
-
     /**
      * @brief Handle the creation of a new cash transaction, this will be called
      * when the user submits the create transaction dialog for a cash
@@ -267,18 +220,12 @@ namespace controller
     {
         LOG_ENTRY;
 
-        if (!addExternalTransactionEntries(&draft, _accountStore))
-        {
-            const std::string msg =
-                "Failed to add external transaction entries";
-            LOG_ERROR(msg);
-            ErrorDialog::show(msg);
-        }
-
         const auto transaction =
-            TransactionMapper::fromCreateCashTransactionDraft(draft);
+            TransactionCreateMapper::fromCreateCashDraft(draft);
 
-        if (!_checkAddTransaction(transaction))
+        const auto result = _transactionStore->addCashTransaction(transaction);
+
+        if (!_checkAddTransaction(result))
             return;
 
         // TODO(97gamjak): add here commands
@@ -325,16 +272,10 @@ namespace controller
         // remove from drafts if ticker does not match
         std::erase_if(
             drafts,
-            [&draft](const drafts::PositionDraft& _draft)
+            [&draft](const drafts::PositionDraft& positionDraft)
             {
-                return std::ranges::all_of(
-                    draft.getLegs(),
-                    [&_draft](const auto& leg)
-                    {
-                        return leg.getTicker() !=
-                               _draft.getStockInfo().getTicker();
-                    }
-                );
+                return draft.getTicker() !=
+                       positionDraft.getStockInfo().getTicker();
             }
         );
 
@@ -360,21 +301,15 @@ namespace controller
             positionId    = _positionStore->createPosition(position);
         }
 
-        for (auto& leg : draft.getLegs())
-            leg.setPositionId(positionId);
-
-        if (!addExternalTransactionEntries(&draft, _accountStore))
-        {
-            const std::string msg =
-                "Failed to add external transaction entries";
-            LOG_ERROR(msg);
-            ErrorDialog::show(msg);
-        }
+        draft.setPositionId(positionId);
 
         const auto transaction =
-            TransactionMapper::fromCreateStockTransactionDraft(draft);
+            TransactionCreateMapper::fromCreateStockDraft(draft);
 
-        if (!_checkAddTransaction(transaction))
+        const auto txAddResult =
+            _transactionStore->addStockTransaction(transaction);
+
+        if (!_checkAddTransaction(txAddResult))
             return;
 
         // TODO(97gamjak): add here commands and also error handling
@@ -414,12 +349,9 @@ namespace controller
      * @return true if the transaction can be added, false otherwise
      */
     bool TransactionSideBarController::_checkAddTransaction(
-        const finance::DomainTransaction& transaction
+        store::TransactionStoreResult result
     )
     {
-        // Check if the transaction can be added
-        const auto result = _transactionStore->addTransaction(transaction);
-
         switch (result)
         {
             case TransactionStoreResult::Ok:

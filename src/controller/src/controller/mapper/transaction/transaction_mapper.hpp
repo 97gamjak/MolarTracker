@@ -22,11 +22,9 @@ namespace finance
 
 namespace drafts
 {
-    class CreateCashTransactionDraft;    // forward declaration
-    class TransactionOverviewDraft;      // forward declaration
-    class TransactionEntryDraft;         // forward declaration
-    class TradeLegDraft;                 // forward declaration
-    class CreateStockTransactionDraft;   // forward declaration
+    class TransactionOverviewDraft;   // forward declaration
+    class TransactionEntryDraft;      // forward declaration
+    class TradeLegDraft;              // forward declaration
 }   // namespace drafts
 
 namespace controller
@@ -54,16 +52,6 @@ namespace controller
         [[nodiscard]]
         static finance::TransactionEntry fromEntryDraft(
             const drafts::TransactionEntryDraft& entryDraft
-        );
-
-        [[nodiscard]]
-        static finance::DomainTransaction fromCreateCashTransactionDraft(
-            const drafts::CreateCashTransactionDraft& draft
-        );
-
-        [[nodiscard]]
-        static finance::DomainTransaction fromCreateStockTransactionDraft(
-            const drafts::CreateStockTransactionDraft& draft
         );
 
         [[nodiscard]]

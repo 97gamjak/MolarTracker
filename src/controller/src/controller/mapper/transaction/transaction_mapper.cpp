@@ -57,35 +57,6 @@ namespace controller
     }
 
     /**
-     * @brief Converts a drafts::CreateCashTransactionDraft to a
-     * finance::DomainTransaction
-     *
-     * @param draft
-     * @return finance::DomainTransaction
-     */
-    finance::DomainTransaction TransactionMapper::
-        fromCreateCashTransactionDraft(
-            const drafts::CreateCashTransactionDraft& draft
-        )
-    {
-        std::vector<finance::TransactionEntry> entries;
-
-        for (const auto& entryDraft : draft.getEntries())
-            entries.push_back(fromEntryDraft(entryDraft));
-
-        finance::DomainTransaction transaction{
-            TransactionId::invalid(),
-            draft.getTimestamp(),
-            TransactionStatus::Completed,
-            finance::CashData{},
-            finance::TransactionEntries{entries},
-            draft.getComment()
-        };
-
-        return transaction;
-    }
-
-    /**
      * @brief Converts a drafts::TradeLegDraft to a finance::TradeLeg
      *
      * @param draft
@@ -179,35 +150,6 @@ namespace controller
         }
 
         return drafts;
-    }
-
-    /**
-     * @brief Converts a drafts::CreateStockTransactionDraft to a
-     * finance::DomainTransaction
-     *
-     * @param draft
-     * @return finance::DomainTransaction
-     */
-    finance::DomainTransaction TransactionMapper::
-        fromCreateStockTransactionDraft(
-            const drafts::CreateStockTransactionDraft& draft
-        )
-    {
-        std::vector<finance::TransactionEntry> entries;
-
-        for (const auto& entryDraft : draft.getEntries())
-            entries.push_back(fromEntryDraft(entryDraft));
-
-        finance::DomainTransaction transaction{
-            TransactionId::invalid(),
-            draft.getTimestamp(),
-            TransactionStatus::Completed,
-            finance::TradeData{fromTradeLegDrafts(draft.getLegs())},
-            finance::TransactionEntries{entries},
-            draft.getComment()
-        };
-
-        return transaction;
     }
 
 }   // namespace controller

@@ -5,7 +5,7 @@
 #include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
-#include "drafts/transaction/transaction_draft.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_position_store.hpp"
@@ -28,16 +28,13 @@ namespace controller
         const std::shared_ptr<store::IStockStore>& stockStore
     )
     {
-        for (auto& leg : draft.getLegs())
-        {
-            const auto& ticker       = leg.getTicker();
-            const auto& instrumentId = stockStore->getInstrumentId(ticker);
+        const auto  ticker       = draft.getTicker();
+        const auto& instrumentId = stockStore->getInstrumentId(ticker);
 
-            if (instrumentId)
-                leg.setInstrumentId(*instrumentId);
-            else
-                return std::unexpected("Invalid stock ticker: " + ticker);
-        }
+        if (instrumentId)
+            draft.setInstrumentId(*instrumentId);
+        else
+            return std::unexpected("Invalid stock ticker: " + ticker);
 
         return {};
     }

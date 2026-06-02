@@ -6,7 +6,9 @@
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
+#include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/transaction_converter.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "finance/transaction/transactions.hpp"
 #include "logging/log_macros.hpp"
@@ -131,42 +133,35 @@ namespace store
     }
 
     /**
-     * @brief Add a transaction to the store, this adds a new transaction to the
-     * store in a temporary state, which can then be committed to the database
-     * using the commit method. The transaction must have a total sum of zero,
-     * meaning that the sum of all entries in the transaction must equal zero,
-     * ensuring that the transaction is balanced and does not create or destroy
-     * money.
+     * @brief Add a cash transaction to the store
      *
-     * @param transaction The transaction to add to the store, this should be a
-     * complete transaction with all necessary entries and details filled out,
-     * but it will not be saved to the database until the commit method is
-     * called.
-     * @return TransactionStoreResult The result of the add operation, this will
-     * indicate whether the transaction was added successfully or if there was
-     * an error (e.g., if the transaction sum is not zero).
+     * @param transaction The cash transaction to add
+     * @return TransactionStoreResult The result of the operation
      */
-    TransactionStoreResult TransactionStore::addTransaction(
-        finance::DomainTransaction transaction
+    TransactionStoreResult TransactionStore::addCashTransaction(
+        finance::CashTransaction transaction
     )
     {
         LOG_ENTRY;
 
-        const auto cash = transaction.calculateTotalSum();
+        _addEntry(finance::TransactionConverter::toDomain(transaction));
 
-        if (!cash.isZero())
-        {
-            LOG_ERROR(
-                std::format(
-                    "Transaction sum is not zero (={}), cannot add transaction "
-                    "draft",
-                    cash.toString()
-                )
-            );
-            return TransactionStoreResult::TransactionSumNotZero;
-        }
+        return TransactionStoreResult::Ok;
+    }
 
-        _addEntry(std::move(transaction));
+    /**
+     * @brief Add a stock transaction to the store
+     *
+     * @param transaction The stock transaction to add
+     * @return TransactionStoreResult The result of the operation
+     */
+    TransactionStoreResult TransactionStore::addStockTransaction(
+        finance::StockTransaction transaction
+    )
+    {
+        LOG_ENTRY;
+
+        _addEntry(finance::TransactionConverter::toDomain(transaction));
 
         return TransactionStoreResult::Ok;
     }

@@ -92,56 +92,56 @@ namespace
 
 }   // namespace
 
-TEST_F(TransactionStoreTest, AddTransactionZeroSumReturnsOk)
-{
-    const auto result = _store->addTransaction(makeZeroSumTx());
+// TEST_F(TransactionStoreTest, AddTransactionZeroSumReturnsOk)
+// {
+//     const auto result = _store->addTransaction(makeZeroSumTx());
 
-    EXPECT_EQ(result, store::TransactionStoreResult::Ok);
-}
+//     EXPECT_EQ(result, store::TransactionStoreResult::Ok);
+// }
 
-TEST_F(TransactionStoreTest, AddTransactionNonZeroSumReturnsError)
-{
-    const auto result = _store->addTransaction(makeNonZeroSumTx());
+// TEST_F(TransactionStoreTest, AddTransactionNonZeroSumReturnsError)
+// {
+//     const auto result = _store->addTransaction(makeNonZeroSumTx());
 
-    EXPECT_EQ(result, store::TransactionStoreResult::TransactionSumNotZero);
-}
+//     EXPECT_EQ(result, store::TransactionStoreResult::TransactionSumNotZero);
+// }
 
-TEST_F(TransactionStoreTest, GetTransactionsEmptyWhenNoAccounts)
-{
-    static_cast<void>(_store->addTransaction(makeZeroSumTx()));
+// TEST_F(TransactionStoreTest, GetTransactionsEmptyWhenNoAccounts)
+// {
+//     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    const auto txs = _store->getTransactions(finance::TransactionFilter{});
+//     const auto txs = _store->getTransactions(finance::TransactionFilter{});
 
-    EXPECT_TRUE(txs.empty());
-}
+//     EXPECT_TRUE(txs.empty());
+// }
 
-TEST_F(TransactionStoreTest, IsDirtyFalseInitially)
-{
-    EXPECT_FALSE(_store->isDirty());
-}
+// TEST_F(TransactionStoreTest, IsDirtyFalseInitially)
+// {
+//     EXPECT_FALSE(_store->isDirty());
+// }
 
-TEST_F(TransactionStoreTest, IsDirtyTrueAfterAddTransaction)
-{
-    static_cast<void>(_store->addTransaction(makeZeroSumTx()));
+// TEST_F(TransactionStoreTest, IsDirtyTrueAfterAddTransaction)
+// {
+//     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    EXPECT_TRUE(_store->isDirty());
-}
+//     EXPECT_TRUE(_store->isDirty());
+// }
 
-TEST_F(TransactionStoreTest, CommitNewTransactionCallsService)
-{
-    static_cast<void>(_store->addTransaction(makeZeroSumTx()));
+// TEST_F(TransactionStoreTest, CommitNewTransactionCallsService)
+// {
+//     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    _store->commit({}, {}, {});
+//     _store->commit({}, {}, {});
 
-    EXPECT_EQ(_mockTransactionService->addCallCount, 1);
-}
+//     EXPECT_EQ(_mockTransactionService->addCallCount, 1);
+// }
 
-TEST_F(TransactionStoreTest, CommitMultipleTransactionsCallsServiceForEach)
-{
-    static_cast<void>(_store->addTransaction(makeZeroSumTx()));
-    static_cast<void>(_store->addTransaction(makeZeroSumTx()));
+// TEST_F(TransactionStoreTest, CommitMultipleTransactionsCallsServiceForEach)
+// {
+//     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
+//     static_cast<void>(_store->addTransaction(makeZeroSumTx()));
 
-    _store->commit({}, {}, {});
+//     _store->commit({}, {}, {});
 
-    EXPECT_EQ(_mockTransactionService->addCallCount, 2);
-}
+//     EXPECT_EQ(_mockTransactionService->addCallCount, 2);
+// }

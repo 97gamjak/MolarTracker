@@ -9,6 +9,7 @@ add_library(molartracker_drafts STATIC
 
     src/drafts/transaction/transaction_draft.cpp
     src/drafts/transaction/transaction_overview_draft.cpp
+    src/drafts/transaction/transaction_create_draft.cpp
 )
 
 target_include_directories(molartracker_drafts

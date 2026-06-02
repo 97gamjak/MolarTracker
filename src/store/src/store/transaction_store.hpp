@@ -60,8 +60,12 @@ namespace store
         ) override;
 
         [[nodiscard]]
-        TransactionStoreResult addTransaction(
-            finance::DomainTransaction transaction
+        TransactionStoreResult addCashTransaction(
+            finance::CashTransaction transaction
+        ) override;
+        [[nodiscard]]
+        TransactionStoreResult addStockTransaction(
+            finance::StockTransaction transaction
         ) override;
 
         [[nodiscard]]

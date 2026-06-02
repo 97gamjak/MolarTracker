@@ -5,7 +5,6 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
-#include "finance/transaction/domain_transaction.hpp"   // needed for vector TODO: remove this as soon as transition is done
 #include "finance/transaction/transactions.hpp"   // needed for vector
 
 namespace finance
@@ -48,14 +47,25 @@ namespace store
         ) = 0;
 
         /**
-         * @brief Add a transaction to the store
+         * @brief Add a cash transaction to the store
          *
-         * @param transaction The transaction to add
+         * @param transaction The cash transaction to add
          * @return TransactionStoreResult The result of the operation
          */
         [[nodiscard]]
-        virtual TransactionStoreResult addTransaction(
-            finance::DomainTransaction transaction
+        virtual TransactionStoreResult addCashTransaction(
+            finance::CashTransaction transaction
+        ) = 0;
+
+        /**
+         * @brief Add a stock transaction to the store
+         *
+         * @param transaction The stock transaction to add
+         * @return TransactionStoreResult The result of the operation
+         */
+        [[nodiscard]]
+        virtual TransactionStoreResult addStockTransaction(
+            finance::StockTransaction transaction
         ) = 0;
 
         /**

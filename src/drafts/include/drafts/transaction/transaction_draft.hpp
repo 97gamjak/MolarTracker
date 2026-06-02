@@ -1,14 +1,11 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_DRAFT_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_DRAFT_HPP__
 
-#include <optional>
 #include <string>
-#include <vector>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
-#include "utils/timestamp.hpp"
 
 namespace drafts
 {
@@ -94,75 +91,6 @@ namespace drafts
 
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
-    };
-
-    /**
-     * @brief A base class for a draft representation of a transaction
-     *
-     */
-    class CreateTransactionDraft
-    {
-       private:
-        /// The timestamp of the transaction
-        Timestamp _timestamp;
-
-        /// The entries of the transaction
-        std::vector<TransactionEntryDraft> _entries;
-
-        /// An optional comment associated with the transaction
-        std::optional<std::string> _comment;
-
-       public:
-        CreateTransactionDraft(
-            Timestamp                          timestamp,
-            std::vector<TransactionEntryDraft> entries,
-            std::optional<std::string>         comment
-        );
-
-        [[nodiscard]]
-        const std::vector<TransactionEntryDraft>& getEntries() const;
-
-        [[nodiscard]]
-        const Timestamp& getTimestamp() const;
-
-        [[nodiscard]]
-        const std::optional<std::string>& getComment() const;
-
-        void addEntry(const TransactionEntryDraft& entry);
-        void addEntries(const std::vector<TransactionEntryDraft>& entries);
-    };
-
-    /**
-     * @brief A draft representation of a transaction
-     *
-     */
-    class CreateCashTransactionDraft : public CreateTransactionDraft
-    {
-       public:
-        using CreateTransactionDraft::CreateTransactionDraft;
-    };
-
-    /**
-     * @brief A draft representation of a stock transaction
-     *
-     */
-    class CreateStockTransactionDraft : public CreateTransactionDraft
-    {
-       private:
-        /// The legs of the stock transaction
-        std::vector<TradeLegDraft> _legs;
-
-       public:
-        CreateStockTransactionDraft(
-            Timestamp                          timestamp,
-            std::vector<TransactionEntryDraft> entries,
-            std::vector<TradeLegDraft>         legs,
-            std::optional<std::string>         comment
-        );
-
-        [[nodiscard]] const std::vector<TradeLegDraft>& getLegs() const;
-
-        [[nodiscard]] std::vector<TradeLegDraft>& getLegs();
     };
 
 }   // namespace drafts

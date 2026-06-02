@@ -7,6 +7,7 @@ qt_add_library(molartracker_controller STATIC
 
     src/controller/mapper/transaction/transaction_mapper.cpp
     src/controller/mapper/transaction/transaction_overview_mapper.cpp
+    src/controller/mapper/transaction/transaction_create_mapper.cpp
 
     # menu bar
     src/controller/menu_bar/menu_bar_controller.cpp

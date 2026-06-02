@@ -6,16 +6,18 @@
 
 #include <QObject>
 #include <QPointer>
+#include <cstdint>
 
 #include "connections/connection.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace store
 {
-    class IAccountStore;       // Forward declaration
-    class ITransactionStore;   // Forward declaration
-    class IStockStore;         // Forward declaration
-    class IPositionStore;      // Forward declaration
+    class IAccountStore;                                // Forward declaration
+    class ITransactionStore;                            // Forward declaration
+    class IStockStore;                                  // Forward declaration
+    class IPositionStore;                               // Forward declaration
+    enum class TransactionStoreResult : std::uint8_t;   // Forward declaration
 }   // namespace store
 
 namespace cmd
@@ -115,9 +117,7 @@ namespace controller
 
         void _onCreateTickerRequested(const std::string& ticker);
 
-        bool _checkAddTransaction(
-            const finance::DomainTransaction& transaction
-        );
+        static bool _checkAddTransaction(store::TransactionStoreResult result);
     };
 }   // namespace controller
 
