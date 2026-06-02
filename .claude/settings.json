@@ -24,6 +24,8 @@
             "Bash(git push origin *)",
             "Bash(git show *)",
             "Bash(git stash *)",
+            "Bash(gh pr create --base dev *)",
+            "Bash(gh pr create --title * --base dev *)",
             "Read"
         ],
         "deny": [
