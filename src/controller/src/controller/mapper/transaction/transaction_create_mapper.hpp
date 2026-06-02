@@ -13,6 +13,10 @@ namespace drafts
 namespace controller
 {
 
+    /**
+     * @brief Maps create transaction drafts to finance transactions.
+     *
+     */
     class TransactionCreateMapper
     {
        public:

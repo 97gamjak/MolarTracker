@@ -9,7 +9,7 @@
 
 namespace drafts
 {
-    class PositionDetailDraft;   // Forward declaration
+    class PositionStockDetailDraft;   // Forward declaration
 }   // namespace drafts
 
 namespace finance
@@ -24,16 +24,16 @@ namespace ui
      * @brief Model for displaying position data in a table view
      *
      */
-    class PositionTableModel : public QAbstractTableModel
+    class StockPositionTableModel : public QAbstractTableModel
     {
         Q_OBJECT
         /// Vector of position drafts
-        std::vector<drafts::PositionDetailDraft> _positions;
+        std::vector<drafts::PositionStockDetailDraft> _positions;
         /// Pointer to the price cache
         const finance::PriceCache* _priceCache;
 
        public:
-        explicit PositionTableModel(
+        explicit StockPositionTableModel(
             const finance::PriceCache* priceCache = nullptr,
             QObject*                   parent     = nullptr
         );
@@ -57,14 +57,14 @@ namespace ui
         void refreshPrices();
 
         void setPositions(
-            const std::vector<drafts::PositionDetailDraft>& positions
+            const std::vector<drafts::PositionStockDetailDraft>& positions
         );
 
        private:
         [[nodiscard]]
         QVariant _priceDisplay(
-            const drafts::PositionDetailDraft& pos,
-            PositionColumns                    col
+            const drafts::PositionStockDetailDraft& pos,
+            PositionColumns                         col
         ) const;
 
         [[nodiscard]]

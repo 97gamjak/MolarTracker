@@ -17,7 +17,7 @@ namespace ui
      * @param priceCache
      * @param parent
      */
-    PositionTableModel::PositionTableModel(
+    StockPositionTableModel::StockPositionTableModel(
         const finance::PriceCache* priceCache,
         QObject*                   parent
     )
@@ -31,7 +31,7 @@ namespace ui
      * @param parent The parent index (unused).
      * @return int The number of rows.
      */
-    int PositionTableModel::rowCount(const QModelIndex& parent) const
+    int StockPositionTableModel::rowCount(const QModelIndex& parent) const
     {
         if (parent.isValid())
             return 0;
@@ -44,7 +44,7 @@ namespace ui
      * @param parent The parent index (unused).
      * @return int The number of columns.
      */
-    int PositionTableModel::columnCount(const QModelIndex& parent) const
+    int StockPositionTableModel::columnCount(const QModelIndex& parent) const
     {
         if (parent.isValid())
             return 0;
@@ -58,7 +58,10 @@ namespace ui
      * @param role The role for which to retrieve data.
      * @return QVariant The data for the specified index and role.
      */
-    QVariant PositionTableModel::data(const QModelIndex& index, int role) const
+    QVariant StockPositionTableModel::data(
+        const QModelIndex& index,
+        int                role
+    ) const
     {
         if (!index.isValid() || index.row() >= rowCount({}))
             return {};
@@ -87,7 +90,7 @@ namespace ui
                             "yyyy-MM-dd"
                         );
 
-                    // TODO(97gamjak): wire up once PositionDetailDraft (or
+                    // TODO(97gamjak): wire up once PositionStockDetailDraft (or
                     // PositionSummary) carries aggregated trade-leg fields.
                     case PositionColumns::Quantity:
                         return QString::fromStdString(
@@ -159,7 +162,7 @@ namespace ui
         }
     }
 
-    QVariant PositionTableModel::headerData(
+    QVariant StockPositionTableModel::headerData(
         int             section,
         Qt::Orientation orientation,
         int             role
@@ -170,7 +173,7 @@ namespace ui
         return _columnLabel(section);
     }
 
-    void PositionTableModel::refreshPrices()
+    void StockPositionTableModel::refreshPrices()
     {
         const int first = static_cast<int>(PositionColumns::LastPrice);
         const int last  = static_cast<int>(PositionColumns::UnrealizedPnlPct);
@@ -186,8 +189,8 @@ namespace ui
         );
     }
 
-    void PositionTableModel::setPositions(
-        const std::vector<drafts::PositionDetailDraft>& positions
+    void StockPositionTableModel::setPositions(
+        const std::vector<drafts::PositionStockDetailDraft>& positions
     )
     {
         beginResetModel();
@@ -199,9 +202,9 @@ namespace ui
     // Private helpers
     // ---------------------------------------------------------------------------
 
-    QVariant PositionTableModel::_priceDisplay(
-        const drafts::PositionDetailDraft& pos,
-        PositionColumns                    col
+    QVariant StockPositionTableModel::_priceDisplay(
+        const drafts::PositionStockDetailDraft& pos,
+        PositionColumns                         col
     ) const
     {
         // TODO: replace getTicker() with yahooSymbol once available on the
@@ -238,7 +241,7 @@ namespace ui
         std::unreachable();
     }
 
-    QString PositionTableModel::_columnLabel(int index)
+    QString StockPositionTableModel::_columnLabel(int index)
     {
         const auto column = static_cast<PositionColumns>(index);
         return toQString(column);

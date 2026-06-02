@@ -4,11 +4,10 @@
 #include <QWidget>
 #include <memory>
 
-#include "drafts/account_draft.hpp"
-
 namespace drafts
 {
-    class PositionDetailDraft;   // Forward declaration
+    class PositionStockDetailDraft;   // Forward declaration
+    class AccountDraft;               // Forward declaration
 }   // namespace drafts
 
 namespace ui
@@ -35,8 +34,8 @@ namespace ui
 
         void updateCashAccount(const drafts::AccountDraft& account);
         void updateSecurityAccount(
-            const drafts::AccountDraft&                     account,
-            const std::vector<drafts::PositionDetailDraft>& positions
+            const drafts::AccountDraft&                          account,
+            const std::vector<drafts::PositionStockDetailDraft>& positions
         );
 
        private:

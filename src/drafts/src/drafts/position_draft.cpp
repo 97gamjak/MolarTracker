@@ -67,7 +67,7 @@ namespace drafts
      * @param quantity
      * @param closedAt
      */
-    PositionDetailDraft::PositionDetailDraft(
+    PositionStockDetailDraft::PositionStockDetailDraft(
         PositionId               positionId,
         StockInfoDraft           stockInfo,
         Timestamp                createdAt,
@@ -84,6 +84,6 @@ namespace drafts
      *
      * @return Quantity The quantity
      */
-    Quantity PositionDetailDraft::getQuantity() const { return _quantity; }
+    Quantity PositionStockDetailDraft::getQuantity() const { return _quantity; }
 
 }   // namespace drafts

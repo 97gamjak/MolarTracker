@@ -14,7 +14,7 @@ namespace controller
             const unorderedIdMap<InstrumentId, std::string>& instrumentNames
         )
         {
-            const auto  instrumentId = transaction.getInstrumentId();
+            const auto  instrumentId = transaction.getBaseInstrumentId();
             std::string ticker       = "UNKNOWN";
 
             if (instrumentNames.contains(instrumentId))
@@ -55,7 +55,7 @@ namespace controller
     {
         std::vector<drafts::StockTransactionOverview> result;
 
-        for (const auto& transaction : transactions.getStockTransactions())
+        for (const auto& transaction : transactions.stocks())
         {
             result.push_back(toStockOverview(transaction, instrumentNames));
         }
@@ -68,7 +68,7 @@ namespace controller
     {
         std::vector<drafts::CashTransactionOverview> result;
 
-        for (const auto& transaction : transactions.getCashTransactions())
+        for (const auto& transaction : transactions.cash())
         {
             result.push_back(toCashOverview(transaction));
         }

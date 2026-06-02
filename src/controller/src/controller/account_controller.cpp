@@ -136,8 +136,8 @@ namespace controller
                 break;
             case AccountKind::Security:
             {
-                const std::vector<drafts::PositionDetailDraft> drafts =
-                    getOpenPositionDrafts(
+                const std::vector<drafts::PositionStockDetailDraft> drafts =
+                    getOpenStockPositionDrafts(
                         account->getId(),
                         _stores->positionStore,
                         _stores->stockStore,

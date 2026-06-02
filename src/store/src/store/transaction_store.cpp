@@ -280,17 +280,9 @@ namespace store
     {
         idSet<InstrumentId> instrumentIdSet;
 
-        const auto transactions = findTransactionsByPositionId(positionId);
+        const auto txs = findTransactionsByPositionId(positionId);
 
-        // TODO: fix this as this will never work in general
-        for (const auto& transaction : transactions.getStockTransactions())
-        {
-            const auto instrumentId = transaction.getInstrumentId();
-
-            instrumentIdSet.insert(instrumentId);
-        }
-
-        return instrumentIdSet;
+        return txs.securities().getBaseInstrumentIds();
     }
 
     /**

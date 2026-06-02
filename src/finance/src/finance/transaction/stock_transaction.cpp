@@ -32,11 +32,6 @@ namespace finance
     {
     }
 
-    InstrumentId StockTransaction::getInstrumentId() const
-    {
-        return _instrumentId;
-    }
-
     AccountId StockTransaction::getSecurityAccountId() const
     {
         return _securityAccount;
@@ -52,11 +47,11 @@ namespace finance
         return _externalAccount;
     }
 
-    Quantity StockTransaction::getQuantity() const { return _quantity; }
+    const Quantity& StockTransaction::getQuantity() const { return _quantity; }
 
-    Cash StockTransaction::getUnitPrice() const { return _unitPrice; }
+    const Cash& StockTransaction::getUnitPrice() const { return _unitPrice; }
 
-    Cash StockTransaction::getFees() const { return _fees; }
+    const Cash& StockTransaction::getFees() const { return _fees; }
 
     PositionId StockTransaction::getPositionId() const { return _positionId; }
 
@@ -88,6 +83,11 @@ namespace finance
     }
 
     Cash StockTransaction::getAmount() const { return _quantity * _unitPrice; }
+
+    InstrumentId StockTransaction::getBaseInstrumentId() const
+    {
+        return _instrumentId;
+    }
 
     TransactionEntry StockTransaction::_getAmountEntry() const
     {

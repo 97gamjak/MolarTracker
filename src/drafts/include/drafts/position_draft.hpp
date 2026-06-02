@@ -45,17 +45,18 @@ namespace drafts
     };
 
     /**
-     * @brief Represents a detailed draft for a position in the trading system
+     * @brief Represents a detailed draft for a stock position in the trading
+     * system
      *
      */
-    class PositionDetailDraft : public PositionDraft
+    class PositionStockDetailDraft : public PositionDraft
     {
        private:
         /// The quantity of the position
         Quantity _quantity;
 
        public:
-        explicit PositionDetailDraft(
+        explicit PositionStockDetailDraft(
             PositionId               positionId,
             StockInfoDraft           stockInfo,
             Timestamp                createdAt,

@@ -118,60 +118,55 @@ namespace controller
      * @param transactionStore
      * @return std::vector<drafts::PositionDraft>
      */
-    std::vector<drafts::PositionDetailDraft> getOpenPositionDrafts(
-        AccountId                                     account,
-        const std::shared_ptr<store::IPositionStore>& positionStore,
-        const std::shared_ptr<store::IStockStore>& /*stockStore*/,
-        const std::shared_ptr<store::ITransactionStore>& /*transactionStore*/
+    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositionDrafts(
+        AccountId                                        account,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
         const auto positions = positionStore->getOpenPositions({account});
 
-        std::vector<drafts::PositionDetailDraft> drafts;
-        // TODO:
-        // for (const auto& position : positions)
-        // {
-        //     const auto txs =
-        //         transactionStore->findTransactionsByPositionId(position.getId()
-        //         );
+        std::vector<drafts::PositionStockDetailDraft> drafts;
 
-        //     if (txs.empty())
-        //     {
-        //         LOG_ERROR(
-        //             "No transactions found for position id: " +
-        //             position.getId().toString()
-        //         );
-        //         continue;
-        //     }
+        for (const auto& position : positions)
+        {
+            const auto txs =
+                transactionStore->findTransactionsByPositionId(position.getId())
+                    .stocks();
 
-        //     const auto transactions = finance::Transactions{txs};
+            if (txs.empty())
+            {
+                LOG_ERROR(
+                    "No transactions found for position id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
 
-        //     const auto instrumentIds = transactions.getInstrumentIds();
-        //     const auto instrumentIdSet =
-        //         idSet<InstrumentId>(instrumentIds.begin(),
-        //         instrumentIds.end());
+            const auto instrumentIds = txs.getBaseInstrumentIds();
 
-        //     const auto& stocks = stockStore->getStocks(instrumentIdSet);
+            const auto& stocks = stockStore->getStocks(instrumentIds);
 
-        //     if (stocks.empty())
-        //     {
-        //         LOG_ERROR(
-        //             "No stock found for instrument id: " +
-        //             position.getId().toString()
-        //         );
-        //         continue;
-        //     }
+            if (stocks.empty())
+            {
+                LOG_ERROR(
+                    "No stock found for instrument id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
 
-        //     const auto stockInfo =
-        //         StockMapper::toStockInfoDraft(stocks.front());
+            const auto stockInfo =
+                StockMapper::toStockInfoDraft(stocks.front());
 
-        //     drafts.emplace_back(
-        //         position.getId(),
-        //         stockInfo,
-        //         position.getCreatedAt(),
-        //         transactions.calculateTotalQuantity()
-        //     );
-        // }
+            drafts.emplace_back(
+                position.getId(),
+                stockInfo,
+                position.getCreatedAt(),
+                txs.getTotalQuantity()
+            );
+        }
 
         return drafts;
     }

@@ -38,6 +38,7 @@ namespace finance
             TransactionStatus          status,
             std::optional<std::string> comment = std::nullopt
         );
+        virtual ~Transaction() = default;
 
         [[nodiscard]] TransactionId              getId() const;
         [[nodiscard]] Timestamp                  getTimestamp() const;

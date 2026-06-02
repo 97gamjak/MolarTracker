@@ -24,7 +24,7 @@ namespace ui
         verticalHeader()->setDefaultSectionSize(defaultSize);
     }
 
-    void PositionTableView::setPositionModel(PositionTableModel* model)
+    void PositionTableView::setPositionModel(StockPositionTableModel* model)
     {
         _proxy = utils::makeQChild<QSortFilterProxyModel>(this);
         _proxy->setSourceModel(model);

@@ -7,7 +7,7 @@ class QSortFilterProxyModel;   // Forward declaration
 
 namespace ui
 {
-    class PositionTableModel;
+    class StockPositionTableModel;
 
     /**
      * @brief View for displaying position data in a table
@@ -24,7 +24,7 @@ namespace ui
        public:
         explicit PositionTableView(QWidget* parent = nullptr);
 
-        void setPositionModel(PositionTableModel* model);
+        void setPositionModel(StockPositionTableModel* model);
 
         /**
          * @brief Returns the source-model row for the current selection,

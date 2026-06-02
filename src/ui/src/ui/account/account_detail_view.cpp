@@ -33,7 +33,7 @@ namespace ui
         /// The position table view
         PositionTableView* positionTableView;
         /// The position table model
-        PositionTableModel* positionTableModel;
+        StockPositionTableModel* positionTableModel;
 
         /// The stacked widget
         QStackedWidget* stackedWidget;
@@ -62,7 +62,7 @@ namespace ui
           nameLabel(new QLabel()),
           balanceLabel(new QLabel()),
           positionTableView(new PositionTableView()),
-          positionTableModel(new PositionTableModel()),
+          positionTableModel(new StockPositionTableModel()),
           stackedWidget(new QStackedWidget()),
           cashAccountWidget(new QWidget()),
           securityAccountWidget(new QWidget()),
@@ -179,8 +179,8 @@ namespace ui
      * @param positions The positions associated with the account
      */
     void AccountDetailView::updateSecurityAccount(
-        const AccountDraft&                             account,
-        const std::vector<drafts::PositionDetailDraft>& positions
+        const AccountDraft&                                  account,
+        const std::vector<drafts::PositionStockDetailDraft>& positions
     )
     {
         if (account.getKind() != AccountKind::Security)
