@@ -27,9 +27,20 @@ namespace ui
      * selected when the itemSelected signal is emitted
      * @param name The name of the account to display in the side bar
      */
-    void AccountCategory::addAccount(AccountId id, const QString& name)
+    void AccountCategory::addAccount(
+        AccountId      id,
+        const QString& name,
+        AccountKind    kind
+    )
     {
-        auto* accountItem = utils::makeQChild<AccountItem>(id, name);
+        static constexpr auto* cashSymbol     = "● ";
+        static constexpr auto* securitySymbol = "▲ ";
+
+        const QString prefix = kind == AccountKind::Security
+                                   ? QString::fromUtf8(securitySymbol)
+                                   : QString::fromUtf8(cashSymbol);
+
+        auto* accountItem = utils::makeQChild<AccountItem>(id, prefix + name);
         appendRow(accountItem);
     }
 
