@@ -57,7 +57,8 @@ namespace vcs
         }
 
         _watcher.setFuture(
-            QtConcurrent::run([this]() { return _client.fetchLatestVersion(); })
+            QtConcurrent::run([]()
+                              { return GitHubClient::fetchLatestVersion(); })
         );
     }
 

@@ -21,7 +21,7 @@ namespace vcs
      * @return std::expected<utils::SemVer, http::HttpError>
      */
     std::expected<utils::SemVer, http::HttpError> GitHubClient::
-        fetchLatestVersion() const
+        fetchLatestVersion()
     {
         const auto response = http::HttpClient::get(
             http::HttpRequest{

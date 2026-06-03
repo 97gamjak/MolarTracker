@@ -39,7 +39,6 @@ namespace vcs
         void onFetchFinished();
 
        private:
-        GitHubClient                                                  _client;
         QTimer                                                        _timer;
         QFutureWatcher<std::expected<utils::SemVer, http::HttpError>> _watcher;
         std::optional<utils::SemVer> _lastNotifiedVersion;

@@ -31,6 +31,7 @@ namespace ui
         [[nodiscard]] bool isDismissedForVersion() const;
 
        private:
+        /// Checkbox for suppressing the dialog for the current version
         QCheckBox* _dismissCheckBox{nullptr};
     };
 

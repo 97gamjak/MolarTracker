@@ -8,6 +8,8 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include "utils/qt_helpers.hpp"
+
 namespace ui
 {
 
@@ -25,17 +27,18 @@ namespace ui
     {
         setWindowTitle("Update Available");
 
-        auto* layout = new QVBoxLayout{this};
+        auto* layout = utils::makeQChild<QVBoxLayout>(this);
 
-        auto* versionLabel = new QLabel{
+        auto* versionLabel = utils::makeQChild<QLabel>(
             QString{"A new version of MolarTracker is available: <b>%1</b>"}
                 .arg(QString::fromStdString(latestVersion.toString())),
             this
-        };
+        );
         versionLabel->setTextFormat(Qt::RichText);
         layout->addWidget(versionLabel);
 
-        auto* releasesButton = new QPushButton{"Open Releases Page", this};
+        auto* releasesButton =
+            utils::makeQChild<QPushButton>("Open Releases Page", this);
         connect(
             releasesButton,
             &QPushButton::clicked,
@@ -49,11 +52,14 @@ namespace ui
         );
         layout->addWidget(releasesButton);
 
-        _dismissCheckBox =
-            new QCheckBox{"Don't show again for this version", this};
+        _dismissCheckBox = utils::makeQChild<QCheckBox>(
+            "Don't show again for this version",
+            this
+        );
         layout->addWidget(_dismissCheckBox);
 
-        auto* buttons = new QDialogButtonBox{QDialogButtonBox::Ok, this};
+        auto* buttons =
+            utils::makeQChild<QDialogButtonBox>(QDialogButtonBox::Ok, this);
         connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
         layout->addWidget(buttons);
     }

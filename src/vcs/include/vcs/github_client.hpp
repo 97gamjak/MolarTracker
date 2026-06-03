@@ -18,8 +18,8 @@ namespace vcs
     {
        public:
         [[nodiscard]]
-        std::expected<utils::SemVer, http::HttpError> fetchLatestVersion(
-        ) const;
+        static std::expected<utils::SemVer, http::HttpError> fetchLatestVersion(
+        );
 
        private:
         static constexpr std::string_view k_url =
