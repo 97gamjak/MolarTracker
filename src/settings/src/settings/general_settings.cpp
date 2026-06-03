@@ -54,4 +54,24 @@ namespace settings
         return _defaultProfile.getOptional().has_value();
     }
 
+    /**
+     * @brief Get the dismissed update version parameter
+     *
+     * @return StringParam&
+     */
+    StringParam& GeneralSettings::getDismissedUpdateVersion()
+    {
+        return _dismissedUpdateVersion;
+    }
+
+    /**
+     * @brief Get the dismissed update version parameter (const version)
+     *
+     * @return const StringParam&
+     */
+    const StringParam& GeneralSettings::getDismissedUpdateVersion() const
+    {
+        return _dismissedUpdateVersion;
+    }
+
 }   // namespace settings

@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__VERSION_HPP__
 #define __UTILS__INCLUDE__UTILS__VERSION_HPP__
 
+#include <compare>
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -41,7 +42,14 @@ namespace utils
 
         static SemVer getInvalidVersion();
 
+        // Returns the compile-time version of the running application.
+        static SemVer current();
+
         friend bool operator==(const SemVer& lhs, const SemVer& rhs);
+        friend std::strong_ordering operator<=>(
+            const SemVer& lhs,
+            const SemVer& rhs
+        );
 
        private:
         static std::optional<SemVer> _parse(const std::string& versionStr);

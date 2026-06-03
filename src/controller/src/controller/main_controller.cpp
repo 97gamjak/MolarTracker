@@ -13,6 +13,9 @@
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
 #include "ui/main_window.hpp"
+#include "ui/update/update_available_dialog.hpp"
+#include "utils/qt_helpers.hpp"
+#include "vcs/update_check_service.hpp"
 
 namespace controller
 {
@@ -50,6 +53,9 @@ namespace controller
         MenuBarController _menuBarController;
         /// controller for managing the side bar
         SideBarController _sideBarController;
+
+        /// service that checks GitHub for newer releases
+        vcs::UpdateCheckService _updateCheckService;
 
         /**
          * @brief Construct a new Impl object
@@ -91,6 +97,36 @@ namespace controller
         {
             _handlers.getDirtyStateHandler()
                 .subscribe(_storeContainer, _settings, &_mainWindow);
+
+            QObject::connect(
+                &_updateCheckService,
+                &vcs::UpdateCheckService::updateAvailable,
+                &_mainWindow,
+                [this](utils::SemVer latest)
+                {
+                    const auto& dismissed = _settings.getGeneralSettings()
+                                                .getDismissedUpdateVersion()
+                                                .getOptional();
+
+                    if (dismissed.has_value() &&
+                        *dismissed == latest.toString())
+                        return;
+
+                    auto* dialog = utils::makeQChild<ui::UpdateAvailableDialog>(
+                        latest,
+                        &_mainWindow
+                    );
+                    dialog->exec();
+
+                    if (dialog->isDismissedForVersion())
+                    {
+                        _settings.getGeneralSettings()
+                            .getDismissedUpdateVersion()
+                            .set(latest.toString());
+                        _settings.save();
+                    }
+                }
+            );
         }
     };
 
@@ -148,6 +184,8 @@ namespace controller
         controller.ensureProfileExists();
 
         _impl->_sideBarController.refresh();
+
+        _impl->_updateCheckService.start();
     }
 
 }   // namespace controller
