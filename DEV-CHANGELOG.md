@@ -113,6 +113,10 @@ All changes and updates, that are relevant for developers will be documented her
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
 
+### Claude
+
+- add rules for allowing and denying commands
+
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
