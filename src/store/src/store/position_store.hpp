@@ -52,6 +52,7 @@ namespace store
         std::vector<finance::Position> getOpenPositions() const override;
 
         void commit() override;
+        void reload() override;
 
         [[nodiscard]]
         const unorderedIdMap<PositionId, PositionId>& getIdRemap(

@@ -65,6 +65,9 @@ namespace repo
         [[nodiscard]] std::shared_ptr<IPositionRepo>       getPositionRepo();
         [[nodiscard]] std::shared_ptr<const IPositionRepo> getPositionRepo(
         ) const;
+
+        void closeDb();
+        void reopenDb();
     };
 
 }   // namespace repo

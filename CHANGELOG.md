@@ -16,6 +16,11 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Features
 
+- Automatic database backup on every startup with a tiered rolling-window
+  retention strategy: 5 most-recent backups, 1 per calendar week for 4 weeks,
+  then 1 per calendar month indefinitely
+- "Restore from Backup…" action in the Settings menu lets you select a backup,
+  preview its timestamp, and restore in-place without restarting
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs

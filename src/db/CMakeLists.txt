@@ -1,4 +1,5 @@
 add_library(molartracker_db STATIC
+    src/db/backup_manager.cpp
     src/db/database.cpp
     src/db/db_exception.cpp
     src/db/statement.cpp
@@ -16,6 +17,7 @@ target_link_libraries(molartracker_db
     PRIVATE
     molartracker_logging
     molartracker_config
+    molartracker_utils
 )
 
 if (WIN32)

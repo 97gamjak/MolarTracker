@@ -52,6 +52,13 @@ namespace store
          * longer any dirty data that needs to be committed.
          */
         virtual void clearPotentiallyDirty() = 0;
+
+        /**
+         * @brief Discard all in-memory state and re-load fresh data from the
+         * database. Called after a database restore to synchronise the store
+         * with the restored file.
+         */
+        virtual void reload() = 0;
     };
 
 }   // namespace store

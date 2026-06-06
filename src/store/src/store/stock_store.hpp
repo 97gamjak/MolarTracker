@@ -79,6 +79,7 @@ namespace store
         ) const override;
 
         void commit() override;
+        void reload() override;
 
         [[nodiscard]]
         const unorderedIdMap<InstrumentId, InstrumentId>& getInstrumentIdMap(

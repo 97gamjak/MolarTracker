@@ -1,7 +1,11 @@
 #include "repo/repo_container.hpp"
 
+#include <filesystem>
+
 #include "account_repo.hpp"
 #include "config/constants.hpp"
+#include "db/backup_manager.hpp"
+#include "db/database.hpp"
 #include "instrument_repo.hpp"
 #include "logging/log_macros.hpp"
 #include "position_repo.hpp"
@@ -22,14 +26,35 @@ namespace repo
     RepoContainer::RepoContainer()
         : _database{std::make_unique<db::Database>(
               Constants::getInstance().getDatabasePath()
-          )},
-          _migrationRunner{std::make_unique<MigrationRunner>(*_database)},
-          _profileRepo{std::make_shared<ProfileRepo>(*_database)},
-          _accountRepo{std::make_shared<AccountRepo>(*_database)},
-          _transactionRepo{std::make_shared<TransactionRepo>(*_database)},
-          _instrumentRepo{std::make_shared<InstrumentRepo>(*_database)},
-          _positionRepo{std::make_shared<PositionRepo>(*_database)}
+          )}
     {
+        // Backup before any writes (including migrations). A non-fatal error
+        // here must not prevent startup.
+        if (std::filesystem::exists(Constants::getInstance().getDatabasePath()))
+        {
+            try
+            {
+                db::BackupManager::createBackup(
+                    *_database,
+                    Constants::getInstance().getBackupPath()
+                );
+            }
+            catch (const std::exception& e)
+            {
+                LOG_WARNING(
+                    std::string{"Startup backup failed (continuing): "} +
+                    e.what()
+                );
+            }
+        }
+
+        _migrationRunner = std::make_unique<MigrationRunner>(*_database);
+        _profileRepo     = std::make_shared<ProfileRepo>(*_database);
+        _accountRepo     = std::make_shared<AccountRepo>(*_database);
+        _transactionRepo = std::make_shared<TransactionRepo>(*_database);
+        _instrumentRepo  = std::make_shared<InstrumentRepo>(*_database);
+        _positionRepo    = std::make_shared<PositionRepo>(*_database);
+
         if (!_migrationRunner || !_profileRepo || !_accountRepo ||
             !_transactionRepo || !_instrumentRepo || !_positionRepo)
         {
@@ -38,6 +63,16 @@ namespace repo
             throw RepositoryException(msg);
         }
     }
+
+    /**
+     * @brief Close the underlying database connection.
+     */
+    void RepoContainer::closeDb() { _database->close(); }
+
+    /**
+     * @brief Reopen the database connection at the original path.
+     */
+    void RepoContainer::reopenDb() { _database->open(_database->getDBPath()); }
 
     RepoContainer::~RepoContainer() = default;
 

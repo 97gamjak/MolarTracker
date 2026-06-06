@@ -2,6 +2,8 @@
 #define __CONTROLLER__SRC__CONTROLLER__MENU_BAR__SETTINGS_MENU_CONTROLLER_HPP__
 
 #include <QObject>
+#include <filesystem>
+#include <functional>
 
 class QMainWindow;   // Forward declaration
 
@@ -25,6 +27,12 @@ namespace controller
     {
         Q_OBJECT
 
+       public:
+        /// Callback type invoked with the chosen backup path when the user
+        /// confirms a restore
+        using RestoreCallback =
+            std::function<void(const std::filesystem::path&)>;
+
        private:
         /// Reference to the main window
         QMainWindow& _mainWindow;
@@ -32,9 +40,15 @@ namespace controller
         ui::SettingsMenu& _settingsMenu;
         /// Reference to the application settings
         settings::Settings& _settings;
+        /// Optional callback wired from MainController for restore
+        RestoreCallback _restoreCallback;
+
+       public:
+        void setRestoreCallback(RestoreCallback callback);
 
        private slots:
         void _onPreferencesRequested();
+        void _onRestoreFromBackupRequested();
 
        public:
         explicit SettingsMenuController(

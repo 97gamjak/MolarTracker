@@ -62,6 +62,9 @@ namespace service
         [[nodiscard]] std::shared_ptr<IPositionService> getPositionService();
         [[nodiscard]] std::shared_ptr<const IPositionService> getPositionService(
         ) const;
+
+        void closeDb();
+        void reopenDb();
     };
 
 }   // namespace service

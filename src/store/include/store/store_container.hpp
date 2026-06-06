@@ -1,6 +1,7 @@
 #ifndef __STORE__INCLUDE__STORE__STORE_CONTAINER_HPP__
 #define __STORE__INCLUDE__STORE__STORE_CONTAINER_HPP__
 
+#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -60,6 +61,8 @@ namespace store
         void               commit();
         void               clearPotentiallyDirty();
         [[nodiscard]] bool isDirty() const;
+
+        void restoreFromBackup(const std::filesystem::path& backupFile);
 
         Connections subscribeToDirty(
             const OnDirtyChanged::func& func,

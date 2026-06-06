@@ -1,5 +1,7 @@
 #include "controller/main_controller.hpp"
 
+#include <filesystem>
+
 #include "commands/undo_stack.hpp"
 #include "config/constants.hpp"
 #include "controller/account_controller.hpp"
@@ -7,6 +9,7 @@
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
+#include "controller/menu_bar/settings_menu_controller.hpp"
 #include "controller/side_bar/side_bar_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "logging/log_manager.hpp"
@@ -91,6 +94,14 @@ namespace controller
         {
             _handlers.getDirtyStateHandler()
                 .subscribe(_storeContainer, _settings, &_mainWindow);
+
+            _menuBarController.getSettingsMenuController().setRestoreCallback(
+                [this](const std::filesystem::path& backupFile)
+                {
+                    _storeContainer.restoreFromBackup(backupFile);
+                    _sideBarController.refresh();
+                }
+            );
         }
     };
 
@@ -108,6 +119,13 @@ namespace controller
         // already initialized while constructing AppContext
 
         settings::Settings settings{Constants::getInstance().getConfigPath()};
+
+        // Configure backup directory from settings before the DB is opened
+        Constants::getInstance().setBackupPath(
+            Constants::getInstance().getDataPath() /
+            settings.getBackupSettings().getBackupDir()
+        );
+
         // initialize settings
         auto& loggingSettings = settings.getLoggingSettings();
 

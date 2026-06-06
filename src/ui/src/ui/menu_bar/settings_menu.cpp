@@ -23,5 +23,15 @@ namespace ui
             this,
             &SettingsMenu::requestPreferences
         );
+
+        _restoreBackupAction =
+            _settingsMenu->addAction("&Restore from Backup…");
+
+        connect(
+            _restoreBackupAction,
+            &QAction::triggered,
+            this,
+            &SettingsMenu::requestRestoreFromBackup
+        );
     }
 }   // namespace ui

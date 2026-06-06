@@ -90,4 +90,15 @@ namespace controller
         );
     }
 
+    /**
+     * @brief Return a reference to the settings menu controller so callers
+     * can configure callbacks (e.g., the restore-from-backup callback).
+     *
+     * @return SettingsMenuController&
+     */
+    SettingsMenuController& MenuBarController::getSettingsMenuController()
+    {
+        return *_settingsMenuController;
+    }
+
 }   // namespace controller

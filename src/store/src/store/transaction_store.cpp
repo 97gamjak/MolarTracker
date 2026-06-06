@@ -500,4 +500,11 @@ namespace store
         }
     }
 
+    /**
+     * @brief Discard all cached transactions. Transactions load lazily, so
+     * clearing the cache is sufficient — the next query will fetch from the
+     * restored database.
+     */
+    void TransactionStore::reload() { _clearEntries(); }
+
 }   // namespace store

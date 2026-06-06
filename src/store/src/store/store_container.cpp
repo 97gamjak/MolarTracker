@@ -1,10 +1,12 @@
 #include "store/store_container.hpp"
 
 #include <algorithm>
+#include <filesystem>
 #include <memory>
 #include <optional>
 #include <string>
 
+#include "config/constants.hpp"
 #include "connections/connection.hpp"
 #include "logging/log_macros.hpp"
 #include "service/service_container.hpp"
@@ -279,6 +281,43 @@ namespace store
     ) const
     {
         return _positionStore;
+    }
+
+    /**
+     * @brief Replace the live database with a backup file and reload all
+     * stores so they reflect the restored data.
+     *
+     * 1. Close the SQLite connection via ServiceContainer.
+     * 2. Overwrite the database file with the selected backup.
+     * 3. Reopen the connection.
+     * 4. Call reload() on every store so they clear their caches and
+     *    re-fetch from the restored database.
+     *
+     * @param backupFile Path to the backup file to restore from
+     */
+    void StoreContainer::restoreFromBackup(
+        const std::filesystem::path& backupFile
+    )
+    {
+        LOG_INFO("Restoring database from backup: " + backupFile.string());
+
+        _serviceContainer->closeDb();
+
+        std::filesystem::copy(
+            backupFile,
+            Constants::getInstance().getDatabasePath(),
+            std::filesystem::copy_options::overwrite_existing
+        );
+
+        _serviceContainer->reopenDb();
+
+        for (auto* store : _allStores)
+        {
+            if (store != nullptr)
+                store->reload();
+        }
+
+        LOG_INFO("Database restore complete");
     }
 
 }   // namespace store

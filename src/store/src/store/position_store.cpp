@@ -188,4 +188,19 @@ namespace store
         return _getIdRemap();
     }
 
+    /**
+     * @brief Discard all cached positions and reload from the database.
+     */
+    void PositionStore::reload()
+    {
+        _clearEntries();
+        const auto accountIds = _session->accountSession.getIds();
+        if (!accountIds.empty())
+        {
+            const auto positions =
+                _positionService->getAllOpenPositions(accountIds);
+            _addCleanEntries(positions);
+        }
+    }
+
 }   // namespace store

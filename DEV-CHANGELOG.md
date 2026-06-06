@@ -4,6 +4,42 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### DB / Backup
+
+- Add `db::BackupManager` (`src/db/`) — static methods for:
+  - `createBackup(Database&, backupDir)` — timestamped SQLite backup via
+    `sqlite3_backup_*`, followed by tiered retention pruning
+  - `listBackups(backupDir)` — sorted-newest-first scan of backup files
+  - Retention: 5 most-recent, 4 weekly, unlimited monthly tiers
+- `RepoContainer` now calls `BackupManager::createBackup()` on every startup
+  (before migrations). The old `Database::makeBackup()` call inside
+  `MigrationRunner` has been removed.
+- `Constants::getBackupPath()` / `setBackupPath()` added; `MainController`
+  sets it from `BackupSettings` before opening the database.
+- `BackupSettings` section added to the settings system (enable toggle,
+  configurable directory, recentCount / weeklyCount)
+
+#### Store / Restore
+
+- `IStore::reload()` pure-virtual method added and implemented in all five
+  stores (Profile, Account, Stock, Transaction, Position) — discards the
+  in-memory cache and reloads from the database
+- `RepoContainer::closeDb()` / `reopenDb()` and
+  `ServiceContainer::closeDb()` / `reopenDb()` added
+- `StoreContainer::restoreFromBackup(path)` — closes the DB, copies the
+  backup file over the live database, reopens, then calls `reload()` on
+  every store
+
+#### UI / Controller
+
+- `ui::RestoreBackupDialog` — table view listing backups by date/time and
+  file size with a confirmation step
+- "Restore from Backup…" action added to `SettingsMenu`
+- `SettingsMenuController::setRestoreCallback` wired from
+  `MainController::Impl` so the controller can trigger an in-place restore
+
 ### Testing
 
 #### UI

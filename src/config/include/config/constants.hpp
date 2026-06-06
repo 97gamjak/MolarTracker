@@ -88,6 +88,8 @@ class Constants
     std::filesystem::path _configPath;
     /// The data path for the application, this is set during initialization
     std::filesystem::path _dataPath;
+    /// The backup directory path (defaults to dataPath/backups)
+    std::filesystem::path _backupPath;
 
    public:
     static Constants& getInstance();
@@ -95,6 +97,8 @@ class Constants
     [[nodiscard]] std::filesystem::path getConfigPath() const;
     [[nodiscard]] std::filesystem::path getDataPath() const;
     [[nodiscard]] std::filesystem::path getDatabasePath() const;
+    [[nodiscard]] std::filesystem::path getBackupPath() const;
+    void setBackupPath(std::filesystem::path path);
 
     [[nodiscard]] static std::string getAppName();
     [[nodiscard]] static std::string getAppDisplayName();

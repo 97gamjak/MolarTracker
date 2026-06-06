@@ -41,6 +41,8 @@ Constants::Constants()
         // https://97gamjak.atlassian.net/browse/MOLTRACK-91
         throw DirException("Failed to resolve data directory");
     }
+
+    _backupPath = _dataPath / "backups";
 }
 
 /**
@@ -65,6 +67,24 @@ std::filesystem::path Constants::getDataPath() const { return _dataPath; }
 std::filesystem::path Constants::getDatabasePath() const
 {
     return _dataPath / ConstantsSchema::_databaseFile;
+}
+
+/**
+ * @brief Get the backup directory path
+ *
+ * @return std::filesystem::path
+ */
+std::filesystem::path Constants::getBackupPath() const { return _backupPath; }
+
+/**
+ * @brief Set a custom backup directory path (called from MainController
+ * after reading BackupSettings)
+ *
+ * @param path
+ */
+void Constants::setBackupPath(std::filesystem::path path)
+{
+    _backupPath = std::move(path);
 }
 
 /**

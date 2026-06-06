@@ -160,4 +160,14 @@ namespace service
         return _positionService;
     }
 
+    /**
+     * @brief Close the underlying database connection.
+     */
+    void ServiceContainer::closeDb() { _repoContainer->closeDb(); }
+
+    /**
+     * @brief Reopen the database connection.
+     */
+    void ServiceContainer::reopenDb() { _repoContainer->reopenDb(); }
+
 }   // namespace service

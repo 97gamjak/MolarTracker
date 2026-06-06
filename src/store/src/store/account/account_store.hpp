@@ -82,6 +82,8 @@ namespace store
         [[nodiscard]]
         const unorderedIdMap<AccountId, AccountId>& getIdRemap() const override;
 
+        void reload() override;
+
        private:
         void _refresh();
     };

@@ -59,6 +59,7 @@ namespace store
             const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
             const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
         ) override;
+        void reload() override;
 
         [[nodiscard]]
         TransactionStoreResult addTransaction(
