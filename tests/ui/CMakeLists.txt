@@ -21,6 +21,6 @@ target_link_libraries(tests_ui
 
 include(GoogleTest)
 gtest_discover_tests(tests_ui
-    PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
-    DISCOVERY_MODE PRE_TEST
+    PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )

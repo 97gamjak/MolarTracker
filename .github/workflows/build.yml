@@ -102,6 +102,8 @@ jobs:
       # Run tests
       # -------------------------
       - name: Run tests (Ubuntu)
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
           ctest --test-dir build --output-on-failure
 
