@@ -4,18 +4,6 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
-### Features
-
-#### UI
-
-- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
-  `MainWindow::closeEvent()` override — window refuses to close when
-  the callback returns `false`
-- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
-  `MainWindow`: checks `StoreContainer::isDirty()` and
-  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
-  before allowing the close
-
 ### Bug Fix
 
 #### ORM
@@ -86,6 +74,14 @@ All changes and updates, that are relevant for developers will be documented her
 - Shared `mock_services.hpp` test helper in `tests/app/store/` providing
   lightweight fakes for all service interfaces
 - New `tests_stores` CMake test executable for store unit tests
+- Add unit test suite for the `src/ui/` layer covering validators
+  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
+  (`StockInfoTableModel`, `CashTransactionTableModel`,
+  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
+  (`AccountItem`, `AccountCategory`), and `EditMenu`
+- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
+  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
+  execution
 
 ### Features
 
@@ -100,6 +96,13 @@ All changes and updates, that are relevant for developers will be documented her
 #### UI
 
 - Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
 
 #### ORM
 
@@ -124,6 +127,10 @@ All changes and updates, that are relevant for developers will be documented her
 - make position store an interface and cleanup deps to remove drafts from store deps
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
+
+### Claude
+
+- add rules for allowing and denying commands
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
