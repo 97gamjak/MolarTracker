@@ -11,19 +11,6 @@ All changes and updates, that are relevant for developers will be documented her
   (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
   uploads to Codecov via `codecov/codecov-action@v5`
 
-### Testing
-
-#### UI
-
-- Add unit test suite for the `src/ui/` layer covering validators
-  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
-  (`StockInfoTableModel`, `CashTransactionTableModel`,
-  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
-  (`AccountItem`, `AccountCategory`), and `EditMenu`
-- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
-  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
-  execution
-
 ### Bug Fix
 
 #### ORM
@@ -94,6 +81,14 @@ All changes and updates, that are relevant for developers will be documented her
 - Shared `mock_services.hpp` test helper in `tests/app/store/` providing
   lightweight fakes for all service interfaces
 - New `tests_stores` CMake test executable for store unit tests
+- Add unit test suite for the `src/ui/` layer covering validators
+  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
+  (`StockInfoTableModel`, `CashTransactionTableModel`,
+  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
+  (`AccountItem`, `AccountCategory`), and `EditMenu`
+- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
+  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
+  execution
 
 ### Features
 
@@ -108,6 +103,13 @@ All changes and updates, that are relevant for developers will be documented her
 #### UI
 
 - Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
 
 #### ORM
 
