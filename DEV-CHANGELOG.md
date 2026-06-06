@@ -4,29 +4,12 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
-### Features
+### CI
 
-#### VCS
-
-- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
-  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
-    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
-  - `vcs::UpdateCheckService` — `QObject` that fires an async
-    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
-    emits `updateAvailable(SemVer)` at most once per distinct version per
-    session
-- Add `SemVer::current()` static method that returns the compile-time
-  version from `MOLARTRACKER_VERSION`
-- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
-  comparison operators
-- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
-  version, a link button to the GitHub releases page, and a
-  "don't show again for this version" checkbox
-- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
-  persists the last dismissed update version to `settings.json`
-- Wire `UpdateCheckService` into `MainController::Impl`; on
-  `updateAvailable` the dismissed version is checked, the dialog is shown,
-  and if dismissed the version is written to settings and saved
+- Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
+  PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
+  (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
+  uploads to Codecov via `codecov/codecov-action@v5`
 
 ### Bug Fix
 
@@ -98,6 +81,14 @@ All changes and updates, that are relevant for developers will be documented her
 - Shared `mock_services.hpp` test helper in `tests/app/store/` providing
   lightweight fakes for all service interfaces
 - New `tests_stores` CMake test executable for store unit tests
+- Add unit test suite for the `src/ui/` layer covering validators
+  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
+  (`StockInfoTableModel`, `CashTransactionTableModel`,
+  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
+  (`AccountItem`, `AccountCategory`), and `EditMenu`
+- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
+  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
+  execution
 
 ### Features
 
@@ -112,6 +103,13 @@ All changes and updates, that are relevant for developers will be documented her
 #### UI
 
 - Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
 
 #### ORM
 
@@ -120,6 +118,28 @@ All changes and updates, that are relevant for developers will be documented her
 #### Utils
 
 - Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+
+#### VCS
+
+- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
+  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
+    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+  - `vcs::UpdateCheckService` — `QObject` that fires an async
+    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
+    emits `updateAvailable(SemVer)` at most once per distinct version per
+    session
+- Add `SemVer::current()` static method that returns the compile-time
+  version from `MOLARTRACKER_VERSION`
+- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
+  comparison operators
+- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
+  version, a link button to the GitHub releases page, and a
+  "don't show again for this version" checkbox
+- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
+  persists the last dismissed update version to `settings.json`
+- Wire `UpdateCheckService` into `MainController::Impl`; on
+  `updateAvailable` the dismissed version is checked, the dialog is shown,
+  and if dismissed the version is written to settings and saved
 
 ### Cleanup
 
@@ -136,6 +156,10 @@ All changes and updates, that are relevant for developers will be documented her
 - make position store an interface and cleanup deps to remove drafts from store deps
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
+
+### Claude
+
+- add rules for allowing and denying commands
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
