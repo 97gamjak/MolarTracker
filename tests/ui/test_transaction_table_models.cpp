@@ -13,10 +13,12 @@
 
 namespace
 {
+    const auto defaultAmount = 10000;
+
     drafts::TransactionEntryDraft makeEntry(
         AccountId   accountId  = AccountId{1},
         bool        isExternal = false,
-        micro_units amount     = 10000,
+        micro_units amount     = defaultAmount,
         Currency    currency   = Currency::USD
     )
     {
@@ -43,10 +45,12 @@ namespace
 
     drafts::TransactionOverviewDraft makeStockTx()
     {
-        auto leg = drafts::TradeLegDraft{
+        const auto amount   = 15000;
+        const auto quantity = Quantity{100'000'000};
+        auto       leg      = drafts::TradeLegDraft{
             AccountId{2},
-            finance::Cash{Currency::USD, 15000},
-            Quantity{100'000'000},
+            finance::Cash{Currency::USD, amount},
+            quantity,
             "AAPL"
         };
         return drafts::TransactionOverviewDraft{

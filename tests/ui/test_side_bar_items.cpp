@@ -27,8 +27,9 @@ namespace
 
     TEST_F(AccountItemTest, GetIdReturnsGivenId)
     {
-        ui::AccountItem item{AccountId{42}, "Savings"};
-        EXPECT_EQ(item.getId(), AccountId{42});
+        const auto      id = 42;
+        ui::AccountItem item{AccountId{id}, "Savings"};
+        EXPECT_EQ(item.getId(), AccountId{id});
     }
 
     TEST_F(AccountItemTest, GetIdDifferentiatesBetweenItems)
