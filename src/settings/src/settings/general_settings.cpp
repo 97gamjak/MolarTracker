@@ -1,6 +1,6 @@
 #include "settings/general_settings.hpp"
 
-#include "config/constants.hpp"
+#include "config/constants/github_constants.hpp"
 #include "connections/observable.hpp"   // IWYU pragma: keep
 #include "connections/signal.hpp"       // IWYU pragma: keep
 #include "settings/params/params.hpp"
@@ -13,9 +13,9 @@ namespace settings
      */
     GeneralSettings::GeneralSettings()
         : _core{Schema::GENERAL_SETTINGS_KEY, Schema::GENERAL_SETTINGS_TITLE, Schema::GENERAL_SETTINGS_DESCRIPTION},
-          _currentVersion(Constants::getSemVer())
+          _currentVersion(GithubConstants::getSemVer())
     {
-        _version.set(Constants::getSemVer());
+        _version.set(GithubConstants::getSemVer());
     }
 
     /**

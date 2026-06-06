@@ -6,8 +6,6 @@
 #include <tuple>
 #include <utility>
 
-#include "utils/version.hpp"
-
 /**
  * @brief Class containing compile-time constants for the application, these
  * are typically set during build time and are used throughout the application
@@ -31,17 +29,6 @@ class ConstantsSchema
     /// The desktop application name
     static constexpr const char* _desktopAppName =
         MOLARTRACKER_DESKTOP_APP_NAME;
-
-    /// The GitHub repository URL
-    static constexpr const char* _githubRepoUrl =
-        "https://github.com/97gamjak/molartracker";
-
-    /// The version of the application, this is set during build time using
-    /// CMake.
-    static constexpr const char* _version = MOLARTRACKER_VERSION_FULL;
-    /// The Git tag of the application, this is set during build time using
-    /// CMake.
-    static constexpr const char* _gitTag = MOLARTRACKER_GIT_TAG;
 
     /// The busy timeout for the database in milliseconds
     static constexpr int _dbBusyTimeoutMs = 5000;
@@ -100,13 +87,6 @@ class Constants
     [[nodiscard]] static std::string getAppDisplayName();
     [[nodiscard]] static std::string getDirPrefix();
     [[nodiscard]] static std::string getDesktopAppName();
-    [[nodiscard]] static std::string getGithubRepoUrl();
-    [[nodiscard]] static std::string getGithubIssuesUrl();
-    [[nodiscard]] static std::string getCreateIssueError();
-
-    [[nodiscard]] static std::string   getVersion();
-    [[nodiscard]] static std::string   getGitTag();
-    [[nodiscard]] static utils::SemVer getSemVer();
 
     [[nodiscard]] static int getDbBusyTimeoutMs();
 

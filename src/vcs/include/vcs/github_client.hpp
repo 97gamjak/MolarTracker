@@ -22,6 +22,7 @@ namespace vcs
         );
 
        private:
+        /// The GitHub API endpoint for fetching the latest release information.
         static constexpr std::string_view k_url =
             "https://api.github.com/repos/97gamjak/MolarTracker/releases/"
             "latest";

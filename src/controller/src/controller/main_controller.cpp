@@ -1,7 +1,7 @@
 #include "controller/main_controller.hpp"
 
 #include "commands/undo_stack.hpp"
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "controller/account_controller.hpp"
 #include "controller/central_controller.hpp"
 #include "controller/ensure_profile_controller.hpp"
