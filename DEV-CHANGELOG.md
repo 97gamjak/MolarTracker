@@ -4,6 +4,13 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### CI
+
+- Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
+  PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
+  (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
+  uploads to Codecov via `codecov/codecov-action@v5`
+
 ### Testing
 
 #### UI
