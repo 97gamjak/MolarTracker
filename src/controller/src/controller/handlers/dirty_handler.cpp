@@ -51,7 +51,8 @@ namespace controller
             mainWindow
         );
 
-        if (mainWindow)
+        if (mainWindow != nullptr)
+        {
             mainWindow->setCanCloseCallback(
                 [&storeContainer, &settings, mainWindow]()
                 {
@@ -61,6 +62,7 @@ namespace controller
                            QMessageBox::Yes;
                 }
             );
+        }
     }
 
 }   // namespace controller
