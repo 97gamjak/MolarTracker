@@ -428,6 +428,7 @@ namespace repo
         _lastReleaseVersion = utils::SemVer(0, 2, 3);
 
         _migrateV11();
+        _migrateV12();
     }
 
     /**
@@ -443,6 +444,29 @@ namespace repo
                 AddColumnMigration<TransactionEntryRow::typeField>>(
                 TransactionEntryRow::typeField{TransactionEntryType::General}
             )
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    void Migrations::_migrateV12()
+    {
+        // change TransactionDataType of Trade to TransactionDataType of Stock
+        constexpr std::size_t currentVersion = 11;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        std::string sql = std::format(
+            R"(
+                UPDATE {0}
+                SET {1} = '{2}' WHERE {1} = 'Trade'
+            )",
+            TransactionRow::tableName,
+            TransactionRow::typeField::name,
+            TransactionDataTypeMeta::toString(TransactionDataType::Stock)
+        );
+
+        migration.addMigration(
+            std::make_unique<CustomMigration>(std::move(sql))
         );
 
         _migrations.push_back(std::move(migration));

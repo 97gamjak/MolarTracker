@@ -130,6 +130,7 @@
         "googletest",
         "hicpp",
         "insertable",
+        "LFIFO",
         "MOLTRACK",
         "MSTD",
         "NOMINMAX",

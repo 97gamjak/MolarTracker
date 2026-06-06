@@ -4,9 +4,9 @@
 
 #include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position_draft.hpp"
-#include "drafts/stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
@@ -39,76 +39,6 @@ namespace controller
         return {};
     }
 
-    namespace
-    {
-        /**
-         * @brief Get stock info draft by position
-         *
-         * @param position
-         * @param stockStore
-         * @param transactionStore
-         * @return std::optional<drafts::StockInfoDraft>
-         */
-        std::optional<drafts::StockInfoDraft> _getStockInfoByPosition(
-            const finance::Position&                         position,
-            const std::shared_ptr<store::IStockStore>&       stockStore,
-            const std::shared_ptr<store::ITransactionStore>& transactionStore
-        )
-        {
-            const auto ids =
-                transactionStore->getInstrumentIdsByPositionId(position.getId()
-                );
-
-            const auto& stocks = stockStore->getStocks(ids);
-
-            if (stocks.empty())
-            {
-                LOG_WARNING(
-                    "No stock found for instrument id: " +
-                    position.getId().toString()
-                );
-                return std::nullopt;
-            }
-
-            return StockMapper::toStockInfoDraft(stocks.front());
-        }
-    }   // namespace
-
-    /**
-     * @brief Get open position drafts
-     *
-     * @param positionStore
-     * @param stockStore
-     * @param transactionStore
-     * @return std::vector<drafts::PositionDraft>
-     */
-    std::vector<drafts::PositionDraft> getOpenPositionDrafts(
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
-    )
-    {
-        const auto positions = positionStore->getOpenPositions();
-
-        std::vector<drafts::PositionDraft> drafts;
-        for (const auto& position : positions)
-        {
-            const auto& stock =
-                _getStockInfoByPosition(position, stockStore, transactionStore);
-
-            if (!stock)
-                continue;
-
-            drafts.emplace_back(
-                position.getId(),
-                stock.value(),
-                position.getCreatedAt()
-            );
-        }
-
-        return drafts;
-    }
-
     /**
      * @brief Get open position drafts for a specific account
      *
@@ -125,15 +55,23 @@ namespace controller
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
-        const auto positions = positionStore->getOpenPositions({account});
+        const auto positions = positionStore->getOpenPositions();
+        auto       filter    = finance::TransactionFilter();
+        filter.setPositionIds(positions.getIds());
+        auto positionTxs = transactionStore->getStockPositions(filter);
+
+        // TODO: find a better place for this
+        std::erase_if(
+            positionTxs,
+            [&](const auto& pair)
+            { return pair.second.getSecurityAccount() != account; }
+        );
 
         std::vector<drafts::PositionStockDetailDraft> drafts;
 
-        for (const auto& position : positions)
+        for (auto& [id, txs] : positionTxs)
         {
-            const auto txs =
-                transactionStore->findTransactionsByPositionId(position.getId())
-                    .stocks();
+            const auto position = positions.at(id);
 
             if (txs.empty())
             {
@@ -144,11 +82,11 @@ namespace controller
                 continue;
             }
 
-            const auto instrumentIds = txs.getBaseInstrumentIds();
+            const auto instrumentId = txs.getBaseInstrument();
 
-            const auto& stocks = stockStore->getStocks(instrumentIds);
+            const auto& stock = stockStore->getStock(instrumentId);
 
-            if (stocks.empty())
+            if (!stock)
             {
                 LOG_ERROR(
                     "No stock found for instrument id: " +
@@ -157,14 +95,21 @@ namespace controller
                 continue;
             }
 
-            const auto stockInfo =
-                StockMapper::toStockInfoDraft(stocks.front());
+            // TODO: move this to a dedicated combined store
+            const auto stockInfo = StockMapper::toStockInfoDraft(stock.value());
 
             drafts.emplace_back(
                 position.getId(),
                 stockInfo,
                 position.getCreatedAt(),
-                txs.getTotalQuantity()
+                txs.getPnL()->getQuantity(),
+                txs.getPnL()->getAverageCost(),
+                txs.getPnL()->getCostBasis(),
+                txs.getPnL()->getRealizedPnL(),
+                txs.getPnL()->getRealizedPnLPercentage(),
+                txs.getPnL()->getRealizedPnL(
+                ),   // TODO: change this as soon as price cache is ready
+                0.0
             );
         }
 

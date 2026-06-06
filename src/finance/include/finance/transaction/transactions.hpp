@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
@@ -13,30 +11,39 @@ namespace finance
 {
     class Accounts;
 
+    /**
+     * @brief Interface for managing security-related transactions.
+     *
+     */
     class ISecurityTransactions
     {
        public:
         virtual ~ISecurityTransactions() = default;
-
-        [[nodiscard]] virtual idSet<InstrumentId> getBaseInstrumentIds(
-        ) const = 0;
-
-        [[nodiscard]] virtual Quantity getTotalQuantity() const = 0;
     };
 
-    class StockTransactions : public Vector<StockTransaction>,
-                              public ISecurityTransactions
+    /**
+     * @brief Class for managing stock transactions.
+     *
+     */
+    class StockTransactions : public Vector<StockTransaction>
     {
        public:
-        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
-        [[nodiscard]] Quantity            getTotalQuantity() const override;
+        void sort();
     };
 
+    /**
+     * @brief Class for managing cash transactions.
+     *
+     */
     class CashTransactions : public Vector<CashTransaction>
     {
        public:
     };
 
+    /**
+     * @brief Class for managing security transactions.
+     *
+     */
     class SecurityView : public ISecurityTransactions
     {
        private:
@@ -51,11 +58,12 @@ namespace finance
         SecurityView(SecurityView&&)                 = delete;
         SecurityView& operator=(const SecurityView&) = delete;
         SecurityView& operator=(SecurityView&&)      = delete;
-
-        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
-        [[nodiscard]] Quantity            getTotalQuantity() const override;
     };
 
+    /**
+     * @brief Class for managing all transactions.
+     *
+     */
     class Transactions
     {
        private:

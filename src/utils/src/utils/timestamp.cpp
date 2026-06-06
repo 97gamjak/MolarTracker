@@ -160,4 +160,10 @@ QDateTime Timestamp::toQDateTime() const
     // https://97gamjak.atlassian.net/browse/MOLTRACK-95
     return QDateTime::fromMSecsSinceEpoch(toInt64());
 }
+
+std::strong_ordering Timestamp::operator<=>(const Timestamp& other) const
+{
+    return _timePoint <=> other._timePoint;
+}
+
 #endif

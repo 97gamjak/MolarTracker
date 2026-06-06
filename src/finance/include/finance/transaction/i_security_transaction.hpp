@@ -6,6 +6,12 @@
 
 namespace finance
 {
+    /**
+     * @brief Interface for security transactions.
+     *
+     * This interface defines the common behavior for all security
+     * transactions, including stocks and bonds.
+     */
     class ISecurityTransaction
     {
        public:

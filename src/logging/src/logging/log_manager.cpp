@@ -241,8 +241,10 @@ namespace logging
 
         _ringFile->writeLine(buffer);
 
-        if (logObject.level == LogLevel::Error ||
-            logObject.level == LogLevel::Warning)
+        // Flush the log file if the log level is not Info
+        // 1) on warning or error we want always to log
+        // 2) if the user selected a debug logging we also want always to log
+        if (logObject.level != LogLevel::Info)
             flush();
     }
 

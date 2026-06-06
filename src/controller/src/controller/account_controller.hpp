@@ -37,6 +37,11 @@ namespace cmd
     class UndoStack;   // Forward declaration
 }   // namespace cmd
 
+namespace finance
+{
+    class PriceCache;   // Forward declaration
+}   // namespace finance
+
 namespace controller
 {
     /**
@@ -50,6 +55,9 @@ namespace controller
        private:
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
+
+        /// Reference to the price cache
+        finance::PriceCache& _priceCache;
 
         struct Stores;
         /// Pointer to the stores
@@ -67,6 +75,7 @@ namespace controller
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             const std::shared_ptr<store::IStockStore>&       stockStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
+            finance::PriceCache&                             priceCache,
             QStackedWidget*                                  stackedWidget
         );
         ~AccountController() override;

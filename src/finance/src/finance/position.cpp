@@ -47,11 +47,11 @@ namespace finance
      *
      * @return filter::Predicate<Position>
      */
-    filter::Predicate<Position> IsPositionOpen()
+    filter::Predicate<Position> IsPositionOpen(bool isOpen)
     {
         return filter::Predicate<Position>{
-            [](const Position& position)
-            { return !position.getClosedAt().has_value(); }
+            [isOpen](const Position& position)
+            { return isOpen == !position.getClosedAt().has_value(); }
         };
     }
 

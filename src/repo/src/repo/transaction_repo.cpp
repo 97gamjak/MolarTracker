@@ -61,7 +61,7 @@ namespace repo
 
         switch (txRow.type.value())
         {
-            case TransactionDataType::Trade:
+            case TransactionDataType::Stock:
             {
                 const auto data =
                     std::get<finance::TradeData>(transaction.getData());

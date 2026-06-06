@@ -1,6 +1,7 @@
 #include "config/quantity.hpp"
 
 #include <format>
+#include <stdexcept>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #include <intrin.h>
@@ -40,6 +41,18 @@ std::string Quantity::toString() const
     return std::format("{:.{}f}", getValue(), precision);
 }
 
+bool Quantity::isZero() const { return _value == 0; }
+
+Quantity Quantity::abs() const
+{
+    return Quantity(_value < 0 ? -_value : _value);
+}
+
+bool Quantity::operator==(const Quantity& other) const
+{
+    return _value == other._value;
+}
+
 /**
  * @brief Compare this quantity to another quantity for greater-than.
  *
@@ -61,6 +74,22 @@ Quantity& Quantity::operator+=(const Quantity& other)
 {
     _value += other._value;
     return *this;
+}
+
+Quantity& Quantity::operator-=(const Quantity& other)
+{
+    _value -= other._value;
+    return *this;
+}
+
+Quantity operator+(const Quantity& lhs, const Quantity& rhs)
+{
+    return Quantity(lhs._value + rhs._value);
+}
+
+Quantity operator-(const Quantity& lhs, const Quantity& rhs)
+{
+    return Quantity(lhs._value - rhs._value);
 }
 
 /**
@@ -112,6 +141,18 @@ micro_units mulDiv(micro_units lhs, micro_units rhs, micro_units divisor)
 micro_units mulDiv(micro_units lhs, Quantity rhs)
 {
     return mulDiv(lhs, rhs.toMicroUnits(), Quantity::factor);
+}
+
+micro_units divBy(micro_units lhs, Quantity rhs)
+{
+    if (rhs.isZero())
+        throw std::domain_error("Division by zero");
+
+    return mulDiv(
+        lhs,
+        static_cast<micro_units>(Quantity::factor),
+        rhs.toMicroUnits()
+    );
 }
 
 /**

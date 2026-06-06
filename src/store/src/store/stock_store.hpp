@@ -59,7 +59,7 @@ namespace store
         std::vector<finance::Stock> getStocks() const override;
 
         [[nodiscard]]
-        std::optional<finance::Stock> getStock(InstrumentId id) const;
+        std::optional<finance::Stock> getStock(InstrumentId id) const override;
 
         [[nodiscard]]
         std::vector<std::string> getAllTickers() const override;

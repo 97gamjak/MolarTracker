@@ -4,6 +4,7 @@
 #include "config/id_types.hpp"
 #include "config/quantity.hpp"
 #include "drafts/stock_draft.hpp"
+#include "finance/cash.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
@@ -55,16 +56,40 @@ namespace drafts
         /// The quantity of the position
         Quantity _quantity;
 
+        finance::Cash _averagePrice;
+
+        finance::Cash _totalPrice;
+
+        finance::Cash _realizedPnL;
+
+        double _realizedPnLPercentage;
+
+        finance::Cash _unrealizedPnL;
+
+        double _unrealizedPnLPercentage;
+
        public:
         explicit PositionStockDetailDraft(
             PositionId               positionId,
             StockInfoDraft           stockInfo,
             Timestamp                createdAt,
             Quantity                 quantity,
+            finance::Cash            averagePrice,
+            finance::Cash            totalPrice,
+            finance::Cash            realizedPnL,
+            double                   realizedPnLPercentage,
+            finance::Cash            unrealizedPnL,
+            double                   unrealizedPnLPercentage,
             std::optional<Timestamp> closedAt = std::nullopt
         );
 
-        [[nodiscard]] Quantity getQuantity() const;
+        [[nodiscard]] Quantity      getQuantity() const;
+        [[nodiscard]] finance::Cash getAveragePrice() const;
+        [[nodiscard]] finance::Cash getTotalPrice() const;
+        [[nodiscard]] finance::Cash getRealizedPnL() const;
+        [[nodiscard]] double        getRealizedPnLPercentage() const;
+        [[nodiscard]] finance::Cash getUnrealizedPnL() const;
+        [[nodiscard]] double        getUnrealizedPnLPercentage() const;
     };
 }   // namespace drafts
 

@@ -18,23 +18,25 @@ namespace finance
     class TransactionFilter
     {
        private:
-        /// An optional position ID to filter transactions by, if set, only
-        /// transactions that are associated with the specified position ID will
-        /// be included in the results when this filter is applied. If
-        /// std::nullopt, no filtering by position ID will be applied.
-        std::optional<PositionId> _positionId;
+        idSet<PositionId> _positionIds;
 
        public:
         TransactionFilter() = default;
 
-        void setPositionId(PositionId positionId);
-        [[nodiscard]] std::optional<PositionId> getPositionId() const;
+        void addPositionId(PositionId positionId);
+        void setPositionIds(const idSet<PositionId>& positionIds);
+        [[nodiscard]] idSet<PositionId> getPositionIds() const;
 
         [[nodiscard]]
         filter::Predicate<DomainTransaction> getPredicate() const;
+
+        [[nodiscard]]
+        std::string toString() const;
     };
 
-    filter::Predicate<DomainTransaction> HasPositionId(PositionId positionId);
+    filter::Predicate<DomainTransaction> HasPositionId(
+        const idSet<PositionId>& positionIds
+    );
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__

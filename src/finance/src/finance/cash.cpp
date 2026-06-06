@@ -4,6 +4,7 @@
 #include <format>
 #include <string>
 
+#include "config/quantity.hpp"
 #include "currency_exception.hpp"
 #include "finance/currency.hpp"
 
@@ -28,6 +29,8 @@ namespace finance
     {
     }
 
+    Cash::Cash() : _currency(std::nullopt), _amount(0) {}
+
     /**
      * @brief Equality operator for Cash
      *
@@ -36,15 +39,9 @@ namespace finance
      * @return true if both Cash objects have the same currency and amount
      * @return false otherwise
      */
-    constexpr bool operator==(const Cash& lhs, const Cash& rhs)
+    constexpr bool operator==(Cash lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot compare Cash objects with different currencies"
-            );
-        }
-
+        lhs._takeCurrency(rhs);
         return lhs._amount == rhs._amount;
     }
 
@@ -76,14 +73,10 @@ namespace finance
      */
     Cash operator+(const Cash& lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot add Cash objects with different currencies"
-            );
-        }
+        auto lhs_ = lhs;
+        lhs_._takeCurrency(rhs);
 
-        return Cash(lhs._currency, lhs._amount + rhs._amount);
+        return {rhs._currency, lhs_._amount + rhs._amount};
     }
 
     /**
@@ -93,17 +86,7 @@ namespace finance
      * @param rhs
      * @return Cash the result of subtracting two Cash objects
      */
-    Cash operator-(const Cash& lhs, const Cash& rhs)
-    {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot subtract Cash objects with different currencies"
-            );
-        }
-
-        return Cash(lhs._currency, lhs._amount - rhs._amount);
-    }
+    Cash operator-(const Cash& lhs, const Cash& rhs) { return lhs + (-rhs); }
 
     /**
      * @brief Unary negation operator for Cash
@@ -111,10 +94,7 @@ namespace finance
      * @param cash
      * @return Cash the result of negating a Cash object
      */
-    Cash operator-(const Cash& cash)
-    {
-        return Cash(cash._currency, -cash._amount);
-    }
+    Cash operator-(const Cash& cash) { return {cash._currency, -cash._amount}; }
 
     /**
      * @brief Multiplication operator for Cash
@@ -125,7 +105,7 @@ namespace finance
      */
     Cash operator*(const Cash& cash, const Quantity& multiplier)
     {
-        return Cash(cash._currency, mulDiv(cash._amount, multiplier));
+        return {cash._currency, mulDiv(cash._amount, multiplier)};
     }
 
     /**
@@ -140,6 +120,17 @@ namespace finance
         return cash * multiplier;
     }
 
+    Cash operator/(const Cash& cash, const Quantity& divisor)
+    {
+        return {cash._currency, divBy(cash._amount, divisor)};
+    }
+
+    double operator/(const Cash& cash, const Cash& divisor)
+    {
+        return static_cast<double>(cash._amount) /
+               static_cast<double>(divisor._amount);
+    }
+
     /**
      * @brief Compound addition assignment operator for Cash
      *
@@ -150,12 +141,7 @@ namespace finance
      */
     Cash& operator+=(Cash& lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot add Cash objects with different currencies"
-            );
-        }
+        lhs._takeCurrency(rhs);
 
         lhs._amount += rhs._amount;
         return lhs;
@@ -171,12 +157,7 @@ namespace finance
      */
     Cash& operator-=(Cash& lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot subtract Cash objects with different currencies"
-            );
-        }
+        lhs._takeCurrency(rhs);
 
         lhs._amount -= rhs._amount;
         return lhs;
@@ -215,7 +196,7 @@ namespace finance
      *
      * @return Currency The currency of the cash.
      */
-    Currency Cash::getCurrency() const { return _currency; }
+    Currency Cash::getCurrency() const { return _currency.value(); }
 
     /**
      * @brief Converts the Cash object to a string representation.
@@ -255,6 +236,28 @@ namespace finance
         );
 
         return std::format("{} {}", decimal, getSymbol(getCurrency()));
+    }
+
+    void Cash::_takeCurrency(const Cash& cash)
+    {
+        if (_currency.has_value() || _amount != 0)
+        {
+            if (_currency != cash._currency)
+            {
+                throw CurrencyMismatchException(
+                    "Cannot subtract Cash objects with different currencies"
+                );
+            }
+        }
+        else
+        {
+            _currency = cash._currency;
+        }
+    }
+
+    Cash::Cash(std::optional<Currency> currency, micro_units amount)
+        : _currency(currency), _amount(amount)
+    {
     }
 
 }   // namespace finance

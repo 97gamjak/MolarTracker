@@ -4,7 +4,11 @@
 
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/account/accounts.hpp"
+#include "finance/positions.hpp"
+#include "logging/log_macros.hpp"
 #include "store/base/base_store.hpp"
+
+REGISTER_LOG_CATEGORY("Store.PositionStore");
 
 namespace store
 {
@@ -77,9 +81,9 @@ namespace store
     /**
      * @brief Get all positions
      *
-     * @return std::vector<finance::Position>
+     * @return finance::Positions
      */
-    std::vector<finance::Position> PositionStore::getAllPositions() const
+    finance::Positions PositionStore::getAllPositions() const
     {
         const auto accountIds = _session->accountSession.getIds();
 
@@ -88,11 +92,9 @@ namespace store
 
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
-        auto                           positionsView = _getValues(options);
-        std::vector<finance::Position> positions     = {
-            positionsView.begin(),
-            positionsView.end()
-        };
+        finance::Positions positions;
+        for (const auto& position : _getValues(options))
+            positions.addUnchecked(position);
 
         options.deletion = DeletionPolicy::IncludeDelete;
         const auto ids   = _getIds(options);
@@ -101,7 +103,7 @@ namespace store
 
         for (const auto& position : dbPositions)
             if (!ids.contains(position.getId()))
-                positions.push_back(position);
+                positions.addUnchecked(position);
 
         return positions;
     }
@@ -109,26 +111,14 @@ namespace store
     /**
      * @brief Get all open positions
      *
-     * @return std::vector<finance::Position>
+     * @return finance::Positions
      */
-    std::vector<finance::Position> PositionStore::getOpenPositions() const
+    finance::Positions PositionStore::getOpenPositions() const
     {
+        LOG_ENTRY;
+
         const auto accountIds = _session->accountSession.getIds();
 
-        return getOpenPositions(accountIds);
-    }
-
-    /**
-     * @brief Get all open positions
-     *
-     * @param accountIds
-     *
-     * @return std::vector<finance::Position>
-     */
-    std::vector<finance::Position> PositionStore::getOpenPositions(
-        const idSet<AccountId>& accountIds
-    ) const
-    {
         if (accountIds.empty())
             return {};
 
@@ -137,11 +127,10 @@ namespace store
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        auto                           positionsView = _getValues(options);
-        std::vector<finance::Position> positions     = {
-            positionsView.begin(),
-            positionsView.end()
-        };
+        finance::Positions positions;
+
+        for (const auto& position : _getValues(options))
+            positions.addUnchecked(position);
 
         options.deletion = DeletionPolicy::IncludeDelete;
         const auto ids   = _getIds(options);
@@ -151,7 +140,11 @@ namespace store
 
         for (const auto& position : openPositions)
             if (!ids.contains(position.getId()))
-                positions.push_back(position);
+                positions.addUnchecked(position);
+
+        LOG_DEBUG(
+            std::format("Open positions retrieved: {}", positions.size())
+        );
 
         return positions;
     }

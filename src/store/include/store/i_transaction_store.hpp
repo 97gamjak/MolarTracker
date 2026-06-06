@@ -5,7 +5,8 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
-#include "finance/transaction/transactions.hpp"   // needed for vector
+#include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "finance/transaction/transactions.hpp"           // needed for vector
 
 namespace finance
 {
@@ -90,27 +91,9 @@ namespace store
         [[nodiscard]]
         virtual finance::Transactions getTransactions() const = 0;
 
-        /**
-         * @brief Get all instrument IDs associated with a position ID
-         *
-         * @param positionId The position ID to filter by
-         * @return idSet<InstrumentId> The set of instrument IDs
-         */
         [[nodiscard]]
-        virtual idSet<InstrumentId> getInstrumentIdsByPositionId(
-            PositionId positionId
-        ) const = 0;
-
-        /**
-         * @brief Find all transactions associated with a position ID
-         *
-         * @param positionId The position ID to filter by
-         * @return finance::Transactions The list of
-         * transactions
-         */
-        [[nodiscard]]
-        virtual finance::Transactions findTransactionsByPositionId(
-            PositionId positionId
+        virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+            const finance::TransactionFilter& filter
         ) const = 0;
     };
 

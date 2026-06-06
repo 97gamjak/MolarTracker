@@ -1,45 +1,23 @@
 #include "finance/transaction/transactions.hpp"
 
-#include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 
 namespace finance
 {
-
-    idSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
+    void StockTransactions::sort()
     {
-        idSet<InstrumentId> ids;
-        for (const auto& transaction : *this)
-            ids.insert(transaction.getBaseInstrumentId());
-
-        return ids;
+        std::ranges::sort(
+            getItems(),
+            [](const StockTransaction& txA, const StockTransaction& txB)
+            { return txA.getTimestamp() < txB.getTimestamp(); }
+        );
     }
 
-    Quantity StockTransactions::getTotalQuantity() const
+    SecurityView::SecurityView(const StockTransactions& transactions)
+        : _stockTransactions(transactions)
     {
-        Quantity total{0};
-        for (const auto& transaction : *this)
-            total += transaction.getQuantity();
-
-        return total;
-    }
-
-    SecurityView::SecurityView(const StockTransactions& stockTransactions)
-        : _stockTransactions(stockTransactions)
-    {
-    }
-
-    idSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
-    {
-        return _stockTransactions.getBaseInstrumentIds();
-    }
-
-    Quantity SecurityView::getTotalQuantity() const
-    {
-        return _stockTransactions.getTotalQuantity();
     }
 
     void Transactions::addTransactions(
@@ -59,7 +37,7 @@ namespace finance
                     );
                     break;
                 // TODO: make Trade to a Stock transaction type and more
-                case TransactionDataType::Trade:
+                case TransactionDataType::Stock:
                     _stockTransactions.add(
                         TransactionConverter::toStock(transaction, accounts)
                             .value()

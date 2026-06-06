@@ -1,5 +1,7 @@
 #include "finance/transaction/transaction_filter.hpp"
 
+#include <sstream>
+
 #include "finance/transaction/domain_transaction.hpp"
 
 namespace finance
@@ -9,20 +11,14 @@ namespace finance
      *
      * @param positionId The position ID to filter by
      */
-    void TransactionFilter::setPositionId(PositionId positionId)
+    void TransactionFilter::setPositionIds(const idSet<PositionId>& positionIds)
     {
-        _positionId = positionId;
+        _positionIds = positionIds;
     }
 
-    /**
-     * @brief Get the position ID that this filter is filtering by, if any
-     *
-     * @return std::optional<PositionId> The position ID that this filter is
-     * filtering by, or std::nullopt if no position ID is set
-     */
-    std::optional<PositionId> TransactionFilter::getPositionId() const
+    idSet<PositionId> TransactionFilter::getPositionIds() const
     {
-        return _positionId;
+        return _positionIds;
     }
 
     /**
@@ -39,40 +35,42 @@ namespace finance
      */
     filter::Predicate<DomainTransaction> TransactionFilter::getPredicate() const
     {
-        if (_positionId.has_value())
-            return HasPositionId(_positionId.value());
+        if (!_positionIds.empty())
+            return HasPositionId(_positionIds);
 
         return {};
     }
 
-    /**
-     * @brief Create a predicate function to filter transactions by a specific
-     * position ID, this function generates a predicate that can be applied to a
-     * collection of transactions to filter them based on whether they are
-     * associated with the specified position ID. The predicate checks if any of
-     * the trade legs in the transaction's data have a position ID that matches
-     * the given position ID.
-     *
-     * @param positionId The position ID to filter transactions by, this
-     * specifies the position that the returned predicate will filter
-     * transactions for.
-     *
-     * @return filter::Predicate<DomainTransaction> A predicate function that
-     * can be used to filter transactions based on whether they are associated
-     * with the specified position ID.
-     */
-    filter::Predicate<DomainTransaction> HasPositionId(PositionId positionId)
+    filter::Predicate<DomainTransaction> HasPositionId(
+        const idSet<PositionId>& positionIds
+    )
     {
         return filter::makePredicate<DomainTransaction>(
-            [positionId](const DomainTransaction& transaction)
+            [positionIds](const DomainTransaction& transaction)
             {
-                return hasId(
-                    transaction.getData(),
-                    positionId,
-                    &TradeLeg::getPositionId
-                );
+                for (const auto& positionId : positionIds)
+                {
+                    if (hasId(
+                            transaction.getData(),
+                            positionId,
+                            &TradeLeg::getPositionId
+                        ))
+                        return true;
+                }
+                return false;
             }
         );
+    }
+
+    std::string TransactionFilter::toString() const
+    {
+        std::ostringstream oss;
+        oss << "TransactionFilter: [";
+        for (const auto& positionId : _positionIds)
+            oss << positionId << ", ";
+
+        oss << "]";
+        return oss.str();
     }
 
 }   // namespace finance

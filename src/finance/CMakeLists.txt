@@ -24,6 +24,8 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction/transaction_entry.cpp
     ${SOURCE_DIR}/transaction/transaction_entries.cpp
     ${SOURCE_DIR}/transaction/transaction_filter.cpp
+    ${SOURCE_DIR}/transaction/pnl.cpp
+    ${SOURCE_DIR}/transaction/position_transaction.cpp
 
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp

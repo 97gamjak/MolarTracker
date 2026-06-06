@@ -51,7 +51,7 @@ namespace repo
             case TransactionDataType::Cash:
                 type = finance::CashData{};
                 break;
-            case TransactionDataType::Trade:
+            case TransactionDataType::Stock:
                 type = finance::TradeData{};
                 break;
         }
@@ -172,8 +172,17 @@ namespace repo
     {
         orm::WhereExpr where = orm::makeEmptyWhere();
 
-        if (filter.getPositionId().has_value())
-            where &= TradeLegRow::hasPosition(filter.getPositionId().value());
+        if (!filter.getPositionIds().empty())
+        {
+            orm::WhereExpr posIdWhere = orm::makeEmptyWhere();
+
+            for (const auto &positionId : filter.getPositionIds())
+            {
+                posIdWhere |= TradeLegRow::hasPosition(positionId);
+            }
+
+            where &= posIdWhere;
+        }
 
         return where;
     }
@@ -194,7 +203,7 @@ namespace repo
     {
         orm::Joins join;
 
-        if (filter.getPositionId().has_value())
+        if (!filter.getPositionIds().empty())
         {
             join = join.add(
                 orm::join<

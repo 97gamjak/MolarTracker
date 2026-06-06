@@ -97,8 +97,13 @@ namespace ui
                             pos.getQuantity().toString()
                         );
                     case PositionColumns::AvgCost:
+                        return QString::fromStdString(
+                            pos.getAveragePrice().toString(2)
+                        );
                     case PositionColumns::CostBasis:
-                        return tr("—");
+                        return QString::fromStdString(
+                            pos.getTotalPrice().toString(2)
+                        );
 
                     case PositionColumns::LastPrice:
                     case PositionColumns::MarketValue:

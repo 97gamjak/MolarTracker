@@ -1,15 +1,2 @@
 Diagnostics:
     Suppress: redefinition
-
-Index:
-    Background: Skip   # or Build
-
-InlayHints:
-    Enabled: No        # these are surprisingly expensive
-
-CompileFlags:
-  Remove:
-    - -DMOLARTRACKER_GIT_SHA=.*
-    - -DMOLARTRACKER_GIT_DIRTY=.*
-    - -DMOLARTRACKER_GIT_TAG=.*
-    - -DMOLARTRACKER_VERSION_FULL=.*

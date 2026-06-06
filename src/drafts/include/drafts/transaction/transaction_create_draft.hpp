@@ -10,6 +10,12 @@
 
 namespace drafts
 {
+    /**
+     * @brief Base class for creating transaction drafts.
+     *
+     * This class serves as a base for all transaction draft types,
+     * encapsulating common properties and behaviors.
+     */
     class CreateTransactionDraft
     {
        private:
@@ -30,6 +36,13 @@ namespace drafts
         const std::optional<std::string>& getComment() const;
     };
 
+    /**
+     * @brief Create a cash transaction draft.
+     *
+     * This class is used to create a draft for a cash transaction,
+     * encapsulating all the necessary information to initiate the
+     * transaction.
+     */
     class CreateCashTransactionDraft : public CreateTransactionDraft
     {
        private:
@@ -56,6 +69,13 @@ namespace drafts
         [[nodiscard]] AccountId            getExternalAccount() const;
     };
 
+    /**
+     * @brief Create a stock transaction draft.
+     *
+     * This class is used to create a draft for a stock transaction,
+     * encapsulating all the necessary information to initiate the
+     * transaction.
+     */
     class CreateStockTransactionDraft : public CreateTransactionDraft
     {
        private:

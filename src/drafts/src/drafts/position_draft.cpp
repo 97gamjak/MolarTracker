@@ -65,6 +65,8 @@ namespace drafts
      * @param stockInfo
      * @param createdAt
      * @param quantity
+     * @param averagePrice
+     * @param totalPrice
      * @param closedAt
      */
     PositionStockDetailDraft::PositionStockDetailDraft(
@@ -72,10 +74,22 @@ namespace drafts
         StockInfoDraft           stockInfo,
         Timestamp                createdAt,
         Quantity                 quantity,
+        finance::Cash            averagePrice,
+        finance::Cash            totalPrice,
+        finance::Cash            realizedPnL,
+        double                   realizedPnLPercentage,
+        finance::Cash            unrealizedPnL,
+        double                   unrealizedPnLPercentage,
         std::optional<Timestamp> closedAt
     )
         : PositionDraft(positionId, std::move(stockInfo), createdAt, closedAt),
-          _quantity(quantity)
+          _quantity(quantity),
+          _averagePrice(averagePrice),
+          _totalPrice(totalPrice),
+          _realizedPnL(realizedPnL),
+          _realizedPnLPercentage(realizedPnLPercentage),
+          _unrealizedPnL(unrealizedPnL),
+          _unrealizedPnLPercentage(unrealizedPnLPercentage)
     {
     }
 
@@ -85,5 +99,35 @@ namespace drafts
      * @return Quantity The quantity
      */
     Quantity PositionStockDetailDraft::getQuantity() const { return _quantity; }
+
+    finance::Cash PositionStockDetailDraft::getAveragePrice() const
+    {
+        return _averagePrice;
+    }
+
+    finance::Cash PositionStockDetailDraft::getTotalPrice() const
+    {
+        return _totalPrice;
+    }
+
+    finance::Cash PositionStockDetailDraft::getRealizedPnL() const
+    {
+        return _realizedPnL;
+    }
+
+    double PositionStockDetailDraft::getRealizedPnLPercentage() const
+    {
+        return _realizedPnLPercentage;
+    }
+
+    finance::Cash PositionStockDetailDraft::getUnrealizedPnL() const
+    {
+        return _unrealizedPnL;
+    }
+
+    double PositionStockDetailDraft::getUnrealizedPnLPercentage() const
+    {
+        return _unrealizedPnLPercentage;
+    }
 
 }   // namespace drafts

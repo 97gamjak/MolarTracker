@@ -52,6 +52,7 @@ target_include_directories(molartracker_controller
 target_link_libraries(molartracker_controller
     PRIVATE
     Qt6::Widgets
+    Qt6::Concurrent
     molartracker_store
     molartracker_connections
     molartracker_settings

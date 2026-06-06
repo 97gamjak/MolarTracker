@@ -1,9 +1,8 @@
 #ifndef __STORE__INCLUDE__STORE__I_POSITION_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_POSITION_STORE_HPP__
 
-#include <vector>
-
 #include "config/id_types.hpp"
+#include "finance/positions.hpp"   // to avoid incomplete return type outside
 
 namespace finance
 {
@@ -35,29 +34,18 @@ namespace store
         /**
          * @brief Get all Positions
          *
-         * @return std::vector<finance::Position>
+         * @return finance::Positions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Position> getAllPositions() const = 0;
+        virtual finance::Positions getAllPositions() const = 0;
 
         /**
          * @brief Get all open Positions
          *
-         * @return std::vector<finance::Position>
+         * @return finance::Positions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Position> getOpenPositions() const = 0;
-
-        /**
-         * @brief Get all open Positions for specific accounts
-         *
-         * @param accountIds
-         * @return std::vector<finance::Position>
-         */
-        [[nodiscard]]
-        virtual std::vector<finance::Position> getOpenPositions(
-            const idSet<AccountId>& accountIds
-        ) const = 0;
+        virtual finance::Positions getOpenPositions() const = 0;
 
         /**
          * @brief Commit the current session

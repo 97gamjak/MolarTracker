@@ -126,7 +126,7 @@ namespace finance
 
             TransactionDataType operator()(const TradeData& /*data*/) const
             {
-                return TransactionDataType::Trade;
+                return TransactionDataType::Stock;
             }
         };
 

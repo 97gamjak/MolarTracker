@@ -12,13 +12,14 @@
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
+#include "finance/price_cache.hpp"
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
 #include "store/i_account_store.hpp"
 #include "ui/account/account_detail_view.hpp"
 
-REGISTER_LOG_CATEGORY("UI.Controller.AccountSideBarController");
+REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
 
 namespace controller
 {
@@ -81,6 +82,7 @@ namespace controller
      * @param positionStore
      * @param stockStore
      * @param transactionStore
+     * @param priceCache
      * @param stackedWidget
      */
     AccountController::AccountController(
@@ -89,9 +91,11 @@ namespace controller
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
+        finance::PriceCache&                             priceCache,
         QStackedWidget*                                  stackedWidget
     )
         : _undoStack(undoStack),
+          _priceCache(priceCache),
           _stores(
               std::make_unique<Stores>(
                   accountStore,

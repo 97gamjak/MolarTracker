@@ -5,6 +5,7 @@
 #include <shared_mutex>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "price_quote.hpp"
 
@@ -57,7 +58,7 @@ namespace finance
 
         [[nodiscard]]
         static std::unordered_map<std::string, PriceQuote> fetchBatch(
-            const std::vector<std::string>& yahooSymbols
+            const std::unordered_set<std::string>& yahooSymbols
         );
     };
 }   // namespace finance

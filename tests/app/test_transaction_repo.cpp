@@ -341,7 +341,7 @@ TEST_F(TransactionRepoFixture, AddTransactionTradeTypeIsDataTypeTrade)
         _repo.getTransactions({_accountId}, finance::TransactionFilter{});
 
     ASSERT_EQ(txs.size(), 1U);
-    EXPECT_EQ(txs[0].getType(), TransactionDataType::Trade);
+    EXPECT_EQ(txs[0].getType(), TransactionDataType::Stock);
 }
 
 TEST_F(TransactionRepoFixture, AddTransactionTradeLegIsRetrieved)

@@ -48,7 +48,7 @@ MSTD_ENUM(TransactionEntryType, std::uint8_t, TRANSACTION_ENTRY_TYPE_LIST);
 
 #define TRANSACTION_DATA_TYPE_LIST(X) \
     X(Cash)                           \
-    X(Trade)
+    X(Stock)
 
 MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
 

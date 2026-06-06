@@ -6,6 +6,7 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"
@@ -76,13 +77,8 @@ namespace store
         finance::Transactions getTransactions() const override;
 
         [[nodiscard]]
-        idSet<InstrumentId> getInstrumentIdsByPositionId(
-            PositionId positionId
-        ) const override;
-
-        [[nodiscard]]
-        finance::Transactions findTransactionsByPositionId(
-            PositionId positionId
+        unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+            const finance::TransactionFilter& filter
         ) const override;
 
        private:

@@ -19,6 +19,11 @@ namespace store
 {
     class TransactionStore;   // Forward declaration
 
+    struct PositionFilter
+    {
+        std::optional<bool> isOpen = std::nullopt;
+    };
+
     /**
      * @brief Store for managing Positions
      *
@@ -46,20 +51,19 @@ namespace store
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getOpenPositions(
-            const idSet<AccountId>& accountIds
-        ) const override;
-
-        std::vector<finance::Position> getAllPositions() const override;
+        finance::Positions getOpenPositions() const override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getOpenPositions() const override;
+        finance::Positions getAllPositions() const override;
 
         void commit() override;
 
         [[nodiscard]]
         const unorderedIdMap<PositionId, PositionId>& getIdRemap(
         ) const override;
+
+       private:
+        finance::Positions _getPositions(PositionFilter filter) const;
     };
 
 }   // namespace store

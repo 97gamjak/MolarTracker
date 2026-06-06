@@ -1,6 +1,7 @@
 #include "finance/price_cache.hpp"
 
 #include <mutex>
+#include <unordered_set>
 
 #include "finance/yf_client.hpp"
 #include "logging/log_macros.hpp"
@@ -86,7 +87,7 @@ namespace finance
      * @return A map of fetched price quotes, indexed by their symbols.
      */
     std::unordered_map<std::string, PriceQuote> PriceFeedService::fetchBatch(
-        const std::vector<std::string>& yahooSymbols
+        const std::unordered_set<std::string>& yahooSymbols
     )
     {
         std::unordered_map<std::string, PriceQuote> results;

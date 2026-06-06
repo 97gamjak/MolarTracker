@@ -49,6 +49,11 @@ namespace store
         [[nodiscard]]
         virtual StockStoreResult addStock(finance::Stock stock) = 0;
 
+        [[nodiscard]]
+        virtual std::optional<finance::Stock> getStock(
+            InstrumentId id
+        ) const = 0;
+
         /**
          * @brief Get a list of stocks by their instrument IDs
          *

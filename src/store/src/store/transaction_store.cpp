@@ -8,6 +8,7 @@
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "finance/transaction/transactions.hpp"
@@ -215,6 +216,12 @@ namespace store
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
+        LOG_DEBUG(
+            std::format(
+                "Retrieving transactions with filter: {}",
+                filter.toString()
+            )
+        );
         auto transactions = _getEntries(options);
 
         auto dbTransactions =
@@ -239,50 +246,50 @@ namespace store
 
         finance::Transactions result;
         result.addTransactions(results, _session->accountSession);
+
+        // TODO: implement a tostring function
+        LOG_DEBUG(
+            std::format(
+                "Transactions retrieved: stocks({}), cash({})",
+                result.stocks().size(),
+                result.cash().size()
+            )
+        );
         return result;
     }
 
-    /**
-     * @brief Find transactions by position ID, this retrieves all transactions
-     * that are associated with a specific position ID, allowing the caller to
-     * easily find and work with transactions that are related to a particular
-     * position. This is useful for analyzing the history of a position,
-     * generating reports, or performing any other operations that require
-     * access to the transactions associated with a specific position.
-     *
-     * @param positionId The ID of the position for which to find transactions,
-     * this specifies the position that the caller is interested in, and the
-     * returned transactions will be those that are associated with this
-     * position.
-     *
-     * @return finance::Transactions
-     */
-    finance::Transactions TransactionStore::findTransactionsByPositionId(
-        PositionId positionId
-    ) const
+    unorderedIdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
+        getStockPositions(const finance::TransactionFilter& filter) const
     {
-        auto filter = finance::TransactionFilter();
-        filter.setPositionId(positionId);
+        unorderedIdMap<PositionId, finance::StockPositionTransaction>
+            stockPositions;
 
-        return getTransactions(filter);
-    }
+        // TODO: add here a filter option to get only stocks
+        const auto transactions = getTransactions(filter);
 
-    /**
-     * @brief Get a set of instrument IDs associated with a specific position ID
-     *
-     * @param positionId The ID of the position for which to find instrument IDs
-     * @return idSet<InstrumentId> A set of instrument IDs associated with the
-     * specified position ID
-     */
-    idSet<InstrumentId> TransactionStore::getInstrumentIdsByPositionId(
-        PositionId positionId
-    ) const
-    {
-        idSet<InstrumentId> instrumentIdSet;
+        for (const auto& transaction : transactions.stocks())
+        {
+            const auto positionId = transaction.getPositionId();
+            if (!stockPositions.contains(positionId))
+            {
+                stockPositions[positionId] =
+                    finance::StockPositionTransaction(positionId);
+            }
 
-        const auto txs = findTransactionsByPositionId(positionId);
+            if (!stockPositions.at(positionId).add(transaction))
+            {
+                LOG_ERROR(
+                    "Failed to add stock transaction to position id: " +
+                    positionId.toString()
+                );
+            }
+        }
 
-        return txs.securities().getBaseInstrumentIds();
+        LOG_DEBUG(
+            std::format("Stock positions retrieved: {}", stockPositions.size())
+        );
+
+        return stockPositions;
     }
 
     /**
@@ -296,8 +303,8 @@ namespace store
         {
             if (entry.state != StoreState::New)
             {
-                // check if this committed transaction references the remapped
-                // ID
+                // check if this committed transaction references the
+                // remapped ID
                 const auto references = std::ranges::any_of(
                     entry.value.getEntries(),
                     [&remap](const auto& entry_)
@@ -348,8 +355,8 @@ namespace store
         {
             if (entry.state != StoreState::New)
             {
-                // check if this committed transaction references the remapped
-                // ID
+                // check if this committed transaction references the
+                // remapped ID
                 const auto hasId = finance::hasId(
                     entry.value.getData(),
                     remap,
@@ -370,7 +377,7 @@ namespace store
 
             switch (entry.value.getType())
             {
-                case TransactionDataType::Trade:
+                case TransactionDataType::Stock:
                 {
                     auto  transaction = entry.value;
                     auto& data =
@@ -385,7 +392,8 @@ namespace store
                         {
                             LOG_DEBUG(
                                 std::format(
-                                    "Remapping instrument ID in transaction "
+                                    "Remapping instrument ID in "
+                                    "transaction "
                                     "leg "
                                     "{}: "
                                     "{} -> "
@@ -423,8 +431,8 @@ namespace store
         {
             if (entry.state != StoreState::New)
             {
-                // check if this committed transaction references the remapped
-                // ID
+                // check if this committed transaction references the
+                // remapped ID
                 const auto hasId = finance::hasId(
                     entry.value.getData(),
                     remap,
@@ -444,7 +452,7 @@ namespace store
 
             switch (entry.value.getType())
             {
-                case TransactionDataType::Trade:
+                case TransactionDataType::Stock:
                 {
                     auto  transaction = entry.value;
                     auto& data =
@@ -459,7 +467,8 @@ namespace store
                         {
                             LOG_DEBUG(
                                 std::format(
-                                    "Remapping position ID in transaction leg "
+                                    "Remapping position ID in transaction "
+                                    "leg "
                                     "{}: "
                                     "{} -> "
                                     "{}",
