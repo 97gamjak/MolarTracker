@@ -3,6 +3,7 @@
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
 #include "ui/main_window.hpp"
+#include "ui/utils/discard_changes.hpp"
 
 namespace controller
 {
@@ -49,6 +50,17 @@ namespace controller
             },
             mainWindow
         );
+
+        if (mainWindow)
+            mainWindow->setCanCloseCallback(
+                [&storeContainer, &settings, mainWindow]()
+                {
+                    if (!storeContainer.isDirty() && !settings.isDirty())
+                        return true;
+                    return ui::askDiscardChanges(mainWindow) ==
+                           QMessageBox::Yes;
+                }
+            );
     }
 
 }   // namespace controller

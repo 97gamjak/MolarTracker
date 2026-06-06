@@ -16,6 +16,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Features
 
+- Closing the main window while there are unsaved changes now shows a
+  "Discard changes?" confirmation dialog; the window only closes if the
+  user confirms
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs

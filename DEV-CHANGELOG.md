@@ -4,6 +4,18 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### UI
+
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
+
 ### Bug Fix
 
 #### ORM
