@@ -1,6 +1,7 @@
 #include "logging/log_manager.hpp"
 
 #include <algorithm>
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -11,6 +12,7 @@
 #include "log_categories.gen.hpp"
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
+#include "logging/log_file_cleaner.hpp"
 #include "logging/log_object.hpp"
 #include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
@@ -44,6 +46,7 @@ namespace logging
     {
         _defaultLogLevel = loggingSettings.getDefaultLogLevelParam().get();
         _initializeCategories(directory);
+        _cleanupOldLogFiles(loggingSettings);
         _initializeRingFileLogger(loggingSettings);
     }
 
@@ -65,6 +68,27 @@ namespace logging
         _startupCategories = _categories;
 
         loadOverrides();
+    }
+
+    /**
+     * @brief Deletes log files in the log directory that are older than
+     * the configured maximum age
+     *
+     * @param settings Logging settings providing directory, prefix, suffix,
+     * and max age
+     */
+    void LogManager::_cleanupOldLogFiles(
+        const settings::LoggingSettings& settings
+    )
+    {
+        const auto dir =
+            std::filesystem::path(_logDirectory) / settings.getLogDirectory();
+        LogFileCleaner::cleanByAge(
+            dir,
+            settings.getLogFilePrefix(),
+            settings.getLogFileSuffix(),
+            settings.getMaxLogAgeDays()
+        );
     }
 
     /**
