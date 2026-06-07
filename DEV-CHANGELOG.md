@@ -4,6 +4,23 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### Result / Error
+
+- Add `src/result/` header-only CMake library (`molartracker_result`) with:
+  - `result/result.hpp` — generic `Result<T,E>` wrapper around `std::expected`
+    with `inspect`/`inspect_error`, `flatten`, `map`/`map_error` aliases,
+    `unwrap`/`unwrap_or`/`unwrap_or_else`, and a `Result<void,E>` specialisation
+    with `then()` / `and_then()` void sugar
+  - `result/error.hpp` — MolarTracker-specific `err::` namespace with per-domain
+    `enum class` types (`Db`, `Repo`, `Store`, `Service`, `Input`), `err::Kind`
+    as `std::variant`, `err::KindFormatter` named visitor, `struct Error` with
+    static factories and `is_not_found()` predicate, `std::formatter<Error>`
+    specialisation, and `AppResult<T>` type alias
+- Type definitions only — nothing in the existing codebase is wired to the new
+  types yet; migration of individual layers is a follow-up
+
 ### CI
 
 - Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
