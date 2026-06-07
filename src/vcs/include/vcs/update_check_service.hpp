@@ -9,7 +9,6 @@
 
 #include "http/http_error.hpp"
 #include "utils/version.hpp"
-#include "vcs/github_client.hpp"
 
 namespace vcs
 {
@@ -26,24 +25,37 @@ namespace vcs
     {
         Q_OBJECT
 
+       private:
+        /// The timer for scheduling periodic checks
+        QTimer _timer;
+        /// The watcher for the async GitHub fetch operation
+        QFutureWatcher<std::expected<utils::SemVer, http::HttpError>> _watcher;
+        /// The last version that was notified to the user, used for
+        /// deduplication of updateAvailable() signals within the same session
+        std::optional<utils::SemVer> _lastNotifiedVersion;
+
+        // TODO(97gamjak): make this interval configurable and also add a way to
+        // trigger manual checks from the UI
+        /// The interval for periodic update checks in milliseconds (24 hours)
+        static constexpr int _intervalMs = 24 * 60 * 60 * 1000;
+
        public:
         explicit UpdateCheckService(QObject* parent = nullptr);
 
         void start();
 
        signals:
+        /**
+         * @brief Signal emitted when a new MolarTracker release is available on
+         * GitHub.
+         *
+         * @param latestVersion
+         */
         void updateAvailable(utils::SemVer latestVersion);
 
        private slots:
         void onTimerTick();
         void onFetchFinished();
-
-       private:
-        QTimer                                                        _timer;
-        QFutureWatcher<std::expected<utils::SemVer, http::HttpError>> _watcher;
-        std::optional<utils::SemVer> _lastNotifiedVersion;
-
-        static constexpr int k_intervalMs = 24 * 60 * 60 * 1000;
     };
 
 }   // namespace vcs

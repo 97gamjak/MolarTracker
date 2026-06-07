@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "config/constants/github_constants.hpp"
 #include "http/http_client.hpp"
 #include "http/http_error.hpp"
 #include "http/http_request.hpp"
@@ -25,10 +26,10 @@ namespace vcs
     {
         const auto response = http::HttpClient::get(
             http::HttpRequest{
-                .url = std::string{k_url},
+                .url = _getLatestReleaseUrl(),
                 .headers =
                     {
-                        {"User-Agent", std::string{k_userAgent}},
+                        {"User-Agent", _userAgent},
                         {"Accept", "application/vnd.github+json"},
                     },
             }
@@ -57,6 +58,17 @@ namespace vcs
                 }
             );
         }
+    }
+
+    /**
+     * @brief Get the URL for fetching the latest release information from
+     * GitHub
+     *
+     * @return std::string
+     */
+    std::string GitHubClient::_getLatestReleaseUrl()
+    {
+        return GithubConstants::getGithubApiUrl() + "/releases/latest";
     }
 
 }   // namespace vcs

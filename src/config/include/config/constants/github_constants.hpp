@@ -32,6 +32,7 @@ class GithubConstants
     static constexpr const char* gitTag = MOLARTRACKER_GIT_TAG;
 
     [[nodiscard]] static std::string getGithubRepoUrl();
+    [[nodiscard]] static std::string getGithubApiUrl();
     [[nodiscard]] static std::string getGithubIssuesUrl();
     [[nodiscard]] static std::string getCreateIssueError();
 

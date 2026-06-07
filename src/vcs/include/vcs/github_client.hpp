@@ -2,7 +2,6 @@
 #define __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 
 #include <expected>
-#include <string_view>
 
 #include "http/http_error.hpp"
 #include "utils/version.hpp"
@@ -16,17 +15,18 @@ namespace vcs
      */
     class GitHubClient
     {
+       private:
+        /// The User-Agent header value to use for GitHub API requests
+        static constexpr const char* _userAgent = "MolarTracker";
+
        public:
         [[nodiscard]]
         static std::expected<utils::SemVer, http::HttpError> fetchLatestVersion(
         );
 
        private:
-        /// The GitHub API endpoint for fetching the latest release information.
-        static constexpr std::string_view k_url =
-            "https://api.github.com/repos/97gamjak/MolarTracker/releases/"
-            "latest";
-        static constexpr std::string_view k_userAgent = "MolarTracker";
+        [[nodiscard]]
+        static std::string _getLatestReleaseUrl();
     };
 
 }   // namespace vcs

@@ -11,6 +11,16 @@ std::string GithubConstants::getGithubRepoUrl()
 }
 
 /**
+ * @brief Get the GitHub API URL
+ *
+ * @return const std::string
+ */
+std::string GithubConstants::getGithubApiUrl()
+{
+    return std::string(_githubApiUrl) + _repoPath;
+}
+
+/**
  * @brief Get the GitHub issues URL
  *
  * @return const std::string

@@ -3,6 +3,7 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "logging/log_macros.hpp"
+#include "vcs/github_client.hpp"
 
 REGISTER_LOG_CATEGORY("VCS.UpdateCheckService");
 
@@ -40,7 +41,7 @@ namespace vcs
     {
         LOG_INFO("Update check service started");
         onTimerTick();
-        _timer.start(k_intervalMs);
+        _timer.start(_intervalMs);
     }
 
     /**
