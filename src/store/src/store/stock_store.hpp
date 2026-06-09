@@ -51,12 +51,12 @@ namespace store
         StockStoreResult addStock(finance::Stock stock) override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks(
+        finance::Stocks getStocks(
             const idSet<InstrumentId>& ids
         ) const override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks() const override;
+        finance::Stocks getStocks() const override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(InstrumentId id) const override;

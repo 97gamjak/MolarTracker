@@ -15,9 +15,31 @@ namespace finance
         );
     }
 
+    idSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
+    {
+        idSet<InstrumentId> instrumentIds;
+        for (const auto& transaction : getItems())
+            instrumentIds.insert(transaction.getBaseInstrumentId());
+
+        return instrumentIds;
+    }
+
     SecurityView::SecurityView(const StockTransactions& transactions)
         : _stockTransactions(transactions)
     {
+    }
+
+    idSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
+    {
+        return _stockTransactions.getBaseInstrumentIds();
+    }
+
+    Transactions::Transactions(
+        const std::vector<DomainTransaction>& transactions,
+        const Accounts&                       accounts
+    )
+    {
+        addTransactions(transactions, accounts);
     }
 
     void Transactions::addTransactions(

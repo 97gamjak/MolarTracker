@@ -22,6 +22,20 @@ namespace finance
         std::unique_lock lock{_mutex};
         for (const auto& [symbol, quote] : quotes)
             _quotes.insert_or_assign(symbol, quote);
+
+        Observable<OnPriceUpdated>::template notify<OnPriceUpdated>();
+    }
+
+    /**
+     * @brief Adds a ticker to the cache with an empty quote if it doesn't
+     * already exist.
+     *
+     * @param yahooSymbol The Yahoo Finance symbol to add.
+     */
+    void PriceCache::addTicker(const std::string& yahooSymbol)
+    {
+        if (!_quotes.contains(yahooSymbol))
+            _tickersNotYetFetched.insert(yahooSymbol);
     }
 
     /**

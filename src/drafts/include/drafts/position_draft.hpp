@@ -78,9 +78,12 @@ namespace drafts
             finance::Cash            totalPrice,
             finance::Cash            realizedPnL,
             double                   realizedPnLPercentage,
-            finance::Cash            unrealizedPnL,
-            double                   unrealizedPnLPercentage,
             std::optional<Timestamp> closedAt = std::nullopt
+        );
+
+        void updateUnrealizedPnL(
+            const finance::Cash& unrealizedPnL,
+            double               unrealizedPnLPercentage
         );
 
         [[nodiscard]] Quantity      getQuantity() const;

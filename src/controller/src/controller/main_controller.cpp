@@ -1,5 +1,7 @@
 #include "controller/main_controller.hpp"
 
+#include <memory>
+
 #include "commands/undo_stack.hpp"
 #include "config/constants.hpp"
 #include "controller/account_controller.hpp"
@@ -7,6 +9,7 @@
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
+#include "controller/position_controller.hpp"
 #include "controller/side_bar/side_bar_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "finance/price_cache.hpp"
@@ -41,7 +44,7 @@ namespace controller
         Handlers _handlers;
 
         /// price cache for managing stock prices
-        finance::PriceCache _priceCache;
+        std::shared_ptr<finance::PriceCache> _priceCache;
 
         /// controller for managing the account
         CentralController _centralController;
@@ -49,6 +52,7 @@ namespace controller
         AccountController _accountController;
         /// controller for managing transactions
         TransactionController _transactionController;
+        PositionController    _positionController;
 
         /// controller for managing the menu bar
         MenuBarController _menuBarController;
@@ -63,6 +67,7 @@ namespace controller
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
               _handlers(_settings),
+              _priceCache(std::make_shared<finance::PriceCache>()),
               _centralController(_mainWindow.getCentralWidget()),
               _accountController(
                   _undoStack,
@@ -79,6 +84,12 @@ namespace controller
                   _storeContainer.getAccountStore(),
                   _storeContainer.getStockStore(),
                   _mainWindow.getCentralWidget()
+              ),
+              _positionController(
+                  _storeContainer.getPositionStore(),
+                  _storeContainer.getTransactionStore(),
+                  _storeContainer.getStockStore(),
+                  _priceCache
               ),
               _menuBarController(
                   &_mainWindow,

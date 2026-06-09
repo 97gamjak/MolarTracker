@@ -27,8 +27,9 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction/pnl.cpp
     ${SOURCE_DIR}/transaction/position_transaction.cpp
 
-    ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp
+    ${SOURCE_DIR}/instrument/stock.cpp
+    ${SOURCE_DIR}/instrument/stocks.cpp
 
     ${SOURCE_DIR}/account/account.cpp
     ${SOURCE_DIR}/account/accounts.cpp
@@ -46,6 +47,7 @@ target_link_libraries(molartracker_finance
     mstd
     molartracker_filter
     molartracker_http   # TODO(97gamjak): try to move this dependency to private
+    molartracker_connections
     PRIVATE
     molartracker_config
     molartracker_exceptions

@@ -172,6 +172,18 @@ namespace repo
     {
         orm::WhereExpr where = orm::makeEmptyWhere();
 
+        if (!filter.getTransactionIds().empty())
+        {
+            orm::WhereExpr idWhere = orm::makeEmptyWhere();
+
+            for (const auto &transactionId : filter.getTransactionIds())
+            {
+                idWhere |= TransactionRow::hasTransactionId(transactionId);
+            }
+
+            where &= idWhere;
+        }
+
         if (!filter.getPositionIds().empty())
         {
             orm::WhereExpr posIdWhere = orm::makeEmptyWhere();

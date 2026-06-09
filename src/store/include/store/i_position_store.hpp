@@ -9,8 +9,16 @@ namespace finance
     class Position;   // Forward declaration
 }   // namespace finance
 
+class Connection;   // Forward declaration
+
 namespace store
 {
+
+    struct PositionClosed
+    {
+        using func = std::function<void(PositionId)>;
+    };
+
     /**
      * @brief Store for managing Positions
      *
@@ -61,6 +69,12 @@ namespace store
         [[nodiscard]]
         virtual const unorderedIdMap<PositionId, PositionId>& getIdRemap(
         ) const = 0;
+
+        [[nodiscard]]
+        virtual Connection subscribeToPositionClosed(
+            PositionClosed::func func,
+            void*                user
+        ) = 0;
     };
 
 }   // namespace store

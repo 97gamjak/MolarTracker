@@ -81,6 +81,12 @@ namespace store
             const finance::TransactionFilter& filter
         ) const override;
 
+        [[nodiscard]]
+        Connection subscribeToTransactionAdded(
+            OnTransactionAdded::func func,
+            void*                    user
+        ) override;
+
        private:
         void _onAccountIdRemap(const accountMap<AccountId>& remap);
         void _onInstrumentIdRemap(const instrumentMap<InstrumentId>& remap);

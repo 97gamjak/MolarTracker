@@ -173,22 +173,17 @@ namespace store
     /**
      * @brief Get a list of all stocks in the store
      *
-     * @return std::vector<finance::Stock>
+     * @return finance::Stocks
      */
-    std::vector<finance::Stock> StockStore::getStocks() const
-    {
-        return getStocks({});
-    }
+    finance::Stocks StockStore::getStocks() const { return getStocks({}); }
 
     /**
      * @brief Get a list of all stocks in the store
      *
      * @param ids The set of instrument IDs to retrieve stocks for
-     * @return std::vector<finance::Stock>
+     * @return finance::Stocks
      */
-    std::vector<finance::Stock> StockStore::getStocks(
-        const idSet<InstrumentId>& ids
-    ) const
+    finance::Stocks StockStore::getStocks(const idSet<InstrumentId>& ids) const
     {
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
         if (!ids.empty())
@@ -196,10 +191,10 @@ namespace store
 
         auto entries = _getValues(options);
 
-        std::vector<Stock> stocks;
+        finance::Stocks stocks;
 
         for (const auto& entry : entries)
-            stocks.push_back(entry);
+            stocks.addUnchecked(entry);
 
         if (!isFullCache())
         {
@@ -214,7 +209,7 @@ namespace store
                 );
 
                 if (!alreadyInStore)
-                    stocks.push_back(stock);
+                    stocks.addUnchecked(stock);
             }
         }
 
@@ -265,7 +260,7 @@ namespace store
     {
         std::vector<std::string> tickers;
 
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             tickers.push_back(stock.getTicker());
 
         return tickers;
@@ -281,7 +276,7 @@ namespace store
     {
         std::unordered_map<std::string, InstrumentId> tickerMap;
 
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             tickerMap[stock.getTicker()] = stock.getInstrumentId();
 
         return tickerMap;
@@ -296,7 +291,7 @@ namespace store
     {
         instrumentMap<std::string> map;
 
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             map[stock.getInstrumentId()] = stock.getTicker();
 
         return map;
@@ -312,7 +307,7 @@ namespace store
         const std::string& ticker
     ) const
     {
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             if (stock.getTicker() == ticker)
                 return stock.getInstrumentId();
 

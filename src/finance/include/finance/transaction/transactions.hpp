@@ -19,16 +19,22 @@ namespace finance
     {
        public:
         virtual ~ISecurityTransactions() = default;
+
+        [[nodiscard]]
+        virtual idSet<InstrumentId> getBaseInstrumentIds() const = 0;
     };
 
     /**
      * @brief Class for managing stock transactions.
      *
      */
-    class StockTransactions : public Vector<StockTransaction>
+    class StockTransactions : public Vector<StockTransaction>,
+                              public ISecurityTransactions
     {
        public:
         void sort();
+
+        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**
@@ -58,6 +64,8 @@ namespace finance
         SecurityView(SecurityView&&)                 = delete;
         SecurityView& operator=(const SecurityView&) = delete;
         SecurityView& operator=(SecurityView&&)      = delete;
+
+        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**
@@ -71,6 +79,11 @@ namespace finance
         StockTransactions _stockTransactions;
 
        public:
+        Transactions() = default;
+        Transactions(
+            const std::vector<DomainTransaction>& transactions,
+            const Accounts&                       accounts
+        );
         void addTransactions(
             const std::vector<DomainTransaction>& transactions,
             const Accounts&                       accounts

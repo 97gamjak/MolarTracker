@@ -195,4 +195,15 @@ namespace store
         return _getIdRemap();
     }
 
+    Connection PositionStore::subscribeToPositionClosed(
+        PositionClosed::func func,
+        void*                user
+    )
+    {
+        return _positionEvents->template on<PositionClosed>(
+            std::move(func),
+            user
+        );
+    }
+
 }   // namespace store

@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <memory>
 
 #include "config/id_types.hpp"
 
@@ -53,20 +54,8 @@ namespace controller
         Q_OBJECT
 
        private:
-        /// Reference to the undo stack
-        cmd::UndoStack& _undoStack;
-
-        /// Reference to the price cache
-        finance::PriceCache& _priceCache;
-
-        struct Stores;
-        /// Pointer to the stores
-        std::unique_ptr<Stores> _stores;
-
-        /// Pointer to the stacked widget
-        QStackedWidget* _stackedWidget;
-        /// Pointer to the account detail view
-        QPointer<ui::AccountDetailView> _accountDetailView;
+        struct Details;
+        std::unique_ptr<Details> _details;
 
        public:
         AccountController(
@@ -75,7 +64,7 @@ namespace controller
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             const std::shared_ptr<store::IStockStore>&       stockStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
-            finance::PriceCache&                             priceCache,
+            const std::shared_ptr<finance::PriceCache>&      priceCache,
             QStackedWidget*                                  stackedWidget
         );
         ~AccountController() override;

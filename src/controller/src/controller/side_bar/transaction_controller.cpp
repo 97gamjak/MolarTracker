@@ -260,7 +260,7 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        auto drafts = getOpenStockPositionDrafts(
+        auto drafts = getOpenStockPositions(
             draft.getSecurityAccount(),
             _positionStore,
             _stockStore,

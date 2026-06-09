@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "drafts/position_draft.hpp"
+#include "finance/transaction/pnl.hpp"
 
 namespace store
 {
@@ -22,6 +24,13 @@ namespace drafts
     class PositionStockDetailDraft;      // Forward declaration
 }   // namespace drafts
 
+struct OpenStockPositionDetail
+{
+    drafts::PositionStockDetailDraft positionDraft;
+    std::string                      ticker;
+    finance::PnL*                    pnl;
+};
+
 namespace controller
 {
     std::expected<void, std::string> convertTickerToInstrumentId(
@@ -29,7 +38,14 @@ namespace controller
         const std::shared_ptr<store::IStockStore>& stockStore
     );
 
-    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositionDrafts(
+    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
+        AccountId                                        account,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
+    );
+
+    std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,

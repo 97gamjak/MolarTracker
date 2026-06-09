@@ -1,6 +1,8 @@
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_HPP__
 #define __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_HPP__
 
+#include <vector>
+
 #include "map.hpp"
 
 template <typename T>

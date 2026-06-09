@@ -18,7 +18,8 @@ namespace finance
     class TransactionFilter
     {
        private:
-        idSet<PositionId> _positionIds;
+        idSet<PositionId>    _positionIds;
+        idSet<TransactionId> _transactionIds;
 
        public:
         TransactionFilter() = default;
@@ -26,6 +27,9 @@ namespace finance
         void addPositionId(PositionId positionId);
         void setPositionIds(const idSet<PositionId>& positionIds);
         [[nodiscard]] idSet<PositionId> getPositionIds() const;
+
+        void setTransactionIds(const idSet<TransactionId>& transactionIds);
+        [[nodiscard]] idSet<TransactionId> getTransactionIds() const;
 
         [[nodiscard]]
         filter::Predicate<DomainTransaction> getPredicate() const;
@@ -37,6 +41,11 @@ namespace finance
     filter::Predicate<DomainTransaction> HasPositionId(
         const idSet<PositionId>& positionIds
     );
+
+    filter::Predicate<DomainTransaction> HasTransactionId(
+        const idSet<TransactionId>& transactionIds
+    );
+
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__

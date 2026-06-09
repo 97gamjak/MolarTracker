@@ -27,7 +27,7 @@ namespace finance
 
         [[nodiscard]] InstrumentId getBaseInstrument() const;
         [[nodiscard]] AccountId    getSecurityAccount() const;
-        [[nodiscard]] const PnL*   getPnL();
+        [[nodiscard]] PnL*         getPnL();
 
         void sort();
 

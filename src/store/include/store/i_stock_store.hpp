@@ -7,6 +7,7 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
+#include "finance/instrument/stocks.hpp"
 
 class Connection;   // Forward declaration
 
@@ -58,20 +59,20 @@ namespace store
          * @brief Get a list of stocks by their instrument IDs
          *
          * @param ids The set of instrument IDs to retrieve stocks for
-         * @return std::vector<finance::Stock>
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks(
+        virtual finance::Stocks getStocks(
             const idSet<InstrumentId>& ids
         ) const = 0;
 
         /**
          * @brief Get a list of all stocks in the store
          *
-         * @return std::vector<finance::Stock>
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks() const = 0;
+        virtual finance::Stocks getStocks() const = 0;
 
         /**
          * @brief Get all stock tickers in the store

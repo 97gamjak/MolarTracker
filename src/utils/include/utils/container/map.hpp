@@ -2,6 +2,7 @@
 #define __UTILS__INCLUDE__UTILS__CONTAINER__MAP_HPP__
 
 #include <unordered_map>
+#include <vector>
 
 #include "iterable.hpp"
 
@@ -36,6 +37,7 @@ class Map : public Iterable<std::unordered_map<Key, Value, Hash>>
     [[nodiscard]] bool contains(const Key& key) const;
 
     [[nodiscard]] std::unordered_set<Key, Hash> getKeys() const;
+    [[nodiscard]] std::vector<Value>            getValues() const;
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__

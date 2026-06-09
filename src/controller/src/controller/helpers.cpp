@@ -48,7 +48,7 @@ namespace controller
      * @param transactionStore
      * @return std::vector<drafts::PositionDraft>
      */
-    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositionDrafts(
+    std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
@@ -67,7 +67,7 @@ namespace controller
             { return pair.second.getSecurityAccount() != account; }
         );
 
-        std::vector<drafts::PositionStockDetailDraft> drafts;
+        std::vector<OpenStockPositionDetail> drafts;
 
         for (auto& [id, txs] : positionTxs)
         {
@@ -99,19 +99,45 @@ namespace controller
             const auto stockInfo = StockMapper::toStockInfoDraft(stock.value());
 
             drafts.emplace_back(
-                position.getId(),
-                stockInfo,
-                position.getCreatedAt(),
-                txs.getPnL()->getQuantity(),
-                txs.getPnL()->getAverageCost(),
-                txs.getPnL()->getCostBasis(),
-                txs.getPnL()->getRealizedPnL(),
-                txs.getPnL()->getRealizedPnLPercentage(),
-                txs.getPnL()->getRealizedPnL(
-                ),   // TODO: change this as soon as price cache is ready
-                0.0
+                OpenStockPositionDetail{
+                    .positionDraft =
+                        drafts::PositionStockDetailDraft{
+                            position.getId(),
+                            stockInfo,
+                            position.getCreatedAt(),
+                            txs.getPnL()->getQuantity(),
+                            txs.getPnL()->getAverageCost(),
+                            txs.getPnL()->getCostBasis(),
+                            txs.getPnL()->getRealizedPnL(),
+                            txs.getPnL()->getRealizedPnLPercentage()
+                        },
+                    .ticker = stockInfo.getTicker(),
+                    .pnl    = txs.getPnL()
+                }
             );
         }
+
+        return drafts;
+    }
+
+    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
+        AccountId                                        account,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
+    )
+    {
+        const auto details = getOpenStockPositionDetails(
+            account,
+            positionStore,
+            stockStore,
+            transactionStore
+        );
+
+        std::vector<drafts::PositionStockDetailDraft> drafts;
+        drafts.reserve(details.size());
+        for (const auto& detail : details)
+            drafts.push_back(detail.positionDraft);
 
         return drafts;
     }

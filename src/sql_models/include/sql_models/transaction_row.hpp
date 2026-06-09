@@ -7,6 +7,7 @@
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 #include "utils/timestamp.hpp"
 
 /**
@@ -19,6 +20,9 @@ struct TransactionRow : public orm::ORMModel<"transaction_">
         tableName != "transaction",
         "Table name must not be 'transaction', this is a reserved key in SQL"
     );
+
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 
     /// The id field, this is the primary key of the table and is
     /// auto-incremented

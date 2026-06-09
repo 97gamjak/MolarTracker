@@ -1,6 +1,8 @@
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__
 #define __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__
 
+#include <vector>
+
 #include "map.hpp"
 
 /**
@@ -68,6 +70,17 @@ std::unordered_set<Key, Hash> Map<Key, Value, Hash>::getKeys() const
     for (const auto& [key, _] : _items)
         keys.insert(key);
     return keys;
+}
+
+template <typename Key, typename Value, typename Hash>
+std::vector<Value> Map<Key, Value, Hash>::getValues() const
+{
+    std::vector<Value> values;
+
+    for (const auto& [_, value] : _items)
+        values.push_back(value);
+
+    return values;
 }
 
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__

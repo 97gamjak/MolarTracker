@@ -53,7 +53,7 @@ namespace finance
         return _securityAccount;
     }
 
-    const PnL* StockPositionTransaction::getPnL()
+    PnL* StockPositionTransaction::getPnL()
     {
         if (!_pnl)
         {

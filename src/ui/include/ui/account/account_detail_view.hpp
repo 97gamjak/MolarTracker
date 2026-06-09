@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <memory>
 
+#include "drafts/account_draft.hpp"
+
 namespace drafts
 {
     class PositionStockDetailDraft;   // Forward declaration

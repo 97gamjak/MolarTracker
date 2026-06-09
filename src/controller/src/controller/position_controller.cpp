@@ -5,22 +5,31 @@
 #include <QtConcurrent>
 #include <memory>
 
+#include "connections/connection.hpp"
 #include "finance/price_cache.hpp"
+#include "finance/transaction/transaction_filter.hpp"
+#include "store/i_position_store.hpp"
+#include "store/i_stock_store.hpp"
+#include "store/i_transaction_store.hpp"
 
 namespace controller
 {
     PositionController::PositionController(
         const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<store::ITransactionStore>& transactionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<finance::PriceCache>&      priceCache
     )
         : _pollTimer(new QTimer()),
-          _priceCache(std::make_unique<finance::PriceCache>()),
+          _priceCache(priceCache),
           _positionStore(positionStore),
           _transactionStore(transactionStore),
-          _expectedSymbolCount(0)
+          _stockStore(stockStore),
+          _expectedSymbolCount(0),
+          _connections(std::make_unique<Connections>())
     {
         connect(
-            _priceWatcher,
+            &_priceWatcher,
             &QFutureWatcher<
                 std::unordered_map<std::string, finance::PriceQuote>>::finished,
             this,
@@ -34,28 +43,39 @@ namespace controller
             &PositionController::_fetchPrices
         );
 
+        _initTickers();
+
+        _connections->add(_transactionStore->subscribeToTransactionAdded(
+            [this](const finance::Transactions& transactions)
+            {
+                _collectTickers(transactions);
+                _fetchPrices();
+            },
+            this
+        ));
+
         _pollTimer->setInterval(60'000);
 
         _fetchPrices();
         _pollTimer->start();
     }
 
+    PositionController::~PositionController() = default;
+
     void PositionController::_fetchPrices()
     {
         if (_priceWatcher.isRunning())
             return;   // don't stack concurrent fetches
 
-        auto tickers = _collectTickers();
-
-        if (tickers.empty())
+        if (_tickers.empty())
             return;
 
-        _expectedSymbolCount = tickers.size();
+        _expectedSymbolCount = _tickers.size();
 
         _priceWatcher.setFuture(
             QtConcurrent::run(
-                [_tickers = std::move(tickers)]()
-                { return finance::PriceFeedService::fetchBatch(_tickers); }
+                [tickers = _tickers]()
+                { return finance::PriceFeedService::fetchBatch(tickers); }
             )
         );
     }
@@ -68,7 +88,30 @@ namespace controller
             _priceCache->update(result);
 
         // Notify table model — adjust column indices to your price/P&L range
-        emit _tableModel->dataChanged(...);
+        // emit _tableModel->dataChanged(...);
+    }
+
+    void PositionController::_collectTickers(
+        const finance::Transactions& transactions
+    )
+    {
+        const auto instruments   = transactions.securities();
+        const auto instrumentIds = instruments.getBaseInstrumentIds();
+
+        const auto tickers = _stockStore->getStocks(instrumentIds).getTickers();
+        for (const auto& ticker : tickers)
+            _tickers.insert(ticker);
+    }
+
+    void PositionController::_initTickers()
+    {
+        const auto ids = _positionStore->getOpenPositions().getIds();
+
+        finance::TransactionFilter filter;
+        filter.setPositionIds(ids);
+
+        const auto transactions = _transactionStore->getTransactions(filter);
+        _collectTickers(transactions);
     }
 
 }   // namespace controller

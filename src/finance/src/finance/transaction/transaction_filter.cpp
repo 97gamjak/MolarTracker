@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+#include "config/strong_id.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 
 namespace finance
@@ -21,6 +22,11 @@ namespace finance
         return _positionIds;
     }
 
+    idSet<TransactionId> TransactionFilter::getTransactionIds() const
+    {
+        return _transactionIds;
+    }
+
     /**
      * @brief Get a predicate function that can be used to filter transactions
      * based on the criteria set in this filter, this function generates a
@@ -37,6 +43,9 @@ namespace finance
     {
         if (!_positionIds.empty())
             return HasPositionId(_positionIds);
+
+        if (!_transactionIds.empty())
+            return HasTransactionId(_transactionIds);
 
         return {};
     }
@@ -59,6 +68,16 @@ namespace finance
                 }
                 return false;
             }
+        );
+    }
+
+    filter::Predicate<DomainTransaction> HasTransactionId(
+        const idSet<TransactionId>& transactionIds
+    )
+    {
+        return filter::makePredicate<DomainTransaction>(
+            [transactionIds](const DomainTransaction& transaction)
+            { return transactionIds.contains(transaction.getId()); }
         );
     }
 

@@ -6,7 +6,6 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
-#include "finance/transaction/transactions.hpp"           // needed for vector
 
 namespace finance
 {
@@ -14,6 +13,8 @@ namespace finance
     class TransactionFilter;   // Forward declaration
     class Transactions;        // Forward declaration
 }   // namespace finance
+
+class Connection;   // Forward declaration
 
 namespace store
 {
@@ -24,6 +25,11 @@ namespace store
     X(TransactionSumNotZero)
 
     MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
+
+    struct OnTransactionAdded
+    {
+        using func = std::function<void(finance::Transactions transactions)>;
+    };
 
     /**
      * @brief Store for managing transactions
@@ -95,6 +101,12 @@ namespace store
         virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const = 0;
+
+        [[nodiscard]]
+        virtual Connection subscribeToTransactionAdded(
+            OnTransactionAdded::func func,
+            void*                    user
+        ) = 0;
     };
 
 }   // namespace store

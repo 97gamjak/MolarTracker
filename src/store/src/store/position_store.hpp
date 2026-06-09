@@ -1,8 +1,6 @@
 #ifndef __STORE__SRC__STORE__POSITION_STORE_HPP__
 #define __STORE__SRC__STORE__POSITION_STORE_HPP__
 
-#include <vector>
-
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
@@ -39,6 +37,8 @@ namespace store
         /// The current session data
         std::unique_ptr<Session> _session;
 
+        std::unique_ptr<Observable<PositionClosed>> _positionEvents;
+
        public:
         explicit PositionStore(
             std::shared_ptr<service::IPositionService> positionService,
@@ -61,6 +61,12 @@ namespace store
         [[nodiscard]]
         const unorderedIdMap<PositionId, PositionId>& getIdRemap(
         ) const override;
+
+        [[nodiscard]]
+        Connection subscribeToPositionClosed(
+            PositionClosed::func func,
+            void*                user
+        ) override;
 
        private:
         finance::Positions _getPositions(PositionFilter filter) const;

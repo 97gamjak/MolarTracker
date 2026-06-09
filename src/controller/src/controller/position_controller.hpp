@@ -16,12 +16,16 @@ namespace store
 {
     class IPositionStore;      // Forward declaration
     class ITransactionStore;   // Forward declaration
+    class IStockStore;         // Forward declaration
 }   // namespace store
 
 namespace finance
 {
-    class PriceCache;   // Forward declaration
+    class PriceCache;     // Forward declaration
+    class Transactions;   // Forward declaration
 }   // namespace finance
+
+class Connections;   // Forward declaration
 
 namespace controller
 {
@@ -37,24 +41,32 @@ namespace controller
         QFutureWatcher<std::unordered_map<std::string, finance::PriceQuote>>
                                                   _priceWatcher;
         QTimer*                                   _pollTimer;
-        std::unique_ptr<finance::PriceCache>      _priceCache;
+        std::shared_ptr<finance::PriceCache>      _priceCache;
         std::shared_ptr<store::IPositionStore>    _positionStore;
         std::shared_ptr<store::ITransactionStore> _transactionStore;
+        std::shared_ptr<store::IStockStore>       _stockStore;
 
         std::size_t _expectedSymbolCount;
+
+        std::unique_ptr<Connections> _connections;
+
+        /// Set of tickers that are currently being tracked for price updates
+        std::unordered_set<std::string> _tickers;
 
        public:
         PositionController(
             const std::shared_ptr<store::IPositionStore>&    positionStore,
-            const std::shared_ptr<store::ITransactionStore>& transactionStore
+            const std::shared_ptr<store::ITransactionStore>& transactionStore,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
+            const std::shared_ptr<finance::PriceCache>&      priceCache
         );
+        ~PositionController() override;
 
        private:
         void _fetchPrices();
         void _onPricesFetched();
-
-        [[nodiscard]]
-        std::unordered_set<std::string> _collectTickers() const;
+        void _collectTickers(const finance::Transactions& transactions);
+        void _initTickers();
     };
 }   // namespace controller
 

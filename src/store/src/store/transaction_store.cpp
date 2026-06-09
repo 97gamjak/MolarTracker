@@ -492,4 +492,24 @@ namespace store
         }
     }
 
+    Connection TransactionStore::subscribeToTransactionAdded(
+        OnTransactionAdded::func func,
+        void*                    user
+    )
+    {
+        return subscribeToEntryAdded(
+            [func = std::move(func),
+             this](const std::vector<finance::DomainTransaction>& transactions)
+            {
+                func(
+                    finance::Transactions(
+                        transactions,
+                        _session->accountSession
+                    )
+                );
+            },
+            user
+        );
+    }
+
 }   // namespace store

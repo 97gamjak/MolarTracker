@@ -9,6 +9,7 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
+#include "config/strong_id.hpp"
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
@@ -23,12 +24,14 @@ REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
 
 namespace controller
 {
-    /**
-     * @brief Stores for managing account-related data
-     *
-     */
-    struct AccountController::Stores
+    struct AccountController::Details
     {
+        /// Reference to the undo stack
+        cmd::UndoStack& undoStack;
+
+        /// Reference to the price cache
+        std::shared_ptr<finance::PriceCache> priceCache;
+
         /// Reference to the account store
         std::shared_ptr<store::IAccountStore> accountStore;
         /// Reference to the position store
@@ -38,39 +41,63 @@ namespace controller
         /// Reference to the transaction store
         std::shared_ptr<store::ITransactionStore> transactionStore;
 
-        Stores(
+        /// Pointer to the stacked widget
+        QStackedWidget* stackedWidget;
+        /// Pointer to the account detail view
+        QPointer<ui::AccountDetailView> accountDetailView;
+
+        std::unique_ptr<Connections> connections;
+
+        std::unique_ptr<drafts::AccountDraft> currentAccount;
+
+        unorderedIdMap<AccountId, std::vector<OpenStockPositionDetail>>
+            openPositionDetails;
+
+        Details(
             const std::shared_ptr<store::IAccountStore>&     accountStore_,
             const std::shared_ptr<store::IPositionStore>&    positionStore_,
             const std::shared_ptr<store::IStockStore>&       stockStore_,
-            const std::shared_ptr<store::ITransactionStore>& transactionStore_
+            const std::shared_ptr<store::ITransactionStore>& transactionStore_,
+            const std::shared_ptr<finance::PriceCache>&      priceCache_,
+            cmd::UndoStack&                                  undoStack_,
+            QStackedWidget*                                  stackedWidget_
         );
-        ~Stores() = default;
+        ~Details() = default;
 
         // delete copy and move constructor and assignment operator
-        Stores(const Stores&)            = delete;
-        Stores& operator=(const Stores&) = delete;
-        Stores(Stores&&)                 = delete;
-        Stores& operator=(Stores&&)      = delete;
+        Details(const Details&)            = delete;
+        Details& operator=(const Details&) = delete;
+        Details(Details&&)                 = delete;
+        Details& operator=(Details&&)      = delete;
     };
 
     /**
-     * @brief Construct a new Account Controller:: Stores:: Stores object
+     * @brief Construct a new Account Controller:: Details:: Details object
      *
      * @param accountStore_
      * @param positionStore_
      * @param stockStore_
      * @param transactionStore_
      */
-    AccountController::Stores::Stores(
+    AccountController::Details::Details(
         const std::shared_ptr<store::IAccountStore>&     accountStore_,
         const std::shared_ptr<store::IPositionStore>&    positionStore_,
         const std::shared_ptr<store::IStockStore>&       stockStore_,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore_
+        const std::shared_ptr<store::ITransactionStore>& transactionStore_,
+        const std::shared_ptr<finance::PriceCache>&      priceCache_,
+        cmd::UndoStack&                                  undoStack_,
+        QStackedWidget*                                  stackedWidget_
     )
-        : accountStore(accountStore_),
+        : undoStack(undoStack_),
+          priceCache(priceCache_),
+          accountStore(accountStore_),
           positionStore(positionStore_),
           stockStore(stockStore_),
-          transactionStore(transactionStore_)
+          transactionStore(transactionStore_),
+          stackedWidget(stackedWidget_),
+          accountDetailView(new ui::AccountDetailView(stackedWidget)),
+          connections(std::make_unique<Connections>())
+
     {
     }
 
@@ -91,23 +118,55 @@ namespace controller
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
-        finance::PriceCache&                             priceCache,
+        const std::shared_ptr<finance::PriceCache>&      priceCache,
         QStackedWidget*                                  stackedWidget
     )
-        : _undoStack(undoStack),
-          _priceCache(priceCache),
-          _stores(
-              std::make_unique<Stores>(
+        : _details(
+              std::make_unique<Details>(
                   accountStore,
                   positionStore,
                   stockStore,
-                  transactionStore
+                  transactionStore,
+                  priceCache,
+                  undoStack,
+                  stackedWidget
               )
-          ),
-          _stackedWidget(stackedWidget),
-          _accountDetailView(new ui::AccountDetailView(_stackedWidget))
+          )
     {
-        _stackedWidget->addWidget(_accountDetailView);
+        _details->stackedWidget->addWidget(_details->accountDetailView);
+
+        _details->connections->add(_details->priceCache->subscribeToPriceChange(
+            [this]()
+            {
+                if (!_details->accountDetailView ||
+                    _details->currentAccount == nullptr)
+                    return;
+
+                auto& details =
+                    _details->openPositionDetails[_details->currentAccount
+                                                      ->getId()];
+                std::vector<drafts::PositionStockDetailDraft> drafts;
+                for (auto detail : details)
+                {
+                    const auto quote = _details->priceCache->get(detail.ticker);
+                    if (quote.has_value())
+                    {
+                        detail.positionDraft.updateUnrealizedPnL(
+                            detail.pnl->getUnrealizedPnL(quote.value()),
+                            detail.pnl->getUnrealizedPnLPercentage(quote.value()
+                            )
+                        );
+                    }
+                    drafts.push_back(detail.positionDraft);
+                }
+
+                _details->accountDetailView->updateSecurityAccount(
+                    *_details->currentAccount,
+                    drafts
+                );
+            },
+            this
+        ));
     }
 
     AccountController::~AccountController() = default;
@@ -121,7 +180,7 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto account = _stores->accountStore->getAccount(id);
+        const auto account = _details->accountStore->getAccount(id);
 
         if (!account.has_value())
         {
@@ -131,35 +190,44 @@ namespace controller
             return;
         }
 
+        const auto accountDraft = AccountMapper::toDraft(account.value());
+
         switch (account->getKind())
         {
             case AccountKind::Cash:
-                _accountDetailView->updateCashAccount(
-                    AccountMapper::toDraft(account.value())
-                );
+                _details->accountDetailView->updateCashAccount(accountDraft);
                 break;
             case AccountKind::Security:
             {
-                const std::vector<drafts::PositionStockDetailDraft> drafts =
-                    getOpenStockPositionDrafts(
+                _details->openPositionDetails[account->getId()] =
+                    getOpenStockPositionDetails(
                         account->getId(),
-                        _stores->positionStore,
-                        _stores->stockStore,
-                        _stores->transactionStore
+                        _details->positionStore,
+                        _details->stockStore,
+                        _details->transactionStore
                     );
 
                 LOG_DEBUG(
                     std::format(
                         "Retrieved {} open position drafts for account {}",
-                        drafts.size(),
+                        _details->openPositionDetails[account->getId()].size(),
                         account->getName()
                     )
                 );
 
-                _accountDetailView->updateSecurityAccount(
-                    AccountMapper::toDraft(account.value()),
-                    drafts
+                std::vector<drafts::PositionStockDetailDraft> details;
+                for (const auto& detail :
+                     _details->openPositionDetails[account->getId()])
+                {
+                    details.push_back(detail.positionDraft);
+                }
+
+                _details->accountDetailView->updateSecurityAccount(
+                    accountDraft,
+                    details
                 );
+                _details->currentAccount =
+                    std::make_unique<drafts::AccountDraft>(accountDraft);
                 break;
             }
             case AccountKind::External:
@@ -169,7 +237,7 @@ namespace controller
             }
         }
 
-        _stackedWidget->setCurrentWidget(_accountDetailView);
+        _details->stackedWidget->setCurrentWidget(_details->accountDetailView);
     }
 
 }   // namespace controller
