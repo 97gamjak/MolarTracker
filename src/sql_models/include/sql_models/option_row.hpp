@@ -26,6 +26,8 @@
  */
 struct OptionRow : public orm::ORMModel<"option">
 {
+    /// as we have a 1:1 relationship between InstrumentRow and OptionRow, we
+    /// disallow inserting an OptionRow without a corresponding InstrumentRow
     using insert_policy = orm::requires_paired_insert_t;
 
     /// The ID of the option instrument, this is the primary key for the option
