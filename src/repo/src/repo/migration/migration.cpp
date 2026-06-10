@@ -13,6 +13,7 @@
 #include "single_migration.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/option_row.hpp"
 #include "sql_models/position_row.hpp"
 #include "sql_models/profile_row.hpp"
 #include "sql_models/stock_row.hpp"
@@ -428,6 +429,7 @@ namespace repo
 
         _migrateV11();
         _migrateV12();
+        _migrateV13();
     }
 
     /**
@@ -475,4 +477,19 @@ namespace repo
         _migrations.push_back(std::move(migration));
     }
 
+    /**
+     * @brief Migrate to version 13
+     *
+     */
+    void Migrations::_migrateV13()
+    {
+        constexpr std::size_t currentVersion = 12;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<OptionRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
 }   // namespace repo

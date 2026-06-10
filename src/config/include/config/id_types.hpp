@@ -18,6 +18,9 @@ using InstrumentIdSeq = IdSequence<InstrumentId>;
 struct StockTag {};
 using StockId = StrongId<StockTag>;
 
+struct OptionTag {};
+using OptionId = StrongId<OptionTag>;
+
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
 

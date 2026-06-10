@@ -63,6 +63,18 @@ MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
 
 MSTD_ENUM(AssetClass, std::uint8_t, ASSET_CLASS_LIST);
 
+#define OPTION_TYPE_LIST(X) \
+    X(Call)                 \
+    X(Put)
+
+MSTD_ENUM(OptionType, std::uint8_t, OPTION_TYPE_LIST);
+
+#define OPTION_BUY_SELL_LIST(X) \
+    X(Buy)                      \
+    X(Sell)
+
+MSTD_ENUM(OptionBuySell, std::uint8_t, OPTION_BUY_SELL_LIST);
+
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
