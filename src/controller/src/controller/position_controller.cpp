@@ -28,7 +28,7 @@ namespace controller
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<finance::PriceCache>&      priceCache
     )
-        : _pollTimer(new QTimer()),
+        : _pollTimer(new QTimer(this)),
           _priceCache(priceCache),
           _positionStore(positionStore),
           _transactionStore(transactionStore),
