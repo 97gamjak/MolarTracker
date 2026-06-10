@@ -1,5 +1,7 @@
 qt_add_library(molartracker_controller STATIC
 
+    src/controller/vcs_controller.cpp
+
     # mappers
     src/controller/mapper/account_mapper.cpp
     src/controller/mapper/profile_mapper.cpp

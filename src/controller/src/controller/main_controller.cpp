@@ -9,13 +9,11 @@
 #include "controller/menu_bar/menu_bar_controller.hpp"
 #include "controller/side_bar/side_bar_controller.hpp"
 #include "controller/transaction_controller.hpp"
+#include "controller/vcs_controller.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
 #include "ui/main_window.hpp"
-#include "ui/update/update_available_dialog.hpp"
-#include "utils/qt_helpers.hpp"
-#include "vcs/update_check_service.hpp"
 
 namespace controller
 {
@@ -35,7 +33,7 @@ namespace controller
         /// application context
         store::StoreContainer _storeContainer;
         /// main window of the application
-        ui::MainWindow _mainWindow;
+        std::shared_ptr<ui::MainWindow> _mainWindow;
         /// undo stack for managing commands
         cmd::UndoStack _undoStack;
 
@@ -49,13 +47,13 @@ namespace controller
         /// controller for managing transactions
         TransactionController _transactionController;
 
+        /// controller for managing version control and updates
+        VCSController _vcsController;
+
         /// controller for managing the menu bar
         MenuBarController _menuBarController;
         /// controller for managing the side bar
         SideBarController _sideBarController;
-
-        /// service that checks GitHub for newer releases
-        vcs::UpdateCheckService _updateCheckService;
 
         /**
          * @brief Construct a new Impl object
@@ -64,23 +62,28 @@ namespace controller
          */
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
-              _centralController(_mainWindow.getCentralWidget()),
+              _mainWindow(std::make_shared<ui::MainWindow>()),
+              _centralController(_mainWindow->getCentralWidget()),
               _handlers(_settings),
               _accountController(
                   _undoStack,
                   _storeContainer.getAccountStore(),
-                  _mainWindow.getCentralWidget()
+                  _mainWindow->getCentralWidget()
               ),
               _transactionController(
                   _undoStack,
                   _storeContainer.getTransactionStore(),
                   _storeContainer.getAccountStore(),
                   _storeContainer.getStockStore(),
-                  _mainWindow.getCentralWidget()
+                  _mainWindow->getCentralWidget()
+              ),
+              _vcsController(
+                  _mainWindow,
+                  std::make_shared<settings::Settings>(_settings)
               ),
               _menuBarController(
-                  &_mainWindow,
-                  _mainWindow.getMenuBar(),
+                  _mainWindow.get(),
+                  _mainWindow->getMenuBar(),
                   _storeContainer,
                   _undoStack,
                   _settings
@@ -88,45 +91,15 @@ namespace controller
               _sideBarController(
                   _undoStack,
                   _storeContainer,
-                  &_mainWindow,
-                  &_mainWindow.getSideBar(),
-                  _mainWindow.getCentralWidget(),
+                  _mainWindow.get(),
+                  &_mainWindow->getSideBar(),
+                  _mainWindow->getCentralWidget(),
                   _accountController,
                   _transactionController
               )
         {
             _handlers.getDirtyStateHandler()
-                .subscribe(_storeContainer, _settings, &_mainWindow);
-
-            QObject::connect(
-                &_updateCheckService,
-                &vcs::UpdateCheckService::updateAvailable,
-                &_mainWindow,
-                [this](utils::SemVer latest)
-                {
-                    const auto& dismissed = _settings.getGeneralSettings()
-                                                .getDismissedUpdateVersion()
-                                                .getOptional();
-
-                    if (dismissed.has_value() &&
-                        *dismissed == latest.toString())
-                        return;
-
-                    auto* dialog = utils::makeQChild<ui::UpdateAvailableDialog>(
-                        latest,
-                        &_mainWindow
-                    );
-                    dialog->exec();
-
-                    if (dialog->isDismissedForVersion())
-                    {
-                        _settings.getGeneralSettings()
-                            .getDismissedUpdateVersion()
-                            .set(latest.toString());
-                        _settings.save();
-                    }
-                }
-            );
+                .subscribe(_storeContainer, _settings, _mainWindow.get());
         }
     };
 
@@ -172,7 +145,7 @@ namespace controller
      */
     void MainController::start()
     {
-        _impl->_mainWindow.show();
+        _impl->_mainWindow->show();
 
         auto controller = controller::EnsureProfileController{
             _impl->_mainWindow,
@@ -185,7 +158,7 @@ namespace controller
 
         _impl->_sideBarController.refresh();
 
-        _impl->_updateCheckService.start();
+        _impl->_vcsController.start();
     }
 
 }   // namespace controller
