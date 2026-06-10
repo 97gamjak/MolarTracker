@@ -33,6 +33,7 @@ class GithubConstants
 
     [[nodiscard]] static std::string getGithubRepoUrl();
     [[nodiscard]] static std::string getGithubApiUrl();
+    [[nodiscard]] static std::string getGithubReleaseUrl();
     [[nodiscard]] static std::string getGithubIssuesUrl();
     [[nodiscard]] static std::string getCreateIssueError();
 

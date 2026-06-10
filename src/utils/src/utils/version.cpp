@@ -5,6 +5,10 @@
 #include <exception>
 #include <vector>
 
+#ifdef __QT_ENABLED__
+#include <QString>
+#endif
+
 namespace utils
 {
     /**
@@ -137,6 +141,18 @@ namespace utils
         return std::to_string(_major) + "." + std::to_string(_minor) + "." +
                std::to_string(_patch);
     }
+
+#ifdef __QT_ENABLED__
+    /**
+     * @brief Convert the SemVer object to a QString
+     *
+     * @return QString
+     */
+    QString SemVer::toQString() const
+    {
+        return QString::fromStdString(toString());
+    }
+#endif
 
     /**
      * @brief Get an invalid SemVer object, this can be used to represent an

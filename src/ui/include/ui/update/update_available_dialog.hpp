@@ -2,10 +2,14 @@
 #define __UI__INCLUDE__UI__UPDATE__UPDATE_AVAILABLE_DIALOG_HPP__
 
 #include "ui/base/dialog.hpp"
-#include "utils/version.hpp"
 
 class QCheckBox;   // Forward declaration
 class QWidget;     // Forward declaration
+
+namespace utils
+{
+    class SemVer;   // Forward declaration
+}   // namespace utils
 
 namespace ui
 {
@@ -22,6 +26,10 @@ namespace ui
     {
         Q_OBJECT
 
+       private:
+        /// Checkbox for suppressing the dialog for the current version
+        QCheckBox* _dismissCheckBox{nullptr};
+
        public:
         explicit UpdateAvailableDialog(
             const utils::SemVer& latestVersion,
@@ -29,10 +37,6 @@ namespace ui
         );
 
         [[nodiscard]] bool isDismissedForVersion() const;
-
-       private:
-        /// Checkbox for suppressing the dialog for the current version
-        QCheckBox* _dismissCheckBox{nullptr};
     };
 
 }   // namespace ui

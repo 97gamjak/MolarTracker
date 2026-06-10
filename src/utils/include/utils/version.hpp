@@ -6,6 +6,8 @@
 #include <optional>
 #include <string>
 
+class QString;   // Forward declaration
+
 namespace utils
 {
 
@@ -39,6 +41,7 @@ namespace utils
         [[nodiscard]] std::size_t getPatch() const;
 
         [[nodiscard]] std::string toString() const;
+        [[nodiscard]] QString     toQString() const;
 
         static SemVer getInvalidVersion();
 

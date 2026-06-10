@@ -8,7 +8,9 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include "config/constants/github_constants.hpp"
 #include "utils/qt_helpers.hpp"
+#include "utils/version.hpp"
 
 namespace ui
 {
@@ -31,7 +33,7 @@ namespace ui
 
         auto* versionLabel = utils::makeQChild<QLabel>(
             QString{"A new version of MolarTracker is available: <b>%1</b>"}
-                .arg(QString::fromStdString(latestVersion.toString())),
+                .arg(latestVersion.toQString()),
             this
         );
         versionLabel->setTextFormat(Qt::RichText);
@@ -39,15 +41,15 @@ namespace ui
 
         auto* releasesButton =
             utils::makeQChild<QPushButton>("Open Releases Page", this);
+
         connect(
             releasesButton,
             &QPushButton::clicked,
             this,
             []()
             {
-                QDesktopServices::openUrl(
-                    QUrl{"https://github.com/97gamjak/MolarTracker/releases"}
-                );
+                const auto url = GithubConstants::getGithubReleaseUrl();
+                QDesktopServices::openUrl(QUrl{url.c_str()});
             }
         );
         layout->addWidget(releasesButton);
@@ -60,6 +62,7 @@ namespace ui
 
         auto* buttons =
             utils::makeQChild<QDialogButtonBox>(QDialogButtonBox::Ok, this);
+
         connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
         layout->addWidget(buttons);
     }
