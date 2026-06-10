@@ -20,14 +20,13 @@ namespace finance
     {
        private:
         /// The currency of the cash amount
-        std::optional<Currency> _currency;
+        Currency _currency;
         /// The amount in micro units (e.g., millionths of a currency unit)
         micro_units _amount;
 
        public:
-        explicit Cash(Currency currency);
-        explicit Cash(Currency currency, micro_units amount);
-        explicit Cash();
+        Cash(Currency currency, micro_units amount);
+        Cash();
 
         friend constexpr bool operator==(Cash lhs, const Cash& rhs);
         friend constexpr std::strong_ordering operator<=>(
@@ -35,8 +34,8 @@ namespace finance
             const Cash& rhs
         );
 
-        friend Cash   operator+(const Cash& lhs, const Cash& rhs);
-        friend Cash   operator-(const Cash& lhs, const Cash& rhs);
+        friend Cash   operator+(Cash lhs, const Cash& rhs);
+        friend Cash   operator-(Cash lhs, const Cash& rhs);
         friend Cash   operator-(const Cash& cash);
         friend Cash   operator*(const Cash& cash, const Quantity& multiplier);
         friend Cash   operator*(const Quantity& multiplier, const Cash& cash);
@@ -61,7 +60,6 @@ namespace finance
 
        private:
         void _takeCurrency(const Cash& cash);
-        Cash(std::optional<Currency> currency, micro_units amount);
     };
 
 }   // namespace finance

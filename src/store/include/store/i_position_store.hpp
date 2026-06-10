@@ -14,6 +14,10 @@ class Connection;   // Forward declaration
 namespace store
 {
 
+    /**
+     * @brief Structure representing a callback for when a position is closed.
+     *
+     */
     struct PositionClosed
     {
         using func = std::function<void(PositionId)>;

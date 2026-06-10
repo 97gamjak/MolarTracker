@@ -7,6 +7,7 @@
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
 #define CURRENCY_LIST(X) \
+    X(Unknown)           \
     X(USD)               \
     X(EUR)               \
     X(GBP)               \

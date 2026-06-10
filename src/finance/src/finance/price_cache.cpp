@@ -19,9 +19,11 @@ namespace finance
         const std::unordered_map<std::string, PriceQuote>& quotes
     )
     {
-        std::unique_lock lock{_mutex};
-        for (const auto& [symbol, quote] : quotes)
-            _quotes.insert_or_assign(symbol, quote);
+        {
+            std::unique_lock lock{_mutex};
+            for (const auto& [symbol, quote] : quotes)
+                _quotes.insert_or_assign(symbol, quote);
+        }
 
         Observable<OnPriceUpdated>::template notify<OnPriceUpdated>();
     }

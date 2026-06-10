@@ -7,6 +7,9 @@
 #include "finance/currency.hpp"
 #include "finance/finance_error.hpp"
 #include "json/json.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("Finance.PriceQuote");
 
 namespace finance
 {
@@ -34,6 +37,8 @@ namespace finance
         const auto& data =
             json.at("quoteSummary").at("result").at(0).at("price");
 
+        LOG_TRACE(std::format("Parsing price quote JSON: {}", data.dump()));
+
         const auto currencyStr = json::safeGet<std::string>(data, "currency");
         const auto currencyOpt = CurrencyMeta::from_string(currencyStr);
 
@@ -46,8 +51,9 @@ namespace finance
         }
         const auto currency = currencyOpt.value();
 
-        const auto priceStr =
-            json::safeGet<std::string>(data, "regularMarketPreviousClose");
+        const auto priceStr = std::to_string(
+            json::safeGet<double>(data.at("regularMarketPreviousClose"), "raw")
+        );
 
         micro_units price = 0;
 

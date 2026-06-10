@@ -24,6 +24,11 @@ REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
 
 namespace controller
 {
+    /**
+     * @brief Detail struct for AccountController, containing references to
+     * stores, the undo stack, and UI components.
+     *
+     */
     struct AccountController::Details
     {
         /// Reference to the undo stack
@@ -151,10 +156,12 @@ namespace controller
                     const auto quote = _details->priceCache->get(detail.ticker);
                     if (quote.has_value())
                     {
+                        detail.pnl->setCurrentPrice(quote.value().getPrice());
                         detail.positionDraft.updateUnrealizedPnL(
-                            detail.pnl->getUnrealizedPnL(quote.value()),
-                            detail.pnl->getUnrealizedPnLPercentage(quote.value()
-                            )
+                            quote.value().getPrice(),
+                            detail.pnl->getMarketValue(),
+                            detail.pnl->getUnrealizedPnL(),
+                            detail.pnl->getUnrealizedPnLPercentage()
                         );
                     }
                     drafts.push_back(detail.positionDraft);

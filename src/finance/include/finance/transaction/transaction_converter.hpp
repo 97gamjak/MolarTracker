@@ -10,11 +10,21 @@
 
 namespace finance
 {
+    /**
+     * @brief Structure representing an error that occurs during transaction
+     * conversion.
+     *
+     */
     struct TransactionConversionError
     {
         std::string message;
     };
 
+    /**
+     * @brief Converter class for transforming between domain transactions and
+     * specific transaction types (cash and stock).
+     *
+     */
     class TransactionConverter
     {
        public:

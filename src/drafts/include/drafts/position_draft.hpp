@@ -56,17 +56,21 @@ namespace drafts
         /// The quantity of the position
         Quantity _quantity;
 
+        finance::Cash _currentPrice;
+
+        finance::Cash _marketValue;
+
         finance::Cash _averagePrice;
 
         finance::Cash _totalPrice;
 
         finance::Cash _realizedPnL;
 
-        double _realizedPnLPercentage;
+        double _realizedPnLPercentage = 0.0;
 
         finance::Cash _unrealizedPnL;
 
-        double _unrealizedPnLPercentage;
+        double _unrealizedPnLPercentage = 0.0;
 
        public:
         explicit PositionStockDetailDraft(
@@ -82,11 +86,15 @@ namespace drafts
         );
 
         void updateUnrealizedPnL(
+            const finance::Cash& currentPrice,
+            const finance::Cash& marketValue,
             const finance::Cash& unrealizedPnL,
             double               unrealizedPnLPercentage
         );
 
         [[nodiscard]] Quantity      getQuantity() const;
+        [[nodiscard]] finance::Cash getCurrentPrice() const;
+        [[nodiscard]] finance::Cash getMarketValue() const;
         [[nodiscard]] finance::Cash getAveragePrice() const;
         [[nodiscard]] finance::Cash getTotalPrice() const;
         [[nodiscard]] finance::Cash getRealizedPnL() const;

@@ -29,14 +29,9 @@ namespace ui
         Q_OBJECT
         /// Vector of position drafts
         std::vector<drafts::PositionStockDetailDraft> _positions;
-        /// Pointer to the price cache
-        const finance::PriceCache* _priceCache;
 
        public:
-        explicit StockPositionTableModel(
-            const finance::PriceCache* priceCache = nullptr,
-            QObject*                   parent     = nullptr
-        );
+        explicit StockPositionTableModel(QObject* parent = nullptr);
 
         [[nodiscard]]
         int rowCount(const QModelIndex& parent) const override;
@@ -61,12 +56,6 @@ namespace ui
         );
 
        private:
-        [[nodiscard]]
-        QVariant _priceDisplay(
-            const drafts::PositionStockDetailDraft& pos,
-            PositionColumns                         col
-        ) const;
-
         [[nodiscard]]
         static QString _columnLabel(int index);
     };

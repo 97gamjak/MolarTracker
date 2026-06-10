@@ -26,6 +26,10 @@ namespace store
 
     MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
 
+    /**
+     * @brief Structure representing a callback for when a transaction is added.
+     *
+     */
     struct OnTransactionAdded
     {
         using func = std::function<void(finance::Transactions transactions)>;

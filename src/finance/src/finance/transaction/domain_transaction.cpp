@@ -181,9 +181,9 @@ namespace finance
     Cash DomainTransaction::calculateTotalSum() const
     {
         if (_entries.empty())
-            return Cash(Currency::USD);
+            return {};
 
-        Cash total(_entries.front().getCurrency());
+        Cash total;
 
         for (const auto& entry : _entries)
             total += entry.getCash();

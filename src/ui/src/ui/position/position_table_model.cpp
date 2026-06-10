@@ -4,12 +4,32 @@
 #include <QDateTime>
 
 #include "drafts/position_draft.hpp"
-#include "finance/price_cache.hpp"
 #include "ui/position/position_columns.hpp"
 #include "ui/utils/format.hpp"
 
 namespace ui
 {
+    namespace
+    {
+        QString displayPrice(const finance::Cash& price)
+        {
+            if (price.getCurrency() == Currency::Unknown || price.isZero())
+                return "-";
+
+            return QString::fromStdString(price.toString(2));
+        }
+
+        QString displayPercentage(double percentage)
+        {
+            if (std::isnan(percentage))
+                return "-";
+
+            return QString::fromStdString(
+                percentage >= 0 ? std::format("+{:.2f}%", percentage)
+                                : std::format("{:.2f}%", percentage)
+            );
+        }
+    }   // namespace
 
     /**
      * @brief Construct a new Position Table Model:: Position Table Model object
@@ -17,11 +37,8 @@ namespace ui
      * @param priceCache
      * @param parent
      */
-    StockPositionTableModel::StockPositionTableModel(
-        const finance::PriceCache* priceCache,
-        QObject*                   parent
-    )
-        : QAbstractTableModel{parent}, _priceCache{priceCache}
+    StockPositionTableModel::StockPositionTableModel(QObject* parent)
+        : QAbstractTableModel{parent}
     {
     }
 
@@ -90,26 +107,29 @@ namespace ui
                             "yyyy-MM-dd"
                         );
 
-                    // TODO(97gamjak): wire up once PositionStockDetailDraft (or
-                    // PositionSummary) carries aggregated trade-leg fields.
                     case PositionColumns::Quantity:
                         return QString::fromStdString(
                             pos.getQuantity().toString()
                         );
                     case PositionColumns::AvgCost:
-                        return QString::fromStdString(
-                            pos.getAveragePrice().toString(2)
-                        );
+                        return displayPrice(pos.getAveragePrice());
                     case PositionColumns::CostBasis:
-                        return QString::fromStdString(
-                            pos.getTotalPrice().toString(2)
-                        );
+                        return displayPrice(pos.getTotalPrice());
 
-                    case PositionColumns::LastPrice:
                     case PositionColumns::MarketValue:
+                        return displayPrice(pos.getMarketValue());
                     case PositionColumns::UnrealizedPnl:
+                        return displayPrice(pos.getUnrealizedPnL());
                     case PositionColumns::UnrealizedPnlPct:
-                        return _priceDisplay(pos, col);
+                        return displayPercentage(pos.getUnrealizedPnLPercentage(
+                        ));
+                    case PositionColumns::RealizedPnl:
+                        return displayPrice(pos.getRealizedPnL());
+                    case PositionColumns::RealizedPnlPct:
+                        return displayPercentage(pos.getRealizedPnLPercentage()
+                        );
+                    case PositionColumns::LastPrice:
+                        return displayPrice(pos.getCurrentPrice());
                 }
                 std::unreachable();
             }
@@ -132,6 +152,8 @@ namespace ui
                     case PositionColumns::MarketValue:
                     case PositionColumns::UnrealizedPnl:
                     case PositionColumns::UnrealizedPnlPct:
+                    case PositionColumns::RealizedPnl:
+                    case PositionColumns::RealizedPnlPct:
                         return static_cast<int>(
                             Qt::AlignRight | Qt::AlignVCenter
                         );
@@ -139,32 +161,11 @@ namespace ui
                 std::unreachable();
             }
 
-            case Qt::ForegroundRole:
-            {
-                // Colour unrealized P&L green/red once values are available.
-                if (col != PositionColumns::UnrealizedPnl &&
-                    col != PositionColumns::UnrealizedPnlPct)
-                    return {};
-
-                // TODO: use PositionSummary::yahooSymbol once available.
-                if (_priceCache == nullptr)
-                    return {};
-                const auto quote =
-                    _priceCache->get(pos.getStockInfo().getTicker());
-                if (!quote)
-                    return {};
-
-                // Placeholder until avgCostMicroUnits() is on the domain type.
-                // Replace the 0 with pos.avgCostMicroUnits().
-                const int64_t avgCost = 0;
-                if (quote->getPrice().getAmount() >= avgCost)
-                    return QColor{Qt::green};
-                return QColor{Qt::red};
-            }
-
             default:
                 return {};
         }
+
+        return {};
     }
 
     QVariant StockPositionTableModel::headerData(
@@ -201,49 +202,6 @@ namespace ui
         beginResetModel();
         _positions = positions;
         endResetModel();
-    }
-
-    // ---------------------------------------------------------------------------
-    // Private helpers
-    // ---------------------------------------------------------------------------
-
-    QVariant StockPositionTableModel::_priceDisplay(
-        const drafts::PositionStockDetailDraft& pos,
-        PositionColumns                         col
-    ) const
-    {
-        // TODO: replace getTicker() with yahooSymbol once available on the
-        // type.
-        if (_priceCache == nullptr)
-            return {};
-
-        const auto quote = _priceCache->get(pos.getStockInfo().getTicker());
-        if (!quote)
-            return tr("—");
-
-        switch (col)
-        {
-            case PositionColumns::LastPrice:
-                return formatMicro(quote->getPrice());
-
-            // TODO: the three cases below require netQuantity and
-            // avgCostMicroUnits from the domain type. Stubbed to "—" until
-            // PositionSummary exists.
-            case PositionColumns::AvgCost:
-            case PositionColumns::MarketValue:
-            case PositionColumns::UnrealizedPnl:
-            case PositionColumns::UnrealizedPnlPct:
-            case PositionColumns::CostBasis:
-                return tr("—");
-
-            case PositionColumns::Ticker:
-            case PositionColumns::Name:
-            case PositionColumns::OpenedAt:
-            case ui::PositionColumns::Quantity:
-                return {};
-        }
-
-        std::unreachable();
     }
 
     QString StockPositionTableModel::_columnLabel(int index)

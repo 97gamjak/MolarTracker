@@ -17,6 +17,10 @@ namespace store
 {
     class TransactionStore;   // Forward declaration
 
+    /**
+     * @brief Store for managing Positions
+     *
+     */
     struct PositionFilter
     {
         std::optional<bool> isOpen = std::nullopt;

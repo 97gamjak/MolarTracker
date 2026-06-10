@@ -24,11 +24,16 @@ namespace drafts
     class PositionStockDetailDraft;      // Forward declaration
 }   // namespace drafts
 
+/**
+ * @brief Detail struct for open stock positions, containing the position draft,
+ * ticker, and PnL information.
+ *
+ */
 struct OpenStockPositionDetail
 {
     drafts::PositionStockDetailDraft positionDraft;
     std::string                      ticker;
-    finance::PnL*                    pnl;
+    std::shared_ptr<finance::PnL>    pnl;
 };
 
 namespace controller

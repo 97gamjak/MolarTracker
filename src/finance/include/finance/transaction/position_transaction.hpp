@@ -9,6 +9,11 @@
 
 namespace finance
 {
+    /**
+     * @brief Class representing a stock position transaction, containing all
+     * transactions related to a specific position, along with PnL information.
+     *
+     */
     class StockPositionTransaction : protected StockTransactions
     {
         PositionId _positionId = PositionId::invalid();
@@ -16,7 +21,7 @@ namespace finance
         InstrumentId _baseInstrument  = InstrumentId::invalid();
         AccountId    _securityAccount = AccountId::invalid();
 
-        std::unique_ptr<PnL> _pnl;
+        std::shared_ptr<PnL> _pnl;
         bool                 _pnlReady = false;
 
        public:
@@ -25,9 +30,9 @@ namespace finance
 
         [[nodiscard]] bool add(const StockTransaction& txs);
 
-        [[nodiscard]] InstrumentId getBaseInstrument() const;
-        [[nodiscard]] AccountId    getSecurityAccount() const;
-        [[nodiscard]] PnL*         getPnL();
+        [[nodiscard]] InstrumentId                getBaseInstrument() const;
+        [[nodiscard]] AccountId                   getSecurityAccount() const;
+        [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
 
         void sort();
 

@@ -53,11 +53,11 @@ namespace finance
         return _securityAccount;
     }
 
-    PnL* StockPositionTransaction::getPnL()
+    const std::shared_ptr<PnL>& StockPositionTransaction::getPnL()
     {
         if (!_pnl)
         {
-            _pnl = std::make_unique<PnLAvg>();
+            _pnl = std::make_shared<PnLAvg>();
         }
 
         if (!_pnlReady)
@@ -66,7 +66,7 @@ namespace finance
             _pnlReady = true;
         }
 
-        return _pnl.get();
+        return _pnl;
     }
 
 }   // namespace finance

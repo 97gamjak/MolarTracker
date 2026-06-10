@@ -6,6 +6,11 @@
 
 namespace finance
 {
+    /**
+     * @brief Class representing a collection of transaction entries, providing
+     * methods for filtering entries by type or associated account IDs.
+     *
+     */
     class TransactionEntries : public Vector<TransactionEntry>
     {
        public:

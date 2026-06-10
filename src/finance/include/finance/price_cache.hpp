@@ -12,8 +12,13 @@
 
 namespace finance
 {
+    /**
+     * @brief Event triggered when price quotes in the cache are updated.
+     *
+     */
     struct OnPriceUpdated
     {
+        /// Callback function type for price updates.
         using func = std::function<void()>;
     };
 

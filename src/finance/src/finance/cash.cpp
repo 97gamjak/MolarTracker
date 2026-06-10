@@ -12,13 +12,6 @@ namespace finance
 {
 
     /**
-     * @brief Construct a new Cash:: Cash object
-     *
-     * @param currency
-     */
-    Cash::Cash(Currency currency) : _currency(currency), _amount(0) {}
-
-    /**
      * @brief Construct a new Cash:: Cash object with a specified amount
      *
      * @param currency
@@ -29,7 +22,7 @@ namespace finance
     {
     }
 
-    Cash::Cash() : _currency(std::nullopt), _amount(0) {}
+    Cash::Cash() : _currency(Currency::Unknown), _amount(0) {}
 
     /**
      * @brief Equality operator for Cash
@@ -71,12 +64,11 @@ namespace finance
      * @param rhs
      * @return Cash the result of adding two Cash objects
      */
-    Cash operator+(const Cash& lhs, const Cash& rhs)
+    Cash operator+(Cash lhs, const Cash& rhs)
     {
-        auto lhs_ = lhs;
-        lhs_._takeCurrency(rhs);
+        lhs._takeCurrency(rhs);
 
-        return {rhs._currency, lhs_._amount + rhs._amount};
+        return Cash{lhs._currency, lhs._amount + rhs._amount};
     }
 
     /**
@@ -86,7 +78,7 @@ namespace finance
      * @param rhs
      * @return Cash the result of subtracting two Cash objects
      */
-    Cash operator-(const Cash& lhs, const Cash& rhs) { return lhs + (-rhs); }
+    Cash operator-(Cash lhs, const Cash& rhs) { return lhs + (-rhs); }
 
     /**
      * @brief Unary negation operator for Cash
@@ -94,7 +86,10 @@ namespace finance
      * @param cash
      * @return Cash the result of negating a Cash object
      */
-    Cash operator-(const Cash& cash) { return {cash._currency, -cash._amount}; }
+    Cash operator-(const Cash& cash)
+    {
+        return Cash{cash._currency, -cash._amount};
+    }
 
     /**
      * @brief Multiplication operator for Cash
@@ -105,7 +100,7 @@ namespace finance
      */
     Cash operator*(const Cash& cash, const Quantity& multiplier)
     {
-        return {cash._currency, mulDiv(cash._amount, multiplier)};
+        return Cash{cash._currency, mulDiv(cash._amount, multiplier)};
     }
 
     /**
@@ -122,7 +117,7 @@ namespace finance
 
     Cash operator/(const Cash& cash, const Quantity& divisor)
     {
-        return {cash._currency, divBy(cash._amount, divisor)};
+        return Cash{cash._currency, divBy(cash._amount, divisor)};
     }
 
     double operator/(const Cash& cash, const Cash& divisor)
@@ -196,7 +191,7 @@ namespace finance
      *
      * @return Currency The currency of the cash.
      */
-    Currency Cash::getCurrency() const { return _currency.value(); }
+    Currency Cash::getCurrency() const { return _currency; }
 
     /**
      * @brief Converts the Cash object to a string representation.
@@ -240,24 +235,24 @@ namespace finance
 
     void Cash::_takeCurrency(const Cash& cash)
     {
-        if (_currency.has_value() || _amount != 0)
-        {
-            if (_currency != cash._currency)
-            {
-                throw CurrencyMismatchException(
-                    "Cannot subtract Cash objects with different currencies"
-                );
-            }
-        }
-        else
+        if (cash._currency == Currency::Unknown)
+            return;   // rhs is currency-less, nothing to reconcile
+
+        if (_currency == Currency::Unknown)
         {
             _currency = cash._currency;
         }
-    }
-
-    Cash::Cash(std::optional<Currency> currency, micro_units amount)
-        : _currency(currency), _amount(amount)
-    {
+        else if (_currency != cash._currency)
+        {
+            throw CurrencyMismatchException(
+                std::format(
+                    "Cannot operate on Cash objects with different currencies: "
+                    "{} vs {}",
+                    CurrencyMeta::toString(_currency),
+                    CurrencyMeta::toString(cash._currency)
+                )
+            );
+        }
     }
 
 }   // namespace finance

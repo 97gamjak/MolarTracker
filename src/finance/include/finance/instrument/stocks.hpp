@@ -6,6 +6,11 @@
 
 namespace finance
 {
+    /**
+     * @brief Class representing a collection of stocks, providing access to
+     * individual stocks by their identifiers.
+     *
+     */
     class Stocks : public IdMap<Stock>
     {
        public:

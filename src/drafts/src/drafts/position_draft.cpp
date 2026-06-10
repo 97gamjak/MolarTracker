@@ -85,17 +85,19 @@ namespace drafts
           _averagePrice(averagePrice),
           _totalPrice(totalPrice),
           _realizedPnL(realizedPnL),
-          _realizedPnLPercentage(realizedPnLPercentage),
-          _unrealizedPnL(finance::Cash(realizedPnL.getCurrency())),
-          _unrealizedPnLPercentage(0.0)
+          _realizedPnLPercentage(realizedPnLPercentage)
     {
     }
 
     void PositionStockDetailDraft::updateUnrealizedPnL(
+        const finance::Cash& currentPrice,
+        const finance::Cash& marketValue,
         const finance::Cash& unrealizedPnL,
         double               unrealizedPnLPercentage
     )
     {
+        _currentPrice            = currentPrice;
+        _marketValue             = marketValue;
         _unrealizedPnL           = unrealizedPnL;
         _unrealizedPnLPercentage = unrealizedPnLPercentage;
     }
@@ -106,6 +108,16 @@ namespace drafts
      * @return Quantity The quantity
      */
     Quantity PositionStockDetailDraft::getQuantity() const { return _quantity; }
+
+    finance::Cash PositionStockDetailDraft::getCurrentPrice() const
+    {
+        return _currentPrice;
+    }
+
+    finance::Cash PositionStockDetailDraft::getMarketValue() const
+    {
+        return _marketValue;
+    }
 
     finance::Cash PositionStockDetailDraft::getAveragePrice() const
     {

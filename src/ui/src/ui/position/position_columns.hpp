@@ -19,6 +19,8 @@ namespace ui
     X(CostBasis)                 \
     X(LastPrice)                 \
     X(MarketValue)               \
+    X(RealizedPnl)               \
+    X(RealizedPnlPct)            \
     X(UnrealizedPnl)             \
     X(UnrealizedPnlPct)
 
