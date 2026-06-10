@@ -20,6 +20,15 @@ namespace settings
 
 namespace controller
 {
+    /**
+     * @brief Controller responsible for handling interactions with version
+     * control systems, specifically for checking for updates on GitHub and
+     * notifying the user about new releases. This controller will manage the
+     * update check service and handle the logic for when to check for updates,
+     * as well as how to notify the user and store their preferences regarding
+     * update notifications.
+     *
+     */
     class VCSController
     {
        private:

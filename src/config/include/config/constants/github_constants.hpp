@@ -1,5 +1,5 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__GITHUB_CONSTANTS_HPP__
-#define __CONFIG__INCLUDE__CONFIG__GITHUB_CONSTANTS_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__CONSTANTS__GITHUB_CONSTANTS_HPP__
+#define __CONFIG__INCLUDE__CONFIG__CONSTANTS__GITHUB_CONSTANTS_HPP__
 
 #include <string>
 
@@ -39,4 +39,4 @@ class GithubConstants
     [[nodiscard]] static utils::SemVer getSemVer();
 };
 
-#endif   // __CONFIG__INCLUDE__CONFIG__GITHUB_CONSTANTS_HPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__CONSTANTS__GITHUB_CONSTANTS_HPP__
