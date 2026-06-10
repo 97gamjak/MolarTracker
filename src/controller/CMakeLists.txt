@@ -4,6 +4,7 @@ qt_add_library(molartracker_controller STATIC
     src/controller/account_controller.cpp
     src/controller/transaction_controller.cpp
     src/controller/position_controller.cpp
+    src/controller/vcs_controller.cpp
 
     # mappers
     src/controller/mapper/account_mapper.cpp
@@ -63,4 +64,5 @@ target_link_libraries(molartracker_controller
     molartracker_drafts
     molartracker_commands
     molartracker_http
+    molartracker_vcs
 )

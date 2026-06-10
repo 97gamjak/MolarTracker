@@ -17,6 +17,7 @@ namespace settings
     {
         std::forward<Func>(func)(_version);
         std::forward<Func>(func)(_defaultProfile);
+        std::forward<Func>(func)(_dismissedUpdateVersion);
     }
 
     /**
@@ -31,6 +32,7 @@ namespace settings
     {
         std::forward<Func>(func)(_version);
         std::forward<Func>(func)(_defaultProfile);
+        std::forward<Func>(func)(_dismissedUpdateVersion);
     }
 
 }   // namespace settings

@@ -59,6 +59,21 @@ namespace settings
         /// default profile description
         static constexpr const char* DEFAULT_PROFILE_DESCRIPTION =
             "The default profile to use when launching the application.";
+
+        /****************************
+         * Dismissed Update Version *
+         ****************************/
+
+        /// dismissed update version key
+        static constexpr const char* DISMISSED_UPDATE_VERSION_KEY =
+            "dismissedUpdateVersion";
+        /// dismissed update version title
+        static constexpr const char* DISMISSED_UPDATE_VERSION_TITLE =
+            "Dismissed Update Version";
+        /// dismissed update version description
+        static constexpr const char* DISMISSED_UPDATE_VERSION_DESCRIPTION =
+            "The version of the update that the user has chosen not to be "
+            "reminded about.";
     };
 
     /**
@@ -93,6 +108,13 @@ namespace settings
             Schema::DEFAULT_PROFILE_DESCRIPTION
         };
 
+        /// The version the user last dismissed the update notification for
+        StringParam _dismissedUpdateVersion{
+            Schema::DISMISSED_UPDATE_VERSION_KEY,
+            Schema::DISMISSED_UPDATE_VERSION_TITLE,
+            Schema::DISMISSED_UPDATE_VERSION_DESCRIPTION
+        };
+
         /// The current version of the application
         std::optional<utils::SemVer> _currentVersion;
 
@@ -107,6 +129,9 @@ namespace settings
         [[nodiscard]] bool hasDefaultProfile() const;
         [[nodiscard]] const std::optional<std::string>& getDefaultProfile(
         ) const;
+
+        [[nodiscard]] StringParam&       getDismissedUpdateVersion();
+        [[nodiscard]] const StringParam& getDismissedUpdateVersion() const;
 
         template <typename Func>
         void forEachParam(Func&& func) const;

@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "config/constants.hpp"
+#include "config/constants/github_constants.hpp"
 #include "logging/log_macros.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -172,7 +172,7 @@ namespace ui
             // crashes in case of unexpected issues.
             LOG_ERROR(
                 "No profile selected, but OK button was clicked. " +
-                Constants::getCreateIssueError()
+                GithubConstants::getCreateIssueError()
             );
             return;
         }

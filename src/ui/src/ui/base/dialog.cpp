@@ -1,6 +1,6 @@
 #include "ui/base/dialog.hpp"
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 
 namespace ui
 {

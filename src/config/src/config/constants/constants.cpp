@@ -1,5 +1,6 @@
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 
+#include "config/constants/github_constants.hpp"
 #include "exceptions/file_exceptions.hpp"
 #include "utils/paths.hpp"
 
@@ -83,7 +84,7 @@ std::string Constants::getAppName() { return ConstantsSchema::_appName; }
  */
 std::string Constants::getAppDisplayName()
 {
-    return getAppName() + " " + getVersion();
+    return getAppName() + " " + GithubConstants::version;
 }
 
 /**
@@ -102,59 +103,6 @@ std::string Constants::getDesktopAppName()
 {
     return ConstantsSchema::_desktopAppName;
 }
-
-/**
- * @brief Get the GitHub repository URL
- *
- * @return const std::string
- */
-std::string Constants::getGithubRepoUrl()
-{
-    return ConstantsSchema::_githubRepoUrl;
-}
-
-/**
- * @brief Get the GitHub issues URL
- *
- * @return const std::string
- */
-std::string Constants::getGithubIssuesUrl()
-{
-    return std::string(ConstantsSchema::_githubRepoUrl) + "/issues";
-}
-
-/**
- * @brief Get the error message to display when creating a GitHub issue fails
- *
- * @return const std::string
- */
-std::string Constants::getCreateIssueError()
-{
-    return "This should never happen. If you see this message, please report "
-           "it to the developers under " +
-           Constants::getGithubIssuesUrl();
-}
-
-/**
- * @brief Get the application version
- *
- * @return const std::string
- */
-std::string Constants::getVersion() { return ConstantsSchema::_version; }
-
-/**
- * @brief Get the semantic version of the application
- *
- * @return utils::SemVer
- */
-utils::SemVer Constants::getSemVer() { return utils::SemVer(getVersion()); }
-
-/**
- * @brief Get the Git tag corresponding to the current version
- *
- * @return const std::string
- */
-std::string Constants::getGitTag() { return ConstantsSchema::_gitTag; }
 
 /**
  * @brief Get the database busy timeout in milliseconds, this is the amount of
