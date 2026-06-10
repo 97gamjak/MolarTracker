@@ -242,7 +242,6 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
         // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         const auto [ptr, ec] =
             std::from_chars(view.data(), view.data() + view.size(), intPart);
-        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
         if (ec == std::errc::result_out_of_range)
             throw std::overflow_error(
@@ -253,6 +252,7 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
             throw std::invalid_argument(
                 "microUnitsFromString: malformed integer part"
             );
+        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
 
     // Parse fractional part: truncate or right-pad with zeros to exactly
