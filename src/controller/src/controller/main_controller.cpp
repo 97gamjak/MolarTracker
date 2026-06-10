@@ -91,15 +91,15 @@ namespace controller
                   _storeContainer.getStockStore(),
                   _mainWindow->getCentralWidget()
               ),
-              _vcsController(
-                  _mainWindow,
-                  std::make_shared<settings::Settings>(_settings)
-              ),
               _positionController(
                   _storeContainer.getPositionStore(),
                   _storeContainer.getTransactionStore(),
                   _storeContainer.getStockStore(),
                   _priceCache
+              ),
+              _vcsController(
+                  _mainWindow,
+                  std::make_shared<settings::Settings>(_settings)
               ),
               _menuBarController(
                   _mainWindow.get(),
