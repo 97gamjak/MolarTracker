@@ -38,7 +38,8 @@ struct OptionRow : public orm::ORMModel<"option">
     /// instruments.
     ORM_FIELD(
         instrumentId,
-        InstrumentRow::template ForeignId<tableName, orm::CascadeDelete>
+        InstrumentRow::
+            template ForeignId<tableName, orm::CascadeDelete, "instrument_id">
     )
 
     /// The ID of the underlying instrument for this option, this is a foreign
@@ -48,7 +49,10 @@ struct OptionRow : public orm::ORMModel<"option">
     /// underlying asset.
     ORM_FIELD(
         underlyingInstrumentId,
-        InstrumentRow::template ForeignId<tableName, orm::CascadeDelete>
+        InstrumentRow::template ForeignId<
+            tableName,
+            orm::CascadeDelete,
+            "underlying_instrument_id">
     )
 
     /// The type of the option, this indicates whether the option is a call or a
