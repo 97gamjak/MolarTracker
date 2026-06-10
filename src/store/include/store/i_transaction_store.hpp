@@ -2,6 +2,7 @@
 #define __STORE__INCLUDE__STORE__I_TRANSACTION_STORE_HPP__
 
 #include <cstdint>
+#include <functional>
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"

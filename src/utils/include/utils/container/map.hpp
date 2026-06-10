@@ -2,6 +2,7 @@
 #define __UTILS__INCLUDE__UTILS__CONTAINER__MAP_HPP__
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "iterable.hpp"

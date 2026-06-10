@@ -12,7 +12,7 @@
 
 namespace
 {
-    drafts::StockInfoDraft makeStockInfo(std::string ticker)
+    drafts::StockInfoDraft makeStockInfo(const std::string& ticker)
     {
         const auto shortName = std::string("Short ") + ticker;
         const auto longName  = std::string("Long ") + ticker;

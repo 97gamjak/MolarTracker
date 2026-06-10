@@ -247,7 +247,6 @@ namespace store
         finance::Transactions result;
         result.addTransactions(results, _session->accountSession);
 
-        // TODO: implement a tostring function
         LOG_DEBUG(
             std::format(
                 "Transactions retrieved: stocks({}), cash({})",
@@ -258,16 +257,35 @@ namespace store
         return result;
     }
 
+    /**
+     * @brief Get stock positions based on transactions in the store, this will
+     * analyze the stock transactions in the store and group them into positions
+     * based on their position IDs, allowing the caller to easily access the
+     * current open positions for stocks based on the transactions that have
+     * been added to the store.
+     *
+     * @param filter An optional filter to apply when retrieving transactions,
+     * this allows the caller to specify criteria for which transactions to
+     * include in the analysis for determining stock positions, such as
+     * filtering by date range, transaction type, or any other relevant
+     * attributes of the transactions. If no filter is provided, all
+     * transactions in the store will be considered when determining stock
+     * positions.
+     *
+     * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
+     * A mapping of position IDs to StockPositionTransaction objects, this
+     * allows the caller to easily access the details of each open stock
+     * position based on its position ID.
+     */
     unorderedIdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
         getStockPositions(const finance::TransactionFilter& filter) const
     {
         unorderedIdMap<PositionId, finance::StockPositionTransaction>
             stockPositions;
 
-        // TODO: add here a filter option to get only stocks
-        const auto transactions = getTransactions(filter);
+        const auto transactions = getTransactions(filter).stocks();
 
-        for (const auto& transaction : transactions.stocks())
+        for (const auto& transaction : transactions)
         {
             const auto positionId = transaction.getPositionId();
             if (!stockPositions.contains(positionId))

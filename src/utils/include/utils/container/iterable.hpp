@@ -1,8 +1,6 @@
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__
 #define __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__
 
-#include <unordered_set>
-
 /**
  * @brief A container that provides iterable functionality.
  *

@@ -1,8 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_FILTER_HPP__
 
-#include <optional>
-
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
 
