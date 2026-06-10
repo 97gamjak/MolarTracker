@@ -16,6 +16,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Features
 
+- Automatically check for new MolarTracker releases on startup and every
+  24 h; if a newer version is available, a dialog is shown with a link to
+  the releases page and a "don't show again for this version" option
 - Closing the main window while there are unsaved changes now shows a
   "Discard changes?" confirmation dialog; the window only closes if the
   user confirms

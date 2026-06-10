@@ -1,8 +1,13 @@
 #include "utils/version.hpp"
 
 #include <cctype>
+#include <compare>
 #include <exception>
 #include <vector>
+
+#ifdef __QT_ENABLED__
+#include <QString>
+#endif
 
 namespace utils
 {
@@ -137,6 +142,18 @@ namespace utils
                std::to_string(_patch);
     }
 
+#ifdef __QT_ENABLED__
+    /**
+     * @brief Convert the SemVer object to a QString
+     *
+     * @return QString
+     */
+    QString SemVer::toQString() const
+    {
+        return QString::fromStdString(toString());
+    }
+#endif
+
     /**
      * @brief Get an invalid SemVer object, this can be used to represent an
      * invalid version when parsing fails, this is useful for error handling
@@ -144,6 +161,38 @@ namespace utils
      * @return SemVer
      */
     SemVer SemVer::getInvalidVersion() { return SemVer{"invalid"}; }
+
+    /**
+     * @brief Returns the compile-time version of the running application,
+     * constructed from the MOLARTRACKER_VERSION preprocessor definition.
+     *
+     * @return SemVer
+     */
+    SemVer SemVer::current() { return SemVer{MOLARTRACKER_VERSION}; }
+
+    /**
+     * @brief Three-way comparison operator for SemVer. Invalid versions sort
+     * below all valid versions; two invalid versions compare as equal.
+     *
+     * @param lhs
+     * @param rhs
+     * @return std::strong_ordering
+     */
+    std::strong_ordering operator<=>(const SemVer& lhs, const SemVer& rhs)
+    {
+        if (lhs._isInvalid && rhs._isInvalid)
+            return std::strong_ordering::equal;
+        if (lhs._isInvalid)
+            return std::strong_ordering::less;
+        if (rhs._isInvalid)
+            return std::strong_ordering::greater;
+
+        if (lhs._major != rhs._major)
+            return lhs._major <=> rhs._major;
+        if (lhs._minor != rhs._minor)
+            return lhs._minor <=> rhs._minor;
+        return lhs._patch <=> rhs._patch;
+    }
 
     /**
      * @brief Equality operator for SemVer, two SemVer objects are

@@ -1,5 +1,7 @@
 qt_add_library(molartracker_controller STATIC
 
+    src/controller/vcs_controller.cpp
+
     # mappers
     src/controller/mapper/account_mapper.cpp
     src/controller/mapper/profile_mapper.cpp
@@ -57,4 +59,5 @@ target_link_libraries(molartracker_controller
     molartracker_drafts
     molartracker_commands
     molartracker_http
+    molartracker_vcs
 )

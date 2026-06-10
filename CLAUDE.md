@@ -337,6 +337,27 @@ The Dockerfile is based on **Ubuntu 24.04** and installs all build dependencies.
 
 ---
 
+## Local CI Script
+
+**Always run `scripts/custom_cpp_checks.sh` before committing.** It runs the same
+checks as CI (cppcheck + clangd-tidy) and will catch issues before they fail the
+pipeline.
+
+The full local CI reference is `scripts/local_ci.sh` (builds, runs tests, then runs
+the same linters).
+
+### Key linter rules enforced by CI
+
+- **`cppcoreguidelines-owning-memory`** — Never write `new T(...)` directly in UI
+  code. Use `utils::makeQChild<T>(...)` instead; the suppression is centralized
+  there.
+- **`readability-convert-member-functions-to-static`** — If a method does not
+  access instance state, declare it `static`.
+- **Doxygen strict mode** — Every private class member needs a `///` doc comment.
+  The Doxygen build runs in strict mode and treats undocumented members as errors.
+
+---
+
 ## Summary Checklist for AI Assistants
 
 Before submitting any change:
@@ -345,6 +366,9 @@ Before submitting any change:
 - [ ] PR targets `dev` (not `main`)
 - [ ] Code formatted with `clang-format`
 - [ ] No new compiler warnings introduced
+- [ ] `scripts/custom_cpp_checks.sh` passes (cppcheck + clangd-tidy)
+- [ ] All private members have `///` doxygen doc comments
+- [ ] Qt widgets created with `utils::makeQChild<T>()`, not bare `new T()`
 - [ ] Tests added or updated for changed logic
 - [ ] One of `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
 - [ ] Git submodules not accidentally modified

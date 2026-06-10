@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "config/constants.hpp"
+#include "config/constants/github_constants.hpp"
 #include "config/finance.hpp"
 #include "controller/mapper/account_mapper.hpp"
 #include "controller/mapper/stock_mapper.hpp"
@@ -436,7 +436,7 @@ namespace controller
             {
                 const auto msg = "Failed to create cash transaction: " +
                                  TransactionStoreResultMeta::toString(result) +
-                                 ". " + Constants::getCreateIssueError();
+                                 ". " + GithubConstants::getCreateIssueError();
 
                 LOG_ERROR(msg);
                 ErrorDialog::show(msg);

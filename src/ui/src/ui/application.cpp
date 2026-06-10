@@ -1,6 +1,7 @@
 #include "ui/application.hpp"
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
+#include "config/constants/github_constants.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/exceptions/exception_dialog.hpp"
 
@@ -18,7 +19,7 @@ namespace ui
         : QApplication(argc, argv)
     {
         const auto appName = QString::fromStdString(Constants::getAppName());
-        const auto version = QString::fromStdString(Constants::getVersion());
+        const auto version = QString::fromStdString(GithubConstants::version);
         const auto desktopAppName =
             QString::fromStdString(Constants::getDesktopAppName());
         const auto appDisplayName =
