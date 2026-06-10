@@ -3,7 +3,6 @@
 #include <utility>
 
 #include "config/id_types.hpp"
-#include "utils/timestamp.hpp"
 
 namespace drafts
 {

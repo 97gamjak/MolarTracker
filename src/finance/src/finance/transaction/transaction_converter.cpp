@@ -169,11 +169,10 @@ namespace finance
      * transaction entries for the stock trades associated with the transaction.
      *
      * @param transaction
-     * @param accounts
      * @return std::expected<StockTransaction, TransactionConversionError>
      */
     std::expected<StockTransaction, TransactionConversionError> TransactionConverter::
-        toStock(const DomainTransaction& transaction, const Accounts& accounts)
+        toStock(const DomainTransaction& transaction)
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
@@ -201,9 +200,6 @@ namespace finance
                 TransactionConversionError{"Invalid number of fee entries"}
             );
         }
-
-        const auto internalAccounts = accounts.filterExternal(false);
-        const auto externalAccounts = accounts.filterExternal(true);
 
         Cash fees{amountEntries[0].getCurrency(), 0};
         auto externalAccountId = AccountId::invalid();

@@ -294,7 +294,7 @@ namespace store
                     finance::StockPositionTransaction(positionId);
             }
 
-            if (!stockPositions.at(positionId).add(transaction))
+            if (!stockPositions.at(positionId).addPosition(transaction))
             {
                 LOG_ERROR(
                     "Failed to add stock transaction to position id: " +

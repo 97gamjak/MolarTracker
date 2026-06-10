@@ -39,8 +39,10 @@ namespace ui
         QStackedWidget* stackedWidget;
 
         /// The cash account widget
+        // cppcheck-suppress unsafeClassCanLeak -- Qt owned
         QWidget* cashAccountWidget;
         /// The security account widget
+        // cppcheck-suppress unsafeClassCanLeak -- Qt owned
         QWidget* securityAccountWidget;
 
         /// The cash account layout
@@ -49,6 +51,11 @@ namespace ui
         QLayout* securityAccountLayout;
 
         UIElements();
+        ~UIElements()                            = default;
+        UIElements(const UIElements&)            = delete;
+        UIElements(UIElements&&)                 = delete;
+        UIElements& operator=(const UIElements&) = delete;
+        UIElements& operator=(UIElements&&)      = delete;
 
         [[nodiscard]] QLayout* setupUI() const;
     };

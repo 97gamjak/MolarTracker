@@ -10,6 +10,7 @@
 #include "db/database.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "repo/migration/migration_runner.hpp"
@@ -56,17 +57,18 @@ namespace
             micro_units amount = 0
         ) const
         {
+            const auto entry = finance::TransactionEntry{
+                TransactionEntryId::invalid(),
+                _accountId,
+                finance::Cash{Currency::USD, amount},
+                TransactionEntryType::General
+            };
             return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 finance::CashData{},
-                finance::TransactionEntries{{finance::TransactionEntry{
-                    TransactionEntryId::invalid(),
-                    _accountId,
-                    finance::Cash{Currency::USD, amount},
-                    TransactionEntryType::General
-                }}},
+                finance::TransactionEntries{{entry}},
                 std::nullopt
             };
         }

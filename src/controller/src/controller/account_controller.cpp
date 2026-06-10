@@ -160,7 +160,7 @@ namespace controller
                     _details->openPositionDetails[_details->currentAccount
                                                       ->getId()];
                 std::vector<drafts::PositionStockDetailDraft> drafts;
-                for (auto detail : details)
+                for (auto& detail : details)
                 {
                     const auto quote = _details->priceCache->get(detail.ticker);
                     if (quote.has_value())

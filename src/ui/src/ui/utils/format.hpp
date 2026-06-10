@@ -7,8 +7,8 @@
 
 namespace finance
 {
-    class Cash;
-}
+    class Cash;   // forward declaration
+}   // namespace finance
 
 class QString;
 

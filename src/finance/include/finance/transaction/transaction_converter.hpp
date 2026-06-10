@@ -46,8 +46,7 @@ namespace finance
         [[nodiscard]]
         static std::
             expected<StockTransaction, TransactionConversionError> toStock(
-                const DomainTransaction& transaction,
-                const Accounts&          accounts
+                const DomainTransaction& transaction
             );
     };
 }   // namespace finance

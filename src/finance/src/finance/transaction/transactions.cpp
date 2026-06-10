@@ -39,10 +39,10 @@ namespace finance
     /**
      * @brief Construct a new Security View:: Security View object
      *
-     * @param transactions
+     * @param stockTransactions
      */
-    SecurityView::SecurityView(const StockTransactions& transactions)
-        : _stockTransactions(transactions)
+    SecurityView::SecurityView(const StockTransactions& stockTransactions)
+        : _stockTransactions(stockTransactions)
     {
     }
 
@@ -89,40 +89,40 @@ namespace finance
             {
                 case TransactionDataType::Cash:
                 {
-                    const auto cash =
+                    const auto cashTx =
                         TransactionConverter::toCash(transaction, accounts);
-                    if (!cash)
+                    if (!cashTx)
                     {
                         LOG_ERROR(
                             std::format(
                                 "Failed to convert transaction with ID {} to "
                                 "cash transaction: {}",
                                 transaction.getId().toString(),
-                                cash.error().message
+                                cashTx.error().message
                             )
                         );
                         continue;
                     }
-                    _cashTransactions.add(cash.value());
+                    _cashTransactions.add(cashTx.value());
                     break;
                 }
                 case TransactionDataType::Stock:
                 {
-                    const auto stock =
-                        TransactionConverter::toStock(transaction, accounts);
-                    if (!stock)
+                    const auto stockTx =
+                        TransactionConverter::toStock(transaction);
+                    if (!stockTx)
                     {
                         LOG_ERROR(
                             std::format(
                                 "Failed to convert transaction with ID {} to "
                                 "stock transaction: {}",
                                 transaction.getId().toString(),
-                                stock.error().message
+                                stockTx.error().message
                             )
                         );
                         continue;
                     }
-                    _stockTransactions.add(stock.value());
+                    _stockTransactions.add(stockTx.value());
                     break;
                 }
             }

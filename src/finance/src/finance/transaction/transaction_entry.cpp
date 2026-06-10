@@ -1,6 +1,5 @@
 #include "finance/transaction/transaction_entry.hpp"
 
-#include <algorithm>
 #include <format>
 
 #include "config/id_types.hpp"

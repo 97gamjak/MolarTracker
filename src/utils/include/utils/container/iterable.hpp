@@ -18,7 +18,9 @@ class Iterable
    public:
     Iterable() = default;
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
+    // cppcheck-suppress noExplicitConstructor
     Iterable(const Container& items);
+    // cppcheck-suppress noExplicitConstructor
     Iterable(Container&& items);
     // NOLINTEND(google-explicit-constructor, hicpp-explicit-conversions)
 

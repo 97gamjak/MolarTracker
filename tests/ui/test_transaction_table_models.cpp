@@ -132,7 +132,10 @@ namespace
     TEST_F(CashTransactionTableModelTest, DataDisplayRoleDescriptionColumn)
     {
         _model.setTransactions({makeCashTx("My Note")}, {});
-        const auto idx  = _model.index(0, _model.getDescriptionIndex());
+        const auto idx = _model.index(
+            0,
+            ui::CashTransactionTableModel::getDescriptionIndex()
+        );
         const auto data = _model.data(idx, Qt::DisplayRole);
         EXPECT_EQ(data.toString(), "My Note");
     }
@@ -140,7 +143,8 @@ namespace
     TEST_F(CashTransactionTableModelTest, DataDisplayRoleDateColumnIsNotEmpty)
     {
         _model.setTransactions({makeCashTx()}, {});
-        const auto idx  = _model.index(0, _model.getDateIndex());
+        const auto idx =
+            _model.index(0, ui::CashTransactionTableModel::getDateIndex());
         const auto data = _model.data(idx, Qt::DisplayRole);
         EXPECT_FALSE(data.toString().isEmpty());
     }

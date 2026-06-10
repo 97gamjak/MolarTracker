@@ -47,7 +47,7 @@ namespace finance
 
         void setId(TransactionId id);
 
-        [[nodiscard]] std::string toString() const;
+        [[nodiscard]] virtual std::string toString() const;
     };
 
 }   // namespace finance

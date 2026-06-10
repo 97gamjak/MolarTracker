@@ -31,11 +31,18 @@ namespace finance
         /// for display
         bool _pnlReady = false;
 
+        /// to hide the add method from StockTransactions and ensure that only
+        /// transactions that match the base instrument and security account can
+        /// be added to the position, this will help maintain the integrity of
+        /// the position and ensure that all transactions in the position are
+        /// related to the same security and account.
+        using StockTransactions::add;
+
        public:
         explicit StockPositionTransaction() = default;
         explicit StockPositionTransaction(PositionId id);
 
-        [[nodiscard]] bool add(const StockTransaction& txs);
+        [[nodiscard]] bool addPosition(const StockTransaction& txs);
 
         [[nodiscard]] InstrumentId                getBaseInstrument() const;
         [[nodiscard]] AccountId                   getSecurityAccount() const;

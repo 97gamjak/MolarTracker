@@ -57,6 +57,7 @@ namespace finance
         ) const;
 
        private:
+        // cppcheck-suppress unusedPrivateFunction -- used in friend operators
         void _takeCurrency(const Cash& cash);
     };
 

@@ -7,10 +7,8 @@
 #include <qpushbutton.h>
 #include <qwidget.h>
 
-#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "drafts/transaction/transaction_draft.hpp"
 #include "finance/cash.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"

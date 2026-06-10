@@ -14,6 +14,8 @@ namespace finance
     class TransactionEntries : public Vector<TransactionEntry>
     {
        public:
+        using Vector<TransactionEntry>::Vector;
+
         [[nodiscard]]
         TransactionEntries filter(TransactionEntryType type) const;
 

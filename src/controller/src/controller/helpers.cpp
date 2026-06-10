@@ -60,7 +60,6 @@ namespace controller
         filter.setPositionIds(positions.getIds());
         auto positionTxs = transactionStore->getStockPositions(filter);
 
-        // TODO: find a better place for this
         std::erase_if(
             positionTxs,
             [&](const auto& pair)
@@ -95,7 +94,6 @@ namespace controller
                 continue;
             }
 
-            // TODO: move this to a dedicated combined store
             const auto stockInfo = StockMapper::toStockInfoDraft(stock.value());
 
             drafts.emplace_back(

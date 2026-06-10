@@ -29,7 +29,7 @@ namespace finance
      * @param txs The stock transaction to add to the position.
      * @return true if the transaction was added successfully, false otherwise.
      */
-    bool StockPositionTransaction::add(const StockTransaction& txs)
+    bool StockPositionTransaction::addPosition(const StockTransaction& txs)
     {
         if (!empty())
         {

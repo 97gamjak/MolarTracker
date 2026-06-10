@@ -20,13 +20,14 @@ class Vector : public Iterable<std::vector<T>>
    public:
     using Iterable<std::vector<T>>::Iterable;
     Vector(std::initializer_list<T> items);
+    virtual ~Vector() = default;
 
     const T& operator[](std::size_t index) const;
 
     auto front() const;
 
-    void add(const T& item);
-    void add(const std::vector<T>& items);
+    virtual void add(const T& item);
+    virtual void add(const std::vector<T>& items);
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_TPP__

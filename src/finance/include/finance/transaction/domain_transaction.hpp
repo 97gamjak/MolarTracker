@@ -57,7 +57,7 @@ namespace finance
 
         [[nodiscard]] std::vector<TradeLeg> getLegs() const;
 
-        [[nodiscard]] std::string toString() const;
+        [[nodiscard]] std::string toString() const override;
     };
 
     /**
