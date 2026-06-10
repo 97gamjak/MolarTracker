@@ -239,15 +239,17 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
     if (!intStr.empty())
     {
         const std::string_view view{intStr};
+        // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         const auto [ptr, ec] =
-            std::from_chars(view.begin(), view.end(), intPart);
+            std::from_chars(view.data(), view.data() + view.size(), intPart);
+        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
         if (ec == std::errc::result_out_of_range)
             throw std::overflow_error(
                 "microUnitsFromString: integer part overflows int64_t"
             );
 
-        if (ec != std::errc{} || ptr != view.end())
+        if (ec != std::errc{} || ptr != view.data() + view.size())
             throw std::invalid_argument(
                 "microUnitsFromString: malformed integer part"
             );
