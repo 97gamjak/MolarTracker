@@ -480,6 +480,14 @@ namespace repo
     /**
      * @brief Migrate to version 13
      *
+     * @details This handles the migration from v12 to v13. It creates a new
+     * option table for representing option instruments, which has a one-to-one
+     * relationship with the instrument table. This allows for more specific
+     * fields related to options (e.g., option type, strike price, expiration
+     * date) while still maintaining a common base for all instruments.
+     * Additionally, it introduces a unique constraint on the combination of
+     * underlying instrument, option type, strike price, and expiration date to
+     * ensure data integrity and prevent duplicate entries for the same option.
      */
     void Migrations::_migrateV13()
     {

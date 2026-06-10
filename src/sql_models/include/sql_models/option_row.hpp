@@ -26,6 +26,8 @@
  */
 struct OptionRow : public orm::ORMModel<"option">
 {
+    using insert_policy = orm::requires_paired_insert_t;
+
     /// The ID of the option instrument, this is the primary key for the option
     /// table.
     ORM_FIELD(id, IdField<OptionId>)
