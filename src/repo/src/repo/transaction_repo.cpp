@@ -3,7 +3,7 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
-#include "finance/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
@@ -22,7 +22,7 @@ namespace repo
      * @return TransactionId
      */
     TransactionId TransactionRepo::addTransaction(
-        const finance::Transaction& transaction
+        const finance::DomainTransaction& transaction
     )
     {
         db::Transaction dbTx{_getDb()};
@@ -61,7 +61,7 @@ namespace repo
 
         switch (txRow.type.value())
         {
-            case TransactionDataType::Trade:
+            case TransactionDataType::Stock:
             {
                 const auto data =
                     std::get<finance::TradeData>(transaction.getData());
@@ -104,9 +104,9 @@ namespace repo
      * transactions from the database, if no filter is provided all transactions
      * will be returned
      *
-     * @return std::vector<finance::Transaction>
+     * @return std::vector<finance::DomainTransaction>
      */
-    std::vector<finance::Transaction> TransactionRepo::getTransactions(
+    std::vector<finance::DomainTransaction> TransactionRepo::getTransactions(
         const idSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
@@ -119,7 +119,7 @@ namespace repo
         const auto txRows =
             _getCrud().getJoined<TransactionRow>(_getDb(), join, query);
 
-        std::vector<finance::Transaction> results;
+        std::vector<finance::DomainTransaction> results;
         results.reserve(txRows.size());
 
         for (const auto& [txRow] : txRows)

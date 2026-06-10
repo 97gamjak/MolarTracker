@@ -30,11 +30,11 @@ namespace service
 
         [[nodiscard]]
         TransactionId addTransaction(
-            const finance::Transaction& transaction
+            const finance::DomainTransaction& transaction
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions(
+        std::vector<finance::DomainTransaction> getTransactions(
             const idSet<AccountId>&           accountIds,
             const finance::TransactionFilter& filter
         ) override;

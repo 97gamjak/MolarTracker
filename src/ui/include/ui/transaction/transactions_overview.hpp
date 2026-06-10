@@ -4,16 +4,23 @@
 #include <qsortfilterproxymodel.h>
 #include <qwidget.h>
 
-#include "ui/transaction/transaction_table.hpp"
+#include "config/id_types.hpp"
+#include "config/strong_id.hpp"
+
+namespace drafts
+{
+    class CashTransactionOverview;    // Forward declaration
+    class StockTransactionOverview;   // Forward declaration
+}   // namespace drafts
 
 class QSortFilterProxyModel;   // Forward declaration
 class QTableView;              // Forward declaration
+class QHeaderView;             // Forward declaration
 
 namespace ui
 {
     class CashTransactionTableModel;    // Forward declaration
     class StockTransactionTableModel;   // Forward declaration
-    class TransactionTableModel;        // Forward declaration
 
     /**
      * @brief Widget for displaying an overview of transactions in a table view
@@ -48,19 +55,18 @@ namespace ui
         explicit TransactionsOverview(QWidget* parent);
 
         void refresh(
-            const std::vector<drafts::TransactionOverviewDraft>&
+            const std::vector<drafts::CashTransactionOverview>&
                 cashTransactions,
-            const std::vector<drafts::TransactionOverviewDraft>&
-                stockTransactions,
-            const std::unordered_map<AccountId, std::string, AccountId::Hash>&
-                accountIdToName
+            const std::vector<drafts::StockTransactionOverview>&
+                                                          stockTransactions,
+            const unorderedIdMap<AccountId, std::string>& accountIdToName
         );
 
        private:
-        static void _setupTable(
+        [[nodiscard]]
+        static QHeaderView* _setupTable(
             QTableView*            table,
-            QSortFilterProxyModel* proxy,
-            TransactionTableModel* model
+            QSortFilterProxyModel* proxy
         );
     };
 }   // namespace ui

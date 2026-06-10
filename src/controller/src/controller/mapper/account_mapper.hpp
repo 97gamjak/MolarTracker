@@ -3,15 +3,12 @@
 
 #include <vector>
 
+#include "drafts/account_draft.hpp"   // needed for vector of accoutndrafts
+
 namespace finance
 {
     class Account;   // Forward declaration
 }   // namespace finance
-
-namespace drafts
-{
-    class AccountDraft;   // Forward declaration
-}   // namespace drafts
 
 namespace controller
 {

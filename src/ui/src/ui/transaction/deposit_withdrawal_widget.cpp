@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "config/finance.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
@@ -175,25 +176,11 @@ namespace ui
 
         auto fees = finance::Cash(currency, feesRow->getAmount(microUnits));
 
-        auto entry = drafts::TransactionEntryDraft{
-            account->getId(),
-            cash,
-            TransactionEntryType::General,
-            false
-        };
-        entry.setNeedsExternal(true);
-
-        auto feesEntry = drafts::TransactionEntryDraft{
-            account->getId(),
-            fees,
-            TransactionEntryType::Fees,
-            false
-        };
-        feesEntry.setNeedsExternal(true);
-
-        return {
+        return drafts::CreateCashTransactionDraft{
             timestampField->getTimestamp(),
-            {entry, feesEntry},
+            cash,
+            fees,
+            account->getId(),
             commentField->getComment()
         };
     }

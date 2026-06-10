@@ -1,8 +1,6 @@
 #ifndef __STORE__SRC__STORE__POSITION_STORE_HPP__
 #define __STORE__SRC__STORE__POSITION_STORE_HPP__
 
-#include <vector>
-
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
@@ -23,6 +21,16 @@ namespace store
      * @brief Store for managing Positions
      *
      */
+    struct PositionFilter
+    {
+        /// The set of position IDs to filter by, if specified
+        std::optional<bool> isOpen = std::nullopt;
+    };
+
+    /**
+     * @brief Store for managing Positions
+     *
+     */
     class PositionStore : public BaseStore<finance::Position, PositionId>,
                           public IPositionStore
     {
@@ -33,6 +41,9 @@ namespace store
         struct Session;
         /// The current session data
         std::unique_ptr<Session> _session;
+
+        /// The position events observable
+        std::unique_ptr<Observable<PositionClosed>> _positionEvents;
 
        public:
         explicit PositionStore(
@@ -46,16 +57,22 @@ namespace store
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getAllPositions() const override;
+        finance::Positions getOpenPositions() const override;
 
         [[nodiscard]]
-        std::vector<finance::Position> getOpenPositions() const override;
+        finance::Positions getAllPositions() const override;
 
         void commit() override;
 
         [[nodiscard]]
         const unorderedIdMap<PositionId, PositionId>& getIdRemap(
         ) const override;
+
+        [[nodiscard]]
+        Connection subscribeToPositionClosed(
+            PositionClosed::func func,
+            void*                user
+        ) override;
     };
 
 }   // namespace store

@@ -7,9 +7,8 @@
 #include <qpushbutton.h>
 #include <qwidget.h>
 
-#include "config/finance.hpp"
 #include "drafts/account_draft.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/cash.hpp"
 #include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
@@ -210,40 +209,22 @@ namespace ui
         const auto unitPrice  = finance::Cash(currency, unitPrice_);
         const auto quantity_  = quantityRow->getAmount(Quantity::precision);
         const auto quantity   = Quantity{quantity_};
-        const auto cash       = -quantity * unitPrice;
-
-        auto entry = drafts::TransactionEntryDraft{
-            refAccountId,
-            cash,
-            TransactionEntryType::General,
-            false
-        };
 
         const auto fees_ = feesRow->getAmount(microUnits);
         const auto fees  = -finance::Cash(currency, fees_);
-
-        const auto feesEntry = drafts::TransactionEntryDraft{
-            refAccountId,
-            fees,
-            TransactionEntryType::Fees,
-            false
-        };
 
         const auto ticker = tickerField->getTicker();
         if (!ticker.has_value())
             throw std::runtime_error("No ticker selected");
 
-        auto tradeLeg = drafts::TradeLegDraft{
-            account->getId(),
-            unitPrice,
-            quantity,
-            ticker.value()
-        };
-
-        return {
+        return drafts::CreateStockTransactionDraft{
             timestampField->getTimestamp(),
-            {entry, feesEntry},
-            {tradeLeg},
+            ticker.value(),
+            quantity,
+            unitPrice,
+            fees,
+            account->getId(),
+            refAccountId,
             commentField->getComment()
         };
     }

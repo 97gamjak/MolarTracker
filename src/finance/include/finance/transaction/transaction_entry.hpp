@@ -1,0 +1,51 @@
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_ENTRY_HPP__
+#define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_ENTRY_HPP__
+
+#include "config/finance.hpp"
+#include "config/id_types.hpp"
+#include "finance/cash.hpp"
+
+namespace finance
+{
+    /**
+     * @brief Represents a single entry in a financial transaction.
+     *
+     */
+    class TransactionEntry
+    {
+       private:
+        /// The unique identifier for the cash transaction entry
+        TransactionEntryId _id;
+
+        /// The account associated with the cash transaction
+        AccountId _accountId;
+
+        /// The cash amount associated with the transaction entry
+        Cash _cash;
+
+        /// Transaction type
+        TransactionEntryType _type;
+
+       public:
+        TransactionEntry(
+            TransactionEntryId   id,
+            AccountId            accountId,
+            Cash                 cash,
+            TransactionEntryType type
+        );
+
+        [[nodiscard]] TransactionEntryId   getId() const;
+        [[nodiscard]] AccountId            getAccountId() const;
+        [[nodiscard]] micro_units          getAmount() const;
+        [[nodiscard]] Currency             getCurrency() const;
+        [[nodiscard]] Cash                 getCash() const;
+        [[nodiscard]] TransactionEntryType getType() const;
+
+        void setAccountId(AccountId accountId);
+
+        [[nodiscard]] std::string toString() const;
+    };
+
+}   // namespace finance
+
+#endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_ENTRY_HPP__

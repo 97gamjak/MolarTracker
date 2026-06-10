@@ -60,7 +60,7 @@ namespace controller
 
        private:
         /// Reference to the main window
-        QMainWindow& _mainWindow;
+        std::shared_ptr<QMainWindow> _mainWindow;
         /// Reference to the store container
         store::StoreContainer& _storeContainer;
         /// Reference to the undo stack
@@ -80,10 +80,10 @@ namespace controller
 
        public:
         explicit EnsureProfileController(
-            QMainWindow&           mainWindow,
-            store::StoreContainer& storeContainer,
-            cmd::UndoStack&        undoStack,
-            settings::Settings&    settings
+            const std::shared_ptr<QMainWindow>& mainWindow,
+            store::StoreContainer&              storeContainer,
+            cmd::UndoStack&                     undoStack,
+            settings::Settings&                 settings
         );
 
         ~EnsureProfileController() override;

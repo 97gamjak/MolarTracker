@@ -1,6 +1,8 @@
 #include "config/quantity.hpp"
 
+#include <charconv>
 #include <format>
+#include <stdexcept>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #include <intrin.h>
@@ -41,6 +43,35 @@ std::string Quantity::toString() const
 }
 
 /**
+ * @brief Check if the quantity is zero.
+ *
+ * @return true if the quantity is zero, false otherwise.
+ */
+bool Quantity::isZero() const { return _value == 0; }
+
+/**
+ * @brief Get the absolute value of the quantity.
+ *
+ * @return A new Quantity object representing the absolute value of this
+ * quantity.
+ */
+Quantity Quantity::abs() const
+{
+    return Quantity(_value < 0 ? -_value : _value);
+}
+
+/**
+ * @brief Compare this quantity to another quantity for equality.
+ *
+ * @param other The other quantity to compare against.
+ * @return true if the quantities are equal, false otherwise.
+ */
+bool Quantity::operator==(const Quantity& other) const
+{
+    return _value == other._value;
+}
+
+/**
  * @brief Compare this quantity to another quantity for greater-than.
  *
  * @param other The other quantity to compare against.
@@ -49,6 +80,55 @@ std::string Quantity::toString() const
 bool Quantity::operator>(const Quantity& other) const
 {
     return _value > other._value;
+}
+
+/**
+ * @brief Adds another quantity to this quantity.
+ *
+ * @param other The other quantity to add.
+ * @return A reference to this quantity.
+ */
+Quantity& Quantity::operator+=(const Quantity& other)
+{
+    _value += other._value;
+    return *this;
+}
+
+/**
+ * @brief Subtracts another quantity from this quantity.
+ *
+ * @param other The other quantity to subtract.
+ * @return A reference to this quantity.
+ */
+Quantity& Quantity::operator-=(const Quantity& other)
+{
+    _value -= other._value;
+    return *this;
+}
+
+/**
+ * @brief Adds two quantities together.
+ *
+ * @param lhs The left-hand side quantity.
+ * @param rhs The right-hand side quantity.
+ * @return A new Quantity object representing the sum of the two quantities.
+ */
+Quantity operator+(const Quantity& lhs, const Quantity& rhs)
+{
+    return Quantity(lhs._value + rhs._value);
+}
+
+/**
+ * @brief Subtracts one quantity from another.
+ *
+ * @param lhs The left-hand side quantity.
+ * @param rhs The right-hand side quantity.
+ * @return A new Quantity object representing the difference between the two
+ * quantities.
+ */
+Quantity operator-(const Quantity& lhs, const Quantity& rhs)
+{
+    return Quantity(lhs._value - rhs._value);
 }
 
 /**
@@ -103,6 +183,25 @@ micro_units mulDiv(micro_units lhs, Quantity rhs)
 }
 
 /**
+ * @brief Divide a micro_unit by a Quantity.
+ *
+ * @param lhs The left-hand side micro_unit value.
+ * @param rhs The right-hand side Quantity value.
+ * @return The result of the division.
+ */
+micro_units divBy(micro_units lhs, Quantity rhs)
+{
+    if (rhs.isZero())
+        throw std::domain_error("Division by zero");
+
+    return mulDiv(
+        lhs,
+        static_cast<micro_units>(Quantity::factor),
+        rhs.toMicroUnits()
+    );
+}
+
+/**
  * @brief Convert a string representation of a quantity to micro_units.
  *
  * @param value The string representation of the quantity.
@@ -139,21 +238,21 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
     int64_t intPart = 0;
     if (!intStr.empty())
     {
-        const auto [ptr, ec] = std::from_chars(
-            intStr.data(),
-            intStr.data() + intStr.size(),
-            intPart
-        );
+        const std::string_view view{intStr};
+        // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        const auto [ptr, ec] =
+            std::from_chars(view.data(), view.data() + view.size(), intPart);
 
         if (ec == std::errc::result_out_of_range)
             throw std::overflow_error(
                 "microUnitsFromString: integer part overflows int64_t"
             );
 
-        if (ec != std::errc{} || ptr != intStr.data() + intStr.size())
+        if (ec != std::errc{} || ptr != view.data() + view.size())
             throw std::invalid_argument(
                 "microUnitsFromString: malformed integer part"
             );
+        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
 
     // Parse fractional part: truncate or right-pad with zeros to exactly
@@ -175,5 +274,5 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
         fracPart += (character - '0') * fracScale;
     }
 
-    return sign * (intPart * scale + fracPart);
+    return sign * ((intPart * scale) + fracPart);
 }

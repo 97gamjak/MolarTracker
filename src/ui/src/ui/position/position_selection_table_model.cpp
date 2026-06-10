@@ -16,8 +16,8 @@ namespace ui
      * @param parent The parent object
      */
     PositionSelectionTableModel::PositionSelectionTableModel(
-        const std::vector<drafts::PositionDraft>& positions,
-        QObject*                                  parent
+        const std::vector<drafts::PositionStockDetailDraft>& positions,
+        QObject*                                             parent
     )
         : QAbstractTableModel{parent}, _positions{positions}
     {
@@ -135,10 +135,10 @@ namespace ui
      * @brief Get the position draft at a specific row
      *
      * @param row The row index
-     * @return std::optional<drafts::PositionDraft> The position draft at the
-     * row
+     * @return std::optional<drafts::PositionStockDetailDraft> The position
+     * draft at the row
      */
-    std::optional<drafts::PositionDraft> PositionSelectionTableModel::
+    std::optional<drafts::PositionStockDetailDraft> PositionSelectionTableModel::
         positionAt(int row) const
     {
         if (row < 0)
