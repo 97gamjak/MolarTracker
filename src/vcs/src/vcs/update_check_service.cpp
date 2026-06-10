@@ -21,14 +21,14 @@ namespace vcs
             &_timer,
             &QTimer::timeout,
             this,
-            &UpdateCheckService::onTimerTick
+            &UpdateCheckService::_onTimerTick
         );
         connect(
             &_watcher,
             &QFutureWatcher<
                 std::expected<utils::SemVer, http::HttpError>>::finished,
             this,
-            &UpdateCheckService::onFetchFinished
+            &UpdateCheckService::_onFetchFinished
         );
     }
 
@@ -40,7 +40,7 @@ namespace vcs
     void UpdateCheckService::start()
     {
         LOG_INFO("Update check service started");
-        onTimerTick();
+        _onTimerTick();
         _timer.start(_intervalMs);
     }
 
@@ -49,7 +49,7 @@ namespace vcs
      *
      * Skips the check if a previous fetch is still in flight.
      */
-    void UpdateCheckService::onTimerTick()
+    void UpdateCheckService::_onTimerTick()
     {
         if (_watcher.isRunning())
         {
@@ -70,7 +70,7 @@ namespace vcs
      * updateAvailable() if a newer release is found, deduplicating within the
      * same session.
      */
-    void UpdateCheckService::onFetchFinished()
+    void UpdateCheckService::_onFetchFinished()
     {
         const auto result = _watcher.result();
 

@@ -54,8 +54,8 @@ namespace vcs
         void updateAvailable(utils::SemVer latestVersion);
 
        private slots:
-        void onTimerTick();
-        void onFetchFinished();
+        void _onTimerTick();
+        void _onFetchFinished();
     };
 
 }   // namespace vcs
