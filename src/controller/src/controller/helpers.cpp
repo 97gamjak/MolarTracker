@@ -70,6 +70,14 @@ namespace controller
 
         for (auto& [id, txs] : positionTxs)
         {
+            if (!positions.contains(id))
+            {
+                LOG_ERROR(
+                    "No position found for position id: " + id.toString()
+                );
+                continue;
+            }
+
             const auto position = positions.at(id);
 
             if (txs.empty())
@@ -118,6 +126,15 @@ namespace controller
         return drafts;
     }
 
+    /**
+     * @brief Get open position drafts for a specific account
+     *
+     * @param account
+     * @param positionStore
+     * @param stockStore
+     * @param transactionStore
+     * @return std::vector<drafts::PositionDraft>
+     */
     std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
