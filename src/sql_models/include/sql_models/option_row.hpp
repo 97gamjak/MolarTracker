@@ -85,6 +85,7 @@ struct OptionRow : public orm::ORMModel<"option">
     /// analysis of the option's performance.
     ORM_FIELD(buySell, Field<"buy_sell", OptionBuySell, orm::not_null_t>)
 
+    /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
         OptionRow,
         id,
@@ -96,7 +97,19 @@ struct OptionRow : public orm::ORMModel<"option">
         currency,
         buySell
     )
+    /// @endcond
 
+    /**
+     * @brief Get the unique groups for the option table, this function defines
+     * the unique constraints for the option table, ensuring that each option is
+     * uniquely identified by the combination of its underlying instrument,
+     * option type, strike price, and expiration date. This is important for
+     * maintaining data integrity and preventing duplicate entries for the same
+     * option, as well as for enabling efficient querying and management of
+     * option data within the application.
+     *
+     * @return auto
+     */
     static auto getUniqueGroups()
     {
         return orm::unique_set(
