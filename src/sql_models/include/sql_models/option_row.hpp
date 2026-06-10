@@ -51,7 +51,8 @@ struct OptionRow : public orm::ORMModel<"option">
         underlyingInstrumentId,
         InstrumentRow::template ForeignId<
             tableName,
-            orm::CascadeDelete,
+            orm::RestrictDelete,   // we restrict deletion of the underlying
+                                   // instrument to prevent orphaned options
             "underlying_instrument_id">
     )
 
