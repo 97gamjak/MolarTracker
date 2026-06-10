@@ -3,6 +3,9 @@
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("Finance.Transactions");
 
 namespace finance
 {
@@ -84,20 +87,44 @@ namespace finance
         {
             switch (transaction.getType())
             {
-                // TODO: fix this here
                 case TransactionDataType::Cash:
-                    _cashTransactions.add(
-                        TransactionConverter::toCash(transaction, accounts)
-                            .value()
-                    );
+                {
+                    const auto cash =
+                        TransactionConverter::toCash(transaction, accounts);
+                    if (!cash)
+                    {
+                        LOG_ERROR(
+                            std::format(
+                                "Failed to convert transaction with ID {} to "
+                                "cash transaction: {}",
+                                transaction.getId().toString(),
+                                cash.error().message
+                            )
+                        );
+                        continue;
+                    }
+                    _cashTransactions.add(cash.value());
                     break;
-                // TODO: make Trade to a Stock transaction type and more
+                }
                 case TransactionDataType::Stock:
-                    _stockTransactions.add(
-                        TransactionConverter::toStock(transaction, accounts)
-                            .value()
-                    );
+                {
+                    const auto stock =
+                        TransactionConverter::toStock(transaction, accounts);
+                    if (!stock)
+                    {
+                        LOG_ERROR(
+                            std::format(
+                                "Failed to convert transaction with ID {} to "
+                                "stock transaction: {}",
+                                transaction.getId().toString(),
+                                stock.error().message
+                            )
+                        );
+                        continue;
+                    }
+                    _stockTransactions.add(stock.value());
                     break;
+                }
             }
         }
     }
@@ -124,9 +151,9 @@ namespace finance
 
     /**
      * @brief Get the security view of the transactions, this will return a
-     * SecurityView object that provides access to the stock transactions and
-     * their associated base instrument IDs for display in the transaction
-     * overview.
+     * SecurityView object that provides access to the stock transactions
+     * and their associated base instrument IDs for display in the
+     * transaction overview.
      *
      * @return SecurityView
      */
@@ -143,9 +170,10 @@ namespace finance
     bool Transactions::empty() const { return _getTransactions().empty(); }
 
     /**
-     * @brief Get a list of pointers to all transactions, this will combine the
-     * cash and stock transactions into a single list of pointers for easy
-     * iteration and access to all transactions in the Transactions object.
+     * @brief Get a list of pointers to all transactions, this will combine
+     * the cash and stock transactions into a single list of pointers for
+     * easy iteration and access to all transactions in the Transactions
+     * object.
      *
      * @return std::vector<const Transaction*>
      */
