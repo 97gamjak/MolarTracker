@@ -5,9 +5,10 @@
 #include <format>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
-#include "result/result.hpp"
+#include "result.hpp"
 
 // ─── Per-domain error codes
 // ───────────────────────────────────────────────────
@@ -274,6 +275,13 @@ struct Error
 // ─── std::formatter<Error>
 // ────────────────────────────────────────────────────
 
+/// @cond DOXYGEN_IGNORE
+/**
+ * @brief Custom formatter for Error that produces "[Domain::Code] Message".
+ *
+ * Relies on err::KindFormatter for the "[Domain::Code]" part. Used by
+ * Result::unwrap() when unwrapping an Err.
+ */
 template <>
 struct std::formatter<Error>
 {
@@ -289,6 +297,7 @@ struct std::formatter<Error>
         );
     }
 };
+/// @endcond
 
 // ─── Convenience alias
 // ────────────────────────────────────────────────────────

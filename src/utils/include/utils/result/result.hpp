@@ -72,6 +72,11 @@ struct Err
     /// The wrapped error
     E error;
 
+    /**
+     * @brief Construct a new Err object
+     *
+     * @param e
+     */
     explicit Err(E e) noexcept(std::is_nothrow_move_constructible_v<E>)
         : error(std::move(e))
     {
