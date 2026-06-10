@@ -1,20 +1,16 @@
 #include "transaction_controller.hpp"
 
-#include <algorithm>
 #include <stdexcept>
 
 #include "config/constants.hpp"
 #include "config/finance.hpp"
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
-#include "controller/mapper/stock_mapper.hpp"
 #include "controller/mapper/transaction/transaction_create_mapper.hpp"
-#include "controller/mapper/transaction/transaction_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "drafts/transaction/transaction_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
@@ -215,7 +211,7 @@ namespace controller
      * including the timestamp, entries, and any optional comment.
      */
     void TransactionSideBarController::_onCreateCashTransactionRequested(
-        drafts::CreateCashTransactionDraft draft
+        const drafts::CreateCashTransactionDraft& draft
     )
     {
         LOG_ENTRY;

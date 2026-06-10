@@ -44,7 +44,7 @@ namespace
             price,
             total,
             finance::Cash{Currency::USD, 0},
-            0.0,
+            Percentage{0.0},
             std::nullopt
         };
     }

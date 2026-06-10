@@ -79,7 +79,7 @@ namespace drafts
         finance::Cash            averagePrice,
         finance::Cash            totalPrice,
         finance::Cash            realizedPnL,
-        double                   realizedPnLPercentage,
+        Percentage               realizedPnLPercentage,
         std::optional<Timestamp> closedAt
     )
         : PositionDraft(positionId, std::move(stockInfo), createdAt, closedAt),
@@ -105,7 +105,7 @@ namespace drafts
         const finance::Cash& currentPrice,
         const finance::Cash& marketValue,
         const finance::Cash& unrealizedPnL,
-        double               unrealizedPnLPercentage
+        Percentage           unrealizedPnLPercentage
     )
     {
         _currentPrice            = currentPrice;
@@ -174,9 +174,9 @@ namespace drafts
     /**
      * @brief Get the realized PnL percentage of the position detail draft
      *
-     * @return double The realized PnL percentage
+     * @return Percentage The realized PnL percentage
      */
-    double PositionStockDetailDraft::getRealizedPnLPercentage() const
+    Percentage PositionStockDetailDraft::getRealizedPnLPercentage() const
     {
         return _realizedPnLPercentage;
     }
@@ -194,9 +194,9 @@ namespace drafts
     /**
      * @brief Get the unrealized PnL percentage of the position detail draft
      *
-     * @return double The unrealized PnL percentage
+     * @return Percentage The unrealized PnL percentage
      */
-    double PositionStockDetailDraft::getUnrealizedPnLPercentage() const
+    Percentage PositionStockDetailDraft::getUnrealizedPnLPercentage() const
     {
         return _unrealizedPnLPercentage;
     }

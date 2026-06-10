@@ -2,6 +2,7 @@ add_library(molartracker_utils STATIC
     src/utils/timestamp.cpp
     src/utils/ring_file.cpp
     src/utils/paths.cpp
+    src/utils/percentage.cpp
     src/utils/qt_helpers.cpp
     src/utils/version.cpp
 )

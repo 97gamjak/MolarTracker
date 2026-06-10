@@ -5,7 +5,7 @@
 #include "config/id_types.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
 #include "finance/transaction/trade_data.hpp"
-#include "finance/transaction/transaction_entries.hpp"
+#include "finance/transaction/transaction_entry.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.Mapper.TransactionMapper");

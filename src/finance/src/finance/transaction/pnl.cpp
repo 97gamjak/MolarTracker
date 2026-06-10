@@ -26,6 +26,50 @@ namespace finance
     finance::Cash PnL::getCostBasis() const { return _averageCost * _quantity; }
 
     /**
+     * @brief Set the quantity of the security involved in the transactions
+     *
+     * @param quantity
+     */
+    void PnL::setQuantity(Quantity quantity) { _quantity = quantity; }
+
+    /**
+     * @brief Set the average cost of the security
+     *
+     * @param averageCost The average cost to set.
+     */
+    void PnL::setAverageCost(const Cash& averageCost)
+    {
+        _averageCost = averageCost;
+    }
+
+    /**
+     * @brief Set the realized PnL of the security
+     *
+     * @param realizedPnL The realized PnL to set.
+     */
+    void PnL::setRealizedPnL(const Cash& realizedPnL)
+    {
+        _realizedPnL = realizedPnL;
+    }
+
+    /**
+     * @brief Set the realized cost basis of the security
+     *
+     * @param realizedCostBasis The realized cost basis to set.
+     */
+    void PnL::setRealizedCostBasis(const Cash& realizedCostBasis)
+    {
+        _realizedCostBasis = realizedCostBasis;
+    }
+
+    /**
+     * @brief Set the fees associated with the transactions
+     *
+     * @param fees The fees to set.
+     */
+    void PnL::setFees(const Cash& fees) { _fees = fees; }
+
+    /**
      * @brief Get the market value of the security, calculated based on the
      * current price and quantity
      *
@@ -76,28 +120,28 @@ namespace finance
      * @brief Get the unrealized PnL percentage of the security, calculated
      * based on the unrealized PnL and cost basis
      *
-     * @return double
+     * @return Percentage
      */
-    double PnL::getUnrealizedPnLPercentage() const
+    Percentage PnL::getUnrealizedPnLPercentage() const
     {
         if (getCostBasis().isZero())
-            return 0;
+            return Percentage(0);
 
-        return (getUnrealizedPnL() / getCostBasis()) * 100;
+        return Percentage(getUnrealizedPnL() / getCostBasis());
     }
 
     /**
      * @brief Get the realized PnL percentage of the security, calculated based
      * on the realized PnL and realized cost basis
      *
-     * @return double
+     * @return Percentage
      */
-    double PnL::getRealizedPnLPercentage() const
+    Percentage PnL::getRealizedPnLPercentage() const
     {
         if (_realizedCostBasis.isZero())
-            return 0;
+            return Percentage(0);
 
-        return (_realizedPnL / _realizedCostBasis) * 100;
+        return Percentage(_realizedPnL / _realizedCostBasis);
     }
 
     /**
@@ -126,30 +170,40 @@ namespace finance
     void PnLAvg::calculatePnL(StockTransactions& transactions)
     {
         transactions.sort();
+        Quantity quantity{0};
+        Cash     fees;
+        Cash     averageCost;
+        Cash     realizedPnL;
+        Cash     realizedCostBasis;
 
         for (const auto& transaction : transactions)
         {
             const auto qty    = transaction.getQuantity();
             const auto price  = transaction.getUnitPrice();
-            const auto oldQty = _quantity;
+            const auto oldQty = quantity;
 
             if (getCurrency() == Currency::Unknown)
                 setCurrency(price.getCurrency());
 
-            _fees     += transaction.getFees();
-            _quantity += qty;
+            fees     += transaction.getFees();
+            quantity += qty;
 
             if (qty > 0)
             {
-                _averageCost =
-                    (_averageCost * oldQty + price * qty) / _quantity;
+                averageCost = (averageCost * oldQty + price * qty) / quantity;
             }
             else
             {
-                _realizedPnL       += (price - _averageCost) * qty.abs();
-                _realizedCostBasis += _averageCost * qty.abs();
+                realizedPnL       += (price - averageCost) * qty.abs();
+                realizedCostBasis += averageCost * qty.abs();
             }
         }
+
+        setQuantity(quantity);
+        setAverageCost(averageCost);
+        setRealizedPnL(realizedPnL);
+        setRealizedCostBasis(realizedCostBasis);
+        setFees(fees);
     }
 
     /**

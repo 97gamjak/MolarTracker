@@ -108,7 +108,7 @@ namespace controller
 
        private:
         void _onCreateCashTransactionRequested(
-            drafts::CreateCashTransactionDraft draft
+            const drafts::CreateCashTransactionDraft& draft
         );
 
         void _onCreateStockTransactionRequested(

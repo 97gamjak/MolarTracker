@@ -62,7 +62,8 @@ namespace controller
             this
         ));
 
-        _pollTimer->setInterval(60'000);
+        const auto timeInterval = 60'000;   // 1 minute
+        _pollTimer->setInterval(timeInterval);
 
         _fetchPrices();
         _pollTimer->start();

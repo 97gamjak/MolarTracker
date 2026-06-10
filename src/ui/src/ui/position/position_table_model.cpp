@@ -33,15 +33,9 @@ namespace ui
          * @param percentage The percentage to display.
          * @return QString The formatted percentage string.
          */
-        QString displayPercentage(double percentage)
+        QString displayPercentage(Percentage percentage)
         {
-            if (std::isnan(percentage))
-                return "-";
-
-            return QString::fromStdString(
-                percentage >= 0 ? std::format("+{:.2f}%", percentage)
-                                : std::format("{:.2f}%", percentage)
-            );
+            return QString::fromStdString(percentage.toString());
         }
     }   // namespace
 

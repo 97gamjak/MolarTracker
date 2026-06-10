@@ -5,6 +5,7 @@
 #include "config/quantity.hpp"
 #include "drafts/stock_draft.hpp"
 #include "finance/cash.hpp"
+#include "utils/percentage.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
@@ -72,13 +73,13 @@ namespace drafts
         finance::Cash _realizedPnL;
 
         /// The realized profit and loss (PnL) percentage of the position
-        double _realizedPnLPercentage = 0.0;
+        Percentage _realizedPnLPercentage = Percentage(0.0);
 
         /// The unrealized profit and loss (PnL) of the position
         finance::Cash _unrealizedPnL;
 
         /// The unrealized profit and loss (PnL) percentage of the position
-        double _unrealizedPnLPercentage = 0.0;
+        Percentage _unrealizedPnLPercentage = Percentage(0.0);
 
        public:
         explicit PositionStockDetailDraft(
@@ -89,7 +90,7 @@ namespace drafts
             finance::Cash            averagePrice,
             finance::Cash            totalPrice,
             finance::Cash            realizedPnL,
-            double                   realizedPnLPercentage,
+            Percentage               realizedPnLPercentage,
             std::optional<Timestamp> closedAt = std::nullopt
         );
 
@@ -97,7 +98,7 @@ namespace drafts
             const finance::Cash& currentPrice,
             const finance::Cash& marketValue,
             const finance::Cash& unrealizedPnL,
-            double               unrealizedPnLPercentage
+            Percentage           unrealizedPnLPercentage
         );
 
         [[nodiscard]] Quantity      getQuantity() const;
@@ -106,9 +107,9 @@ namespace drafts
         [[nodiscard]] finance::Cash getAveragePrice() const;
         [[nodiscard]] finance::Cash getTotalPrice() const;
         [[nodiscard]] finance::Cash getRealizedPnL() const;
-        [[nodiscard]] double        getRealizedPnLPercentage() const;
+        [[nodiscard]] Percentage    getRealizedPnLPercentage() const;
         [[nodiscard]] finance::Cash getUnrealizedPnL() const;
-        [[nodiscard]] double        getUnrealizedPnLPercentage() const;
+        [[nodiscard]] Percentage    getUnrealizedPnLPercentage() const;
     };
 }   // namespace drafts
 

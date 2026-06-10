@@ -2,8 +2,8 @@
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__PNL_HPP__
 
 #include "finance/cash.hpp"
-#include "finance/price_quote.hpp"
 #include "finance/transaction/transactions.hpp"
+#include "utils/percentage.hpp"
 
 namespace finance
 {
@@ -16,24 +16,29 @@ namespace finance
     {
        private:
         /// The current price of the security, if available
-        std::optional<finance::Cash> _currentPrice = std::nullopt;
+        std::optional<Cash> _currentPrice = std::nullopt;
         /// The currency of the PnL calculations, this will be set based on the
         Currency _currency = Currency::Unknown;
 
-       protected:
         /// The quantity of the security involved in the transactions
         Quantity _quantity{0};
         /// The average cost of the security, calculated based on the
         /// transactions
-        finance::Cash _averageCost;
+        Cash _averageCost;
         /// The cost basis of the security, calculated based on the transactions
-        finance::Cash _realizedPnL;
+        Cash _realizedPnL;
         /// The market value of the security, calculated based on the current
-        finance::Cash _realizedCostBasis;
+        Cash _realizedCostBasis;
         /// The total PnL of the security, calculated based on the transactions
-        finance::Cash _fees;
+        Cash _fees;
 
+       protected:
         void setCurrency(Currency currency);
+        void setQuantity(Quantity quantity);
+        void setAverageCost(const Cash& averageCost);
+        void setRealizedPnL(const Cash& realizedPnL);
+        void setRealizedCostBasis(const Cash& realizedCostBasis);
+        void setFees(const Cash& fees);
 
         [[nodiscard]] Currency getCurrency() const;
 
@@ -49,17 +54,17 @@ namespace finance
          */
         virtual void calculatePnL(StockTransactions& transactions) = 0;
 
-        [[nodiscard]] Quantity      getQuantity() const;
-        [[nodiscard]] finance::Cash getAverageCost() const;
-        [[nodiscard]] finance::Cash getCostBasis() const;
-        [[nodiscard]] finance::Cash getMarketValue() const;
-        [[nodiscard]] finance::Cash getTotalPnL() const;
-        [[nodiscard]] finance::Cash getRealizedPnL() const;
-        [[nodiscard]] finance::Cash getUnrealizedPnL() const;
-        [[nodiscard]] double        getUnrealizedPnLPercentage() const;
-        [[nodiscard]] double        getRealizedPnLPercentage() const;
+        [[nodiscard]] Quantity   getQuantity() const;
+        [[nodiscard]] Cash       getAverageCost() const;
+        [[nodiscard]] Cash       getCostBasis() const;
+        [[nodiscard]] Cash       getMarketValue() const;
+        [[nodiscard]] Cash       getTotalPnL() const;
+        [[nodiscard]] Cash       getRealizedPnL() const;
+        [[nodiscard]] Cash       getUnrealizedPnL() const;
+        [[nodiscard]] Percentage getUnrealizedPnLPercentage() const;
+        [[nodiscard]] Percentage getRealizedPnLPercentage() const;
 
-        void setCurrentPrice(const finance::Cash& price);
+        void setCurrentPrice(const Cash& price);
     };
 
     /**

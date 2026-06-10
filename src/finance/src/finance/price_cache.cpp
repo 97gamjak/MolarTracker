@@ -118,4 +118,24 @@ namespace finance
         return results;
     }
 
+    /**
+     * @brief subscribe to price changes in the cache, the callback will be
+     * called whenever the price quotes in the cache are updated, allowing
+     * clients to react to price changes in real-time.
+     *
+     * @param callback
+     * @param user
+     * @return Connection
+     */
+    Connection PriceCache::subscribeToPriceChange(
+        OnPriceUpdated::func callback,
+        void*                user
+    )
+    {
+        return Observable<OnPriceUpdated>::template on<OnPriceUpdated>(
+            std::move(callback),
+            user
+        );
+    }
+
 }   // namespace finance
