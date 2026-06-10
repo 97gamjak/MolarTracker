@@ -1,5 +1,5 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__CONSTANTS_HPP__
-#define __CONFIG__INCLUDE__CONFIG__CONSTANTS_HPP__
+#ifndef __CONFIG__INCLUDE__CONFIG__CONSTANTS__CONSTANTS_HPP__
+#define __CONFIG__INCLUDE__CONFIG__CONSTANTS__CONSTANTS_HPP__
 
 #include <filesystem>
 #include <string>
@@ -105,4 +105,4 @@ class Constants
     Constants();
 };
 
-#endif   // __CONFIG__INCLUDE__CONFIG__CONSTANTS_HPP__
+#endif   // __CONFIG__INCLUDE__CONFIG__CONSTANTS__CONSTANTS_HPP__
