@@ -1,5 +1,6 @@
 #include "config/quantity.hpp"
 
+#include <charconv>
 #include <format>
 #include <stdexcept>
 
