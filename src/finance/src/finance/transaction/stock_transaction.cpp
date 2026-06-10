@@ -202,7 +202,7 @@ namespace finance
     {
         return TransactionEntry{
             TransactionEntryId::invalid(),
-            external ? _cashAccount : _externalAccount,
+            external ? _externalAccount : _cashAccount,
             external ? -_fees : _fees,
             TransactionEntryType::Fees
         };
