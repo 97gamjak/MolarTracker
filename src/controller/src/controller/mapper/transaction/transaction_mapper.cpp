@@ -2,10 +2,8 @@
 
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
-#include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/trade_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "logging/log_macros.hpp"
@@ -103,8 +101,8 @@ namespace controller
      * @return drafts::TradeLegDraft
      */
     drafts::TradeLegDraft TransactionMapper::toTradeLegDraft(
-        const finance::TradeLeg&          leg,
-        const instrumentMap<std::string>& instrumentNames
+        const finance::TradeLeg&                         leg,
+        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
     )
     {
         std::string instrumentName = "UNKNOWN";
@@ -137,8 +135,8 @@ namespace controller
      * @return std::vector<drafts::TradeLegDraft>
      */
     std::vector<drafts::TradeLegDraft> TransactionMapper::toTradeLegDrafts(
-        const std::vector<finance::TradeLeg>& legs,
-        const instrumentMap<std::string>&     instrumentNames
+        const std::vector<finance::TradeLeg>&            legs,
+        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
     )
     {
         std::vector<drafts::TradeLegDraft> drafts;

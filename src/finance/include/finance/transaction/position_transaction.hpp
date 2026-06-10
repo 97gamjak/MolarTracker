@@ -16,13 +16,20 @@ namespace finance
      */
     class StockPositionTransaction : protected StockTransactions
     {
+        /// The ID of the position associated with the stock transactions
         PositionId _positionId = PositionId::invalid();
+        /// The base instrument associated with the position
+        InstrumentId _baseInstrument = InstrumentId::invalid();
+        /// The security account associated with the position
+        AccountId _securityAccount = AccountId::invalid();
 
-        InstrumentId _baseInstrument  = InstrumentId::invalid();
-        AccountId    _securityAccount = AccountId::invalid();
-
+        /// The PnL information for the position, this will be calculated based
+        /// on the transactions in the position and the current price of the
+        /// security
         std::shared_ptr<PnL> _pnl;
-        bool                 _pnlReady = false;
+        /// Flag indicating whether the PnL information is up to date and ready
+        /// for display
+        bool _pnlReady = false;
 
        public:
         explicit StockPositionTransaction() = default;
@@ -33,8 +40,6 @@ namespace finance
         [[nodiscard]] InstrumentId                getBaseInstrument() const;
         [[nodiscard]] AccountId                   getSecurityAccount() const;
         [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
-
-        void sort();
 
         using StockTransactions::empty;
     };

@@ -20,6 +20,11 @@ namespace finance
        public:
         virtual ~ISecurityTransactions() = default;
 
+        /**
+         * @brief Get the Base Instrument Ids
+         *
+         * @return idSet<InstrumentId>
+         */
         [[nodiscard]]
         virtual idSet<InstrumentId> getBaseInstrumentIds() const = 0;
     };
@@ -53,6 +58,7 @@ namespace finance
     class SecurityView : public ISecurityTransactions
     {
        private:
+        /// The stock transactions that are part of the security view
         const StockTransactions& _stockTransactions;
 
        public:
@@ -75,7 +81,9 @@ namespace finance
     class Transactions
     {
        private:
-        CashTransactions  _cashTransactions;
+        /// The list of cash transactions
+        CashTransactions _cashTransactions;
+        /// The list of stock transactions
         StockTransactions _stockTransactions;
 
        public:

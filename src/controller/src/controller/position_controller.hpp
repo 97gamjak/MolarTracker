@@ -38,16 +38,28 @@ namespace controller
         Q_OBJECT
 
        private:
+        /// Watcher for asynchronous price fetching operations
         QFutureWatcher<std::unordered_map<std::string, finance::PriceQuote>>
-                                                  _priceWatcher;
-        QTimer*                                   _pollTimer;
-        std::shared_ptr<finance::PriceCache>      _priceCache;
-        std::shared_ptr<store::IPositionStore>    _positionStore;
-        std::shared_ptr<store::ITransactionStore> _transactionStore;
-        std::shared_ptr<store::IStockStore>       _stockStore;
+            _priceWatcher;
+        /// Timer for periodically fetching price updates
+        QTimer* _pollTimer;
+        /// Cache for storing the latest price quotes for the tracked tickers
+        std::shared_ptr<finance::PriceCache> _priceCache;
 
+        /// Reference to the position store for retrieving position data
+        std::shared_ptr<store::IPositionStore> _positionStore;
+        /// Reference to the transaction store for retrieving transaction data
+        std::shared_ptr<store::ITransactionStore> _transactionStore;
+        /// Reference to the stock store for retrieving stock data (e.g.
+        /// tickers)
+        std::shared_ptr<store::IStockStore> _stockStore;
+
+        /// The expected number of symbols to be fetched in the price update,
+        /// used for gating updates to the price cache
         std::size_t _expectedSymbolCount;
 
+        /// Connections object for managing signal-slot connections and ensuring
+        /// they are properly cleaned up
         std::unique_ptr<Connections> _connections;
 
         /// Set of tickers that are currently being tracked for price updates

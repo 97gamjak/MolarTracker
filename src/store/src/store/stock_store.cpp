@@ -285,11 +285,12 @@ namespace store
     /**
      * @brief Get a mapping of instrument IDs to their names
      *
-     * @return instrumentMap<std::string>
+     * @return unorderedIdMap<InstrumentId, std::string>
      */
-    instrumentMap<std::string> StockStore::getInstrumentIdToNameMap() const
+    unorderedIdMap<InstrumentId, std::string> StockStore::
+        getInstrumentIdToNameMap() const
     {
-        instrumentMap<std::string> map;
+        unorderedIdMap<InstrumentId, std::string> map;
 
         for (const auto& [id, stock] : getStocks())
             map[stock.getInstrumentId()] = stock.getTicker();

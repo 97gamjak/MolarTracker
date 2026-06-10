@@ -22,6 +22,10 @@ namespace finance
     {
     }
 
+    /**
+     * @brief Construct a new Cash:: Cash object
+     *
+     */
     Cash::Cash() : _currency(Currency::Unknown), _amount(0) {}
 
     /**
@@ -115,11 +119,25 @@ namespace finance
         return cash * multiplier;
     }
 
+    /**
+     * @brief Division operator for Cash
+     *
+     * @param cash
+     * @param divisor
+     * @return Cash
+     */
     Cash operator/(const Cash& cash, const Quantity& divisor)
     {
         return Cash{cash._currency, divBy(cash._amount, divisor)};
     }
 
+    /**
+     * @brief Division operator for Cash
+     *
+     * @param cash
+     * @param divisor
+     * @return double
+     */
     double operator/(const Cash& cash, const Cash& divisor)
     {
         return static_cast<double>(cash._amount) /
@@ -233,6 +251,11 @@ namespace finance
         return std::format("{} {}", decimal, getSymbol(getCurrency()));
     }
 
+    /**
+     * @brief Handle remapping of position IDs in transaction entries
+     *
+     * @param cash
+     */
     void Cash::_takeCurrency(const Cash& cash)
     {
         if (cash._currency == Currency::Unknown)

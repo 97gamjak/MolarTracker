@@ -88,9 +88,15 @@ namespace store
         ) override;
 
        private:
-        void _onAccountIdRemap(const accountMap<AccountId>& remap);
-        void _onInstrumentIdRemap(const instrumentMap<InstrumentId>& remap);
-        void _onPositionIdRemap(const positionMap<PositionId>& remap);
+        void _onAccountIdRemap(
+            const unorderedIdMap<AccountId, AccountId>& remap
+        );
+        void _onInstrumentIdRemap(
+            const unorderedIdMap<InstrumentId, InstrumentId>& remap
+        );
+        void _onPositionIdRemap(
+            const unorderedIdMap<PositionId, PositionId>& remap
+        );
     };
 
 }   // namespace store

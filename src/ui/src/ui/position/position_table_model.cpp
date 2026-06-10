@@ -11,6 +11,13 @@ namespace ui
 {
     namespace
     {
+        /**
+         * @brief Display a price as a string, formatted with two decimal
+         * places.
+         *
+         * @param price The price to display.
+         * @return QString The formatted price string.
+         */
         QString displayPrice(const finance::Cash& price)
         {
             if (price.getCurrency() == Currency::Unknown || price.isZero())
@@ -19,6 +26,13 @@ namespace ui
             return QString::fromStdString(price.toString(2));
         }
 
+        /**
+         * @brief Display a percentage as a string, formatted with two decimal
+         * places and a percent sign, with a "+" sign for positive values.
+         *
+         * @param percentage The percentage to display.
+         * @return QString The formatted percentage string.
+         */
         QString displayPercentage(double percentage)
         {
             if (std::isnan(percentage))
@@ -34,8 +48,7 @@ namespace ui
     /**
      * @brief Construct a new Position Table Model:: Position Table Model object
      *
-     * @param priceCache
-     * @param parent
+     * @param parent The parent QObject (optional).
      */
     StockPositionTableModel::StockPositionTableModel(QObject* parent)
         : QAbstractTableModel{parent}
@@ -168,6 +181,15 @@ namespace ui
         return {};
     }
 
+    /**
+     * @brief Get the header data for a specific section, orientation, and role.
+     *
+     * @param section The section index.
+     * @param orientation The orientation (horizontal or vertical).
+     * @param role The role for which to retrieve header data.
+     * @return QVariant The header data for the specified section, orientation,
+     * and role.
+     */
     QVariant StockPositionTableModel::headerData(
         int             section,
         Qt::Orientation orientation,
@@ -179,6 +201,11 @@ namespace ui
         return _columnLabel(section);
     }
 
+    /**
+     * @brief Refresh the prices displayed in the model, this will emit data
+     * changed signals for all price-related columns to ensure that the latest
+     * prices are displayed in the view.
+     */
     void StockPositionTableModel::refreshPrices()
     {
         const int first = static_cast<int>(PositionColumns::LastPrice);
@@ -195,6 +222,13 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Set the positions to be displayed in the model, this will reset
+     * the model and update the internal list of position drafts to be
+     * displayed in the view.
+     *
+     * @param positions The list of position drafts to display.
+     */
     void StockPositionTableModel::setPositions(
         const std::vector<drafts::PositionStockDetailDraft>& positions
     )
@@ -204,6 +238,14 @@ namespace ui
         endResetModel();
     }
 
+    /**
+     * @brief Get the label for a specific column index, this will return a
+     * user-friendly label for the specified column index to be displayed in the
+     * header of the table view.
+     *
+     * @param index The column index.
+     * @return QString The label for the specified column index.
+     */
     QString StockPositionTableModel::_columnLabel(int index)
     {
         const auto column = static_cast<PositionColumns>(index);

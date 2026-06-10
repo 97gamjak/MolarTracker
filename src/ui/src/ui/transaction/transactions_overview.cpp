@@ -91,8 +91,7 @@ namespace ui
     void TransactionsOverview::refresh(
         const std::vector<drafts::CashTransactionOverview>&  cashTransactions,
         const std::vector<drafts::StockTransactionOverview>& stockTransactions,
-        const std::unordered_map<AccountId, std::string, AccountId::Hash>&
-            accountIdToName
+        const unorderedIdMap<AccountId, std::string>&        accountIdToName
     )
     {
         _cashModel->setTransactions(cashTransactions, accountIdToName);
@@ -109,6 +108,8 @@ namespace ui
      * @param table The table view to set up.
      * @param proxy The proxy model to use for filtering.
      *
+     * @return QHeaderView* The header view of the configured table, which can
+     * be used for further customization if needed.
      */
     QHeaderView* TransactionsOverview::_setupTable(
         QTableView*            table,

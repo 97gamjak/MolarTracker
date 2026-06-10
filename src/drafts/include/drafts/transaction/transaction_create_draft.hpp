@@ -19,8 +19,10 @@ namespace drafts
     class CreateTransactionDraft
     {
        private:
+        /// The timestamp of the transaction draft
         Timestamp _timestamp;
 
+        /// An optional comment associated with the transaction draft
         std::optional<std::string> _comment;
 
        public:
@@ -46,10 +48,16 @@ namespace drafts
     class CreateCashTransactionDraft : public CreateTransactionDraft
     {
        private:
+        /// The amount of the cash transaction
         finance::Cash _amount;
-        finance::Cash _fees;
-        AccountId     _accountId;
 
+        /// The fees associated with the cash transaction
+        finance::Cash _fees;
+
+        /// The account ID associated with the cash transaction
+        AccountId _accountId;
+
+        /// The external account ID associated with the cash transaction, if any
         AccountId _externalAccount = AccountId::invalid();
 
        public:
@@ -79,17 +87,26 @@ namespace drafts
     class CreateStockTransactionDraft : public CreateTransactionDraft
     {
        private:
-        std::string   _ticker;
-        Quantity      _quantity;
+        /// The ticker symbol of the stock being transacted
+        std::string _ticker;
+        /// The quantity of the stock being transacted
+        Quantity _quantity;
+        /// The unit price of the stock being transacted
         finance::Cash _unitPrice;
+        /// The fees associated with the stock transaction
         finance::Cash _fees;
 
+        /// The security account ID associated with the stock transaction
         AccountId _securityAccount;
+        /// The cash account ID associated with the stock transaction
         AccountId _cashAccount;
 
-        InstrumentId _instrumentId    = InstrumentId::invalid();
-        AccountId    _externalAccount = AccountId::invalid();
-        PositionId   _positionId      = PositionId::invalid();
+        /// The instrument ID associated with the stock transaction
+        InstrumentId _instrumentId = InstrumentId::invalid();
+        /// The external account ID associated with the stock transaction
+        AccountId _externalAccount = AccountId::invalid();
+        /// The position ID associated with the stock transaction
+        PositionId _positionId = PositionId::invalid();
 
        public:
         explicit CreateStockTransactionDraft(

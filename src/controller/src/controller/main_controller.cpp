@@ -52,7 +52,8 @@ namespace controller
         AccountController _accountController;
         /// controller for managing transactions
         TransactionController _transactionController;
-        PositionController    _positionController;
+        /// controller for managing positions
+        PositionController _positionController;
 
         /// controller for managing the menu bar
         MenuBarController _menuBarController;

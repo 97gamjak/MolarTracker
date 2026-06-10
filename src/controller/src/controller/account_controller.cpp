@@ -51,10 +51,16 @@ namespace controller
         /// Pointer to the account detail view
         QPointer<ui::AccountDetailView> accountDetailView;
 
+        /// Pointer to the connections object for managing signal-slot
+        /// connections
         std::unique_ptr<Connections> connections;
 
+        /// The currently selected account, stored as an optional AccountDraft
+        /// for display purposes
         std::unique_ptr<drafts::AccountDraft> currentAccount;
 
+        /// A mapping of account IDs to their corresponding open stock position
+        /// details, used for displaying the account details in the UI
         unorderedIdMap<AccountId, std::vector<OpenStockPositionDetail>>
             openPositionDetails;
 
@@ -83,6 +89,9 @@ namespace controller
      * @param positionStore_
      * @param stockStore_
      * @param transactionStore_
+     * @param priceCache_
+     * @param undoStack_
+     * @param stackedWidget_
      */
     AccountController::Details::Details(
         const std::shared_ptr<store::IAccountStore>&     accountStore_,

@@ -195,6 +195,14 @@ namespace store
         return _getIdRemap();
     }
 
+    /**
+     * @brief Subscribe to position closed events, this allows subscribers to be
+     * notified when a position is closed, which can be useful for updating
+     *
+     * @param func
+     * @param user
+     * @return Connection
+     */
     Connection PositionStore::subscribeToPositionClosed(
         PositionClosed::func func,
         void*                user

@@ -161,6 +161,13 @@ QDateTime Timestamp::toQDateTime() const
     return QDateTime::fromMSecsSinceEpoch(toInt64());
 }
 
+/**
+ * @brief Compares this Timestamp with another Timestamp for ordering.
+ *
+ * @param other The other Timestamp to compare against.
+ * @return std::strong_ordering indicating the relative order of the two
+ * Timestamps.
+ */
 std::strong_ordering Timestamp::operator<=>(const Timestamp& other) const
 {
     return _timePoint <=> other._timePoint;

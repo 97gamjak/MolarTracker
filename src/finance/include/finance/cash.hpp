@@ -56,8 +56,6 @@ namespace finance
             std::optional<std::uint8_t> nDecimalPlaces
         ) const;
 
-        [[nodiscard]] finance::Cash getZeroCash() const;
-
        private:
         void _takeCurrency(const Cash& cash);
     };

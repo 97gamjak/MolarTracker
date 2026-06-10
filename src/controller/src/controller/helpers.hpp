@@ -31,9 +31,12 @@ namespace drafts
  */
 struct OpenStockPositionDetail
 {
+    /// The position draft containing the details of the open stock position.
     drafts::PositionStockDetailDraft positionDraft;
-    std::string                      ticker;
-    std::shared_ptr<finance::PnL>    pnl;
+    /// The ticker symbol of the stock associated with the open position.
+    std::string ticker;
+    /// The profit and loss (PnL) information for the open stock position.
+    std::shared_ptr<finance::PnL> pnl;
 };
 
 namespace controller

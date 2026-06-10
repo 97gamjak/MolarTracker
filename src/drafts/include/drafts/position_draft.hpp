@@ -56,20 +56,28 @@ namespace drafts
         /// The quantity of the position
         Quantity _quantity;
 
+        /// The current price of the stock in the position
         finance::Cash _currentPrice;
 
+        /// The current market value of the position
         finance::Cash _marketValue;
 
+        /// The average price of the stock in the position
         finance::Cash _averagePrice;
 
+        /// The total price of the stock in the position
         finance::Cash _totalPrice;
 
+        /// The realized profit and loss (PnL) of the position
         finance::Cash _realizedPnL;
 
+        /// The realized profit and loss (PnL) percentage of the position
         double _realizedPnLPercentage = 0.0;
 
+        /// The unrealized profit and loss (PnL) of the position
         finance::Cash _unrealizedPnL;
 
+        /// The unrealized profit and loss (PnL) percentage of the position
         double _unrealizedPnLPercentage = 0.0;
 
        public:

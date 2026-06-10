@@ -1,15 +1,29 @@
-#include "transaction_overview_mapper.hpp"
+#include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 
+#include "config/strong_id.hpp"
+#include "drafts/transaction/transaction_overview_draft.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transactions.hpp"
 
 namespace controller
 {
+    using drafts::StockTransactionOverview;
 
     namespace
     {
-        drafts::StockTransactionOverview toStockOverview(
+        /**
+         * @brief Converts a finance::StockTransaction to a
+         * StockTransactionOverview draft, this will extract the relevant
+         * information from the stock transaction and format it for display in
+         * the transaction overview, including resolving the instrument ID to a
+         * ticker symbol using the provided mapping of instrument IDs to names.
+         *
+         * @param transaction
+         * @param instrumentNames
+         * @return StockTransactionOverview
+         */
+        StockTransactionOverview toStockOverview(
             const finance::StockTransaction&                 transaction,
             const unorderedIdMap<InstrumentId, std::string>& instrumentNames
         )
@@ -20,7 +34,7 @@ namespace controller
             if (instrumentNames.contains(instrumentId))
                 ticker = instrumentNames.at(instrumentId);
 
-            return drafts::StockTransactionOverview(
+            return StockTransactionOverview(
                 transaction.getTimestamp(),
                 transaction.getComment(),
                 transaction.getQuantity(),
@@ -32,6 +46,15 @@ namespace controller
             );
         }
 
+        /**
+         * @brief Converts a finance::CashTransaction to a
+         * drafts::CashTransactionOverview, this will extract the relevant
+         * information from the cash transaction and format it for display in
+         * the transaction overview.
+         *
+         * @param transaction
+         * @return drafts::CashTransactionOverview
+         */
         drafts::CashTransactionOverview toCashOverview(
             const finance::CashTransaction& transaction
         )
@@ -47,13 +70,23 @@ namespace controller
         }
     }   // namespace
 
-    std::vector<drafts::StockTransactionOverview> TransactionOverviewMapper::
-        toStock(
-            const finance::Transactions&      transactions,
-            const instrumentMap<std::string>& instrumentNames
-        )
+    /**
+     * @brief Converts a vector of finance::StockTransaction to a vector of
+     * StockTransactionOverview drafts, this will iterate over the list of stock
+     * transactions and convert each one to a StockTransactionOverview draft
+     * using the toStockOverview function, and return the resulting list of
+     * drafts for display in the transaction overview.
+     *
+     * @param transactions
+     * @param instrumentNames
+     * @return std::vector<StockTransactionOverview>
+     */
+    std::vector<StockTransactionOverview> TransactionOverviewMapper::toStock(
+        const finance::Transactions&                     transactions,
+        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+    )
     {
-        std::vector<drafts::StockTransactionOverview> result;
+        std::vector<StockTransactionOverview> result;
 
         for (const auto& transaction : transactions.stocks())
         {
@@ -63,6 +96,16 @@ namespace controller
         return result;
     }
 
+    /**
+     * @brief Converts a vector of finance::CashTransaction to a vector of
+     * drafts::CashTransactionOverview, this will iterate over the list of cash
+     * transactions and convert each one to a CashTransactionOverview draft
+     * using the toCashOverview function, and return the resulting list of
+     * drafts for display in the transaction overview.
+     *
+     * @param transactions
+     * @return std::vector<drafts::CashTransactionOverview>
+     */
     std::vector<drafts::CashTransactionOverview> TransactionOverviewMapper::
         toCash(const finance::Transactions& transactions)
     {

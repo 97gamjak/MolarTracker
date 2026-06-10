@@ -493,6 +493,19 @@ namespace store
         return _fullCache;
     }
 
+    /**
+     * @brief logs the contents of the store's cache for debugging purposes.
+     * This method checks if logging is enabled for the specified category and
+     * log level, and if so, it logs the number of entries in the cache and the
+     * details of each entry, including its value and state. This can be useful
+     * for debugging and understanding the current state of the store's cache.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param category The logging category to use for the log messages.
+     * @param level The log level to use for the log messages.
+     */
+
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_logCache(
         const std::string& category,

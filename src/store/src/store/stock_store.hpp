@@ -68,7 +68,8 @@ namespace store
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
-        instrumentMap<std::string> getInstrumentIdToNameMap() const override;
+        unorderedIdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        ) const override;
 
         [[nodiscard]]
         bool stockExists(const std::string& ticker, bool checkDeleted) const;

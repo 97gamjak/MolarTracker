@@ -14,8 +14,6 @@ namespace finance
      * @param id
      * @param timestamp
      * @param status
-     * @param data
-     * @param entries
      * @param comment
      */
     Transaction::Transaction(

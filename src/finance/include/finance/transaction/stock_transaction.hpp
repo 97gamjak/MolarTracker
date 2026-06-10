@@ -20,18 +20,24 @@ namespace finance
     class StockTransaction : public Transaction, ISecurityTransaction
     {
        private:
+        /// The instrument ID of the stock being traded in the transaction
         InstrumentId _instrumentId;
 
+        /// The security account associated with the stock transaction
         AccountId _securityAccount;
+        /// The cash account associated with the stock transaction
         AccountId _cashAccount;
+        /// The external account associated with the stock transaction
         AccountId _externalAccount;
 
+        /// The quantity of the stock being traded in the transaction
         Quantity _quantity;
-
+        /// The unit price of the stock being traded in the transaction
         Cash _unitPrice;
-
+        /// The fees associated with the stock transaction
         Cash _fees;
 
+        /// The position ID associated with the stock transaction
         PositionId _positionId;
 
        public:

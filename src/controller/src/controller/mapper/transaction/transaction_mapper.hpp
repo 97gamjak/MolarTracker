@@ -66,14 +66,14 @@ namespace controller
 
         [[nodiscard]]
         static drafts::TradeLegDraft toTradeLegDraft(
-            const finance::TradeLeg&          leg,
-            const instrumentMap<std::string>& instrumentNames
+            const finance::TradeLeg&                         leg,
+            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
         );
 
         [[nodiscard]]
         static std::vector<drafts::TradeLegDraft> toTradeLegDrafts(
-            const std::vector<finance::TradeLeg>& legs,
-            const instrumentMap<std::string>&     instrumentNames
+            const std::vector<finance::TradeLeg>&            legs,
+            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
         );
     };
 

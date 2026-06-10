@@ -15,14 +15,22 @@ namespace finance
     class PnL
     {
        private:
+        /// The current price of the security, if available
         std::optional<finance::Cash> _currentPrice = std::nullopt;
-        Currency                     _currency     = Currency::Unknown;
+        /// The currency of the PnL calculations, this will be set based on the
+        Currency _currency = Currency::Unknown;
 
        protected:
-        Quantity      _quantity{0};
+        /// The quantity of the security involved in the transactions
+        Quantity _quantity{0};
+        /// The average cost of the security, calculated based on the
+        /// transactions
         finance::Cash _averageCost;
+        /// The cost basis of the security, calculated based on the transactions
         finance::Cash _realizedPnL;
+        /// The market value of the security, calculated based on the current
         finance::Cash _realizedCostBasis;
+        /// The total PnL of the security, calculated based on the transactions
         finance::Cash _fees;
 
         void setCurrency(Currency currency);
@@ -30,9 +38,15 @@ namespace finance
         [[nodiscard]] Currency getCurrency() const;
 
        public:
+        /// Default constructor and virtual destructor for PnL
         PnL()          = default;
         virtual ~PnL() = default;
 
+        /**
+         * @brief calculate the PnL of the security based on the transactions
+         *
+         * @param transactions
+         */
         virtual void calculatePnL(StockTransactions& transactions) = 0;
 
         [[nodiscard]] Quantity      getQuantity() const;

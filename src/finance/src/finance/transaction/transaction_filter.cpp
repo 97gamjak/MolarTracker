@@ -8,20 +8,35 @@
 namespace finance
 {
     /**
-     * @brief Set the position ID to filter transactions by
+     * @brief Set the position IDs used to filter transactions, this will set
+     * the position IDs that will be used to filter transactions when querying
+     * the transaction store. Transactions that are associated with any of the
+     * specified position IDs will be included in the results, while
+     * transactions that are not associated with any of the specified position
+     * IDs will be excluded from the results.
      *
-     * @param positionId The position ID to filter by
+     * @param positionIds The set of position IDs to filter transactions by
      */
     void TransactionFilter::setPositionIds(const idSet<PositionId>& positionIds)
     {
         _positionIds = positionIds;
     }
 
+    /**
+     * @brief Get the position IDs used to filter transactions
+     *
+     * @return idSet<PositionId> The set of position IDs used for filtering
+     */
     idSet<PositionId> TransactionFilter::getPositionIds() const
     {
         return _positionIds;
     }
 
+    /**
+     * @brief get the transaction IDs used to filter transactions
+     *
+     * @return idSet<TransactionId>
+     */
     idSet<TransactionId> TransactionFilter::getTransactionIds() const
     {
         return _transactionIds;
@@ -50,6 +65,14 @@ namespace finance
         return {};
     }
 
+    /**
+     * @brief Get a predicate function that can be used to filter transactions
+     * based on the specified position IDs.
+     *
+     * @param positionIds The set of position IDs to filter by
+     * @return filter::Predicate<DomainTransaction> A predicate function that
+     * can be used to filter transactions based on the specified position IDs
+     */
     filter::Predicate<DomainTransaction> HasPositionId(
         const idSet<PositionId>& positionIds
     )
@@ -71,6 +94,13 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Get a predicate function that can be used to filter transactions
+     * based on the specified transaction IDs.
+     *
+     * @param transactionIds
+     * @return filter::Predicate<DomainTransaction>
+     */
     filter::Predicate<DomainTransaction> HasTransactionId(
         const idSet<TransactionId>& transactionIds
     )
@@ -81,6 +111,12 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Get a string representation of the transaction filter, this is
+     * used for logging and debugging purposes
+     *
+     * @return std::string
+     */
     std::string TransactionFilter::toString() const
     {
         std::ostringstream oss;

@@ -17,9 +17,19 @@ namespace finance
        public:
         virtual ~ISecurityTransaction() = default;
 
+        /**
+         * @brief Get the Base Instrument Id
+         *
+         * @return InstrumentId
+         */
         [[nodiscard]]
         virtual InstrumentId getBaseInstrumentId() const = 0;
 
+        /**
+         * @brief Get the quantity of the security transaction
+         *
+         * @return const Quantity&
+         */
         [[nodiscard]]
         virtual const Quantity& getQuantity() const = 0;
     };

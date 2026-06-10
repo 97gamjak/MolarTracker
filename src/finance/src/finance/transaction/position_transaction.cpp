@@ -8,11 +8,27 @@ REGISTER_LOG_CATEGORY("Finance.StockPositionTransaction");
 namespace finance
 {
 
+    /**
+     * @brief Construct a new Stock Position Transaction:: Stock Position
+     * Transaction object
+     *
+     * @param id
+     */
     StockPositionTransaction::StockPositionTransaction(PositionId id)
         : _positionId(id)
     {
     }
 
+    /**
+     * @brief Add a stock transaction to the position, this will check that the
+     * transaction matches the base instrument and security account of the
+     * position, and if so it will add the transaction to the list of stock
+     * transactions for the position and mark the PnL as not ready for
+     * recalculation.
+     *
+     * @param txs The stock transaction to add to the position.
+     * @return true if the transaction was added successfully, false otherwise.
+     */
     bool StockPositionTransaction::add(const StockTransaction& txs)
     {
         if (!empty())
@@ -43,16 +59,37 @@ namespace finance
         return true;
     }
 
+    /**
+     * @brief get the base instrument associated with the position
+     *
+     * @return InstrumentId
+     */
     InstrumentId StockPositionTransaction::getBaseInstrument() const
     {
         return _baseInstrument;
     }
 
+    /**
+     * @brief Get the security account associated with the position, this will
+     * be used for display purposes and to ensure that transactions added to the
+     * position match the correct account.
+     *
+     * @return AccountId The security account ID associated with the position.
+     */
     AccountId StockPositionTransaction::getSecurityAccount() const
     {
         return _securityAccount;
     }
 
+    /**
+     * @brief Get the PnL information for the position, this will calculate the
+     * PnL based on the transactions in the position if it is not already
+     * calculated, and return a shared pointer to the PnL object for display and
+     * further calculations.
+     *
+     * @return const std::shared_ptr<PnL>& A shared pointer to the PnL object
+     * containing the profit and loss information for the position.
+     */
     const std::shared_ptr<PnL>& StockPositionTransaction::getPnL()
     {
         if (!_pnl)

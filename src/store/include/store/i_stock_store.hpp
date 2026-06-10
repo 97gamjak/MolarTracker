@@ -50,6 +50,12 @@ namespace store
         [[nodiscard]]
         virtual StockStoreResult addStock(finance::Stock stock) = 0;
 
+        /**
+         * @brief Get the Stock based on the given instrument ID
+         *
+         * @param id
+         * @return std::optional<finance::Stock>
+         */
         [[nodiscard]]
         virtual std::optional<finance::Stock> getStock(
             InstrumentId id
@@ -88,7 +94,9 @@ namespace store
          * @return std::unordered_map<std::string, InstrumentId>
          */
         [[nodiscard]]
-        virtual instrumentMap<std::string> getInstrumentIdToNameMap() const = 0;
+        virtual unorderedIdMap<
+            InstrumentId,
+            std::string> getInstrumentIdToNameMap() const = 0;
 
         /**
          * @brief Get the instrument ID for a given stock ticker

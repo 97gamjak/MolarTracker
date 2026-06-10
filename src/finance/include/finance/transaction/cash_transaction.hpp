@@ -17,12 +17,16 @@ namespace finance
     class CashTransaction : public Transaction
     {
        private:
+        /// The cash account ID associated with the cash transaction
         AccountId _cashAccount;
 
+        /// The external account ID associated with the cash transaction, if any
         AccountId _externalAccount;
 
+        /// The amount of the cash transaction
         Cash _amount;
 
+        /// The fees associated with the cash transaction
         Cash _fees;
 
        public:

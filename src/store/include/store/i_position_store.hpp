@@ -20,6 +20,7 @@ namespace store
      */
     struct PositionClosed
     {
+        /// The callback function type for when a position is closed
         using func = std::function<void(PositionId)>;
     };
 
@@ -74,6 +75,16 @@ namespace store
         virtual const unorderedIdMap<PositionId, PositionId>& getIdRemap(
         ) const = 0;
 
+        /**
+         * @brief Subscribe to position closed events, this allows subscribers
+         * to be notified when a position is closed, which can be useful for
+         * updating the UI or performing other actions in response to a position
+         * being closed.
+         *
+         * @param func
+         * @param user
+         * @return Connection
+         */
         [[nodiscard]]
         virtual Connection subscribeToPositionClosed(
             PositionClosed::func func,

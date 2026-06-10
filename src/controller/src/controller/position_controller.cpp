@@ -14,6 +14,14 @@
 
 namespace controller
 {
+    /**
+     * @brief Construct a new Position Controller:: Position Controller object
+     *
+     * @param positionStore
+     * @param transactionStore
+     * @param stockStore
+     * @param priceCache
+     */
     PositionController::PositionController(
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
@@ -62,6 +70,14 @@ namespace controller
 
     PositionController::~PositionController() = default;
 
+    /**
+     * @brief Fetches the latest price quotes for the tracked tickers and
+     * updates the price cache.
+     *
+     * This function is triggered by a timer and runs asynchronously to avoid
+     * blocking the UI. It uses QtConcurrent to fetch the prices in a separate
+     * thread and updates the price cache once the fetch is complete.
+     */
     void PositionController::_fetchPrices()
     {
         if (_priceWatcher.isRunning())
@@ -80,17 +96,25 @@ namespace controller
         );
     }
 
+    /**
+     * @brief Slot that is called when the price fetch is complete, it updates
+     * the price cache with the new prices and notifies any observers (e.g.
+     * table models) to refresh their data.
+     */
     void PositionController::_onPricesFetched()
     {
         const auto result = _priceWatcher.result();
         // Gate: only update if we got back the full symbol set
         if (result.size() == _expectedSymbolCount)
             _priceCache->update(result);
-
-        // Notify table model — adjust column indices to your price/P&L range
-        // emit _tableModel->dataChanged(...);
     }
 
+    /**
+     * @brief Collects the tickers from the transactions and updates the set of
+     * tracked tickers.
+     *
+     * @param transactions
+     */
     void PositionController::_collectTickers(
         const finance::Transactions& transactions
     )
@@ -103,6 +127,14 @@ namespace controller
             _tickers.insert(ticker);
     }
 
+    /**
+     * @brief Initializes the set of tracked tickers based on the currently open
+     * positions in the position store.
+     *
+     * This function retrieves the open positions from the position store, gets
+     * the associated transactions, and collects the tickers from those
+     * transactions to initialize the set of tracked tickers for price updates.
+     */
     void PositionController::_initTickers()
     {
         const auto ids = _positionStore->getOpenPositions().getIds();

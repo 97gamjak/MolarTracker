@@ -55,6 +55,7 @@ namespace controller
 
        private:
         struct Details;
+        /// Pointer to the details struct (PIMPL idiom)
         std::unique_ptr<Details> _details;
 
        public:

@@ -32,6 +32,7 @@ namespace store
      */
     struct OnTransactionAdded
     {
+        /// The callback function type for when a transaction is added
         using func = std::function<void(finance::Transactions transactions)>;
     };
 
@@ -101,11 +102,29 @@ namespace store
         [[nodiscard]]
         virtual finance::Transactions getTransactions() const = 0;
 
+        /**
+         * @brief Get the Stock Positions
+         *
+         * @param filter
+         * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
+         */
         [[nodiscard]]
         virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const = 0;
 
+        /**
+         * @brief Subscribe to transaction added events, this allows subscribers
+         * to be notified when a transaction is added, which can be useful for
+         * updating the UI or performing other actions in response to a
+         * transaction being added.
+         *
+         * @param func The callback function to call when a transaction is added
+         * @param user A pointer to the user data, which will be passed to the
+         * callback function
+         * @return Connection The connection object, which can be used to
+         * unsubscribe from the event
+         */
         [[nodiscard]]
         virtual Connection subscribeToTransactionAdded(
             OnTransactionAdded::func func,

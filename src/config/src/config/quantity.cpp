@@ -41,13 +41,30 @@ std::string Quantity::toString() const
     return std::format("{:.{}f}", getValue(), precision);
 }
 
+/**
+ * @brief Check if the quantity is zero.
+ *
+ * @return true if the quantity is zero, false otherwise.
+ */
 bool Quantity::isZero() const { return _value == 0; }
 
+/**
+ * @brief Get the absolute value of the quantity.
+ *
+ * @return A new Quantity object representing the absolute value of this
+ * quantity.
+ */
 Quantity Quantity::abs() const
 {
     return Quantity(_value < 0 ? -_value : _value);
 }
 
+/**
+ * @brief Compare this quantity to another quantity for equality.
+ *
+ * @param other The other quantity to compare against.
+ * @return true if the quantities are equal, false otherwise.
+ */
 bool Quantity::operator==(const Quantity& other) const
 {
     return _value == other._value;
@@ -76,17 +93,38 @@ Quantity& Quantity::operator+=(const Quantity& other)
     return *this;
 }
 
+/**
+ * @brief Subtracts another quantity from this quantity.
+ *
+ * @param other The other quantity to subtract.
+ * @return A reference to this quantity.
+ */
 Quantity& Quantity::operator-=(const Quantity& other)
 {
     _value -= other._value;
     return *this;
 }
 
+/**
+ * @brief Adds two quantities together.
+ *
+ * @param lhs The left-hand side quantity.
+ * @param rhs The right-hand side quantity.
+ * @return A new Quantity object representing the sum of the two quantities.
+ */
 Quantity operator+(const Quantity& lhs, const Quantity& rhs)
 {
     return Quantity(lhs._value + rhs._value);
 }
 
+/**
+ * @brief Subtracts one quantity from another.
+ *
+ * @param lhs The left-hand side quantity.
+ * @param rhs The right-hand side quantity.
+ * @return A new Quantity object representing the difference between the two
+ * quantities.
+ */
 Quantity operator-(const Quantity& lhs, const Quantity& rhs)
 {
     return Quantity(lhs._value - rhs._value);
@@ -143,6 +181,13 @@ micro_units mulDiv(micro_units lhs, Quantity rhs)
     return mulDiv(lhs, rhs.toMicroUnits(), Quantity::factor);
 }
 
+/**
+ * @brief Divide a micro_unit by a Quantity.
+ *
+ * @param lhs The left-hand side micro_unit value.
+ * @param rhs The right-hand side Quantity value.
+ * @return The result of the division.
+ */
 micro_units divBy(micro_units lhs, Quantity rhs)
 {
     if (rhs.isZero())
@@ -228,5 +273,5 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
         fracPart += (character - '0') * fracScale;
     }
 
-    return sign * (intPart * scale + fracPart);
+    return sign * ((intPart * scale) + fracPart);
 }

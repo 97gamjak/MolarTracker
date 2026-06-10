@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 
 namespace finance

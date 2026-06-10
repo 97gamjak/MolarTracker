@@ -13,6 +13,15 @@
 
 namespace finance
 {
+    /**
+     * @brief Converts a finance::CashTransaction to a DomainTransaction, this
+     * will take the relevant information from the cash transaction and format
+     * it into a DomainTransaction, including creating the appropriate
+     * transaction entries for the cash flows associated with the transaction.
+     *
+     * @param transaction
+     * @return DomainTransaction
+     */
     DomainTransaction TransactionConverter::toDomain(
         const CashTransaction& transaction
     )
@@ -26,6 +35,15 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Converts a finance::StockTransaction to a DomainTransaction, this
+     * will take the relevant information from the stock transaction and format
+     * it into a DomainTransaction, including creating the appropriate
+     * transaction entries for the stock trades associated with the transaction.
+     *
+     * @param transaction
+     * @return DomainTransaction
+     */
     DomainTransaction TransactionConverter::toDomain(
         const StockTransaction& transaction
     )
@@ -39,6 +57,16 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Converts a DomainTransaction to a finance::CashTransaction, this
+     * will take the relevant information from the DomainTransaction and format
+     * it into a CashTransaction, including creating the appropriate transaction
+     * entries for the cash flows associated with the transaction.
+     *
+     * @param transaction
+     * @param accounts
+     * @return std::expected<CashTransaction, TransactionConversionError>
+     */
     std::expected<CashTransaction, TransactionConversionError> TransactionConverter::
         toCash(const DomainTransaction& transaction, const Accounts& accounts)
     {
@@ -134,6 +162,16 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Converts a DomainTransaction to a finance::StockTransaction, this
+     * will take the relevant information from the DomainTransaction and format
+     * it into a StockTransaction, including creating the appropriate
+     * transaction entries for the stock trades associated with the transaction.
+     *
+     * @param transaction
+     * @param accounts
+     * @return std::expected<StockTransaction, TransactionConversionError>
+     */
     std::expected<StockTransaction, TransactionConversionError> TransactionConverter::
         toStock(const DomainTransaction& transaction, const Accounts& accounts)
     {

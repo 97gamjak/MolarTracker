@@ -6,6 +6,18 @@
 
 namespace finance
 {
+    /**
+     * @brief Construct a new Cash Transaction:: Cash Transaction object
+     *
+     * @param id
+     * @param timestamp
+     * @param status
+     * @param cashAccount
+     * @param externalAccount
+     * @param amount
+     * @param fees
+     * @param comment
+     */
     CashTransaction::CashTransaction(
         TransactionId              id,
         Timestamp                  timestamp,
@@ -24,17 +36,42 @@ namespace finance
     {
     }
 
+    /**
+     * @brief Get the cash account ID associated with the cash transaction
+     *
+     * @return AccountId
+     */
     AccountId CashTransaction::getCashAccountId() const { return _cashAccount; }
 
+    /**
+     * @brief Get the external account ID associated with the cash transaction
+     *
+     * @return AccountId
+     */
     AccountId CashTransaction::getExternalAccountId() const
     {
         return _externalAccount;
     }
 
+    /**
+     * @brief Get the amount of the cash transaction
+     *
+     * @return Cash
+     */
     Cash CashTransaction::getAmount() const { return _amount; }
 
+    /**
+     * @brief Get the fees associated with the cash transaction
+     *
+     * @return Cash
+     */
     Cash CashTransaction::getFees() const { return _fees; }
 
+    /**
+     * @brief Get the transaction entries associated with the cash transaction
+     *
+     * @return TransactionEntries
+     */
     TransactionEntries CashTransaction::getTransactionEntries() const
     {
         TransactionEntries entries;
@@ -47,6 +84,15 @@ namespace finance
         return entries;
     }
 
+    /**
+     * @brief Get the amount entry for the cash transaction, this will create a
+     * transaction entry for the amount of the cash transaction, if the entry is
+     * for the external account it will negate the amount to reflect the cash
+     * flow correctly.
+     *
+     * @param external
+     * @return TransactionEntry
+     */
     TransactionEntry CashTransaction::_getAmountEntry(bool external) const
     {
         return TransactionEntry{
@@ -57,6 +103,15 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Get the fee entry for the cash transaction, this will create a
+     * transaction entry for the fees of the cash transaction, if the entry is
+     * for the external account it will negate the fees to reflect the cash
+     * flow correctly.
+     *
+     * @param external
+     * @return TransactionEntry
+     */
     TransactionEntry CashTransaction::_getFeeEntry(bool external) const
     {
         return TransactionEntry{

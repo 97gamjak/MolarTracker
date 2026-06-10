@@ -35,10 +35,6 @@ class Iterable
    protected:
     [[nodiscard]] Container&       getItems();
     [[nodiscard]] const Container& getItems() const;
-
-    template <typename IdType, typename Hash = std::hash<IdType>>
-    [[nodiscard]]
-    std::unordered_set<IdType, Hash> _getIds() const;
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_TPP__

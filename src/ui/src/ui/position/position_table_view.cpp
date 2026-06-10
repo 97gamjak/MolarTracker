@@ -9,6 +9,11 @@
 namespace ui
 {
 
+    /**
+     * @brief Construct a new Position Table View:: Position Table View object
+     *
+     * @param parent
+     */
     PositionTableView::PositionTableView(QWidget* parent) : QTableView{parent}
     {
         setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -24,6 +29,11 @@ namespace ui
         verticalHeader()->setDefaultSectionSize(defaultSize);
     }
 
+    /**
+     * @brief Set the model for the position table view
+     *
+     * @param model
+     */
     void PositionTableView::setPositionModel(StockPositionTableModel* model)
     {
         _proxy = utils::makeQChild<QSortFilterProxyModel>(this);
@@ -40,6 +50,12 @@ namespace ui
         );
     }
 
+    /**
+     * @brief Get the currently selected row in the position table view
+     *
+     * @return int The source-model row index of the current selection, or -1 if
+     * nothing is selected.
+     */
     int PositionTableView::selectedRow() const
     {
         const auto indexes = selectionModel()->selectedRows();
@@ -48,6 +64,11 @@ namespace ui
         return _proxy->mapToSource(indexes.first()).row();
     }
 
+    /**
+     * @brief Set up the columns for the position table view, this will
+     * configure the column widths and resizing behavior to ensure that the
+     * position data is displayed clearly and is easy to read for the user.
+     */
     void PositionTableView::_setupColumns()
     {
         auto* header = horizontalHeader();

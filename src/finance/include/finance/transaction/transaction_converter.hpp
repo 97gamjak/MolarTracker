@@ -17,6 +17,8 @@ namespace finance
      */
     struct TransactionConversionError
     {
+        /// A message describing the error that occurred during transaction
+        /// conversion.
         std::string message;
     };
 

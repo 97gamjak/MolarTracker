@@ -18,17 +18,17 @@ namespace finance
     class TransactionFilter
     {
        private:
-        idSet<PositionId>    _positionIds;
+        /// The set of position IDs to filter transactions by
+        idSet<PositionId> _positionIds;
+        /// The set of transaction IDs to filter transactions by
         idSet<TransactionId> _transactionIds;
 
        public:
         TransactionFilter() = default;
 
-        void addPositionId(PositionId positionId);
         void setPositionIds(const idSet<PositionId>& positionIds);
         [[nodiscard]] idSet<PositionId> getPositionIds() const;
 
-        void setTransactionIds(const idSet<TransactionId>& transactionIds);
         [[nodiscard]] idSet<TransactionId> getTransactionIds() const;
 
         [[nodiscard]]

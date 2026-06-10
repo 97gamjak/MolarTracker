@@ -42,10 +42,14 @@ namespace drafts
     class CashTransactionOverview : public TransactionOverviewDraft
     {
        private:
+        /// The amount of the cash transaction
         finance::Cash _amount;
+        /// The fees associated with the cash transaction
         finance::Cash _fees;
 
+        /// The cash account ID associated with the cash transaction
         AccountId _cashAccount;
+        /// The external account ID associated with the cash transaction
         AccountId _externalAccount;
 
        public:
@@ -71,13 +75,19 @@ namespace drafts
     class StockTransactionOverview : public TransactionOverviewDraft
     {
        private:
-        Quantity      _quantity;
+        /// The quantity of the stock transaction
+        Quantity _quantity;
+        /// The unit price of the stock transaction
         finance::Cash _unitPrice;
+        /// The total fees associated with the stock transaction
         finance::Cash _fees;
 
+        /// The ticker symbol of the stock being transacted
         std::string _ticker;
 
+        /// The security account ID associated with the stock transaction
         AccountId _securityAccount;
+        /// The cash account ID associated with the stock transaction
         AccountId _cashAccount;
 
        public:

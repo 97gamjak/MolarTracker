@@ -297,7 +297,9 @@ namespace store
      *
      * @param remap The mapping of old account IDs to new account IDs
      */
-    void TransactionStore::_onAccountIdRemap(const accountMap<AccountId>& remap)
+    void TransactionStore::_onAccountIdRemap(
+        const unorderedIdMap<AccountId, AccountId>& remap
+    )
     {
         for (const auto& entry : _getEntries())
         {
@@ -346,7 +348,7 @@ namespace store
      * @param remap The mapping of old instrument IDs to new instrument IDs
      */
     void TransactionStore::_onInstrumentIdRemap(
-        const instrumentMap<InstrumentId>& remap
+        const unorderedIdMap<InstrumentId, InstrumentId>& remap
     )
     {
         LOG_ENTRY;
@@ -424,7 +426,7 @@ namespace store
      * @param remap The mapping of old position IDs to new position IDs
      */
     void TransactionStore::_onPositionIdRemap(
-        const positionMap<PositionId>& remap
+        const unorderedIdMap<PositionId, PositionId>& remap
     )
     {
         for (const auto& entry : _getEntries())

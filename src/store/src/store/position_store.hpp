@@ -23,6 +23,7 @@ namespace store
      */
     struct PositionFilter
     {
+        /// The set of position IDs to filter by, if specified
         std::optional<bool> isOpen = std::nullopt;
     };
 
@@ -41,6 +42,7 @@ namespace store
         /// The current session data
         std::unique_ptr<Session> _session;
 
+        /// The position events observable
         std::unique_ptr<Observable<PositionClosed>> _positionEvents;
 
        public:
@@ -71,9 +73,6 @@ namespace store
             PositionClosed::func func,
             void*                user
         ) override;
-
-       private:
-        finance::Positions _getPositions(PositionFilter filter) const;
     };
 
 }   // namespace store

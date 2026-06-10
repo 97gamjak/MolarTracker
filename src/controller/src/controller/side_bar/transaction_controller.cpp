@@ -344,10 +344,10 @@ namespace controller
     }
 
     /**
-     * @brief Check if a transaction can be added
+     * @brief Check the result of adding a transaction to the store
      *
-     * @param transaction The transaction to check
-     * @return true if the transaction can be added, false otherwise
+     * @param result The result of the transaction store add operation
+     * @return true if the transaction was added successfully, false otherwise
      */
     bool TransactionSideBarController::_checkAddTransaction(
         store::TransactionStoreResult result

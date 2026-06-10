@@ -448,6 +448,10 @@ namespace repo
         _migrations.push_back(std::move(migration));
     }
 
+    /**
+     * @brief Migrate to version 12
+     *
+     */
     void Migrations::_migrateV12()
     {
         // change TransactionDataType of Trade to TransactionDataType of Stock

@@ -5,6 +5,12 @@
 
 namespace controller
 {
+    /**
+     * @brief Maps a CreateCashTransactionDraft to a CashTransaction.
+     *
+     * @param draft
+     * @return finance::CashTransaction
+     */
     finance::CashTransaction TransactionCreateMapper::fromCreateCashDraft(
         const drafts::CreateCashTransactionDraft& draft
     )
@@ -21,6 +27,12 @@ namespace controller
         };
     }
 
+    /**
+     * @brief Maps a CreateStockTransactionDraft to a StockTransaction.
+     *
+     * @param draft
+     * @return finance::StockTransaction
+     */
     finance::StockTransaction TransactionCreateMapper::fromCreateStockDraft(
         const drafts::CreateStockTransactionDraft& draft
     )
