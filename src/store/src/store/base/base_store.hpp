@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "config/logging_base.hpp"
 #include "config/signal_tags.hpp"
 #include "config/strong_id.hpp"
 #include "connections/observable.hpp"
@@ -221,6 +222,8 @@ namespace store
         void _clearEntries();
 
         void _notifyOnCommit();
+
+        void _logCache(const std::string& category, LogLevel level);
 
         [[nodiscard]] const IdMap& _getIdRemap() const;
 

@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 #define __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 
+#include <compare>
 #include <string>
 
 // TODO(97gamjak): migrate to mstd later on
@@ -45,6 +46,8 @@ class Timestamp
     [[nodiscard]] static Timestamp fromInt64(int64_t value);
 
     [[nodiscard]] QDateTime toQDateTime() const;
+
+    std::strong_ordering operator<=>(const Timestamp& other) const;
 
    private:
     explicit Timestamp(int64_t timePoint);

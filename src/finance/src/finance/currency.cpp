@@ -16,6 +16,8 @@ namespace finance
                 return CurrencyTraits<Currency::GBP>::microUnit;
             case Currency::CHF:
                 return CurrencyTraits<Currency::CHF>::microUnit;
+            case Currency::Unknown:
+                return 0;
         }
 
         throw std::invalid_argument("Unsupported currency");
@@ -33,6 +35,8 @@ namespace finance
                 return CurrencyTraits<Currency::GBP>::symbol;
             case Currency::CHF:
                 return CurrencyTraits<Currency::CHF>::symbol;
+            case Currency::Unknown:
+                return "UNKNOWN";
         }
 
         throw std::invalid_argument("Unsupported currency");

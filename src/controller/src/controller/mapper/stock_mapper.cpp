@@ -2,6 +2,7 @@
 
 #include "drafts/stock_draft.hpp"
 #include "finance/instrument/stock.hpp"
+#include "finance/instrument/stocks.hpp"
 
 namespace controller
 {
@@ -29,20 +30,20 @@ namespace controller
     }
 
     /**
-     * @brief Convert a vector of finance::Stock to a vector of
+     * @brief Convert a finance::Stocks map to a vector of
      * drafts::StockInfoDraft.
      *
      * @param stocks
      * @return std::vector<drafts::StockInfoDraft>
      */
     std::vector<drafts::StockInfoDraft> StockMapper::toStockInfoDrafts(
-        const std::vector<finance::Stock>& stocks
+        const finance::Stocks& stocks
     )
     {
         std::vector<drafts::StockInfoDraft> drafts;
         drafts.reserve(stocks.size());
 
-        for (const auto& stock : stocks)
+        for (const auto& [id, stock] : stocks)
             drafts.push_back(toStockInfoDraft(stock));
 
         return drafts;

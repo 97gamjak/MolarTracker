@@ -37,6 +37,7 @@ namespace db
        private:   // PRIVATE HELPER METHODS
         void _moveFrom(Transaction&& other);
     };
+
 }   // namespace db
 
 #endif   // __DB__INCLUDE__DB__TRANSACTION_HPP__

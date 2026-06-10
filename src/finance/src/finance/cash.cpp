@@ -4,18 +4,12 @@
 #include <format>
 #include <string>
 
+#include "config/quantity.hpp"
 #include "currency_exception.hpp"
 #include "finance/currency.hpp"
 
 namespace finance
 {
-
-    /**
-     * @brief Construct a new Cash:: Cash object
-     *
-     * @param currency
-     */
-    Cash::Cash(Currency currency) : _currency(currency), _amount(0) {}
 
     /**
      * @brief Construct a new Cash:: Cash object with a specified amount
@@ -29,6 +23,12 @@ namespace finance
     }
 
     /**
+     * @brief Construct a new Cash:: Cash object
+     *
+     */
+    Cash::Cash() : _currency(Currency::Unknown), _amount(0) {}
+
+    /**
      * @brief Equality operator for Cash
      *
      * @param lhs
@@ -36,15 +36,9 @@ namespace finance
      * @return true if both Cash objects have the same currency and amount
      * @return false otherwise
      */
-    constexpr bool operator==(const Cash& lhs, const Cash& rhs)
+    constexpr bool operator==(Cash lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot compare Cash objects with different currencies"
-            );
-        }
-
+        lhs._takeCurrency(rhs);
         return lhs._amount == rhs._amount;
     }
 
@@ -74,16 +68,11 @@ namespace finance
      * @param rhs
      * @return Cash the result of adding two Cash objects
      */
-    Cash operator+(const Cash& lhs, const Cash& rhs)
+    Cash operator+(Cash lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot add Cash objects with different currencies"
-            );
-        }
+        lhs._takeCurrency(rhs);
 
-        return Cash(lhs._currency, lhs._amount + rhs._amount);
+        return Cash{lhs._currency, lhs._amount + rhs._amount};
     }
 
     /**
@@ -93,17 +82,7 @@ namespace finance
      * @param rhs
      * @return Cash the result of subtracting two Cash objects
      */
-    Cash operator-(const Cash& lhs, const Cash& rhs)
-    {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot subtract Cash objects with different currencies"
-            );
-        }
-
-        return Cash(lhs._currency, lhs._amount - rhs._amount);
-    }
+    Cash operator-(Cash lhs, const Cash& rhs) { return lhs + (-rhs); }
 
     /**
      * @brief Unary negation operator for Cash
@@ -113,7 +92,7 @@ namespace finance
      */
     Cash operator-(const Cash& cash)
     {
-        return Cash(cash._currency, -cash._amount);
+        return Cash{cash._currency, -cash._amount};
     }
 
     /**
@@ -125,7 +104,7 @@ namespace finance
      */
     Cash operator*(const Cash& cash, const Quantity& multiplier)
     {
-        return Cash(cash._currency, mulDiv(cash._amount, multiplier));
+        return Cash{cash._currency, mulDiv(cash._amount, multiplier)};
     }
 
     /**
@@ -141,6 +120,31 @@ namespace finance
     }
 
     /**
+     * @brief Division operator for Cash
+     *
+     * @param cash
+     * @param divisor
+     * @return Cash
+     */
+    Cash operator/(const Cash& cash, const Quantity& divisor)
+    {
+        return Cash{cash._currency, divBy(cash._amount, divisor)};
+    }
+
+    /**
+     * @brief Division operator for Cash
+     *
+     * @param cash
+     * @param divisor
+     * @return double
+     */
+    double operator/(const Cash& cash, const Cash& divisor)
+    {
+        return static_cast<double>(cash._amount) /
+               static_cast<double>(divisor._amount);
+    }
+
+    /**
      * @brief Compound addition assignment operator for Cash
      *
      * @param lhs
@@ -150,12 +154,7 @@ namespace finance
      */
     Cash& operator+=(Cash& lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot add Cash objects with different currencies"
-            );
-        }
+        lhs._takeCurrency(rhs);
 
         lhs._amount += rhs._amount;
         return lhs;
@@ -171,12 +170,7 @@ namespace finance
      */
     Cash& operator-=(Cash& lhs, const Cash& rhs)
     {
-        if (lhs._currency != rhs._currency)
-        {
-            throw CurrencyMismatchException(
-                "Cannot subtract Cash objects with different currencies"
-            );
-        }
+        lhs._takeCurrency(rhs);
 
         lhs._amount -= rhs._amount;
         return lhs;
@@ -255,6 +249,33 @@ namespace finance
         );
 
         return std::format("{} {}", decimal, getSymbol(getCurrency()));
+    }
+
+    /**
+     * @brief Handle remapping of position IDs in transaction entries
+     *
+     * @param cash
+     */
+    void Cash::_takeCurrency(const Cash& cash)
+    {
+        if (cash._currency == Currency::Unknown)
+            return;   // rhs is currency-less, nothing to reconcile
+
+        if (_currency == Currency::Unknown)
+        {
+            _currency = cash._currency;
+        }
+        else if (_currency != cash._currency)
+        {
+            throw CurrencyMismatchException(
+                std::format(
+                    "Cannot operate on Cash objects with different currencies: "
+                    "{} vs {}",
+                    CurrencyMeta::toString(_currency),
+                    CurrencyMeta::toString(cash._currency)
+                )
+            );
+        }
     }
 
 }   // namespace finance

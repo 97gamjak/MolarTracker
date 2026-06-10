@@ -6,7 +6,6 @@
 
 #include <vector>
 
-#include "drafts/account_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
@@ -16,6 +15,7 @@ class QPushButton;   // Forward declaration
 namespace drafts
 {
     class CreateStockTransactionDraft;   // Forward declaration
+    class AccountDraft;                  // Forward declaration
 }   // namespace drafts
 
 namespace ui

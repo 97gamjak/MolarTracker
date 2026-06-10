@@ -7,13 +7,17 @@
 #include <vector>
 
 #include "config/finance.hpp"
-#include "drafts/account_draft.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
 class QPushButton;   // Forward declaration
+
+namespace drafts
+{
+    class AccountDraft;   // Forward declaration
+}   // namespace drafts
 
 namespace ui
 {

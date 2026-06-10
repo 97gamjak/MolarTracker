@@ -11,7 +11,7 @@
 #include <QFont>
 #include <mstd/enum.hpp>
 
-#include "drafts/transaction_draft.hpp"
+#include "drafts/transaction/transaction_overview_draft.hpp"
 
 namespace ui
 {
@@ -59,6 +59,114 @@ namespace ui
     }   // namespace
 
     /**
+     * @brief Construct a new Cash Transaction Table Model:: Cash Transaction
+     * Table Model object
+     *
+     * @param parent
+     */
+    CashTransactionTableModel::CashTransactionTableModel(QObject* parent)
+        : QAbstractTableModel(parent)
+    {
+    }
+
+    CashTransactionTableModel::~CashTransactionTableModel() = default;
+
+    /**
+     * @brief Sets the transactions for the model.
+     *
+     * @param transactions The transactions to set.
+     * @param accountIdToName The mapping of account IDs to account names.
+     */
+    void CashTransactionTableModel::setTransactions(
+        std::vector<drafts::CashTransactionOverview> transactions,
+        unorderedIdMap<AccountId, std::string>       accountIdToName
+    )
+    {
+        beginResetModel();
+        _transactions    = std::move(transactions);
+        _accountIdToName = std::move(accountIdToName);
+        endResetModel();
+    }
+
+    /**
+     * @brief get the number of rows in the table model
+     *
+     * @param parent
+     * @return int
+     */
+    int CashTransactionTableModel::rowCount(const QModelIndex& parent) const
+    {
+        return parent.isValid() ? 0 : static_cast<int>(_transactions.size());
+    }
+
+    /**
+     * @brief data method for the table model
+     *
+     * @param index
+     * @param role
+     * @return QVariant
+     */
+    QVariant CashTransactionTableModel::data(
+        const QModelIndex& index,
+        int                role
+    ) const
+    {
+        if (!index.isValid() || index.row() >= rowCount({}))
+            return {};
+
+        const auto& transaction =
+            _transactions[static_cast<std::size_t>(index.row())];
+
+        switch (role)
+        {
+            case Qt::DisplayRole:
+                return _displayData(transaction, index.column());
+            case Qt::DecorationRole:
+                return _decorationData(transaction, index.column());
+            case Qt::TextAlignmentRole:
+                return _textAlignmentData(index.column());
+            default:
+                return {};
+        }
+    }
+
+    /**
+     * @brief header data for the table model
+     *
+     * @param section
+     * @param orientation
+     * @param role
+     * @return QVariant
+     */
+    QVariant CashTransactionTableModel::headerData(
+        int             section,
+        Qt::Orientation orientation,
+        int             role
+    ) const
+    {
+        if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+            return {};
+
+        return _getColLabel(section);
+    }
+
+    /**
+     * @brief the item flags for the table model
+     *
+     * @param index
+     * @return Qt::ItemFlags
+     */
+    Qt::ItemFlags CashTransactionTableModel::flags(
+        const QModelIndex& index
+    ) const
+    {
+        if (!index.isValid())
+            return Qt::NoItemFlags;
+
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
+
+    /**
      * @brief get the number of columns in the table model
      *
      * @param parent
@@ -74,7 +182,7 @@ namespace ui
      *
      * @return int The index of the description column.
      */
-    int CashTransactionTableModel::getDescriptionIndex() const
+    int CashTransactionTableModel::getDescriptionIndex()
     {
         return static_cast<int>(CashTransactionColumn::Description);
     }
@@ -84,7 +192,7 @@ namespace ui
      *
      * @return int The index of the date column.
      */
-    int CashTransactionTableModel::getDateIndex() const
+    int CashTransactionTableModel::getDateIndex()
     {
         return static_cast<int>(CashTransactionColumn::Date);
     }
@@ -97,8 +205,8 @@ namespace ui
      * @return QVariant
      */
     QVariant CashTransactionTableModel::_displayData(
-        const drafts::TransactionOverviewDraft& transaction,
-        int                                     col
+        const drafts::CashTransactionOverview& transaction,
+        int                                    col
     ) const
     {
         switch (getColFromIndex(col))
@@ -117,35 +225,26 @@ namespace ui
                 return QString::fromStdString("");
             case CashTransactionColumn::Account:
             {
-                const auto id = transaction.getEntryAccountId(false);
-                if (!_getAccountIdToNameMap().contains(id))
+                const auto id = transaction.getCashAccount();
+                if (!_accountIdToName.contains(id))
                     return "";
 
-                return QString::fromStdString(_getAccountIdToNameMap().at(id));
+                return QString::fromStdString(_accountIdToName.at(id));
             }
             case CashTransactionColumn::ReferenceAccount:
             {
-                for (const auto& entry : transaction.getEntries())
-                {
-                    if (!entry.isExternal())
-                        continue;
+                const auto id = transaction.getExternalAccount();
+                if (!_accountIdToName.contains(id))
+                    return "";
 
-                    const auto id = entry.getAccountId();
-                    if (_getAccountIdToNameMap().contains(id))
-                        return QString::fromStdString(
-                            _getAccountIdToNameMap().at(id)
-                        );
-                }
-
-                return "";
+                return QString::fromStdString(_accountIdToName.at(id));
             }
             case CashTransactionColumn::Amount:
                 return QString::fromStdString(
-                    transaction.getTotalGeneralCash().toString(2)
+                    transaction.getAmount().toString(2)
                 );
             case CashTransactionColumn::Fees:
-                return QString::fromStdString(
-                    transaction.getTotalFees().toString(2)
+                return QString::fromStdString(transaction.getFees().toString(2)
                 );
         }
         return {};
@@ -159,14 +258,14 @@ namespace ui
      * @return QVariant
      */
     QVariant CashTransactionTableModel::_decorationData(
-        const drafts::TransactionOverviewDraft& transaction,
-        int                                     col
-    ) const
+        const drafts::CashTransactionOverview& transaction,
+        int                                    col
+    )
     {
         if (getColFromIndex(col) != CashTransactionColumn::Amount)
             return {};
 
-        return transaction.getEntries().front().getCash().isPositive()
+        return transaction.getAmount().isPositive()
                    ? QColor(Qt::GlobalColor::green)
                    : QColor(Qt::GlobalColor::red);
     }
@@ -176,7 +275,7 @@ namespace ui
      * @param col
      * @return QVariant
      */
-    QVariant CashTransactionTableModel::_textAlignmentData(int col) const
+    QVariant CashTransactionTableModel::_textAlignmentData(int col)
     {
         if (getColFromIndex(col) == CashTransactionColumn::Amount)
             return {Qt::AlignRight | Qt::AlignVCenter};
@@ -189,7 +288,7 @@ namespace ui
      * @param col The column to get the label for.
      * @return QString The label for the column.
      */
-    QString CashTransactionTableModel::_getColLabel(int col) const
+    QString CashTransactionTableModel::_getColLabel(int col)
     {
         return getColLabel(static_cast<CashTransactionColumn>(col));
     }

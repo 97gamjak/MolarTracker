@@ -109,6 +109,9 @@ namespace logging::detail
     } while (0)
 // NOLINTEND(cppcoreguidelines-avoid-do-while, cppcoreguidelines-macro-usage)
 
+#define EXPLICIT_LOG(level, category, message) \
+    LOG(LOG_OBJECT_INTERNAL(level, category, message))
+
 #define LOG_TRACE_OBJECT(message)   LOG_OBJECT(LogLevel::Trace, message)
 #define LOG_DEBUG_OBJECT(message)   LOG_OBJECT(LogLevel::Debug, message)
 #define LOG_INFO_OBJECT(message)    LOG_OBJECT(LogLevel::Info, message)
@@ -124,6 +127,8 @@ namespace logging::detail
 #define LOG_ENTRY logging::LogEntryScope __logEntryScope__(LOG_TRACE_OBJECT(""))
 #define LOG_TIMED_ENTRY \
     logging::TimedLogEntryScope __timedLogEntryScope__(LOG_TRACE_OBJECT(""))
+
+#define LOG_CATEGORY std::string(logging::detail::getCategory(__FILE__))
 
 #define MT_DEBUG std::cerr
 

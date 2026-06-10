@@ -3,9 +3,9 @@
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/transaction_entry.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "orm/where_expr.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
@@ -20,7 +20,7 @@ namespace repo
      * @return The converted TransactionRow object.
      */
     TransactionRow TransactionFactory::toRow(
-        const finance::Transaction &transaction
+        const finance::DomainTransaction &transaction
     )
     {
         TransactionRow row;
@@ -40,7 +40,9 @@ namespace repo
      * @param row The TransactionRow object to convert.
      * @return The converted Transaction object.
      */
-    finance::Transaction TransactionFactory::fromRow(const TransactionRow &row)
+    finance::DomainTransaction TransactionFactory::fromRow(
+        const TransactionRow &row
+    )
     {
         finance::TransactionData type;
 
@@ -49,12 +51,12 @@ namespace repo
             case TransactionDataType::Cash:
                 type = finance::CashData{};
                 break;
-            case TransactionDataType::Trade:
+            case TransactionDataType::Stock:
                 type = finance::TradeData{};
                 break;
         }
 
-        finance::Transaction transaction{
+        finance::DomainTransaction transaction{
             row.id.value(),
             row.timestamp.value(),
             row.status.value(),
@@ -170,8 +172,29 @@ namespace repo
     {
         orm::WhereExpr where = orm::makeEmptyWhere();
 
-        if (filter.getPositionId().has_value())
-            where &= TradeLegRow::hasPosition(filter.getPositionId().value());
+        if (!filter.getTransactionIds().empty())
+        {
+            orm::WhereExpr idWhere = orm::makeEmptyWhere();
+
+            for (const auto &transactionId : filter.getTransactionIds())
+            {
+                idWhere |= TransactionRow::hasTransactionId(transactionId);
+            }
+
+            where &= idWhere;
+        }
+
+        if (!filter.getPositionIds().empty())
+        {
+            orm::WhereExpr posIdWhere = orm::makeEmptyWhere();
+
+            for (const auto &positionId : filter.getPositionIds())
+            {
+                posIdWhere |= TradeLegRow::hasPosition(positionId);
+            }
+
+            where &= posIdWhere;
+        }
 
         return where;
     }
@@ -192,7 +215,7 @@ namespace repo
     {
         orm::Joins join;
 
-        if (filter.getPositionId().has_value())
+        if (!filter.getPositionIds().empty())
         {
             join = join.add(
                 orm::join<

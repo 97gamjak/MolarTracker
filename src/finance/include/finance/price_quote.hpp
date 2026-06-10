@@ -30,6 +30,9 @@ namespace finance
         static std::expected<PriceQuote, FinanceError> fromJson(
             const nlohmann::json& json
         );
+
+        [[nodiscard]]
+        const finance::Cash& getPrice() const;
     };
 }   // namespace finance
 

@@ -7,7 +7,7 @@
 
 namespace finance
 {
-    class Transaction;         // Forward declaration
+    class DomainTransaction;   // Forward declaration
     class TransactionFilter;   // Forward declaration
 }   // namespace finance
 
@@ -31,7 +31,7 @@ namespace service
          */
         [[nodiscard]]
         virtual TransactionId addTransaction(
-            const finance::Transaction& transaction
+            const finance::DomainTransaction& transaction
         ) = 0;
 
         /**
@@ -47,7 +47,7 @@ namespace service
          * @return A vector of all transactions.
          */
         [[nodiscard]]
-        virtual std::vector<finance::Transaction> getTransactions(
+        virtual std::vector<finance::DomainTransaction> getTransactions(
             const idSet<AccountId>&           accountIds,
             const finance::TransactionFilter& filter
         ) = 0;

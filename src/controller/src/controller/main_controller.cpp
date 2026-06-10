@@ -1,5 +1,7 @@
 #include "controller/main_controller.hpp"
 
+#include <memory>
+
 #include "commands/undo_stack.hpp"
 #include "config/constants/constants.hpp"
 #include "controller/account_controller.hpp"
@@ -7,9 +9,11 @@
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
+#include "controller/position_controller.hpp"
 #include "controller/side_bar/side_bar_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "controller/vcs_controller.hpp"
+#include "finance/price_cache.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
@@ -37,15 +41,20 @@ namespace controller
         /// undo stack for managing commands
         cmd::UndoStack _undoStack;
 
-        /// controller for managing the account
-        CentralController _centralController;
-
         /// handlers for managing interactions no QT signals
         Handlers _handlers;
+
+        /// price cache for managing stock prices
+        std::shared_ptr<finance::PriceCache> _priceCache;
+
+        /// controller for managing the account
+        CentralController _centralController;
         /// controller for managing accounts
         AccountController _accountController;
         /// controller for managing transactions
         TransactionController _transactionController;
+        /// controller for managing positions
+        PositionController _positionController;
 
         /// controller for managing version control and updates
         VCSController _vcsController;
@@ -63,11 +72,16 @@ namespace controller
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
               _mainWindow(std::make_shared<ui::MainWindow>()),
-              _centralController(_mainWindow->getCentralWidget()),
               _handlers(_settings),
+              _priceCache(std::make_shared<finance::PriceCache>()),
+              _centralController(_mainWindow->getCentralWidget()),
               _accountController(
                   _undoStack,
                   _storeContainer.getAccountStore(),
+                  _storeContainer.getPositionStore(),
+                  _storeContainer.getStockStore(),
+                  _storeContainer.getTransactionStore(),
+                  _priceCache,
                   _mainWindow->getCentralWidget()
               ),
               _transactionController(
@@ -80,6 +94,12 @@ namespace controller
               _vcsController(
                   _mainWindow,
                   std::make_shared<settings::Settings>(_settings)
+              ),
+              _positionController(
+                  _storeContainer.getPositionStore(),
+                  _storeContainer.getTransactionStore(),
+                  _storeContainer.getStockStore(),
+                  _priceCache
               ),
               _menuBarController(
                   _mainWindow.get(),
