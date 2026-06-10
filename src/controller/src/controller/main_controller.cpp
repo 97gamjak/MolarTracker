@@ -101,12 +101,6 @@ namespace controller
                   _storeContainer.getStockStore(),
                   _priceCache
               ),
-              _positionController(
-                  _storeContainer.getPositionStore(),
-                  _storeContainer.getTransactionStore(),
-                  _storeContainer.getStockStore(),
-                  _priceCache
-              ),
               _menuBarController(
                   _mainWindow.get(),
                   _mainWindow->getMenuBar(),
