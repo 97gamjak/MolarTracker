@@ -100,6 +100,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
 - Make stock store a fully cached store with possibility to switch to a dirty-only cache store
 - Implement first version of Option SQL model
+- Extend transaction row sql model with some option specific data
 
 #### UI
 
