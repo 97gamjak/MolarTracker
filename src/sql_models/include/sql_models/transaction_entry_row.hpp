@@ -31,14 +31,7 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
     /// transaction entries will also be deleted
     ORM_FIELD(
         transactionId,
-        Field<
-            "transaction_id",
-            TransactionId,
-            orm::foreign_key_t<
-                orm::CascadeDelete,
-                TransactionRow,
-                decltype(TransactionRow::id)>,
-            orm::not_null_t>
+        TransactionRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The account_id field, this is a required field and is a foreign key

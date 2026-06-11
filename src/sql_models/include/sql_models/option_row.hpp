@@ -87,13 +87,6 @@ struct OptionRow : public orm::ORMModel<"option">
     /// and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
-    /// Indicates whether the option is a buy or sell, this is a field that
-    /// specifies whether the option position is a long (buy) or short (sell)
-    /// position, which is essential for understanding the option's risk profile
-    /// and potential payoff, as well as for accurate financial reporting and
-    /// analysis of the option's performance.
-    ORM_FIELD(buySell, Field<"buy_sell", OptionBuySell, orm::not_null_t>)
-
     /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
         OptionRow,
@@ -103,8 +96,7 @@ struct OptionRow : public orm::ORMModel<"option">
         optionType,
         strikePrice,
         expirationDate,
-        currency,
-        buySell
+        currency
     )
     /// @endcond
 
