@@ -27,17 +27,18 @@ namespace
     // Creates a file at `path` and sets its mtime to `ageInDays` days ago.
     void createAgedFile(const fs::path& path, int ageInDays)
     {
-        std::ofstream{path};   // create empty file
+        std::ofstream file{path};   // create empty file
 
         const auto mtime =
             fs::file_time_type::clock::now() -
-            std::chrono::hours(24) * static_cast<long long>(ageInDays);
+            std::chrono::hours(24) * static_cast<std::int64_t>(ageInDays);
         fs::last_write_time(path, mtime);
     }
 
     class LogFileCleanerTest : public ::testing::Test
     {
        protected:
+        // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
         fs::path _dir;
 
         void SetUp() override
@@ -53,8 +54,8 @@ namespace
 
         void TearDown() override
         {
-            std::error_code ec;
-            fs::remove_all(_dir, ec);
+            std::error_code errorCode;
+            fs::remove_all(_dir, errorCode);
         }
     };
 
@@ -62,20 +63,24 @@ namespace
 
 TEST_F(LogFileCleanerTest, NoOpWhenMaxAgeDaysIsZero)
 {
-    const auto file = _dir / "molar_tracker_old.log";
-    createAgedFile(file, 100);
+    const auto file   = _dir / "molar_tracker_old.log";
+    const auto age    = 100;
+    const auto maxAge = 0;   // 0 disables cleanup
+    createAgedFile(file, age);
 
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", 0);
+    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
 
     EXPECT_TRUE(fs::exists(file));
 }
 
 TEST_F(LogFileCleanerTest, DeletesOldFiles)
 {
-    const auto old = _dir / "molar_tracker_20260101_120000.log";
-    createAgedFile(old, 40);   // 40 days old, limit is 30
+    const auto old    = _dir / "molar_tracker_20260101_120000.log";
+    const auto age    = 40;
+    const auto maxAge = 30;
+    createAgedFile(old, age);   // 40 days old, limit is 30
 
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", 30);
+    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
 
     EXPECT_FALSE(fs::exists(old));
 }
@@ -83,29 +88,35 @@ TEST_F(LogFileCleanerTest, DeletesOldFiles)
 TEST_F(LogFileCleanerTest, PreservesNewFiles)
 {
     const auto recent = _dir / "molar_tracker_20260607_120000.log";
-    createAgedFile(recent, 5);   // 5 days old, limit is 30
+    const auto age    = 5;
+    const auto maxAge = 30;
+    createAgedFile(recent, age);   // 5 days old, limit is 30
 
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", 30);
+    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
 
     EXPECT_TRUE(fs::exists(recent));
 }
 
 TEST_F(LogFileCleanerTest, IgnoresFilesWithWrongPrefix)
 {
-    const auto file = _dir / "other_app_20260101_120000.log";
-    createAgedFile(file, 40);
+    const auto file   = _dir / "other_app_20260101_120000.log";
+    const auto age    = 40;
+    const auto maxAge = 30;
+    createAgedFile(file, age);
 
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", 30);
+    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
 
     EXPECT_TRUE(fs::exists(file));
 }
 
 TEST_F(LogFileCleanerTest, IgnoresFilesWithWrongSuffix)
 {
-    const auto file = _dir / "molar_tracker_20260101_120000.txt";
-    createAgedFile(file, 40);
+    const auto file   = _dir / "molar_tracker_20260101_120000.txt";
+    const auto age    = 40;
+    const auto maxAge = 30;
+    createAgedFile(file, age);
 
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", 30);
+    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
 
     EXPECT_TRUE(fs::exists(file));
 }
@@ -113,23 +124,26 @@ TEST_F(LogFileCleanerTest, IgnoresFilesWithWrongSuffix)
 TEST_F(LogFileCleanerTest, IgnoresSymlinks)
 {
     const auto target = _dir / "molar_tracker_20260101_120000.log";
-    createAgedFile(target, 40);
+    const auto age    = 40;
+    createAgedFile(target, age);
 
     const auto      link = _dir / "molar_tracker_latest.log";
-    std::error_code ec;
-    fs::create_symlink(target, link, ec);
-    if (ec)
+    std::error_code errorCode;
+    fs::create_symlink(target, link, errorCode);
+    if (errorCode)
     {
         GTEST_SKIP() << "Cannot create symlinks on this platform";
     }
 
     // Set mtime on the target to old as well
+    const auto dayInHours = std::chrono::hours(24);
     fs::last_write_time(
         target,
-        fs::file_time_type::clock::now() - std::chrono::hours(24 * 40)
+        fs::file_time_type::clock::now() - dayInHours * age
     );
 
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", 30);
+    const auto maxAge = 30;
+    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
 
     // The symlink itself (non-regular file) must survive
     EXPECT_TRUE(fs::exists(link) || fs::is_symlink(link));

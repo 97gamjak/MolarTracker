@@ -27,24 +27,24 @@ namespace logging
         if (maxAgeDays == 0)
             return;
 
-        std::error_code ec;
-        if (!std::filesystem::is_directory(directory, ec) || ec)
+        std::error_code errorCode;
+        if (!std::filesystem::is_directory(directory, errorCode) || errorCode)
             return;
 
         const auto now = std::filesystem::file_time_type::clock::now();
         const auto maxAge =
-            std::chrono::hours(24) * static_cast<long long>(maxAgeDays);
+            std::chrono::hours(24) * static_cast<std::int64_t>(maxAgeDays);
         const auto cutoff = now - maxAge;
 
         for (const auto& entry :
-             std::filesystem::directory_iterator(directory, ec))
+             std::filesystem::directory_iterator(directory, errorCode))
         {
-            if (ec)
+            if (errorCode)
                 break;
 
-            if (!entry.is_regular_file(ec) || ec)
+            if (!entry.is_regular_file(errorCode) || errorCode)
             {
-                ec.clear();
+                errorCode.clear();
                 continue;
             }
 
@@ -53,17 +53,17 @@ namespace logging
             if (!filename.starts_with(prefix) || !filename.ends_with(suffix))
                 continue;
 
-            const auto mtime = entry.last_write_time(ec);
-            if (ec)
+            const auto mtime = entry.last_write_time(errorCode);
+            if (errorCode)
             {
-                ec.clear();
+                errorCode.clear();
                 continue;
             }
 
             if (mtime < cutoff)
-                std::filesystem::remove(entry.path(), ec);
+                std::filesystem::remove(entry.path(), errorCode);
 
-            ec.clear();
+            errorCode.clear();
         }
     }
 
