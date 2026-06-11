@@ -237,9 +237,11 @@ namespace logging
             return;
 
         std::string buffer;
+        std::string prefix;
 
-        buffer += _logLevelToString(logObject.level);
-        buffer += " [" + Timestamp().iso8601TimeMs() + "] ";
+        prefix += _logLevelToString(logObject.level);
+        prefix += " [" + Timestamp().iso8601TimeMs() + "] ";
+        buffer += prefix;
         buffer += logObject.message;
         if (logObject.level >= LogLevel::Debug ||
             logObject.level == LogLevel::Error)
@@ -251,10 +253,22 @@ namespace logging
             buffer += ")";
         }
 
+        // replace all new lines in buffer with a new line following by n
+        // whitespaces according to the length of the prefix
+        const auto             prefixLength = prefix.length();
+        std::string::size_type pos          = 0;
+        while ((pos = buffer.find('\n', pos)) != std::string::npos)
+        {
+            buffer.insert(pos + 1, prefixLength, ' ');
+            pos += prefixLength + 1;
+        }
+
         _ringFile->writeLine(buffer);
 
-        if (logObject.level == LogLevel::Error ||
-            logObject.level == LogLevel::Warning)
+        // Flush the log file if the log level is not Info
+        // 1) on warning or error we want always to log
+        // 2) if the user selected a debug logging we also want always to log
+        if (logObject.level != LogLevel::Info)
             flush();
     }
 

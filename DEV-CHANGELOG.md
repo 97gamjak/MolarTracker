@@ -113,6 +113,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Add fees to creating stock and cash transactions
 - Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
 - Make stock store a fully cached store with possibility to switch to a dirty-only cache store
+- Implement first version of Option SQL model
 
 #### UI
 
@@ -132,6 +133,28 @@ All changes and updates, that are relevant for developers will be documented her
 #### Utils
 
 - Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+
+#### VCS
+
+- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
+  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
+    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+  - `vcs::UpdateCheckService` — `QObject` that fires an async
+    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
+    emits `updateAvailable(SemVer)` at most once per distinct version per
+    session
+- Add `SemVer::current()` static method that returns the compile-time
+  version from `MOLARTRACKER_VERSION`
+- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
+  comparison operators
+- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
+  version, a link button to the GitHub releases page, and a
+  "don't show again for this version" checkbox
+- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
+  persists the last dismissed update version to `settings.json`
+- Wire `UpdateCheckService` into `MainController::Impl`; on
+  `updateAvailable` the dismissed version is checked, the dialog is shown,
+  and if dismissed the version is written to settings and saved
 
 ### Cleanup
 

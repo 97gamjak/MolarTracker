@@ -38,7 +38,7 @@ namespace finance
         [[nodiscard]] std::optional<Timestamp> getClosedAt() const;
     };
 
-    filter::Predicate<Position> IsPositionOpen();
+    filter::Predicate<Position> IsPositionOpen(bool isOpen = true);
 
 }   // namespace finance
 

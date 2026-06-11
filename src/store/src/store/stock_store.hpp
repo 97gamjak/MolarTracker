@@ -51,15 +51,15 @@ namespace store
         StockStoreResult addStock(finance::Stock stock) override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks(
+        finance::Stocks getStocks(
             const idSet<InstrumentId>& ids
         ) const override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks() const override;
+        finance::Stocks getStocks() const override;
 
         [[nodiscard]]
-        std::optional<finance::Stock> getStock(InstrumentId id) const;
+        std::optional<finance::Stock> getStock(InstrumentId id) const override;
 
         [[nodiscard]]
         std::vector<std::string> getAllTickers() const override;
@@ -68,7 +68,8 @@ namespace store
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
-        instrumentMap<std::string> getInstrumentIdToNameMap() const override;
+        unorderedIdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        ) const override;
 
         [[nodiscard]]
         bool stockExists(const std::string& ticker, bool checkDeleted) const;

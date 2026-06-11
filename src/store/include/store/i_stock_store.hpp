@@ -7,6 +7,7 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
+#include "finance/instrument/stocks.hpp"
 
 class Connection;   // Forward declaration
 
@@ -50,23 +51,34 @@ namespace store
         virtual StockStoreResult addStock(finance::Stock stock) = 0;
 
         /**
+         * @brief Get the Stock based on the given instrument ID
+         *
+         * @param id
+         * @return std::optional<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Stock> getStock(
+            InstrumentId id
+        ) const = 0;
+
+        /**
          * @brief Get a list of stocks by their instrument IDs
          *
          * @param ids The set of instrument IDs to retrieve stocks for
-         * @return std::vector<finance::Stock>
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks(
+        virtual finance::Stocks getStocks(
             const idSet<InstrumentId>& ids
         ) const = 0;
 
         /**
          * @brief Get a list of all stocks in the store
          *
-         * @return std::vector<finance::Stock>
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks() const = 0;
+        virtual finance::Stocks getStocks() const = 0;
 
         /**
          * @brief Get all stock tickers in the store
@@ -82,7 +94,9 @@ namespace store
          * @return std::unordered_map<std::string, InstrumentId>
          */
         [[nodiscard]]
-        virtual instrumentMap<std::string> getInstrumentIdToNameMap() const = 0;
+        virtual unorderedIdMap<
+            InstrumentId,
+            std::string> getInstrumentIdToNameMap() const = 0;
 
         /**
          * @brief Get the instrument ID for a given stock ticker

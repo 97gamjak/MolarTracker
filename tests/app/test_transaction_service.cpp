@@ -9,9 +9,10 @@
 #include "config/quantity.hpp"
 #include "db/database.hpp"
 #include "finance/cash.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/transaction_entries.hpp"
+#include "finance/transaction/transaction_entry.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/transaction_repo.hpp"
 #include "service/transaction_service.hpp"
@@ -52,21 +53,22 @@ namespace
             );
         }
 
-        [[nodiscard]] finance::Transaction makeCashTx(
+        [[nodiscard]] finance::DomainTransaction makeCashTx(
             micro_units amount = 0
         ) const
         {
-            return finance::Transaction{
+            const auto entry = finance::TransactionEntry{
+                TransactionEntryId::invalid(),
+                _accountId,
+                finance::Cash{Currency::USD, amount},
+                TransactionEntryType::General
+            };
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 finance::CashData{},
-                {finance::TransactionEntry{
-                    TransactionEntryId::invalid(),
-                    _accountId,
-                    finance::Cash{Currency::USD, amount},
-                    TransactionEntryType::General
-                }},
+                finance::TransactionEntries{{entry}},
                 std::nullopt
             };
         }

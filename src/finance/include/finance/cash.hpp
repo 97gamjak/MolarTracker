@@ -25,20 +25,22 @@ namespace finance
         micro_units _amount;
 
        public:
-        explicit Cash(Currency currency);
-        explicit Cash(Currency currency, micro_units amount);
+        Cash(Currency currency, micro_units amount);
+        Cash();
 
-        friend constexpr bool operator==(const Cash& lhs, const Cash& rhs);
+        friend constexpr bool operator==(Cash lhs, const Cash& rhs);
         friend constexpr std::strong_ordering operator<=>(
             const Cash& lhs,
             const Cash& rhs
         );
 
-        friend Cash operator+(const Cash& lhs, const Cash& rhs);
-        friend Cash operator-(const Cash& lhs, const Cash& rhs);
-        friend Cash operator-(const Cash& cash);
-        friend Cash operator*(const Cash& cash, const Quantity& multiplier);
-        friend Cash operator*(const Quantity& multiplier, const Cash& cash);
+        friend Cash   operator+(Cash lhs, const Cash& rhs);
+        friend Cash   operator-(Cash lhs, const Cash& rhs);
+        friend Cash   operator-(const Cash& cash);
+        friend Cash   operator*(const Cash& cash, const Quantity& multiplier);
+        friend Cash   operator*(const Quantity& multiplier, const Cash& cash);
+        friend Cash   operator/(const Cash& cash, const Quantity& divisor);
+        friend double operator/(const Cash& cash, const Cash& divisor);
 
         friend Cash& operator+=(Cash& lhs, const Cash& rhs);
         friend Cash& operator-=(Cash& lhs, const Cash& rhs);
@@ -53,6 +55,10 @@ namespace finance
         [[nodiscard]] std::string toString(
             std::optional<std::uint8_t> nDecimalPlaces
         ) const;
+
+       private:
+        // cppcheck-suppress unusedPrivateFunction -- used in friend operators
+        void _takeCurrency(const Cash& cash);
     };
 
 }   // namespace finance

@@ -9,7 +9,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/side_bar.hpp"

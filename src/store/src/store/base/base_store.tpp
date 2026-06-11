@@ -213,8 +213,9 @@ namespace store
     auto BaseStore<T, IdType>::_getValues(Options options) const
     {
         return _getEntries(options) |
-               std::views::transform([](const auto& entry)
-                                     { return entry.value; });
+               std::views::transform(
+                   [](const auto& entry) -> const T& { return entry.value; }
+               );
     }
 
     /**
@@ -490,6 +491,48 @@ namespace store
     bool BaseStore<T, IdType>::isFullCache() const
     {
         return _fullCache;
+    }
+
+    /**
+     * @brief logs the contents of the store's cache for debugging purposes.
+     * This method checks if logging is enabled for the specified category and
+     * log level, and if so, it logs the number of entries in the cache and the
+     * details of each entry, including its value and state. This can be useful
+     * for debugging and understanding the current state of the store's cache.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param category The logging category to use for the log messages.
+     * @param level The log level to use for the log messages.
+     */
+
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_logCache(
+        const std::string& category,
+        LogLevel           level
+    )
+    {
+        if (logging::LogManager::getInstance().isEnabled(category, level))
+        {
+            EXPLICIT_LOG(
+                level,
+                category,
+                std::format("Cache contents ({}):", _entries.size())
+            );
+
+            for (const auto& entry : _entries)
+            {
+                EXPLICIT_LOG(
+                    level,
+                    category,
+                    std::format(
+                        "Cache: {{value: {}, state: {}}}",
+                        entry.value.toString(),
+                        StoreStateMeta::toString(entry.state)
+                    )
+                );
+            }
+        }
     }
 
     /**

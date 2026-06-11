@@ -2,17 +2,20 @@
 #define __STORE__INCLUDE__STORE__I_TRANSACTION_STORE_HPP__
 
 #include <cstdint>
+#include <functional>
 #include <mstd/enum.hpp>
-#include <vector>
 
 #include "config/id_types.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/position_transaction.hpp"   // needed for vector
 
 namespace finance
 {
-    class Account;   // Forward declaration
+    class Account;             // Forward declaration
+    class TransactionFilter;   // Forward declaration
+    class Transactions;        // Forward declaration
 }   // namespace finance
+
+class Connection;   // Forward declaration
 
 namespace store
 {
@@ -23,6 +26,16 @@ namespace store
     X(TransactionSumNotZero)
 
     MSTD_ENUM(TransactionStoreResult, std::uint8_t, TRANSACTION_STORE_RESULT);
+
+    /**
+     * @brief Structure representing a callback for when a transaction is added.
+     *
+     */
+    struct OnTransactionAdded
+    {
+        /// The callback function type for when a transaction is added
+        using func = std::function<void(finance::Transactions transactions)>;
+    };
 
     /**
      * @brief Store for managing transactions
@@ -47,14 +60,25 @@ namespace store
         ) = 0;
 
         /**
-         * @brief Add a transaction to the store
+         * @brief Add a cash transaction to the store
          *
-         * @param transaction The transaction to add
+         * @param transaction The cash transaction to add
          * @return TransactionStoreResult The result of the operation
          */
         [[nodiscard]]
-        virtual TransactionStoreResult addTransaction(
-            finance::Transaction transaction
+        virtual TransactionStoreResult addCashTransaction(
+            finance::CashTransaction transaction
+        ) = 0;
+
+        /**
+         * @brief Add a stock transaction to the store
+         *
+         * @param transaction The stock transaction to add
+         * @return TransactionStoreResult The result of the operation
+         */
+        [[nodiscard]]
+        virtual TransactionStoreResult addStockTransaction(
+            finance::StockTransaction transaction
         ) = 0;
 
         /**
@@ -62,31 +86,51 @@ namespace store
          *
          * @param filter The filter to apply
          *
-         * @return std::vector<finance::Transaction> The list of transactions
+         * @return finance::Transactions The list of
+         * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Transaction> getTransactions(
+        virtual finance::Transactions getTransactions(
             const finance::TransactionFilter& filter
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
-         * @return std::vector<finance::Transaction> The list of transactions
+         * @return finance::Transactions The list of
+         * transactions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Transaction> getTransactions() const = 0;
+        virtual finance::Transactions getTransactions() const = 0;
 
         /**
-         * @brief Get all instrument IDs associated with a position ID
+         * @brief Get the Stock Positions
          *
-         * @param positionId The position ID to filter by
-         * @return idSet<InstrumentId> The set of instrument IDs
+         * @param filter
+         * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
          */
         [[nodiscard]]
-        virtual idSet<InstrumentId> getInstrumentIdsByPositionId(
-            PositionId positionId
+        virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+            const finance::TransactionFilter& filter
         ) const = 0;
+
+        /**
+         * @brief Subscribe to transaction added events, this allows subscribers
+         * to be notified when a transaction is added, which can be useful for
+         * updating the UI or performing other actions in response to a
+         * transaction being added.
+         *
+         * @param func The callback function to call when a transaction is added
+         * @param user A pointer to the user data, which will be passed to the
+         * callback function
+         * @return Connection The connection object, which can be used to
+         * unsubscribe from the event
+         */
+        [[nodiscard]]
+        virtual Connection subscribeToTransactionAdded(
+            OnTransactionAdded::func func,
+            void*                    user
+        ) = 0;
     };
 
 }   // namespace store

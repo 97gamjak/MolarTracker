@@ -15,17 +15,14 @@ using InstrumentId = StrongId<InstrumentTag>;
 
 using InstrumentIdSeq = IdSequence<InstrumentId>;
 
-template <typename T>
-using instrumentMap = unorderedIdMap<InstrumentId, T>;
-
 struct StockTag {};
 using StockId = StrongId<StockTag>;
 
+struct OptionTag {};
+using OptionId = StrongId<OptionTag>;
+
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
-
-template <typename T>
-using accountMap = unorderedIdMap<AccountId, T>;
 
 struct TransactionTag {};
 using TransactionId = StrongId<TransactionTag>;

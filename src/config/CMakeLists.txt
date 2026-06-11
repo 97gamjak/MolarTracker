@@ -1,5 +1,7 @@
 add_library(molartracker_config STATIC
-    src/config/constants.cpp
+    src/config/constants/constants.cpp
+    src/config/constants/github_constants.cpp
+    
     src/config/quantity.cpp
 )
 

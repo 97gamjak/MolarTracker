@@ -54,10 +54,23 @@ class Quantity
 
     [[nodiscard]] micro_units toMicroUnits() const;
 
-    [[nodiscard]]
-    std::string toString() const;
+    [[nodiscard]] std::string toString() const;
 
+    [[nodiscard]] bool isZero() const;
+
+    [[nodiscard]] Quantity abs() const;
+
+    [[nodiscard]] bool operator==(const Quantity& other) const;
     [[nodiscard]] bool operator>(const Quantity& other) const;
+    Quantity&          operator+=(const Quantity& other);
+    Quantity&          operator-=(const Quantity& other);
+
+    friend Quantity operator+(const Quantity& lhs, const Quantity& rhs);
+    friend Quantity operator-(const Quantity& lhs, const Quantity& rhs);
+
+    /********************
+     * friend operators *
+     ********************/
 
     template <typename T>
     friend bool operator>(const Quantity& lhs, const T& rhs);
@@ -72,6 +85,8 @@ class Quantity
 );
 
 [[nodiscard]] micro_units mulDiv(micro_units lhs, Quantity rhs);
+
+[[nodiscard]] micro_units divBy(micro_units lhs, Quantity rhs);
 
 [[nodiscard]] micro_units microUnitsFromString(
     std::string_view value,

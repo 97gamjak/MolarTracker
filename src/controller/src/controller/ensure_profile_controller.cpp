@@ -39,12 +39,12 @@ namespace controller
      * @param settings
      */
     EnsureProfileController::EnsureProfileController(
-        QMainWindow&           mainWindow,
-        store::StoreContainer& storeContainer,
-        cmd::UndoStack&        undoStack,
-        settings::Settings&    settings
+        const std::shared_ptr<QMainWindow>& mainWindow,
+        store::StoreContainer&              storeContainer,
+        cmd::UndoStack&                     undoStack,
+        settings::Settings&                 settings
     )
-        : QObject(&mainWindow),
+        : QObject(mainWindow.get()),
           _mainWindow(mainWindow),
           _storeContainer(storeContainer),
           _undoStack(undoStack),
@@ -158,7 +158,7 @@ namespace controller
 
             *_ensureProfileExistsCommand << std::move(cmdResult);
 
-            auto* statusBar = _mainWindow.statusBar();
+            auto* statusBar = _mainWindow->statusBar();
 
             const auto msg =
                 "Default profile '" + name + "' loaded successfully.";
@@ -195,7 +195,7 @@ namespace controller
                     defaultProfile
                 )
             ),
-            &_mainWindow
+            _mainWindow.get()
         );
 
         if (profileStore->hasProfiles())
@@ -219,7 +219,7 @@ namespace controller
                 "configured. You will need to select an existing profile or "
                 "create a new one to continue."
             ),
-            &_mainWindow
+            _mainWindow.get()
         );
 
         auto& profileStore = _storeContainer.getProfileStore();
@@ -243,7 +243,7 @@ namespace controller
         _addProfileDialog = utils::makeQChild<ui::AddProfileDialog>(
             settings,
             false,   // canBeClosed = false to disable the close button
-            &_mainWindow
+            _mainWindow.get()
         );
 
         connect(
@@ -271,7 +271,7 @@ namespace controller
         const auto& profileStore = _storeContainer.getProfileStore();
 
         _profileSelectionDialog = utils::makeQChild<ui::ProfileSelectionDialog>(
-            &_mainWindow,
+            _mainWindow.get(),
             profileStore->getAllProfileNames(),
             false   // canBeClosed = false to disable the close button
         );
@@ -328,7 +328,7 @@ namespace controller
 
             ui::showInfoStatusBar(
                 LOG_INFO_OBJECT(msg),
-                _mainWindow.statusBar()
+                _mainWindow->statusBar()
             );
         }
     }
@@ -421,7 +421,7 @@ namespace controller
                     "Profile '" + profileDraft.getName() +
                     "' created successfully."
                 ),
-                _mainWindow.statusBar()
+                _mainWindow->statusBar()
             );
 
             if (auto* dialog = _addProfileDialog.data())

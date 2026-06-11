@@ -1,10 +1,19 @@
 qt_add_library(molartracker_controller STATIC
 
+    # general controllers
+    src/controller/account_controller.cpp
+    src/controller/transaction_controller.cpp
+    src/controller/position_controller.cpp
+    src/controller/vcs_controller.cpp
+
     # mappers
     src/controller/mapper/account_mapper.cpp
     src/controller/mapper/profile_mapper.cpp
     src/controller/mapper/stock_mapper.cpp
-    src/controller/mapper/transaction_mapper.cpp
+
+    src/controller/mapper/transaction/transaction_mapper.cpp
+    src/controller/mapper/transaction/transaction_overview_mapper.cpp
+    src/controller/mapper/transaction/transaction_create_mapper.cpp
 
     # menu bar
     src/controller/menu_bar/menu_bar_controller.cpp
@@ -23,9 +32,6 @@ qt_add_library(molartracker_controller STATIC
     src/controller/side_bar/transaction_controller.cpp
     src/controller/side_bar/securities_controller.cpp
 
-    src/controller/account_controller.cpp
-    src/controller/transaction_controller.cpp
-
     src/controller/central_controller.cpp
 
     # handler TODO: refactor this general handler
@@ -34,7 +40,7 @@ qt_add_library(molartracker_controller STATIC
     src/controller/handlers/dirty_handler.cpp
 
     # transaction
-    src/controller/transaction/transaction_helpers.cpp
+    src/controller/helpers.cpp
 
     src/controller/main_controller.cpp
 )
@@ -49,6 +55,7 @@ target_include_directories(molartracker_controller
 target_link_libraries(molartracker_controller
     PRIVATE
     Qt6::Widgets
+    Qt6::Concurrent
     molartracker_store
     molartracker_connections
     molartracker_settings
@@ -57,4 +64,5 @@ target_link_libraries(molartracker_controller
     molartracker_drafts
     molartracker_commands
     molartracker_http
+    molartracker_vcs
 )
