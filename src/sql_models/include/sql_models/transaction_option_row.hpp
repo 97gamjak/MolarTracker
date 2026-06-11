@@ -57,7 +57,7 @@ struct TransactionOptionRow : public orm::ORMModel<"transaction_option">
     ORM_FIELD(
         rolledOption,
         orm::Field<
-            "id",
+            "rolled_option_id",
             TransactionOptionId,
             tableName,
             orm::foreign_key_t<
