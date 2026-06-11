@@ -75,6 +75,19 @@ MSTD_ENUM(OptionType, std::uint8_t, OPTION_TYPE_LIST);
 
 MSTD_ENUM(OptionBuySell, std::uint8_t, OPTION_BUY_SELL_LIST);
 
+#define TRANSACTION_OPTION_ACTION_LIST(X) \
+    X(Open)                               \
+    X(Close)                              \
+    X(RollOpen)                           \
+    X(RollClose)                          \
+    X(Exercised)
+
+MSTD_ENUM(
+    TransactionOptionAction,
+    std::uint8_t,
+    TRANSACTION_OPTION_ACTION_LIST
+);
+
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__

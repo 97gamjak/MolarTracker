@@ -33,14 +33,7 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// associate this trade leg with a specific transaction.
     ORM_FIELD(
         transactionId,
-        Field<
-            "transaction_id",
-            TransactionId,
-            orm::foreign_key_t<
-                orm::CascadeDelete,
-                TransactionRow,
-                decltype(TransactionRow::id)>,
-            orm::not_null_t>
+        TransactionRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The ID of the account associated with this trade leg, this is a foreign

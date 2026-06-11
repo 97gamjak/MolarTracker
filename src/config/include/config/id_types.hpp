@@ -21,6 +21,9 @@ using StockId = StrongId<StockTag>;
 struct OptionTag {};
 using OptionId = StrongId<OptionTag>;
 
+struct TransactionOptionTag {};
+using TransactionOptionId = StrongId<TransactionOptionTag>;
+
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
 

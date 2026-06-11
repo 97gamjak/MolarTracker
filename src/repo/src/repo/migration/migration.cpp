@@ -19,6 +19,7 @@
 #include "sql_models/stock_row.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
 #include "utils/version.hpp"
 
@@ -430,6 +431,7 @@ namespace repo
         _migrateV11();
         _migrateV12();
         _migrateV13();
+        _migrateV14();
     }
 
     /**
@@ -496,6 +498,32 @@ namespace repo
 
         migration.addMigration(
             std::make_unique<CreateTableMigration<OptionRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 14
+     *
+     * @details This handles the migration from v13 to v14. It creates a new
+     * transaction_option table for representing options associated with
+     * financial transactions, allowing for detailed tracking and management of
+     * option positions within transactions, including whether the option is a
+     * buy or sell, the action taken on the option (e.g., open, close, roll),
+     * and any rolled options if applicable. This structured representation
+     * enables accurate reporting and analysis of option-related activities
+     * within the application.
+     */
+    void Migrations::_migrateV14()
+    {
+        constexpr std::size_t currentVersion = 13;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        // here we can safely migrate with invalid as we did not yet add any
+        // transaction options to the db
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<TransactionOptionRow>>()
         );
 
         _migrations.push_back(std::move(migration));
