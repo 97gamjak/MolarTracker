@@ -1,9 +1,12 @@
 #include "transaction_repo.hpp"
 
+#include <algorithm>
+
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
@@ -28,11 +31,11 @@ namespace repo
          * @param db
          */
         void addLegs(
-            const std::vector<finance::TradeLeg>& legs,
-            TransactionId                         txId,
-            db::Transaction&                      dbTx,
-            orm::Crud&                            crud,
-            db::Database&                         db
+            const finance::TradeLegs& legs,
+            TransactionId             txId,
+            const db::Transaction&    dbTx,
+            orm::Crud&                crud,
+            db::Database&             db
         )
         {
             for (const auto& leg : legs)
@@ -104,7 +107,7 @@ namespace repo
 
                     return TransactionFactory::fromOptionRow(
                         txRow,
-                        optionRow.value(),
+                        optionRow.value()
                     );
                 }
                 case TransactionDataType::Stock:
@@ -165,7 +168,7 @@ namespace repo
             case TransactionDataType::Stock:
             {
                 const auto data =
-                    std::get<finance::TradeData>(transaction.getData());
+                    std::get<finance::StockData>(transaction.getData());
 
                 addLegs(
                     data.getLegs(),

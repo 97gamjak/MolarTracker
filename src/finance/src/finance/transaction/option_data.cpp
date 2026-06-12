@@ -54,4 +54,19 @@ namespace finance
         return _rolledOption;
     }
 
+    /**
+     * @brief get the position ID associated with the option data, this will
+     * return the position ID of the first leg of the option data, assuming that
+     * all legs of the option data are associated with the same position.
+     *
+     * @return PositionId
+     */
+    PositionId OptionData::getPositionId() const
+    {
+        if (_legs.empty())
+            return PositionId::invalid();
+
+        return _legs[0].getPositionId();
+    }
+
 }   // namespace finance

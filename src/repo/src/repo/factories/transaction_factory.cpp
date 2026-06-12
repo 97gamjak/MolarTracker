@@ -3,6 +3,7 @@
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "orm/where_expr.hpp"
@@ -64,11 +65,10 @@ namespace repo
      * object.
      */
     finance::DomainTransaction TransactionFactory::fromStockRow(
-        const TransactionRow &row,
-        PositionId            positionId
+        const TransactionRow &row
     )
     {
-        return _fromRow(row, finance::TradeData{positionId});
+        return _fromRow(row, finance::StockData{});
     }
 
     /**
@@ -86,12 +86,10 @@ namespace repo
      */
     finance::DomainTransaction TransactionFactory::fromOptionRow(
         const TransactionRow       &row,
-        const TransactionOptionRow &optionRow,
-        PositionId                  positionId
+        const TransactionOptionRow &optionRow
     )
     {
         finance::OptionData type = finance::OptionData{
-            positionId,
             optionRow.id.value(),
             optionRow.buySell.value(),
             optionRow.action.value(),
@@ -213,7 +211,8 @@ namespace repo
             row.accountId.value(),
             row.instrumentId.value(),
             Quantity(row.quantity.value()),
-            finance::Cash(row.currency.value(), row.unitPrice.value())
+            finance::Cash(row.currency.value(), row.unitPrice.value()),
+            row.positionId.value()
         };
     }
 

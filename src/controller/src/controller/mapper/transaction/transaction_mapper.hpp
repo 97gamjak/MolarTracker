@@ -2,7 +2,6 @@
 #define __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_MAPPER_HPP__
 
 #include <string>
-#include <variant>
 #include <vector>
 
 #include "config/id_types.hpp"
@@ -10,14 +9,10 @@
 namespace finance
 {
     struct CashData;           // forward declaration
-    class TradeData;           // forward declaration
+    class StockData;           // forward declaration
     class TransactionEntry;    // forward declaration
     class DomainTransaction;   // forward declaration
     class TradeLeg;            // forward declaration
-
-    using TransactionData =
-        std::variant<CashData, TradeData>;   // forward declaration
-
 }   // namespace finance
 
 namespace drafts

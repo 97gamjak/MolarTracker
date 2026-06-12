@@ -136,6 +136,7 @@ namespace logging::detail
 template <int Todo>
 void mustImplement()
 {
+    // cppcheck-suppress knownConditionTrueFalse
     if constexpr (Todo > 0)
     {
         MSTD_COMPILE_FAIL("REACHED MUST_BE_IMPLEMENTED");

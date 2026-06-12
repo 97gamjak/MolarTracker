@@ -10,6 +10,7 @@
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/position_transaction.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "finance/transaction/transactions.hpp"
@@ -378,10 +379,10 @@ namespace store
             {
                 // check if this committed transaction references the
                 // remapped ID
-                const auto hasId = finance::hasId(
-                    entry.value.getData(),
+                const auto hasId = std::ranges::any_of(
                     remap,
-                    &finance::TradeLeg::getInstrumentId
+                    [&entry](const auto& pair)
+                    { return entry.value.hasInstrumentId(pair.first); }
                 );
 
                 if (hasId)
@@ -402,7 +403,7 @@ namespace store
                 {
                     auto  transaction = entry.value;
                     auto& data =
-                        std::get<finance::TradeData>(transaction.getData());
+                        std::get<finance::StockData>(transaction.getData());
 
                     bool modified = false;
 
@@ -457,10 +458,10 @@ namespace store
             {
                 // check if this committed transaction references the
                 // remapped ID
-                const auto hasId = finance::hasId(
-                    entry.value.getData(),
+                const auto hasId = std::ranges::any_of(
                     remap,
-                    &finance::TradeLeg::getPositionId
+                    [&entry](const auto& pair)
+                    { return entry.value.hasPositionId(pair.first); }
                 );
 
                 if (hasId)
@@ -480,7 +481,7 @@ namespace store
                 {
                     auto  transaction = entry.value;
                     auto& data =
-                        std::get<finance::TradeData>(transaction.getData());
+                        std::get<finance::StockData>(transaction.getData());
 
                     bool modified = false;
 

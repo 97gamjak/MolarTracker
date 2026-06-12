@@ -43,15 +43,13 @@ namespace repo
 
         [[nodiscard]]
         static finance::DomainTransaction fromStockRow(
-            const TransactionRow& row,
-            PositionId            positionId
+            const TransactionRow& row
         );
 
         [[nodiscard]]
         static finance::DomainTransaction fromOptionRow(
             const TransactionRow&       row,
-            const TransactionOptionRow& optionRow,
-            PositionId                  positionId
+            const TransactionOptionRow& optionRow
         );
 
         [[nodiscard]]

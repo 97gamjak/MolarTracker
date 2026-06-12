@@ -2,6 +2,7 @@
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__OPTION_DATA_HPP__
 
 #include "finance/transaction/trade_data.hpp"
+#include "trade_leg.hpp"
 
 namespace finance
 {
@@ -15,8 +16,10 @@ namespace finance
      * financial transaction system.
      *
      */
-    class OptionData : public TradeData
+    class OptionData : public TradeData<OptionData>
     {
+        friend class TradeData<OptionData>;
+
        private:
         /// The ID of the option contract being traded
         TransactionOptionId _id;
@@ -29,6 +32,9 @@ namespace finance
 
         /// The rolled option for this option transaction, if any
         std::optional<TransactionOptionId> _rolledOption;
+
+        /// The trade legs associated with the option transaction
+        TradeLegs _legs;
 
        public:
         OptionData(
@@ -44,6 +50,8 @@ namespace finance
 
         [[nodiscard]]
         std::optional<TransactionOptionId> getRolledOption() const;
+
+        [[nodiscard]] PositionId getPositionId() const;
     };
 }   // namespace finance
 

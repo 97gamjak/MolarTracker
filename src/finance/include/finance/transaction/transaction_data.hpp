@@ -4,7 +4,7 @@
 #include <variant>
 
 #include "finance/transaction/option_data.hpp"
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/stock_data.hpp"
 
 namespace finance
 {
@@ -12,7 +12,7 @@ namespace finance
     {
     };
 
-    using TransactionData = std::variant<CashData, TradeData, OptionData>;
+    using TransactionData = std::variant<CashData, StockData, OptionData>;
 
 }   // namespace finance
 

@@ -1,11 +1,12 @@
 #include "finance/transaction/domain_transaction.hpp"
 
+#include <algorithm>
 #include <utility>
 #include <variant>
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_data.hpp"
 
 namespace finance
@@ -65,16 +66,16 @@ namespace finance
      * legs associated with the transaction, which contain information about
      * the instruments being traded, the quantities, and the unit prices.
      *
-     * @return std::vector<TradeLeg> A vector of TradeLeg objects
+     * @return TradeLegs A vector of TradeLeg objects
      * representing the legs of the transaction. If the transaction does not
      * contain trade data, an empty vector is returned.
      */
-    std::vector<TradeLeg> DomainTransaction::getLegs() const
+    TradeLegs DomainTransaction::getLegs() const
     {
         switch (getType())
         {
             case TransactionDataType::Stock:
-                return std::get<TradeData>(_data).getLegs();
+                return std::get<StockData>(_data).getLegs();
             case TransactionDataType::Option:
                 return std::get<OptionData>(_data).getLegs();
             case TransactionDataType::Cash:
@@ -128,7 +129,7 @@ namespace finance
                 return TransactionDataType::Cash;
             }
 
-            TransactionDataType operator()(const TradeData& /*data*/) const
+            TransactionDataType operator()(const StockData& /*data*/) const
             {
                 return TransactionDataType::Stock;
             }
@@ -167,7 +168,7 @@ namespace finance
         {
             case TransactionDataType::Stock:
             {
-                auto& data = std::get<TradeData>(_data);
+                auto& data = std::get<StockData>(_data);
                 data.addLeg(leg);
                 break;
             }
@@ -186,12 +187,19 @@ namespace finance
         std::unreachable();
     }
 
+    /**
+     * @brief Checks if the transaction has a specific position ID
+     *
+     * @param id
+     * @return true
+     * @return false
+     */
     bool DomainTransaction::hasPositionId(PositionId id) const
     {
         switch (getType())
         {
             case TransactionDataType::Stock:
-                return std::get<TradeData>(_data).getPositionId() == id;
+                return std::get<StockData>(_data).getPositionId() == id;
             case TransactionDataType::Option:
                 return std::get<OptionData>(_data).getPositionId() == id;
             case TransactionDataType::Cash:
@@ -199,6 +207,21 @@ namespace finance
         }
 
         std::unreachable();
+    }
+
+    /**
+     * @brief Checks if the transaction has a specific instrument ID
+     *
+     * @param id
+     * @return true
+     * @return false
+     */
+    bool DomainTransaction::hasInstrumentId(InstrumentId id) const
+    {
+        return std::ranges::any_of(
+            getLegs(),
+            [id](const auto& leg) { return leg.getInstrumentId() == id; }
+        );
     }
 
 }   // namespace finance

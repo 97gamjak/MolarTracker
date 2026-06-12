@@ -3,14 +3,10 @@
 
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "trade_data.hpp"
 #include "transaction_data.hpp"
 #include "transaction_entry.hpp"
 #include "utils/timestamp.hpp"
@@ -47,14 +43,14 @@ namespace finance
         [[nodiscard]] TransactionDataType       getType() const;
         [[nodiscard]] const TransactionData&    getData() const;
         [[nodiscard]] TransactionData&          getData();
-        [[nodiscard]] std::vector<InstrumentId> getInstrumentIds() const;
 
         [[nodiscard]] bool hasPositionId(PositionId id) const;
+        [[nodiscard]] bool hasInstrumentId(InstrumentId id) const;
 
         void addEntry(const TransactionEntry& entry);
         void addLeg(const TradeLeg& leg);
 
-        [[nodiscard]] std::vector<TradeLeg> getLegs() const;
+        [[nodiscard]] TradeLegs getLegs() const;
 
         [[nodiscard]] std::string toString() const override;
     };
