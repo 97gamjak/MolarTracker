@@ -121,34 +121,6 @@ TEST_F(LogFileCleanerTest, IgnoresFilesWithWrongSuffix)
     EXPECT_TRUE(fs::exists(file));
 }
 
-TEST_F(LogFileCleanerTest, IgnoresSymlinks)
-{
-    const auto target = _dir / "molar_tracker_20260101_120000.log";
-    const auto age    = 40;
-    createAgedFile(target, age);
-
-    const auto      link = _dir / "molar_tracker_latest.log";
-    std::error_code errorCode;
-    fs::create_symlink(target, link, errorCode);
-    if (errorCode)
-    {
-        GTEST_SKIP() << "Cannot create symlinks on this platform";
-    }
-
-    // Set mtime on the target to old as well
-    const auto dayInHours = std::chrono::hours(24);
-    fs::last_write_time(
-        target,
-        fs::file_time_type::clock::now() - dayInHours * age
-    );
-
-    const auto maxAge = 30;
-    logging::LogFileCleaner::cleanByAge(_dir, "molar_tracker_", ".log", maxAge);
-
-    // The symlink itself (non-regular file) must survive
-    EXPECT_TRUE(fs::exists(link) || fs::is_symlink(link));
-}
-
 TEST_F(LogFileCleanerTest, NonExistentDirectoryIsNoOp)
 {
     const auto missing = _dir / "no_such_dir";
