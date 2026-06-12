@@ -86,6 +86,22 @@ namespace repo
                             )
                         )
                     );
+
+                    if (!optionRow.has_value())
+                    {
+                        LOG_ERROR(
+                            "Failed to retrieve option data for transaction "
+                            "with "
+                            "ID " +
+                            txRow.id.value().toString()
+                        );
+                        throw orm::CrudException(
+                            "Missing option data for option transaction with "
+                            "ID " +
+                            txRow.id.value().toString()
+                        );
+                    }
+
                     return TransactionFactory::fromOptionRow(
                         txRow,
                         optionRow.value()
