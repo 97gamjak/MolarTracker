@@ -1,9 +1,8 @@
 #ifndef __REPO__SRC__REPO__FACTORIES__TRANSACTION_FACTORY_HPP__
 #define __REPO__SRC__REPO__FACTORIES__TRANSACTION_FACTORY_HPP__
 
-#include <optional>
-
 #include "config/id_types.hpp"
+#include "finance/transaction/transaction_data.hpp"
 #include "orm/join.hpp"
 #include "orm/where_expr.hpp"
 
@@ -38,9 +37,19 @@ namespace repo
         );
 
         [[nodiscard]]
-        static finance::DomainTransaction fromRow(
-            const TransactionRow&                      row,
-            const std::optional<TransactionOptionRow>& optionRow
+        static finance::DomainTransaction fromCashRow(
+            const TransactionRow& row
+        );
+
+        [[nodiscard]]
+        static finance::DomainTransaction fromStockRow(
+            const TransactionRow& row
+        );
+
+        [[nodiscard]]
+        static finance::DomainTransaction fromOptionRow(
+            const TransactionRow&       row,
+            const TransactionOptionRow& optionRow
         );
 
         [[nodiscard]]
@@ -76,6 +85,13 @@ namespace repo
 
         [[nodiscard]]
         static orm::Joins toJoin(const finance::TransactionFilter& filter);
+
+       private:
+        [[nodiscard]]
+        static finance::DomainTransaction _fromRow(
+            const TransactionRow&           row,
+            const finance::TransactionData& transactionData
+        );
     };
 
 }   // namespace repo

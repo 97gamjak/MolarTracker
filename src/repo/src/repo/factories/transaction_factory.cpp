@@ -1,6 +1,5 @@
 #include "transaction_factory.hpp"
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -36,46 +35,93 @@ namespace repo
     }
 
     /**
-     * @brief Converts a TransactionRow object to a Transaction object.
+     * @brief Converts a TransactionRow object to a DomainTransaction object,
+     * this method takes a TransactionRow and constructs a DomainTransaction
+     * object based on the type of transaction, allowing for the creation of a
+     * complete DomainTransaction that includes all additional details for
+     * option transactions.
      *
      * @param row The TransactionRow object to convert.
-     * @param optionRow An optional TransactionOptionRow object to include in
-     * the conversion, this is used to provide additional details for option
-     * transactions, allowing for a more complete representation of
-     * option-related transactions when converting from a TransactionRow to a
-     * Transaction object.
-     * @return The converted Transaction object.
+     * @return finance::DomainTransaction The converted DomainTransaction
+     * object.
      */
-    finance::DomainTransaction TransactionFactory::fromRow(
-        const TransactionRow                      &row,
-        const std::optional<TransactionOptionRow> &optionRow
+    finance::DomainTransaction TransactionFactory::fromCashRow(
+        const TransactionRow &row
     )
     {
-        finance::TransactionData type;
+        return _fromRow(row, finance::CashData{});
+    }
 
-        switch (row.type.value())
-        {
-            case TransactionDataType::Cash:
-                type = finance::CashData{};
-                break;
-            case TransactionDataType::Stock:
-                type = finance::TradeData{};
-                break;
-            case TransactionDataType::Option:
-                type = finance::OptionData{
-                    optionRow->id.value(),
-                    optionRow->buySell.value(),
-                    optionRow->action.value(),
-                    optionRow->rolledOption.value()
-                };
-                break;
-        }
+    /**
+     * @brief Converts a TransactionRow object to a DomainTransaction object,
+     * this method takes a TransactionRow and constructs a DomainTransaction
+     * object based on the type of transaction, allowing for the creation of a
+     * complete DomainTransaction that includes all additional details for stock
+     * transactions.
+     *
+     * @param row The TransactionRow object to convert.
+     * @return finance::DomainTransaction The converted DomainTransaction
+     * object.
+     */
+    finance::DomainTransaction TransactionFactory::fromStockRow(
+        const TransactionRow &row
+    )
+    {
+        return _fromRow(row, finance::TradeData{});
+    }
 
+    /**
+     * @brief Converts a TransactionRow object to a DomainTransaction object,
+     * this method takes a TransactionRow and a TransactionOptionRow and
+     * constructs a DomainTransaction object based on the type of transaction,
+     * allowing for the creation of a complete DomainTransaction that includes
+     * all additional details for option transactions.
+     *
+     * @param row The TransactionRow object to convert.
+     * @param optionRow The TransactionOptionRow object to include in the
+     * conversion, providing additional details for option transactions.
+     * @return finance::DomainTransaction The converted DomainTransaction
+     * object.
+     */
+    finance::DomainTransaction TransactionFactory::fromOptionRow(
+        const TransactionRow       &row,
+        const TransactionOptionRow &optionRow
+    )
+    {
+        finance::OptionData type = finance::OptionData{
+            optionRow.id.value(),
+            optionRow.buySell.value(),
+            optionRow.action.value(),
+            optionRow.rolledOption.value()
+        };
+
+        return _fromRow(row, type);
+    }
+
+    /**
+     * @brief Internal private method to convert a TransactionRow and
+     * TransactionData to a DomainTransaction, this method takes a
+     * TransactionRow and a TransactionData object and constructs a
+     * DomainTransaction object based on the type of transaction, allowing for
+     * the creation of a complete DomainTransaction that includes all relevant
+     * data for the transaction, including option details if applicable.
+     *
+     * @param row The TransactionRow object to convert.
+     * @param transactionData The TransactionData object to include in the
+     * conversion, providing additional details for the transaction.
+     * @return finance::DomainTransaction The converted DomainTransaction
+     * object.
+     */
+    finance::DomainTransaction TransactionFactory::_fromRow(
+        const TransactionRow           &row,
+        const finance::TransactionData &transactionData
+    )
+    {
         finance::DomainTransaction transaction{
             row.id.value(),
             row.timestamp.value(),
             row.status.value(),
-            type,
+            transactionData,
             {},
             row.comment.value()
         };

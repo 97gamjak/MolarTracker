@@ -51,6 +51,54 @@ namespace repo
                 }
             }
         }
+
+        /**
+         * @brief Prepare a DomainTransaction object from a TransactionRow and
+         * an optional TransactionOptionRow, this method takes a TransactionRow
+         * and an optional TransactionOptionRow and constructs a
+         * DomainTransaction object based on the type of transaction, allowing
+         * for the creation of a complete DomainTransaction that includes all
+         * relevant data for the transaction, including option details if
+         * applicable.
+         *
+         * @param txRow The TransactionRow containing the basic transaction
+         * data.
+         * @param optionRow An optional TransactionOptionRow containing
+         * additional details for option transactions.
+         * @return finance::DomainTransaction The prepared DomainTransaction
+         * object.
+         */
+        finance::DomainTransaction prepareDomainTx(
+            const TransactionRow& txRow,
+            orm::Crud&            crud,
+            db::Database&         db
+        )
+        {
+            switch (txRow.type.value())
+            {
+                case TransactionDataType::Option:
+                {
+                    const auto optionRow = crud.getUnique<TransactionOptionRow>(
+                        db,
+                        orm::Query{}.where(
+                            TransactionOptionRow::hasTransactionId(
+                                txRow.id.value()
+                            )
+                        )
+                    );
+                    return TransactionFactory::fromOptionRow(
+                        txRow,
+                        optionRow.value()
+                    );
+                }
+                case TransactionDataType::Stock:
+                    return TransactionFactory::fromStockRow(txRow);
+                case TransactionDataType::Cash:
+                    return TransactionFactory::fromCashRow(txRow);
+            }
+
+            std::unreachable();
+        }
     }   // namespace
     /**
      * @brief add a transaction to the database
@@ -220,26 +268,7 @@ namespace repo
                 continue;
             }
 
-            std::optional<TransactionOptionRow> optionRow = std::nullopt;
-
-            switch (txRow.type.value())
-            {
-                case TransactionDataType::Option:
-                    optionRow = _getCrud().getUnique<TransactionOptionRow>(
-                        _getDb(),
-                        orm::Query{}.where(
-                            TransactionOptionRow::hasTransactionId(
-                                txRow.id.value()
-                            )
-                        )
-                    );
-                    break;
-                case TransactionDataType::Stock:
-                case TransactionDataType::Cash:
-                    break;
-            }
-
-            auto transaction = TransactionFactory::fromRow(txRow, optionRow);
+            auto transaction = prepareDomainTx(txRow, _getCrud(), _getDb());
 
             for (const auto& entryRow : entryRows)
                 transaction.addEntry(
