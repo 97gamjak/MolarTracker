@@ -9,6 +9,7 @@
 #include "orm/where_expr.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
 namespace repo
@@ -38,10 +39,16 @@ namespace repo
      * @brief Converts a TransactionRow object to a Transaction object.
      *
      * @param row The TransactionRow object to convert.
+     * @param optionRow An optional TransactionOptionRow object to include in
+     * the conversion, this is used to provide additional details for option
+     * transactions, allowing for a more complete representation of
+     * option-related transactions when converting from a TransactionRow to a
+     * Transaction object.
      * @return The converted Transaction object.
      */
     finance::DomainTransaction TransactionFactory::fromRow(
-        const TransactionRow &row
+        const TransactionRow                      &row,
+        const std::optional<TransactionOptionRow> &optionRow
     )
     {
         finance::TransactionData type;
@@ -53,6 +60,14 @@ namespace repo
                 break;
             case TransactionDataType::Stock:
                 type = finance::TradeData{};
+                break;
+            case TransactionDataType::Option:
+                type = finance::OptionData{
+                    optionRow->id.value(),
+                    optionRow->buySell.value(),
+                    optionRow->action.value(),
+                    optionRow->rolledOption.value()
+                };
                 break;
         }
 
@@ -153,6 +168,29 @@ namespace repo
             finance::Cash(row.currency.value(), row.unitPrice.value()),
             row.positionId.value()
         };
+    }
+
+    /**
+     * @brief Converts an OptionData object to a TransactionOptionRow object.
+     *
+     * @param optionData The OptionData object to convert.
+     * @param transactionId The ID of the associated transaction.
+     * @return The converted TransactionOptionRow object.
+     */
+    TransactionOptionRow TransactionFactory::toOptionRow(
+        const finance::OptionData &optionData,
+        TransactionId              transactionId
+    )
+    {
+        TransactionOptionRow row;
+
+        row.id            = optionData.getId();
+        row.transactionId = transactionId;
+        row.buySell       = optionData.getBuySell();
+        row.action        = optionData.getAction();
+        row.rolledOption  = optionData.getRolledOption();
+
+        return row;
     }
 
     /**

@@ -1,8 +1,11 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_OPTION_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_OPTION_ROW_HPP__
 
+#include <optional>
+
 #include "config/id_types.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 #include "transaction_row.hpp"
 
 /**
@@ -18,6 +21,9 @@
  */
 struct TransactionOptionRow : public orm::ORMModel<"transaction_option">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasTransactionId(TransactionId transactionId);
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     ORM_FIELD(id, IdField<TransactionOptionId>)
@@ -58,7 +64,7 @@ struct TransactionOptionRow : public orm::ORMModel<"transaction_option">
         rolledOption,
         orm::Field<
             "rolled_option_id",
-            TransactionOptionId,
+            std::optional<TransactionOptionId>,
             tableName,
             orm::foreign_key_t<
                 orm::RestrictDelete,

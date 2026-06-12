@@ -1,6 +1,8 @@
 #ifndef __REPO__SRC__REPO__FACTORIES__TRANSACTION_FACTORY_HPP__
 #define __REPO__SRC__REPO__FACTORIES__TRANSACTION_FACTORY_HPP__
 
+#include <optional>
+
 #include "config/id_types.hpp"
 #include "orm/join.hpp"
 #include "orm/where_expr.hpp"
@@ -11,11 +13,13 @@ namespace finance
     class TransactionEntry;    // forward declaration
     class TradeLeg;            // forward declaration
     class TransactionFilter;   // forward declaration
+    class OptionData;          // forward declaration
 }   // namespace finance
 
-struct TransactionRow;        // forward declaration
-struct TransactionEntryRow;   // forward declaration
-struct TradeLegRow;           // forward declaration
+struct TransactionRow;         // forward declaration
+struct TransactionEntryRow;    // forward declaration
+struct TradeLegRow;            // forward declaration
+struct TransactionOptionRow;   // forward declaration
 
 namespace repo
 {
@@ -34,7 +38,10 @@ namespace repo
         );
 
         [[nodiscard]]
-        static finance::DomainTransaction fromRow(const TransactionRow& row);
+        static finance::DomainTransaction fromRow(
+            const TransactionRow&                      row,
+            const std::optional<TransactionOptionRow>& optionRow
+        );
 
         [[nodiscard]]
         static TransactionEntryRow toEntryRow(
@@ -55,6 +62,12 @@ namespace repo
 
         [[nodiscard]]
         static finance::TradeLeg fromLegRow(const TradeLegRow& row);
+
+        [[nodiscard]]
+        static TransactionOptionRow toOptionRow(
+            const finance::OptionData& optionData,
+            TransactionId              transactionId
+        );
 
         [[nodiscard]]
         static orm::WhereExpr toWhereExpr(

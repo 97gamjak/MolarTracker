@@ -13,19 +13,20 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/price_cache.cpp
     ${SOURCE_DIR}/finance_error.cpp
 
-    ${SOURCE_DIR}/transaction/transaction.cpp
-    ${SOURCE_DIR}/transaction/transactions.cpp
     ${SOURCE_DIR}/transaction/cash_transaction.cpp
     ${SOURCE_DIR}/transaction/domain_transaction.cpp
+    ${SOURCE_DIR}/transaction/option_data.cpp
     ${SOURCE_DIR}/transaction/stock_transaction.cpp
     ${SOURCE_DIR}/transaction/trade_data.cpp
+    ${SOURCE_DIR}/transaction/pnl.cpp
+    ${SOURCE_DIR}/transaction/position_transaction.cpp
+    ${SOURCE_DIR}/transaction/transaction.cpp
+    ${SOURCE_DIR}/transaction/transactions.cpp
     ${SOURCE_DIR}/transaction/transaction_converter.cpp
     ${SOURCE_DIR}/transaction/transaction_data.cpp
     ${SOURCE_DIR}/transaction/transaction_entry.cpp
     ${SOURCE_DIR}/transaction/transaction_entries.cpp
     ${SOURCE_DIR}/transaction/transaction_filter.cpp
-    ${SOURCE_DIR}/transaction/pnl.cpp
-    ${SOURCE_DIR}/transaction/position_transaction.cpp
 
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp
     ${SOURCE_DIR}/instrument/stock.cpp

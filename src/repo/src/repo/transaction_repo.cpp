@@ -11,10 +11,47 @@
 #include "repo_errors.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
 
 namespace repo
 {
+    namespace
+    {
+        /**
+         * @brief add the legs of a trade transaction to the database
+         *
+         * @param legs
+         * @param txId
+         * @param dbTx
+         * @param crud
+         * @param db
+         */
+        void addLegs(
+            const std::vector<finance::TradeLeg>& legs,
+            TransactionId                         txId,
+            db::Transaction&                      dbTx,
+            orm::Crud&                            crud,
+            db::Database&                         db
+        )
+        {
+            for (const auto& leg : legs)
+            {
+                const auto legRow = TransactionFactory::toLegRow(leg, txId);
+
+                const auto legResult = crud.insert(db, dbTx, legRow);
+
+                if (!legResult.has_value())
+                {
+                    const auto msg =
+                        getInsertError(legResult.error(), "trade leg");
+
+                    LOG_ERROR(msg);
+                    throw orm::CrudException(msg);
+                }
+            }
+        }
+    }   // namespace
     /**
      * @brief add a transaction to the database
      *
@@ -66,23 +103,44 @@ namespace repo
                 const auto data =
                     std::get<finance::TradeData>(transaction.getData());
 
-                for (const auto& leg : data.getLegs())
+                addLegs(
+                    data.getLegs(),
+                    TransactionId(transactionResult.value()),
+                    dbTx,
+                    _getCrud(),
+                    _getDb()
+                );
+                break;
+            }
+            case TransactionDataType::Option:
+            {
+                const auto data =
+                    std::get<finance::OptionData>(transaction.getData());
+
+                addLegs(
+                    data.getLegs(),
+                    TransactionId(transactionResult.value()),
+                    dbTx,
+                    _getCrud(),
+                    _getDb()
+                );
+
+                const auto optionResult = _getCrud().insert(
+                    _getDb(),
+                    dbTx,
+                    TransactionFactory::toOptionRow(data, txId)
+                );
+
+                if (!optionResult.has_value())
                 {
-                    const auto legRow = TransactionFactory::toLegRow(leg, txId);
+                    const auto msg = getInsertError(
+                        optionResult.error(),
+                        "transaction option"
+                    );
 
-                    const auto legResult =
-                        _getCrud().insert(_getDb(), dbTx, legRow);
-
-                    if (!legResult.has_value())
-                    {
-                        const auto msg =
-                            getInsertError(legResult.error(), "trade leg");
-
-                        LOG_ERROR(msg);
-                        throw orm::CrudException(msg);
-                    }
+                    LOG_ERROR(msg);
+                    throw orm::CrudException(msg);
                 }
-
                 break;
             }
             case TransactionDataType::Cash:
@@ -162,7 +220,26 @@ namespace repo
                 continue;
             }
 
-            auto transaction = TransactionFactory::fromRow(txRow);
+            std::optional<TransactionOptionRow> optionRow = std::nullopt;
+
+            switch (txRow.type.value())
+            {
+                case TransactionDataType::Option:
+                    optionRow = _getCrud().getUnique<TransactionOptionRow>(
+                        _getDb(),
+                        orm::Query{}.where(
+                            TransactionOptionRow::hasTransactionId(
+                                txRow.id.value()
+                            )
+                        )
+                    );
+                    break;
+                case TransactionDataType::Stock:
+                case TransactionDataType::Cash:
+                    break;
+            }
+
+            auto transaction = TransactionFactory::fromRow(txRow, optionRow);
 
             for (const auto& entryRow : entryRows)
                 transaction.addEntry(

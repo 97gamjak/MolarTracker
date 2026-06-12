@@ -101,6 +101,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Make stock store a fully cached store with possibility to switch to a dirty-only cache store
 - Implement first version of Option SQL model
 - Extend transaction row sql model with some option specific data
+- Extend domain transaction type to have now `OptionData`
 
 #### UI
 

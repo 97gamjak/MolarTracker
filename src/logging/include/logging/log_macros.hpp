@@ -4,6 +4,7 @@
 #include <format>     // IWYU pragma: keep
 #include <iostream>   // IWYU pragma: keep
 #include <map>
+#include <mstd/error.hpp>
 #include <string_view>
 
 #include "logging/log_category.hpp"      // IWYU pragma: keep
@@ -131,6 +132,21 @@ namespace logging::detail
 #define LOG_CATEGORY std::string(logging::detail::getCategory(__FILE__))
 
 #define MT_DEBUG std::cerr
+
+template <int Todo>
+void mustImplement()
+{
+    if constexpr (Todo > 0)
+    {
+        MSTD_COMPILE_FAIL("REACHED MUST_BE_IMPLEMENTED");
+    }
+    else
+    {
+        LOG_ERROR(
+            "Reached a MUST_BE_IMPLEMENTED code path, this should never happen"
+        );
+    }
+}
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 

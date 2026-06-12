@@ -49,9 +49,12 @@ MSTD_ENUM(TransactionEntryType, std::uint8_t, TRANSACTION_ENTRY_TYPE_LIST);
 
 #define TRANSACTION_DATA_TYPE_LIST(X) \
     X(Cash)                           \
-    X(Stock)
+    X(Stock)                          \
+    X(Option)
 
 MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
+
+constexpr int TxDataTypeNotImplError = 0;
 
 #define ASSET_CLASS_LIST(X) \
     X(Stock)                \

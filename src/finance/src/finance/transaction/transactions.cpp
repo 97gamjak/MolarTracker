@@ -125,6 +125,9 @@ namespace finance
                     _stockTransactions.add(stockTx.value());
                     break;
                 }
+                case TransactionDataType::Option:
+                    mustImplement<TxDataTypeNotImplError>();
+                    break;
             }
         }
     }

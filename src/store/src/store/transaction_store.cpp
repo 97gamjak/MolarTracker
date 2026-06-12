@@ -3,6 +3,7 @@
 #include <format>
 #include <unordered_map>
 
+#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
@@ -432,6 +433,9 @@ namespace store
                         _updateEntry(transaction, StoreState::New);
                     break;
                 }
+                case TransactionDataType::Option:
+                    mustImplement<TxDataTypeNotImplError>();
+                    break;
                 case TransactionDataType::Cash:
                     break;
             }
@@ -506,6 +510,9 @@ namespace store
                         _updateEntry(transaction, StoreState::New);
                     break;
                 }
+                case TransactionDataType::Option:
+                    mustImplement<TxDataTypeNotImplError>();
+                    break;
                 case TransactionDataType::Cash:
                     break;
             }
