@@ -435,7 +435,7 @@ namespace store
                     break;
                 }
                 case TransactionDataType::Option:
-                    mustImplement<TxDataTypeNotImplError>();
+                    logging::mustImplement<TxDataTypeNotImplError>();
                     break;
                 case TransactionDataType::Cash:
                     break;
@@ -512,7 +512,7 @@ namespace store
                     break;
                 }
                 case TransactionDataType::Option:
-                    mustImplement<TxDataTypeNotImplError>();
+                    logging::mustImplement<TxDataTypeNotImplError>();
                     break;
                 case TransactionDataType::Cash:
                     break;

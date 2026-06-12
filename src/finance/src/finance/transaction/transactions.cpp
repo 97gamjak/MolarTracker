@@ -128,7 +128,7 @@ namespace finance
                     break;
                 }
                 case TransactionDataType::Option:
-                    mustImplement<TxDataTypeNotImplError>();
+                    logging::mustImplement<TxDataTypeNotImplError>();
                     break;
             }
         }
