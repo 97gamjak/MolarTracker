@@ -14,8 +14,6 @@ namespace finance
 
     using TransactionData = std::variant<CashData, TradeData, OptionData>;
 
-    [[nodiscard]]
-    Quantity getTotalQuantity(const TransactionData& data);
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_DATA_HPP__

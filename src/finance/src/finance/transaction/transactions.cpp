@@ -1,5 +1,7 @@
 #include "finance/transaction/transactions.hpp"
 
+#include <algorithm>
+
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"

@@ -64,10 +64,11 @@ namespace repo
      * object.
      */
     finance::DomainTransaction TransactionFactory::fromStockRow(
-        const TransactionRow &row
+        const TransactionRow &row,
+        PositionId            positionId
     )
     {
-        return _fromRow(row, finance::TradeData{});
+        return _fromRow(row, finance::TradeData{positionId});
     }
 
     /**
@@ -85,10 +86,12 @@ namespace repo
      */
     finance::DomainTransaction TransactionFactory::fromOptionRow(
         const TransactionRow       &row,
-        const TransactionOptionRow &optionRow
+        const TransactionOptionRow &optionRow,
+        PositionId                  positionId
     )
     {
         finance::OptionData type = finance::OptionData{
+            positionId,
             optionRow.id.value(),
             optionRow.buySell.value(),
             optionRow.action.value(),
@@ -194,7 +197,6 @@ namespace repo
         row.quantity      = leg.getQuantity().toMicroUnits();
         row.unitPrice     = leg.getUnitPrice().getAmount();
         row.currency      = leg.getUnitPrice().getCurrency();
-        row.positionId    = leg.getPositionId();
 
         return row;
     }
@@ -211,8 +213,7 @@ namespace repo
             row.accountId.value(),
             row.instrumentId.value(),
             Quantity(row.quantity.value()),
-            finance::Cash(row.currency.value(), row.unitPrice.value()),
-            row.positionId.value()
+            finance::Cash(row.currency.value(), row.unitPrice.value())
         };
     }
 

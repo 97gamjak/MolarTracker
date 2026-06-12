@@ -262,7 +262,7 @@ namespace finance
             legs[0].getQuantity(),
             legs[0].getUnitPrice(),
             fees,
-            legs[0].getPositionId(),
+            std::get<TradeData>(transaction.getData()).getPositionId(),
             transaction.getComment()
         };
     }

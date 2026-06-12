@@ -104,7 +104,7 @@ namespace repo
 
                     return TransactionFactory::fromOptionRow(
                         txRow,
-                        optionRow.value()
+                        optionRow.value(),
                     );
                 }
                 case TransactionDataType::Stock:

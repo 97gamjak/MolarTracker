@@ -1,5 +1,6 @@
 #include "finance/transaction/transaction_filter.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 #include "config/strong_id.hpp"
@@ -80,16 +81,11 @@ namespace finance
         return filter::makePredicate<DomainTransaction>(
             [positionIds](const DomainTransaction& transaction)
             {
-                for (const auto& positionId : positionIds)
-                {
-                    if (hasId(
-                            transaction.getData(),
-                            positionId,
-                            &TradeLeg::getPositionId
-                        ))
-                        return true;
-                }
-                return false;
+                return std::ranges::any_of(
+                    positionIds,
+                    [&](const auto& positionId)
+                    { return transaction.hasPositionId(positionId); }
+                );
             }
         );
     }
