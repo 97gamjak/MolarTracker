@@ -1,5 +1,5 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
-#define __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__FINANCE_HPP__
+#define __UTILS__INCLUDE__UTILS__FINANCE_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -108,4 +108,4 @@ static inline std::string toString(AssetClass assetClass)
     return AssetClassMeta::toString(assetClass);
 }
 
-#endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__FINANCE_HPP__

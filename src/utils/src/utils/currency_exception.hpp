@@ -1,5 +1,5 @@
-#ifndef __FINANCE__SRC__FINANCE__CURRENCY_EXCEPTION_HPP__
-#define __FINANCE__SRC__FINANCE__CURRENCY_EXCEPTION_HPP__
+#ifndef __UTILS__SRC__UTILS__CURRENCY_EXCEPTION_HPP__
+#define __UTILS__SRC__UTILS__CURRENCY_EXCEPTION_HPP__
 
 #include <string>
 
@@ -21,4 +21,4 @@ class CurrencyMismatchException : public MolarTrackerException
     [[nodiscard]] const char* what() const noexcept override;
 };
 
-#endif   // __FINANCE__SRC__FINANCE__CURRENCY_EXCEPTION_HPP__
+#endif   // __UTILS__SRC__UTILS__CURRENCY_EXCEPTION_HPP__

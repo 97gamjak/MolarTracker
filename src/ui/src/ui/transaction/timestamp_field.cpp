@@ -24,7 +24,7 @@ namespace ui
           _dateEdit(makeQChild<QDateEdit>(this)),
           _timeEdit(nullptr),
           _todayButton(makeQChild<QPushButton>("Today", this)),
-          onlyDateEdit(onlyDateEdit)
+          _onlyDateEdit(onlyDateEdit)
     {
         auto* layout = makeQChild<QHBoxLayout>();
         layout->setContentsMargins(0, 0, 0, 0);
@@ -35,7 +35,7 @@ namespace ui
         _dateEdit->setDisplayFormat("yyyy-MM-dd");
         _dateEdit->setCalendarPopup(true);
 
-        if (!onlyDateEdit)
+        if (!_onlyDateEdit)
         {
             _timeEdit = makeQChild<QTimeEdit>(this);
             _timeEdit->setDisplayFormat("HH:mm:ss");
@@ -64,7 +64,7 @@ namespace ui
     {
         const QDateTime local{
             _dateEdit->date(),
-            onlyDateEdit ? QTime(0, 0, 0) : _timeEdit->time()
+            _onlyDateEdit ? QTime(0, 0, 0) : _timeEdit->time()
         };
         return Timestamp{local.toUTC()};
     }
@@ -75,7 +75,7 @@ namespace ui
     void TimestampField::_resetToToday()
     {
         _dateEdit->setDate(QDate::currentDate());
-        if (!onlyDateEdit)
+        if (!_onlyDateEdit)
             _timeEdit->setTime(QTime(0, 0, 0));
     }
 

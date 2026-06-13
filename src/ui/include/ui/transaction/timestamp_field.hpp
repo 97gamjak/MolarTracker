@@ -35,7 +35,7 @@ namespace ui
         QPushButton* _todayButton;
 
         /// Whether to only allow editing the date
-        bool onlyDateEdit;
+        bool _onlyDateEdit;
 
        public:
         explicit TimestampField(bool onlyDateEdit, QWidget* parent);
