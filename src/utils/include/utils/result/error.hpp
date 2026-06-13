@@ -1,11 +1,11 @@
-#ifndef __RESULT__INCLUDE__RESULT__ERROR_HPP__
-#define __RESULT__INCLUDE__RESULT__ERROR_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__RESULT__ERROR_HPP__
+#define __UTILS__INCLUDE__UTILS__RESULT__ERROR_HPP__
 
 #include <cstdint>
 #include <format>
+#include <mstd/enum.hpp>
 #include <string>
 #include <type_traits>
-#include <utility>
 #include <variant>
 
 #include "result.hpp"
@@ -24,165 +24,93 @@
 //   3. Add domain_name / code_name overloads.
 //   4. Add is_not_found() arm in Error::is_not_found() if needed.
 //
-// -Werror=switch-enum will flag any visitor that does not handle the new arm.
 
 namespace err
 {
 
-    enum class Db : std::uint8_t
-    {
-        NotFound,
-        ConstraintViolation,
-        QueryFailed,
-        ConnectionFailed,
-    };
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+#define DB_CODES(X)        \
+    X(NotFound)            \
+    X(ConstraintViolation) \
+    X(QueryFailed)         \
+    X(ConnectionFailed)
 
-    enum class Repo : std::uint8_t
-    {
-        NotFound,
-        InvalidState,
-        DuplicateKey,
-    };
+    MSTD_ENUM(DbError, std::uint8_t, DB_CODES)
 
-    enum class Store : std::uint8_t
-    {
-        NotFound,
-        Conflict,
-        InvalidState,
-    };
+#define REPO_CODES(X) \
+    X(NotFound)       \
+    X(InvalidState)   \
+    X(DuplicateKey)
 
-    enum class Service : std::uint8_t
-    {
-        NotFound,
-        InvalidState,
-        Unauthorized,
-    };
+    MSTD_ENUM(RepoError, std::uint8_t, REPO_CODES)
 
-    enum class Input : std::uint8_t
-    {
-        NotFound,
-        MissingField,
-        InvalidValue,
-        OutOfRange,
-    };
+#define STORE_CODES(X) \
+    X(NotFound)        \
+    X(Conflict)        \
+    X(InvalidState)
 
-    using Kind = std::variant<Db, Repo, Store, Service, Input>;
+    MSTD_ENUM(StoreError, std::uint8_t, STORE_CODES)
+
+#define SERVICE_CODES(X) \
+    X(NotFound)          \
+    X(InvalidState)      \
+    X(Unauthorized)
+
+    MSTD_ENUM(ServiceError, std::uint8_t, SERVICE_CODES)
+
+#define INPUT_CODES(X) \
+    X(NotFound)        \
+    X(MissingField)    \
+    X(InvalidValue)    \
+    X(OutOfRange)
+
+    MSTD_ENUM(InputError, std::uint8_t, INPUT_CODES)
+    // NOLINTEND(cppcoreguidelines-macro-usage)
+
+    using Kind =
+        std::variant<DbError, RepoError, StoreError, ServiceError, InputError>;
 
     // ── domain_name ──────────────────────────────────────────────────────────
 
-    [[nodiscard]] constexpr std::string_view domain_name(Db) noexcept
+    template <mstd::has_enum_meta T>
+    [[nodiscard]]
+    constexpr std::string_view domain_name(T /*unused*/)
     {
-        return "Db";
+        using Meta = mstd::enum_meta_t<T>;
+        return Meta::EnumNameStr;
     }
 
-    [[nodiscard]] constexpr std::string_view domain_name(Repo) noexcept
+    // ── code_name
+    // ────────────────────────────────────────────────────────────
+
+    template <mstd::has_enum_meta T>
+    [[nodiscard]]
+    constexpr std::string_view code_name(T entry)
     {
-        return "Repo";
+        using Meta = mstd::enum_meta_t<T>;
+        return Meta::name(entry);
     }
 
-    [[nodiscard]] constexpr std::string_view domain_name(Store) noexcept
-    {
-        return "Store";
-    }
-
-    [[nodiscard]] constexpr std::string_view domain_name(Service) noexcept
-    {
-        return "Service";
-    }
-
-    [[nodiscard]] constexpr std::string_view domain_name(Input) noexcept
-    {
-        return "Input";
-    }
-
-    // ── code_name ────────────────────────────────────────────────────────────
-
-    [[nodiscard]] constexpr std::string_view code_name(Db c) noexcept
-    {
-        switch (c)
-        {
-            case Db::NotFound:
-                return "NotFound";
-            case Db::ConstraintViolation:
-                return "ConstraintViolation";
-            case Db::QueryFailed:
-                return "QueryFailed";
-            case Db::ConnectionFailed:
-                return "ConnectionFailed";
-        }
-        std::unreachable();
-    }
-
-    [[nodiscard]] constexpr std::string_view code_name(Repo c) noexcept
-    {
-        switch (c)
-        {
-            case Repo::NotFound:
-                return "NotFound";
-            case Repo::InvalidState:
-                return "InvalidState";
-            case Repo::DuplicateKey:
-                return "DuplicateKey";
-        }
-        std::unreachable();
-    }
-
-    [[nodiscard]] constexpr std::string_view code_name(Store c) noexcept
-    {
-        switch (c)
-        {
-            case Store::NotFound:
-                return "NotFound";
-            case Store::Conflict:
-                return "Conflict";
-            case Store::InvalidState:
-                return "InvalidState";
-        }
-        std::unreachable();
-    }
-
-    [[nodiscard]] constexpr std::string_view code_name(Service c) noexcept
-    {
-        switch (c)
-        {
-            case Service::NotFound:
-                return "NotFound";
-            case Service::InvalidState:
-                return "InvalidState";
-            case Service::Unauthorized:
-                return "Unauthorized";
-        }
-        std::unreachable();
-    }
-
-    [[nodiscard]] constexpr std::string_view code_name(Input c) noexcept
-    {
-        switch (c)
-        {
-            case Input::NotFound:
-                return "NotFound";
-            case Input::MissingField:
-                return "MissingField";
-            case Input::InvalidValue:
-                return "InvalidValue";
-            case Input::OutOfRange:
-                return "OutOfRange";
-        }
-        std::unreachable();
-    }
-
-    // ── KindFormatter ────────────────────────────────────────────────────────
+    // ── KindFormatter
+    // ────────────────────────────────────────────────────────
 
     /**
-     * @brief Named visitor struct that formats an err::Kind as "Domain::Code".
+     * @brief Named visitor struct that formats an err::Kind as
+     * "Domain::Code".
      *
-     * Follows the project's named-visitor-struct convention; avoids overloaded
-     * lambdas. Use with std::visit:
+     * Follows the project's named-visitor-struct convention; avoids
+     * overloaded lambdas. Use with std::visit:
      *
      *   std::string s = std::visit(err::KindFormatter{}, kind);
      */
     struct KindFormatter
     {
+        /**
+         * @brief Format an err::Kind as "Domain::Code".
+         *
+         * @param code
+         * @return std::string
+         */
         [[nodiscard]] std::string operator()(auto code) const
         {
             return std::format("{}::{}", domain_name(code), code_name(code));
@@ -198,12 +126,8 @@ namespace err
  * @brief Unified application error carrying a domain-specific kind and a
  * human-readable message.
  *
- * Flows through all application layers via Result<T, Error> / AppResult<T>.
- * The err::Kind variant enforces exhaustive handling at every visit site
- * (-Werror=switch-enum flags missing arms).
- *
  * Static factories make construction at each layer self-documenting:
- *   return Err{Error::repo(err::Repo::NotFound, "Profile not found")};
+ *   return Err{Error::error(err::Repo::NotFound, "Profile not found")};
  */
 struct Error
 {
@@ -212,59 +136,60 @@ struct Error
     /// Human-readable description of the failure
     std::string _message;
 
-    [[nodiscard]] static Error db(err::Db code, std::string msg)
+    /**
+     * @brief Static factory for database errors, e.g. Result<T,
+     * Error>{Err{Error::db(err::Db::NotFound, "User not found")}}
+     *
+     * @tparam E
+     * @param code
+     * @param msg
+     * @return Error
+     */
+    template <mstd::has_enum_meta E>
+    [[nodiscard]] static Error error(E code, const std::string& msg)
     {
-        return {code, std::move(msg)};
+        return {._kind = code, ._message = msg};
     }
 
-    [[nodiscard]] static Error repo(err::Repo code, std::string msg)
-    {
-        return {code, std::move(msg)};
-    }
+    /**
+     * @brief get the error kind, which is a variant of all domain-specific
+     * error enums.
+     *
+     * @return const err::Kind&
+     */
+    [[nodiscard]] const err::Kind& kind() const { return _kind; }
 
-    [[nodiscard]] static Error store(err::Store code, std::string msg)
-    {
-        return {code, std::move(msg)};
-    }
-
-    [[nodiscard]] static Error service(err::Service code, std::string msg)
-    {
-        return {code, std::move(msg)};
-    }
-
-    [[nodiscard]] static Error input(err::Input code, std::string msg)
-    {
-        return {code, std::move(msg)};
-    }
-
-    [[nodiscard]] const err::Kind&   kind() const noexcept { return _kind; }
-    [[nodiscard]] const std::string& message() const noexcept
-    {
-        return _message;
-    }
+    /**
+     * @brief Get the human-readable error message.
+     *
+     * @return const std::string&
+     */
+    [[nodiscard]] const std::string& message() const { return _message; }
 
     /**
      * @brief Cross-domain NotFound predicate.
      *
      * If more cross-domain predicates accumulate, replace this if-constexpr
      * chain with a named visitor struct.
+     *
+     * @return bool
      */
-    [[nodiscard]] bool is_not_found() const noexcept
+    [[nodiscard]] bool is_not_found() const
     {
         return std::visit(
-            [](auto code) noexcept
+            [](auto code)
             {
                 using T = decltype(code);
-                if constexpr (std::is_same_v<T, err::Db>)
-                    return code == err::Db::NotFound;
-                if constexpr (std::is_same_v<T, err::Repo>)
-                    return code == err::Repo::NotFound;
-                if constexpr (std::is_same_v<T, err::Store>)
-                    return code == err::Store::NotFound;
-                if constexpr (std::is_same_v<T, err::Service>)
-                    return code == err::Service::NotFound;
-                if constexpr (std::is_same_v<T, err::Input>)
-                    return code == err::Input::NotFound;
+                if constexpr (std::is_same_v<T, err::DbError>)
+                    return code == err::DbError::NotFound;
+                if constexpr (std::is_same_v<T, err::RepoError>)
+                    return code == err::RepoError::NotFound;
+                if constexpr (std::is_same_v<T, err::StoreError>)
+                    return code == err::StoreError::NotFound;
+                if constexpr (std::is_same_v<T, err::ServiceError>)
+                    return code == err::ServiceError::NotFound;
+                if constexpr (std::is_same_v<T, err::InputError>)
+                    return code == err::InputError::NotFound;
                 return false;
             },
             _kind
@@ -285,15 +210,18 @@ struct Error
 template <>
 struct std::formatter<Error>
 {
-    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+    static constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return ctx.begin();
+    }
 
-    auto format(const Error& e, std::format_context& ctx) const
+    static auto format(const Error& error, std::format_context& ctx)
     {
         return std::format_to(
             ctx.out(),
             "[{}] {}",
-            std::visit(err::KindFormatter{}, e.kind()),
-            e.message()
+            std::visit(err::KindFormatter{}, error.kind()),
+            error.message()
         );
     }
 };
@@ -305,9 +233,10 @@ struct std::formatter<Error>
 /**
  * @brief Canonical result type for MolarTracker operations.
  *
- * @tparam T Success value type (use void for operations that succeed silently)
+ * @tparam T Success value type (use void for operations that succeed
+ * silently)
  */
 template <typename T>
 using AppResult = Result<T, Error>;
 
-#endif   // __RESULT__INCLUDE__RESULT__ERROR_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__RESULT__ERROR_HPP__

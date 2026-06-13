@@ -72,7 +72,6 @@ Result<T, E>::Result(std::expected<T, E> exp) : _inner(std::move(exp))
  * @brief Construct a new Result<void, E>::Result object
  *
  * @tparam E
- * @param ok
  */
 template <typename E>
 Result<void, E>::Result(Ok<void> /*ok*/) : _inner()
@@ -235,10 +234,11 @@ T& Result<T, E>::value() &
 }
 
 /**
- * @brief Get the value (if Ok) or throw (if Err).
+ * @brief mimic value() for Result<void, E> since it has no value to return, but
+ * we want to be able to call value() on it for uniformity in generic code.
+ * Always returns void, but will throw if the Result is an Err.
  *
  * @tparam E
- * @return const T&
  */
 template <typename E>
 void Result<void, E>::value() const
@@ -409,6 +409,8 @@ T Result<T, E>::unwrap_or_else(F&& func) &&
     return static_cast<T>(std::invoke(std::forward<F>(func), _inner.error()));
 }
 
+/// @cond DOXYGEN_IGNORE
+
 /**
  * @brief Inspect the Result to run a function on the value (if Ok) or do
  * nothing (if Err).
@@ -556,6 +558,8 @@ Result<void, E>&& Result<void, E>::inspect_error(F&& func) &&
         std::invoke(std::forward<F>(func), _inner.error());
     return std::move(*this);
 }
+
+/// @endcond
 
 /**
  * @brief Then / transform the Result to run a function on the value (if Ok) or

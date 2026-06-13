@@ -42,10 +42,13 @@ class Result
         "Result error type cannot be a reference"
     );
 
+    /// The underlying std::expected that does the heavy lifting.
     std::expected<T, E> _inner;
 
    public:
+    /// Type alias for value type, used by monadic op constraints.
     using value_type = T;
+    /// Type alias for error type, used by monadic op constraints.
     using error_type = E;
 
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
@@ -92,6 +95,7 @@ class Result
     // Side-effect only; returns self so chains on temporaries work:
     //   makeResult().inspect(...).and_then(...).unwrap()
 
+    /// @cond DOXYGEN_IGNORE
     template <std::invocable<const T&> F>
     Result& inspect(F&& func) &;
 
@@ -103,6 +107,7 @@ class Result
 
     template <std::invocable<const E&> F>
     Result&& inspect_error(F&& func) &&;
+    /// @endcond
 
     // ── Monadic ops ──────────────────────────────────────────────────────────
 
@@ -156,10 +161,13 @@ class Result
 template <typename E>
 class Result<void, E>
 {
+    /// The underlying std::expected that does the heavy lifting.
     std::expected<void, E> _inner;
 
    public:
+    /// Type alias for value type, used by monadic op constraints.
     using value_type = void;
+    /// Type alias for error type, used by monadic op constraints.
     using error_type = E;
 
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
@@ -179,6 +187,7 @@ class Result<void, E>
 
     void unwrap() &&;
 
+    /// @cond DOXYGEN_IGNORE
     template <std::invocable F>
     Result& inspect(F&& func) &;
 
@@ -190,6 +199,7 @@ class Result<void, E>
 
     template <std::invocable<const E&> F>
     Result&& inspect_error(F&& func) &&;
+    /// @endcond
 
     template <std::invocable F>
     [[nodiscard]] auto then(F&& func) &&;
