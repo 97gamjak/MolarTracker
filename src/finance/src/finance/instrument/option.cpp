@@ -1,5 +1,6 @@
 #include "finance/instrument/option.hpp"
 
+#include <format>
 #include <string>
 
 namespace finance
