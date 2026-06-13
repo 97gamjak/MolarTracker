@@ -9,7 +9,7 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
 #include "utils/qt_helpers.hpp"
 

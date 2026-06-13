@@ -3,7 +3,7 @@
 #include <QColor>
 #include <QDateTime>
 
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "ui/position/position_columns.hpp"
 #include "ui/utils/format.hpp"
 

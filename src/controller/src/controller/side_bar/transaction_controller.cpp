@@ -12,7 +12,7 @@
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/account_draft.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"

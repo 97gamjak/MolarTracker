@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "finance/transaction/pnl.hpp"
 
 namespace store
@@ -39,6 +39,16 @@ struct OpenStockPositionDetail
     /// The profit and loss (PnL) information for the open stock position.
     std::shared_ptr<finance::PnL> pnl;
 };
+
+// struct OpenOptionPositionDetail
+// {
+//     /// The position draft containing the details of the open option
+//     position. drafts::PositionOptionDetailDraft positionDraft;
+//     /// The ticker symbol of the option associated with the open position.
+//     std::string ticker;
+//     /// The profit and loss (PnL) information for the open option position.
+//     std::shared_ptr<finance::PnL> pnl;
+// };
 
 namespace controller
 {

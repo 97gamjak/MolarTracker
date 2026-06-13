@@ -3,7 +3,7 @@
 #include <expected>
 
 #include "controller/mapper/stock_mapper.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
 #include "finance/transaction/transaction_filter.hpp"
