@@ -1,5 +1,7 @@
 #include "finance/transaction/trade_leg.hpp"
 
+#include <format>
+
 namespace finance
 {
 
