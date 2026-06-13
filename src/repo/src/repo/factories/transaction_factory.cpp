@@ -195,6 +195,7 @@ namespace repo
         row.quantity      = leg.getQuantity().toMicroUnits();
         row.unitPrice     = leg.getUnitPrice().getAmount();
         row.currency      = leg.getUnitPrice().getCurrency();
+        row.positionId    = leg.getPositionId();
 
         return row;
     }

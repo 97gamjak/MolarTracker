@@ -183,8 +183,6 @@ namespace finance
                     "Cannot add trade legs to cash transactions"
                 );
         }
-
-        std::unreachable();
     }
 
     /**
