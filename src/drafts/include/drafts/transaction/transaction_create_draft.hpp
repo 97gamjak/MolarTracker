@@ -4,8 +4,8 @@
 #include <optional>
 
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
-#include "finance/cash.hpp"
+#include "utils/cash.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
@@ -49,10 +49,10 @@ namespace drafts
     {
        private:
         /// The amount of the cash transaction
-        finance::Cash _amount;
+        Cash _amount;
 
         /// The fees associated with the cash transaction
-        finance::Cash _fees;
+        Cash _fees;
 
         /// The account ID associated with the cash transaction
         AccountId _accountId;
@@ -60,15 +60,15 @@ namespace drafts
        public:
         explicit CreateCashTransactionDraft(
             Timestamp                  timestamp,
-            finance::Cash              amount,
-            finance::Cash              fees,
+            Cash                       amount,
+            Cash                       fees,
             AccountId                  accountId,
             std::optional<std::string> comment = std::nullopt
         );
 
-        [[nodiscard]] const finance::Cash& getAmount() const;
-        [[nodiscard]] const finance::Cash& getFees() const;
-        [[nodiscard]] AccountId            getAccountId() const;
+        [[nodiscard]] const Cash& getAmount() const;
+        [[nodiscard]] const Cash& getFees() const;
+        [[nodiscard]] AccountId   getAccountId() const;
     };
 
     /**
@@ -86,9 +86,9 @@ namespace drafts
         /// The quantity of the stock being transacted
         Quantity _quantity;
         /// The unit price of the stock being transacted
-        finance::Cash _unitPrice;
+        Cash _unitPrice;
         /// The fees associated with the stock transaction
-        finance::Cash _fees;
+        Cash _fees;
 
         /// The security account ID associated with the stock transaction
         AccountId _securityAccount;
@@ -105,8 +105,8 @@ namespace drafts
             Timestamp                  timestamp,
             std::string                ticker,
             Quantity                   quantity,
-            finance::Cash              unitPrice,
-            finance::Cash              fees,
+            Cash                       unitPrice,
+            Cash                       fees,
             AccountId                  securityAccount,
             AccountId                  cashAccount,
             std::optional<std::string> comment = std::nullopt
@@ -115,14 +115,14 @@ namespace drafts
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
 
-        [[nodiscard]] AccountId            getSecurityAccount() const;
-        [[nodiscard]] AccountId            getCashAccount() const;
-        [[nodiscard]] InstrumentId         getInstrumentId() const;
-        [[nodiscard]] std::string          getTicker() const;
-        [[nodiscard]] const Quantity&      getQuantity() const;
-        [[nodiscard]] const finance::Cash& getUnitPrice() const;
-        [[nodiscard]] const finance::Cash& getFees() const;
-        [[nodiscard]] PositionId           getPositionId() const;
+        [[nodiscard]] AccountId       getSecurityAccount() const;
+        [[nodiscard]] AccountId       getCashAccount() const;
+        [[nodiscard]] InstrumentId    getInstrumentId() const;
+        [[nodiscard]] std::string     getTicker() const;
+        [[nodiscard]] const Quantity& getQuantity() const;
+        [[nodiscard]] const Cash&     getUnitPrice() const;
+        [[nodiscard]] const Cash&     getFees() const;
+        [[nodiscard]] PositionId      getPositionId() const;
     };
 
     /**
@@ -142,10 +142,10 @@ namespace drafts
         /// The quantity of the option being transacted
         Quantity _quantity;
         /// The strike price of the option being transacted
-        finance::Cash _strikePrice;
-        finance::Cash _amount;
+        Cash _strikePrice;
+        Cash _amount;
         /// The fees associated with the option transaction
-        finance::Cash _fees;
+        Cash _fees;
 
         std::int64_t _contractSize;
 
@@ -167,9 +167,9 @@ namespace drafts
             Timestamp                  expiration,
             OptionType                 optionType,
             Quantity                   quantity,
-            finance::Cash              amount,
-            finance::Cash              strikePrice,
-            finance::Cash              fees,
+            Cash                       amount,
+            Cash                       strikePrice,
+            Cash                       fees,
             std::int64_t               contractSize,
             AccountId                  securityAccount,
             AccountId                  cashAccount,
@@ -180,19 +180,19 @@ namespace drafts
         void setUnderlyingInstrumentId(InstrumentId underlyingInstrumentId);
         void setPositionId(PositionId positionId);
 
-        [[nodiscard]] AccountId            getSecurityAccount() const;
-        [[nodiscard]] AccountId            getCashAccount() const;
-        [[nodiscard]] InstrumentId         getInstrumentId() const;
-        [[nodiscard]] InstrumentId         getUnderlyingInstrumentId() const;
-        [[nodiscard]] const Quantity&      getQuantity() const;
-        [[nodiscard]] const finance::Cash& getStrikePrice() const;
-        [[nodiscard]] const finance::Cash& getAmount() const;
-        [[nodiscard]] const finance::Cash& getFees() const;
-        [[nodiscard]] PositionId           getPositionId() const;
-        [[nodiscard]] const std::string&   getUnderlyingTicker() const;
-        [[nodiscard]] Timestamp            getExpiration() const;
-        [[nodiscard]] OptionType           getOptionType() const;
-        [[nodiscard]] std::int64_t         getContractSize() const;
+        [[nodiscard]] AccountId          getSecurityAccount() const;
+        [[nodiscard]] AccountId          getCashAccount() const;
+        [[nodiscard]] InstrumentId       getInstrumentId() const;
+        [[nodiscard]] InstrumentId       getUnderlyingInstrumentId() const;
+        [[nodiscard]] const Quantity&    getQuantity() const;
+        [[nodiscard]] const Cash&        getStrikePrice() const;
+        [[nodiscard]] const Cash&        getAmount() const;
+        [[nodiscard]] const Cash&        getFees() const;
+        [[nodiscard]] PositionId         getPositionId() const;
+        [[nodiscard]] const std::string& getUnderlyingTicker() const;
+        [[nodiscard]] Timestamp          getExpiration() const;
+        [[nodiscard]] OptionType         getOptionType() const;
+        [[nodiscard]] std::int64_t       getContractSize() const;
     };
 
 }   // namespace drafts

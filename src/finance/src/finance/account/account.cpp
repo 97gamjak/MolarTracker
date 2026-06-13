@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "config/finance.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {

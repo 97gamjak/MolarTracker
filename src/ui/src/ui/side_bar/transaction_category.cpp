@@ -2,8 +2,8 @@
 
 #include <QMenu>
 
-#include "config/finance.hpp"
 #include "ui/side_bar/category.hpp"
+#include "utils/finance.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui

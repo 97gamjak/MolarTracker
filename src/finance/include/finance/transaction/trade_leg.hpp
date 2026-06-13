@@ -2,7 +2,7 @@
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_LEG_HPP__
 
 #include "config/id_types.hpp"
-#include "finance/cash.hpp"
+#include "utils/cash.hpp"
 #include "utils/container/vector.hpp"
 
 namespace finance

@@ -102,7 +102,7 @@ namespace repo
             row.instrumentId.value(),
             toStock(stockRow),
             row.optionType.value(),
-            finance::Cash{row.currency.value(), row.strikePrice.value()},
+            Cash{row.currency.value(), row.strikePrice.value()},
             row.expirationDate.value(),
             row.contractSize.value()
         };

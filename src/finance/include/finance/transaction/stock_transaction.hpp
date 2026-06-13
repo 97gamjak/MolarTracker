@@ -2,12 +2,12 @@
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/security_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
+#include "utils/cash.hpp"
+#include "utils/quantity.hpp"
 
 namespace finance
 {

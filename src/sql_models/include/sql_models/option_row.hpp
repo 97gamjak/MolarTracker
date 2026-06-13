@@ -1,14 +1,14 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__OPTION_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__OPTION_ROW_HPP__
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/where_expr.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 /**

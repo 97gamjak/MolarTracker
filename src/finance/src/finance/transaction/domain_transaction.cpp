@@ -4,10 +4,10 @@
 #include <utility>
 #include <variant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_data.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {

@@ -2,10 +2,10 @@
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__CASH_TRANSACTION_HPP__
 
 #include "config/id_types.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
+#include "utils/cash.hpp"
 
 namespace finance
 {

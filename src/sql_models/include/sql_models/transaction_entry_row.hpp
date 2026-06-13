@@ -2,13 +2,13 @@
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
 
 #include "account_row.hpp"
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
 #include "transaction_row.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 
 /**
  * @brief Represents a row in the "transaction_entry" database table, which

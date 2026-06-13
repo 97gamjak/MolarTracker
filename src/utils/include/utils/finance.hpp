@@ -94,4 +94,18 @@ MSTD_ENUM(
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
+/**
+ * @brief Convert an AssetClass to its string representation.
+ *
+ * @param assetClass The AssetClass to convert.
+ * @return std::string The string representation of the AssetClass.
+ */
+static inline std::string toString(AssetClass assetClass)
+{
+    if (assetClass == AssetClass::MutualFund)
+        return "MutualFund";
+
+    return AssetClassMeta::toString(assetClass);
+}
+
 #endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__

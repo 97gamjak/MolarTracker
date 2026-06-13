@@ -1,4 +1,4 @@
-#include "config/quantity.hpp"
+#include "utils/quantity.hpp"
 
 #include <charconv>
 #include <cmath>

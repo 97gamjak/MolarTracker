@@ -1,10 +1,10 @@
 #include "sql_models/option_row.hpp"
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "filter/operators.hpp"
 #include "orm/where_expr.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 
 orm::WhereExpr OptionRow::hasName(
     InstrumentId underlying,

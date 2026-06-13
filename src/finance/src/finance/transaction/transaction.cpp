@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {

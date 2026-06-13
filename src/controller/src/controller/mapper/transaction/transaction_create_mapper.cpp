@@ -1,8 +1,8 @@
 #include "transaction_create_mapper.hpp"
 
-#include "config/finance.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/transaction/option_transaction.hpp"
+#include "utils/finance.hpp"
 
 namespace controller
 {
@@ -10,7 +10,7 @@ namespace controller
      * @brief Maps a CreateCashTransactionDraft to a CashTransaction.
      *
      * @param draft
-     * @return finance::CashTransaction
+     * @return CashTransaction
      */
     finance::CashTransaction TransactionCreateMapper::fromCreateCashDraft(
         const drafts::CreateCashTransactionDraft& draft

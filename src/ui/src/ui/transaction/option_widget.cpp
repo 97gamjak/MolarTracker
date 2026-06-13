@@ -11,14 +11,14 @@
 
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "finance/cash.hpp"
-#include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/ticker_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
+#include "utils/cash.hpp"
+#include "utils/currency.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -248,17 +248,17 @@ namespace ui
 
         const auto currency     = referenceAccount->getCurrency();
         const auto refAccountId = referenceAccount->getId();
-        const auto microUnits   = finance::getMicroUnit(currency);
+        const auto microUnits   = getMicroUnit(currency);
 
         const auto strikePrice_ = strikeRow->getAmount(microUnits);
-        const auto strikePrice  = finance::Cash(currency, strikePrice_);
+        const auto strikePrice  = Cash(currency, strikePrice_);
         const auto amount_      = amountRow->getAmount(microUnits);
-        const auto amount       = finance::Cash(currency, amount_);
+        const auto amount       = Cash(currency, amount_);
         const auto quantity_    = quantityRow->getAmount(Quantity::precision);
         const auto quantity     = Quantity{quantity_};
 
         const auto fees_ = feesRow->getAmount(microUnits);
-        const auto fees  = -finance::Cash(currency, fees_);
+        const auto fees  = -Cash(currency, fees_);
 
         const auto ticker = tickerField->getTicker();
         if (!ticker.has_value())
@@ -366,9 +366,6 @@ namespace ui
      */
     void OptionWidget::_onAccountSelected(const drafts::AccountDraft& account)
     {
-        using finance::getMicroUnit;
-        using finance::getSymbol;
-
         const auto currency   = account.getCurrency();
         const auto microUnits = getMicroUnit(currency);
 

@@ -1,7 +1,7 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__QUANTITY_TPP__
-#define __CONFIG__INCLUDE__CONFIG__DETAILS__QUANTITY_TPP__
+#ifndef __UTILS__INCLUDE__UTILS__QUANTITY_TPP__
+#define __UTILS__INCLUDE__UTILS__QUANTITY_TPP__
 
-#include "config/quantity.hpp"
+#include "quantity.hpp"
 
 /**
  * @brief Compare this quantity to a scalar value for greater-than.
@@ -18,4 +18,4 @@ template <typename T>
     return lhs.getValue() > rhs;
 }
 
-#endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__QUANTITY_TPP__
+#endif   // __UTILS__INCLUDE__UTILS__QUANTITY_TPP__

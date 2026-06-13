@@ -3,18 +3,18 @@
 #include <expected>
 #include <variant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
     /**
-     * @brief Converts a finance::CashTransaction to a DomainTransaction, this
+     * @brief Converts a CashTransaction to a DomainTransaction, this
      * will take the relevant information from the cash transaction and format
      * it into a DomainTransaction, including creating the appropriate
      * transaction entries for the cash flows associated with the transaction.
@@ -112,7 +112,7 @@ namespace finance
     }
 
     /**
-     * @brief Converts a DomainTransaction to a finance::CashTransaction, this
+     * @brief Converts a DomainTransaction to a CashTransaction, this
      * will take the relevant information from the DomainTransaction and format
      * it into a CashTransaction, including creating the appropriate transaction
      * entries for the cash flows associated with the transaction.

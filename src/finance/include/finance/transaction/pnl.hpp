@@ -1,8 +1,8 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__PNL_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__PNL_HPP__
 
-#include "finance/cash.hpp"
 #include "finance/transaction/transactions.hpp"
+#include "utils/cash.hpp"
 #include "utils/percentage.hpp"
 
 namespace finance

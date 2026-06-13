@@ -26,20 +26,6 @@ namespace finance
         return AssetClass::Unknown;
     }
 
-    /**
-     * @brief Convert an AssetClass to its string representation.
-     *
-     * @param assetClass The AssetClass to convert.
-     * @return std::string The string representation of the AssetClass.
-     */
-    std::string toString(AssetClass assetClass)
-    {
-        if (assetClass == AssetClass::MutualFund)
-            return "MutualFund";
-
-        return AssetClassMeta::toString(assetClass);
-    }
-
     namespace
     {
         /**

@@ -48,8 +48,8 @@ namespace drafts
      */
     CreateCashTransactionDraft::CreateCashTransactionDraft(
         Timestamp                  timestamp,
-        finance::Cash              amount,
-        finance::Cash              fees,
+        Cash                       amount,
+        Cash                       fees,
         AccountId                  accountId,
         std::optional<std::string> comment
     )
@@ -63,9 +63,9 @@ namespace drafts
     /**
      * @brief Gets the amount of the cash transaction draft.
      *
-     * @return const finance::Cash& The amount of the cash transaction draft.
+     * @return const Cash& The amount of the cash transaction draft.
      */
-    const finance::Cash& CreateCashTransactionDraft::getAmount() const
+    const Cash& CreateCashTransactionDraft::getAmount() const
     {
         return _amount;
     }
@@ -73,12 +73,9 @@ namespace drafts
     /**
      * @brief Gets the fees of the cash transaction draft.
      *
-     * @return const finance::Cash& The fees of the cash transaction draft.
+     * @return const Cash& The fees of the cash transaction draft.
      */
-    const finance::Cash& CreateCashTransactionDraft::getFees() const
-    {
-        return _fees;
-    }
+    const Cash& CreateCashTransactionDraft::getFees() const { return _fees; }
 
     /**
      * @brief Gets the account ID of the cash transaction draft.
@@ -107,8 +104,8 @@ namespace drafts
         Timestamp                  timestamp,
         std::string                ticker,
         Quantity                   quantity,
-        finance::Cash              unitPrice,
-        finance::Cash              fees,
+        Cash                       unitPrice,
+        Cash                       fees,
         AccountId                  securityAccount,
         AccountId                  cashAccount,
         std::optional<std::string> comment
@@ -198,10 +195,10 @@ namespace drafts
     /**
      * @brief Gets the unit price of the stock transaction draft.
      *
-     * @return const finance::Cash& The unit price of the stock transaction
+     * @return const Cash& The unit price of the stock transaction
      * draft.
      */
-    const finance::Cash& CreateStockTransactionDraft::getUnitPrice() const
+    const Cash& CreateStockTransactionDraft::getUnitPrice() const
     {
         return _unitPrice;
     }
@@ -209,12 +206,9 @@ namespace drafts
     /**
      * @brief Gets the fees of the stock transaction draft.
      *
-     * @return const finance::Cash& The fees of the stock transaction draft.
+     * @return const Cash& The fees of the stock transaction draft.
      */
-    const finance::Cash& CreateStockTransactionDraft::getFees() const
-    {
-        return _fees;
-    }
+    const Cash& CreateStockTransactionDraft::getFees() const { return _fees; }
 
     /**
      * @brief Gets the position ID of the stock transaction draft.
@@ -232,9 +226,9 @@ namespace drafts
         Timestamp                  expiration,
         OptionType                 optionType,
         Quantity                   quantity,
-        finance::Cash              amount,
-        finance::Cash              strikePrice,
-        finance::Cash              fees,
+        Cash                       amount,
+        Cash                       strikePrice,
+        Cash                       fees,
         std::int64_t               contractSize,
         AccountId                  securityAccount,
         AccountId                  cashAccount,
@@ -291,19 +285,16 @@ namespace drafts
     {
         return _quantity;
     }
-    const finance::Cash& CreateOptionTransactionDraft::getStrikePrice() const
+    const Cash& CreateOptionTransactionDraft::getStrikePrice() const
     {
         return _strikePrice;
     }
-    const finance::Cash& CreateOptionTransactionDraft::getAmount() const
+    const Cash& CreateOptionTransactionDraft::getAmount() const
     {
         return _amount;
     }
-    const finance::Cash& CreateOptionTransactionDraft::getFees() const
-    {
-        return _fees;
-    }
-    PositionId CreateOptionTransactionDraft::getPositionId() const
+    const Cash& CreateOptionTransactionDraft::getFees() const { return _fees; }
+    PositionId  CreateOptionTransactionDraft::getPositionId() const
     {
         return _positionId;
     }

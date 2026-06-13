@@ -3,11 +3,11 @@
 #include <QVariant>
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
+#include "utils/finance.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -34,7 +34,7 @@ namespace
     )
     {
         const auto quantity = Quantity{100};
-        const auto price    = finance::Cash{Currency::USD, 150};
+        const auto price    = Cash{Currency::USD, 150};
         const auto total    = price * quantity;
         return drafts::PositionStockDetailDraft{
             id,
@@ -43,7 +43,7 @@ namespace
             quantity,
             price,
             total,
-            finance::Cash{Currency::USD, 0},
+            Cash{Currency::USD, 0},
             Percentage{0.0},
             std::nullopt
         };
