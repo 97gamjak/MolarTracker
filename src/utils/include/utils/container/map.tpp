@@ -18,6 +18,12 @@ const Value& Map<Key, Value, Hash>::operator[](const Key& key) const
     return _items.at(key);
 }
 
+template <typename Key, typename Value, typename Hash>
+Value& Map<Key, Value, Hash>::operator[](const Key& key)
+{
+    return _items[key];
+}
+
 /**
  * @brief Returns a const reference to the value associated with the specified
  * key.
@@ -145,6 +151,12 @@ std::vector<Value> Map<Key, Value, Hash>::getValues() const
         values.push_back(value);
 
     return values;
+}
+
+template <typename Key, typename Value, typename Hash>
+void Map<Key, Value, Hash>::clear()
+{
+    _items.clear();
 }
 
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__

@@ -93,6 +93,13 @@ class Quantity
     std::uint8_t     precision
 );
 
+[[nodiscard]] std::string microUnitsToString(
+    micro_units  value,
+    std::uint8_t precision,
+    std::uint8_t scale,
+    bool         withDecimalPoint = true
+);
+
 #ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__QUANTITY_TPP__
 #include "details/quantity.tpp"
 #endif

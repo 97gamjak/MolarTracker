@@ -7,6 +7,7 @@
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "utils/timestamp.hpp"
 
@@ -26,6 +27,14 @@
  */
 struct OptionRow : public orm::ORMModel<"option">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasName(
+        InstrumentId underlying,
+        OptionType   optionType,
+        micro_units  strikePrice,
+        Timestamp    expirationDate
+    );
+
     /// as we have a 1:1 relationship between InstrumentRow and OptionRow, we
     /// disallow inserting an OptionRow without a corresponding InstrumentRow
     using insert_policy = orm::requires_paired_insert_t;

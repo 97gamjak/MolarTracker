@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <optional>
 #include <string>
 
 #include "connections/connection.hpp"
@@ -10,6 +9,7 @@
 #include "service/service_container.hpp"
 #include "store/account/account_store.hpp"
 #include "store/i_profile_store.hpp"
+#include "store/option_store.hpp"
 #include "store/position_store.hpp"
 #include "store/profile/profile_store.hpp"
 #include "store/stock_store.hpp"
@@ -36,6 +36,10 @@ namespace store
               _serviceContainer->getInstrumentService(),
               _instrumentIdSeq
           )},
+          _optionStore{std::make_shared<OptionStore>(
+              _serviceContainer->getInstrumentService(),
+              _instrumentIdSeq
+          )},
           _positionStore{std::make_shared<PositionStore>(
               _serviceContainer->getPositionService(),
               _accountStore->getAccountSession()
@@ -49,6 +53,7 @@ namespace store
         auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
         auto* accountStore = dynamic_cast<AccountStore*>(_accountStore.get());
         auto* stockStore   = dynamic_cast<StockStore*>(_stockStore.get());
+        auto* optionStore  = dynamic_cast<OptionStore*>(_optionStore.get());
         auto* positionStore =
             dynamic_cast<PositionStore*>(_positionStore.get());
         auto* transactionStore =
@@ -60,6 +65,8 @@ namespace store
             throw std::runtime_error("Failed to initialize account store");
         if (stockStore == nullptr || !_stockStore)
             throw std::runtime_error("Failed to initialize stock store");
+        if (optionStore == nullptr || !_optionStore)
+            throw std::runtime_error("Failed to initialize option store");
         if (positionStore == nullptr || !_positionStore)
             throw std::runtime_error("Failed to initialize position store");
         if (transactionStore == nullptr || !_transactionStore)
@@ -69,6 +76,7 @@ namespace store
         _allStores.push_back(accountStore);
         _allStores.push_back(transactionStore);
         _allStores.push_back(stockStore);
+        _allStores.push_back(optionStore);
         _allStores.push_back(positionStore);
 
         _connections->add(_profileStore->subscribeToProfileChange(
@@ -101,11 +109,23 @@ namespace store
 
         _stockStore->commit();
 
-        _transactionStore->commit(
-            _accountStore->getIdRemap(),
-            _stockStore->getInstrumentIdMap(),
-            _positionStore->getIdRemap()
-        );
+        _optionStore->commit();
+
+        const auto& accountIdRemap  = _accountStore->getIdRemap();
+        const auto& positionIdRemap = _positionStore->getIdRemap();
+
+        auto instrumentIdRemap = _stockStore->getInstrumentIdMap();
+
+        if (!instrumentIdRemap.combine(_optionStore->getInstrumentIdMap()))
+        {
+            throw std::runtime_error(
+                "Failed to combine instrument ID remaps from stock and option "
+                "stores"
+            );
+        }
+
+        _transactionStore
+            ->commit(accountIdRemap, instrumentIdRemap, positionIdRemap);
     }
 
     /**
@@ -258,6 +278,26 @@ namespace store
     const std::shared_ptr<IStockStore>& StoreContainer::getStockStore() const
     {
         return _stockStore;
+    }
+
+    /**
+     * @brief Get the OptionStore
+     *
+     * @return std::shared_ptr<IOptionStore>&
+     */
+    std::shared_ptr<IOptionStore>& StoreContainer::getOptionStore()
+    {
+        return _optionStore;
+    }
+
+    /**
+     * @brief Get the OptionStore (const version)
+     *
+     * @return const std::shared_ptr<IOptionStore>&
+     */
+    const std::shared_ptr<IOptionStore>& StoreContainer::getOptionStore() const
+    {
+        return _optionStore;
     }
 
     /**

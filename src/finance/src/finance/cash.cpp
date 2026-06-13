@@ -214,13 +214,6 @@ namespace finance
     /**
      * @brief Converts the Cash object to a string representation.
      *
-     * @return std::string The string representation of the Cash object.
-     */
-    std::string Cash::toString() const { return toString(std::nullopt); }
-
-    /**
-     * @brief Converts the Cash object to a string representation.
-     *
      * @param nDecimalPlaces An optional parameter specifying the number of
      * decimal places to include in the string representation. If not provided,
      * it will default to the number of decimal places defined from the
@@ -228,27 +221,27 @@ namespace finance
      *
      * @return std::string The string representation of the Cash object.
      */
-    std::string Cash::toString(std::optional<std::uint8_t> nDecimalPlaces) const
+    std::string Cash::toString(
+        std::optional<std::uint8_t> nDecimalPlaces,
+        bool                        includeCurrencySymbol,
+        bool                        includeDecimalPoint
+    ) const
     {
         const auto amount        = getAmount();
         const auto microUnit     = getMicroUnit(getCurrency());
         const auto decimalPlaces = nDecimalPlaces.value_or(microUnit);
 
-        const auto scale = static_cast<int64_t>(std::pow(10, microUnit));
-
-        const auto intPart  = std::abs(amount / scale);
-        const auto fracPart = std::abs(amount % scale);
-        const char sign     = amount < 0 ? '-' : '\0';
-
-        const std::string decimal = std::format(
-            "{}{}.{:0{}d}",   // pad fracPart to _nDecimalPlaces digits
-            (sign != 0) ? std::string(1, sign) : "",
-            intPart,
-            fracPart,
-            decimalPlaces
+        auto result = microUnitsToString(
+            amount,
+            decimalPlaces,
+            microUnit,
+            includeDecimalPoint
         );
 
-        return std::format("{} {}", decimal, getSymbol(getCurrency()));
+        if (!includeCurrencySymbol || getCurrency() == Currency::Unknown)
+            return result;
+
+        return std::format("{} {}", result, getSymbol(getCurrency()));
     }
 
     /**

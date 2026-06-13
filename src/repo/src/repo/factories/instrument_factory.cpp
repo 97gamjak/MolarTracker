@@ -91,4 +91,19 @@ namespace repo
         return {instrumentRow, optionRow};
     }
 
+    finance::Option InstrumentFactory::toOption(
+        const OptionRow& row,
+        const StockRow&  stockRow
+    )
+    {
+        return finance::Option{
+            row.id.value(),
+            row.instrumentId.value(),
+            toStock(stockRow),
+            row.optionType.value(),
+            finance::Cash{row.currency.value(), row.strikePrice.value()},
+            row.expirationDate.value()
+        };
+    }
+
 }   // namespace repo

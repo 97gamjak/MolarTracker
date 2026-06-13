@@ -44,6 +44,9 @@ namespace service
         ) override;
 
         [[nodiscard]]
+        std::vector<finance::Option> getOptions() override;
+
+        [[nodiscard]]
         std::optional<finance::Stock> getStock(
             const std::string& ticker
         ) override;
@@ -59,6 +62,8 @@ namespace service
         ) override;
 
         [[nodiscard]] bool stockExists(const std::string& ticker) override;
+
+        [[nodiscard]] bool optionExists(const finance::Option& option) override;
     };
 
 }   // namespace service

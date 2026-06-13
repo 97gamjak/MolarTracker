@@ -3,6 +3,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "filter/predicate.hpp"
 #include "finance/cash.hpp"
 #include "finance/instrument/stock.hpp"
 #include "utils/timestamp.hpp"
@@ -40,6 +41,13 @@ namespace finance
         [[nodiscard]] Cash         getStrikePrice() const;
         [[nodiscard]] Timestamp    getExpirationDate() const;
         [[nodiscard]] const Stock& getUnderlying() const;
+
+        [[nodiscard]] std::string getName() const;
+
+        void setId(OptionId id);
+        void setInstrumentId(InstrumentId instrumentId);
+
+        [[nodiscard]] std::string toString() const;
     };
 
     struct [[nodiscard]] OptionInsertionResult

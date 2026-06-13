@@ -1,6 +1,7 @@
 #include "finance/instrument/instrument_predicates.hpp"
 
 #include "filter/predicate.hpp"
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 
 namespace finance
@@ -42,6 +43,13 @@ namespace finance
         return filter::makePredicate<Stock>(
             [ids](const Stock& stock)
             { return ids.contains(stock.getInstrumentId()); }
+        );
+    }
+
+    filter::Predicate<Option> HasOptionName(const std::string& name)
+    {
+        return filter::makePredicate<Option>(
+            [name](const Option& option) { return option.getName() == name; }
         );
     }
 

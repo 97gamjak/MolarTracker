@@ -41,6 +41,11 @@ namespace service
         return _instrumentRepo->getStocks(ids);
     }
 
+    std::vector<finance::Option> InstrumentService::getOptions()
+    {
+        return _instrumentRepo->getOptions();
+    }
+
     std::optional<finance::Stock> InstrumentService::getStock(
         const std::string& ticker
     )
@@ -85,6 +90,11 @@ namespace service
     bool InstrumentService::stockExists(const std::string& ticker)
     {
         return _instrumentRepo->stockExists(ticker);
+    }
+
+    bool InstrumentService::optionExists(const finance::Option& option)
+    {
+        return _instrumentRepo->optionExists(option);
     }
 
 }   // namespace service

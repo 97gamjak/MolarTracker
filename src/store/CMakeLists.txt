@@ -1,8 +1,10 @@
 add_library(molartracker_store STATIC
     src/store/store_container.cpp
 
-    src/store/transaction_store.cpp
+    src/store/option_store.cpp
     src/store/stock_store.cpp
+    src/store/transaction_store.cpp
+
     src/store/position_store.cpp
     src/store/account/account_store.cpp
     src/store/profile/profile_store.cpp

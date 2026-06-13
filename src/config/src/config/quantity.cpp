@@ -1,6 +1,7 @@
 #include "config/quantity.hpp"
 
 #include <charconv>
+#include <cmath>
 #include <format>
 #include <stdexcept>
 
@@ -275,4 +276,45 @@ micro_units microUnitsFromString(std::string_view value, std::uint8_t precision)
     }
 
     return sign * ((intPart * scale) + fracPart);
+}
+
+/**
+ * @brief Convert a micro_units value to a string representation with the given
+ * precision.
+ *
+ * @param value The micro_units value to convert.
+ * @param precision The number of decimal places to include in the string
+ * representation.
+ * @param withDecimalPoint Whether to include the decimal point in the string
+ * representation (default: true).
+ * @return The string representation of the quantity.
+ */
+std::string microUnitsToString(
+    micro_units  value,
+    std::uint8_t precision,
+    std::uint8_t scale,
+    bool         withDecimalPoint
+)
+{
+    const auto factor   = static_cast<int64_t>(std::pow(10, scale));
+    const auto intPart  = std::abs(value / factor);
+    const auto fracPart = std::abs(value % factor);
+    const char sign     = value < 0 ? '-' : '\0';
+
+    auto result = std::format(
+        "{}{}.{:0{}d}",
+        (sign != 0) ? std::string(1, sign) : "",
+        intPart,
+        fracPart,
+        precision
+    );
+
+    if (!withDecimalPoint && precision > 0)
+    {
+        const auto dotPos = result.find('.');
+        if (dotPos != std::string::npos)
+            result.erase(dotPos, 1);
+    }
+
+    return result;
 }

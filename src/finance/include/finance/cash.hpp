@@ -51,9 +51,10 @@ namespace finance
 
         [[nodiscard]] micro_units getAmount() const;
         [[nodiscard]] Currency    getCurrency() const;
-        [[nodiscard]] std::string toString() const;
         [[nodiscard]] std::string toString(
-            std::optional<std::uint8_t> nDecimalPlaces
+            std::optional<std::uint8_t> nDecimalPlaces        = std::nullopt,
+            bool                        includeCurrencySymbol = true,
+            bool                        includeDecimalPoint   = true
         ) const;
 
        private:

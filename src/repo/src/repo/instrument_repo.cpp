@@ -7,6 +7,7 @@
 #include "orm/query_options.hpp"
 #include "repo/factories/instrument_factory.hpp"
 #include "repo_errors.hpp"
+#include "sql_models/option_row.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace repo
@@ -83,6 +84,31 @@ namespace repo
                                   { return InstrumentFactory::toStock(row); });
 
         return {results.begin(), results.end()};
+    }
+
+    std::vector<finance::Option> InstrumentRepo::getOptions()
+    {
+        orm::Query query{};
+
+        auto join = orm::Joins{}.add(
+            orm::join<
+                OptionRow::underlyingInstrumentIdField,
+                StockRow::instrumentIdField>()
+        );
+
+        const auto options =
+            _getCrud().getJoined<OptionRow, StockRow>(_getDb(), join, query) |
+            std::views::transform(
+                [](const std::tuple<OptionRow, StockRow>& rows)
+                {
+                    return InstrumentFactory::toOption(
+                        std::get<0>(rows),
+                        std::get<1>(rows)
+                    );
+                }
+            );
+
+        return {options.begin(), options.end()};
     }
 
     std::optional<finance::Stock> InstrumentRepo::getStock(
@@ -176,6 +202,22 @@ namespace repo
         const auto query = orm::Query{}.where(StockRow::hasTicker(ticker));
 
         auto result = _getCrud().get<StockRow>(_getDb(), query);
+
+        return !result.empty();
+    }
+
+    bool InstrumentRepo::optionExists(const finance::Option& option)
+    {
+        const auto query = orm::Query{}.where(
+            OptionRow::hasName(
+                option.getUnderlying().getInstrumentId(),
+                option.getOptionType(),
+                option.getStrikePrice().getAmount(),
+                option.getExpirationDate()
+            )
+        );
+
+        auto result = _getCrud().get<OptionRow>(_getDb(), query);
 
         return !result.empty();
     }

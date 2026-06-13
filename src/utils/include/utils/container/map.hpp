@@ -25,6 +25,7 @@ class Map : public Iterable<std::unordered_map<Key, Value, Hash>>
     using Iterable<std::unordered_map<Key, Value, Hash>>::Iterable;
 
     [[nodiscard]] const Value& operator[](const Key& key) const;
+    [[nodiscard]] Value&       operator[](const Key& key);
     [[nodiscard]] const Value& at(const Key& key) const;
 
     [[nodiscard]] bool add(const Key& key, const Value& value);
@@ -39,6 +40,8 @@ class Map : public Iterable<std::unordered_map<Key, Value, Hash>>
 
     [[nodiscard]] std::unordered_set<Key, Hash> getKeys() const;
     [[nodiscard]] std::vector<Value>            getValues() const;
+
+    void clear();
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__

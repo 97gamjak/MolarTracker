@@ -38,6 +38,12 @@ namespace repo
         static std::pair<InstrumentRow, OptionRow> fromOption(
             const finance::Option& option
         );
+
+        [[nodiscard]]
+        static finance::Option toOption(
+            const OptionRow& row,
+            const StockRow&  stockRow
+        );
     };
 
 }   // namespace repo

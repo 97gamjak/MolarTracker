@@ -10,6 +10,7 @@
 #include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"
+#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
@@ -55,9 +56,9 @@ namespace store
         ~TransactionStore() override;
 
         void commit(
-            const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
+            const unorderedIdMap<AccountId, AccountId>&   accountIdRemap,
+            const IdIdMap<InstrumentId>&                  instrumentIdRemap,
+            const unorderedIdMap<PositionId, PositionId>& positionIdRemap
         ) override;
 
         [[nodiscard]]
@@ -91,9 +92,7 @@ namespace store
         void _onAccountIdRemap(
             const unorderedIdMap<AccountId, AccountId>& remap
         );
-        void _onInstrumentIdRemap(
-            const unorderedIdMap<InstrumentId, InstrumentId>& remap
-        );
+        void _onInstrumentIdRemap(const IdIdMap<InstrumentId>& remap);
         void _onPositionIdRemap(
             const unorderedIdMap<PositionId, PositionId>& remap
         );

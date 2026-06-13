@@ -7,6 +7,7 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
@@ -54,9 +55,9 @@ namespace store
          * @param positionIdRemap Mapping of position IDs
          */
         virtual void commit(
-            const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
+            const unorderedIdMap<AccountId, AccountId>&   accountIdRemap,
+            const IdIdMap<InstrumentId>&                  instrumentIdRemap,
+            const unorderedIdMap<PositionId, PositionId>& positionIdRemap
         ) = 0;
 
         /**

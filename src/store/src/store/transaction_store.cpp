@@ -84,9 +84,9 @@ namespace store
      * @param positionIdRemap Mapping of position IDs
      */
     void TransactionStore::commit(
-        const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-        const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-        const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
+        const unorderedIdMap<AccountId, AccountId>&   accountIdRemap,
+        const IdIdMap<InstrumentId>&                  instrumentIdRemap,
+        const unorderedIdMap<PositionId, PositionId>& positionIdRemap
     )
     {
         LOG_ENTRY;
@@ -368,7 +368,7 @@ namespace store
      * @param remap The mapping of old instrument IDs to new instrument IDs
      */
     void TransactionStore::_onInstrumentIdRemap(
-        const unorderedIdMap<InstrumentId, InstrumentId>& remap
+        const IdIdMap<InstrumentId>& remap
     )
     {
         LOG_ENTRY;
@@ -409,8 +409,8 @@ namespace store
 
                     for (auto& leg : data.getLegs())
                     {
-                        if (const auto it = remap.find(leg.getInstrumentId());
-                            it != remap.end())
+                        const auto instrumentId = leg.getInstrumentId();
+                        if (remap.contains(instrumentId))
                         {
                             LOG_DEBUG(
                                 std::format(
@@ -421,11 +421,11 @@ namespace store
                                     "{} -> "
                                     "{}",
                                     leg.toString(),
-                                    leg.getInstrumentId().toString(),
-                                    it->second.toString()
+                                    instrumentId.toString(),
+                                    remap.at(instrumentId).toString()
                                 )
                             );
-                            leg.setInstrumentId(it->second);
+                            leg.setInstrumentId(remap.at(instrumentId));
                             modified = true;
                         }
                     }

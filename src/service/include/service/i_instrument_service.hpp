@@ -47,6 +47,9 @@ namespace service
             const idSet<InstrumentId>& ids
         ) = 0;
 
+        [[nodiscard]]
+        virtual std::vector<finance::Option> getOptions() = 0;
+
         /**
          * @brief Get a stock by its ticker symbol
          *
@@ -90,6 +93,9 @@ namespace service
          */
         [[nodiscard]]
         virtual bool stockExists(const std::string& ticker) = 0;
+
+        [[nodiscard]]
+        virtual bool optionExists(const finance::Option& option) = 0;
     };
 }   // namespace service
 

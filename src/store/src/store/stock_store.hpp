@@ -11,6 +11,7 @@
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
+#include "utils/container/id_id_map.hpp"
 
 namespace store
 {
@@ -33,7 +34,7 @@ namespace store
         InstrumentIdSeq& _instrumentIdSeq;
 
         /// The observable for instrument ID remapping events
-        unorderedIdMap<InstrumentId, InstrumentId> _instrumentIdMap;
+        IdIdMap<InstrumentId> _instrumentIdMap;
 
        public:
         explicit StockStore(
@@ -82,8 +83,7 @@ namespace store
         void commit() override;
 
         [[nodiscard]]
-        const unorderedIdMap<InstrumentId, InstrumentId>& getInstrumentIdMap(
-        ) const override;
+        const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
 
         [[nodiscard]]
         Connection subscribeToStoreChange(

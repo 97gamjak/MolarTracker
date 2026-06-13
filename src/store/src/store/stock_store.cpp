@@ -319,10 +319,9 @@ namespace store
      * @brief Get the mapping of old instrument IDs to new instrument IDs after
      * a commit
      *
-     * @return const unorderedIdMap<InstrumentId, InstrumentId>&
+     * @return const IdIdMap<InstrumentId>&
      */
-    const unorderedIdMap<InstrumentId, InstrumentId>& StockStore::
-        getInstrumentIdMap() const
+    const IdIdMap<InstrumentId>& StockStore::getInstrumentIdMap() const
     {
         return _instrumentIdMap;
     }

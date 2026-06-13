@@ -41,6 +41,9 @@ class Timestamp
     // Filename-safe: 20260120_123405
     [[nodiscard]] std::string fileSafe() const;
 
+    // Human readable: 260120
+    [[nodiscard]] std::string toDateString() const;
+
     [[nodiscard]] int64_t toInt64() const;
 
     [[nodiscard]] static Timestamp fromInt64(int64_t value);
