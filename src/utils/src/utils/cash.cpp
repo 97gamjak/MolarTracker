@@ -212,6 +212,11 @@ Currency Cash::getCurrency() const { return _currency; }
  * decimal places to include in the string representation. If not provided,
  * it will default to the number of decimal places defined from the
  * currency's micro unit.
+ * @param includeCurrencySymbol A boolean flag indicating whether to include
+ * the currency symbol in the string representation. Defaults to false.
+ * @param includeDecimalPoint A boolean flag indicating whether to include the
+ * decimal point in the string representation, even if the number of
+ * decimal places is zero. Defaults to false.
  *
  * @return std::string The string representation of the Cash object.
  */

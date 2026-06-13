@@ -23,18 +23,25 @@ namespace finance
     class Option
     {
        private:
+        /// The unique identifier for the option
         OptionId _id;
 
+        /// The unique identifier for the instrument associated with the option
         InstrumentId _instrumentId;
 
+        /// The underlying stock associated with the option
         Stock _underlying;
 
+        /// The option type (call or put) of the option
         OptionType _optionType;
 
+        /// The strike price of the option
         Cash _strikePrice;
 
+        /// The expiration date of the option
         Timestamp _expirationDate;
 
+        /// The contract size of the option
         std::int64_t _contractSize;
 
        public:

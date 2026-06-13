@@ -54,6 +54,12 @@ namespace controller
         };
     }
 
+    /**
+     * @brief Maps a CreateOptionTransactionDraft to an OptionTransaction.
+     *
+     * @param draft
+     * @return finance::OptionTransaction
+     */
     finance::OptionTransaction TransactionCreateMapper::fromCreateOptionDraft(
         const drafts::CreateOptionTransactionDraft& draft
     )

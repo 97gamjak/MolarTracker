@@ -5,6 +5,26 @@
 namespace finance
 {
 
+    /**
+     * @brief Construct a new Option Transaction:: Option Transaction object
+     *
+     * @param id
+     * @param timestamp
+     * @param status
+     * @param instrumentId
+     * @param underlyingInstrumentId
+     * @param securityAccount
+     * @param cashAccount
+     * @param externalAccount
+     * @param quantity
+     * @param strikePrice
+     * @param amount
+     * @param fees
+     * @param positionId
+     * @param action
+     * @param rolledOption
+     * @param comment
+     */
     OptionTransaction::OptionTransaction(
         TransactionId                id,
         Timestamp                    timestamp,
@@ -44,11 +64,27 @@ namespace finance
     {
     }
 
+    /**
+     * @brief Get the base instrument ID for the option transaction, which is
+     * the underlying instrument ID.
+     *
+     * @return InstrumentId The underlying instrument ID associated with the
+     * option transaction.
+     */
     InstrumentId OptionTransaction::getBaseInstrumentId() const
     {
         return getInstrumentId();
     }
 
+    /**
+     * @brief Get the transaction entries for the option transaction, which
+     * includes the cash movement for the option amount and fees.
+     *
+     * @param externalAccount The external account ID to use for the cash entry
+     * representing the cash movement for the option amount.
+     * @return TransactionEntries The transaction entries associated with the
+     * option transaction.
+     */
     TransactionEntries OptionTransaction::getEntries(
         AccountId externalAccount
     ) const
@@ -76,6 +112,13 @@ namespace finance
         return entries;
     }
 
+    /**
+     * @brief Get the option data for the option transaction, which includes the
+     * quantity, strike price, action, and any rolled option information.
+     *
+     * @return OptionData The option data associated with the option
+     * transaction.
+     */
     OptionData OptionTransaction::getOptionData() const
     {
         auto optionData = OptionData{

@@ -6,6 +6,16 @@
 #include "utils/finance.hpp"
 #include "utils/quantity.hpp"
 
+/**
+ * @brief Creates a where expression to find an option by its underlying
+ * instrument ID, option type, strike price, and expiration date.
+ *
+ * @param underlying
+ * @param optionType
+ * @param strikePrice
+ * @param expirationDate
+ * @return orm::WhereExpr
+ */
 orm::WhereExpr OptionRow::hasName(
     InstrumentId underlying,
     OptionType   optionType,

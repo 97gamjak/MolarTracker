@@ -24,6 +24,8 @@ namespace finance
     class OptionTransaction : public SecurityTransaction
     {
        private:
+        /// The underlying instrument ID of the option being traded in the
+        /// transaction
         InstrumentId _underlyingInstrumentId;
 
         /// The strike price of the option being traded in the transaction
@@ -31,7 +33,17 @@ namespace finance
         /// The amount of the option being traded in the transaction
         Cash _amount;
 
-        TransactionOptionAction      _action;
+        /// The action being performed in the option transaction (e.g., open,
+        /// close, roll)
+        TransactionOptionAction _action;
+        /// The ID of the rolled option transaction, if this transaction is a
+        /// roll of an existing option position, this allows the transaction to
+        /// reference the original option transaction that is being rolled,
+        /// which can be useful for tracking the history of the position and
+        /// understanding the sequence of transactions that have occurred for
+        /// the position, and provides a way to link the new option transaction
+        /// to the original transaction that is being rolled, allowing for
+        /// better traceability and analysis of the option trading activity.
         std::optional<TransactionId> _rolledOption;
 
        public:

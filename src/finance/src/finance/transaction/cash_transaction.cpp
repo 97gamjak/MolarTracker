@@ -51,6 +51,12 @@ namespace finance
     /**
      * @brief Get the transaction entries associated with the cash transaction
      *
+     * @param externalAccount The external account ID, if applicable, this is
+     * used to determine the direction of the cash flow for the amount and fees
+     * entries, if the entry is for the external account it will negate the
+     * amount to reflect the cash flow correctly, and if the entry is for the
+     * cash account it will use the amount as is.
+     *
      * @return TransactionEntries
      */
     TransactionEntries CashTransaction::getEntries(

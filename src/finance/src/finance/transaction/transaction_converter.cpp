@@ -20,6 +20,8 @@ namespace finance
      * transaction entries for the cash flows associated with the transaction.
      *
      * @param transaction
+     * @param accounts
+     *
      * @return DomainTransaction
      */
     DomainTransaction TransactionConverter::toDomain(
@@ -56,6 +58,8 @@ namespace finance
      * transaction entries for the stock trades associated with the transaction.
      *
      * @param transaction
+     * @param accounts
+     *
      * @return DomainTransaction
      */
     DomainTransaction TransactionConverter::toDomain(
@@ -84,6 +88,18 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Converts an OptionTransaction to a DomainTransaction, this
+     * will take the relevant information from the option transaction and format
+     * it into a DomainTransaction, including creating the appropriate
+     * transaction entries for the option trades associated with the
+     * transaction.
+     *
+     * @param transaction
+     * @param accounts
+     *
+     * @return DomainTransaction
+     */
     DomainTransaction TransactionConverter::toDomain(
         const OptionTransaction& transaction,
         const Accounts&          accounts

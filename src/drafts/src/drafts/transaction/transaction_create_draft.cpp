@@ -220,6 +220,23 @@ namespace drafts
         return _positionId;
     }
 
+    /**
+     * @brief Create a Option Transaction Draft:: Create Option Transaction
+     * Draft object
+     *
+     * @param timestamp
+     * @param ticker
+     * @param expiration
+     * @param optionType
+     * @param quantity
+     * @param amount
+     * @param strikePrice
+     * @param fees
+     * @param contractSize
+     * @param securityAccount
+     * @param cashAccount
+     * @param comment
+     */
     CreateOptionTransactionDraft::CreateOptionTransactionDraft(
         Timestamp                  timestamp,
         std::string                ticker,
@@ -248,69 +265,168 @@ namespace drafts
     {
     }
 
+    /**
+     * @brief Set the instrument ID for the option transaction draft.
+     *
+     * @param instrumentId The ID of the instrument to associate with the option
+     * transaction draft
+     */
     void CreateOptionTransactionDraft::setInstrumentId(
         InstrumentId instrumentId
     )
     {
         _instrumentId = instrumentId;
     }
+
+    /**
+     * @brief Set the underlying instrument ID for the option transaction draft.
+     *
+     * @param underlyingInstrumentId The ID of the underlying instrument to
+     * associate with the option transaction draft
+     */
     void CreateOptionTransactionDraft::setUnderlyingInstrumentId(
         InstrumentId underlyingInstrumentId
     )
     {
         _underlyingInstrumentId = underlyingInstrumentId;
     }
+
+    /**
+     * @brief Set the position ID for the option transaction draft.
+     *
+     * @param positionId The ID of the position to associate with the option
+     * transaction draft
+     */
     void CreateOptionTransactionDraft::setPositionId(PositionId positionId)
     {
         _positionId = positionId;
     }
 
+    /**
+     * @brief Gets the security account ID of the option transaction draft.
+     *
+     * @return AccountId The security account ID of the option transaction
+     * draft.
+     */
     AccountId CreateOptionTransactionDraft::getSecurityAccount() const
     {
         return _securityAccount;
     }
+
+    /**
+     * @brief Gets the cash account ID of the option transaction draft.
+     *
+     * @return AccountId The cash account ID of the option transaction draft.
+     */
     AccountId CreateOptionTransactionDraft::getCashAccount() const
     {
         return _cashAccount;
     }
+
+    /**
+     * @brief Gets the instrument ID of the option transaction draft.
+     *
+     * @return InstrumentId The instrument ID of the option transaction draft.
+     */
     InstrumentId CreateOptionTransactionDraft::getInstrumentId() const
     {
         return _instrumentId;
     }
+
+    /**
+     * @brief Gets the underlying instrument ID of the option transaction draft.
+     *
+     * @return InstrumentId The underlying instrument ID of the option
+     * transaction draft.
+     */
     InstrumentId CreateOptionTransactionDraft::getUnderlyingInstrumentId() const
     {
         return _underlyingInstrumentId;
     }
+
+    /**
+     * @brief Gets the quantity of the option transaction draft.
+     *
+     * @return const Quantity& The quantity of the option transaction draft.
+     */
     const Quantity& CreateOptionTransactionDraft::getQuantity() const
     {
         return _quantity;
     }
+
+    /**
+     * @brief Gets the strike price of the option transaction draft.
+     *
+     * @return const Cash& The strike price of the option transaction draft.
+     */
     const Cash& CreateOptionTransactionDraft::getStrikePrice() const
     {
         return _strikePrice;
     }
+
+    /**
+     * @brief Gets the amount of the option transaction draft.
+     *
+     * @return const Cash& The amount of the option transaction draft.
+     */
     const Cash& CreateOptionTransactionDraft::getAmount() const
     {
         return _amount;
     }
+
+    /**
+     * @brief Gets the fees of the option transaction draft.
+     *
+     * @return const Cash& The fees of the option transaction draft.
+     */
     const Cash& CreateOptionTransactionDraft::getFees() const { return _fees; }
-    PositionId  CreateOptionTransactionDraft::getPositionId() const
+
+    /**
+     * @brief Gets the position ID of the option transaction draft.
+     *
+     * @return PositionId The position ID of the option transaction draft.
+     */
+    PositionId CreateOptionTransactionDraft::getPositionId() const
     {
         return _positionId;
     }
+
+    /**
+     * @brief Gets the underlying ticker of the option transaction draft.
+     *
+     * @return const std::string& The underlying ticker of the option
+     * transaction draft.
+     */
     const std::string& CreateOptionTransactionDraft::getUnderlyingTicker() const
     {
         return _underlyingTicker;
     }
+
+    /**
+     * @brief Gets the expiration date of the option transaction draft.
+     *
+     * @return Timestamp The expiration date of the option transaction draft.
+     */
     Timestamp CreateOptionTransactionDraft::getExpiration() const
     {
         return _expiration;
     }
+
+    /**
+     * @brief Gets the option type of the option transaction draft.
+     *
+     * @return OptionType The option type of the option transaction draft.
+     */
     OptionType CreateOptionTransactionDraft::getOptionType() const
     {
         return _optionType;
     }
 
+    /**
+     * @brief Gets the contract size of the option transaction draft.
+     *
+     * @return std::int64_t The contract size of the option transaction draft.
+     */
     std::int64_t CreateOptionTransactionDraft::getContractSize() const
     {
         return _contractSize;

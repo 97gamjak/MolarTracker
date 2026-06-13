@@ -90,15 +90,41 @@ namespace finance
      */
     void BaseTransaction::setId(TransactionId id) { _id = id; }
 
+    /**
+     * @brief Gets the fees associated with the transaction.
+     *
+     * @return Cash The fees of the transaction.
+     */
     Cash Transaction::getFees() const { return _fees; }
 
+    /**
+     * @brief Gets the cash account ID associated with the transaction.
+     *
+     * @return AccountId
+     */
     AccountId Transaction::getCashAccountId() const { return _cashAccount; }
 
+    /**
+     * @brief Gets the external account ID associated with the transaction.
+     *
+     * @return AccountId
+     */
     AccountId Transaction::getExternalAccountId() const
     {
         return _externalAccount;
     }
 
+    /**
+     * @brief Construct a new Transaction:: Transaction object
+     *
+     * @param id
+     * @param timestamp
+     * @param status
+     * @param cashAccount
+     * @param externalAccount
+     * @param fees
+     * @param comment
+     */
     Transaction::Transaction(
         TransactionId              id,
         Timestamp                  timestamp,
@@ -121,8 +147,8 @@ namespace finance
      * for the external account it will negate the fees to reflect the cash
      * flow correctly.
      *
-     * @param external
-     * @return TransactionEntry
+     * @param externalAccount The external account ID, if applicable.
+     * @return TransactionEntry The fee entry for the transaction.
      */
     TransactionEntry Transaction::_getFeeEntry(
         std::optional<AccountId> externalAccount

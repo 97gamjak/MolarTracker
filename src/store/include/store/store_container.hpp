@@ -37,6 +37,11 @@ namespace store
         InstrumentIdSeq _instrumentIdSeq;
 
         struct StoreImpl;
+        /// The implementation of the store container, this is used to hide the
+        /// details of the store implementations and allow for a clean interface
+        /// for the store container, while still providing the necessary
+        /// functionality to manage and access the various stores within the
+        /// application.
         std::unique_ptr<StoreImpl> _stores;
 
         /// list of connections for all stores

@@ -135,18 +135,25 @@ namespace drafts
     class CreateOptionTransactionDraft : public CreateTransactionDraft
     {
        private:
-        /// The name of the option being transacted
+        /// The underlying ticker of the option being transacted
         std::string _underlyingTicker;
-        Timestamp   _expiration;
-        OptionType  _optionType;
+
+        /// The expiration date of the option being transacted
+        Timestamp _expiration;
+
+        /// The option type (call or put) of the option being transacted
+        OptionType _optionType;
+
         /// The quantity of the option being transacted
         Quantity _quantity;
         /// The strike price of the option being transacted
         Cash _strikePrice;
+        /// The amount of the option being transacted
         Cash _amount;
         /// The fees associated with the option transaction
         Cash _fees;
 
+        /// The contract size of the option being transacted
         std::int64_t _contractSize;
 
         /// The security account ID associated with the option transaction
@@ -155,7 +162,8 @@ namespace drafts
         AccountId _cashAccount;
 
         /// The instrument ID associated with the option transaction
-        InstrumentId _instrumentId           = InstrumentId::invalid();
+        InstrumentId _instrumentId = InstrumentId::invalid();
+        /// The underlying instrument ID associated with the option transaction
         InstrumentId _underlyingInstrumentId = InstrumentId::invalid();
         /// The position ID associated with the option transaction
         PositionId _positionId = PositionId::invalid();

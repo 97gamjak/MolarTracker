@@ -71,6 +71,17 @@ namespace repo
         return stock;
     }
 
+    /**
+     * @brief Create an InstrumentRow and OptionRow from an Option object, this
+     * factory method takes an Option object as input and creates corresponding
+     * InstrumentRow and OptionRow objects that can be inserted into the
+     * database, ensuring that the relationships between the tables are
+     * maintained correctly (e.g., the instrumentId in the OptionRow matches the
+     * id in the InstrumentRow).
+     *
+     * @param option
+     * @return std::pair<InstrumentRow, OptionRow>
+     */
     std::pair<InstrumentRow, OptionRow> InstrumentFactory::fromOption(
         const finance::Option& option
     )
@@ -92,6 +103,18 @@ namespace repo
         return {instrumentRow, optionRow};
     }
 
+    /**
+     * @brief Create an Option object from an OptionRow and its corresponding
+     * StockRow, this factory method takes an OptionRow and its associated
+     * StockRow as input and creates a corresponding Option object that can be
+     * used in the application, ensuring that the details from the database rows
+     * are correctly mapped to the properties of the Option object, and that
+     * the underlying stock information is included in the Option object.
+     *
+     * @param row
+     * @param stockRow
+     * @return finance::Option
+     */
     finance::Option InstrumentFactory::toOption(
         const OptionRow& row,
         const StockRow&  stockRow

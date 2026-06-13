@@ -35,22 +35,33 @@ namespace store
         std::vector<IStore*> allStores;
 
         /// The Profile store
-        std::shared_ptr<ProfileStore>  profileStoreImpl;
+        std::shared_ptr<ProfileStore> profileStoreImpl;
+        /// The IProfileStore interface for the profile store
         std::shared_ptr<IProfileStore> profileStore;
+
         /// The Account store
-        std::shared_ptr<AccountStore>  accountStoreImpl;
+        std::shared_ptr<AccountStore> accountStoreImpl;
+        /// The IAccountStore interface for the account store
         std::shared_ptr<IAccountStore> accountStore;
+
         /// The stock store
-        std::shared_ptr<StockStore>  stockStoreImpl;
+        std::shared_ptr<StockStore> stockStoreImpl;
+        /// The IStockStore interface for the stock store
         std::shared_ptr<IStockStore> stockStore;
+
         /// The option store
-        std::shared_ptr<OptionStore>  optionStoreImpl;
+        std::shared_ptr<OptionStore> optionStoreImpl;
+        /// The IOptionStore interface for the option store
         std::shared_ptr<IOptionStore> optionStore;
+
         /// The Position store
-        std::shared_ptr<PositionStore>  positionStoreImpl;
+        std::shared_ptr<PositionStore> positionStoreImpl;
+        /// The IPositionStore interface for the position store
         std::shared_ptr<IPositionStore> positionStore;
+
         /// The Transaction store
-        std::shared_ptr<TransactionStore>  transactionStoreImpl;
+        std::shared_ptr<TransactionStore> transactionStoreImpl;
+        /// The ITransactionStore interface for the transaction store
         std::shared_ptr<ITransactionStore> transactionStore;
 
         StoreImpl(
@@ -59,6 +70,12 @@ namespace store
         );
     };
 
+    /**
+     * @brief Construct a new Store Container:: Store Impl:: Store Impl object
+     *
+     * @param serviceContainer
+     * @param instrumentIdSeq
+     */
     StoreContainer::StoreImpl::StoreImpl(
         service::ServiceContainer& serviceContainer,
         InstrumentIdSeq&           instrumentIdSeq

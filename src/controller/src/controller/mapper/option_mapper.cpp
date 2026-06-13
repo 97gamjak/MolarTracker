@@ -2,6 +2,13 @@
 
 namespace controller
 {
+    /**
+     * @brief Convert a CreateOptionTransactionDraft to an Option instrument.
+     *
+     * @param draft
+     * @param underlying
+     * @return finance::Option
+     */
     finance::Option OptionMapper::toOption(
         const drafts::CreateOptionTransactionDraft& draft,
         const finance::Stock&                       underlying

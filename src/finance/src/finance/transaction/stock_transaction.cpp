@@ -69,6 +69,10 @@ namespace finance
      * flows associated with the stock transaction, including the amount of the
      * transaction and any fees.
      *
+     * @param externalAccount The external account ID to use for the fee entry,
+     * this allows the fee to be associated with a specific external account for
+     * reporting and categorization purposes.
+     *
      * @return TransactionEntries
      */
     TransactionEntries StockTransaction::getEntries(

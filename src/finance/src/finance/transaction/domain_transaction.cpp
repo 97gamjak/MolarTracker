@@ -173,6 +173,17 @@ namespace finance
         }
     }
 
+    /**
+     * @brief Sets the trade legs for the transaction, this is used to update
+     * the trade legs associated with the transaction, which contain information
+     * about the instruments being traded, the quantities, and the unit prices.
+     * This allows for modifying the transaction's details after it has been
+     * created, and can be useful for scenarios where the transaction needs to
+     * be adjusted or corrected. If the transaction type is Cash, this function
+     * will throw a logic_error since cash transactions do not have trade legs.
+     *
+     * @param legs The new set of TradeLegs to associate with the transaction.
+     */
     void DomainTransaction::setLegs(const TradeLegs& legs)
     {
         switch (getType())
@@ -196,6 +207,17 @@ namespace finance
         }
     }
 
+    /**
+     * @brief Sets the entries for the transaction, this is used to update the
+     * entries associated with the transaction, which may include cash
+     * movements, fees, and other relevant information. This allows for
+     * modifying the transaction's details after it has been created, and can be
+     * useful for scenarios where the transaction needs to be adjusted or
+     * corrected.
+     *
+     * @param entries The new set of TransactionEntries to associate with the
+     * transaction.
+     */
     void DomainTransaction::setEntries(const TransactionEntries& entries)
     {
         _entries = entries;

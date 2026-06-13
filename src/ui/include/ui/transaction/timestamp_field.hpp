@@ -34,6 +34,7 @@ namespace ui
         /// The button for resetting the timestamp to the current date
         QPushButton* _todayButton;
 
+        /// Whether to only allow editing the date
         bool onlyDateEdit;
 
        public:

@@ -548,6 +548,14 @@ namespace store
         return _idRemap;
     }
 
+    /**
+     * @brief Clears the ID remapping map for the store. This is used to reset
+     * the ID remapping state, typically after a commit or when the remapping is
+     * no longer needed.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::clearIdRemap()
     {

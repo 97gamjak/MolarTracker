@@ -102,6 +102,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Implement first version of Option SQL model
 - Extend transaction row sql model with some option specific data
 - Extend domain transaction type to have now `OptionData`
+- Make it possible to open (create) option transactions
 
 #### UI
 

@@ -35,6 +35,16 @@ namespace repo
         return _getCrud().get<StockRow>(_getDb(), query);
     }
 
+    /**
+     * @brief helper method to add an instrument to the database, this will
+     * insert a new row into the instrument table and return the generated
+     * instrument ID, which can then be used to insert rows into the specific
+     * instrument type tables (e.g., stock, option) while maintaining the
+     * correct relationships between the tables.
+     *
+     * @param instrumentRow
+     * @return InstrumentId
+     */
     InstrumentId InstrumentRepo::_addInstrument(
         const InstrumentRow& instrumentRow
     )
@@ -86,6 +96,13 @@ namespace repo
         return {results.begin(), results.end()};
     }
 
+    /**
+     * @brief get a list of all options in the database, this will return all
+     * options that are not marked as deleted, and will include options that
+     * are new or modified but not yet saved to the database.
+     *
+     * @return std::vector<finance::Option>
+     */
     std::vector<finance::Option> InstrumentRepo::getOptions()
     {
         orm::Query query{};
@@ -111,6 +128,16 @@ namespace repo
         return {options.begin(), options.end()};
     }
 
+    /**
+     * @brief get a stock by its ticker symbol, this allows callers to retrieve
+     * a specific stock from the database based on its ticker, which is a
+     * common identifier for stocks and can be used to quickly access the
+     * stock's details without needing to know its instrument ID.
+     *
+     * @param ticker The ticker symbol of the stock to retrieve
+     * @return std::optional<finance::Stock> The Stock object if found, or an
+     * empty optional if no stock with the given ticker exists in the database
+     */
     std::optional<finance::Stock> InstrumentRepo::getStock(
         const std::string& ticker
     )
@@ -161,6 +188,19 @@ namespace repo
         };
     }
 
+    /**
+     * @brief add an option instrument to the database, this involves inserting
+     * a new row into the instrument table and a corresponding row into the
+     * option table, ensuring that the relationships between the tables are
+     * maintained correctly, and that the underlying stock information is also
+     * added to the database if it does not already exist.
+     *
+     * @param option The Option object containing the details of the option to
+     * be added to the database
+     *
+     * @return A struct containing the OptionId and InstrumentId of the newly
+     * added option
+     */
     finance::OptionInsertionResult InstrumentRepo::addOption(
         const finance::Option& option
     )
@@ -208,6 +248,15 @@ namespace repo
         return !result.empty();
     }
 
+    /**
+     * @brief Check if an option with the given details already exists in the
+     * database, this is used to prevent duplicate entries and ensure data
+     * integrity.
+     *
+     * @param option The Option object containing the details of the option to
+     * check for existence
+     * @return true if an option with the given details exists, false otherwise
+     */
     bool InstrumentRepo::optionExists(const finance::Option& option)
     {
         const auto query = orm::Query{}.where(

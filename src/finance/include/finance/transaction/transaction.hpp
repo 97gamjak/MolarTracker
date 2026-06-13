@@ -87,6 +87,22 @@ namespace finance
         [[nodiscard]] AccountId getCashAccountId() const;
         [[nodiscard]] AccountId getExternalAccountId() const;
 
+        /**
+         * @brief Get the entries associated with the transaction for a given
+         * external account, this is used to retrieve the specific cash
+         * movements and account changes that are associated with the
+         * transaction, filtered by the external account, which can be useful
+         * for understanding the details of the transaction and how it affects
+         * different accounts.
+         *
+         * @param externalAccount The external account to filter the entries by,
+         * this specifies which external account's entries to retrieve, and is
+         * used as a filter criterion when fetching the transaction entries.
+         * @return TransactionEntries The entries associated with the
+         * transaction for the specified external account, this is a collection
+         * of all the individual movements and changes that are part of the
+         * transaction, filtered by the given external account.
+         */
         [[nodiscard]]
         virtual TransactionEntries getEntries(
             AccountId externalAccount

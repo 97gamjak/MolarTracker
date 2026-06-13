@@ -34,42 +34,32 @@ namespace ui
     {
         /// The combo box for selecting the primary account
         QPointer<AccountCombo> accountCombo = nullptr;
-
         /// The combo box for selecting the reference account
         QPointer<AccountCombo> referenceAccountCombo = nullptr;
-
+        /// The combo box for selecting the option type (call or put)
         QPointer<QComboBox> optionTypeCombo = nullptr;
 
         /// The row for entering the quantity of the option
         QPointer<AmountRow> quantityRow = nullptr;
-
         /// The row for entering the price of the option
         QPointer<AmountRow> strikeRow = nullptr;
-
         /// The row for entering the price of the option
         QPointer<AmountRow> amountRow = nullptr;
-
         /// The row for entering the fees of the option
         QPointer<AmountRow> feesRow = nullptr;
-
-        /// The row for entering the fees of the option
+        /// The row for entering the contract size of the option
         QPointer<AmountRow> contractSizeRow = nullptr;
 
         /// The label for displaying the currency of the selected account
         QPointer<QLabel> currencyLabel = nullptr;
-
         /// The field for entering the option ticker
         QPointer<TickerField> tickerField = nullptr;
-
         /// The field for entering the expiration timestamp of the option
         QPointer<TimestampField> expirationField = nullptr;
-
         /// The field for entering the timestamp of the transaction
         QPointer<TimestampField> timestampField = nullptr;
-
         /// The field for entering a comment about the transaction
         QPointer<CommentField> commentField = nullptr;
-
         /// The label for displaying the currency of the fees
         QPointer<QLabel> currencyFeesLabel = nullptr;
 

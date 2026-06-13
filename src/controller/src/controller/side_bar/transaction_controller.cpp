@@ -58,9 +58,12 @@ namespace controller
      */
     struct TransactionSideBarController::Dialogs
     {
-        QPointer<ui::DepositWithdrawalWidget> cash   = nullptr;
-        QPointer<ui::StockWidget>             stock  = nullptr;
-        QPointer<ui::OptionWidget>            option = nullptr;
+        /// Dialog for creating cash transactions
+        QPointer<ui::DepositWithdrawalWidget> cash = nullptr;
+        /// Dialog for creating stock transactions
+        QPointer<ui::StockWidget> stock = nullptr;
+        /// Dialog for creating option transactions
+        QPointer<ui::OptionWidget> option = nullptr;
 
         Dialogs(
             const std::vector<drafts::AccountDraft>& cashAccounts,
@@ -70,6 +73,15 @@ namespace controller
         );
     };
 
+    /**
+     * @brief Construct a new Transaction Side Bar Controller:: Dialogs::
+     * Dialogs object
+     *
+     * @param cashAccounts
+     * @param securityAccounts
+     * @param tickers
+     * @param mainWindow
+     */
     TransactionSideBarController::Dialogs::Dialogs(
         const std::vector<drafts::AccountDraft>& cashAccounts,
         const std::vector<drafts::AccountDraft>& securityAccounts,
@@ -104,6 +116,7 @@ namespace controller
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
      * @param stockStore The stock store for the application
+     * @param optionStore The option store for the application
      * @param positionStore The position store for the application
      * @param transactionController The transaction controller for the
      * application
@@ -389,6 +402,20 @@ namespace controller
         _transactionController.transactionOverviewSelected(false);
     }
 
+    /**
+     * @brief Handle the creation of a new option transaction, this will be
+     * called when the user submits the create transaction dialog for an option
+     * transaction, and should handle validating the transaction draft, adding
+     * any necessary additional entries (e.g. for external accounts), and then
+     * adding the transaction to the store. This allows the controller to manage
+     * the process of creating a new option transaction from the UI, ensuring
+     * that the transaction is properly validated and added to the store with
+     * all necessary information.
+     *
+     * @param draft The draft of the option transaction to create, this contains
+     * all the necessary information for creating a new option transaction,
+     * including the timestamp, legs, and any optional comment.
+     */
     void TransactionSideBarController::_onCreateOptionTransactionRequested(
         drafts::CreateOptionTransactionDraft draft
     )

@@ -18,6 +18,12 @@ const Value& Map<Key, Value, Hash>::operator[](const Key& key) const
     return _items.at(key);
 }
 
+/**
+ * @brief Returns a reference to the value associated with the specified key.
+ *
+ * @param key The key of the value to retrieve.
+ * @return A reference to the value associated with the specified key.
+ */
 template <typename Key, typename Value, typename Hash>
 Value& Map<Key, Value, Hash>::operator[](const Key& key)
 {
@@ -153,6 +159,13 @@ std::vector<Value> Map<Key, Value, Hash>::getValues() const
     return values;
 }
 
+/**
+ * @brief Clears all key-value pairs from the map.
+ *
+ * @details This method removes all entries from the map, effectively resetting
+ * it to an empty state. After calling this method, the map will contain no
+ * keys or values.
+ */
 template <typename Key, typename Value, typename Hash>
 void Map<Key, Value, Hash>::clear()
 {

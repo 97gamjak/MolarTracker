@@ -83,6 +83,12 @@ namespace store
             finance::StockTransaction transaction
         ) = 0;
 
+        /**
+         * @brief Add an option transaction to the store
+         *
+         * @param transaction The option transaction to add
+         * @return TransactionStoreResult The result of the operation
+         */
         [[nodiscard]]
         virtual TransactionStoreResult addOptionTransaction(
             finance::OptionTransaction transaction

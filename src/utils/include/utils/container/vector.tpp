@@ -15,6 +15,13 @@ Vector<T>::Vector(std::initializer_list<T> items)
 {
 }
 
+/**
+ * @brief Construct a new Vector< T>:: Vector object from a range of items
+ *
+ * @tparam T
+ * @tparam R
+ * @param range
+ */
 template <typename T>
 template <std::ranges::input_range R>
 requires std::convertible_to<std::ranges::range_value_t<R>, T>

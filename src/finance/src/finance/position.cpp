@@ -55,6 +55,11 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Get a string representation of the position.
+     *
+     * @return std::string
+     */
     std::string Position::toString() const
     {
         return std::format(

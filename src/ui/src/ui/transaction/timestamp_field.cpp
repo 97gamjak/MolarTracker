@@ -15,6 +15,8 @@ namespace ui
     /**
      * @brief Construct a new Timestamp Field:: Timestamp Field object
      *
+     * @param onlyDateEdit Whether to only allow editing the date (true) or also
+     * allow editing the time (false)
      * @param parent
      */
     TimestampField::TimestampField(bool onlyDateEdit, QWidget* parent)

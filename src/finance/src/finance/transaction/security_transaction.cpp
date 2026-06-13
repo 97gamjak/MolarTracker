@@ -46,21 +46,42 @@ namespace finance
     {
     }
 
+    /**
+     * @brief Get the instrument ID of the security transaction.
+     *
+     * @return InstrumentId
+     */
     [[nodiscard]] InstrumentId SecurityTransaction::getInstrumentId() const
     {
         return _instrumentId;
     }
 
+    /**
+     * @brief Get the security account ID associated with the security
+     * transaction.
+     *
+     * @return AccountId
+     */
     [[nodiscard]] AccountId SecurityTransaction::getSecurityAccountId() const
     {
         return _securityAccount;
     }
 
+    /**
+     * @brief Get the quantity associated with the security transaction.
+     *
+     * @return const Quantity&
+     */
     [[nodiscard]] const Quantity& SecurityTransaction::getQuantity() const
     {
         return _quantity;
     }
 
+    /**
+     * @brief Get the position ID associated with the security transaction.
+     *
+     * @return PositionId
+     */
     [[nodiscard]] PositionId SecurityTransaction::getPositionId() const
     {
         return _positionId;
