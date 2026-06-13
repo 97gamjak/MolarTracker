@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <mstd/enum.hpp>
+#include <string>
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 

@@ -4,9 +4,9 @@
 #include <qformlayout.h>
 #include <qlabel.h>
 #include <qpushbutton.h>
-#include <qt6/QtWidgets/qcombobox.h>
 #include <qwidget.h>
 
+#include <QComboBox>
 #include <QPointer>
 
 #include "drafts/account_draft.hpp"
