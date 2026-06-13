@@ -1,5 +1,6 @@
 #include "instrument_service.hpp"
 
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 #include "repo/i_instrument_repo.hpp"
 
@@ -64,6 +65,13 @@ namespace service
     )
     {
         return _instrumentRepo->addStock(stock);
+    }
+
+    finance::OptionInsertionResult InstrumentService::addOption(
+        const finance::Option& option
+    )
+    {
+        return _instrumentRepo->addOption(option);
     }
 
     /**

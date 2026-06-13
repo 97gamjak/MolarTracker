@@ -9,8 +9,10 @@
 
 namespace finance
 {
-    class Stock;                  // forward declaration
-    class StockInsertionResult;   // forward declaration
+    class Stock;                   // forward declaration
+    class StockInsertionResult;    // forward declaration
+    class Option;                  // forward declaration
+    class OptionInsertionResult;   // forward declaration
 
 }   // namespace finance
 
@@ -71,6 +73,11 @@ namespace service
         [[nodiscard]]
         virtual finance::StockInsertionResult addStock(
             const finance::Stock& stock
+        ) = 0;
+
+        [[nodiscard]]
+        virtual finance::OptionInsertionResult addOption(
+            const finance::Option& option
         ) = 0;
 
         /**
