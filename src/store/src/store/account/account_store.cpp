@@ -4,11 +4,11 @@
 #include <format>
 #include <ranges>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_account_service.hpp"
+#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
 
@@ -481,9 +481,9 @@ namespace store
     /**
      * @brief Get the ID remapping for accounts
      *
-     * @return const unorderedIdMap<AccountId, AccountId>& The ID remapping
+     * @return const IdIdMap<AccountId>& The ID remapping
      */
-    const unorderedIdMap<AccountId, AccountId>& AccountStore::getIdRemap() const
+    const IdIdMap<AccountId>& AccountStore::getIdRemap() const
     {
         return _getIdRemap();
     }

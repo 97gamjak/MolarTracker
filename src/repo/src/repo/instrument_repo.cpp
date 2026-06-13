@@ -1,11 +1,13 @@
 #include "instrument_repo.hpp"
 
 #include "config/id_types.hpp"
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
 #include "repo/factories/instrument_factory.hpp"
 #include "repo_errors.hpp"
+#include "sql_models/option_row.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace repo
@@ -31,6 +33,33 @@ namespace repo
             query = query.in<StockRow::instrumentIdField>(ids);
 
         return _getCrud().get<StockRow>(_getDb(), query);
+    }
+
+    /**
+     * @brief helper method to add an instrument to the database, this will
+     * insert a new row into the instrument table and return the generated
+     * instrument ID, which can then be used to insert rows into the specific
+     * instrument type tables (e.g., stock, option) while maintaining the
+     * correct relationships between the tables.
+     *
+     * @param instrumentRow
+     * @return InstrumentId
+     */
+    InstrumentId InstrumentRepo::_addInstrument(
+        const InstrumentRow& instrumentRow
+    )
+    {
+        auto result = _getCrud().insert(_getDb(), instrumentRow);
+
+        if (!result)
+        {
+            throw RepositoryException(
+                "Failed to insert instrument row: " +
+                result.error().getMessage()
+            );
+        }
+
+        return InstrumentId(result.value());
     }
 
     /**
@@ -67,6 +96,48 @@ namespace repo
         return {results.begin(), results.end()};
     }
 
+    /**
+     * @brief get a list of all options in the database, this will return all
+     * options that are not marked as deleted, and will include options that
+     * are new or modified but not yet saved to the database.
+     *
+     * @return std::vector<finance::Option>
+     */
+    std::vector<finance::Option> InstrumentRepo::getOptions()
+    {
+        orm::Query query{};
+
+        auto join = orm::Joins{}.add(
+            orm::join<
+                OptionRow::underlyingInstrumentIdField,
+                StockRow::instrumentIdField>()
+        );
+
+        const auto options =
+            _getCrud().getJoined<OptionRow, StockRow>(_getDb(), join, query) |
+            std::views::transform(
+                [](const std::tuple<OptionRow, StockRow>& rows)
+                {
+                    return InstrumentFactory::toOption(
+                        std::get<0>(rows),
+                        std::get<1>(rows)
+                    );
+                }
+            );
+
+        return {options.begin(), options.end()};
+    }
+
+    /**
+     * @brief get a stock by its ticker symbol, this allows callers to retrieve
+     * a specific stock from the database based on its ticker, which is a
+     * common identifier for stocks and can be used to quickly access the
+     * stock's details without needing to know its instrument ID.
+     *
+     * @param ticker The ticker symbol of the stock to retrieve
+     * @return std::optional<finance::Stock> The Stock object if found, or an
+     * empty optional if no stock with the given ticker exists in the database
+     */
     std::optional<finance::Stock> InstrumentRepo::getStock(
         const std::string& ticker
     )
@@ -99,18 +170,10 @@ namespace repo
     {
         auto [instrumentRow, stockRow] = InstrumentFactory::fromStock(stock);
 
-        auto result = _getCrud().insert(_getDb(), instrumentRow);
+        const auto instrumentId = _addInstrument(instrumentRow);
 
-        if (!result)
-        {
-            throw RepositoryException(
-                "Failed to insert instrument row: " +
-                result.error().getMessage()
-            );
-        }
-
-        stockRow.instrumentId = InstrumentId(result.value());
-        result                = _getCrud().insert(_getDb(), stockRow);
+        stockRow.instrumentId = instrumentId;
+        const auto result     = _getCrud().insert(_getDb(), stockRow);
 
         if (!result)
         {
@@ -122,6 +185,49 @@ namespace repo
         return {
             .stockId      = StockId(result.value()),
             .instrumentId = stockRow.instrumentId.value()
+        };
+    }
+
+    /**
+     * @brief add an option instrument to the database, this involves inserting
+     * a new row into the instrument table and a corresponding row into the
+     * option table, ensuring that the relationships between the tables are
+     * maintained correctly, and that the underlying stock information is also
+     * added to the database if it does not already exist.
+     *
+     * @param option The Option object containing the details of the option to
+     * be added to the database
+     *
+     * @return A struct containing the OptionId and InstrumentId of the newly
+     * added option
+     */
+    finance::OptionInsertionResult InstrumentRepo::addOption(
+        const finance::Option& option
+    )
+    {
+        const auto& stock = option.getUnderlying();
+        if (!stockExists(stock.getTicker()))
+        {
+            [[maybe_unused]] const auto stockResult = addStock(stock);
+        }
+
+        auto [instrumentRow, optionRow] = InstrumentFactory::fromOption(option);
+
+        const auto instrumentId = _addInstrument(instrumentRow);
+
+        optionRow.instrumentId = instrumentId;
+        const auto result      = _getCrud().insert(_getDb(), optionRow);
+
+        if (!result)
+        {
+            throw RepositoryException(
+                "Failed to insert option row: " + result.error().getMessage()
+            );
+        }
+
+        return {
+            .optionId     = OptionId(result.value()),
+            .instrumentId = optionRow.instrumentId.value()
         };
     }
 
@@ -138,6 +244,31 @@ namespace repo
         const auto query = orm::Query{}.where(StockRow::hasTicker(ticker));
 
         auto result = _getCrud().get<StockRow>(_getDb(), query);
+
+        return !result.empty();
+    }
+
+    /**
+     * @brief Check if an option with the given details already exists in the
+     * database, this is used to prevent duplicate entries and ensure data
+     * integrity.
+     *
+     * @param option The Option object containing the details of the option to
+     * check for existence
+     * @return true if an option with the given details exists, false otherwise
+     */
+    bool InstrumentRepo::optionExists(const finance::Option& option)
+    {
+        const auto query = orm::Query{}.where(
+            OptionRow::hasName(
+                option.getUnderlying().getInstrumentId(),
+                option.getOptionType(),
+                option.getStrikePrice().getAmount(),
+                option.getExpirationDate()
+            )
+        );
+
+        auto result = _getCrud().get<OptionRow>(_getDb(), query);
 
         return !result.empty();
     }

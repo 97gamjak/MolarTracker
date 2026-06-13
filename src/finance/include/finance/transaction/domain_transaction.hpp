@@ -19,7 +19,7 @@ namespace finance
      * more specific transaction types (e.g., deposits, withdrawals, transfers).
      *
      */
-    class DomainTransaction : public Transaction
+    class DomainTransaction : public BaseTransaction
     {
        private:
         /// The data associated with the transaction
@@ -38,19 +38,19 @@ namespace finance
             std::optional<std::string> comment = std::nullopt
         );
 
-        [[nodiscard]] const TransactionEntries& getEntries() const;
-        [[nodiscard]] TransactionEntries&       getEntries();
-        [[nodiscard]] TransactionDataType       getType() const;
-        [[nodiscard]] const TransactionData&    getData() const;
-        [[nodiscard]] TransactionData&          getData();
+        [[nodiscard]] TransactionDataType    getType() const;
+        [[nodiscard]] const TransactionData& getData() const;
 
         [[nodiscard]] bool hasPositionId(PositionId id) const;
         [[nodiscard]] bool hasInstrumentId(InstrumentId id) const;
 
+        [[nodiscard]] const TransactionEntries& getEntries() const;
         void addEntry(const TransactionEntry& entry);
-        void addLeg(const TradeLeg& leg);
+        void setEntries(const TransactionEntries& entries);
 
-        [[nodiscard]] TradeLegs getLegs() const;
+        [[nodiscard]] const TradeLegs& getLegs() const;
+        void                           addLeg(const TradeLeg& leg);
+        void                           setLegs(const TradeLegs& legs);
 
         [[nodiscard]] std::string toString() const override;
     };

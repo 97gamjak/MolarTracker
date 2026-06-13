@@ -3,19 +3,18 @@
 #include <format>
 #include <unordered_map>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/position_transaction.hpp"
-#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "finance/transaction/transactions.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
+#include "store/i_stock_store.hpp"
 
 REGISTER_LOG_CATEGORY("Store.TransactionStore");
 
@@ -84,14 +83,20 @@ namespace store
      * @param positionIdRemap Mapping of position IDs
      */
     void TransactionStore::commit(
-        const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-        const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-        const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
+        const IdIdMap<AccountId>&    accountIdRemap,
+        const IdIdMap<InstrumentId>& instrumentIdRemap,
+        const IdIdMap<PositionId>&   positionIdRemap
     )
     {
         LOG_ENTRY;
 
         _logCache(LOG_CATEGORY, LogLevel::Trace);
+
+        if (!isDirty())
+        {
+            LOG_DEBUG("No changes to commit");
+            return;
+        }
 
         _onAccountIdRemap(accountIdRemap);
         _onInstrumentIdRemap(instrumentIdRemap);
@@ -147,7 +152,12 @@ namespace store
     {
         LOG_ENTRY;
 
-        _addEntry(finance::TransactionConverter::toDomain(transaction));
+        _addEntry(
+            finance::TransactionConverter::toDomain(
+                transaction,
+                _session->accountSession
+            )
+        );
 
         return TransactionStoreResult::Ok;
     }
@@ -164,7 +174,28 @@ namespace store
     {
         LOG_ENTRY;
 
-        _addEntry(finance::TransactionConverter::toDomain(transaction));
+        _addEntry(
+            finance::TransactionConverter::toDomain(
+                transaction,
+                _session->accountSession
+            )
+        );
+
+        return TransactionStoreResult::Ok;
+    }
+
+    TransactionStoreResult TransactionStore::addOptionTransaction(
+        finance::OptionTransaction transaction
+    )
+    {
+        LOG_ENTRY;
+
+        _addEntry(
+            finance::TransactionConverter::toDomain(
+                transaction,
+                _session->accountSession
+            )
+        );
 
         return TransactionStoreResult::Ok;
     }
@@ -317,9 +348,7 @@ namespace store
      *
      * @param remap The mapping of old account IDs to new account IDs
      */
-    void TransactionStore::_onAccountIdRemap(
-        const unorderedIdMap<AccountId, AccountId>& remap
-    )
+    void TransactionStore::_onAccountIdRemap(const IdIdMap<AccountId>& remap)
     {
         for (const auto& entry : _getEntries())
         {
@@ -344,21 +373,37 @@ namespace store
                 continue;
             }
 
-            bool modified    = false;
-            auto transaction = entry.value;
+            bool modified = false;
 
-            for (auto& transactionEntry : transaction.getEntries())
+            auto txEntries = entry.value.getEntries();
+            for (auto& txEntry : txEntries)
             {
-                if (const auto it = remap.find(transactionEntry.getAccountId());
-                    it != remap.end())
+                const auto id = txEntry.getAccountId();
+                if (remap.contains(id))
                 {
-                    transactionEntry.setAccountId(it->second);
+                    txEntry.setAccountId(remap.at(id));
+                    modified = true;
+                }
+            }
+
+            auto legs = entry.value.getLegs();
+            for (auto& leg : legs)
+            {
+                const auto id = leg.getAccountId();
+                if (remap.contains(id))
+                {
+                    leg.setAccountId(remap.at(id));
                     modified = true;
                 }
             }
 
             if (modified)
-                _updateEntry(transaction, StoreState::New);
+            {
+                auto txCopy = entry.value;
+                txCopy.setEntries(txEntries);
+                txCopy.setLegs(legs);
+                _updateEntry(txCopy, StoreState::New);
+            }
         }
     }
 
@@ -368,10 +413,17 @@ namespace store
      * @param remap The mapping of old instrument IDs to new instrument IDs
      */
     void TransactionStore::_onInstrumentIdRemap(
-        const unorderedIdMap<InstrumentId, InstrumentId>& remap
+        const IdIdMap<InstrumentId>& remap
     )
     {
         LOG_ENTRY;
+
+        LOG_TRACE(
+            std::format(
+                "Remapping instrument IDs in transactions: {}",
+                remap.toString()
+            )
+        );
 
         for (const auto& entry : _getEntries())
         {
@@ -397,48 +449,33 @@ namespace store
                 continue;
             }
 
-            switch (entry.value.getType())
+            bool               modified = false;
+            finance::TradeLegs legs     = entry.value.getLegs();
+
+            for (auto& leg : legs)
             {
-                case TransactionDataType::Stock:
+                const auto instrumentId = leg.getInstrumentId();
+                if (remap.contains(instrumentId))
                 {
-                    auto  transaction = entry.value;
-                    auto& data =
-                        std::get<finance::StockData>(transaction.getData());
-
-                    bool modified = false;
-
-                    for (auto& leg : data.getLegs())
-                    {
-                        if (const auto it = remap.find(leg.getInstrumentId());
-                            it != remap.end())
-                        {
-                            LOG_DEBUG(
-                                std::format(
-                                    "Remapping instrument ID in "
-                                    "transaction "
-                                    "leg "
-                                    "{}: "
-                                    "{} -> "
-                                    "{}",
-                                    leg.toString(),
-                                    leg.getInstrumentId().toString(),
-                                    it->second.toString()
-                                )
-                            );
-                            leg.setInstrumentId(it->second);
-                            modified = true;
-                        }
-                    }
-
-                    if (modified)
-                        _updateEntry(transaction, StoreState::New);
-                    break;
+                    LOG_DEBUG(
+                        std::format(
+                            "Remapping instrument ID in transaction leg {}: {} "
+                            "-> {}",
+                            leg.toString(),
+                            instrumentId.toString(),
+                            remap.at(instrumentId).toString()
+                        )
+                    );
+                    leg.setInstrumentId(remap.at(instrumentId));
+                    modified = true;
                 }
-                case TransactionDataType::Option:
-                    logging::mustImplement<TxDataTypeNotImplError>();
-                    break;
-                case TransactionDataType::Cash:
-                    break;
+            }
+
+            if (modified)
+            {
+                auto txCopy = entry.value;
+                txCopy.setLegs(legs);
+                _updateEntry(txCopy, StoreState::New);
             }
         }
     }
@@ -448,10 +485,15 @@ namespace store
      *
      * @param remap The mapping of old position IDs to new position IDs
      */
-    void TransactionStore::_onPositionIdRemap(
-        const unorderedIdMap<PositionId, PositionId>& remap
-    )
+    void TransactionStore::_onPositionIdRemap(const IdIdMap<PositionId>& remap)
     {
+        LOG_TRACE(
+            std::format(
+                "Remapping position IDs in transactions: {}",
+                remap.toString()
+            )
+        );
+
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
@@ -475,47 +517,38 @@ namespace store
                 continue;
             }
 
-            switch (entry.value.getType())
+            bool modified = false;
+
+            auto legs = entry.value.getLegs();
+            for (auto& leg : legs)
             {
-                case TransactionDataType::Stock:
+                const auto positionId = leg.getPositionId();
+                if (remap.contains(positionId))
                 {
-                    auto  transaction = entry.value;
-                    auto& data =
-                        std::get<finance::StockData>(transaction.getData());
+                    const auto newPositionId = remap.at(positionId);
 
-                    bool modified = false;
-
-                    for (auto& leg : data.getLegs())
-                    {
-                        if (const auto it = remap.find(leg.getPositionId());
-                            it != remap.end())
-                        {
-                            LOG_DEBUG(
-                                std::format(
-                                    "Remapping position ID in transaction "
-                                    "leg "
-                                    "{}: "
-                                    "{} -> "
-                                    "{}",
-                                    leg.toString(),
-                                    leg.getPositionId().toString(),
-                                    it->second.toString()
-                                )
-                            );
-                            leg.setPositionId(it->second);
-                            modified = true;
-                        }
-                    }
-
-                    if (modified)
-                        _updateEntry(transaction, StoreState::New);
-                    break;
+                    LOG_DEBUG(
+                        std::format(
+                            "Remapping position ID in transaction "
+                            "leg "
+                            "{}: "
+                            "{} -> "
+                            "{}",
+                            leg.toString(),
+                            positionId.toString(),
+                            newPositionId.toString()
+                        )
+                    );
+                    leg.setPositionId(newPositionId);
+                    modified = true;
                 }
-                case TransactionDataType::Option:
-                    logging::mustImplement<TxDataTypeNotImplError>();
-                    break;
-                case TransactionDataType::Cash:
-                    break;
+            }
+
+            if (modified)
+            {
+                auto txCopy = entry.value;
+                txCopy.setLegs(legs);
+                _updateEntry(txCopy, StoreState::New);
             }
         }
     }

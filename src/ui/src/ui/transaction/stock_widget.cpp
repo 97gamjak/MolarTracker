@@ -3,20 +3,22 @@
 
 #include <qboxlayout.h>
 #include <qformlayout.h>
-#include <qlabel.h>
 #include <qpushbutton.h>
 #include <qwidget.h>
 
+#include <QLabel>
+#include <QPointer>
+
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "finance/cash.hpp"
-#include "finance/currency.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/ticker_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
+#include "utils/cash.hpp"
+#include "utils/currency.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -31,34 +33,36 @@ namespace ui
     struct StockWidget::Fields
     {
         /// The combo box for selecting the primary account
-        AccountCombo* accountCombo;
+        QPointer<AccountCombo> accountCombo = nullptr;
 
         /// The combo box for selecting the reference account
-        AccountCombo* referenceAccountCombo;
+        QPointer<AccountCombo> referenceAccountCombo = nullptr;
 
         /// The row for entering the quantity of the stock
-        AmountRow* quantityRow;
+        QPointer<AmountRow> quantityRow = nullptr;
 
         /// The row for entering the price of the stock
-        AmountRow* priceRow;
+        QPointer<AmountRow> priceRow = nullptr;
 
         /// The row for entering the fees of the stock
-        AmountRow* feesRow;
+        QPointer<AmountRow> feesRow = nullptr;
 
         /// The label for displaying the currency of the selected account
-        QLabel* currencyLabel;
+        QPointer<QLabel> currencyLabel = nullptr;
 
         /// The field for entering the stock ticker
-        TickerField* tickerField;
+        QPointer<TickerField> tickerField = nullptr;
 
         /// The field for entering the timestamp of the transaction
-        TimestampField* timestampField;
+        QPointer<TimestampField> timestampField = nullptr;
 
         /// The field for entering a comment about the transaction
-        CommentField* commentField;
+        QPointer<CommentField> commentField = nullptr;
 
         /// The label for displaying the currency of the fees
-        QLabel* currencyFeesLabel;
+        // cppcheck-suppress unsafeClassCanLeak -- handled by Qt parent-child
+        // system
+        QPointer<QLabel> currencyFeesLabel = nullptr;
 
         Fields(
             const std::vector<drafts::AccountDraft>& accounts,
@@ -92,18 +96,16 @@ namespace ui
         const std::vector<std::string>&          tickers,
         QWidget*                                 parent
     )
-        : accountCombo(makeQChild<AccountCombo>(accounts, parent)),
-          referenceAccountCombo(
-              makeQChild<AccountCombo>(referenceAccounts, parent)
-          ),
-          quantityRow(makeQChild<AmountRow>(parent)),
-          priceRow(makeQChild<AmountRow>(parent)),
-          feesRow(makeQChild<AmountRow>(parent)),
-          currencyLabel(makeQChild<QLabel>(parent)),
-          tickerField(makeQChild<TickerField>(tickers, parent)),
-          timestampField(makeQChild<TimestampField>(parent)),
-          commentField(makeQChild<CommentField>(parent)),
-          currencyFeesLabel(makeQChild<QLabel>(parent))
+        : accountCombo(new AccountCombo(accounts, parent)),
+          referenceAccountCombo(new AccountCombo(referenceAccounts, parent)),
+          quantityRow(new AmountRow(parent)),
+          priceRow(new AmountRow(parent)),
+          feesRow(new AmountRow(parent)),
+          currencyLabel(new QLabel(parent)),
+          tickerField(new TickerField(tickers, parent)),
+          timestampField(new TimestampField(false, parent)),
+          commentField(new CommentField(parent)),
+          currencyFeesLabel(new QLabel(parent))
     {
         feesRow->setDefaultValue(0);
     }
@@ -203,15 +205,15 @@ namespace ui
 
         const auto currency     = referenceAccount->getCurrency();
         const auto refAccountId = referenceAccount->getId();
-        const auto microUnits   = finance::getMicroUnit(currency);
+        const auto microUnits   = getMicroUnit(currency);
 
         const auto unitPrice_ = priceRow->getAmount(microUnits);
-        const auto unitPrice  = finance::Cash(currency, unitPrice_);
+        const auto unitPrice  = Cash(currency, unitPrice_);
         const auto quantity_  = quantityRow->getAmount(Quantity::precision);
         const auto quantity   = Quantity{quantity_};
 
         const auto fees_ = feesRow->getAmount(microUnits);
-        const auto fees  = -finance::Cash(currency, fees_);
+        const auto fees  = -Cash(currency, fees_);
 
         const auto ticker = tickerField->getTicker();
         if (!ticker.has_value())
@@ -310,9 +312,6 @@ namespace ui
      */
     void StockWidget::_onAccountSelected(const drafts::AccountDraft& account)
     {
-        using finance::getMicroUnit;
-        using finance::getSymbol;
-
         const auto currency   = account.getCurrency();
         const auto microUnits = getMicroUnit(currency);
 

@@ -111,4 +111,11 @@ namespace finance
         _positionId = positionId;
     }
 
+    /**
+     * @brief Sets the account ID of the trade leg.
+     *
+     * @param accountId The new account ID for the trade leg.
+     */
+    void TradeLeg::setAccountId(AccountId accountId) { _accountId = accountId; }
+
 }   // namespace finance

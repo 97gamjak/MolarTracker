@@ -3,9 +3,6 @@ set(SOURCE_DIR
 )
 
 add_library(molartracker_finance STATIC
-    ${SOURCE_DIR}/cash.cpp
-    ${SOURCE_DIR}/currency.cpp
-    ${SOURCE_DIR}/currency_exception.cpp
     ${SOURCE_DIR}/ticker_info.cpp
     ${SOURCE_DIR}/yf_client.cpp
     ${SOURCE_DIR}/position.cpp
@@ -17,7 +14,9 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction/domain_transaction.cpp
     ${SOURCE_DIR}/transaction/option_data.cpp
     ${SOURCE_DIR}/transaction/pnl.cpp
+    ${SOURCE_DIR}/transaction/option_transaction.cpp
     ${SOURCE_DIR}/transaction/position_transaction.cpp
+    ${SOURCE_DIR}/transaction/security_transaction.cpp
     ${SOURCE_DIR}/transaction/stock_data.cpp
     ${SOURCE_DIR}/transaction/stock_transaction.cpp
     ${SOURCE_DIR}/transaction/trade_leg.cpp
@@ -29,6 +28,7 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction/transaction_filter.cpp
 
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp
+    ${SOURCE_DIR}/instrument/option.cpp
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/stocks.cpp
 

@@ -16,10 +16,10 @@ namespace drafts
      * @param ticker
      */
     TradeLegDraft::TradeLegDraft(
-        AccountId     accountId,
-        finance::Cash unitPrice,
-        Quantity      quantity,
-        std::string   ticker
+        AccountId   accountId,
+        Cash        unitPrice,
+        Quantity    quantity,
+        std::string ticker
     )
         : _accountId(accountId),
           _unitPrice(unitPrice),
@@ -38,9 +38,9 @@ namespace drafts
     /**
      * @brief Get the unit price associated with the trade leg draft.
      *
-     * @return finance::Cash The unit price associated with the trade leg draft.
+     * @return Cash The unit price associated with the trade leg draft.
      */
-    finance::Cash TradeLegDraft::getUnitPrice() const { return _unitPrice; }
+    Cash TradeLegDraft::getUnitPrice() const { return _unitPrice; }
 
     /**
      * @brief Get the quantity associated with the trade leg draft.
@@ -117,7 +117,7 @@ namespace drafts
      */
     TransactionEntryDraft::TransactionEntryDraft(
         AccountId            accountId,
-        finance::Cash        cash,
+        Cash                 cash,
         TransactionEntryType type,
         bool                 isExternal
     )
@@ -156,9 +156,9 @@ namespace drafts
     /**
      * @brief get the cash amount associated with this transaction entry draft
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash TransactionEntryDraft::getCash() const { return _cash; }
+    Cash TransactionEntryDraft::getCash() const { return _cash; }
 
     /**
      * @brief get whether this transaction entry draft needs an external account

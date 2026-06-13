@@ -3,14 +3,10 @@
 
 #include <cstdint>
 
-#include "config/finance.hpp"
+#include "utils/finance.hpp"
 
-namespace finance
-{
-    class Cash;   // forward declaration
-}   // namespace finance
-
-class QString;
+class Cash;      // forward declaration
+class QString;   // forward declaration
 
 namespace ui
 {
@@ -18,7 +14,7 @@ namespace ui
     QString formatMicro(int64_t micro, Currency currency);
 
     [[nodiscard]]
-    QString formatMicro(const finance::Cash& cash);
+    QString formatMicro(const Cash& cash);
 
     [[nodiscard]]
     QString formatBps(int64_t bps);

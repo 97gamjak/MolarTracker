@@ -7,12 +7,14 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
     class Account;             // Forward declaration
     class TransactionFilter;   // Forward declaration
     class Transactions;        // Forward declaration
+    class OptionTransaction;   // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -54,9 +56,9 @@ namespace store
          * @param positionIdRemap Mapping of position IDs
          */
         virtual void commit(
-            const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
+            const IdIdMap<AccountId>&    accountIdRemap,
+            const IdIdMap<InstrumentId>& instrumentIdRemap,
+            const IdIdMap<PositionId>&   positionIdRemap
         ) = 0;
 
         /**
@@ -79,6 +81,17 @@ namespace store
         [[nodiscard]]
         virtual TransactionStoreResult addStockTransaction(
             finance::StockTransaction transaction
+        ) = 0;
+
+        /**
+         * @brief Add an option transaction to the store
+         *
+         * @param transaction The option transaction to add
+         * @return TransactionStoreResult The result of the operation
+         */
+        [[nodiscard]]
+        virtual TransactionStoreResult addOptionTransaction(
+            finance::OptionTransaction transaction
         ) = 0;
 
         /**

@@ -10,6 +10,7 @@ qt_add_library(molartracker_controller STATIC
     src/controller/mapper/account_mapper.cpp
     src/controller/mapper/profile_mapper.cpp
     src/controller/mapper/stock_mapper.cpp
+    src/controller/mapper/option_mapper.cpp
 
     src/controller/mapper/transaction/transaction_mapper.cpp
     src/controller/mapper/transaction/transaction_overview_mapper.cpp

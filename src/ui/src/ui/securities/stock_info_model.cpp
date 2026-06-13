@@ -2,9 +2,8 @@
 
 #include <mstd/enum.hpp>
 
-#include "config/finance.hpp"
 #include "drafts/stock_draft.hpp"
-#include "finance/ticker_info.hpp"
+#include "utils/finance.hpp"
 
 namespace ui
 {
@@ -135,8 +134,7 @@ namespace ui
                 case StockColumn::Sector:
                     return QString::fromStdString(row.getSector());
                 case StockColumn::AssetClass:
-                    return QString::fromStdString(
-                        finance::toString(row.getAssetClass())
+                    return QString::fromStdString(toString(row.getAssetClass())
                     );
             }
 

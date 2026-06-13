@@ -6,6 +6,7 @@
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
+#include "utils/container/id_id_map.hpp"
 
 namespace store
 {
@@ -49,11 +50,10 @@ namespace store
         /**
          * @brief Get a mapping of account IDs to their remapped IDs
          *
-         * @return const unorderedIdMap<AccountId, AccountId>&
+         * @return const IdIdMap<AccountId>&
          */
         [[nodiscard]]
-        virtual const unorderedIdMap<AccountId, AccountId>& getIdRemap(
-        ) const = 0;
+        virtual const IdIdMap<AccountId>& getIdRemap() const = 0;
 
         /**
          * @brief Get an account by its ID

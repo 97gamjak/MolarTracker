@@ -80,7 +80,7 @@ namespace store
         const finance::Accounts& getAccountSession() const override;
 
         [[nodiscard]]
-        const unorderedIdMap<AccountId, AccountId>& getIdRemap() const override;
+        const IdIdMap<AccountId>& getIdRemap() const override;
 
        private:
         void _refresh();

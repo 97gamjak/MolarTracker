@@ -1,9 +1,9 @@
 #include "transaction_factory.hpp"
 
 #include "config/id_types.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
+#include "finance/transaction/transaction_data.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "orm/where_expr.hpp"
@@ -11,6 +11,7 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "utils/cash.hpp"
 
 namespace repo
 {
@@ -169,7 +170,7 @@ namespace repo
         return {
             row.id.value(),
             row.accountId.value(),
-            finance::Cash(row.currency.value(), row.amount.value()),
+            Cash(row.currency.value(), row.amount.value()),
             row.type.value()
         };
     }
@@ -212,7 +213,7 @@ namespace repo
             row.accountId.value(),
             row.instrumentId.value(),
             Quantity(row.quantity.value()),
-            finance::Cash(row.currency.value(), row.unitPrice.value()),
+            Cash(row.currency.value(), row.unitPrice.value()),
             row.positionId.value()
         };
     }

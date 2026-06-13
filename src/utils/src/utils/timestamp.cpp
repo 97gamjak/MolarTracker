@@ -117,6 +117,21 @@ std::string Timestamp::fileSafe() const
 }
 
 /**
+ * @brief Returns the current time formatted as a date string
+ *
+ * Example: 260120
+ *
+ * @return std::string
+ */
+std::string Timestamp::toDateString() const
+{
+    return std::format(
+        "{:%y%m%d}",
+        floor<seconds>(toTimePoint(_toLocalTime()))
+    );
+}
+
+/**
  * @brief Converts the Timestamp to an int64 representation.
  *
  * @return int64_t

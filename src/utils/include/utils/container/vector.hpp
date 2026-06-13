@@ -20,6 +20,11 @@ class Vector : public Iterable<std::vector<T>>
    public:
     using Iterable<std::vector<T>>::Iterable;
     Vector(std::initializer_list<T> items);
+
+    template <std::ranges::input_range R>
+    requires std::convertible_to<std::ranges::range_value_t<R>, T>
+    explicit Vector(R&& range);
+
     virtual ~Vector() = default;
 
     const T& operator[](std::size_t index) const;

@@ -8,6 +8,7 @@
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
+#include "utils/container/id_id_map.hpp"
 
 class Connection;   // Forward declaration
 
@@ -120,12 +121,10 @@ namespace store
         /**
          * @brief Get the mapping of old instrument IDs to new instrument IDs
          *
-         * @return const unorderedIdMap<InstrumentId, InstrumentId>&
+         * @return const IdIdMap<InstrumentId>&
          */
         [[nodiscard]]
-        virtual const unorderedIdMap<
-            InstrumentId,
-            InstrumentId>& getInstrumentIdMap() const = 0;
+        virtual const IdIdMap<InstrumentId>& getInstrumentIdMap() const = 0;
 
         /**
          * @brief Subscribe to changes in the stock store, this allows observers

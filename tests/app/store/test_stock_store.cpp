@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
 #include "mock_services.hpp"
 #include "store/stock_store.hpp"
+#include "utils/finance.hpp"
 
 namespace
 {

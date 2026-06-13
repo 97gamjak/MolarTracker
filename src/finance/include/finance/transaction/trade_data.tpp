@@ -41,6 +41,18 @@ namespace finance
         static_cast<Derived*>(this)->_legs.add(leg);
     }
 
+    /**
+     * @brief Set the legs of the trade data
+     *
+     * @tparam Derived
+     * @param legs
+     */
+    template <typename Derived>
+    void TradeData<Derived>::setLegs(const TradeLegs& legs)
+    {
+        static_cast<Derived*>(this)->_legs = legs;
+    }
+
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_TPP__

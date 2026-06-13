@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "multi_migration.hpp"
@@ -21,6 +20,7 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "utils/finance.hpp"
 #include "utils/version.hpp"
 
 namespace repo

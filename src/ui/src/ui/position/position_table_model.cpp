@@ -18,7 +18,7 @@ namespace ui
          * @param price The price to display.
          * @return QString The formatted price string.
          */
-        QString displayPrice(const finance::Cash& price)
+        QString displayPrice(const Cash& price)
         {
             if (price.getCurrency() == Currency::Unknown || price.isZero())
                 return "-";

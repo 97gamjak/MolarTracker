@@ -13,17 +13,17 @@ namespace finance
     /**
      * @brief Get the average cost of the security
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash PnL::getAverageCost() const { return _averageCost; }
+    Cash PnL::getAverageCost() const { return _averageCost; }
 
     /**
      * @brief Get the cost basis of the security, calculated based on the
      * transactions
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash PnL::getCostBasis() const { return _averageCost * _quantity; }
+    Cash PnL::getCostBasis() const { return _averageCost * _quantity; }
 
     /**
      * @brief Set the quantity of the security involved in the transactions
@@ -73,9 +73,9 @@ namespace finance
      * @brief Get the market value of the security, calculated based on the
      * current price and quantity
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash PnL::getMarketValue() const
+    Cash PnL::getMarketValue() const
     {
         if (!_currentPrice.has_value())
             return {_currency, 0};
@@ -87,28 +87,25 @@ namespace finance
      * @brief Get the total PnL of the security, calculated based on the
      * transactions
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash PnL::getTotalPnL() const
-    {
-        return _realizedPnL + getUnrealizedPnL();
-    }
+    Cash PnL::getTotalPnL() const { return _realizedPnL + getUnrealizedPnL(); }
 
     /**
      * @brief Get the realized PnL of the security, calculated based on the
      * transactions
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash PnL::getRealizedPnL() const { return _realizedPnL; }
+    Cash PnL::getRealizedPnL() const { return _realizedPnL; }
 
     /**
      * @brief Get the unrealized PnL of the security, calculated based on the
      * current price and quantity
      *
-     * @return finance::Cash
+     * @return Cash
      */
-    finance::Cash PnL::getUnrealizedPnL() const
+    Cash PnL::getUnrealizedPnL() const
     {
         if (!_currentPrice.has_value())
             return {_currency, 0};
@@ -213,9 +210,6 @@ namespace finance
      *
      * @param price The current price of the security.
      */
-    void PnL::setCurrentPrice(const finance::Cash& price)
-    {
-        _currentPrice = price;
-    }
+    void PnL::setCurrentPrice(const Cash& price) { _currentPrice = price; }
 
 }   // namespace finance

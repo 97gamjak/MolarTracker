@@ -1,4 +1,3 @@
-// stock_widget.hpp
 #ifndef __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
 

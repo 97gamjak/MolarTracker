@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/cash.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
 
 namespace drafts
 {
@@ -22,7 +22,7 @@ namespace drafts
         AccountId _accountId;
 
         /// The cash amount associated with the transaction entry
-        finance::Cash _cash;
+        Cash _cash;
 
         /// A flag indicating whether this transaction entry needs an external
         /// account
@@ -38,7 +38,7 @@ namespace drafts
        public:
         TransactionEntryDraft(
             AccountId            accountId,
-            finance::Cash        cash,
+            Cash                 cash,
             TransactionEntryType type,
             bool                 isExternal
         );
@@ -46,7 +46,7 @@ namespace drafts
         void setNeedsExternal(bool needsExternal);
 
         [[nodiscard]] AccountId            getAccountId() const;
-        [[nodiscard]] finance::Cash        getCash() const;
+        [[nodiscard]] Cash                 getCash() const;
         [[nodiscard]] bool                 needsExternal() const;
         [[nodiscard]] bool                 isExternal() const;
         [[nodiscard]] TransactionEntryType getType() const;
@@ -63,7 +63,7 @@ namespace drafts
         /// The ID of the account associated with the trade leg draft.
         AccountId _accountId;
         /// The unit price associated with the trade leg draft.
-        finance::Cash _unitPrice;
+        Cash _unitPrice;
         /// The quantity associated with the trade leg draft.
         Quantity _quantity;
         /// The ticker associated with the trade leg draft.
@@ -75,14 +75,14 @@ namespace drafts
 
        public:
         TradeLegDraft(
-            AccountId     accountId,
-            finance::Cash unitPrice,
-            Quantity      quantity,
-            std::string   ticker
+            AccountId   accountId,
+            Cash        unitPrice,
+            Quantity    quantity,
+            std::string ticker
         );
 
         [[nodiscard]] AccountId          getAccountId() const;
-        [[nodiscard]] finance::Cash      getUnitPrice() const;
+        [[nodiscard]] Cash               getUnitPrice() const;
         [[nodiscard]] Quantity           getQuantity() const;
         [[nodiscard]] const std::string& getTicker() const;
         [[nodiscard]] InstrumentId       getInstrumentId() const;

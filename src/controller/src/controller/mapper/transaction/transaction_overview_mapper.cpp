@@ -47,7 +47,7 @@ namespace controller
         }
 
         /**
-         * @brief Converts a finance::CashTransaction to a
+         * @brief Converts a CashTransaction to a
          * drafts::CashTransactionOverview, this will extract the relevant
          * information from the cash transaction and format it for display in
          * the transaction overview.
@@ -97,7 +97,7 @@ namespace controller
     }
 
     /**
-     * @brief Converts a vector of finance::CashTransaction to a vector of
+     * @brief Converts a vector of CashTransaction to a vector of
      * drafts::CashTransactionOverview, this will iterate over the list of cash
      * transactions and convert each one to a CashTransactionOverview draft
      * using the toCashOverview function, and return the resulting list of

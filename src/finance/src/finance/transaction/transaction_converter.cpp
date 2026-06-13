@@ -3,35 +3,51 @@
 #include <expected>
 #include <variant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
     /**
-     * @brief Converts a finance::CashTransaction to a DomainTransaction, this
+     * @brief Converts a CashTransaction to a DomainTransaction, this
      * will take the relevant information from the cash transaction and format
      * it into a DomainTransaction, including creating the appropriate
      * transaction entries for the cash flows associated with the transaction.
      *
      * @param transaction
+     * @param accounts
+     *
      * @return DomainTransaction
      */
     DomainTransaction TransactionConverter::toDomain(
-        const CashTransaction& transaction
+        const CashTransaction& transaction,
+        const Accounts&        accounts
     )
     {
+        const auto externalAccountId =
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
+
+        if (!externalAccountId.isValid())
+        {
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
+            );
+        }
+
         return DomainTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
             CashData{},
-            transaction.getTransactionEntries()
+            transaction.getEntries(externalAccountId)
         };
     }
 
@@ -42,23 +58,77 @@ namespace finance
      * transaction entries for the stock trades associated with the transaction.
      *
      * @param transaction
+     * @param accounts
+     *
      * @return DomainTransaction
      */
     DomainTransaction TransactionConverter::toDomain(
-        const StockTransaction& transaction
+        const StockTransaction& transaction,
+        const Accounts&         accounts
     )
     {
+        const auto externalAccountId =
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
+
+        if (!externalAccountId.isValid())
+        {
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
+            );
+        }
         return DomainTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
             transaction.getStockData(),
-            transaction.getTransactionEntries()
+            transaction.getEntries(externalAccountId)
         };
     }
 
     /**
-     * @brief Converts a DomainTransaction to a finance::CashTransaction, this
+     * @brief Converts an OptionTransaction to a DomainTransaction, this
+     * will take the relevant information from the option transaction and format
+     * it into a DomainTransaction, including creating the appropriate
+     * transaction entries for the option trades associated with the
+     * transaction.
+     *
+     * @param transaction
+     * @param accounts
+     *
+     * @return DomainTransaction
+     */
+    DomainTransaction TransactionConverter::toDomain(
+        const OptionTransaction& transaction,
+        const Accounts&          accounts
+    )
+    {
+        const auto externalAccountId =
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
+
+        if (!externalAccountId.isValid())
+        {
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
+            );
+        }
+
+        return DomainTransaction{
+            transaction.getId(),
+            transaction.getTimestamp(),
+            transaction.getStatus(),
+            transaction.getOptionData(),
+            transaction.getEntries(externalAccountId)
+        };
+    }
+
+    /**
+     * @brief Converts a DomainTransaction to a CashTransaction, this
      * will take the relevant information from the DomainTransaction and format
      * it into a CashTransaction, including creating the appropriate transaction
      * entries for the cash flows associated with the transaction.

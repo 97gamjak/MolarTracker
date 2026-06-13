@@ -4,11 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "db/database.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
@@ -17,6 +14,9 @@
 #include "repo/transaction_repo.hpp"
 #include "service/transaction_service.hpp"
 #include "test_fixtures.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -60,7 +60,7 @@ namespace
             const auto entry = finance::TransactionEntry{
                 TransactionEntryId::invalid(),
                 _accountId,
-                finance::Cash{Currency::USD, amount},
+                Cash{Currency::USD, amount},
                 TransactionEntryType::General
             };
             return finance::DomainTransaction{

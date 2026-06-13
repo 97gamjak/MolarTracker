@@ -1,13 +1,14 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__OPTION_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__OPTION_ROW_HPP__
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
+#include "orm/where_expr.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 /**
@@ -26,6 +27,14 @@
  */
 struct OptionRow : public orm::ORMModel<"option">
 {
+    [[nodiscard]]
+    static orm::WhereExpr hasName(
+        InstrumentId underlying,
+        OptionType   optionType,
+        micro_units  strikePrice,
+        Timestamp    expirationDate
+    );
+
     /// as we have a 1:1 relationship between InstrumentRow and OptionRow, we
     /// disallow inserting an OptionRow without a corresponding InstrumentRow
     using insert_policy = orm::requires_paired_insert_t;
@@ -87,6 +96,12 @@ struct OptionRow : public orm::ORMModel<"option">
     /// and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
+    /// The contract size of the option
+    ORM_FIELD(
+        contractSize,
+        Field<"contract_size", std::int64_t, orm::not_null_t>
+    )
+
     /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
         OptionRow,
@@ -96,7 +111,8 @@ struct OptionRow : public orm::ORMModel<"option">
         optionType,
         strikePrice,
         expirationDate,
-        currency
+        currency,
+        contractSize
     )
     /// @endcond
 
@@ -118,7 +134,8 @@ struct OptionRow : public orm::ORMModel<"option">
                 &OptionRow::underlyingInstrumentId,
                 &OptionRow::optionType,
                 &OptionRow::strikePrice,
-                &OptionRow::expirationDate>()
+                &OptionRow::expirationDate,
+                &OptionRow::contractSize>()
         );
     }
 };

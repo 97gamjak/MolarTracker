@@ -1,5 +1,6 @@
 #include "instrument_service.hpp"
 
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 #include "repo/i_instrument_repo.hpp"
 
@@ -40,6 +41,11 @@ namespace service
         return _instrumentRepo->getStocks(ids);
     }
 
+    std::vector<finance::Option> InstrumentService::getOptions()
+    {
+        return _instrumentRepo->getOptions();
+    }
+
     std::optional<finance::Stock> InstrumentService::getStock(
         const std::string& ticker
     )
@@ -66,6 +72,13 @@ namespace service
         return _instrumentRepo->addStock(stock);
     }
 
+    finance::OptionInsertionResult InstrumentService::addOption(
+        const finance::Option& option
+    )
+    {
+        return _instrumentRepo->addOption(option);
+    }
+
     /**
      * @brief Check if a stock with the given ticker already exists in the
      * database, this is used to prevent duplicate entries and ensure data
@@ -77,6 +90,11 @@ namespace service
     bool InstrumentService::stockExists(const std::string& ticker)
     {
         return _instrumentRepo->stockExists(ticker);
+    }
+
+    bool InstrumentService::optionExists(const finance::Option& option)
+    {
+        return _instrumentRepo->optionExists(option);
     }
 
 }   // namespace service

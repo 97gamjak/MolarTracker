@@ -52,6 +52,13 @@ namespace store
          * longer any dirty data that needs to be committed.
          */
         virtual void clearPotentiallyDirty() = 0;
+
+        /**
+         * @brief Clear the ID remapping map for the store. This is used to
+         * reset the ID remapping state, typically after a commit or when the
+         * remapping is no longer needed.
+         */
+        virtual void clearIdRemap() = 0;
     };
 
 }   // namespace store

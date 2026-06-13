@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include "finance/cash.hpp"
+#include "utils/cash.hpp"
 
 namespace ui
 {
@@ -16,7 +16,7 @@ namespace ui
      */
     QString formatMicro(int64_t micro, Currency currency)
     {
-        return formatMicro(finance::Cash{currency, micro});
+        return formatMicro(Cash{currency, micro});
     }
 
     /**
@@ -25,7 +25,7 @@ namespace ui
      * @param cash The cash object to format.
      * @return QString The formatted string.
      */
-    QString formatMicro(const finance::Cash& cash)
+    QString formatMicro(const Cash& cash)
     {
         return QString::fromStdString(cash.toString(2));
     }

@@ -1,8 +1,9 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
-#define __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__FINANCE_HPP__
+#define __UTILS__INCLUDE__UTILS__FINANCE_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
+#include <string>
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
@@ -37,7 +38,8 @@ MSTD_ENUM(TransactionStatus, std::uint8_t, TRANSACTION_STATUS_LIST);
 #define TRANSACTION_TYPE_LIST(X) \
     X(Deposit)                   \
     X(Withdrawal)                \
-    X(Stock)
+    X(Stock)                     \
+    X(Option)
 
 MSTD_ENUM(TransactionType, std::uint8_t, TRANSACTION_TYPE_LIST);
 
@@ -93,4 +95,18 @@ MSTD_ENUM(
 
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
-#endif   // __CONFIG__INCLUDE__CONFIG__FINANCE_HPP__
+/**
+ * @brief Convert an AssetClass to its string representation.
+ *
+ * @param assetClass The AssetClass to convert.
+ * @return std::string The string representation of the AssetClass.
+ */
+static inline std::string toString(AssetClass assetClass)
+{
+    if (assetClass == AssetClass::MutualFund)
+        return "MutualFund";
+
+    return AssetClassMeta::toString(assetClass);
+}
+
+#endif   // __UTILS__INCLUDE__UTILS__FINANCE_HPP__

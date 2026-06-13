@@ -155,6 +155,8 @@ namespace store
      */
     void PositionStore::commit()
     {
+        _logCache(LOG_CATEGORY, LogLevel::Trace);
+
         for (const auto& entry : _getEntries())
         {
             switch (entry.state)
@@ -187,10 +189,9 @@ namespace store
     /**
      * @brief Get the ID remapping for positions
      *
-     * @return const unorderedIdMap<PositionId, PositionId>&
+     * @return const IdIdMap<PositionId>&
      */
-    const unorderedIdMap<PositionId, PositionId>& PositionStore::getIdRemap(
-    ) const
+    const IdIdMap<PositionId>& PositionStore::getIdRemap() const
     {
         return _getIdRemap();
     }

@@ -64,12 +64,12 @@ struct TransactionOptionRow : public orm::ORMModel<"transaction_option">
         rolledOption,
         orm::Field<
             "rolled_option_id",
-            std::optional<TransactionOptionId>,
+            std::optional<TransactionId>,
             tableName,
             orm::foreign_key_t<
                 orm::RestrictDelete,
-                TransactionOptionRow,
-                TransactionOptionRow::idField>>
+                TransactionRow::idField,
+                TransactionRow::idField>>
     )
 
     /// @cond DOXYGEN_IGNORE

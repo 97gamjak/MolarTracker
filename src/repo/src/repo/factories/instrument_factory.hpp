@@ -3,13 +3,17 @@
 
 #include <utility>
 
+#include "sql_models/option_row.hpp"
+
 namespace finance
 {
-    class Stock;   // Forward declaration
+    class Stock;    // Forward declaration
+    class Option;   // Forward declaration
 }   // namespace finance
 
 struct InstrumentRow;
 struct StockRow;
+struct OptionRow;
 
 namespace repo
 {
@@ -29,6 +33,17 @@ namespace repo
 
         [[nodiscard]]
         static finance::Stock toStock(const StockRow& row);
+
+        [[nodiscard]]
+        static std::pair<InstrumentRow, OptionRow> fromOption(
+            const finance::Option& option
+        );
+
+        [[nodiscard]]
+        static finance::Option toOption(
+            const OptionRow& row,
+            const StockRow&  stockRow
+        );
     };
 
 }   // namespace repo
