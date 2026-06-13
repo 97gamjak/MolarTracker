@@ -1,12 +1,12 @@
-// stock_widget.cpp
-#include "ui/transaction/stock_widget.hpp"
+#include "ui/transaction/option_widget.hpp"
 
 #include <qboxlayout.h>
 #include <qformlayout.h>
+#include <qlabel.h>
 #include <qpushbutton.h>
+#include <qt6/QtWidgets/qcombobox.h>
 #include <qwidget.h>
 
-#include <QLabel>
 #include <QPointer>
 
 #include "drafts/account_draft.hpp"
@@ -27,10 +27,10 @@ namespace ui
 {
 
     /**
-     * @brief Struct holding the fields for the stock widget
+     * @brief Struct holding the fields for the option widget
      *
      */
-    struct StockWidget::Fields
+    struct OptionWidget::Fields
     {
         /// The combo box for selecting the primary account
         QPointer<AccountCombo> accountCombo = nullptr;
@@ -38,20 +38,31 @@ namespace ui
         /// The combo box for selecting the reference account
         QPointer<AccountCombo> referenceAccountCombo = nullptr;
 
-        /// The row for entering the quantity of the stock
+        QPointer<QComboBox> optionTypeCombo = nullptr;
+
+        /// The row for entering the quantity of the option
         QPointer<AmountRow> quantityRow = nullptr;
 
-        /// The row for entering the price of the stock
-        QPointer<AmountRow> priceRow = nullptr;
+        /// The row for entering the price of the option
+        QPointer<AmountRow> strikeRow = nullptr;
 
-        /// The row for entering the fees of the stock
+        /// The row for entering the price of the option
+        QPointer<AmountRow> amountRow = nullptr;
+
+        /// The row for entering the fees of the option
         QPointer<AmountRow> feesRow = nullptr;
+
+        /// The row for entering the fees of the option
+        QPointer<AmountRow> contractSizeRow = nullptr;
 
         /// The label for displaying the currency of the selected account
         QPointer<QLabel> currencyLabel = nullptr;
 
-        /// The field for entering the stock ticker
+        /// The field for entering the option ticker
         QPointer<TickerField> tickerField = nullptr;
+
+        /// The field for entering the expiration timestamp of the option
+        QPointer<TimestampField> expirationField = nullptr;
 
         /// The field for entering the timestamp of the transaction
         QPointer<TimestampField> timestampField = nullptr;
@@ -60,8 +71,6 @@ namespace ui
         QPointer<CommentField> commentField = nullptr;
 
         /// The label for displaying the currency of the fees
-        // cppcheck-suppress unsafeClassCanLeak -- handled by Qt parent-child
-        // system
         QPointer<QLabel> currencyFeesLabel = nullptr;
 
         Fields(
@@ -79,18 +88,18 @@ namespace ui
         void update() const;
 
         [[nodiscard]]
-        drafts::CreateStockTransactionDraft getDraft() const;
+        drafts::CreateOptionTransactionDraft getDraft() const;
     };
 
     /**
-     * @brief Construct a new Stock Widget:: Fields:: Fields object
+     * @brief Construct a new Option Widget:: Fields:: Fields object
      *
      * @param accounts
      * @param referenceAccounts
      * @param tickers
      * @param parent
      */
-    StockWidget::Fields::Fields(
+    OptionWidget::Fields::Fields(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
         const std::vector<std::string>&          tickers,
@@ -98,16 +107,28 @@ namespace ui
     )
         : accountCombo(new AccountCombo(accounts, parent)),
           referenceAccountCombo(new AccountCombo(referenceAccounts, parent)),
+          optionTypeCombo(new QComboBox(parent)),
           quantityRow(new AmountRow(parent)),
-          priceRow(new AmountRow(parent)),
+          strikeRow(new AmountRow(parent)),
+          amountRow(new AmountRow(parent)),
           feesRow(new AmountRow(parent)),
+          contractSizeRow(new AmountRow(parent)),
           currencyLabel(new QLabel(parent)),
           tickerField(new TickerField(tickers, parent)),
+          expirationField(new TimestampField(true, parent)),
           timestampField(new TimestampField(false, parent)),
           commentField(new CommentField(parent)),
           currencyFeesLabel(new QLabel(parent))
     {
         feesRow->setDefaultValue(0);
+        constexpr auto defaultContractSize = 100;
+        contractSizeRow->setDefaultValue(defaultContractSize);
+        contractSizeRow->setNDecimalPlaces(0);
+
+        for (const auto& optionType : OptionTypeMeta::values)
+            optionTypeCombo->addItem(
+                OptionTypeMeta::toString(optionType).c_str()
+            );
     }
 
     /**
@@ -115,11 +136,13 @@ namespace ui
      *
      * @param layout The layout to add the fields to
      */
-    void StockWidget::Fields::addFieldsToLayout(QFormLayout* layout) const
+    void OptionWidget::Fields::addFieldsToLayout(QFormLayout* layout) const
     {
         layout->addRow("Account:", accountCombo);
         layout->addRow("Reference Account:", referenceAccountCombo);
-        layout->addRow("Ticker:", tickerField);
+        layout->addRow("Underlying:", tickerField);
+        layout->addRow("Option Type:", optionTypeCombo);
+        layout->addRow("Expiration:", expirationField);
         layout->addRow("Timestamp:", timestampField);
 
         auto* quantityRowLayout = makeQChild<QHBoxLayout>();
@@ -127,14 +150,25 @@ namespace ui
         layout->addRow("Quantity:", quantityRowLayout);
         quantityRow->setNDecimalPlaces(Quantity::precision);
 
+        auto* strikeRowLayout = makeQChild<QHBoxLayout>();
+        strikeRowLayout->addWidget(strikeRow);
+        strikeRowLayout->addWidget(currencyLabel);
+        layout->addRow("Strike Price:", strikeRowLayout);
+
         auto* amountRowLayout = makeQChild<QHBoxLayout>();
-        amountRowLayout->addWidget(priceRow);
+        amountRowLayout->addWidget(amountRow);
         amountRowLayout->addWidget(currencyLabel);
-        layout->addRow("Stock Price:", amountRowLayout);
+        layout->addRow("Premium:", amountRowLayout);
+
         auto* feesRowLayout = makeQChild<QHBoxLayout>();
         feesRowLayout->addWidget(feesRow);
         feesRowLayout->addWidget(currencyFeesLabel);
         layout->addRow("Fees:", feesRowLayout);
+
+        auto* contractSizeRowLayout = makeQChild<QHBoxLayout>();
+        contractSizeRowLayout->addWidget(contractSizeRow);
+        layout->addRow("Contract Size:", contractSizeRowLayout);
+
         layout->addRow("Comment:", commentField);
 
         referenceAccountCombo->setEnabled(false);
@@ -145,7 +179,7 @@ namespace ui
      *
      * @return true if all fields are valid, false otherwise
      */
-    bool StockWidget::Fields::isValid() const
+    bool OptionWidget::Fields::isValid() const
     {
         if (!accountCombo->selected().has_value())
             return false;
@@ -156,13 +190,20 @@ namespace ui
             return false;
         if (!quantityRow->isValid())
             return false;
-        if (!priceRow->isValid())
+        if (!strikeRow->isValid())
+            return false;
+        if (!amountRow->isValid())
+            return false;
+        if (!contractSizeRow->isValid())
             return false;
 
         if (quantityRow->isZero())
             return false;
-
-        if (priceRow->isZero())
+        if (strikeRow->isZero())
+            return false;
+        if (amountRow->isZero())
+            return false;
+        if (contractSizeRow->isZero())
             return false;
 
         return true;
@@ -172,24 +213,26 @@ namespace ui
      * @brief Update the fields
      *
      */
-    void StockWidget::Fields::update() const
+    void OptionWidget::Fields::update() const
     {
         accountCombo->update();
         referenceAccountCombo->update();
         quantityRow->update();
-        priceRow->update();
+        strikeRow->update();
+        amountRow->update();
         feesRow->update();
         currencyLabel->update();
         tickerField->update();
         currencyFeesLabel->update();
+        contractSizeRow->update();
     }
 
     /**
-     * @brief Get the draft for the stock transaction
+     * @brief Get the draft for the option transaction
      *
-     * @return drafts::CreateStockTransactionDraft
+     * @return drafts::CreateOptionTransactionDraft
      */
-    drafts::CreateStockTransactionDraft StockWidget::Fields::getDraft() const
+    drafts::CreateOptionTransactionDraft OptionWidget::Fields::getDraft() const
     {
         const auto account = accountCombo->selected();
 
@@ -207,10 +250,12 @@ namespace ui
         const auto refAccountId = referenceAccount->getId();
         const auto microUnits   = finance::getMicroUnit(currency);
 
-        const auto unitPrice_ = priceRow->getAmount(microUnits);
-        const auto unitPrice  = finance::Cash(currency, unitPrice_);
-        const auto quantity_  = quantityRow->getAmount(Quantity::precision);
-        const auto quantity   = Quantity{quantity_};
+        const auto strikePrice_ = strikeRow->getAmount(microUnits);
+        const auto strikePrice  = finance::Cash(currency, strikePrice_);
+        const auto amount_      = amountRow->getAmount(microUnits);
+        const auto amount       = finance::Cash(currency, amount_);
+        const auto quantity_    = quantityRow->getAmount(Quantity::precision);
+        const auto quantity     = Quantity{quantity_};
 
         const auto fees_ = feesRow->getAmount(microUnits);
         const auto fees  = -finance::Cash(currency, fees_);
@@ -219,12 +264,16 @@ namespace ui
         if (!ticker.has_value())
             throw std::runtime_error("No ticker selected");
 
-        return drafts::CreateStockTransactionDraft{
+        return drafts::CreateOptionTransactionDraft{
             timestampField->getTimestamp(),
             ticker.value(),
+            expirationField->getTimestamp(),
+            static_cast<OptionType>(optionTypeCombo->currentIndex()),
             quantity,
-            unitPrice,
+            amount,
+            strikePrice,
             fees,
+            quantityRow->getAmount(0),
             account->getId(),
             refAccountId,
             commentField->getComment()
@@ -232,7 +281,7 @@ namespace ui
     }
 
     /**
-     * @brief Construct a new Stock Widget:: Stock Widget object
+     * @brief Construct a new Option Widget:: Option Widget object
      *
      * @param accounts A list of account drafts to populate the account
      * combo box
@@ -243,7 +292,7 @@ namespace ui
      * @param tickers A list of ticker symbols to populate the ticker field
      * @param parent The parent widget for this widget
      */
-    StockWidget::StockWidget(
+    OptionWidget::OptionWidget(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
         const std::vector<std::string>&          tickers,
@@ -275,26 +324,31 @@ namespace ui
             _fields->accountCombo,
             &AccountCombo::accountSelected,
             this,
-            &StockWidget::_onAccountSelected
+            &OptionWidget::_onAccountSelected
         );
         connect(
             _fields->referenceAccountCombo,
             &AccountCombo::accountSelected,
             this,
-            &StockWidget::_onReferenceAccountSelected
+            &OptionWidget::_onReferenceAccountSelected
         );
         _connectAddButton();
         connect(
             _fields->tickerField,
             &TickerField::createTickerRequested,
             this,
-            &StockWidget::createTickerRequested
+            &OptionWidget::createTickerRequested
         );
 
-        connect(_addButton, &QPushButton::clicked, this, &StockWidget::_emitOk);
+        connect(
+            _addButton,
+            &QPushButton::clicked,
+            this,
+            &OptionWidget::_emitOk
+        );
     }
 
-    StockWidget::~StockWidget() = default;
+    OptionWidget::~OptionWidget() = default;
 
     /**
      * @brief Handle the selection of a primary account, this will be called
@@ -303,14 +357,14 @@ namespace ui
      * updating the currency label to show the currency of the selected
      * account), as well as filtering the reference accounts to only include
      * accounts with the same currency as the selected primary account, ensuring
-     * that the user can only select valid reference accounts for the stock
+     * that the user can only select valid reference accounts for the option
      * transaction.
      *
      * @param account The account draft of the selected primary account, this is
      * used to determine the currency of the selected account for updating the
      * UI and filtering the reference accounts.
      */
-    void StockWidget::_onAccountSelected(const drafts::AccountDraft& account)
+    void OptionWidget::_onAccountSelected(const drafts::AccountDraft& account)
     {
         using finance::getMicroUnit;
         using finance::getSymbol;
@@ -318,7 +372,8 @@ namespace ui
         const auto currency   = account.getCurrency();
         const auto microUnits = getMicroUnit(currency);
 
-        _fields->priceRow->setNDecimalPlaces(microUnits);
+        _fields->strikeRow->setNDecimalPlaces(microUnits);
+        _fields->amountRow->setNDecimalPlaces(microUnits);
         _fields->feesRow->setNDecimalPlaces(microUnits);
         _fields->currencyLabel->setText(getSymbol(currency).c_str());
         _fields->currencyFeesLabel->setText(getSymbol(currency).c_str());
@@ -342,14 +397,14 @@ namespace ui
      * combo box, and should handle updating the UI to reflect the selected
      * reference account (if necessary), as well as enabling the add button if
      * all required fields are valid and filled out, allowing the user to
-     * proceed with creating the stock transaction once they have selected a
+     * proceed with creating the option transaction once they have selected a
      * valid reference account.
      *
      * @param account The account draft of the selected reference account, this
      * is used to determine if a valid reference account has been selected for
      * enabling the add button.
      */
-    void StockWidget::_onReferenceAccountSelected(
+    void OptionWidget::_onReferenceAccountSelected(
         const drafts::AccountDraft& /*account*/
     )
     {
@@ -358,14 +413,14 @@ namespace ui
 
     /**
      * @brief Update the enabled state of the add button, this should check if
-     * all required fields for creating a stock transaction are valid and filled
-     * out (e.g. a primary account is selected, a reference account is selected,
-     * the quantity and price are valid and non-zero), and then enable or
-     * disable the add button accordingly, ensuring that the user can only
-     * proceed with creating the stock transaction once all necessary
+     * all required fields for creating an option transaction are valid and
+     * filled out (e.g. a primary account is selected, a reference account is
+     * selected, the quantity and price are valid and non-zero), and then enable
+     * or disable the add button accordingly, ensuring that the user can only
+     * proceed with creating the option transaction once all necessary
      * information has been provided and is valid.
      */
-    void StockWidget::_updateAddButton()
+    void OptionWidget::_updateAddButton()
     {
         const auto isValid = _fields->isValid();
 
@@ -378,16 +433,16 @@ namespace ui
      * transaction draft generated from the information entered in this widget,
      * allowing the owning dialog to handle creating the transaction in the
      * store based on the provided draft. This allows the widget to communicate
-     * with the rest of the UI and trigger the creation of a new stock
+     * with the rest of the UI and trigger the creation of a new option
      * transaction once the user has entered all necessary information and is
      * ready to proceed.
      */
-    void StockWidget::_emitOk()
+    void OptionWidget::_emitOk()
     {
         try
         {
             const auto draft = _getDraft();
-            emit       createStockTransactionRequested(draft);
+            emit       createOptionTransactionRequested(draft);
         }
         catch (const std::exception& e)
         {
@@ -400,7 +455,9 @@ namespace ui
      *
      * @param accounts The new list of account drafts to populate the combo box
      */
-    void StockWidget::updateAccounts(std::vector<drafts::AccountDraft> accounts)
+    void OptionWidget::updateAccounts(
+        std::vector<drafts::AccountDraft> accounts
+    )
     {
         _fields->accountCombo->updateAccounts(std::move(accounts));
     }
@@ -412,7 +469,7 @@ namespace ui
      * @param referenceAccounts The new list of reference account drafts to
      * populate the combo box
      */
-    void StockWidget::updateReferenceAccounts(
+    void OptionWidget::updateReferenceAccounts(
         std::vector<drafts::AccountDraft> referenceAccounts
     )
     {
@@ -429,7 +486,7 @@ namespace ui
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
      */
-    void StockWidget::updateTickers(const std::vector<std::string>& tickers)
+    void OptionWidget::updateTickers(const std::vector<std::string>& tickers)
     {
         std::vector<QString> qTickers;
         qTickers.reserve(tickers.size());
@@ -443,15 +500,15 @@ namespace ui
      * @brief Refresh the widget to reflect the current state
      *
      */
-    void StockWidget::refresh() { _fields->update(); }
+    void OptionWidget::refresh() { _fields->update(); }
 
     /**
-     * @brief Gets the draft for the stock transaction.
+     * @brief Gets the draft for the option transaction.
      *
-     * @return drafts::CreateStockTransactionDraft The draft for the stock
+     * @return drafts::CreateOptionTransactionDraft The draft for the option
      * transaction.
      */
-    drafts::CreateStockTransactionDraft StockWidget::_getDraft() const
+    drafts::CreateOptionTransactionDraft OptionWidget::_getDraft() const
     {
         return _fields->getDraft();
     }
@@ -460,25 +517,25 @@ namespace ui
      * @brief Connects the add button to the appropriate signals.
      *
      */
-    void StockWidget::_connectAddButton()
+    void OptionWidget::_connectAddButton()
     {
         connect(
-            _fields->priceRow,
+            _fields->strikeRow,
             &AmountRow::validityChanged,
             this,
-            &StockWidget::_updateAddButton
+            &OptionWidget::_updateAddButton
         );
         connect(
-            _fields->priceRow,
+            _fields->strikeRow,
             &AmountRow::valueChanged,
             this,
-            &StockWidget::_updateAddButton
+            &OptionWidget::_updateAddButton
         );
         connect(
             _fields->tickerField,
             &TickerField::tickerSelected,
             this,
-            &StockWidget::_updateAddButton
+            &OptionWidget::_updateAddButton
         );
     }
 

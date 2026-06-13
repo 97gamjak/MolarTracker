@@ -16,7 +16,7 @@ namespace finance
      * @param status
      * @param comment
      */
-    Transaction::Transaction(
+    BaseTransaction::BaseTransaction(
         TransactionId              id,
         Timestamp                  timestamp,
         TransactionStatus          status,
@@ -35,7 +35,7 @@ namespace finance
      *
      * @return std::string
      */
-    std::string Transaction::toString() const
+    std::string BaseTransaction::toString() const
     {
         std::string result = "Transaction {\n";
 
@@ -57,28 +57,28 @@ namespace finance
      *
      * @return TransactionId The ID of the transaction.
      */
-    TransactionId Transaction::getId() const { return _id; }
+    TransactionId BaseTransaction::getId() const { return _id; }
 
     /**
      * @brief Gets the timestamp of the transaction.
      *
      * @return Timestamp The timestamp of the transaction.
      */
-    Timestamp Transaction::getTimestamp() const { return _timestamp; }
+    Timestamp BaseTransaction::getTimestamp() const { return _timestamp; }
 
     /**
      * @brief Gets the status of the transaction.
      *
      * @return TransactionStatus The status of the transaction.
      */
-    TransactionStatus Transaction::getStatus() const { return _status; }
+    TransactionStatus BaseTransaction::getStatus() const { return _status; }
 
     /**
      * @brief Gets the comment associated with the transaction.
      *
      * @return std::optional<std::string> The comment, if it exists.
      */
-    std::optional<std::string> Transaction::getComment() const
+    std::optional<std::string> BaseTransaction::getComment() const
     {
         return _comment;
     }
@@ -88,6 +88,57 @@ namespace finance
      *
      * @param id The new ID to set.
      */
-    void Transaction::setId(TransactionId id) { _id = id; }
+    void BaseTransaction::setId(TransactionId id) { _id = id; }
+
+    Cash Transaction::getFees() const { return _fees; }
+
+    AccountId Transaction::getCashAccountId() const { return _cashAccount; }
+
+    AccountId Transaction::getExternalAccountId() const
+    {
+        return _externalAccount;
+    }
+
+    Transaction::Transaction(
+        TransactionId              id,
+        Timestamp                  timestamp,
+        TransactionStatus          status,
+        AccountId                  cashAccount,
+        AccountId                  externalAccount,
+        Cash                       fees,
+        std::optional<std::string> comment
+    )
+        : BaseTransaction(id, timestamp, status, std::move(comment)),
+          _cashAccount(cashAccount),
+          _externalAccount(externalAccount),
+          _fees(fees)
+    {
+    }
+
+    /**
+     * @brief Get the fee entry for the transaction, this will create a
+     * transaction entry for the fees of the transaction, if the entry is
+     * for the external account it will negate the fees to reflect the cash
+     * flow correctly.
+     *
+     * @param external
+     * @return TransactionEntry
+     */
+    TransactionEntry Transaction::_getFeeEntry(
+        std::optional<AccountId> externalAccount
+    ) const
+    {
+        const auto fees      = getFees();
+        const auto accountId = externalAccount.has_value()
+                                   ? externalAccount.value()
+                                   : getCashAccountId();
+        const auto amount    = externalAccount.has_value() ? -fees : fees;
+        return TransactionEntry{
+            TransactionEntryId::invalid(),
+            accountId,
+            amount,
+            TransactionEntryType::Fees
+        };
+    }
 
 }   // namespace finance

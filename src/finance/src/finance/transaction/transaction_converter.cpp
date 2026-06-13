@@ -23,15 +23,29 @@ namespace finance
      * @return DomainTransaction
      */
     DomainTransaction TransactionConverter::toDomain(
-        const CashTransaction& transaction
+        const CashTransaction& transaction,
+        const Accounts&        accounts
     )
     {
+        const auto externalAccountId =
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
+
+        if (!externalAccountId.isValid())
+        {
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
+            );
+        }
+
         return DomainTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
             CashData{},
-            transaction.getTransactionEntries()
+            transaction.getEntries(externalAccountId)
         };
     }
 
@@ -45,15 +59,55 @@ namespace finance
      * @return DomainTransaction
      */
     DomainTransaction TransactionConverter::toDomain(
-        const StockTransaction& transaction
+        const StockTransaction& transaction,
+        const Accounts&         accounts
     )
     {
+        const auto externalAccountId =
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
+
+        if (!externalAccountId.isValid())
+        {
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
+            );
+        }
         return DomainTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
             transaction.getStockData(),
-            transaction.getTransactionEntries()
+            transaction.getEntries(externalAccountId)
+        };
+    }
+
+    DomainTransaction TransactionConverter::toDomain(
+        const OptionTransaction& transaction,
+        const Accounts&          accounts
+    )
+    {
+        const auto externalAccountId =
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
+
+        if (!externalAccountId.isValid())
+        {
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
+            );
+        }
+
+        return DomainTransaction{
+            transaction.getId(),
+            transaction.getTimestamp(),
+            transaction.getStatus(),
+            transaction.getOptionData(),
+            transaction.getEntries(externalAccountId)
         };
     }
 

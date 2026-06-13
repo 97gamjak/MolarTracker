@@ -48,6 +48,7 @@ namespace finance
         [[nodiscard]] Cash         getUnitPrice() const;
         [[nodiscard]] PositionId   getPositionId() const;
 
+        void setAccountId(AccountId accountId);
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
 

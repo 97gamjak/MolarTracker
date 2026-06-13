@@ -11,10 +11,10 @@ namespace finance
      * @param rolledOption
      */
     OptionData::OptionData(
-        TransactionOptionId                id,
-        OptionBuySell                      buySell,
-        TransactionOptionAction            action,
-        std::optional<TransactionOptionId> rolledOption
+        TransactionOptionId          id,
+        OptionBuySell                buySell,
+        TransactionOptionAction      action,
+        std::optional<TransactionId> rolledOption
     )
         : _id(id),
           _buySell(buySell),
@@ -47,9 +47,9 @@ namespace finance
     /**
      * @brief get the rolled option for this option transaction, if any
      *
-     * @return std::optional<TransactionOptionId>
+     * @return std::optional<TransactionId>
      */
-    std::optional<TransactionOptionId> OptionData::getRolledOption() const
+    std::optional<TransactionId> OptionData::getRolledOption() const
     {
         return _rolledOption;
     }

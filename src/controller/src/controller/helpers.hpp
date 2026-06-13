@@ -19,9 +19,10 @@ namespace store
 
 namespace drafts
 {
-    class CreateStockTransactionDraft;   // Forward declaration
-    class PositionDraft;                 // Forward declaration
-    class PositionStockDetailDraft;      // Forward declaration
+    class CreateStockTransactionDraft;    // Forward declaration
+    class CreateOptionTransactionDraft;   // Forward declaration
+    class PositionDraft;                  // Forward declaration
+    class PositionStockDetailDraft;       // Forward declaration
 }   // namespace drafts
 
 /**
@@ -43,6 +44,11 @@ namespace controller
 {
     std::expected<void, std::string> convertTickerToInstrumentId(
         drafts::CreateStockTransactionDraft&       draft,
+        const std::shared_ptr<store::IStockStore>& stockStore
+    );
+
+    std::expected<void, std::string> convertTickerToInstrumentId(
+        drafts::CreateOptionTransactionDraft&      draft,
         const std::shared_ptr<store::IStockStore>& stockStore
     );
 

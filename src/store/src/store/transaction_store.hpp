@@ -56,9 +56,9 @@ namespace store
         ~TransactionStore() override;
 
         void commit(
-            const unorderedIdMap<AccountId, AccountId>&   accountIdRemap,
-            const IdIdMap<InstrumentId>&                  instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>& positionIdRemap
+            const IdIdMap<AccountId>&    accountIdRemap,
+            const IdIdMap<InstrumentId>& instrumentIdRemap,
+            const IdIdMap<PositionId>&   positionIdRemap
         ) override;
 
         [[nodiscard]]
@@ -68,6 +68,11 @@ namespace store
         [[nodiscard]]
         TransactionStoreResult addStockTransaction(
             finance::StockTransaction transaction
+        ) override;
+
+        [[nodiscard]]
+        TransactionStoreResult addOptionTransaction(
+            finance::OptionTransaction transaction
         ) override;
 
         [[nodiscard]]
@@ -89,13 +94,9 @@ namespace store
         ) override;
 
        private:
-        void _onAccountIdRemap(
-            const unorderedIdMap<AccountId, AccountId>& remap
-        );
+        void _onAccountIdRemap(const IdIdMap<AccountId>& remap);
         void _onInstrumentIdRemap(const IdIdMap<InstrumentId>& remap);
-        void _onPositionIdRemap(
-            const unorderedIdMap<PositionId, PositionId>& remap
-        );
+        void _onPositionIdRemap(const IdIdMap<PositionId>& remap);
     };
 
 }   // namespace store

@@ -20,6 +20,8 @@ namespace ui
         QAction* _createWithdrawalAction;
         /// The create stock transaction action for the transaction category
         QAction* _createStockTransactionAction;
+        /// The create option transaction action for the transaction category
+        QAction* _createOptionTransactionAction;
 
        public:
         explicit TransactionCategory();
@@ -27,6 +29,7 @@ namespace ui
         [[nodiscard]] QAction* getCreateDepositAction() const;
         [[nodiscard]] QAction* getCreateWithdrawalAction() const;
         [[nodiscard]] QAction* getCreateStockTransactionAction() const;
+        [[nodiscard]] QAction* getCreateOptionTransactionAction() const;
 
         void populateContextMenu(QMenu& menu) override;
     };

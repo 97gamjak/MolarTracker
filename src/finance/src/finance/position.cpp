@@ -55,4 +55,14 @@ namespace finance
         };
     }
 
+    std::string Position::toString() const
+    {
+        return std::format(
+            "Position(id={}, createdAt={}, closedAt={})",
+            _id.toString(),
+            _createdAt.humanReadable(),
+            _closedAt.has_value() ? _closedAt->humanReadable() : "null"
+        );
+    }
+
 }   // namespace finance

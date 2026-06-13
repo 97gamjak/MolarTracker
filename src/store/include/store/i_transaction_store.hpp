@@ -14,6 +14,7 @@ namespace finance
     class Account;             // Forward declaration
     class TransactionFilter;   // Forward declaration
     class Transactions;        // Forward declaration
+    class OptionTransaction;   // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -55,9 +56,9 @@ namespace store
          * @param positionIdRemap Mapping of position IDs
          */
         virtual void commit(
-            const unorderedIdMap<AccountId, AccountId>&   accountIdRemap,
-            const IdIdMap<InstrumentId>&                  instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>& positionIdRemap
+            const IdIdMap<AccountId>&    accountIdRemap,
+            const IdIdMap<InstrumentId>& instrumentIdRemap,
+            const IdIdMap<PositionId>&   positionIdRemap
         ) = 0;
 
         /**
@@ -80,6 +81,11 @@ namespace store
         [[nodiscard]]
         virtual TransactionStoreResult addStockTransaction(
             finance::StockTransaction transaction
+        ) = 0;
+
+        [[nodiscard]]
+        virtual TransactionStoreResult addOptionTransaction(
+            finance::OptionTransaction transaction
         ) = 0;
 
         /**

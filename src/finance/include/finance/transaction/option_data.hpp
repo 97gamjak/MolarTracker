@@ -31,17 +31,17 @@ namespace finance
         TransactionOptionAction _action;
 
         /// The rolled option for this option transaction, if any
-        std::optional<TransactionOptionId> _rolledOption;
+        std::optional<TransactionId> _rolledOption;
 
         /// The trade legs associated with the option transaction
         TradeLegs _legs;
 
        public:
         OptionData(
-            TransactionOptionId                id,
-            OptionBuySell                      buySell,
-            TransactionOptionAction            action,
-            std::optional<TransactionOptionId> rolledOption
+            TransactionOptionId          id,
+            OptionBuySell                buySell,
+            TransactionOptionAction      action,
+            std::optional<TransactionId> rolledOption
         );
 
         [[nodiscard]] TransactionOptionId     getId() const;
@@ -49,7 +49,7 @@ namespace finance
         [[nodiscard]] TransactionOptionAction getAction() const;
 
         [[nodiscard]]
-        std::optional<TransactionOptionId> getRolledOption() const;
+        std::optional<TransactionId> getRolledOption() const;
 
         [[nodiscard]] PositionId getPositionId() const;
     };

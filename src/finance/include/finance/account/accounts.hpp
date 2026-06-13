@@ -22,6 +22,11 @@ namespace finance
         std::vector<std::optional<bool>> isExternal(
             const idSet<AccountId>& ids
         ) const;
+
+        [[nodiscard]]
+        AccountId getCorrespondingExternalAccountId(
+            const AccountId& cashAccountId
+        ) const;
     };
 }   // namespace finance
 

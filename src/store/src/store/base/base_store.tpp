@@ -540,12 +540,18 @@ namespace store
      *
      * @tparam T
      * @tparam IdType
-     * @return const IdMap&
+     * @return const IdIdMap<IdType>&
      */
     template <typename T, typename IdType>
-    auto BaseStore<T, IdType>::_getIdRemap() const -> const IdMap&
+    const IdIdMap<IdType>& BaseStore<T, IdType>::_getIdRemap() const
     {
         return _idRemap;
+    }
+
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::clearIdRemap()
+    {
+        _idRemap.clear();
     }
 
 }   // namespace store

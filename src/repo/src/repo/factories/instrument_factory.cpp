@@ -87,6 +87,7 @@ namespace repo
         optionRow.currency       = option.getStrikePrice().getCurrency();
         optionRow.expirationDate = option.getExpirationDate();
         optionRow.optionType     = option.getOptionType();
+        optionRow.contractSize   = option.getContractSize();
 
         return {instrumentRow, optionRow};
     }
@@ -102,7 +103,8 @@ namespace repo
             toStock(stockRow),
             row.optionType.value(),
             finance::Cash{row.currency.value(), row.strikePrice.value()},
-            row.expirationDate.value()
+            row.expirationDate.value(),
+            row.contractSize.value()
         };
     }
 

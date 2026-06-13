@@ -96,6 +96,12 @@ struct OptionRow : public orm::ORMModel<"option">
     /// and reporting.
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
 
+    /// The contract size of the option
+    ORM_FIELD(
+        contractSize,
+        Field<"contract_size", std::int64_t, orm::not_null_t>
+    )
+
     /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
         OptionRow,
@@ -105,7 +111,8 @@ struct OptionRow : public orm::ORMModel<"option">
         optionType,
         strikePrice,
         expirationDate,
-        currency
+        currency,
+        contractSize
     )
     /// @endcond
 
@@ -127,7 +134,8 @@ struct OptionRow : public orm::ORMModel<"option">
                 &OptionRow::underlyingInstrumentId,
                 &OptionRow::optionType,
                 &OptionRow::strikePrice,
-                &OptionRow::expirationDate>()
+                &OptionRow::expirationDate,
+                &OptionRow::contractSize>()
         );
     }
 };

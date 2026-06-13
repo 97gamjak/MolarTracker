@@ -24,6 +24,7 @@ namespace finance
         [[nodiscard]] const TradeLegs& getLegs() const;
 
         void addLeg(const TradeLeg& leg);
+        void setLegs(const TradeLegs& legs);
     };
 }   // namespace finance
 

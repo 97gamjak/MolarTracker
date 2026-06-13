@@ -111,4 +111,6 @@ namespace finance
         _positionId = positionId;
     }
 
+    void TradeLeg::setAccountId(AccountId accountId) { _accountId = accountId; }
+
 }   // namespace finance

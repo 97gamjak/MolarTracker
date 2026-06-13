@@ -2,7 +2,6 @@
 #define __STORE__INCLUDE__STORE__STORE_CONTAINER_HPP__
 
 #include <memory>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
@@ -36,28 +35,15 @@ namespace store
         std::unique_ptr<service::ServiceContainer> _serviceContainer;
         /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
-        /// The Profile store
-        std::shared_ptr<IProfileStore> _profileStore;
-        /// The Account store
-        std::shared_ptr<IAccountStore> _accountStore;
-        /// The stock store
-        std::shared_ptr<IStockStore> _stockStore;
-        /// The option store
-        std::shared_ptr<IOptionStore> _optionStore;
-        /// The Position store
-        std::shared_ptr<IPositionStore> _positionStore;
-        /// The Transaction store
-        std::shared_ptr<ITransactionStore> _transactionStore;
 
-        /// list of all stores
-        std::vector<IStore*> _allStores;
+        struct StoreImpl;
+        std::unique_ptr<StoreImpl> _stores;
 
         /// list of connections for all stores
         std::unique_ptr<Connections> _connections;
 
        public:
         explicit StoreContainer();
-
         ~StoreContainer();
 
         void               commit();
@@ -69,26 +55,20 @@ namespace store
             void*                       user
         );
 
-        [[nodiscard]] std::shared_ptr<IProfileStore>&       getProfileStore();
         [[nodiscard]] const std::shared_ptr<IProfileStore>& getProfileStore(
         ) const;
 
-        [[nodiscard]] std::shared_ptr<IAccountStore>&       getAccountStore();
         [[nodiscard]] const std::shared_ptr<IAccountStore>& getAccountStore(
         ) const;
 
-        [[nodiscard]] std::shared_ptr<ITransactionStore>& getTransactionStore();
         [[nodiscard]] const std::shared_ptr<ITransactionStore>& getTransactionStore(
         ) const;
 
-        [[nodiscard]] std::shared_ptr<IStockStore>&       getStockStore();
         [[nodiscard]] const std::shared_ptr<IStockStore>& getStockStore() const;
 
-        [[nodiscard]] std::shared_ptr<IOptionStore>&       getOptionStore();
         [[nodiscard]] const std::shared_ptr<IOptionStore>& getOptionStore(
         ) const;
 
-        [[nodiscard]] std::shared_ptr<IPositionStore>&       getPositionStore();
         [[nodiscard]] const std::shared_ptr<IPositionStore>& getPositionStore(
         ) const;
     };

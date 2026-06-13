@@ -17,7 +17,9 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction/domain_transaction.cpp
     ${SOURCE_DIR}/transaction/option_data.cpp
     ${SOURCE_DIR}/transaction/pnl.cpp
+    ${SOURCE_DIR}/transaction/option_transaction.cpp
     ${SOURCE_DIR}/transaction/position_transaction.cpp
+    ${SOURCE_DIR}/transaction/security_transaction.cpp
     ${SOURCE_DIR}/transaction/stock_data.cpp
     ${SOURCE_DIR}/transaction/stock_transaction.cpp
     ${SOURCE_DIR}/transaction/trade_leg.cpp

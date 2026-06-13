@@ -167,7 +167,9 @@ namespace repo
     {
         const auto& stock = option.getUnderlying();
         if (!stockExists(stock.getTicker()))
-            const auto stockResult = addStock(stock);
+        {
+            [[maybe_unused]] const auto stockResult = addStock(stock);
+        }
 
         auto [instrumentRow, optionRow] = InstrumentFactory::fromOption(option);
 

@@ -52,6 +52,8 @@ namespace store
          * longer any dirty data that needs to be committed.
          */
         virtual void clearPotentiallyDirty() = 0;
+
+        virtual void clearIdRemap() = 0;
     };
 
 }   // namespace store

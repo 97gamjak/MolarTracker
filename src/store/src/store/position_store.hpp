@@ -3,7 +3,6 @@
 
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "finance/position.hpp"
 #include "service/i_position_service.hpp"
 #include "store/i_position_store.hpp"
@@ -65,8 +64,7 @@ namespace store
         void commit() override;
 
         [[nodiscard]]
-        const unorderedIdMap<PositionId, PositionId>& getIdRemap(
-        ) const override;
+        const IdIdMap<PositionId>& getIdRemap() const override;
 
         [[nodiscard]]
         Connection subscribeToPositionClosed(

@@ -48,7 +48,7 @@ namespace repo
         bool stockExists(const std::string& ticker) override;
 
         [[nodiscard]]
-        bool optionExists(const finance::Option& optionName) override;
+        bool optionExists(const finance::Option& option) override;
 
        private:
         [[nodiscard]]

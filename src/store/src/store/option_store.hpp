@@ -12,6 +12,14 @@
 
 namespace store
 {
+    /**
+     * @brief Store for managing options, this class implements the IOptionStore
+     * interface and provides methods to add options, retrieve the mapping of
+     * instrument IDs, commit changes, and check if an option exists, allowing
+     * for a structured way to manage options within the application and
+     * interact with the underlying data storage for options.
+     *
+     */
     class OptionStore : public BaseStore<finance::Option, OptionId>,
                         public IOptionStore
     {
@@ -42,15 +50,20 @@ namespace store
         OptionStore& operator=(OptionStore&&)      = delete;
 
         [[nodiscard]]
-        OptionStoreResult addOption(finance::Option option) override;
+        std::expected<InstrumentId, OptionStoreResult> addOption(
+            finance::Option option
+        ) override;
 
         [[nodiscard]]
         const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
 
-        void commit() override;
+        void commit(const IdIdMap<InstrumentId>& reMap) override;
 
         [[nodiscard]]
         bool optionExists(const finance::Option& option) const;
+
+       private:
+        void _onInstrumentIdRemap(const IdIdMap<InstrumentId>& reMap);
     };
 }   // namespace store
 

@@ -1,5 +1,8 @@
 #include "option_store.hpp"
 
+#include <algorithm>
+
+#include "config/id_types.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
 
@@ -18,7 +21,9 @@ namespace store
         _addCleanEntries(options);
     }
 
-    OptionStoreResult OptionStore::addOption(finance::Option option)
+    std::expected<InstrumentId, OptionStoreResult> OptionStore::addOption(
+        finance::Option option
+    )
     {
         const auto name = option.getName();
 
@@ -32,22 +37,25 @@ namespace store
                 )
             );
 
-            return OptionStoreResult::OptionAlreadyExists;
+            return std::unexpected(OptionStoreResult::OptionAlreadyExists);
         }
 
-        option.setInstrumentId(_instrumentIdSeq.next());
+        const auto instrumentId = _instrumentIdSeq.next();
+        option.setInstrumentId(instrumentId);
         _addEntry(std::move(option));
 
-        return OptionStoreResult::Ok;
+        return instrumentId;
     }
 
-    void OptionStore::commit()
+    void OptionStore::commit(const IdIdMap<InstrumentId>& reMap)
     {
         LOG_ENTRY;
 
         // make an early return to not notify unnecessarily
         if (!isDirty())
             return;
+
+        _onInstrumentIdRemap(reMap);
 
         _instrumentIdMap.clear();
 
@@ -71,11 +79,11 @@ namespace store
                         )
                     );
 
+                    const auto oldInstrumentId = entry.value.getInstrumentId();
+
                     auto option = entry.value;
                     option.setId(insertionResult.optionId);
                     option.setInstrumentId(insertionResult.instrumentId);
-
-                    const auto oldInstrumentId = entry.value.getInstrumentId();
 
                     const auto result = _commitEntry(
                         entry.value.getId(),
@@ -85,7 +93,7 @@ namespace store
                     if (result != StoreResult::Ok)
                     {
                         throw std::runtime_error(
-                            "Failed to add new stock entry to database"
+                            "Failed to add new option entry to database"
                         );
                     }
 
@@ -133,6 +141,47 @@ namespace store
     const IdIdMap<InstrumentId>& OptionStore::getInstrumentIdMap() const
     {
         return _instrumentIdMap;
+    }
+
+    void OptionStore::_onInstrumentIdRemap(const IdIdMap<InstrumentId>& reMap)
+    {
+        LOG_ENTRY;
+
+        for (const auto& entry : _getEntries())
+        {
+            if (entry.state != StoreState::New)
+            {
+                // check if this committed transaction references the
+                // remapped ID
+                const auto hasId = std::ranges::any_of(
+                    reMap,
+                    [&entry](const auto& pair)
+                    { return entry.value.hasUnderlying(pair.first); }
+                );
+
+                if (hasId)
+                {
+                    throw std::runtime_error(
+                        "Instrument ID found in already committed "
+                        "transaction "
+                        "entry!"
+                    );
+                }
+
+                continue;
+            }
+
+            for (const auto& pair : reMap)
+            {
+                if (entry.value.hasUnderlying(pair.first))
+                {
+                    auto option = entry.value;
+                    option.updateUnderlying(pair.second);
+                    _updateEntry(option, StoreState::New);
+                    break;
+                }
+            }
+        }
     }
 
 }   // namespace store

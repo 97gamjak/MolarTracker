@@ -10,14 +10,16 @@ namespace finance
         Stock        underlying,
         OptionType   optionType,
         Cash         strikePrice,
-        Timestamp    expirationDate
+        Timestamp    expirationDate,
+        std::int64_t contractSize
     )
         : _id(id),
           _instrumentId(instrumentId),
           _underlying(std::move(underlying)),
           _optionType(optionType),
           _strikePrice(strikePrice),
-          _expirationDate(expirationDate)
+          _expirationDate(expirationDate),
+          _contractSize(contractSize)
     {
     }
 
@@ -33,6 +35,8 @@ namespace finance
 
     const Stock& Option::getUnderlying() const { return _underlying; }
 
+    std::int64_t Option::getContractSize() const { return _contractSize; }
+
     std::string Option::getName() const
     {
         return std::format(
@@ -42,6 +46,16 @@ namespace finance
             _optionType == OptionType::Call ? "C" : "P",
             _strikePrice.toString(2, false, false)
         );
+    }
+
+    bool Option::hasUnderlying(InstrumentId underlyingId) const
+    {
+        return _underlying.getInstrumentId() == underlyingId;
+    }
+
+    void Option::updateUnderlying(InstrumentId underlyingId)
+    {
+        _underlying.setInstrumentId(underlyingId);
     }
 
     void Option::setId(OptionId id) { _id = id; }

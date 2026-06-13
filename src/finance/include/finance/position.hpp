@@ -36,6 +36,8 @@ namespace finance
         [[nodiscard]] PositionId               getId() const;
         [[nodiscard]] Timestamp                getCreatedAt() const;
         [[nodiscard]] std::optional<Timestamp> getClosedAt() const;
+
+        [[nodiscard]] std::string toString() const;
     };
 
     filter::Predicate<Position> IsPositionOpen(bool isOpen = true);

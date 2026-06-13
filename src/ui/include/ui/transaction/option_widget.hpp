@@ -1,5 +1,5 @@
-#ifndef __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
-#define __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
+#ifndef __UI__INCLUDE__UI__TRANSACTION__OPTION_WIDGET_HPP__
+#define __UI__INCLUDE__UI__TRANSACTION__OPTION_WIDGET_HPP__
 
 #include <qwidget.h>
 
@@ -13,8 +13,8 @@ class QPushButton;   // Forward declaration
 
 namespace drafts
 {
-    class CreateStockTransactionDraft;   // Forward declaration
-    class AccountDraft;                  // Forward declaration
+    class CreateOptionTransactionDraft;   // Forward declaration
+    class AccountDraft;                   // Forward declaration
 }   // namespace drafts
 
 namespace ui
@@ -27,13 +27,15 @@ namespace ui
     class CommentField;     // Forward declaration
 
     /**
-     * @brief Widget for creating a stock transaction
+     * @brief Widget for creating and editing option transactions, this widget
+     * provides a user interface for users to input the necessary information to
+     * create or edit option transactions, such as selecting the accounts
+     * involved, entering the amount, selecting the ticker, and specifying the
+     * timestamp and any optional comments, allowing for a user-friendly way to
+     * manage option transactions within the application.
      *
-     * Extends the basic transaction form with a reference account selector,
-     * which is kept disabled until a primary account has been chosen. The
-     * add button requires both accounts and a non-zero valid amount.
      */
-    class StockWidget : public Dialog
+    class OptionWidget : public Dialog
     {
         Q_OBJECT
        private:
@@ -51,14 +53,14 @@ namespace ui
         std::vector<drafts::AccountDraft> _referenceAccounts;
 
        public:
-        explicit StockWidget(
+        explicit OptionWidget(
             const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
             const std::vector<std::string>&          tickers,
             QWidget*                                 parent = nullptr
         );
 
-        ~StockWidget() override;
+        ~OptionWidget() override;
 
         void updateAccounts(std::vector<drafts::AccountDraft> accounts);
         void updateReferenceAccounts(
@@ -76,12 +78,12 @@ namespace ui
         void createTickerRequested(const std::string& ticker);
 
         /**
-         * @brief Emitted when a new stock transaction is requested
+         * @brief Emitted when a new option transaction is requested
          *
-         * @param draft The draft of the stock transaction to create
+         * @param draft The draft of the option transaction to create
          */
-        void createStockTransactionRequested(
-            const drafts::CreateStockTransactionDraft& draft
+        void createOptionTransactionRequested(
+            const drafts::CreateOptionTransactionDraft& draft
         );
 
        private:
@@ -91,11 +93,11 @@ namespace ui
         void _emitOk();
 
         [[nodiscard]]
-        drafts::CreateStockTransactionDraft _getDraft() const;
+        drafts::CreateOptionTransactionDraft _getDraft() const;
 
         void _connectAddButton();
     };
 
 }   // namespace ui
 
-#endif   // __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
+#endif   // __UI__INCLUDE__UI__TRANSACTION__OPTION_WIDGET_HPP__

@@ -32,10 +32,22 @@ namespace finance
     {
        public:
         [[nodiscard]]
-        static DomainTransaction toDomain(const CashTransaction& transaction);
+        static DomainTransaction toDomain(
+            const CashTransaction& transaction,
+            const Accounts&        accounts
+        );
 
         [[nodiscard]]
-        static DomainTransaction toDomain(const StockTransaction& transaction);
+        static DomainTransaction toDomain(
+            const StockTransaction& transaction,
+            const Accounts&         accounts
+        );
+
+        [[nodiscard]]
+        static DomainTransaction toDomain(
+            const OptionTransaction& transaction,
+            const Accounts&          accounts
+        );
 
         [[nodiscard]]
         static std::
@@ -49,12 +61,6 @@ namespace finance
             expected<StockTransaction, TransactionConversionError> toStock(
                 const DomainTransaction& transaction
             );
-
-        // [[nodiscard]]
-        // static std::
-        //     expected<OptionTransaction, TransactionConversionError> toOption(
-        //         const DomainTransaction& transaction
-        //     );
     };
 }   // namespace finance
 

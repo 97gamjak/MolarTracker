@@ -481,9 +481,9 @@ namespace store
     /**
      * @brief Get the ID remapping for accounts
      *
-     * @return const unorderedIdMap<AccountId, AccountId>& The ID remapping
+     * @return const IdIdMap<AccountId>& The ID remapping
      */
-    const unorderedIdMap<AccountId, AccountId>& AccountStore::getIdRemap() const
+    const IdIdMap<AccountId>& AccountStore::getIdRemap() const
     {
         return _getIdRemap();
     }

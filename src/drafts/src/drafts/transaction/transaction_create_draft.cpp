@@ -61,19 +61,6 @@ namespace drafts
     }
 
     /**
-     * @brief Set the external account for the cash transaction draft.
-     *
-     * @param externalAccount The ID of the external account to associate with
-     * the cash transaction draft
-     */
-    void CreateCashTransactionDraft::setExternalAccount(
-        AccountId externalAccount
-    )
-    {
-        _externalAccount = externalAccount;
-    }
-
-    /**
      * @brief Gets the amount of the cash transaction draft.
      *
      * @return const finance::Cash& The amount of the cash transaction draft.
@@ -101,16 +88,6 @@ namespace drafts
     AccountId CreateCashTransactionDraft::getAccountId() const
     {
         return _accountId;
-    }
-
-    /**
-     * @brief Gets the external account ID of the cash transaction draft.
-     *
-     * @return AccountId The external account ID of the cash transaction draft.
-     */
-    AccountId CreateCashTransactionDraft::getExternalAccount() const
-    {
-        return _externalAccount;
     }
 
     /**
@@ -144,19 +121,6 @@ namespace drafts
           _securityAccount(securityAccount),
           _cashAccount(cashAccount)
     {
-    }
-
-    /**
-     * @brief Set the external account for the stock transaction draft.
-     *
-     * @param externalAccount The ID of the external account to associate with
-     * the stock transaction draft
-     */
-    void CreateStockTransactionDraft::setExternalAccount(
-        AccountId externalAccount
-    )
-    {
-        _externalAccount = externalAccount;
     }
 
     /**
@@ -199,16 +163,6 @@ namespace drafts
     AccountId CreateStockTransactionDraft::getCashAccount() const
     {
         return _cashAccount;
-    }
-
-    /**
-     * @brief Gets the external account ID of the stock transaction draft.
-     *
-     * @return AccountId The external account ID of the stock transaction draft.
-     */
-    AccountId CreateStockTransactionDraft::getExternalAccount() const
-    {
-        return _externalAccount;
     }
 
     /**
@@ -271,4 +225,104 @@ namespace drafts
     {
         return _positionId;
     }
+
+    CreateOptionTransactionDraft::CreateOptionTransactionDraft(
+        Timestamp                  timestamp,
+        std::string                ticker,
+        Timestamp                  expiration,
+        OptionType                 optionType,
+        Quantity                   quantity,
+        finance::Cash              amount,
+        finance::Cash              strikePrice,
+        finance::Cash              fees,
+        std::int64_t               contractSize,
+        AccountId                  securityAccount,
+        AccountId                  cashAccount,
+        std::optional<std::string> comment
+    )
+        : CreateTransactionDraft(timestamp, std::move(comment)),
+          _underlyingTicker(std::move(ticker)),
+          _expiration(expiration),
+          _optionType(optionType),
+          _quantity(quantity),
+          _strikePrice(strikePrice),
+          _amount(amount),
+          _fees(fees),
+          _contractSize(contractSize),
+          _securityAccount(securityAccount),
+          _cashAccount(cashAccount)
+    {
+    }
+
+    void CreateOptionTransactionDraft::setInstrumentId(
+        InstrumentId instrumentId
+    )
+    {
+        _instrumentId = instrumentId;
+    }
+    void CreateOptionTransactionDraft::setUnderlyingInstrumentId(
+        InstrumentId underlyingInstrumentId
+    )
+    {
+        _underlyingInstrumentId = underlyingInstrumentId;
+    }
+    void CreateOptionTransactionDraft::setPositionId(PositionId positionId)
+    {
+        _positionId = positionId;
+    }
+
+    AccountId CreateOptionTransactionDraft::getSecurityAccount() const
+    {
+        return _securityAccount;
+    }
+    AccountId CreateOptionTransactionDraft::getCashAccount() const
+    {
+        return _cashAccount;
+    }
+    InstrumentId CreateOptionTransactionDraft::getInstrumentId() const
+    {
+        return _instrumentId;
+    }
+    InstrumentId CreateOptionTransactionDraft::getUnderlyingInstrumentId() const
+    {
+        return _underlyingInstrumentId;
+    }
+    const Quantity& CreateOptionTransactionDraft::getQuantity() const
+    {
+        return _quantity;
+    }
+    const finance::Cash& CreateOptionTransactionDraft::getStrikePrice() const
+    {
+        return _strikePrice;
+    }
+    const finance::Cash& CreateOptionTransactionDraft::getAmount() const
+    {
+        return _amount;
+    }
+    const finance::Cash& CreateOptionTransactionDraft::getFees() const
+    {
+        return _fees;
+    }
+    PositionId CreateOptionTransactionDraft::getPositionId() const
+    {
+        return _positionId;
+    }
+    const std::string& CreateOptionTransactionDraft::getUnderlyingTicker() const
+    {
+        return _underlyingTicker;
+    }
+    Timestamp CreateOptionTransactionDraft::getExpiration() const
+    {
+        return _expiration;
+    }
+    OptionType CreateOptionTransactionDraft::getOptionType() const
+    {
+        return _optionType;
+    }
+
+    std::int64_t CreateOptionTransactionDraft::getContractSize() const
+    {
+        return _contractSize;
+    }
+
 }   // namespace drafts

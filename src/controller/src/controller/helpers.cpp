@@ -39,6 +39,22 @@ namespace controller
         return {};
     }
 
+    std::expected<void, std::string> convertTickerToInstrumentId(
+        drafts::CreateOptionTransactionDraft&      draft,
+        const std::shared_ptr<store::IStockStore>& stockStore
+    )
+    {
+        const auto  ticker       = draft.getUnderlyingTicker();
+        const auto& instrumentId = stockStore->getInstrumentId(ticker);
+
+        if (instrumentId)
+            draft.setUnderlyingInstrumentId(*instrumentId);
+        else
+            return std::unexpected("Invalid stock ticker: " + ticker);
+
+        return {};
+    }
+
     /**
      * @brief Get open position drafts for a specific account
      *

@@ -30,7 +30,7 @@ namespace finance
         TransactionEntries         entries,
         std::optional<std::string> comment
     )
-        : Transaction(id, timestamp, status, std::move(comment)),
+        : BaseTransaction(id, timestamp, status, std::move(comment)),
           _data(std::move(data)),
           _entries(std::move(entries))
     {
@@ -44,7 +44,7 @@ namespace finance
      */
     std::string DomainTransaction::toString() const
     {
-        std::string result = Transaction::toString();
+        std::string result = BaseTransaction::toString();
 
         // clang-format off
         result += "DomainTransaction {\n";
@@ -70,7 +70,7 @@ namespace finance
      * representing the legs of the transaction. If the transaction does not
      * contain trade data, an empty vector is returned.
      */
-    TradeLegs DomainTransaction::getLegs() const
+    const TradeLegs& DomainTransaction::getLegs() const
     {
         switch (getType())
         {
@@ -79,7 +79,10 @@ namespace finance
             case TransactionDataType::Option:
                 return std::get<OptionData>(_data).getLegs();
             case TransactionDataType::Cash:
-                return {};
+            {
+                static const TradeLegs emptyLegs;
+                return emptyLegs;
+            }
         }
 
         std::unreachable();
@@ -95,14 +98,6 @@ namespace finance
     {
         return _entries;
     }
-
-    /**
-     * @brief Gets the entries associated with the transaction.
-     *
-     * @return TransactionEntries& The entries of the
-     * transaction.
-     */
-    TransactionEntries& DomainTransaction::getEntries() { return _entries; }
 
     /**
      * @brief Adds an entry to the transaction.
@@ -151,13 +146,6 @@ namespace finance
     const TransactionData& DomainTransaction::getData() const { return _data; }
 
     /**
-     * @brief Gets the data associated with the transaction.
-     *
-     * @return TransactionData& The data of the transaction.
-     */
-    TransactionData& DomainTransaction::getData() { return _data; }
-
-    /**
      * @brief Adds a leg to the transaction.
      *
      * @param leg The trade leg to add.
@@ -183,6 +171,34 @@ namespace finance
                     "Cannot add trade legs to cash transactions"
                 );
         }
+    }
+
+    void DomainTransaction::setLegs(const TradeLegs& legs)
+    {
+        switch (getType())
+        {
+            case TransactionDataType::Stock:
+            {
+                auto& data = std::get<StockData>(_data);
+                data.setLegs(legs);
+                break;
+            }
+            case TransactionDataType::Option:
+            {
+                auto& data = std::get<OptionData>(_data);
+                data.setLegs(legs);
+                break;
+            }
+            case TransactionDataType::Cash:
+                throw std::logic_error(
+                    "Cannot set trade legs on cash transactions"
+                );
+        }
+    }
+
+    void DomainTransaction::setEntries(const TransactionEntries& entries)
+    {
+        _entries = entries;
     }
 
     /**

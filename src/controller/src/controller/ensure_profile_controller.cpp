@@ -75,7 +75,7 @@ namespace controller
     void EnsureProfileController::ensureProfileExists()
     {
         const auto& settings     = _settings.getGeneralSettings();
-        auto&       profileStore = _storeContainer.getProfileStore();
+        const auto& profileStore = _storeContainer.getProfileStore();
 
         for (std::size_t attempt = 0; attempt < MAX_PROFILE_CHECKS; ++attempt)
         {
@@ -135,7 +135,7 @@ namespace controller
      */
     bool EnsureProfileController::_activateProfile(const std::string& name)
     {
-        auto& profileStore = _storeContainer.getProfileStore();
+        const auto& profileStore = _storeContainer.getProfileStore();
 
         if (profileStore->profileExists(name))
         {
@@ -182,7 +182,7 @@ namespace controller
         const std::string& defaultProfile
     )
     {
-        auto& profileStore = _storeContainer.getProfileStore();
+        const auto& profileStore = _storeContainer.getProfileStore();
 
         ui::showWarningMessageBox(
             "Default Profile Not Found",
@@ -222,7 +222,7 @@ namespace controller
             _mainWindow.get()
         );
 
-        auto& profileStore = _storeContainer.getProfileStore();
+        const auto& profileStore = _storeContainer.getProfileStore();
 
         if (profileStore->hasProfiles())
             _showProfileSelectionDialog();

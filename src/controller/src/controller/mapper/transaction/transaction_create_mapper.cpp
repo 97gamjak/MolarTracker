@@ -2,6 +2,7 @@
 
 #include "config/finance.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
+#include "finance/transaction/option_transaction.hpp"
 
 namespace controller
 {
@@ -20,7 +21,7 @@ namespace controller
             draft.getTimestamp(),
             TransactionStatus::Completed,
             draft.getAccountId(),
-            draft.getExternalAccount(),
+            AccountId::invalid(),
             draft.getAmount(),
             draft.getFees(),
             draft.getComment()
@@ -44,11 +45,35 @@ namespace controller
             draft.getInstrumentId(),
             draft.getSecurityAccount(),
             draft.getCashAccount(),
-            draft.getExternalAccount(),
+            AccountId::invalid(),
             draft.getQuantity(),
             draft.getUnitPrice(),
             draft.getFees(),
             draft.getPositionId(),
+            draft.getComment()
+        };
+    }
+
+    finance::OptionTransaction TransactionCreateMapper::fromCreateOptionDraft(
+        const drafts::CreateOptionTransactionDraft& draft
+    )
+    {
+        return finance::OptionTransaction{
+            TransactionId::invalid(),   // will be created
+            draft.getTimestamp(),
+            TransactionStatus::Completed,
+            draft.getInstrumentId(),
+            draft.getUnderlyingInstrumentId(),
+            draft.getSecurityAccount(),
+            draft.getCashAccount(),
+            AccountId::invalid(),
+            draft.getQuantity(),
+            draft.getStrikePrice(),
+            draft.getAmount(),
+            draft.getFees(),
+            draft.getPositionId(),
+            TransactionOptionAction::Open,
+            std::nullopt,   // rolled option will be set when rolling
             draft.getComment()
         };
     }
