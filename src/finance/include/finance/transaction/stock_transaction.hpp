@@ -5,7 +5,7 @@
 #include "config/quantity.hpp"
 #include "finance/cash.hpp"
 #include "finance/transaction/i_security_transaction.hpp"
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
@@ -67,7 +67,7 @@ namespace finance
         [[nodiscard]]
         TransactionEntries getTransactionEntries() const;
 
-        [[nodiscard]] TradeData getTradeData() const;
+        [[nodiscard]] StockData getStockData() const;
 
         [[nodiscard]] Cash getAmount() const;
 

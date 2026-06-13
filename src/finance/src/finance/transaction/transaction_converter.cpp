@@ -7,8 +7,8 @@
 #include "config/id_types.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/stock_transaction.hpp"
-#include "finance/transaction/trade_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 
 namespace finance
@@ -52,7 +52,7 @@ namespace finance
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
-            transaction.getTradeData(),
+            transaction.getStockData(),
             transaction.getTransactionEntries()
         };
     }
@@ -234,14 +234,14 @@ namespace finance
             }
         }
 
-        if (!std::holds_alternative<TradeData>(transaction.getData()))
+        if (!std::holds_alternative<StockData>(transaction.getData()))
         {
             return std::unexpected(
                 TransactionConversionError{"Invalid transaction data"}
             );
         }
 
-        const auto data = std::get<TradeData>(transaction.getData());
+        const auto data = std::get<StockData>(transaction.getData());
 
         const auto& legs = data.getLegs();
         if (legs.size() != 1)
@@ -262,7 +262,7 @@ namespace finance
             legs[0].getQuantity(),
             legs[0].getUnitPrice(),
             fees,
-            legs[0].getPositionId(),
+            std::get<StockData>(transaction.getData()).getPositionId(),
             transaction.getComment()
         };
     }

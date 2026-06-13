@@ -4,7 +4,7 @@
 
 #include "config/id_types.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/trade_leg.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "logging/log_macros.hpp"
 

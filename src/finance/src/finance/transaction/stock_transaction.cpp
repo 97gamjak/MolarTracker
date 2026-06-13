@@ -1,6 +1,8 @@
 #include "finance/transaction/stock_transaction.hpp"
 
 #include "config/id_types.hpp"
+#include "finance/transaction/stock_data.hpp"
+#include "finance/transaction/trade_leg.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 
@@ -130,14 +132,14 @@ namespace finance
     }
 
     /**
-     * @brief Get the trade data associated with the stock transaction, this
-     * will return a TradeData object that represents the details of the trade
-     * associated with the stock transaction, including the security account,
-     * instrument, quantity, unit price, and position ID.
+     * @brief Get the stock data associated with the stock transaction, this
+     * will return a StockData object that represents the details of the stock
+     * transaction, including the security account, instrument, quantity, unit
+     * price, and position ID.
      *
-     * @return TradeData
+     * @return StockData
      */
-    TradeData StockTransaction::getTradeData() const
+    StockData StockTransaction::getStockData() const
     {
         const TradeLeg leg{
             _securityAccount,
@@ -146,7 +148,7 @@ namespace finance
             _unitPrice,
             _positionId
         };
-        return TradeData{{leg}};
+        return StockData{{leg}};
     }
 
     /**

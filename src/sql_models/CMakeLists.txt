@@ -8,6 +8,7 @@ add_library(molartracker_sql_models STATIC
     ${SRC}/stock_row.cpp
     ${SRC}/trade_leg_row.cpp
     ${SRC}/transaction_entry_row.cpp
+    ${SRC}/transaction_option_row.cpp
     ${SRC}/transaction_row.cpp
 )
 

@@ -1,83 +1,34 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_HPP__
 
-#include <vector>
-
-#include "config/id_types.hpp"
-#include "finance/cash.hpp"
+#include "finance/transaction/trade_leg.hpp"
 
 namespace finance
 {
-
     /**
-     * @brief A class representing a single leg of a trade, this is used to
-     * represent the details of a single leg of a trade transaction, including
-     * the account involved, the financial instrument being traded, the quantity
-     * of the instrument, the unit price, and the currency of the trade leg.
+     * @brief A class template representing the data for a trade, this class
+     * serves as a base for specific trade data types (e.g., StockData,
+     * OptionData) and provides common functionality for managing trade legs
+     * associated with a trade transaction, allowing for a structured
+     * representation of the details of a trade within the financial transaction
+     * system.
      *
+     * @tparam Derived
      */
-    class TradeLeg
-    {
-       private:
-        /// The ID of the account associated with this trade leg
-        AccountId _accountId;
-
-        /// The ID of the instrument being traded in this leg
-        InstrumentId _instrumentId;
-
-        /// The quantity of the instrument being traded in this leg
-        Quantity _quantity;
-
-        /// The unit price of the instrument being traded in this leg
-        Cash _unitPrice;
-
-        /// The ID of the position associated with this trade leg
-        PositionId _positionId;
-
-       public:
-        TradeLeg(
-            AccountId       accountId,
-            InstrumentId    instrumentId,
-            const Quantity& quantity,
-            const Cash&     unitPrice,
-            PositionId      positionId
-        );
-
-        [[nodiscard]] Cash         getCash() const;
-        [[nodiscard]] InstrumentId getInstrumentId() const;
-        [[nodiscard]] AccountId    getAccountId() const;
-        [[nodiscard]] Quantity     getQuantity() const;
-        [[nodiscard]] Cash         getUnitPrice() const;
-        [[nodiscard]] PositionId   getPositionId() const;
-
-        void setInstrumentId(InstrumentId instrumentId);
-        void setPositionId(PositionId positionId);
-
-        [[nodiscard]] std::string toString() const;
-    };
-
-    /**
-     * @brief A class representing the data for a trade transaction
-     *
-     */
+    template <typename Derived>
     class TradeData
     {
-       private:
-        /// A list of trade legs associated with the trade transaction
-        std::vector<TradeLeg> _legs;
-
        public:
-        explicit TradeData() = default;
-        explicit TradeData(std::vector<TradeLeg> legs);
+        [[nodiscard]] TradeLegs& getLegs();
 
-        [[nodiscard]] const std::vector<TradeLeg>& getLegs() const;
-        [[nodiscard]] std::vector<TradeLeg>&       getLegs();
-
-        [[nodiscard]] Quantity calculateTotalQuantity() const;
+        [[nodiscard]] const TradeLegs& getLegs() const;
 
         void addLeg(const TradeLeg& leg);
     };
-
 }   // namespace finance
+
+#ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_TPP__
+#include "finance/transaction/trade_data.tpp"
+#endif
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_DATA_HPP__
