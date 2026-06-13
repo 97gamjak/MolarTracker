@@ -10,6 +10,8 @@ namespace finance
 {
     class Stock;
     struct StockInsertionResult;
+    class Option;
+    struct OptionInsertionResult;
 }   // namespace finance
 
 namespace repo
@@ -71,13 +73,20 @@ namespace repo
             const finance::Stock& stock
         ) = 0;
 
+        [[nodiscard]]
+        virtual finance::OptionInsertionResult addOption(
+            const finance::Option& option
+        ) = 0;
+
         /**
-         * @brief Check if a stock with the given ticker already exists in the
-         * database, this is used to prevent duplicate entries and ensure data
-         * integrity.
+         * @brief Check if a stock with the given ticker already exists in
+         * the database, this is used to prevent duplicate entries and
+         * ensure data integrity.
          *
-         * @param ticker The ticker symbol of the stock to check for existence
-         * @return true if a stock with the given ticker exists, false otherwise
+         * @param ticker The ticker symbol of the stock to check for
+         * existence
+         * @return true if a stock with the given ticker exists, false
+         * otherwise
          */
         [[nodiscard]]
         virtual bool stockExists(const std::string& ticker) = 0;

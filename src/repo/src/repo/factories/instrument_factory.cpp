@@ -2,8 +2,10 @@
 
 #include <string>
 
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/option_row.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace repo
@@ -67,6 +69,26 @@ namespace repo
         stock.setInstrumentId(row.instrumentId.value());
 
         return stock;
+    }
+
+    std::pair<InstrumentRow, OptionRow> InstrumentFactory::fromOption(
+        const finance::Option& option
+    )
+    {
+        InstrumentRow instrumentRow;
+        instrumentRow.id = option.getInstrumentId();
+
+        OptionRow optionRow;
+        optionRow.id           = option.getId();
+        optionRow.instrumentId = option.getInstrumentId();
+        optionRow.underlyingInstrumentId =
+            option.getUnderlying().getInstrumentId();
+        optionRow.strikePrice    = option.getStrikePrice().getAmount();
+        optionRow.currency       = option.getStrikePrice().getCurrency();
+        optionRow.expirationDate = option.getExpirationDate();
+        optionRow.optionType     = option.getOptionType();
+
+        return {instrumentRow, optionRow};
     }
 
 }   // namespace repo

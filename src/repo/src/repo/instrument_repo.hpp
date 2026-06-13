@@ -4,6 +4,7 @@
 #include "base_repo.hpp"
 #include "config/id_types.hpp"
 #include "repo/i_instrument_repo.hpp"
+#include "sql_models/instrument_row.hpp"
 #include "sql_models/stock_row.hpp"
 
 namespace repo
@@ -35,6 +36,11 @@ namespace repo
         ) override;
 
         [[nodiscard]]
+        finance::OptionInsertionResult addOption(
+            const finance::Option& option
+        ) override;
+
+        [[nodiscard]]
         bool stockExists(const std::string& ticker) override;
 
        private:
@@ -42,6 +48,9 @@ namespace repo
         std::vector<StockRow> _getStockRows(
             const idSet<InstrumentId>& ids = {}
         );
+
+        [[nodiscard]]
+        InstrumentId _addInstrument(const InstrumentRow& instrumentRow);
     };
 }   // namespace repo
 

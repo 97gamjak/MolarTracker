@@ -6,6 +6,7 @@
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 
 namespace finance
@@ -48,6 +49,12 @@ namespace finance
             expected<StockTransaction, TransactionConversionError> toStock(
                 const DomainTransaction& transaction
             );
+
+        // [[nodiscard]]
+        // static std::
+        //     expected<OptionTransaction, TransactionConversionError> toOption(
+        //         const DomainTransaction& transaction
+        //     );
     };
 }   // namespace finance
 

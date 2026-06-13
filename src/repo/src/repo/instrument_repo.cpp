@@ -1,6 +1,7 @@
 #include "instrument_repo.hpp"
 
 #include "config/id_types.hpp"
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
@@ -31,6 +32,23 @@ namespace repo
             query = query.in<StockRow::instrumentIdField>(ids);
 
         return _getCrud().get<StockRow>(_getDb(), query);
+    }
+
+    InstrumentId InstrumentRepo::_addInstrument(
+        const InstrumentRow& instrumentRow
+    )
+    {
+        auto result = _getCrud().insert(_getDb(), instrumentRow);
+
+        if (!result)
+        {
+            throw RepositoryException(
+                "Failed to insert instrument row: " +
+                result.error().getMessage()
+            );
+        }
+
+        return InstrumentId(result.value());
     }
 
     /**
@@ -99,18 +117,10 @@ namespace repo
     {
         auto [instrumentRow, stockRow] = InstrumentFactory::fromStock(stock);
 
-        auto result = _getCrud().insert(_getDb(), instrumentRow);
+        const auto instrumentId = _addInstrument(instrumentRow);
 
-        if (!result)
-        {
-            throw RepositoryException(
-                "Failed to insert instrument row: " +
-                result.error().getMessage()
-            );
-        }
-
-        stockRow.instrumentId = InstrumentId(result.value());
-        result                = _getCrud().insert(_getDb(), stockRow);
+        stockRow.instrumentId = instrumentId;
+        const auto result     = _getCrud().insert(_getDb(), stockRow);
 
         if (!result)
         {
@@ -122,6 +132,34 @@ namespace repo
         return {
             .stockId      = StockId(result.value()),
             .instrumentId = stockRow.instrumentId.value()
+        };
+    }
+
+    finance::OptionInsertionResult InstrumentRepo::addOption(
+        const finance::Option& option
+    )
+    {
+        const auto& stock = option.getUnderlying();
+        if (!stockExists(stock.getTicker()))
+            const auto stockResult = addStock(stock);
+
+        auto [instrumentRow, optionRow] = InstrumentFactory::fromOption(option);
+
+        const auto instrumentId = _addInstrument(instrumentRow);
+
+        optionRow.instrumentId = instrumentId;
+        const auto result      = _getCrud().insert(_getDb(), optionRow);
+
+        if (!result)
+        {
+            throw RepositoryException(
+                "Failed to insert option row: " + result.error().getMessage()
+            );
+        }
+
+        return {
+            .optionId     = OptionId(result.value()),
+            .instrumentId = optionRow.instrumentId.value()
         };
     }
 
