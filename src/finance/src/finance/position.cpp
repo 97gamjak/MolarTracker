@@ -1,5 +1,7 @@
 #include "finance/position.hpp"
 
+#include <format>
+
 namespace finance
 {
     /**
