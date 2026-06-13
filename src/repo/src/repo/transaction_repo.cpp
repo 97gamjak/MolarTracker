@@ -232,7 +232,7 @@ namespace repo
      * @return std::vector<finance::DomainTransaction>
      */
     std::vector<finance::DomainTransaction> TransactionRepo::getTransactions(
-        const idSet<AccountId>&           accountIds,
+        const IdSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
     {

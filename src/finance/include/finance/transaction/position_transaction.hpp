@@ -51,6 +51,30 @@ namespace finance
         using StockTransactions::empty;
     };
 
+    class OptionPositionTransaction : protected OptionTransactions
+    {
+        PositionId   _positionId      = PositionId::invalid();
+        InstrumentId _baseInstrument  = InstrumentId::invalid();
+        AccountId    _securityAccount = AccountId::invalid();
+
+        std::shared_ptr<PnL> _pnl;
+        bool                 _pnlReady = false;
+
+        using OptionTransactions::add;
+
+       public:
+        explicit OptionPositionTransaction() = default;
+        explicit OptionPositionTransaction(PositionId id);
+
+        [[nodiscard]] bool addPosition(const OptionTransaction& txs);
+
+        [[nodiscard]] InstrumentId                getBaseInstrument() const;
+        [[nodiscard]] AccountId                   getSecurityAccount() const;
+        [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
+
+        using OptionTransactions::empty;
+    };
+
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__POSITION_TRANSACTION_HPP__

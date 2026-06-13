@@ -127,6 +127,11 @@ namespace store
             const finance::TransactionFilter& filter
         ) const = 0;
 
+        [[nodiscard]]
+        virtual unorderedIdMap<PositionId, finance::OptionPositionTransaction> getOptionPositions(
+            const finance::TransactionFilter& filter
+        ) const = 0;
+
         /**
          * @brief Subscribe to transaction added events, this allows subscribers
          * to be notified when a transaction is added, which can be useful for

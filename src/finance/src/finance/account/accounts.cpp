@@ -27,7 +27,7 @@ namespace finance
      * external (true), internal (false), or not found (nullopt).
      */
     std::vector<std::optional<bool>> Accounts::isExternal(
-        const idSet<AccountId>& ids
+        const IdSet<AccountId>& ids
     ) const
     {
         std::vector<std::optional<bool>> results;

@@ -263,7 +263,7 @@ namespace store
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
-        idSet<TransactionId> transactionIds;
+        IdSet<TransactionId> transactionIds;
 
         std::vector<finance::DomainTransaction> results;
 
@@ -341,6 +341,42 @@ namespace store
         );
 
         return stockPositions;
+    }
+
+    unorderedIdMap<PositionId, finance::OptionPositionTransaction> TransactionStore::
+        getOptionPositions(const finance::TransactionFilter& filter) const
+    {
+        unorderedIdMap<PositionId, finance::OptionPositionTransaction>
+            optionPositions;
+
+        const auto transactions = getTransactions(filter).options();
+
+        for (const auto& transaction : transactions)
+        {
+            const auto positionId = transaction.getPositionId();
+            if (!optionPositions.contains(positionId))
+            {
+                optionPositions[positionId] =
+                    finance::OptionPositionTransaction(positionId);
+            }
+
+            if (!optionPositions.at(positionId).addPosition(transaction))
+            {
+                LOG_ERROR(
+                    "Failed to add option transaction to position id: " +
+                    positionId.toString()
+                );
+            }
+        }
+
+        LOG_DEBUG(
+            std::format(
+                "Option positions retrieved: {}",
+                optionPositions.size()
+            )
+        );
+
+        return optionPositions;
     }
 
     /**

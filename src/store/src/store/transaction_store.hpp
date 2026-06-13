@@ -86,6 +86,10 @@ namespace store
         unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const override;
+        [[nodiscard]]
+        unorderedIdMap<PositionId, finance::OptionPositionTransaction> getOptionPositions(
+            const finance::TransactionFilter& filter
+        ) const override;
 
         [[nodiscard]]
         Connection subscribeToTransactionAdded(

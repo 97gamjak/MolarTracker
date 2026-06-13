@@ -24,7 +24,7 @@ namespace repo
      * @return std::vector<StockRow>
      */
     std::vector<StockRow> InstrumentRepo::_getStockRows(
-        const idSet<InstrumentId>& ids
+        const IdSet<InstrumentId>& ids
     )
     {
         orm::Query query{};
@@ -85,7 +85,7 @@ namespace repo
      * @return std::vector<finance::Stock>
      */
     std::vector<finance::Stock> InstrumentRepo::getStocks(
-        const idSet<InstrumentId>& ids
+        const IdSet<InstrumentId>& ids
     )
     {
         auto results =

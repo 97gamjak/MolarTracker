@@ -183,7 +183,7 @@ namespace store
      * @param ids The set of instrument IDs to retrieve stocks for
      * @return finance::Stocks
      */
-    finance::Stocks StockStore::getStocks(const idSet<InstrumentId>& ids) const
+    finance::Stocks StockStore::getStocks(const IdSet<InstrumentId>& ids) const
     {
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
         if (!ids.empty())

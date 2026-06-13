@@ -6,6 +6,7 @@
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "logging/log_macros.hpp"
+#include "utils/container/set.hpp"
 
 REGISTER_LOG_CATEGORY("Finance.Transactions");
 
@@ -27,11 +28,20 @@ namespace finance
     /**
      * @brief Get the Base Instrument Ids from the stock transactions
      *
-     * @return idSet<InstrumentId>
+     * @return IdSet<InstrumentId>
      */
-    idSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
+    IdSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
     {
-        idSet<InstrumentId> instrumentIds;
+        IdSet<InstrumentId> instrumentIds;
+        for (const auto& transaction : getItems())
+            instrumentIds.insert(transaction.getBaseInstrumentId());
+
+        return instrumentIds;
+    }
+
+    IdSet<InstrumentId> OptionTransactions::getBaseInstrumentIds() const
+    {
+        IdSet<InstrumentId> instrumentIds;
         for (const auto& transaction : getItems())
             instrumentIds.insert(transaction.getBaseInstrumentId());
 
@@ -42,20 +52,28 @@ namespace finance
      * @brief Construct a new Security View:: Security View object
      *
      * @param stockTransactions
+     * @param optionTransactions
      */
-    SecurityView::SecurityView(const StockTransactions& stockTransactions)
-        : _stockTransactions(stockTransactions)
+    SecurityView::SecurityView(
+        const StockTransactions&  stockTransactions,
+        const OptionTransactions& optionTransactions
+    )
+        : _stockTransactions(stockTransactions),
+          _optionTransactions(optionTransactions)
     {
     }
 
     /**
      * @brief Get the Base Instrument Ids from the security view
      *
-     * @return idSet<InstrumentId>
+     * @return IdSet<InstrumentId>
      */
-    idSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
+    IdSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
     {
-        return _stockTransactions.getBaseInstrumentIds();
+        auto instrumentIds = _stockTransactions.getBaseInstrumentIds();
+
+        instrumentIds.combine(_optionTransactions.getBaseInstrumentIds());
+        return instrumentIds;
     }
 
     /**
@@ -155,6 +173,16 @@ namespace finance
     }
 
     /**
+     * @brief Get the list of option transactions
+     *
+     * @return const OptionTransactions&
+     */
+    const OptionTransactions& Transactions::options() const
+    {
+        return _optionTransactions;
+    }
+
+    /**
      * @brief Get the security view of the transactions, this will return a
      * SecurityView object that provides access to the stock transactions
      * and their associated base instrument IDs for display in the
@@ -164,7 +192,7 @@ namespace finance
      */
     SecurityView Transactions::securities() const
     {
-        return SecurityView(_stockTransactions);
+        return SecurityView(_stockTransactions, _optionTransactions);
     }
 
     /**
@@ -195,6 +223,12 @@ namespace finance
             );
         }
         for (const auto& transaction : _stockTransactions)
+        {
+            transactions.push_back(
+                dynamic_cast<const Transaction*>(&transaction)
+            );
+        }
+        for (const auto& transaction : _optionTransactions)
         {
             transactions.push_back(
                 dynamic_cast<const Transaction*>(&transaction)

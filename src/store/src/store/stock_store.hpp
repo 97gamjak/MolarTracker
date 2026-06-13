@@ -53,7 +53,7 @@ namespace store
 
         [[nodiscard]]
         finance::Stocks getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) const override;
 
         [[nodiscard]]

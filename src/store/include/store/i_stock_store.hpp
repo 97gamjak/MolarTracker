@@ -9,6 +9,7 @@
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
 #include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 class Connection;   // Forward declaration
 
@@ -70,7 +71,7 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Stocks getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) const = 0;
 
         /**

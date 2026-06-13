@@ -1,0 +1,6 @@
+#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
+#define __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
+
+#include "set.hpp"
+
+#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__

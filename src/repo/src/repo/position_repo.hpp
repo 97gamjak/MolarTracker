@@ -27,12 +27,12 @@ namespace repo
 
         [[nodiscard]]
         std::vector<finance::Position> getAllPositions(
-            const idSet<AccountId>& accountIds
+            const IdSet<AccountId>& accountIds
         ) override;
 
         [[nodiscard]]
         std::vector<finance::Position> getAllOpenPositions(
-            const idSet<AccountId>& accountIds
+            const IdSet<AccountId>& accountIds
         ) override;
 
        private:
@@ -41,7 +41,7 @@ namespace repo
 
         [[nodiscard]]
         static orm::Query _createPositionQuery(
-            const idSet<AccountId>& accountIds
+            const IdSet<AccountId>& accountIds
         );
     };
 }   // namespace repo

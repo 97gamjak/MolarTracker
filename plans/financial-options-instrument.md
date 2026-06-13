@@ -8,15 +8,15 @@ MolarTracker currently supports stocks as the only specific instrument type. Thi
 
 ## Fields
 
-| Field | DB column | Type | Constraints |
-|---|---|---|---|
-| `id` | `id` | `OptionId` | PK, auto-increment |
-| `instrumentId` | `instrument_id` | `InstrumentId` | FK → `instrument`, CascadeDelete, not_null |
-| `underlyingTicker` | `underlying_ticker` | `std::string` | not_null |
-| `optionType` | `option_type` | `OptionType` (Call/Put) | not_null |
-| `strikePrice` | `strike_price` | `micro_units` | not_null |
-| `expirationDate` | `expiration_date` | `Timestamp` | not_null |
-| `currency` | `currency` | `Currency` | not_null |
+| Field              | DB column           | Type                    | Constraints                                |
+| ------------------ | ------------------- | ----------------------- | ------------------------------------------ |
+| `id`               | `id`                | `OptionId`              | PK, auto-increment                         |
+| `instrumentId`     | `instrument_id`     | `InstrumentId`          | FK → `instrument`, CascadeDelete, not_null |
+| `underlyingTicker` | `underlying_ticker` | `std::string`           | not_null                                   |
+| `optionType`       | `option_type`       | `OptionType` (Call/Put) | not_null                                   |
+| `strikePrice`      | `strike_price`      | `micro_units`           | not_null                                   |
+| `expirationDate`   | `expiration_date`   | `Timestamp`             | not_null                                   |
+| `currency`         | `currency`          | `Currency`              | not_null                                   |
 
 **Unique group:** `(underlyingTicker, optionType, strikePrice, expirationDate)` — the combination of these four fields uniquely identifies a contract.
 
@@ -121,7 +121,7 @@ Add pure-virtual methods parallel to the stock ones:
 ```cpp
 [[nodiscard]]
 virtual std::vector<finance::Option> getOptions(
-    const idSet<InstrumentId>& ids) = 0;
+    const IdSet<InstrumentId>& ids) = 0;
 
 [[nodiscard]]
 virtual std::optional<finance::Option> getOption(
@@ -146,7 +146,7 @@ virtual bool optionExists(
 
 Follow the exact pattern of the existing stock methods:
 
-- Private `_getOptionRows(const idSet<InstrumentId>&)`.
+- Private `_getOptionRows(const IdSet<InstrumentId>&)`.
 - `getOptions()` — transform rows via `InstrumentFactory::toOption()`.
 - `getOption()` — `orm::Crud::getUnique<OptionRow>()` with a `WhereExpr` on all four key fields.
 - `addOption()` — paired insert: `InstrumentRow` first, then `OptionRow`; throw `RepositoryException` on failure (same pattern as `addStock()`).
@@ -179,27 +179,27 @@ static finance::Option toOption(const OptionRow&);
 
 ## Files Changed
 
-| File | Action |
-|---|---|
-| `src/config/include/config/finance.hpp` | Modify — add `OptionType` enum; add `Option` to `ASSET_CLASS_LIST` and `TRANSACTION_TYPE_LIST` |
-| `src/config/include/config/id_types.hpp` | Modify — add `OptionId` |
-| `src/sql_models/include/sql_models/option_row.hpp` | **New** |
-| `src/sql_models/src/sql_models/option_row.cpp` | **New** |
-| `src/sql_models/CMakeLists.txt` | Modify |
-| `src/finance/include/finance/instrument/option.hpp` | **New** |
-| `src/finance/src/finance/instrument/option.cpp` | **New** |
-| `src/finance/CMakeLists.txt` | Modify |
-| `src/repo/include/repo/i_instrument_repo.hpp` | Modify |
-| `src/repo/src/repo/instrument_repo.hpp` | Modify |
-| `src/repo/src/repo/instrument_repo.cpp` | Modify |
-| `src/repo/src/repo/factories/instrument_factory.hpp` | Modify |
-| `src/repo/src/repo/factories/instrument_factory.cpp` | Modify |
-| `src/service/include/service/i_instrument_service.hpp` | Modify |
-| `src/service/src/service/instrument_service.hpp` | Modify |
-| `src/service/src/service/instrument_service.cpp` | Modify |
-| `src/repo/src/repo/migration/migration.hpp` | Modify |
-| `src/repo/src/repo/migration/migration.cpp` | Modify |
-| `CHANGELOG.md` / `DEV-CHANGELOG.md` | Modify |
+| File                                                   | Action                                                                                         |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `src/config/include/config/finance.hpp`                | Modify — add `OptionType` enum; add `Option` to `ASSET_CLASS_LIST` and `TRANSACTION_TYPE_LIST` |
+| `src/config/include/config/id_types.hpp`               | Modify — add `OptionId`                                                                        |
+| `src/sql_models/include/sql_models/option_row.hpp`     | **New**                                                                                        |
+| `src/sql_models/src/sql_models/option_row.cpp`         | **New**                                                                                        |
+| `src/sql_models/CMakeLists.txt`                        | Modify                                                                                         |
+| `src/finance/include/finance/instrument/option.hpp`    | **New**                                                                                        |
+| `src/finance/src/finance/instrument/option.cpp`        | **New**                                                                                        |
+| `src/finance/CMakeLists.txt`                           | Modify                                                                                         |
+| `src/repo/include/repo/i_instrument_repo.hpp`          | Modify                                                                                         |
+| `src/repo/src/repo/instrument_repo.hpp`                | Modify                                                                                         |
+| `src/repo/src/repo/instrument_repo.cpp`                | Modify                                                                                         |
+| `src/repo/src/repo/factories/instrument_factory.hpp`   | Modify                                                                                         |
+| `src/repo/src/repo/factories/instrument_factory.cpp`   | Modify                                                                                         |
+| `src/service/include/service/i_instrument_service.hpp` | Modify                                                                                         |
+| `src/service/src/service/instrument_service.hpp`       | Modify                                                                                         |
+| `src/service/src/service/instrument_service.cpp`       | Modify                                                                                         |
+| `src/repo/src/repo/migration/migration.hpp`            | Modify                                                                                         |
+| `src/repo/src/repo/migration/migration.cpp`            | Modify                                                                                         |
+| `CHANGELOG.md` / `DEV-CHANGELOG.md`                    | Modify                                                                                         |
 
 ---
 

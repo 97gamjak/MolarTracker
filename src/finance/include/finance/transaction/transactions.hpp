@@ -5,7 +5,9 @@
 
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -23,10 +25,10 @@ namespace finance
         /**
          * @brief Get the Base Instrument Ids
          *
-         * @return idSet<InstrumentId>
+         * @return IdSet<InstrumentId>
          */
         [[nodiscard]]
-        virtual idSet<InstrumentId> getBaseInstrumentIds() const = 0;
+        virtual IdSet<InstrumentId> getBaseInstrumentIds() const = 0;
     };
 
     /**
@@ -39,7 +41,16 @@ namespace finance
        public:
         void sort();
 
-        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
+    };
+
+    class OptionTransactions : public Vector<OptionTransaction>,
+                               public ISecurityTransactions
+    {
+       public:
+        void sort();
+
+        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**
@@ -61,8 +72,14 @@ namespace finance
         /// The stock transactions that are part of the security view
         const StockTransactions& _stockTransactions;
 
+        /// The option transactions that are part of the security view
+        const OptionTransactions& _optionTransactions;
+
        public:
-        explicit SecurityView(const StockTransactions& stockTransactions);
+        explicit SecurityView(
+            const StockTransactions&  stockTransactions,
+            const OptionTransactions& optionTransactions
+        );
         ~SecurityView() override = default;
 
         // delete copy and move constructors
@@ -71,7 +88,7 @@ namespace finance
         SecurityView& operator=(const SecurityView&) = delete;
         SecurityView& operator=(SecurityView&&)      = delete;
 
-        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**
@@ -85,6 +102,8 @@ namespace finance
         CashTransactions _cashTransactions;
         /// The list of stock transactions
         StockTransactions _stockTransactions;
+        /// The list of option transactions
+        OptionTransactions _optionTransactions;
 
        public:
         Transactions() = default;
@@ -100,6 +119,8 @@ namespace finance
         [[nodiscard]] const CashTransactions& cash() const;
 
         [[nodiscard]] const StockTransactions& stocks() const;
+
+        [[nodiscard]] const OptionTransactions& options() const;
 
         [[nodiscard]] SecurityView securities() const;
 

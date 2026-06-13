@@ -167,12 +167,12 @@ namespace store
      * @tparam T
      * @tparam IdType
      * @param options
-     * @return idSet<IdType>
+     * @return IdSet<IdType>
      */
     template <typename T, typename IdType>
-    idSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
+    IdSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
     {
-        idSet<IdType> ids;
+        IdSet<IdType> ids;
         for (const auto& entry : _entries)
             if (options.eval(entry))
                 ids.insert(getId(entry.value));

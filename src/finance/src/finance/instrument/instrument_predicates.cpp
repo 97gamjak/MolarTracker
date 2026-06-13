@@ -38,7 +38,7 @@ namespace finance
      * @param ids The instrument ID to filter by
      * @return filter::Predicate<Stock>
      */
-    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids)
+    filter::Predicate<Stock> HasInstrumentId(const IdSet<InstrumentId>& ids)
     {
         return filter::makePredicate<Stock>(
             [ids](const Stock& stock)

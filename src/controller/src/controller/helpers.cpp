@@ -2,6 +2,7 @@
 
 #include <expected>
 
+#include "config/id_types.hpp"
 #include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
@@ -169,6 +170,83 @@ namespace controller
         drafts.reserve(details.size());
         for (const auto& detail : details)
             drafts.push_back(detail.positionDraft);
+
+        return drafts;
+    }
+
+    std::vector<OpenOptionPositionDetail> getOpenOptionPositionDetails(
+        AccountId                                        account,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
+    )
+    {
+        const auto positions = positionStore->getOpenPositions();
+
+        auto filter = finance::TransactionFilter();
+        filter.setPositionIds(positions.getIds());
+        auto positionTxs = transactionStore->getOptionPositions(filter);
+
+        std::erase_if(
+            positionTxs,
+            [&](const auto& pair)
+            { return pair.second.getSecurityAccount() != account; }
+        );
+
+        std::vector<OpenOptionPositionDetail> drafts;
+
+        for (auto& [id, txs] : positionTxs)
+        {
+            if (!positions.contains(id))
+            {
+                LOG_ERROR(
+                    "No position found for position id: " + id.toString()
+                );
+                continue;
+            }
+
+            const auto position = positions.at(id);
+
+            if (txs.empty())
+            {
+                LOG_ERROR(
+                    "No transactions found for position id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            const auto instrumentId = txs.getBaseInstrument();
+
+            const auto& stock = stockStore->getStock(instrumentId);
+
+            if (!stock)
+            {
+                LOG_ERROR(
+                    "No stock found for instrument id: " +
+                    position.getId().toString()
+                );
+                continue;
+            }
+
+            const auto stockInfo = StockMapper::toStockInfoDraft(stock.value());
+
+            drafts.emplace_back(
+                OpenOptionPositionDetail{
+                    .positionDraft =
+                        drafts::PositionOptionDetailDraft{
+                            position.getId(),
+                            stockInfo,
+                            position.getCreatedAt(),
+                            txs.getPnL()->getQuantity(),
+                            txs.getPnL()->getRealizedPnL(),
+                            txs.getPnL()->getRealizedPnLPercentage()
+                        },
+                    .ticker = stockInfo.getTicker(),
+                    .pnl    = txs.getPnL()
+                }
+            );
+        }
 
         return drafts;
     }

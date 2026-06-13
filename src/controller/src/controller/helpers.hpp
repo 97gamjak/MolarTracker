@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "drafts/position/position_option_draft.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "finance/transaction/pnl.hpp"
 
@@ -22,7 +23,6 @@ namespace drafts
     class CreateStockTransactionDraft;    // Forward declaration
     class CreateOptionTransactionDraft;   // Forward declaration
     class PositionDraft;                  // Forward declaration
-    class PositionStockDetailDraft;       // Forward declaration
 }   // namespace drafts
 
 /**
@@ -40,15 +40,15 @@ struct OpenStockPositionDetail
     std::shared_ptr<finance::PnL> pnl;
 };
 
-// struct OpenOptionPositionDetail
-// {
-//     /// The position draft containing the details of the open option
-//     position. drafts::PositionOptionDetailDraft positionDraft;
-//     /// The ticker symbol of the option associated with the open position.
-//     std::string ticker;
-//     /// The profit and loss (PnL) information for the open option position.
-//     std::shared_ptr<finance::PnL> pnl;
-// };
+struct OpenOptionPositionDetail
+{
+    /// The position draft containing the details of the open option position.
+    drafts::PositionOptionDetailDraft positionDraft;
+    /// The ticker symbol of the option associated with the open position.
+    std::string ticker;
+    /// The profit and loss (PnL) information for the open option position.
+    std::shared_ptr<finance::PnL> pnl;
+};
 
 namespace controller
 {
@@ -70,6 +70,13 @@ namespace controller
     );
 
     std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
+        AccountId                                        account,
+        const std::shared_ptr<store::IPositionStore>&    positionStore,
+        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::ITransactionStore>& transactionStore
+    );
+
+    std::vector<OpenOptionPositionDetail> getOpenOptionPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
