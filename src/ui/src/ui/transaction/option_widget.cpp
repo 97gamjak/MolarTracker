@@ -50,8 +50,6 @@ namespace ui
         /// The row for entering the contract size of the option
         QPointer<AmountRow> contractSizeRow = nullptr;
 
-        /// The label for displaying the currency of the selected account
-        QPointer<QLabel> currencyLabel = nullptr;
         /// The field for entering the option ticker
         QPointer<TickerField> tickerField = nullptr;
         /// The field for entering the expiration timestamp of the option
@@ -60,6 +58,11 @@ namespace ui
         QPointer<TimestampField> timestampField = nullptr;
         /// The field for entering a comment about the transaction
         QPointer<CommentField> commentField = nullptr;
+
+        /// The label for displaying the currency of the selected account
+        QPointer<QLabel> currencyAmountLabel = nullptr;
+        /// The label for displaying the currency of the strike price
+        QPointer<QLabel> currencyStrikeLabel = nullptr;
         /// The label for displaying the currency of the fees
         QPointer<QLabel> currencyFeesLabel = nullptr;
 
@@ -103,11 +106,12 @@ namespace ui
           amountRow(new AmountRow(parent)),
           feesRow(new AmountRow(parent)),
           contractSizeRow(new AmountRow(parent)),
-          currencyLabel(new QLabel(parent)),
           tickerField(new TickerField(tickers, parent)),
           expirationField(new TimestampField(true, parent)),
           timestampField(new TimestampField(false, parent)),
           commentField(new CommentField(parent)),
+          currencyAmountLabel(new QLabel(parent)),
+          currencyStrikeLabel(new QLabel(parent)),
           currencyFeesLabel(new QLabel(parent))
     {
         feesRow->setDefaultValue(0);
@@ -142,12 +146,12 @@ namespace ui
 
         auto* strikeRowLayout = makeQChild<QHBoxLayout>();
         strikeRowLayout->addWidget(strikeRow);
-        strikeRowLayout->addWidget(currencyLabel);
+        strikeRowLayout->addWidget(currencyStrikeLabel);
         layout->addRow("Strike Price:", strikeRowLayout);
 
         auto* amountRowLayout = makeQChild<QHBoxLayout>();
         amountRowLayout->addWidget(amountRow);
-        amountRowLayout->addWidget(currencyLabel);
+        amountRowLayout->addWidget(currencyAmountLabel);
         layout->addRow("Premium:", amountRowLayout);
 
         auto* feesRowLayout = makeQChild<QHBoxLayout>();
@@ -211,10 +215,12 @@ namespace ui
         strikeRow->update();
         amountRow->update();
         feesRow->update();
-        currencyLabel->update();
-        tickerField->update();
-        currencyFeesLabel->update();
         contractSizeRow->update();
+        tickerField->update();
+
+        currencyStrikeLabel->update();
+        currencyAmountLabel->update();
+        currencyFeesLabel->update();
     }
 
     /**
@@ -263,7 +269,7 @@ namespace ui
             amount,
             strikePrice,
             fees,
-            quantityRow->getAmount(0),
+            contractSizeRow->getAmount(0),
             account->getId(),
             refAccountId,
             commentField->getComment()
@@ -362,7 +368,8 @@ namespace ui
         _fields->strikeRow->setNDecimalPlaces(microUnits);
         _fields->amountRow->setNDecimalPlaces(microUnits);
         _fields->feesRow->setNDecimalPlaces(microUnits);
-        _fields->currencyLabel->setText(getSymbol(currency).c_str());
+        _fields->currencyAmountLabel->setText(getSymbol(currency).c_str());
+        _fields->currencyStrikeLabel->setText(getSymbol(currency).c_str());
         _fields->currencyFeesLabel->setText(getSymbol(currency).c_str());
 
         std::vector<drafts::AccountDraft> referenceAccounts;
@@ -514,6 +521,18 @@ namespace ui
         );
         connect(
             _fields->strikeRow,
+            &AmountRow::valueChanged,
+            this,
+            &OptionWidget::_updateAddButton
+        );
+        connect(
+            _fields->amountRow,
+            &AmountRow::valueChanged,
+            this,
+            &OptionWidget::_updateAddButton
+        );
+        connect(
+            _fields->contractSizeRow,
             &AmountRow::valueChanged,
             this,
             &OptionWidget::_updateAddButton
