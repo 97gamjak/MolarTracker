@@ -35,6 +35,9 @@ struct Err
     E error;
 
     explicit Err(E error_);
+
+    template <typename... Args>
+    explicit Err(Args&&... args);
 };
 
 template <typename E>

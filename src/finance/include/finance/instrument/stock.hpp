@@ -6,6 +6,7 @@
 
 #include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "utils/result/error.hpp"
 
 namespace finance
 {
@@ -64,9 +65,7 @@ namespace finance
         );
 
         [[nodiscard]]
-        static std::expected<Stock, YahooFinanceError> retrieveTickerInfo(
-            const std::string& ticker
-        );
+        static MTResult<Stock> retrieveTickerInfo(const std::string& ticker);
 
         [[nodiscard]] StockId      getId() const;
         [[nodiscard]] InstrumentId getInstrumentId() const;

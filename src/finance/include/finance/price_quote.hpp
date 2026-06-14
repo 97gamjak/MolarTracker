@@ -1,11 +1,11 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__PRICE_QUOTE_HPP__
 #define __FINANCE__INCLUDE__FINANCE__PRICE_QUOTE_HPP__
 
-#include <expected>
 #include <nlohmann/json.hpp>
 
 #include "finance/cash.hpp"
-#include "finance/finance_error.hpp"
+#include "utils/result/error.hpp"
+#include "utils/result/result.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
@@ -27,9 +27,7 @@ namespace finance
         PriceQuote(finance::Cash price, Timestamp timestamp);
 
         [[nodiscard]]
-        static std::expected<PriceQuote, FinanceError> fromJson(
-            const nlohmann::json& json
-        );
+        static MTResult<PriceQuote> fromJson(const nlohmann::json& json);
 
         [[nodiscard]]
         const finance::Cash& getPrice() const;

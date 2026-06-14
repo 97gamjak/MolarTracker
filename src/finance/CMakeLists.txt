@@ -11,7 +11,6 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/position.cpp
     ${SOURCE_DIR}/price_quote.cpp
     ${SOURCE_DIR}/price_cache.cpp
-    ${SOURCE_DIR}/finance_error.cpp
 
     ${SOURCE_DIR}/transaction/transaction.cpp
     ${SOURCE_DIR}/transaction/transactions.cpp

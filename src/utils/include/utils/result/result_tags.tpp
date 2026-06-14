@@ -27,4 +27,17 @@ Err<E>::Err(E error_) : error(std::move(error_))
 {
 }
 
+/**
+ * @brief Construct a new Err<E>::Err object from variadic args
+ *
+ * @tparam E
+ * @tparam Args
+ * @param args
+ */
+template <typename E>
+template <typename... Args>
+Err<E>::Err(Args&&... args) : error(std::forward<Args>(args)...)
+{
+}
+
 #endif   // __UTILS__INCLUDE__UTILS__RESULT__RESULT_TAGS_TPP__

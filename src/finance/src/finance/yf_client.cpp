@@ -6,6 +6,7 @@
 #include "finance/price_quote.hpp"
 #include "finance/ticker_info.hpp"
 #include "http/http_client.hpp"
+#include "utils/result/error.hpp"
 
 namespace finance
 {
@@ -43,9 +44,9 @@ namespace finance
     /**
      * @brief Authenticate the Yahoo Finance API session.
      *
-     * @return std::expected<void, http::HttpError>
+     * @return MTResult<void, HttpError>
      */
-    std::expected<void, http::HttpError> YahooSession::authenticate()
+    MTResult<void, HttpError> YahooSession::authenticate()
     {
         // Step 1: hit fc.yahoo.com to get the B cookie
         auto cookieResult = http::HttpClient::get(
@@ -64,38 +65,34 @@ namespace finance
         {
             headers = &cookieResult->headers;
         }
-        else if (cookieResult.error().kind == http::HttpErrorKind::BadStatus)
+        else if (cookieResult.error().kind == HttpErrorKind::BadStatus)
         {
             headers = &cookieResult.error().responseHeaders;
         }
         else
         {
-            return std::unexpected(cookieResult.error());
+            return cookieResult.error();
         }
 
         const auto it = headers->find("set-cookie");
         if (it == headers->end())
         {
-            return std::unexpected(
-                http::HttpError{
-                    .kind            = http::HttpErrorKind::AuthError,
-                    .message         = "No Set-Cookie header from fc.yahoo.com",
-                    .responseHeaders = *headers,
-                }
-            );
+            return Err<Error>{HttpError{
+                .kind            = HttpErrorKind::AuthError,
+                .message         = "No Set-Cookie header from fc.yahoo.com",
+                .responseHeaders = *headers,
+            }};
         }
 
         const std::string prefix = "A3=";
         const std::string bValue = extractSessionCookie(it->second, prefix);
         if (bValue.empty())
         {
-            return std::unexpected(
-                http::HttpError{
-                    .kind    = http::HttpErrorKind::AuthError,
-                    .message = "B cookie not found in Set-Cookie header",
-                    .responseHeaders = *headers,
-                }
-            );
+            return Err<Error>{HttpError{
+                .kind            = HttpErrorKind::AuthError,
+                .message         = "B cookie not found in Set-Cookie header",
+                .responseHeaders = *headers,
+            }};
         }
 
         _credentials.cookie = prefix + bValue;
@@ -120,17 +117,15 @@ namespace finance
 
         if (_credentials.crumb.empty())
         {
-            return std::unexpected(
-                http::HttpError{
-                    .kind    = http::HttpErrorKind::AuthError,
-                    .message = "Empty crumb returned from Yahoo Finance",
-                    .responseHeaders = std::move(crumbResult->headers),
-                }
-            );
-        }
+            return Err<Error>{HttpError{
+                .kind            = HttpErrorKind::AuthError,
+                .message         = "Empty crumb returned from Yahoo Finance",
+                .responseHeaders = std::move(crumbResult->headers),
+            }};
 
-        _authenticated = true;
-        return {};
+            _authenticated = true;
+            return {};
+        }
     }
 
     /**
@@ -186,39 +181,35 @@ namespace finance
      * @brief Send a GET request to the Yahoo Finance API.
      *
      * @param path The API endpoint path.
-     * @return std::expected<http::HttpResponse, YahooFinanceError>
+     * @return MTResult<http::HttpResponse>
      */
-    std::expected<http::HttpResponse, YahooFinanceError> YahooFinanceClient::
-        _getRequest(const std::string& path)
+    MTResult<http::HttpResponse> YahooFinanceClient::_getRequest(
+        const std::string& path
+    )
     {
         auto result = http::HttpClient::get(_buildRequest(path));
         if (result)
             return result.value();
 
-        return std::unexpected(
-            YahooFinanceError{
-                YahooFinanceErrorType::HttpError,
-                result.error().message,
-                result.error()
-            }
-        );
+        return result.error();
     }
 
     /**
      * @brief Fetch ticker information from Yahoo Finance API.
      *
      * @param ticker The ticker symbol of the stock.
-     * @return std::expected<TickerInfo, YahooFinanceError>
+     * @return MTResult<TickerInfo>
      */
-    std::expected<TickerInfo, YahooFinanceError> YahooFinanceClient::
-        fetchTickerInfo(const std::string& ticker)
+    MTResult<TickerInfo> YahooFinanceClient::fetchTickerInfo(
+        const std::string& ticker
+    )
     {
         const std::string path = "/v10/finance/quoteSummary/" + ticker +
                                  "?modules=price,assetProfile";
 
         const auto result = _getRequest(path);
         if (!result)
-            return std::unexpected(result.error());
+            return result.error();
 
         try
         {
@@ -226,27 +217,21 @@ namespace finance
             const auto tickerResult = TickerInfo::fromJson(json);
 
             if (!tickerResult)
-            {
-                return std::unexpected(
-                    YahooFinanceError::fromError(tickerResult.error())
-                );
-            }
+                return tickerResult.error();
 
             return tickerResult.value();
         }
         catch (const nlohmann::json::exception& ex)
         {
-            return std::unexpected(
-                YahooFinanceError{
-                    YahooFinanceErrorType::HttpError,
-                    ex.what(),
-                    http::HttpError{
-                        .kind            = http::HttpErrorKind::ParseError,
-                        .message         = ex.what(),
-                        .responseHeaders = result->headers,
-                    }
+            return Err<YahooFinanceError>(YahooFinanceError{
+                YahooFinanceErrorType::HttpError,
+                ex.what(),
+                http::HttpError{
+                    .kind            = http::HttpErrorKind::ParseError,
+                    .message         = ex.what(),
+                    .responseHeaders = result->headers,
                 }
-            );
+            });
         }
 
         std::unreachable();
@@ -256,9 +241,9 @@ namespace finance
      * @brief Fetches the latest price quote for a ticker.
      *
      * @param ticker The ticker symbol to look up.
-     * @return std::expected<PriceQuote, YahooFinanceError>
+     * @return MTResult<PriceQuote>
      */
-    std::expected<PriceQuote, YahooFinanceError> YahooFinanceClient::fetchPrice(
+    MTResult<PriceQuote> YahooFinanceClient::fetchPrice(
         const std::string& ticker
     )
     {
@@ -267,7 +252,7 @@ namespace finance
 
         auto result = _getRequest(path);
         if (!result)
-            return std::unexpected(result.error());
+            return result.error();
 
         try
         {
@@ -275,11 +260,7 @@ namespace finance
             const auto quoteResult = PriceQuote::fromJson(json);
 
             if (!quoteResult)
-            {
-                return std::unexpected(
-                    YahooFinanceError::fromError(quoteResult.error())
-                );
-            }
+                return quoteResult.error();
 
             return quoteResult.value();
         }

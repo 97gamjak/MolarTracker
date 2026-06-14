@@ -5,7 +5,7 @@
 
 #include "finance/price_quote.hpp"
 #include "finance/ticker_info.hpp"
-#include "http/http_error.hpp"
+#include "utils/result/error.hpp"
 
 namespace http
 {
@@ -43,7 +43,7 @@ namespace finance
 
        public:
         // Fetches cookie + crumb. Call once before any ticker requests.
-        [[nodiscard]] std::expected<void, http::HttpError> authenticate();
+        [[nodiscard]] MTResult<void> authenticate();
 
         [[nodiscard]] bool isAuthenticated() const;
 
@@ -66,21 +66,17 @@ namespace finance
 
        public:
         [[nodiscard]]
-        static std::expected<TickerInfo, YahooFinanceError> fetchTickerInfo(
-            const std::string& ticker
-        );
+        static MTResult<TickerInfo> fetchTickerInfo(const std::string& ticker);
 
         [[nodiscard]]
-        static std::expected<PriceQuote, YahooFinanceError> fetchPrice(
-            const std::string& ticker
-        );
+        static MTResult<PriceQuote> fetchPrice(const std::string& ticker);
 
        private:
         [[nodiscard]]
         static http::HttpRequest _buildRequest(const std::string& path);
 
         [[nodiscard]]
-        static std::expected<http::HttpResponse, YahooFinanceError> _getRequest(
+        static MTResult<http::HttpResponse> _getRequest(
             const std::string& path
         );
     };

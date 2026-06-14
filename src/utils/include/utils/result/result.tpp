@@ -13,7 +13,7 @@ namespace detail
      *
      * Falls back gracefully if E is not std::formattable or an exception type.
      */
-    template <typename E>
+    template <typename E, typename Exception>
     [[nodiscard]] std::string format_error(const E& err)
     {
         if constexpr (requires { std::format("{}", err); })
@@ -31,15 +31,8 @@ namespace detail
     }
 }   // namespace detail
 
-/**
- * @brief Construct a new Result< T,  E>:: Result object
- *
- * @tparam T
- * @tparam E
- * @param object
- */
-template <typename T, typename E>
-Result<T, E>::Result(Ok<T> object) : _inner(std::move(object.value))
+template <typename T, typename E, typename Exception>
+Result<T, E, Exception>::Result(T value) : _inner(std::move(value))
 {
 }
 
@@ -50,8 +43,20 @@ Result<T, E>::Result(Ok<T> object) : _inner(std::move(object.value))
  * @tparam E
  * @param object
  */
-template <typename T, typename E>
-Result<T, E>::Result(Err<E> object)
+template <typename T, typename E, typename Exception>
+Result<T, E, Exception>::Result(Ok<T> object) : _inner(std::move(object.value))
+{
+}
+
+/**
+ * @brief Construct a new Result< T,  E>:: Result object
+ *
+ * @tparam T
+ * @tparam E
+ * @param object
+ */
+template <typename T, typename E, typename Exception>
+Result<T, E, Exception>::Result(Err<E> object)
     : _inner(std::unexpected(std::move(object.error)))
 {
 }
@@ -63,41 +68,43 @@ Result<T, E>::Result(Err<E> object)
  * @tparam E
  * @param exp
  */
-template <typename T, typename E>
-Result<T, E>::Result(std::expected<T, E> exp) : _inner(std::move(exp))
+template <typename T, typename E, typename Exception>
+Result<T, E, Exception>::Result(std::expected<T, E> exp)
+    : _inner(std::move(exp))
 {
 }
 
 /**
- * @brief Construct a new Result<void, E>::Result object
+ * @brief Construct a new Result<void, E, Exception>::Result object
  *
  * @tparam E
  */
-template <typename E>
-Result<void, E>::Result(Ok<void> /*ok*/) : _inner()
+template <typename E, typename Exception>
+Result<void, E, Exception>::Result(Ok<void> /*ok*/) : _inner()
 {
 }
 
 /**
- * @brief Construct a new Result<void, E>::Result object
+ * @brief Construct a new Result<void, E, Exception>::Result object
  *
  * @tparam E
  * @param error
  */
-template <typename E>
-Result<void, E>::Result(Err<E> error)
+template <typename E, typename Exception>
+Result<void, E, Exception>::Result(Err<E> error)
     : _inner(std::unexpected(std::move(error.error)))
 {
 }
 
 /**
- * @brief Construct a new Result<void, E>::Result object
+ * @brief Construct a new Result<void, E, Exception>::Result object
  *
  * @tparam E
  * @param exp
  */
-template <typename E>
-Result<void, E>::Result(std::expected<void, E> exp) : _inner(std::move(exp))
+template <typename E, typename Exception>
+Result<void, E, Exception>::Result(std::expected<void, E> exp)
+    : _inner(std::move(exp))
 {
 }
 
@@ -109,8 +116,8 @@ Result<void, E>::Result(std::expected<void, E> exp) : _inner(std::move(exp))
  * @return true
  * @return false
  */
-template <typename T, typename E>
-bool Result<T, E>::has_value() const
+template <typename T, typename E, typename Exception>
+bool Result<T, E, Exception>::has_value() const
 {
     return _inner.has_value();
 }
@@ -122,8 +129,8 @@ bool Result<T, E>::has_value() const
  * @return true
  * @return false
  */
-template <typename E>
-bool Result<void, E>::has_value() const
+template <typename E, typename Exception>
+bool Result<void, E, Exception>::has_value() const
 {
     return _inner.has_value();
 }
@@ -136,8 +143,8 @@ bool Result<void, E>::has_value() const
  * @return true
  * @return false
  */
-template <typename T, typename E>
-Result<T, E>::operator bool() const
+template <typename T, typename E, typename Exception>
+Result<T, E, Exception>::operator bool() const
 {
     return _inner.has_value();
 }
@@ -149,8 +156,8 @@ Result<T, E>::operator bool() const
  * @return true
  * @return false
  */
-template <typename E>
-Result<void, E>::operator bool() const
+template <typename E, typename Exception>
+Result<void, E, Exception>::operator bool() const
 {
     return _inner.has_value();
 }
@@ -162,8 +169,8 @@ Result<void, E>::operator bool() const
  * @tparam E
  * @return T&
  */
-template <typename T, typename E>
-T& Result<T, E>::operator*() &
+template <typename T, typename E, typename Exception>
+T& Result<T, E, Exception>::operator*() &
 {
     return *_inner;
 }
@@ -175,8 +182,8 @@ T& Result<T, E>::operator*() &
  * @tparam E
  * @return const T&
  */
-template <typename T, typename E>
-const T& Result<T, E>::operator*() const&
+template <typename T, typename E, typename Exception>
+const T& Result<T, E, Exception>::operator*() const&
 {
     return *_inner;
 }
@@ -188,8 +195,8 @@ const T& Result<T, E>::operator*() const&
  * @tparam E
  * @return T&&
  */
-template <typename T, typename E>
-T&& Result<T, E>::operator*() &&
+template <typename T, typename E, typename Exception>
+T&& Result<T, E, Exception>::operator*() &&
 {
     return *std::move(_inner);
 }
@@ -201,8 +208,8 @@ T&& Result<T, E>::operator*() &&
  * @tparam E
  * @return T*
  */
-template <typename T, typename E>
-T* Result<T, E>::operator->()
+template <typename T, typename E, typename Exception>
+T* Result<T, E, Exception>::operator->()
 {
     return _inner.operator->();
 }
@@ -214,8 +221,8 @@ T* Result<T, E>::operator->()
  * @tparam E
  * @return const T*
  */
-template <typename T, typename E>
-const T* Result<T, E>::operator->() const
+template <typename T, typename E, typename Exception>
+const T* Result<T, E, Exception>::operator->() const
 {
     return _inner.operator->();
 }
@@ -227,21 +234,21 @@ const T* Result<T, E>::operator->() const
  * @tparam E
  * @return T&
  */
-template <typename T, typename E>
-T& Result<T, E>::value() &
+template <typename T, typename E, typename Exception>
+T& Result<T, E, Exception>::value() &
 {
     return _inner.value();
 }
 
 /**
- * @brief mimic value() for Result<void, E> since it has no value to return, but
- * we want to be able to call value() on it for uniformity in generic code.
- * Always returns void, but will throw if the Result is an Err.
+ * @brief mimic value() for Result<void, E, Exception> since it has no value to
+ * return, but we want to be able to call value() on it for uniformity in
+ * generic code. Always returns void, but will throw if the Result is an Err.
  *
  * @tparam E
  */
-template <typename E>
-void Result<void, E>::value() const
+template <typename E, typename Exception>
+void Result<void, E, Exception>::value() const
 {
     _inner.value();
 }
@@ -253,8 +260,8 @@ void Result<void, E>::value() const
  * @tparam E
  * @return const T&
  */
-template <typename T, typename E>
-const T& Result<T, E>::value() const&
+template <typename T, typename E, typename Exception>
+const T& Result<T, E, Exception>::value() const&
 {
     return _inner.value();
 }
@@ -266,8 +273,8 @@ const T& Result<T, E>::value() const&
  * @tparam E
  * @return T&&
  */
-template <typename T, typename E>
-T&& Result<T, E>::value() &&
+template <typename T, typename E, typename Exception>
+T&& Result<T, E, Exception>::value() &&
 {
     return std::move(_inner).value();
 }
@@ -279,8 +286,8 @@ T&& Result<T, E>::value() &&
  * @tparam E
  * @return E&
  */
-template <typename T, typename E>
-E& Result<T, E>::error() &
+template <typename T, typename E, typename Exception>
+E& Result<T, E, Exception>::error() &
 {
     return _inner.error();
 }
@@ -291,8 +298,8 @@ E& Result<T, E>::error() &
  * @tparam E
  * @return const E&
  */
-template <typename E>
-E& Result<void, E>::error() &
+template <typename E, typename Exception>
+E& Result<void, E, Exception>::error() &
 {
     return _inner.error();
 }
@@ -304,8 +311,8 @@ E& Result<void, E>::error() &
  * @tparam E
  * @return const E&
  */
-template <typename T, typename E>
-const E& Result<T, E>::error() const&
+template <typename T, typename E, typename Exception>
+const E& Result<T, E, Exception>::error() const&
 {
     return _inner.error();
 }
@@ -316,8 +323,8 @@ const E& Result<T, E>::error() const&
  * @tparam E
  * @return const E&
  */
-template <typename E>
-const E& Result<void, E>::error() const&
+template <typename E, typename Exception>
+const E& Result<void, E, Exception>::error() const&
 {
     return _inner.error();
 }
@@ -329,8 +336,8 @@ const E& Result<void, E>::error() const&
  * @tparam E
  * @return E&&
  */
-template <typename T, typename E>
-E&& Result<T, E>::error() &&
+template <typename T, typename E, typename Exception>
+E&& Result<T, E, Exception>::error() &&
 {
     return std::move(_inner).error();
 }
@@ -341,8 +348,8 @@ E&& Result<T, E>::error() &&
  * @tparam E
  * @return E&&
  */
-template <typename E>
-E&& Result<void, E>::error() &&
+template <typename E, typename Exception>
+E&& Result<void, E, Exception>::error() &&
 {
     return std::move(_inner).error();
 }
@@ -354,11 +361,11 @@ E&& Result<void, E>::error() &&
  * @tparam E
  * @return T
  */
-template <typename T, typename E>
-T Result<T, E>::unwrap() &&
+template <typename T, typename E, typename Exception>
+T Result<T, E, Exception>::unwrap() &&
 {
     if (!_inner.has_value())
-        throw std::runtime_error(detail::format_error(_inner.error()));
+        throw Exception(detail::format_error(_inner.error()));
     return std::move(*_inner);
 }
 
@@ -367,11 +374,11 @@ T Result<T, E>::unwrap() &&
  *
  * @tparam E
  */
-template <typename E>
-void Result<void, E>::unwrap() &&
+template <typename E, typename Exception>
+void Result<void, E, Exception>::unwrap() &&
 {
     if (!_inner.has_value())
-        throw std::runtime_error(detail::format_error(_inner.error()));
+        throw Exception(detail::format_error(_inner.error()));
 }
 
 /**
@@ -383,8 +390,8 @@ void Result<void, E>::unwrap() &&
  * @param fallback
  * @return T
  */
-template <typename T, typename E>
-T Result<T, E>::unwrap_or(T fallback) &&
+template <typename T, typename E, typename Exception>
+T Result<T, E, Exception>::unwrap_or(T fallback) &&
 {
     return _inner.has_value() ? std::move(*_inner) : std::move(fallback);
 }
@@ -399,10 +406,10 @@ T Result<T, E>::unwrap_or(T fallback) &&
  * @param func
  * @return T
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<const E&> F>
 requires std::convertible_to<std::invoke_result_t<F, const E&>, T>
-T Result<T, E>::unwrap_or_else(F&& func) &&
+T Result<T, E, Exception>::unwrap_or_else(F&& func) &&
 {
     if (_inner.has_value())
         return std::move(*_inner);
@@ -419,11 +426,11 @@ T Result<T, E>::unwrap_or_else(F&& func) &&
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<T, E>&
+ * @return Result<T, E, Exception>&
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<const T&> F>
-Result<T, E>& Result<T, E>::inspect(F&& func) &
+Result<T, E, Exception>& Result<T, E, Exception>::inspect(F&& func) &
 {
     if (_inner.has_value())
         std::invoke(std::forward<F>(func), *_inner);
@@ -437,11 +444,11 @@ Result<T, E>& Result<T, E>::inspect(F&& func) &
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<void, E>&
+ * @return Result<void, E, Exception>&
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable F>
-Result<void, E>& Result<void, E>::inspect(F&& func) &
+Result<void, E, Exception>& Result<void, E, Exception>::inspect(F&& func) &
 {
     if (_inner.has_value())
         std::invoke(std::forward<F>(func));
@@ -456,11 +463,11 @@ Result<void, E>& Result<void, E>::inspect(F&& func) &
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<T, E>&&
+ * @return Result<T, E, Exception>&&
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<const T&> F>
-Result<T, E>&& Result<T, E>::inspect(F&& func) &&
+Result<T, E, Exception>&& Result<T, E, Exception>::inspect(F&& func) &&
 {
     if (_inner.has_value())
         std::invoke(std::forward<F>(func), *_inner);
@@ -474,11 +481,11 @@ Result<T, E>&& Result<T, E>::inspect(F&& func) &&
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<void, E>&&
+ * @return Result<void, E, Exception>&&
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable F>
-Result<void, E>&& Result<void, E>::inspect(F&& func) &&
+Result<void, E, Exception>&& Result<void, E, Exception>::inspect(F&& func) &&
 {
     if (_inner.has_value())
         std::invoke(std::forward<F>(func));
@@ -493,11 +500,11 @@ Result<void, E>&& Result<void, E>::inspect(F&& func) &&
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<T, E>&
+ * @return Result<T, E, Exception>&
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<const E&> F>
-Result<T, E>& Result<T, E>::inspect_error(F&& func) &
+Result<T, E, Exception>& Result<T, E, Exception>::inspect_error(F&& func) &
 {
     if (!_inner.has_value())
         std::invoke(std::forward<F>(func), _inner.error());
@@ -511,11 +518,13 @@ Result<T, E>& Result<T, E>::inspect_error(F&& func) &
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<void, E>&
+ * @return Result<void, E, Exception>&
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable<const E&> F>
-Result<void, E>& Result<void, E>::inspect_error(F&& func) &
+Result<void, E, Exception>& Result<void, E, Exception>::inspect_error(
+    F&& func
+) &
 {
     if (!_inner.has_value())
         std::invoke(std::forward<F>(func), _inner.error());
@@ -530,11 +539,11 @@ Result<void, E>& Result<void, E>::inspect_error(F&& func) &
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<T, E>&&
+ * @return Result<T, E, Exception>&&
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<const E&> F>
-Result<T, E>&& Result<T, E>::inspect_error(F&& func) &&
+Result<T, E, Exception>&& Result<T, E, Exception>::inspect_error(F&& func) &&
 {
     if (!_inner.has_value())
         std::invoke(std::forward<F>(func), _inner.error());
@@ -548,11 +557,13 @@ Result<T, E>&& Result<T, E>::inspect_error(F&& func) &&
  * @tparam E
  * @tparam F
  * @param func
- * @return Result<void, E>&&
+ * @return Result<void, E, Exception>&&
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable<const E&> F>
-Result<void, E>&& Result<void, E>::inspect_error(F&& func) &&
+Result<void, E, Exception>&& Result<void, E, Exception>::inspect_error(
+    F&& func
+) &&
 {
     if (!_inner.has_value())
         std::invoke(std::forward<F>(func), _inner.error());
@@ -571,11 +582,11 @@ Result<void, E>&& Result<void, E>::inspect_error(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<T> F>
 requires ResultLike<std::invoke_result_t<F, T>> &&
          std::same_as<typename std::invoke_result_t<F, T>::error_type, E>
-auto Result<T, E>::and_then(F&& func) &&
+auto Result<T, E, Exception>::and_then(F&& func) &&
 {
     using Ret = std::invoke_result_t<F, T>;
     if (_inner.has_value())
@@ -592,9 +603,9 @@ auto Result<T, E>::and_then(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable F>
-auto Result<void, E>::then(F&& func) &&
+auto Result<void, E, Exception>::then(F&& func) &&
 {
     using U = std::invoke_result_t<F>;
     if constexpr (std::is_void_v<U>)
@@ -602,9 +613,9 @@ auto Result<void, E>::then(F&& func) &&
         if (_inner.has_value())
         {
             std::invoke(std::forward<F>(func));
-            return Result<void, E>{ok()};
+            return Result<void, E, Exception>{ok()};
         }
-        return Result<void, E>{Err<E>{std::move(_inner).error()}};
+        return Result<void, E, Exception>{Err<E>{std::move(_inner).error()}};
     }
     else
     {
@@ -623,11 +634,11 @@ auto Result<void, E>::then(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable F>
 requires ResultLike<std::invoke_result_t<F>> &&
          std::same_as<typename std::invoke_result_t<F>::error_type, E>
-auto Result<void, E>::and_then(F&& func) &&
+auto Result<void, E, Exception>::and_then(F&& func) &&
 {
     using Ret = std::invoke_result_t<F>;
     if (_inner.has_value())
@@ -645,9 +656,9 @@ auto Result<void, E>::and_then(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<T> F>
-auto Result<T, E>::transform(F&& func) &&
+auto Result<T, E, Exception>::transform(F&& func) &&
 {
     using U = std::invoke_result_t<F, T>;
     if constexpr (std::is_void_v<U>)
@@ -655,9 +666,9 @@ auto Result<T, E>::transform(F&& func) &&
         if (_inner.has_value())
         {
             std::invoke(std::forward<F>(func), std::move(*_inner));
-            return Result<void, E>{ok()};
+            return Result<void, E, Exception>{ok()};
         }
-        return Result<void, E>{Err<E>{std::move(_inner).error()}};
+        return Result<void, E, Exception>{Err<E>{std::move(_inner).error()}};
     }
     else
     {
@@ -678,9 +689,9 @@ auto Result<T, E>::transform(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable F>
-auto Result<void, E>::transform(F&& func) &&
+auto Result<void, E, Exception>::transform(F&& func) &&
 {
     return std::move(*this).then(std::forward<F>(func));
 }
@@ -695,9 +706,9 @@ auto Result<void, E>::transform(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<T> F>
-auto Result<T, E>::map(F&& func) &&
+auto Result<T, E, Exception>::map(F&& func) &&
 {
     return std::move(*this).transform(std::forward<F>(func));
 }
@@ -712,9 +723,9 @@ auto Result<T, E>::map(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<E> F>
-auto Result<T, E>::transform_error(F&& func) &&
+auto Result<T, E, Exception>::transform_error(F&& func) &&
 {
     using E2 = std::invoke_result_t<F, E>;
     if (!_inner.has_value())
@@ -733,9 +744,9 @@ auto Result<T, E>::transform_error(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable<E> F>
-auto Result<void, E>::transform_error(F&& func) &&
+auto Result<void, E, Exception>::transform_error(F&& func) &&
 {
     using E2 = std::invoke_result_t<F, E>;
     if (!_inner.has_value())
@@ -755,9 +766,9 @@ auto Result<void, E>::transform_error(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<E> F>
-auto Result<T, E>::map_error(F&& func) &&
+auto Result<T, E, Exception>::map_error(F&& func) &&
 {
     return std::move(*this).transform_error(std::forward<F>(func));
 }
@@ -771,9 +782,9 @@ auto Result<T, E>::map_error(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable<E> F>
-auto Result<void, E>::map_error(F&& func) &&
+auto Result<void, E, Exception>::map_error(F&& func) &&
 {
     return std::move(*this).transform_error(std::forward<F>(func));
 }
@@ -788,11 +799,11 @@ auto Result<void, E>::map_error(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception>
 template <std::invocable<E> F>
 requires ResultLike<std::invoke_result_t<F, E>> &&
          std::same_as<typename std::invoke_result_t<F, E>::value_type, T>
-auto Result<T, E>::or_else(F&& func) &&
+auto Result<T, E, Exception>::or_else(F&& func) &&
 {
     using Ret = std::invoke_result_t<F, E>;
     if (!_inner.has_value())
@@ -809,11 +820,11 @@ auto Result<T, E>::or_else(F&& func) &&
  * @param func
  * @return auto
  */
-template <typename E>
+template <typename E, typename Exception>
 template <std::invocable<E> F>
 requires ResultLike<std::invoke_result_t<F, E>> &&
          std::is_void_v<typename std::invoke_result_t<F, E>::value_type>
-auto Result<void, E>::or_else(F&& func) &&
+auto Result<void, E, Exception>::or_else(F&& func) &&
 {
     using Ret = std::invoke_result_t<F, E>;
     if (!_inner.has_value())
@@ -829,8 +840,8 @@ auto Result<void, E>::or_else(F&& func) &&
  * @tparam E
  * @return auto
  */
-template <typename T, typename E>
-auto Result<T, E>::flatten() &&
+template <typename T, typename E, typename Exception>
+auto Result<T, E, Exception>::flatten() &&
 requires ResultLike<T> && std::same_as<typename T::error_type, E>
 {
     if (_inner.has_value())

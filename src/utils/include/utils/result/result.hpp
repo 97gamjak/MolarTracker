@@ -2,6 +2,7 @@
 #define __UTILS__INCLUDE__UTILS__RESULT__RESULT_HPP__
 
 #include <expected>
+#include <stdexcept>
 #include <type_traits>
 
 #include "result_tags.hpp"
@@ -29,8 +30,10 @@ concept ResultLike = requires {
  *
  * @tparam T Value type (must not be a reference)
  * @tparam E Error type (must not be a reference)
+ * @tparam Exception Exception type to throw on unwrap (default:
+ * std::runtime_error)
  */
-template <typename T, typename E>
+template <typename T, typename E, typename Exception = std::runtime_error>
 class Result
 {
     static_assert(
@@ -52,6 +55,7 @@ class Result
     using error_type = E;
 
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
+    Result(T value);
     Result(Ok<T> object);
     Result(Err<E> object);
     Result(std::expected<T, E> exp);
@@ -158,8 +162,8 @@ class Result
  *
  * @tparam E Error type
  */
-template <typename E>
-class Result<void, E>
+template <typename E, typename Exception>
+class Result<void, E, Exception>
 {
     /// The underlying std::expected that does the heavy lifting.
     std::expected<void, E> _inner;
@@ -171,6 +175,7 @@ class Result<void, E>
     using error_type = E;
 
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
+    Result() = default;
     Result(Ok<void> /*ok*/);
     Result(Err<E> error);
     Result(std::expected<void, E> exp);
