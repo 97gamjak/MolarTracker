@@ -1,5 +1,7 @@
 #include "finance/transaction/position_transaction.hpp"
 
+#include "config/id_types.hpp"
+#include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/pnl.hpp"
 #include "logging/log_macros.hpp"
 
@@ -104,6 +106,67 @@ namespace finance
         }
 
         return _pnl;
+    }
+
+    OptionPositionTransaction::OptionPositionTransaction(PositionId id)
+        : _positionId(id)
+    {
+    }
+
+    bool OptionPositionTransaction::addPosition(const OptionTransaction& txs)
+    {
+        if (!empty())
+        {
+            if (_baseInstrument != txs.getBaseInstrumentId())
+            {
+                LOG_ERROR(
+                    "Failed to add option transaction to position because it "
+                    "does not match the base instrument"
+                );
+                return false;
+            }
+
+            if (_securityAccount != txs.getSecurityAccountId())
+            {
+                LOG_ERROR(
+                    "Failed to add option transaction to position because it "
+                    "does not match the security account"
+                );
+                return false;
+            }
+        }
+
+        _baseInstrument  = txs.getBaseInstrumentId();
+        _securityAccount = txs.getSecurityAccountId();
+        _pnlReady        = false;
+        OptionTransactions::add(txs);
+        return true;
+    }
+
+    InstrumentId OptionPositionTransaction::getBaseInstrument() const
+    {
+        return _baseInstrument;
+    }
+
+    const std::shared_ptr<PnL>& OptionPositionTransaction::getPnL()
+    {
+        if (!_pnl)
+        {
+            _pnl = std::make_shared<PnLAvg>();
+        }
+
+        if (!_pnlReady)
+        {
+            _pnl->calculatePnL(*this);
+            _pnlReady = true;
+        }
+
+        return _pnl;
+    }
+
+    AccountId OptionPositionTransaction::getSecurityAccount() const
+    {
+        return _securityAccount;
     }
 
 }   // namespace finance

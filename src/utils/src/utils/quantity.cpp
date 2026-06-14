@@ -133,6 +133,19 @@ Quantity operator-(const Quantity& lhs, const Quantity& rhs)
 }
 
 /**
+ * @brief Multiplies a quantity by a micro_units value.
+ *
+ * @param lhs The left-hand side quantity.
+ * @param rhs The right-hand side micro_units value.
+ * @return A new Quantity object representing the product of the quantity and
+ * the micro_units value.
+ */
+Quantity operator*(const Quantity& lhs, micro_units rhs)
+{
+    return Quantity(lhs._value * rhs);
+}
+
+/**
  * @brief Negate the quantity.
  *
  * @param quantity The quantity to negate.

@@ -23,8 +23,6 @@ namespace finance
         IdSet<TransactionId> _transactionIds;
 
        public:
-        TransactionFilter() = default;
-
         void setPositionIds(const IdSet<PositionId>& positionIds);
         [[nodiscard]] IdSet<PositionId> getPositionIds() const;
 

@@ -25,6 +25,15 @@ namespace finance
         );
     }
 
+    void OptionTransactions::sort()
+    {
+        std::ranges::sort(
+            getItems(),
+            [](const OptionTransaction& txA, const OptionTransaction& txB)
+            { return txA.getTimestamp() < txB.getTimestamp(); }
+        );
+    }
+
     /**
      * @brief Get the Base Instrument Ids from the stock transactions
      *

@@ -1,6 +1,8 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__OPTION_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__OPTION_TRANSACTION_HPP__
 
+#include <cstddef>
+
 #include "config/id_types.hpp"
 #include "finance/transaction/option_data.hpp"
 #include "finance/transaction/security_transaction.hpp"
@@ -33,9 +35,16 @@ namespace finance
         /// The amount of the option being traded in the transaction
         Cash _amount;
 
+        std::int64_t _contractSize;
+
         /// The action being performed in the option transaction (e.g., open,
         /// close, roll)
         TransactionOptionAction _action;
+
+        OptionBuySell _buySell;
+
+        OptionType _optionType;
+
         /// The ID of the rolled option transaction, if this transaction is a
         /// roll of an existing option position, this allows the transaction to
         /// reference the original option transaction that is being rolled,
@@ -60,8 +69,11 @@ namespace finance
             Cash                         strikePrice,
             Cash                         amount,
             Cash                         fees,
+            std::int64_t                 contractSize,
             PositionId                   positionId,
             TransactionOptionAction      action,
+            OptionBuySell                buySell,
+            OptionType                   optionType,
             std::optional<TransactionId> rolledOption = std::nullopt,
             std::optional<std::string>   comment      = std::nullopt
         );
@@ -71,7 +83,14 @@ namespace finance
         [[nodiscard]]
         TransactionEntries getEntries(AccountId externalAccount) const override;
 
-        [[nodiscard]] OptionData getOptionData() const;
+        [[nodiscard]] OptionData                   getOptionData() const;
+        [[nodiscard]] std::int64_t                 getContractSize() const;
+        [[nodiscard]] Cash                         getStrikePrice() const;
+        [[nodiscard]] Cash                         getAmount() const;
+        [[nodiscard]] TransactionOptionAction      getAction() const;
+        [[nodiscard]] OptionBuySell                getBuySell() const;
+        [[nodiscard]] OptionType                   getOptionType() const;
+        [[nodiscard]] std::optional<TransactionId> getRolledOption() const;
     };
 }   // namespace finance
 

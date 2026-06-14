@@ -1,5 +1,7 @@
 #include "drafts/transaction/transaction_create_draft.hpp"
 
+#include "config/id_types.hpp"
+
 namespace drafts
 {
     /**
@@ -242,6 +244,7 @@ namespace drafts
         std::string                ticker,
         Timestamp                  expiration,
         OptionType                 optionType,
+        OptionBuySell              buySell,
         Quantity                   quantity,
         Cash                       amount,
         Cash                       strikePrice,
@@ -255,6 +258,7 @@ namespace drafts
           _underlyingTicker(std::move(ticker)),
           _expiration(expiration),
           _optionType(optionType),
+          _buySell(buySell),
           _quantity(quantity),
           _strikePrice(strikePrice),
           _amount(amount),
@@ -430,6 +434,17 @@ namespace drafts
     std::int64_t CreateOptionTransactionDraft::getContractSize() const
     {
         return _contractSize;
+    }
+
+    /**
+     * @brief Gets the buy/sell action of the option transaction draft.
+     *
+     * @return OptionBuySell The buy/sell action of the option transaction
+     * draft.
+     */
+    OptionBuySell CreateOptionTransactionDraft::getBuySell() const
+    {
+        return _buySell;
     }
 
 }   // namespace drafts

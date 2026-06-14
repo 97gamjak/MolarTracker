@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
 #define __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -67,6 +68,7 @@ class Quantity
 
     friend Quantity operator+(const Quantity& lhs, const Quantity& rhs);
     friend Quantity operator-(const Quantity& lhs, const Quantity& rhs);
+    friend Quantity operator*(const Quantity& lhs, micro_units rhs);
 
     /********************
      * friend operators *

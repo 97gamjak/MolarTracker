@@ -77,8 +77,11 @@ namespace controller
             draft.getStrikePrice(),
             draft.getAmount(),
             draft.getFees(),
+            draft.getContractSize(),
             draft.getPositionId(),
             TransactionOptionAction::Open,
+            draft.getBuySell(),
+            draft.getOptionType(),
             std::nullopt,   // rolled option will be set when rolling
             draft.getComment()
         };

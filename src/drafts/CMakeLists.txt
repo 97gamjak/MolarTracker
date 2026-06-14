@@ -5,6 +5,7 @@ add_library(molartracker_drafts STATIC
     src/drafts/stock_draft.cpp
     
     src/drafts/position/position_draft.cpp
+    src/drafts/position/position_option_draft.cpp
     src/drafts/position/position_stock_draft.cpp
 
     src/drafts/transaction/transaction_draft.cpp

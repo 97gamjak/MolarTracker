@@ -54,6 +54,8 @@ namespace finance
          */
         virtual void calculatePnL(StockTransactions& transactions) = 0;
 
+        virtual void calculatePnL(OptionTransactions& transactions) = 0;
+
         [[nodiscard]] Quantity   getQuantity() const;
         [[nodiscard]] Cash       getAverageCost() const;
         [[nodiscard]] Cash       getCostBasis() const;
@@ -77,6 +79,7 @@ namespace finance
        public:
         using PnL::PnL;
         void calculatePnL(StockTransactions& transactions) override;
+        void calculatePnL(OptionTransactions& transactions) override;
     };
 
 }   // namespace finance

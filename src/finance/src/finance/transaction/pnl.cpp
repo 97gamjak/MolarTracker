@@ -1,5 +1,7 @@
 #include "finance/transaction/pnl.hpp"
 
+#include "config/finance.hpp"
+
 namespace finance
 {
 
@@ -158,6 +160,15 @@ namespace finance
     Currency PnL::getCurrency() const { return _currency; }
 
     /**
+     * @brief Set the current price of the security, this will be used to
+     * calculate the unrealized PnL based on the current market value of the
+     * security.
+     *
+     * @param price The current price of the security.
+     */
+    void PnL::setCurrentPrice(const Cash& price) { _currentPrice = price; }
+
+    /**
      * @brief calculate the PnL of the security based on the transactions for
      * the average cost method, this will calculate the average cost, realized
      * PnL, and unrealized PnL based on the transactions and current price
@@ -203,13 +214,104 @@ namespace finance
         setFees(fees);
     }
 
-    /**
-     * @brief Set the current price of the security, this will be used to
-     * calculate the unrealized PnL based on the current market value of the
-     * security.
-     *
-     * @param price The current price of the security.
-     */
-    void PnL::setCurrentPrice(const Cash& price) { _currentPrice = price; }
+    void PnLAvg::calculatePnL(OptionTransactions& transactions)
+    {
+        transactions.sort();
+        Quantity quantity{0};
+        Cash     fees;
+        Cash     totalCost;
+        Cash     realizedPnL;
+        Cash     realizedCostBasis;
+
+        for (const auto& transaction : transactions)
+        {
+            const auto qty           = transaction.getQuantity();
+            const auto contractSize  = transaction.getContractSize();
+            const auto premium       = transaction.getAmount();
+            const auto strikePrice   = transaction.getStrikePrice();
+            const auto oldQty        = quantity;
+            Quantity   underlyingQty = qty * contractSize;
+
+            if (getCurrency() == Currency::Unknown)
+                setCurrency(strikePrice.getCurrency());
+
+            using enum OptionType;
+            using enum OptionBuySell;
+            using enum TransactionOptionAction;
+
+            const auto buySell = transaction.getBuySell();
+            const auto type    = transaction.getOptionType();
+            const auto action  = transaction.getAction();
+
+            if (action == Exercised && type == Call && buySell == Buy)
+            {
+                realizedPnL -= premium;
+                quantity    -= underlyingQty;
+                totalCost   -= strikePrice * underlyingQty;
+            }
+            else if (action == Exercised && type == Put && buySell == Buy)
+            {
+                realizedPnL -= premium;
+                quantity    += underlyingQty;
+                totalCost   += strikePrice * underlyingQty;
+            }
+            else if (action == Exercised && type == Call && buySell == Sell)
+            {
+                realizedPnL += premium;
+                quantity    += underlyingQty;
+                totalCost   += strikePrice * underlyingQty;
+            }
+            else if (action == Exercised && type == Put && buySell == Sell)
+            {
+                realizedPnL += premium;
+                quantity    -= underlyingQty;
+                totalCost   -= strikePrice * underlyingQty;
+            }
+
+            switch (buySell)
+            {
+                case Buy:
+                {
+                    realizedPnL -= premium;
+                    quantity    -= underlyingQty;
+
+                    if (type == Call)
+                    {
+                        realizedPnL -= strikePrice * underlyingQty;
+                    }
+                    else
+                    {
+                        realizedPnL -= strikePrice * underlyingQty;
+                    }
+
+                    break;
+                }
+                case OptionBuySell::Sell:
+                {
+                    quantity    += underlyingQty;
+                    realizedPnL += premium;
+
+                    if (type == Call)
+                    {
+                        // total cost does not change
+                    }
+                    else
+                    {
+                        totalCost    = totalCost + strikePrice * underlyingQty;
+                        realizedPnL += premium;
+                    }
+                    realizedPnL       += premium - averageCost * underlyingQty;
+                    realizedCostBasis += averageCost * underlyingQty;
+                    break;
+                }
+            }
+        }
+
+        setQuantity(quantity);
+        setAverageCost(averageCost);
+        setRealizedPnL(realizedPnL);
+        setRealizedCostBasis(realizedCostBasis);
+        setFees(fees);
+    }
 
 }   // namespace finance

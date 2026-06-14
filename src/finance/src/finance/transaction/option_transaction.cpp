@@ -20,8 +20,11 @@ namespace finance
      * @param strikePrice
      * @param amount
      * @param fees
+     * @param contractSize
      * @param positionId
      * @param action
+     * @param buySell
+     * @param optionType
      * @param rolledOption
      * @param comment
      */
@@ -38,8 +41,11 @@ namespace finance
         Cash                         strikePrice,
         Cash                         amount,
         Cash                         fees,
+        std::int64_t                 contractSize,
         PositionId                   positionId,
         TransactionOptionAction      action,
+        OptionBuySell                buySell,
+        OptionType                   optionType,
         std::optional<TransactionId> rolledOption,
         std::optional<std::string>   comment
     )
@@ -59,7 +65,10 @@ namespace finance
           _underlyingInstrumentId(underlyingInstrumentId),
           _strikePrice(strikePrice),
           _amount(amount),
+          _contractSize(contractSize),
           _action(action),
+          _buySell(buySell),
+          _optionType(optionType),
           _rolledOption(rolledOption)
     {
     }
@@ -140,5 +149,14 @@ namespace finance
         );
         return optionData;
     }
+
+    std::int64_t OptionTransaction::getContractSize() const
+    {
+        return _contractSize;
+    }
+
+    Cash OptionTransaction::getStrikePrice() const { return _strikePrice; }
+
+    Cash OptionTransaction::getAmount() const { return _amount; }
 
 }   // namespace finance
