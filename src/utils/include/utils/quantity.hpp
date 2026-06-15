@@ -46,9 +46,10 @@ class Quantity
 
    private:
     /// The value of the quantity, stored in micro_units.
-    micro_units _value;
+    micro_units _value{0};
 
    public:
+    Quantity() = default;
     explicit Quantity(micro_units value);
 
     [[nodiscard]] double getValue() const;

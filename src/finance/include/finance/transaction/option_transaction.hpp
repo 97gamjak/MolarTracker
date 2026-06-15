@@ -1,8 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__OPTION_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__OPTION_TRANSACTION_HPP__
 
-#include <cstddef>
-
 #include "config/id_types.hpp"
 #include "finance/transaction/option_data.hpp"
 #include "finance/transaction/security_transaction.hpp"
@@ -91,6 +89,7 @@ namespace finance
         [[nodiscard]] OptionBuySell                getBuySell() const;
         [[nodiscard]] OptionType                   getOptionType() const;
         [[nodiscard]] std::optional<TransactionId> getRolledOption() const;
+        [[nodiscard]] Currency                     getCurrency() const;
     };
 }   // namespace finance
 

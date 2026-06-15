@@ -178,7 +178,8 @@ namespace controller
 
                 _details->accountDetailView->updateSecurityAccount(
                     *_details->currentAccount,
-                    drafts
+                    drafts,
+                    {}
                 );
             },
             this
@@ -238,10 +239,8 @@ namespace controller
                     details.push_back(detail.positionDraft);
                 }
 
-                _details->accountDetailView->updateSecurityAccount(
-                    accountDraft,
-                    details
-                );
+                _details->accountDetailView
+                    ->updateSecurityAccount(accountDraft, details, {});
                 _details->currentAccount =
                     std::make_unique<drafts::AccountDraft>(accountDraft);
                 break;

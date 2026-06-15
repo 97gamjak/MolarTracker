@@ -13,7 +13,7 @@ namespace ui
      * @brief View for displaying position data in a table
      *
      */
-    class PositionTableView : public QTableView
+    class StockPositionTableView : public QTableView
     {
         Q_OBJECT
 
@@ -22,7 +22,7 @@ namespace ui
         QSortFilterProxyModel* _proxy{nullptr};
 
        public:
-        explicit PositionTableView(QWidget* parent = nullptr);
+        explicit StockPositionTableView(QWidget* parent = nullptr);
 
         void setPositionModel(StockPositionTableModel* model);
 

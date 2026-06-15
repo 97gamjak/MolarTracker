@@ -1,4 +1,4 @@
-#include "ui/position/position_table_model.hpp"
+#include "ui/position/stock_position_table_model.hpp"
 
 #include <QColor>
 #include <QDateTime>
@@ -72,7 +72,7 @@ namespace ui
     {
         if (parent.isValid())
             return 0;
-        return static_cast<int>(PositionColumnsMeta::size);
+        return static_cast<int>(StockPositionColumnsMeta::size);
     }
 
     /**
@@ -91,7 +91,7 @@ namespace ui
             return {};
 
         const auto& pos = _positions[static_cast<std::size_t>(index.row())];
-        const auto  col = static_cast<PositionColumns>(index.column());
+        const auto  col = static_cast<StockPositionColumns>(index.column());
 
         switch (role)
         {
@@ -99,43 +99,43 @@ namespace ui
             {
                 switch (col)
                 {
-                    case PositionColumns::Ticker:
+                    case StockPositionColumns::Ticker:
                         return QString::fromStdString(
                             pos.getStockInfo().getTicker()
                         );
 
-                    case PositionColumns::Name:
+                    case StockPositionColumns::Name:
                         return QString::fromStdString(
                             pos.getStockInfo().getShortName()
                         );
 
-                    case PositionColumns::OpenedAt:
+                    case StockPositionColumns::OpenedAt:
                         return pos.getCreatedAt().toQDateTime().toString(
                             "yyyy-MM-dd"
                         );
 
-                    case PositionColumns::Quantity:
+                    case StockPositionColumns::Quantity:
                         return QString::fromStdString(
                             pos.getQuantity().toString()
                         );
-                    case PositionColumns::AvgCost:
+                    case StockPositionColumns::AvgCost:
                         return displayPrice(pos.getAveragePrice());
-                    case PositionColumns::CostBasis:
+                    case StockPositionColumns::CostBasis:
                         return displayPrice(pos.getTotalPrice());
 
-                    case PositionColumns::MarketValue:
+                    case StockPositionColumns::MarketValue:
                         return displayPrice(pos.getMarketValue());
-                    case PositionColumns::UnrealizedPnl:
+                    case StockPositionColumns::UnrealizedPnl:
                         return displayPrice(pos.getUnrealizedPnL());
-                    case PositionColumns::UnrealizedPnlPct:
+                    case StockPositionColumns::UnrealizedPnlPct:
                         return displayPercentage(pos.getUnrealizedPnLPercentage(
                         ));
-                    case PositionColumns::RealizedPnl:
+                    case StockPositionColumns::RealizedPnl:
                         return displayPrice(pos.getRealizedPnL());
-                    case PositionColumns::RealizedPnlPct:
+                    case StockPositionColumns::RealizedPnlPct:
                         return displayPercentage(pos.getRealizedPnLPercentage()
                         );
-                    case PositionColumns::LastPrice:
+                    case StockPositionColumns::LastPrice:
                         return displayPrice(pos.getCurrentPrice());
                 }
                 std::unreachable();
@@ -145,22 +145,22 @@ namespace ui
             {
                 switch (col)
                 {
-                    case PositionColumns::Ticker:
-                    case PositionColumns::Name:
-                    case PositionColumns::OpenedAt:
+                    case StockPositionColumns::Ticker:
+                    case StockPositionColumns::Name:
+                    case StockPositionColumns::OpenedAt:
                         return static_cast<int>(
                             Qt::AlignLeft | Qt::AlignVCenter
                         );
 
-                    case PositionColumns::Quantity:
-                    case PositionColumns::AvgCost:
-                    case PositionColumns::CostBasis:
-                    case PositionColumns::LastPrice:
-                    case PositionColumns::MarketValue:
-                    case PositionColumns::UnrealizedPnl:
-                    case PositionColumns::UnrealizedPnlPct:
-                    case PositionColumns::RealizedPnl:
-                    case PositionColumns::RealizedPnlPct:
+                    case StockPositionColumns::Quantity:
+                    case StockPositionColumns::AvgCost:
+                    case StockPositionColumns::CostBasis:
+                    case StockPositionColumns::LastPrice:
+                    case StockPositionColumns::MarketValue:
+                    case StockPositionColumns::UnrealizedPnl:
+                    case StockPositionColumns::UnrealizedPnlPct:
+                    case StockPositionColumns::RealizedPnl:
+                    case StockPositionColumns::RealizedPnlPct:
                         return static_cast<int>(
                             Qt::AlignRight | Qt::AlignVCenter
                         );
@@ -202,9 +202,10 @@ namespace ui
      */
     void StockPositionTableModel::refreshPrices()
     {
-        const int first = static_cast<int>(PositionColumns::LastPrice);
-        const int last  = static_cast<int>(PositionColumns::UnrealizedPnlPct);
-        const int rows  = rowCount({}) - 1;
+        const int first = static_cast<int>(StockPositionColumns::LastPrice);
+        const int last =
+            static_cast<int>(StockPositionColumns::UnrealizedPnlPct);
+        const int rows = rowCount({}) - 1;
 
         if (rows < 0)
             return;
@@ -242,7 +243,7 @@ namespace ui
      */
     QString StockPositionTableModel::_columnLabel(int index)
     {
-        const auto column = static_cast<PositionColumns>(index);
+        const auto column = static_cast<StockPositionColumns>(index);
         return toQString(column);
     }
 

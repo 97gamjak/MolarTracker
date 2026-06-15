@@ -159,4 +159,9 @@ namespace finance
 
     Cash OptionTransaction::getAmount() const { return _amount; }
 
+    Currency OptionTransaction::getCurrency() const
+    {
+        return _amount.getCurrency();
+    }
+
 }   // namespace finance

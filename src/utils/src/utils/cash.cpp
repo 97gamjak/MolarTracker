@@ -33,7 +33,7 @@ Cash::Cash() : _currency(Currency::Unknown), _amount(0) {}
  * @return true if both Cash objects have the same currency and amount
  * @return false otherwise
  */
-constexpr bool operator==(Cash lhs, const Cash& rhs)
+bool operator==(Cash lhs, const Cash& rhs)
 {
     lhs._takeCurrency(rhs);
     return lhs._amount == rhs._amount;
@@ -268,4 +268,28 @@ void Cash::_takeCurrency(const Cash& cash)
             )
         );
     }
+}
+
+Cash Cash::max(const Cash& lhs, const Cash& rhs)
+{
+    if (lhs._currency != rhs._currency)
+    {
+        throw CurrencyMismatchException(
+            "Cannot compare Cash objects with different currencies"
+        );
+    }
+
+    return lhs._amount >= rhs._amount ? lhs : rhs;
+}
+
+Cash Cash::min(const Cash& lhs, const Cash& rhs)
+{
+    if (lhs._currency != rhs._currency)
+    {
+        throw CurrencyMismatchException(
+            "Cannot compare Cash objects with different currencies"
+        );
+    }
+
+    return lhs._amount <= rhs._amount ? lhs : rhs;
 }

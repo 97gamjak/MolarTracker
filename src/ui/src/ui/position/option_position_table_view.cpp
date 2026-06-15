@@ -1,20 +1,21 @@
-#include "ui/position/position_table_view.hpp"
+#include "ui/position/option_position_table_view.hpp"
 
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
 
-#include "ui/position/position_table_model.hpp"
+#include "ui/position/option_position_table_model.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
 {
 
     /**
-     * @brief Construct a new Position Table View:: Position Table View object
+     * @brief Construct a new OptionPositionTableView object
      *
      * @param parent
      */
-    PositionTableView::PositionTableView(QWidget* parent) : QTableView{parent}
+    OptionPositionTableView::OptionPositionTableView(QWidget* parent)
+        : QTableView{parent}
     {
         setSelectionBehavior(QAbstractItemView::SelectRows);
         setSelectionMode(QAbstractItemView::SingleSelection);
@@ -34,7 +35,9 @@ namespace ui
      *
      * @param model
      */
-    void PositionTableView::setPositionModel(StockPositionTableModel* model)
+    void OptionPositionTableView::setPositionModel(
+        OptionPositionTableModel* model
+    )
     {
         _proxy = utils::makeQChild<QSortFilterProxyModel>(this);
         _proxy->setSourceModel(model);
@@ -45,7 +48,7 @@ namespace ui
 
         // Default sort: newest positions first.
         sortByColumn(
-            static_cast<int>(PositionColumns::OpenedAt),
+            static_cast<int>(StockPositionColumns::OpenedAt),
             Qt::DescendingOrder
         );
     }
@@ -56,7 +59,7 @@ namespace ui
      * @return int The source-model row index of the current selection, or -1 if
      * nothing is selected.
      */
-    int PositionTableView::selectedRow() const
+    int OptionPositionTableView::selectedRow() const
     {
         const auto indexes = selectionModel()->selectedRows();
         if (indexes.isEmpty())
@@ -69,37 +72,40 @@ namespace ui
      * configure the column widths and resizing behavior to ensure that the
      * position data is displayed clearly and is easy to read for the user.
      */
-    void PositionTableView::_setupColumns()
+    void OptionPositionTableView::_setupColumns()
     {
         auto* header = horizontalHeader();
 
         // Fixed-width columns.
         header->setSectionResizeMode(
-            static_cast<int>(PositionColumns::Ticker),
+            static_cast<int>(StockPositionColumns::Ticker),
             QHeaderView::Fixed
         );
         const auto tickerWidth = 80;
-        setColumnWidth(static_cast<int>(PositionColumns::Ticker), tickerWidth);
+        setColumnWidth(
+            static_cast<int>(StockPositionColumns::Ticker),
+            tickerWidth
+        );
 
         header->setSectionResizeMode(
-            static_cast<int>(PositionColumns::OpenedAt),
+            static_cast<int>(StockPositionColumns::OpenedAt),
             QHeaderView::Fixed
         );
         const auto openedAtWidth = 100;
         setColumnWidth(
-            static_cast<int>(PositionColumns::OpenedAt),
+            static_cast<int>(StockPositionColumns::OpenedAt),
             openedAtWidth
         );
 
         // Numeric columns: fixed, right-aligned content already set by model.
         for (const auto col : {
-                 PositionColumns::Quantity,
-                 PositionColumns::AvgCost,
-                 PositionColumns::CostBasis,
-                 PositionColumns::LastPrice,
-                 PositionColumns::MarketValue,
-                 PositionColumns::UnrealizedPnl,
-                 PositionColumns::UnrealizedPnlPct,
+                 StockPositionColumns::Quantity,
+                 StockPositionColumns::AvgCost,
+                 StockPositionColumns::CostBasis,
+                 StockPositionColumns::LastPrice,
+                 StockPositionColumns::MarketValue,
+                 StockPositionColumns::UnrealizedPnl,
+                 StockPositionColumns::UnrealizedPnlPct,
              })
         {
             header->setSectionResizeMode(
@@ -112,7 +118,7 @@ namespace ui
 
         // Name stretches to fill remaining space.
         header->setSectionResizeMode(
-            static_cast<int>(PositionColumns::Name),
+            static_cast<int>(StockPositionColumns::Name),
             QHeaderView::Stretch
         );
     }
