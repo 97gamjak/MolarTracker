@@ -1,6 +1,7 @@
 #include "finance/transaction/option_transaction.hpp"
 
 #include "config/id_types.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
@@ -162,6 +163,15 @@ namespace finance
     Currency OptionTransaction::getCurrency() const
     {
         return _amount.getCurrency();
+    }
+
+    OptionBuySell OptionTransaction::getBuySell() const { return _buySell; }
+
+    OptionType OptionTransaction::getOptionType() const { return _optionType; }
+
+    TransactionOptionAction OptionTransaction::getAction() const
+    {
+        return _action;
     }
 
 }   // namespace finance

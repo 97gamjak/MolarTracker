@@ -12,6 +12,7 @@
 #include "config/strong_id.hpp"
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
+#include "drafts/position/position_option_draft.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "finance/price_cache.hpp"
 #include "helpers.hpp"

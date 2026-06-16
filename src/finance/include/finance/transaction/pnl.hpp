@@ -48,8 +48,8 @@ namespace finance
         PnL()          = default;
         virtual ~PnL() = default;
 
-        virtual void calculatePnL(StockTransactions& transactions);
-        virtual void calculatePnL(OptionTransactions& transactions);
+        virtual void calculatePnL(StockTransactions& transactions)  = 0;
+        virtual void calculatePnL(OptionTransactions& transactions) = 0;
 
         [[nodiscard]] Quantity     getQuantity() const;
         [[nodiscard]] virtual Cash getAverageCost() const;

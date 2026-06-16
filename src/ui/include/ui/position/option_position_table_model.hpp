@@ -5,6 +5,7 @@
 #include <QString>
 #include <vector>
 
+#include "drafts/position/position_option_draft.hpp"   // TODO; remove this
 #include "position_columns.hpp"
 
 namespace drafts
