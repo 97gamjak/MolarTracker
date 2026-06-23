@@ -10,10 +10,10 @@ namespace finance
     /**
      * @brief A collection of financial accounts.
      */
-    class Accounts : public IdMap<Account>
+    class Accounts : public IdObjectMap<Account>
     {
        public:
-        using IdMap<Account>::IdMap;
+        using IdObjectMap<Account>::IdMap;
 
         [[nodiscard]]
         Accounts filterExternal(bool external) const;

@@ -131,12 +131,14 @@ namespace finance
         TransactionStatus          status,
         AccountId                  cashAccount,
         AccountId                  externalAccount,
+        TransactionDataType        type,
         Cash                       fees,
         std::optional<std::string> comment
     )
         : BaseTransaction(id, timestamp, status, std::move(comment)),
           _cashAccount(cashAccount),
           _externalAccount(externalAccount),
+          _type(type),
           _fees(fees)
     {
     }
@@ -165,6 +167,11 @@ namespace finance
             amount,
             TransactionEntryType::Fees
         };
+    }
+
+    TransactionDataType Transaction::getTransactionType() const
+    {
+        return _type;
     }
 
 }   // namespace finance

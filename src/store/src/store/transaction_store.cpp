@@ -1,14 +1,12 @@
 #include "store/transaction_store.hpp"
 
 #include <format>
-#include <unordered_map>
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
-#include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "finance/transaction/transactions.hpp"
@@ -288,95 +286,6 @@ namespace store
             )
         );
         return result;
-    }
-
-    /**
-     * @brief Get stock positions based on transactions in the store, this will
-     * analyze the stock transactions in the store and group them into positions
-     * based on their position IDs, allowing the caller to easily access the
-     * current open positions for stocks based on the transactions that have
-     * been added to the store.
-     *
-     * @param filter An optional filter to apply when retrieving transactions,
-     * this allows the caller to specify criteria for which transactions to
-     * include in the analysis for determining stock positions, such as
-     * filtering by date range, transaction type, or any other relevant
-     * attributes of the transactions. If no filter is provided, all
-     * transactions in the store will be considered when determining stock
-     * positions.
-     *
-     * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
-     * A mapping of position IDs to StockPositionTransaction objects, this
-     * allows the caller to easily access the details of each open stock
-     * position based on its position ID.
-     */
-    unorderedIdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
-        getStockPositions(const finance::TransactionFilter& filter) const
-    {
-        unorderedIdMap<PositionId, finance::StockPositionTransaction>
-            stockPositions;
-
-        const auto transactions = getTransactions(filter).stocks();
-
-        for (const auto& transaction : transactions)
-        {
-            const auto positionId = transaction.getPositionId();
-            if (!stockPositions.contains(positionId))
-            {
-                stockPositions[positionId] =
-                    finance::StockPositionTransaction(positionId);
-            }
-
-            if (!stockPositions.at(positionId).addPosition(transaction))
-            {
-                LOG_ERROR(
-                    "Failed to add stock transaction to position id: " +
-                    positionId.toString()
-                );
-            }
-        }
-
-        LOG_DEBUG(
-            std::format("Stock positions retrieved: {}", stockPositions.size())
-        );
-
-        return stockPositions;
-    }
-
-    unorderedIdMap<PositionId, finance::OptionPositionTransaction> TransactionStore::
-        getOptionPositions(const finance::TransactionFilter& filter) const
-    {
-        unorderedIdMap<PositionId, finance::OptionPositionTransaction>
-            optionPositions;
-
-        const auto transactions = getTransactions(filter).options();
-
-        for (const auto& transaction : transactions)
-        {
-            const auto positionId = transaction.getPositionId();
-            if (!optionPositions.contains(positionId))
-            {
-                optionPositions[positionId] =
-                    finance::OptionPositionTransaction(positionId);
-            }
-
-            if (!optionPositions.at(positionId).addPosition(transaction))
-            {
-                LOG_ERROR(
-                    "Failed to add option transaction to position id: " +
-                    positionId.toString()
-                );
-            }
-        }
-
-        LOG_DEBUG(
-            std::format(
-                "Option positions retrieved: {}",
-                optionPositions.size()
-            )
-        );
-
-        return optionPositions;
     }
 
     /**

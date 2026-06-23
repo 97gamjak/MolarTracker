@@ -120,7 +120,7 @@ namespace controller
 
         return drafts::TradeLegDraft{
             leg.getAccountId(),
-            leg.getUnitPrice(),
+            leg.getAmount(),
             leg.getQuantity(),
             instrumentName
         };

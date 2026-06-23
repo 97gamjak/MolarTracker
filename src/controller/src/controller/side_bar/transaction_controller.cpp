@@ -124,18 +124,20 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&                           undoStack,
-        const std::shared_ptr<IAccountStore>&     accountStore,
-        const std::shared_ptr<ITransactionStore>& transactionStore,
-        const std::shared_ptr<IStockStore>&       stockStore,
-        const std::shared_ptr<IOptionStore>&      optionStore,
-        const std::shared_ptr<IPositionStore>&    positionStore,
-        TransactionController&                    transactionController,
-        SecuritiesSideBarController&              stockController,
-        QMainWindow*                              mainWindow
+        cmd::UndoStack&                                  undoStack,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<IAccountStore>&            accountStore,
+        const std::shared_ptr<ITransactionStore>&        transactionStore,
+        const std::shared_ptr<IStockStore>&              stockStore,
+        const std::shared_ptr<IOptionStore>&             optionStore,
+        const std::shared_ptr<IPositionStore>&           positionStore,
+        TransactionController&                           transactionController,
+        SecuritiesSideBarController&                     stockController,
+        QMainWindow*                                     mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
+          _positionGateway(positionGateway),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
           _positionStore(positionStore),
@@ -346,9 +348,8 @@ namespace controller
 
         auto drafts = getOpenStockPositions(
             draft.getSecurityAccount(),
-            _positionStore,
-            _stockStore,
-            _transactionStore
+            _positionGateway,
+            _stockStore
         );
 
         // TODO(97gamjak): as soon as coordinators are available this will be

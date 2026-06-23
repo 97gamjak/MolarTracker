@@ -55,6 +55,8 @@ namespace finance
         [[nodiscard]] AccountId       getSecurityAccountId() const;
         [[nodiscard]] const Quantity& getQuantity() const;
         [[nodiscard]] PositionId      getPositionId() const;
+
+        [[nodiscard]] IdSet<AccountId> getInvolvedAccounts() const override;
     };
 
 }   // namespace finance

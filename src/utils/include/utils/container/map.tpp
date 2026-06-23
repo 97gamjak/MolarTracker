@@ -44,6 +44,19 @@ const Value& Map<Key, Value, Hash>::at(const Key& key) const
 }
 
 /**
+ * @brief Returns a reference to the value associated with the specified
+ * key.
+ *
+ * @param key The key of the value to retrieve.
+ * @return A reference to the value associated with the specified key.
+ */
+template <typename Key, typename Value, typename Hash>
+Value& Map<Key, Value, Hash>::at(const Key& key)
+{
+    return _items.at(key);
+}
+
+/**
  * @brief Adds a key-value pair to the map if the key does not already exist.
  *
  * @param key The key to add.

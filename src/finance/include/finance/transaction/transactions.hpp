@@ -7,11 +7,13 @@
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
+#include "finance/transaction/transaction_converter.hpp"
 #include "utils/container/set.hpp"
 
 namespace finance
 {
-    class Accounts;
+    class Accounts;   // forward declaration
+    class Options;    // forward declaration
 
     /**
      * @brief Interface for managing security-related transactions.
@@ -28,6 +30,7 @@ namespace finance
          * @return IdSet<InstrumentId>
          */
         [[nodiscard]]
+
         virtual IdSet<InstrumentId> getBaseInstrumentIds() const = 0;
     };
 
@@ -41,16 +44,25 @@ namespace finance
        public:
         void sort();
 
-        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]]
+        IdSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
+    /**
+     * @brief Class for managing option transactions.
+     *
+     */
     class OptionTransactions : public Vector<OptionTransaction>,
                                public ISecurityTransactions
     {
        public:
         void sort();
 
-        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]]
+        IdSet<InstrumentId> getBaseInstrumentIds() const override;
+
+        [[nodiscard]]
+        std::vector<TransactionId> getIds() const;
     };
 
     /**
@@ -60,6 +72,7 @@ namespace finance
     class CashTransactions : public Vector<CashTransaction>
     {
        public:
+        void sort();
     };
 
     /**
@@ -70,15 +83,15 @@ namespace finance
     {
        private:
         /// The stock transactions that are part of the security view
-        const StockTransactions& _stockTransactions;
+        StockTransactions _stockTransactions;
 
         /// The option transactions that are part of the security view
-        const OptionTransactions& _optionTransactions;
+        std::vector<OptionTransactionTemporary> _optionTransactions;
 
        public:
         explicit SecurityView(
-            const StockTransactions&  stockTransactions,
-            const OptionTransactions& optionTransactions
+            const StockTransactions&                       stockTransactions,
+            const std::vector<OptionTransactionTemporary>& optionTransactions
         );
         ~SecurityView() override = default;
 
@@ -88,7 +101,8 @@ namespace finance
         SecurityView& operator=(const SecurityView&) = delete;
         SecurityView& operator=(SecurityView&&)      = delete;
 
-        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]]
+        IdSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**
@@ -98,12 +112,8 @@ namespace finance
     class Transactions
     {
        private:
-        /// The list of cash transactions
-        CashTransactions _cashTransactions;
-        /// The list of stock transactions
-        StockTransactions _stockTransactions;
-        /// The list of option transactions
-        OptionTransactions _optionTransactions;
+        class TransactionsImpl;
+        std::shared_ptr<TransactionsImpl> _impl;
 
        public:
         Transactions() = default;
@@ -111,23 +121,46 @@ namespace finance
             const std::vector<DomainTransaction>& transactions,
             const Accounts&                       accounts
         );
+        Transactions(
+            const CashTransactions&   cash,
+            const StockTransactions&  stock,
+            const OptionTransactions& options
+        );
+        ~Transactions();
+
         void addTransactions(
             const std::vector<DomainTransaction>& transactions,
             const Accounts&                       accounts
         );
 
-        [[nodiscard]] const CashTransactions& cash() const;
+        void addTransaction(const StockTransaction&);
+        void addTransaction(const OptionTransaction&);
 
-        [[nodiscard]] const StockTransactions& stocks() const;
+        [[nodiscard]]
+        const CashTransactions& cash() const;
+        [[nodiscard]]
+        const StockTransactions& stocks() const;
 
-        [[nodiscard]] const OptionTransactions& options() const;
-
-        [[nodiscard]] SecurityView securities() const;
+        [[nodiscard]]
+        std::expected<OptionTransactions, TransactionConversionError> options(
+        ) const;
+        [[nodiscard]]
+        SecurityView securities() const;
 
         [[nodiscard]] bool empty() const;
+        [[nodiscard]] bool containsOptions() const;
 
-       private:
-        [[nodiscard]] std::vector<const Transaction*> _getTransactions() const;
+        [[nodiscard]]
+        IdSet<InstrumentId> getNeededOptionPopulation() const;
+
+        [[nodiscard]]
+        bool populateOptions(const finance::Options& options);
+
+        [[nodiscard]]
+        IdMap<PositionId, Transactions> groupByPosition() const;
+
+        [[nodiscard]]
+        Transactions filter(const IdSet<AccountId>& accountIds) const;
     };
 }   // namespace finance
 

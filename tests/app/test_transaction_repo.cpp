@@ -360,8 +360,8 @@ TEST_F(TransactionRepoFixture, AddTransactionTradeLegIsRetrieved)
     EXPECT_EQ(leg.getAccountId(), _accountId);
     EXPECT_EQ(leg.getInstrumentId(), _instrumentId);
     EXPECT_EQ(leg.getQuantity().toMicroUnits(), 100'000'000LL);
-    EXPECT_EQ(leg.getUnitPrice().getAmount(), 150'000'000LL);
-    EXPECT_EQ(leg.getUnitPrice().getCurrency(), Currency::USD);
+    EXPECT_EQ(leg.getAmount().getAmount(), 150'000'000LL);
+    EXPECT_EQ(leg.getAmount().getCurrency(), Currency::USD);
 }
 
 TEST_F(

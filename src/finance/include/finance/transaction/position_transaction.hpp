@@ -4,24 +4,31 @@
 #include <memory>
 
 #include "config/id_types.hpp"
+#include "finance/position.hpp"
 #include "pnl.hpp"
 #include "transactions.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
+    class Positions;
+
     /**
      * @brief Class representing a stock position transaction, containing all
      * transactions related to a specific position, along with PnL information.
      *
      */
-    class StockPositionTransaction : protected StockTransactions
+    class PositionTransaction
     {
-        /// The ID of the position associated with the stock transactions
-        PositionId _positionId = PositionId::invalid();
+        Position _position;
         /// The base instrument associated with the position
-        InstrumentId _baseInstrument = InstrumentId::invalid();
+        InstrumentId _baseInstrument;
         /// The security account associated with the position
-        AccountId _securityAccount = AccountId::invalid();
+        AccountId _securityAccount;
+
+        InstrumentType _instrumentType;
+
+        Transactions _transactions;
 
         /// The PnL information for the position, this will be calculated based
         /// on the transactions in the position and the current price of the
@@ -31,48 +38,50 @@ namespace finance
         /// for display
         bool _pnlReady = false;
 
-        /// to hide the add method from StockTransactions and ensure that only
-        /// transactions that match the base instrument and security account can
-        /// be added to the position, this will help maintain the integrity of
-        /// the position and ensure that all transactions in the position are
-        /// related to the same security and account.
-        using StockTransactions::add;
-
        public:
-        explicit StockPositionTransaction() = default;
-        explicit StockPositionTransaction(PositionId id);
+        explicit PositionTransaction(
+            const Position&     position,
+            InstrumentId        baseInstrument,
+            AccountId           securityAccount,
+            InstrumentType      instrumentType,
+            const Transactions& transactions
+        );
 
-        [[nodiscard]] bool addPosition(const StockTransaction& txs);
+        [[nodiscard]] const Transactions& getTransactions() const;
 
+        [[nodiscard]] PositionId                  getId() const;
+        [[nodiscard]] InstrumentType              getInstrumentType() const;
         [[nodiscard]] InstrumentId                getBaseInstrument() const;
         [[nodiscard]] AccountId                   getSecurityAccount() const;
         [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
+        [[nodiscard]] const Position&             getPosition() const;
 
-        using StockTransactions::empty;
+        [[nodiscard]]
+        static PositionTransaction fromTransactions(
+            const Position&     position,
+            InstrumentType      instrumentType,
+            const Transactions& transactions
+        );
     };
 
-    class OptionPositionTransaction : protected OptionTransactions
+    class PositionTransactions
     {
-        PositionId   _positionId      = PositionId::invalid();
-        InstrumentId _baseInstrument  = InstrumentId::invalid();
-        AccountId    _securityAccount = AccountId::invalid();
-
-        std::shared_ptr<PnL> _pnl;
-        bool                 _pnlReady = false;
-
-        using OptionTransactions::add;
+        std::vector<PositionTransaction> _stockPositions;
+        std::vector<PositionTransaction> _optionPositions;
 
        public:
-        explicit OptionPositionTransaction() = default;
-        explicit OptionPositionTransaction(PositionId id);
+        [[nodiscard]]
+        static PositionTransactions fromTransactions(
+            const Transactions& transactions,
+            const Positions&    positions
+        );
 
-        [[nodiscard]] bool addPosition(const OptionTransaction& txs);
-
-        [[nodiscard]] InstrumentId                getBaseInstrument() const;
-        [[nodiscard]] AccountId                   getSecurityAccount() const;
-        [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
-
-        using OptionTransactions::empty;
+        [[nodiscard]] std::vector<PositionTransaction> getStockPositions(
+        ) const;
+        [[nodiscard]]
+        std::vector<PositionTransaction> getOptionPositions() const;
+        [[nodiscard]]
+        std::vector<PositionTransaction> getAllPositions() const;
     };
 
 }   // namespace finance

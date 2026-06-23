@@ -48,8 +48,8 @@ namespace finance
         PnL()          = default;
         virtual ~PnL() = default;
 
-        virtual void calculatePnL(StockTransactions& transactions)  = 0;
-        virtual void calculatePnL(OptionTransactions& transactions) = 0;
+        virtual void calculatePnL(const StockTransactions& txs)  = 0;
+        virtual void calculatePnL(const OptionTransactions& txs) = 0;
 
         [[nodiscard]] Quantity     getQuantity() const;
         [[nodiscard]] virtual Cash getAverageCost() const;
@@ -72,8 +72,10 @@ namespace finance
     {
        public:
         using PnL::PnL;
-        void calculatePnL(StockTransactions& transactions) override;
-        void calculatePnL(OptionTransactions& /*transactions*/) override {}
+        void calculatePnL(const StockTransactions& txs) override;
+        void calculatePnL(const OptionTransactions& /*transactions*/) override
+        {
+        }
     };
 
     /**
@@ -116,8 +118,8 @@ namespace finance
     class PnLAvgOption : public PnLOption
     {
        public:
-        void calculatePnL(StockTransactions& /*transactions*/) override {}
-        void calculatePnL(OptionTransactions& transactions) override;
+        void calculatePnL(const StockTransactions& /*transactions*/) override {}
+        void calculatePnL(const OptionTransactions& txs) override;
     };
 
 }   // namespace finance

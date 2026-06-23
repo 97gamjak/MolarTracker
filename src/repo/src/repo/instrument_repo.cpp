@@ -2,6 +2,7 @@
 
 #include "config/id_types.hpp"
 #include "finance/instrument/option.hpp"
+#include "finance/instrument/options.hpp"
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
@@ -101,12 +102,27 @@ namespace repo
      * options that are not marked as deleted, and will include options that
      * are new or modified but not yet saved to the database.
      *
-     * @return std::vector<finance::Option>
+     * @return finance::Options
      */
-    std::vector<finance::Option> InstrumentRepo::getOptions()
+    finance::Options InstrumentRepo::getOptions()
     {
         orm::Query query{};
 
+        return _getOptions(query);
+    }
+
+    finance::Options InstrumentRepo::getOptions(const IdSet<InstrumentId>& ids)
+    {
+        orm::Query query{};
+
+        if (!ids.empty())
+            query = query.in<OptionRow::instrumentIdField>(ids);
+
+        return _getOptions(query);
+    }
+
+    finance::Options InstrumentRepo::_getOptions(const orm::Query& query)
+    {
         auto join = orm::Joins{}.add(
             orm::join<
                 OptionRow::underlyingInstrumentIdField,
@@ -125,7 +141,7 @@ namespace repo
                 }
             );
 
-        return {options.begin(), options.end()};
+        return {options};
     }
 
     /**

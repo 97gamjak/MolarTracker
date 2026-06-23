@@ -103,6 +103,9 @@ struct isStrongId<StrongId<Tag, Rep>> : std::true_type
 template <typename T>
 inline constexpr bool isStrongId_v = isStrongId<T>::value;
 
+template <typename T>
+concept IsId = isStrongId_v<T>;
+
 #ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 #include "config/details/strong_id.tpp"
 #endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__

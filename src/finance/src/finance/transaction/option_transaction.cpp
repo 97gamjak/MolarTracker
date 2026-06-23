@@ -1,6 +1,7 @@
 #include "finance/transaction/option_transaction.hpp"
 
 #include "config/id_types.hpp"
+#include "finance/instrument/option.hpp"
 #include "utils/finance.hpp"
 
 namespace finance
@@ -50,7 +51,7 @@ namespace finance
         std::optional<TransactionId> rolledOption,
         std::optional<std::string>   comment
     )
-        : SecurityTransaction(
+        : OptionTransactionTemporary(
               id,
               timestamp,
               status,
@@ -59,18 +60,46 @@ namespace finance
               cashAccount,
               externalAccount,
               quantity,
+              amount,
               fees,
               positionId,
+              action,
+              buySell,
+              rolledOption,
               std::move(comment)
           ),
           _underlyingInstrumentId(underlyingInstrumentId),
           _strikePrice(strikePrice),
-          _amount(amount),
           _contractSize(contractSize),
-          _action(action),
-          _buySell(buySell),
-          _optionType(optionType),
-          _rolledOption(rolledOption)
+          _optionType(optionType)
+    {
+    }
+
+    OptionTransaction::OptionTransaction(
+        const OptionTransactionTemporary& tempTx,
+        const finance::Option&            option
+    )
+        : OptionTransaction(
+              tempTx.getId(),
+              tempTx.getTimestamp(),
+              tempTx.getStatus(),
+              tempTx.getInstrumentId(),
+              option.getUnderlying().getInstrumentId(),
+              tempTx.getSecurityAccountId(),
+              tempTx.getCashAccountId(),
+              tempTx.getExternalAccountId(),
+              tempTx.getQuantity(),
+              option.getStrikePrice(),
+              tempTx.getAmount(),
+              tempTx.getFees(),
+              option.getContractSize(),
+              tempTx.getPositionId(),
+              tempTx.getAction(),
+              tempTx.getBuySell(),
+              option.getOptionType(),
+              tempTx.getRolledOption(),
+              tempTx.getComment()
+          )
     {
     }
 
@@ -81,7 +110,7 @@ namespace finance
      * @return InstrumentId The underlying instrument ID associated with the
      * option transaction.
      */
-    InstrumentId OptionTransaction::getBaseInstrumentId() const
+    InstrumentId OptionTransactionTemporary::getBaseInstrumentId() const
     {
         return getInstrumentId();
     }
@@ -95,7 +124,7 @@ namespace finance
      * @return TransactionEntries The transaction entries associated with the
      * option transaction.
      */
-    TransactionEntries OptionTransaction::getEntries(
+    TransactionEntries OptionTransactionTemporary::getEntries(
         AccountId externalAccount
     ) const
     {
@@ -129,7 +158,7 @@ namespace finance
      * @return OptionData The option data associated with the option
      * transaction.
      */
-    OptionData OptionTransaction::getOptionData() const
+    OptionData OptionTransactionTemporary::getOptionData() const
     {
         auto optionData = OptionData{
             TransactionOptionId::invalid(),   // populated with commit
@@ -144,7 +173,7 @@ namespace finance
                 getSecurityAccountId(),
                 getBaseInstrumentId(),
                 getQuantity(),
-                _strikePrice,
+                getAmount(),
                 getPositionId()
             }
         );
@@ -156,22 +185,68 @@ namespace finance
         return _contractSize;
     }
 
+    std::optional<TransactionId> OptionTransactionTemporary::getRolledOption(
+    ) const
+    {
+        return _rolledOption;
+    }
+
     Cash OptionTransaction::getStrikePrice() const { return _strikePrice; }
 
-    Cash OptionTransaction::getAmount() const { return _amount; }
+    Cash OptionTransactionTemporary::getAmount() const { return _amount; }
 
-    Currency OptionTransaction::getCurrency() const
+    Currency OptionTransactionTemporary::getCurrency() const
     {
         return _amount.getCurrency();
     }
 
-    OptionBuySell OptionTransaction::getBuySell() const { return _buySell; }
+    OptionBuySell OptionTransactionTemporary::getBuySell() const
+    {
+        return _buySell;
+    }
 
     OptionType OptionTransaction::getOptionType() const { return _optionType; }
 
-    TransactionOptionAction OptionTransaction::getAction() const
+    TransactionOptionAction OptionTransactionTemporary::getAction() const
     {
         return _action;
+    }
+
+    OptionTransactionTemporary::OptionTransactionTemporary(
+        TransactionId                id,
+        Timestamp                    timestamp,
+        TransactionStatus            status,
+        InstrumentId                 instrumentId,
+        AccountId                    securityAccount,
+        AccountId                    cashAccount,
+        AccountId                    externalAccount,
+        Quantity                     quantity,
+        Cash                         amount,
+        Cash                         fees,
+        PositionId                   positionId,
+        TransactionOptionAction      action,
+        OptionBuySell                buySell,
+        std::optional<TransactionId> rolledOption,
+        std::optional<std::string>   comment
+    )
+        : SecurityTransaction(
+              id,
+              timestamp,
+              status,
+              instrumentId,
+              securityAccount,
+              cashAccount,
+              externalAccount,
+              quantity,
+              fees,
+              positionId,
+              std::move(comment)
+          ),
+          _amount(amount),
+          _action(action),
+          _buySell(buySell),
+          _rolledOption(rolledOption)
+    {
     }
 
 }   // namespace finance

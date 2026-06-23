@@ -6,7 +6,6 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
-#include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"
@@ -81,15 +80,6 @@ namespace store
         ) const override;
         [[nodiscard]]
         finance::Transactions getTransactions() const override;
-
-        [[nodiscard]]
-        unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter
-        ) const override;
-        [[nodiscard]]
-        unorderedIdMap<PositionId, finance::OptionPositionTransaction> getOptionPositions(
-            const finance::TransactionFilter& filter
-        ) const override;
 
         [[nodiscard]]
         Connection subscribeToTransactionAdded(

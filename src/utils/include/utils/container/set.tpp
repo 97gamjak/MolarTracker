@@ -27,4 +27,22 @@ void Set<T, Hash>::combine(const Set<T, Hash>& other)
         insert(value);
 }
 
+template <typename T, typename Hash>
+Set<T, Hash> Set<T, Hash>::operator&(const Set<T, Hash>& other) const
+{
+    Set<T, Hash> result;
+    for (const auto& value : IterableBase::_items)
+    {
+        if (other.contains(value))
+            result.insert(value);
+    }
+    return result;
+}
+
+template <typename T, typename Hash>
+bool Set<T, Hash>::intersects(const Set<T, Hash>& other) const
+{
+    return !(this->operator&(other)).empty();
+}
+
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__

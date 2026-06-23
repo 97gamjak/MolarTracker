@@ -194,8 +194,8 @@ namespace repo
         row.instrumentId  = leg.getInstrumentId();
         row.accountId     = leg.getAccountId();
         row.quantity      = leg.getQuantity().toMicroUnits();
-        row.unitPrice     = leg.getUnitPrice().getAmount();
-        row.currency      = leg.getUnitPrice().getCurrency();
+        row.unitPrice     = leg.getAmount().getAmount();
+        row.currency      = leg.getAmount().getCurrency();
         row.positionId    = leg.getPositionId();
 
         return row;

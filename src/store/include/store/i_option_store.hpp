@@ -5,7 +5,9 @@
 #include <expected>
 
 #include "config/id_types.hpp"
+#include "finance/instrument/options.hpp"
 #include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -64,6 +66,11 @@ namespace store
          */
         [[nodiscard]]
         virtual const IdIdMap<InstrumentId>& getInstrumentIdMap() const = 0;
+
+        [[nodiscard]]
+        virtual finance::Options getOptions(
+            const IdSet<InstrumentId>& instrumentIds
+        ) const = 0;
 
         /**
          * @brief Commit the current changes to the store, this will apply any

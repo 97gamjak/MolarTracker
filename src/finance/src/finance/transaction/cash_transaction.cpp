@@ -34,6 +34,7 @@ namespace finance
               status,
               cashAccount,
               externalAccount,
+              TransactionDataType::Cash,
               fees,
               std::move(comment)
           ),
@@ -97,6 +98,14 @@ namespace finance
             amount,
             TransactionEntryType::General
         };
+    }
+
+    IdSet<AccountId> CashTransaction::getInvolvedAccounts() const
+    {
+        IdSet<AccountId> accounts;
+        accounts.insert(getCashAccountId());
+        accounts.insert(getExternalAccountId());
+        return accounts;
     }
 
 }   // namespace finance

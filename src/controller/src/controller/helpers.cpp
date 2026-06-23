@@ -6,9 +6,10 @@
 #include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "finance/position.hpp"
 #include "finance/transaction/transaction_filter.hpp"
+#include "gateway/position_gateway.hpp"
 #include "logging/log_macros.hpp"
+#include "store/i_option_store.hpp"
 #include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
@@ -67,46 +68,19 @@ namespace controller
      */
     std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
         AccountId                                        account,
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<store::IStockStore>&       stockStore
     )
     {
-        const auto positions = positionStore->getOpenPositions();
-        auto       filter    = finance::TransactionFilter();
-        filter.setPositionIds(positions.getIds());
-        auto positionTxs = transactionStore->getStockPositions(filter);
-
-        std::erase_if(
-            positionTxs,
-            [&](const auto& pair)
-            { return pair.second.getSecurityAccount() != account; }
-        );
+        const auto positions =
+            positionGateway->getOpenPositionTransactions({account})
+                .getStockPositions();
 
         std::vector<OpenStockPositionDetail> drafts;
 
-        for (auto& [id, txs] : positionTxs)
+        for (auto position : positions)
         {
-            if (!positions.contains(id))
-            {
-                LOG_ERROR(
-                    "No position found for position id: " + id.toString()
-                );
-                continue;
-            }
-
-            const auto position = positions.at(id);
-
-            if (txs.empty())
-            {
-                LOG_ERROR(
-                    "No transactions found for position id: " +
-                    position.getId().toString()
-                );
-                continue;
-            }
-
-            const auto instrumentId = txs.getBaseInstrument();
+            const auto instrumentId = position.getBaseInstrument();
 
             const auto& stock = stockStore->getStock(instrumentId);
 
@@ -127,15 +101,15 @@ namespace controller
                         drafts::PositionStockDetailDraft{
                             position.getId(),
                             stockInfo,
-                            position.getCreatedAt(),
-                            txs.getPnL()->getQuantity(),
-                            txs.getPnL()->getAverageCost(),
-                            txs.getPnL()->getCostBasis(),
-                            txs.getPnL()->getRealizedPnL(),
-                            txs.getPnL()->getRealizedPnLPercentage()
+                            position.getPosition().getCreatedAt(),
+                            position.getPnL()->getQuantity(),
+                            position.getPnL()->getAverageCost(),
+                            position.getPnL()->getCostBasis(),
+                            position.getPnL()->getRealizedPnL(),
+                            position.getPnL()->getRealizedPnLPercentage()
                         },
                     .ticker = stockInfo.getTicker(),
-                    .pnl    = txs.getPnL()
+                    .pnl    = position.getPnL()
                 }
             );
         }
@@ -154,17 +128,12 @@ namespace controller
      */
     std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
         AccountId                                        account,
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<store::IStockStore>&       stockStore
     )
     {
-        const auto details = getOpenStockPositionDetails(
-            account,
-            positionStore,
-            stockStore,
-            transactionStore
-        );
+        const auto details =
+            getOpenStockPositionDetails(account, positionGateway, stockStore);
 
         std::vector<drafts::PositionStockDetailDraft> drafts;
         drafts.reserve(details.size());
@@ -176,60 +145,36 @@ namespace controller
 
     std::vector<OpenOptionPositionDetail> getOpenOptionPositionDetails(
         AccountId                                        account,
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<store::IOptionStore>&      optionStore
     )
     {
-        const auto positions = positionStore->getOpenPositions();
-
-        auto filter = finance::TransactionFilter();
-        filter.setPositionIds(positions.getIds());
-        auto positionTxs = transactionStore->getOptionPositions(filter);
-
-        std::erase_if(
-            positionTxs,
-            [&](const auto& pair)
-            { return pair.second.getSecurityAccount() != account; }
-        );
+        const auto positions =
+            positionGateway->getOpenPositionTransactions({account})
+                .getOptionPositions();
 
         std::vector<OpenOptionPositionDetail> drafts;
 
-        for (auto& [id, txs] : positionTxs)
+        for (auto position : positions)
         {
-            if (!positions.contains(id))
+            const auto instrumentId = position.getBaseInstrument();
+
+            // TODO: implement fast path for retrieving option details based on
+            // single instrument id lookup
+            const auto& options = optionStore->getOptions({instrumentId});
+
+            if (options.empty() || options.size() > 1)
             {
                 LOG_ERROR(
-                    "No position found for position id: " + id.toString()
-                );
-                continue;
-            }
-
-            const auto position = positions.at(id);
-
-            if (txs.empty())
-            {
-                LOG_ERROR(
-                    "No transactions found for position id: " +
+                    "No option found for instrument id: " +
                     position.getId().toString()
                 );
                 continue;
             }
 
-            const auto instrumentId = txs.getBaseInstrument();
+            const auto stock = options.getValues()[0].getUnderlying();
 
-            const auto& stock = stockStore->getStock(instrumentId);
-
-            if (!stock)
-            {
-                LOG_ERROR(
-                    "No stock found for instrument id: " +
-                    position.getId().toString()
-                );
-                continue;
-            }
-
-            const auto stockInfo = StockMapper::toStockInfoDraft(stock.value());
+            const auto stockInfo = StockMapper::toStockInfoDraft(stock);
 
             drafts.emplace_back(
                 OpenOptionPositionDetail{
@@ -237,13 +182,13 @@ namespace controller
                         drafts::PositionOptionDetailDraft{
                             position.getId(),
                             stockInfo,
-                            position.getCreatedAt(),
-                            txs.getPnL()->getQuantity(),
-                            txs.getPnL()->getRealizedPnL(),
-                            txs.getPnL()->getRealizedPnLPercentage()
+                            position.getPosition().getCreatedAt(),
+                            position.getPnL()->getQuantity(),
+                            position.getPnL()->getRealizedPnL(),
+                            position.getPnL()->getRealizedPnLPercentage()
                         },
                     .ticker = stockInfo.getTicker(),
-                    .pnl    = txs.getPnL()
+                    .pnl    = position.getPnL()
                 }
             );
         }

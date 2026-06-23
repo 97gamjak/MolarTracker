@@ -31,6 +31,10 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
     void insert(const T& value);
 
     void combine(const Set<T, Hash>& other);
+
+    Set operator&(const Set<T, Hash>& other) const;
+
+    bool intersects(const Set<T, Hash>& other) const;
 };
 
 template <typename T>

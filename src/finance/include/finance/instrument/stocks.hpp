@@ -11,7 +11,7 @@ namespace finance
      * individual stocks by their identifiers.
      *
      */
-    class Stocks : public IdMap<Stock>
+    class Stocks : public IdObjectMap<Stock>
     {
        public:
         [[nodiscard]] std::unordered_set<std::string> getTickers() const;

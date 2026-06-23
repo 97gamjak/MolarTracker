@@ -36,6 +36,7 @@ namespace finance
               status,
               cashAccount,
               externalAccount,
+              TransactionDataType::Stock,   // TODO:
               fees,
               std::move(comment)
           ),
@@ -51,7 +52,7 @@ namespace finance
      *
      * @return InstrumentId
      */
-    [[nodiscard]] InstrumentId SecurityTransaction::getInstrumentId() const
+    InstrumentId SecurityTransaction::getInstrumentId() const
     {
         return _instrumentId;
     }
@@ -62,7 +63,7 @@ namespace finance
      *
      * @return AccountId
      */
-    [[nodiscard]] AccountId SecurityTransaction::getSecurityAccountId() const
+    AccountId SecurityTransaction::getSecurityAccountId() const
     {
         return _securityAccount;
     }
@@ -72,7 +73,7 @@ namespace finance
      *
      * @return const Quantity&
      */
-    [[nodiscard]] const Quantity& SecurityTransaction::getQuantity() const
+    const Quantity& SecurityTransaction::getQuantity() const
     {
         return _quantity;
     }
@@ -82,8 +83,17 @@ namespace finance
      *
      * @return PositionId
      */
-    [[nodiscard]] PositionId SecurityTransaction::getPositionId() const
+    PositionId SecurityTransaction::getPositionId() const
     {
         return _positionId;
+    }
+
+    IdSet<AccountId> SecurityTransaction::getInvolvedAccounts() const
+    {
+        IdSet<AccountId> accounts;
+        accounts.insert(getCashAccountId());
+        accounts.insert(getExternalAccountId());
+        accounts.insert(getSecurityAccountId());
+        return accounts;
     }
 }   // namespace finance

@@ -330,9 +330,108 @@ namespace finance
             amountEntries[0].getAccountId(),
             externalAccountId,
             legs[0].getQuantity(),
-            legs[0].getUnitPrice(),
+            legs[0].getAmount(),
             fees,
             std::get<StockData>(transaction.getData()).getPositionId(),
+            transaction.getComment()
+        };
+    }
+
+    std::expected<OptionTransactionTemporary, TransactionConversionError> TransactionConverter::
+        toOption(const DomainTransaction& transaction)
+    {
+        const auto& entries = transaction.getEntries();
+        if (entries.empty())
+        {
+            return std::unexpected(
+                TransactionConversionError{"No cash entries found"}
+            );
+        }
+
+        auto amountEntries = entries.filter(TransactionEntryType::General);
+        auto feeEntries    = entries.filter(TransactionEntryType::Fees);
+
+        if (amountEntries.size() != 1)
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of amount entries"}
+            );
+        }
+
+        const auto cashAccountId = amountEntries[0].getAccountId();
+
+        if (feeEntries.size() != 2 && !feeEntries.empty())
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of fee entries"}
+            );
+        }
+
+        Cash fees{amountEntries[0].getCurrency(), 0};
+        auto externalAccountId = AccountId::invalid();
+
+        if (feeEntries.size() == 2)
+        {
+            if (cashAccountId != feeEntries[0].getAccountId() &&
+                cashAccountId != feeEntries[1].getAccountId())
+            {
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
+            }
+
+            if (cashAccountId != feeEntries[0].getAccountId() &&
+                cashAccountId != feeEntries[1].getAccountId())
+            {
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
+            }
+
+            if (cashAccountId == feeEntries[0].getAccountId())
+            {
+                externalAccountId  = feeEntries[1].getAccountId();
+                fees              += feeEntries[0].getCash();
+            }
+            else
+            {
+                externalAccountId  = feeEntries[0].getAccountId();
+                fees              += feeEntries[1].getCash();
+            }
+        }
+
+        if (!std::holds_alternative<OptionData>(transaction.getData()))
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid transaction data"}
+            );
+        }
+
+        const auto data = std::get<OptionData>(transaction.getData());
+
+        const auto& legs = data.getLegs();
+        if (legs.size() != 1)
+        {
+            return std::unexpected(
+                TransactionConversionError{"Invalid trade legs"}
+            );
+        }
+
+        return OptionTransactionTemporary{
+            transaction.getId(),
+            transaction.getTimestamp(),
+            transaction.getStatus(),
+            legs[0].getInstrumentId(),
+            legs[0].getAccountId(),
+            amountEntries[0].getAccountId(),
+            externalAccountId,
+            legs[0].getQuantity(),
+            legs[0].getAmount(),
+            fees,
+            legs[0].getPositionId(),
+            data.getAction(),
+            data.getBuySell(),
+            data.getRolledOption(),
             transaction.getComment()
         };
     }

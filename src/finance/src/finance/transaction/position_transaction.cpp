@@ -1,6 +1,9 @@
 #include "finance/transaction/position_transaction.hpp"
 
+#include <utility>
+
 #include "config/id_types.hpp"
+#include "finance/positions.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/pnl.hpp"
 #include "logging/log_macros.hpp"
@@ -9,90 +12,22 @@ REGISTER_LOG_CATEGORY("Finance.StockPositionTransaction");
 
 namespace finance
 {
-
-    /**
-     * @brief Construct a new Stock Position Transaction:: Stock Position
-     * Transaction object
-     *
-     * @param id
-     */
-    StockPositionTransaction::StockPositionTransaction(PositionId id)
-        : _positionId(id)
+    PositionTransaction::PositionTransaction(
+        const Position&     position,
+        InstrumentId        baseInstrument,
+        AccountId           securityAccount,
+        InstrumentType      instrumentType,
+        const Transactions& transactions
+    )
+        : _position(position),
+          _baseInstrument(baseInstrument),
+          _securityAccount(securityAccount),
+          _instrumentType(instrumentType),
+          _transactions(transactions)
     {
     }
 
-    /**
-     * @brief Add a stock transaction to the position, this will check that the
-     * transaction matches the base instrument and security account of the
-     * position, and if so it will add the transaction to the list of stock
-     * transactions for the position and mark the PnL as not ready for
-     * recalculation.
-     *
-     * @param txs The stock transaction to add to the position.
-     * @return true if the transaction was added successfully, false otherwise.
-     */
-    bool StockPositionTransaction::addPosition(const StockTransaction& txs)
-    {
-        if (!empty())
-        {
-            if (_baseInstrument != txs.getBaseInstrumentId())
-            {
-                LOG_ERROR(
-                    "Failed to add stock transaction to position because it "
-                    "does not match the base instrument"
-                );
-                return false;
-            }
-
-            if (_securityAccount != txs.getSecurityAccountId())
-            {
-                LOG_ERROR(
-                    "Failed to add stock transaction to position because it "
-                    "does not match the security account"
-                );
-                return false;
-            }
-        }
-
-        _baseInstrument  = txs.getBaseInstrumentId();
-        _securityAccount = txs.getSecurityAccountId();
-        _pnlReady        = false;
-        StockTransactions::add(txs);
-        return true;
-    }
-
-    /**
-     * @brief get the base instrument associated with the position
-     *
-     * @return InstrumentId
-     */
-    InstrumentId StockPositionTransaction::getBaseInstrument() const
-    {
-        return _baseInstrument;
-    }
-
-    /**
-     * @brief Get the security account associated with the position, this will
-     * be used for display purposes and to ensure that transactions added to the
-     * position match the correct account.
-     *
-     * @return AccountId The security account ID associated with the position.
-     */
-    AccountId StockPositionTransaction::getSecurityAccount() const
-    {
-        return _securityAccount;
-    }
-
-    /**
-     * @brief Get the PnL information for the position, this will calculate the
-     * PnL based on the transactions in the position if it is not already
-     * calculated, and return a shared pointer to the PnL object for display and
-     * further calculations.
-     *
-     * @return const std::shared_ptr<PnL>& A shared pointer to the PnL object
-     * containing the profit and loss information for the position.
-     */
-    const std::shared_ptr<PnL>& StockPositionTransaction::getPnL()
+    const std::shared_ptr<PnL>& PositionTransaction::getPnL()
     {
         if (!_pnl)
         {
@@ -101,72 +36,164 @@ namespace finance
 
         if (!_pnlReady)
         {
-            _pnl->calculatePnL(*this);
+            switch (getInstrumentType())
+            {
+                case InstrumentType::Stock:
+                    _pnl->calculatePnL(_transactions.stocks());
+                    break;
+                case InstrumentType::Option:
+                {
+                    // TODO: combine pnls!
+                    const auto optionsResult = _transactions.options();
+                    if (!optionsResult)
+                    {
+                        LOG_ERROR(
+                            std::format(
+                                "Failed to calculate PnL for position {}: {}",
+                                getId().toString(),
+                                optionsResult.error().message
+                            )
+                        );
+                        break;
+                    }
+                    _pnl->calculatePnL(optionsResult.value());
+                    break;
+                }
+            }
             _pnlReady = true;
         }
 
         return _pnl;
     }
 
-    OptionPositionTransaction::OptionPositionTransaction(PositionId id)
-        : _positionId(id)
+    PositionTransaction PositionTransaction::fromTransactions(
+        const Position&     position,
+        InstrumentType      instrumentType,
+        const Transactions& transactions
+    )
     {
-    }
-
-    bool OptionPositionTransaction::addPosition(const OptionTransaction& txs)
-    {
-        if (!empty())
+        switch (instrumentType)
         {
-            if (_baseInstrument != txs.getBaseInstrumentId())
+            case InstrumentType::Stock:
             {
-                LOG_ERROR(
-                    "Failed to add option transaction to position because it "
-                    "does not match the base instrument"
+                PositionTransaction result(
+                    position,
+                    transactions.stocks()[0].getInstrumentId(),
+                    transactions.stocks()[0].getSecurityAccountId(),
+                    instrumentType,
+                    transactions
                 );
-                return false;
-            }
 
-            if (_securityAccount != txs.getSecurityAccountId())
+                return result;
+            }
+            case InstrumentType::Option:
             {
-                LOG_ERROR(
-                    "Failed to add option transaction to position because it "
-                    "does not match the security account"
+                PositionTransaction result(
+                    position,
+                    transactions.options().value()[0].getInstrumentId(),
+                    transactions.options().value()[0].getSecurityAccountId(),
+                    instrumentType,
+                    transactions
                 );
-                return false;
+                return result;
             }
         }
 
-        _baseInstrument  = txs.getBaseInstrumentId();
-        _securityAccount = txs.getSecurityAccountId();
-        _pnlReady        = false;
-        OptionTransactions::add(txs);
-        return true;
+        std::unreachable();
     }
 
-    InstrumentId OptionPositionTransaction::getBaseInstrument() const
+    PositionTransactions PositionTransactions::fromTransactions(
+        const Transactions& transactions,
+        const Positions&    positions
+    )
+    {
+        const IdMap<PositionId, Transactions> groupedTransactions =
+            transactions.groupByPosition();
+
+        PositionTransactions positionTransactions;
+
+        for (const auto& [positionId, txs] : groupedTransactions)
+        {
+            if (!positions.contains(positionId))
+                continue;
+
+            if (txs.containsOptions())
+            {
+                positionTransactions._optionPositions.push_back(
+                    PositionTransaction::fromTransactions(
+                        positions.at(positionId),
+                        InstrumentType::Option,
+                        txs
+                    )
+                );
+            }
+            else
+            {
+                positionTransactions._stockPositions.push_back(
+                    PositionTransaction::fromTransactions(
+                        positions.at(positionId),
+                        InstrumentType::Stock,
+                        txs
+                    )
+                );
+            }
+        }
+
+        return positionTransactions;
+    }
+
+    std::vector<PositionTransaction> PositionTransactions::getStockPositions(
+    ) const
+    {
+        return _stockPositions;
+    }
+
+    std::vector<PositionTransaction> PositionTransactions::getOptionPositions(
+    ) const
+    {
+        return _optionPositions;
+    }
+
+    std::vector<PositionTransaction> PositionTransactions::getAllPositions(
+    ) const
+    {
+        std::vector<PositionTransaction> allPositions;
+        allPositions.reserve(_stockPositions.size() + _optionPositions.size());
+
+        allPositions.insert(
+            allPositions.end(),
+            _stockPositions.begin(),
+            _stockPositions.end()
+        );
+        allPositions.insert(
+            allPositions.end(),
+            _optionPositions.begin(),
+            _optionPositions.end()
+        );
+
+        return allPositions;
+    }
+
+    InstrumentId PositionTransaction::getBaseInstrument() const
     {
         return _baseInstrument;
     }
 
-    const std::shared_ptr<PnL>& OptionPositionTransaction::getPnL()
-    {
-        if (!_pnl)
-        {
-            _pnl = std::make_shared<PnLAvg>();
-        }
-
-        if (!_pnlReady)
-        {
-            _pnl->calculatePnL(*this);
-            _pnlReady = true;
-        }
-
-        return _pnl;
-    }
-
-    AccountId OptionPositionTransaction::getSecurityAccount() const
+    AccountId PositionTransaction::getSecurityAccount() const
     {
         return _securityAccount;
+    }
+
+    InstrumentType PositionTransaction::getInstrumentType() const
+    {
+        return _instrumentType;
+    }
+
+    PositionId PositionTransaction::getId() const { return _position.getId(); }
+
+    const Position& PositionTransaction::getPosition() const
+    {
+        return _position;
     }
 
 }   // namespace finance

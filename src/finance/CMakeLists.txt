@@ -29,6 +29,7 @@ add_library(molartracker_finance STATIC
 
     ${SOURCE_DIR}/instrument/instrument_predicates.cpp
     ${SOURCE_DIR}/instrument/option.cpp
+    ${SOURCE_DIR}/instrument/options.cpp
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/stocks.cpp
 

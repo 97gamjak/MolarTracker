@@ -6,14 +6,15 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
-#include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "finance/transaction/transactions.hpp"   // needed for public return types
 #include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
     class Account;             // Forward declaration
     class TransactionFilter;   // Forward declaration
-    class Transactions;        // Forward declaration
+    class CashTransaction;     // Forward declaration
+    class StockTransaction;    // Forward declaration
     class OptionTransaction;   // Forward declaration
 }   // namespace finance
 
@@ -115,22 +116,6 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Transactions getTransactions() const = 0;
-
-        /**
-         * @brief Get the Stock Positions
-         *
-         * @param filter
-         * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
-         */
-        [[nodiscard]]
-        virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter
-        ) const = 0;
-
-        [[nodiscard]]
-        virtual unorderedIdMap<PositionId, finance::OptionPositionTransaction> getOptionPositions(
-            const finance::TransactionFilter& filter
-        ) const = 0;
 
         /**
          * @brief Subscribe to transaction added events, this allows subscribers

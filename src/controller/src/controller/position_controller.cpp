@@ -120,8 +120,8 @@ namespace controller
         const finance::Transactions& transactions
     )
     {
-        const auto instruments   = transactions.securities();
-        const auto instrumentIds = instruments.getBaseInstrumentIds();
+        const auto& instruments   = transactions.securities();
+        const auto  instrumentIds = instruments.getBaseInstrumentIds();
 
         const auto tickers = _stockStore->getStocks(instrumentIds).getTickers();
         for (const auto& ticker : tickers)

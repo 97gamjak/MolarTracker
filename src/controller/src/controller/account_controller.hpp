@@ -24,6 +24,7 @@ namespace store
     class IPositionStore;      // Forward declaration
     class IStockStore;         // Forward declaration
     class ITransactionStore;   // Forward declaration
+    class IOptionStore;        // Forward declaration
 }   // namespace store
 
 namespace ui
@@ -43,6 +44,11 @@ namespace finance
     class PriceCache;   // Forward declaration
 }   // namespace finance
 
+namespace gateway
+{
+    class PositionGateway;   // Forward declaration
+}   // namespace gateway
+
 namespace controller
 {
     /**
@@ -61,10 +67,12 @@ namespace controller
        public:
         AccountController(
             cmd::UndoStack&                                  undoStack,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway,
             const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             const std::shared_ptr<store::IStockStore>&       stockStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
+            const std::shared_ptr<store::IOptionStore>&      optionStore,
             const std::shared_ptr<finance::PriceCache>&      priceCache,
             QStackedWidget*                                  stackedWidget
         );

@@ -68,6 +68,8 @@ namespace finance
         /// The external account associated with the option transaction
         AccountId _externalAccount;
 
+        TransactionDataType _type;
+
         /// The fees associated with the option transaction
         Cash _fees;
 
@@ -78,14 +80,16 @@ namespace finance
             TransactionStatus          status,
             AccountId                  cashAccount,
             AccountId                  externalAccount,
+            TransactionDataType        type,
             Cash                       fees,
             std::optional<std::string> comment = std::nullopt
         );
         ~Transaction() override = default;
 
-        [[nodiscard]] Cash      getFees() const;
-        [[nodiscard]] AccountId getCashAccountId() const;
-        [[nodiscard]] AccountId getExternalAccountId() const;
+        [[nodiscard]] Cash                getFees() const;
+        [[nodiscard]] AccountId           getCashAccountId() const;
+        [[nodiscard]] AccountId           getExternalAccountId() const;
+        [[nodiscard]] TransactionDataType getTransactionType() const;
 
         /**
          * @brief Get the entries associated with the transaction for a given
@@ -107,6 +111,9 @@ namespace finance
         virtual TransactionEntries getEntries(
             AccountId externalAccount
         ) const = 0;
+
+        [[nodiscard]]
+        virtual IdSet<AccountId> getInvolvedAccounts() const = 0;
 
        protected:
         [[nodiscard]]

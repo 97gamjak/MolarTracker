@@ -5,6 +5,7 @@
 #include "config/id_types.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
+#include "finance/predicates/predicates.hpp"
 
 namespace store
 {
@@ -18,13 +19,12 @@ namespace store
         InstrumentServicePtr instrumentService,
         InstrumentIdSeq&     instrumentIdSeq
     )
-        : BaseStore<finance::Option, OptionId>(true),
-          _instrumentService(std::move(instrumentService)),
+        : _instrumentService(std::move(instrumentService)),
           _instrumentIdSeq(instrumentIdSeq)
     {
         const auto options = _instrumentService->getOptions();
 
-        _addCleanEntries(options);
+        _addCleanEntries(options.getValues());
     }
 
     /**
@@ -60,6 +60,43 @@ namespace store
         _addEntry(std::move(option));
 
         return instrumentId;
+    }
+
+    /**
+     * @brief Get the options for the given instrument IDs, this method
+     * retrieves the options from the store that match the provided instrument
+     * IDs, allowing callers to access specific options based on their
+     * associated instrument IDs.
+     *
+     * @param instrumentIds The set of instrument IDs for which to retrieve
+     * options.
+     * @return finance::Options The options corresponding to the provided
+     * instrument IDs.
+     */
+    finance::Options OptionStore::getOptions(
+        const IdSet<InstrumentId>& instrumentIds
+    ) const
+    {
+        const auto options = Options{
+            .filter = finance::HasInstrumentIds<finance::Option>(instrumentIds),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        finance::Options result{_getValues(options)};
+
+        if (!isFullCache())
+        {
+            const auto dbOptions =
+                _instrumentService->getOptions(instrumentIds);
+
+            for (const auto& option : dbOptions.getValues())
+            {
+                if (!result.contains(option.getId()))
+                    result.addUnchecked(option);
+            }
+        }
+
+        return result;
     }
 
     /**

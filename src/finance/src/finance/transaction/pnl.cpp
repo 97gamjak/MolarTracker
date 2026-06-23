@@ -171,10 +171,11 @@ namespace finance
      * the average cost method, this will calculate the average cost, realized
      * PnL, and unrealized PnL based on the transactions and current price
      *
-     * @param transactions
+     * @param txs
      */
-    void PnLAvg::calculatePnL(StockTransactions& transactions)
+    void PnLAvg::calculatePnL(const StockTransactions& txs)
     {
+        auto transactions = txs;
         transactions.sort();
         Quantity quantity{0};
         Cash     fees;
@@ -278,8 +279,9 @@ namespace finance
         return _unrealizedPnL + intrinsic;
     }
 
-    void PnLAvgOption::calculatePnL(OptionTransactions& transactions)
+    void PnLAvgOption::calculatePnL(const OptionTransactions& txs)
     {
+        auto transactions = txs;
         transactions.sort();
 
         Quantity             quantity{0};

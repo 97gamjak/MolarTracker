@@ -16,6 +16,7 @@ namespace store
     class IStockStore;         // Forward declaration
     class ITransactionStore;   // Forward declaration
     class IPositionStore;      // Forward declaration
+    class IOptionStore;        // Forward declaration
 }   // namespace store
 
 namespace drafts
@@ -24,6 +25,11 @@ namespace drafts
     class CreateOptionTransactionDraft;   // Forward declaration
     class PositionDraft;                  // Forward declaration
 }   // namespace drafts
+
+namespace gateway
+{
+    class PositionGateway;   // Forward declaration
+}   // namespace gateway
 
 /**
  * @brief Detail struct for open stock positions, containing the position draft,
@@ -40,6 +46,11 @@ struct OpenStockPositionDetail
     std::shared_ptr<finance::PnL> pnl;
 };
 
+/**
+ * @brief Detail struct for open option positions, containing the position
+ * draft, ticker, and PnL information.
+ *
+ */
 struct OpenOptionPositionDetail
 {
     /// The position draft containing the details of the open option position.
@@ -64,23 +75,20 @@ namespace controller
 
     std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
         AccountId                                        account,
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<store::IStockStore>&       stockStore
     );
 
     std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
         AccountId                                        account,
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<store::IStockStore>&       stockStore
     );
 
     std::vector<OpenOptionPositionDetail> getOpenOptionPositionDetails(
         AccountId                                        account,
-        const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<store::IOptionStore>&      optionStore
     );
 
 }   // namespace controller

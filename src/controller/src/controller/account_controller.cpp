@@ -15,10 +15,12 @@
 #include "drafts/position/position_option_draft.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "finance/price_cache.hpp"
+#include "gateway/position_gateway.hpp"
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
 #include "store/i_account_store.hpp"
+#include "store/i_option_store.hpp"
 #include "ui/account/account_detail_view.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
@@ -38,6 +40,8 @@ namespace controller
         /// Reference to the price cache
         std::shared_ptr<finance::PriceCache> priceCache;
 
+        std::shared_ptr<gateway::PositionGateway> positionGateway;
+
         /// Reference to the account store
         std::shared_ptr<store::IAccountStore> accountStore;
         /// Reference to the position store
@@ -46,6 +50,7 @@ namespace controller
         std::shared_ptr<store::IStockStore> stockStore;
         /// Reference to the transaction store
         std::shared_ptr<store::ITransactionStore> transactionStore;
+        std::shared_ptr<store::IOptionStore>      optionStore;
 
         /// Pointer to the stacked widget
         QStackedWidget* stackedWidget;
@@ -63,14 +68,18 @@ namespace controller
         /// A mapping of account IDs to their corresponding open stock position
         /// details, used for displaying the account details in the UI
         unorderedIdMap<AccountId, std::vector<OpenStockPositionDetail>>
-            openPositionDetails;
+            openStockPositions;
+        unorderedIdMap<AccountId, std::vector<OpenOptionPositionDetail>>
+            openOptionPositions;
 
         Details(
             const std::shared_ptr<store::IAccountStore>&     accountStore_,
             const std::shared_ptr<store::IPositionStore>&    positionStore_,
             const std::shared_ptr<store::IStockStore>&       stockStore_,
             const std::shared_ptr<store::ITransactionStore>& transactionStore_,
+            const std::shared_ptr<store::IOptionStore>&      optionStore_,
             const std::shared_ptr<finance::PriceCache>&      priceCache_,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway_,
             cmd::UndoStack&                                  undoStack_,
             QStackedWidget*                                  stackedWidget_
         );
@@ -99,16 +108,20 @@ namespace controller
         const std::shared_ptr<store::IPositionStore>&    positionStore_,
         const std::shared_ptr<store::IStockStore>&       stockStore_,
         const std::shared_ptr<store::ITransactionStore>& transactionStore_,
+        const std::shared_ptr<store::IOptionStore>&      optionStore_,
         const std::shared_ptr<finance::PriceCache>&      priceCache_,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway_,
         cmd::UndoStack&                                  undoStack_,
         QStackedWidget*                                  stackedWidget_
     )
         : undoStack(undoStack_),
           priceCache(priceCache_),
+          positionGateway(positionGateway_),
           accountStore(accountStore_),
           positionStore(positionStore_),
           stockStore(stockStore_),
           transactionStore(transactionStore_),
+          optionStore(optionStore_),
           stackedWidget(stackedWidget_),
           accountDetailView(new ui::AccountDetailView(stackedWidget)),
           connections(std::make_unique<Connections>())
@@ -129,10 +142,12 @@ namespace controller
      */
     AccountController::AccountController(
         cmd::UndoStack&                                  undoStack,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IAccountStore>&     accountStore,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
+        const std::shared_ptr<store::IOptionStore>&      optionStore,
         const std::shared_ptr<finance::PriceCache>&      priceCache,
         QStackedWidget*                                  stackedWidget
     )
@@ -142,7 +157,9 @@ namespace controller
                   positionStore,
                   stockStore,
                   transactionStore,
+                  optionStore,
                   priceCache,
+                  positionGateway,
                   undoStack,
                   stackedWidget
               )
@@ -158,8 +175,8 @@ namespace controller
                     return;
 
                 auto& details =
-                    _details->openPositionDetails[_details->currentAccount
-                                                      ->getId()];
+                    _details
+                        ->openStockPositions[_details->currentAccount->getId()];
                 std::vector<drafts::PositionStockDetailDraft> drafts;
                 for (auto& detail : details)
                 {
@@ -217,31 +234,50 @@ namespace controller
                 break;
             case AccountKind::Security:
             {
-                _details->openPositionDetails[account->getId()] =
+                const auto positions =
+                    _details->positionGateway->getOpenPositionTransactions(
+                        {account->getId()}
+                    );
+                _details->openStockPositions[account->getId()] =
                     getOpenStockPositionDetails(
                         account->getId(),
-                        _details->positionStore,
-                        _details->stockStore,
-                        _details->transactionStore
+                        _details->positionGateway,
+                        _details->stockStore
+                    );
+
+                _details->openOptionPositions[account->getId()] =
+                    getOpenOptionPositionDetails(
+                        account->getId(),
+                        _details->positionGateway,
+                        _details->optionStore
                     );
 
                 LOG_DEBUG(
                     std::format(
                         "Retrieved {} open position drafts for account {}",
-                        _details->openPositionDetails[account->getId()].size(),
+                        _details->openStockPositions[account->getId()].size() +
+                            _details->openOptionPositions[account->getId()]
+                                .size(),
                         account->getName()
                     )
                 );
 
-                std::vector<drafts::PositionStockDetailDraft> details;
+                std::vector<drafts::PositionStockDetailDraft> stocks;
                 for (const auto& detail :
-                     _details->openPositionDetails[account->getId()])
+                     _details->openStockPositions[account->getId()])
                 {
-                    details.push_back(detail.positionDraft);
+                    stocks.push_back(detail.positionDraft);
+                }
+
+                std::vector<drafts::PositionOptionDetailDraft> options;
+                for (const auto& detail :
+                     _details->openOptionPositions[account->getId()])
+                {
+                    options.push_back(detail.positionDraft);
                 }
 
                 _details->accountDetailView
-                    ->updateSecurityAccount(accountDraft, details, {});
+                    ->updateSecurityAccount(accountDraft, stocks, options);
                 _details->currentAccount =
                     std::make_unique<drafts::AccountDraft>(accountDraft);
                 break;
