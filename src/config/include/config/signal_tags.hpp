@@ -31,7 +31,7 @@ template <typename T>
 struct OnStoreItemAdded
 {
     /// Type alias for the add callback function
-    using func = std::function<void(const std::vector<T>& item)>;
+    using func = std::function<void(const T& item)>;
 };
 
 /**
@@ -44,7 +44,7 @@ template <typename T>
 struct OnStoreItemUpdated
 {
     /// Type alias for the update callback function
-    using func = std::function<void(const std::vector<T>& item)>;
+    using func = std::function<void(const T& item)>;
 };
 
 /**
@@ -57,7 +57,7 @@ template <typename IdType>
 struct OnStoreItemRemoved
 {
     /// Type alias for the remove callback function
-    using func = std::function<void(const std::vector<IdType>& item)>;
+    using func = std::function<void(const IdType& item)>;
 };
 
 /**
@@ -70,7 +70,7 @@ template <typename IdType>
 struct OnIdRemap
 {
     /// Type alias for the remap callback function
-    using func = std::function<void(const unorderedIdMap<IdType, IdType>& map)>;
+    using func = std::function<void(const std::pair<IdType, IdType>& remap)>;
 };
 
 /**

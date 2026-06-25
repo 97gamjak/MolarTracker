@@ -252,8 +252,7 @@ namespace store
 
         _entries.push_back(Entry{value, StoreState::New});
 
-        _added.push_back(value);
-        _notifyAdded(false);
+        _notifyAdded(value);
 
         return value.getId();
     }
@@ -271,8 +270,6 @@ namespace store
     {
         for (const auto& item : value)
             _entries.push_back(Entry{item, StoreState::Clean});
-
-        _notifyStoreChanged(false);
     }
 
     /**
@@ -301,8 +298,7 @@ namespace store
         entry->value = value;
         entry->state = state;
 
-        _updated.push_back(entry->value);
-        _notifyUpdated(false);
+        _notifyUpdated(value);
         return StoreResult::Ok;
     }
 
@@ -364,8 +360,7 @@ namespace store
         if (result != StoreResult::Ok)
             return result;
 
-        _removed.push_back(id);
-        _notifyRemoved(false);
+        _notifyRemoved(id);
         _markPotentiallyDirty();
 
         return StoreResult::Ok;
@@ -465,7 +460,10 @@ namespace store
 
         if (tempId != getId(persistedValue.value) &&
             persistedValue.state == StoreState::New)
+        {
             _idRemap[tempId] = getId(persistedValue.value);
+            _notifyIdRemap({tempId, getId(persistedValue.value)});
+        }
 
         if (persistedValue.state == StoreState::New ||
             persistedValue.state == StoreState::Modified)
@@ -495,10 +493,11 @@ namespace store
 
     /**
      * @brief logs the contents of the store's cache for debugging purposes.
-     * This method checks if logging is enabled for the specified category and
-     * log level, and if so, it logs the number of entries in the cache and the
-     * details of each entry, including its value and state. This can be useful
-     * for debugging and understanding the current state of the store's cache.
+     * This method checks if logging is enabled for the specified category
+     * and log level, and if so, it logs the number of entries in the cache
+     * and the details of each entry, including its value and state. This
+     * can be useful for debugging and understanding the current state of
+     * the store's cache.
      *
      * @tparam T
      * @tparam IdType
@@ -549,9 +548,9 @@ namespace store
     }
 
     /**
-     * @brief Clears the ID remapping map for the store. This is used to reset
-     * the ID remapping state, typically after a commit or when the remapping is
-     * no longer needed.
+     * @brief Clears the ID remapping map for the store. This is used to
+     * reset the ID remapping state, typically after a commit or when the
+     * remapping is no longer needed.
      *
      * @tparam T
      * @tparam IdType

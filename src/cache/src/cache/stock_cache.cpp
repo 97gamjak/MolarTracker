@@ -14,37 +14,27 @@ namespace cache
         : _reader(reader)
     {
         addConnection(_reader->subscribeToStockAdded(
-            [this](const auto& stocks)
+            [this](const auto& stock)
             {
-                for (const auto& stock : stocks)
-                {
-                    _onStoreAdded(
-                        stock.getId(),
-                        std::make_shared<const finance::Stock>(stock)
-                    );
-                }
+                _onStoreAdded(
+                    stock.getId(),
+                    std::make_shared<const finance::Stock>(stock)
+                );
             },
             this
         ));
         addConnection(_reader->subscribeToStockUpdated(
-            [this](const auto& stocks)
+            [this](const auto& stock)
             {
-                for (const auto& stock : stocks)
-                {
-                    _onStoreUpdated(
-                        stock.getId(),
-                        std::make_shared<const finance::Stock>(stock)
-                    );
-                }
+                _onStoreUpdated(
+                    stock.getId(),
+                    std::make_shared<const finance::Stock>(stock)
+                );
             },
             this
         ));
         addConnection(_reader->subscribeToStockRemoved(
-            [this](const auto& stockIds)
-            {
-                for (const auto& stockId : stockIds)
-                    _onStoreRemoved(stockId);
-            },
+            [this](const auto& stockId) { _onStoreRemoved(stockId); },
             this
         ));
     }

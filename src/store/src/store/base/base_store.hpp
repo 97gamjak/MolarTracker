@@ -132,12 +132,6 @@ namespace store
 
         /// Map for remapping IDs
         IdIdMap<IdType> _idRemap;
-        /// Vector for tracking updated entries
-        std::vector<T> _updated;
-        /// Vector for tracking added entries
-        std::vector<T> _added;
-        /// Vector for tracking removed entry IDs
-        std::vector<IdType> _removed;
 
         /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
@@ -237,10 +231,10 @@ namespace store
         void                 _markPotentiallyDirty();
         [[nodiscard]] IdType _generateNewId();
 
-        void _notifyUpdated(bool checkAlreadyNotified);
-        void _notifyAdded(bool checkAlreadyNotified);
-        void _notifyRemoved(bool checkAlreadyNotified);
-        void _notifyStoreChanged(bool checkAlreadyNotified);
+        void _notifyUpdated(const T& value);
+        void _notifyAdded(const T& value);
+        void _notifyRemoved(const IdType& id);
+        void _notifyIdRemap(const std::pair<IdType, IdType>& remap);
     };
 
     /**

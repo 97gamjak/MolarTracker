@@ -90,7 +90,7 @@ namespace cache
     template <typename Key, typename Value>
     void SingleCache<Key, Value>::_onStoreRemoved(const Key& key)
     {
-        _entries.erase(key);
+        _entries.removeUnchecked(key);
         this->recordEviction();
         Base::_observable.template notify<OnRemoved<Key>>(key);
     }

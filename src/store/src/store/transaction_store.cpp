@@ -558,11 +558,11 @@ namespace store
     {
         return subscribeToEntryAdded(
             [func = std::move(func),
-             this](const std::vector<finance::DomainTransaction>& transactions)
+             this](const finance::DomainTransaction& transaction)
             {
                 func(
                     finance::Transactions(
-                        transactions,
+                        {transaction},
                         _session->accountSession
                     )
                 );

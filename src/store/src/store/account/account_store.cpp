@@ -39,14 +39,14 @@ namespace store
         // we use the unchecked versions as ids are unique due to store
         // handling!
         _connections.add(subscribeToEntryAdded(
-            [this](const std::vector<finance::Account>& accounts)
-            { _session.addUnchecked(accounts); },
+            [this](const finance::Account& account)
+            { _session.addUnchecked(account); },
             this
         ));
 
         _connections.add(subscribeToEntryRemoved(
-            [this](const std::vector<AccountId>& accountIds)
-            { _session.removeUnchecked(accountIds); },
+            [this](const AccountId& accountId)
+            { _session.removeUnchecked(accountId); },
             this
         ));
 
