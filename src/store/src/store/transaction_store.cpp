@@ -263,7 +263,7 @@ namespace store
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
-        idSet<TransactionId> transactionIds;
+        IdSet<TransactionId> transactionIds;
 
         std::vector<finance::DomainTransaction> results;
 

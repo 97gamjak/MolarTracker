@@ -2,8 +2,10 @@
 
 #include <string>
 
+#include "finance/instrument/instrument_predicates.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
+#include "orm/query_options.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/option_row.hpp"
 #include "sql_models/stock_row.hpp"
@@ -129,6 +131,21 @@ namespace repo
             row.expirationDate.value(),
             row.contractSize.value()
         };
+    }
+
+    orm::Query InstrumentFactory::toStockQuery(
+        const finance::StockFilter& filter
+    )
+    {
+        orm::Query query{};
+
+        if (!filter.stockIds.empty())
+            query = query.in<StockRow::idField>(filter.stockIds);
+
+        if (!filter.instrumentIds.empty())
+            query = query.in<StockRow::instrumentIdField>(filter.instrumentIds);
+
+        return query;
     }
 
 }   // namespace repo

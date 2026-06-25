@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "cache/stock_cache.hpp"
 #include "config/constants/github_constants.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
@@ -68,7 +69,7 @@ namespace controller
         Dialogs(
             const std::vector<drafts::AccountDraft>& cashAccounts,
             const std::vector<drafts::AccountDraft>& securityAccounts,
-            const std::vector<std::string>&          tickers,
+            const std::unordered_set<std::string>&   tickers,
             QMainWindow*                             mainWindow
         );
     };
@@ -85,7 +86,7 @@ namespace controller
     TransactionSideBarController::Dialogs::Dialogs(
         const std::vector<drafts::AccountDraft>& cashAccounts,
         const std::vector<drafts::AccountDraft>& securityAccounts,
-        const std::vector<std::string>&          tickers,
+        const std::unordered_set<std::string>&   tickers,
         QMainWindow*                             mainWindow
     )
         : cash(new DepositWithdrawalWidget(
@@ -127,7 +128,7 @@ namespace controller
         cmd::UndoStack&                           undoStack,
         const std::shared_ptr<IAccountStore>&     accountStore,
         const std::shared_ptr<ITransactionStore>& transactionStore,
-        const std::shared_ptr<IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>& stockCache,
         const std::shared_ptr<IOptionStore>&      optionStore,
         const std::shared_ptr<IPositionStore>&    positionStore,
         TransactionController&                    transactionController,
@@ -139,7 +140,7 @@ namespace controller
           _accountStore(accountStore),
           _transactionStore(transactionStore),
           _positionStore(positionStore),
-          _stockStore(stockStore),
+          _stockCache(stockCache),
           _optionStore(optionStore),
           _dialogs(nullptr),
           _transactionController(transactionController),
@@ -155,7 +156,7 @@ namespace controller
         _dialogs = std::make_unique<Dialogs>(
             cashAccounts,
             securityAccounts,
-            _stockStore->getAllTickers(),
+            _stockCache->getAllTickers(),
             mainWindow
         );
 
@@ -194,11 +195,11 @@ namespace controller
             &TransactionSideBarController::_onCreateTickerRequested
         );
 
-        _connections->add(_stockStore->subscribeToStoreChange(
+        _connections->add(_stockCache->subscribeToAdded(
             [&]()
             {
-                _dialogs->stock->updateTickers(_stockStore->getAllTickers());
-                _dialogs->option->updateTickers(_stockStore->getAllTickers());
+                _dialogs->stock->updateTickers(_stockCache->getAllTickers());
+                _dialogs->option->updateTickers(_stockCache->getAllTickers());
             },
             this
         ));
@@ -257,7 +258,7 @@ namespace controller
             _dialogs->stock->updateReferenceAccounts(
                 AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
-            _dialogs->stock->updateTickers(_stockStore->getAllTickers());
+            _dialogs->stock->updateTickers(_stockCache->getAllTickers());
             _dialogs->stock->refresh();
 
             _dialogs->stock->show();
@@ -270,7 +271,7 @@ namespace controller
             _dialogs->option->updateReferenceAccounts(
                 AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
-            _dialogs->option->updateTickers(_stockStore->getAllTickers());
+            _dialogs->option->updateTickers(_stockCache->getAllTickers());
             _dialogs->option->refresh();
 
             _dialogs->option->show();
@@ -340,14 +341,14 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto result = convertTickerToInstrumentId(draft, _stockStore);
+        const auto result = convertTickerToInstrumentId(draft, _stockCache);
         if (!result)
             throw std::logic_error(result.error());
 
         auto drafts = getOpenStockPositions(
             draft.getSecurityAccount(),
             _positionStore,
-            _stockStore,
+            _stockCache,
             _transactionStore
         );
 
@@ -422,13 +423,13 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto result = convertTickerToInstrumentId(draft, _stockStore);
+        const auto result = convertTickerToInstrumentId(draft, _stockCache);
 
         if (!result)
             throw std::logic_error(result.error());
 
         const auto stock =
-            _stockStore->getStock(draft.getUnderlyingInstrumentId());
+            _stockCache->getStock(draft.getUnderlyingInstrumentId());
 
         if (!stock)
         {

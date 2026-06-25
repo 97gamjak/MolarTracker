@@ -1,18 +1,17 @@
 #ifndef __SERVICE__INCLUDE__SERVICE__I_INSTRUMENT_SERVICE_HPP__
 #define __SERVICE__INCLUDE__SERVICE__I_INSTRUMENT_SERVICE_HPP__
 
-#include <optional>
 #include <string>
 #include <vector>
 
-#include "config/id_types.hpp"
-
 namespace finance
 {
-    class Stock;                   // forward declaration
-    class StockInsertionResult;    // forward declaration
-    class Option;                  // forward declaration
-    class OptionInsertionResult;   // forward declaration
+    class Stock;                    // forward declaration
+    class Stocks;                   // forward declaration
+    struct StockInsertionResult;    // forward declaration
+    class Option;                   // forward declaration
+    struct OptionInsertionResult;   // forward declaration
+    class StockFilter;              // forward declaration
 
 }   // namespace finance
 
@@ -29,22 +28,14 @@ namespace service
         virtual ~IInstrumentService() = default;
 
         /**
-         * @brief Get a list of all stock tickers in the database
-         *
-         * @return std::vector<std::string>
-         */
-        [[nodiscard]]
-        virtual std::vector<std::string> getTickers() = 0;
-
-        /**
          * @brief get a list of all stocks in the database
          *
-         * @param ids The set of instrument IDs to retrieve stocks for
-         * @return std::vector<finance::Stock>
+         * @param filter The filter to apply when retrieving stocks
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+        virtual finance::Stocks getStocks(
+            const finance::StockFilter& filter
         ) = 0;
 
         /**
@@ -56,17 +47,6 @@ namespace service
          */
         [[nodiscard]]
         virtual std::vector<finance::Option> getOptions() = 0;
-
-        /**
-         * @brief Get a stock by its ticker symbol
-         *
-         * @param ticker The ticker symbol of the stock to retrieve
-         * @return std::optional<finance::Stock>
-         */
-        [[nodiscard]]
-        virtual std::optional<finance::Stock> getStock(
-            const std::string& ticker
-        ) = 0;
 
         /**
          * @brief Add a stock instrument to the database, this involves

@@ -1,11 +1,31 @@
 #include "finance/instrument/instrument_predicates.hpp"
 
 #include "filter/predicate.hpp"
+#include "finance/filter/predicates.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 
 namespace finance
 {
+
+    filter::Predicate<Stock> StockFilter::makePredicates() const
+    {
+        filter::Predicate<Stock> predicate =
+            filter::makeEmptyPredicate<Stock>();
+
+        if (!stockIds.empty())
+        {
+            predicate &= checkId<Stock>(stockIds);
+        }
+
+        if (!instrumentIds.empty())
+        {
+            predicate &= checkInstrumentId<Stock>(instrumentIds);
+        }
+
+        return predicate;
+    }
+
     /**
      * @brief Create a Predicate to filter stocks by ticker
      *
@@ -16,33 +36,6 @@ namespace finance
     {
         return filter::makePredicate<Stock>(
             [ticker](const Stock& stock) { return stock.getTicker() == ticker; }
-        );
-    }
-
-    /**
-     * @brief Create a Predicate to filter stocks by instrument ID
-     *
-     * @param id The instrument ID to filter by
-     * @return filter::Predicate<Stock>
-     */
-    filter::Predicate<Stock> HasInstrumentId(InstrumentId id)
-    {
-        return filter::makePredicate<Stock>(
-            [id](const Stock& stock) { return stock.getInstrumentId() == id; }
-        );
-    }
-
-    /**
-     * @brief Create a Predicate to filter stocks by instrument ID
-     *
-     * @param ids The instrument ID to filter by
-     * @return filter::Predicate<Stock>
-     */
-    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids)
-    {
-        return filter::makePredicate<Stock>(
-            [ids](const Stock& stock)
-            { return ids.contains(stock.getInstrumentId()); }
         );
     }
 

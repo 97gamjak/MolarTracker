@@ -24,6 +24,11 @@ namespace ui
     class TransactionsOverview;   // Forward declaration
 }   // namespace ui
 
+namespace cache
+{
+    class StockCache;
+}   // namespace cache
+
 namespace controller
 {
     /**
@@ -43,8 +48,8 @@ namespace controller
         std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// Reference to the account store
         std::shared_ptr<store::IAccountStore> _accountStore;
-        /// Reference to the stock store
-        std::shared_ptr<store::IStockStore> _stockStore;
+        /// Reference to the stock cache
+        std::shared_ptr<cache::StockCache> _stockCache;
 
         /// Pointer to the central stacked widget
         QStackedWidget* _stackedWidget;
@@ -56,7 +61,7 @@ namespace controller
             cmd::UndoStack&                                  undoStack,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
             const std::shared_ptr<store::IAccountStore>&     accountStore,
-            const std::shared_ptr<store::IStockStore>&       stockStore,
+            const std::shared_ptr<cache::StockCache>&        stockCache,
             QStackedWidget*                                  stackedWidget
         );
 

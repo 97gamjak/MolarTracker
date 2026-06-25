@@ -36,7 +36,7 @@ namespace store
         // empty id set returns all stocks
         const auto& stocks = _instrumentService->getStocks({});
 
-        _addCleanEntries(stocks);
+        _addCleanEntries(stocks.getValues());
     }
 
     /**
@@ -175,7 +175,7 @@ namespace store
      *
      * @return finance::Stocks
      */
-    finance::Stocks StockStore::getStocks() const { return getStocks({}); }
+    finance::Stocks StockStore::getStocks() const { return _getStocks({}); }
 
     /**
      * @brief Get a list of all stocks in the store
@@ -183,37 +183,26 @@ namespace store
      * @param ids The set of instrument IDs to retrieve stocks for
      * @return finance::Stocks
      */
-    finance::Stocks StockStore::getStocks(const idSet<InstrumentId>& ids) const
+    finance::Stocks StockStore::getStocks(const IdSet<InstrumentId>& ids) const
     {
-        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
-        if (!ids.empty())
-            options.filter = finance::HasInstrumentId(ids);
+        finance::StockFilter filter;
+        filter.instrumentIds.combine(ids);
 
-        auto entries = _getValues(options);
+        return _getStocks(filter);
+    }
 
-        finance::Stocks stocks;
+    /**
+     * @brief Get a stock by its instrument ID
+     *
+     * @param id The instrument ID
+     * @return std::optional<Stock>
+     */
+    std::optional<Stock> StockStore::getStock(StockId id) const
+    {
+        finance::StockFilter filter;
+        filter.stockIds.combine({id});
 
-        for (const auto& entry : entries)
-            stocks.addUnchecked(entry);
-
-        if (!isFullCache())
-        {
-            options.deletion = DeletionPolicy::IncludeDelete;
-
-            for (const auto& stock : _instrumentService->getStocks(ids))
-            {
-                const auto alreadyInStore = std::ranges::any_of(
-                    _getValues(options),
-                    [&](const Stock& stockInStore)
-                    { return stockInStore.getId() == stock.getId(); }
-                );
-
-                if (!alreadyInStore)
-                    stocks.addUnchecked(stock);
-            }
-        }
-
-        return stocks;
+        return _getStock(filter);
     }
 
     /**
@@ -224,46 +213,22 @@ namespace store
      */
     std::optional<Stock> StockStore::getStock(InstrumentId id) const
     {
-        const auto options = Options{
-            .filter   = finance::HasInstrumentId(id),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-        auto stocksView = _getValues(options);
+        finance::StockFilter filter;
+        filter.instrumentIds.combine({id});
 
-        std::vector<Stock> stocks = {stocksView.begin(), stocksView.end()};
-
-        if (stocksView.empty())
-        {
-            if (isFullCache())
-                return std::nullopt;
-
-            const auto dbStocks = _instrumentService->getStocks({id});
-
-            stocks.insert(stocks.end(), dbStocks.begin(), dbStocks.end());
-
-            if (stocks.empty())
-                return std::nullopt;
-        }
-
-        if (stocks.size() > 1)
-            throw std::runtime_error("Multiple stocks found");
-
-        return stocks.front();
+        return _getStock(filter);
     }
 
     /**
      * @brief Get a list of all stock tickers in the store
      *
-     * @return std::vector<std::string>
+     * @return std::unordered_set<std::string>
      */
-    std::vector<std::string> StockStore::getAllTickers() const
+    std::unordered_set<std::string> StockStore::getAllTickers() const
     {
         std::vector<std::string> tickers;
 
-        for (const auto& [id, stock] : getStocks())
-            tickers.push_back(stock.getTicker());
-
-        return tickers;
+        return getStocks().getTickers();
     }
 
     /**
@@ -350,6 +315,97 @@ namespace store
             func,
             subscriber
         );
+    }
+
+    Connection StockStore::subscribeToStockAdded(
+        OnStoreItemAdded<Stock>::func func,
+        void*                         subscriber
+    )
+    {
+        return BaseStore<finance::Stock, StockId>::subscribeToEntryAdded(
+            func,
+            subscriber
+        );
+    }
+
+    Connection StockStore::subscribeToStockUpdated(
+        OnStoreItemUpdated<Stock>::func func,
+        void*                           subscriber
+    )
+    {
+        return BaseStore<finance::Stock, StockId>::subscribeToEntryUpdated(
+            func,
+            subscriber
+        );
+    }
+
+    Connection StockStore::subscribeToStockRemoved(
+        OnStoreItemRemoved<StockId>::func func,
+        void*                             subscriber
+    )
+    {
+        return BaseStore<finance::Stock, StockId>::subscribeToEntryRemoved(
+            func,
+            subscriber
+        );
+    }
+
+    std::optional<Stock> StockStore::_getStock(
+        const finance::StockFilter& filter
+    ) const
+    {
+        const auto stocks = _getStocks(filter);
+
+        if (stocks.size() > 1)
+            throw std::runtime_error("Multiple stocks found");
+
+        if (stocks.empty())
+            return std::nullopt;
+
+        return stocks.begin()->second;
+    }
+
+    /**
+     * @brief Get a list of all stocks in the store
+     *
+     * @param filter The filter to apply when retrieving stocks
+     * @return finance::Stocks
+     */
+    finance::Stocks StockStore::_getStocks(
+        const finance::StockFilter& filter
+    ) const
+    {
+        auto options = Options{
+            .filter   = filter.makePredicates(),
+            .deletion = DeletionPolicy::ExcludeDelete,
+        };
+
+        auto entries = _getValues(options);
+
+        finance::Stocks stocks;
+
+        for (const auto& entry : entries)
+            stocks.addUnchecked(entry);
+
+        if (!isFullCache())
+        {
+            options.deletion = DeletionPolicy::IncludeDelete;
+
+            for (const auto& [stockId, stock] :
+                 _instrumentService->getStocks(filter))
+            {
+                const auto alreadyInStore = std::ranges::any_of(
+                    _getValues(options),
+                    [_stockId = stockId](const Stock& stockInStore)
+                    { return stockInStore.getId() == _stockId; }
+                );
+
+                if (!alreadyInStore)
+                    stocks.addUnchecked(stock);
+            }
+        }
+
+        return stocks;
     }
 
 }   // namespace store

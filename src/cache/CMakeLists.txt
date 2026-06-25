@@ -1,0 +1,18 @@
+add_library(molartracker_cache STATIC
+    src/cache/stock_cache.cpp
+)
+
+target_include_directories(molartracker_cache
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+)
+
+target_link_libraries(molartracker_cache
+    PRIVATE
+    molartracker_store
+    molartracker_finance
+    molartracker_utils
+    molartracker_config
+)

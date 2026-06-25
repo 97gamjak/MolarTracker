@@ -9,6 +9,7 @@
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
 #include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 class Connection;   // Forward declaration
 
@@ -31,25 +32,13 @@ namespace store
         StockNotFound,
     };
 
-    /**
-     * @brief Store for managing stocks
-     *
-     */
-    class IStockStore
+    class IStockStoreReader
     {
        public:
-        virtual ~IStockStore() = default;
+        virtual ~IStockStoreReader() = default;
 
-        /**
-         * @brief Add a stock to the store, this will check if a stock with the
-         * same ticker already exists in the store or in the database, and if
-         * not, it will add the stock to the store and the database.
-         *
-         * @param stock The Stock object to be added to the store
-         * @return StockStoreResult indicating the result of the operation
-         */
         [[nodiscard]]
-        virtual StockStoreResult addStock(finance::Stock stock) = 0;
+        virtual std::optional<finance::Stock> getStock(StockId id) const = 0;
 
         /**
          * @brief Get the Stock based on the given instrument ID
@@ -70,7 +59,7 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Stocks getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) const = 0;
 
         /**
@@ -84,10 +73,10 @@ namespace store
         /**
          * @brief Get all stock tickers in the store
          *
-         * @return std::vector<std::string>
+         * @return std::unordered_set<std::string>
          */
         [[nodiscard]]
-        virtual std::vector<std::string> getAllTickers() const = 0;
+        virtual std::unordered_set<std::string> getAllTickers() const = 0;
 
         /**
          * @brief Get a mapping of stock tickers to their instrument IDs
@@ -110,21 +99,44 @@ namespace store
             const std::string& ticker
         ) const = 0;
 
-        /**
-         * @brief commit changes to the store, this will save any new or
-         * modified stocks to the database, and will also handle any necessary
-         * cleanup or state updates in the store after committing changes.
-         *
-         */
-        virtual void commit() = 0;
+        [[nodiscard]]
+        virtual Connection subscribeToStockAdded(
+            OnStoreItemAdded<finance::Stock>::func func,
+            void*                                  subscriber
+        ) = 0;
+
+        [[nodiscard]]
+        virtual Connection subscribeToStockUpdated(
+            OnStoreItemUpdated<finance::Stock>::func func,
+            void*                                    subscriber
+        ) = 0;
+
+        [[nodiscard]]
+        virtual Connection subscribeToStockRemoved(
+            OnStoreItemRemoved<StockId>::func func,
+            void*                             subscriber
+        ) = 0;
+    };
+
+    /**
+     * @brief Store for managing stocks
+     *
+     */
+    class IStockStore
+    {
+       public:
+        virtual ~IStockStore() = default;
 
         /**
-         * @brief Get the mapping of old instrument IDs to new instrument IDs
+         * @brief Add a stock to the store, this will check if a stock with the
+         * same ticker already exists in the store or in the database, and if
+         * not, it will add the stock to the store and the database.
          *
-         * @return const IdIdMap<InstrumentId>&
+         * @param stock The Stock object to be added to the store
+         * @return StockStoreResult indicating the result of the operation
          */
         [[nodiscard]]
-        virtual const IdIdMap<InstrumentId>& getInstrumentIdMap() const = 0;
+        virtual StockStoreResult addStock(finance::Stock stock) = 0;
 
         /**
          * @brief Subscribe to changes in the stock store, this allows observers

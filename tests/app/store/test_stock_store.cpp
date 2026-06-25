@@ -83,7 +83,7 @@ TEST_F(StockStoreTest, GetAllTickersReturnsAddedStock)
     const auto tickers = _store->getAllTickers();
 
     ASSERT_EQ(tickers.size(), 1U);
-    EXPECT_EQ(tickers[0], "AAPL");
+    EXPECT_EQ(*tickers.begin(), "AAPL");
 }
 
 TEST_F(StockStoreTest, StockExistsFalseForUnknown)

@@ -4,14 +4,6 @@
 #include "config/strong_id.hpp"
 #include "map.hpp"
 
-template <typename T>
-concept HasId = requires(T item) {
-    { item.getId() };
-};
-
-template <typename T>
-using IdOf = decltype(std::declval<T>().getId());
-
 /**
  * @brief A map that associates IDs with values.
  *

@@ -3,6 +3,8 @@
 
 #include "field.hpp"
 #include "fixed_string.hpp"
+#include "orm/where_expr.hpp"
+#include "utils/container/set.hpp"
 
 namespace orm
 {

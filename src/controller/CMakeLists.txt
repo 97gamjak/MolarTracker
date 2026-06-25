@@ -57,13 +57,14 @@ target_link_libraries(molartracker_controller
     PRIVATE
     Qt6::Widgets
     Qt6::Concurrent
-    molartracker_store
-    molartracker_connections
-    molartracker_settings
-    molartracker_logging
-    molartracker_ui
-    molartracker_drafts
+    molartracker_cache
     molartracker_commands
+    molartracker_connections
+    molartracker_drafts
     molartracker_http
+    molartracker_logging
+    molartracker_settings
+    molartracker_store
+    molartracker_ui
     molartracker_vcs
 )

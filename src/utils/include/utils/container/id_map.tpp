@@ -39,7 +39,7 @@ template <typename Value>
 requires HasId<Value>
 bool IdObjectMap<Value>::add(const Value& value)
 {
-    return Base::add(value.getId(), value);
+    return Base::add(extractId(value), value);
 }
 
 /**
@@ -54,8 +54,18 @@ requires HasId<Value>
 template <std::ranges::range R>
 void IdObjectMap<Value>::addUnchecked(R&& values)
 {
-    for (const auto& value : std::forward<R>(values))
-        Base::addUnchecked(value.getId(), value);
+    if constexpr (std::same_as<std::decay_t<R>, IdObjectMap<Value>>)
+    {
+        // Direct copy from another IdObjectMap — already has IDs
+        for (const auto& [key, value] : values)
+            Base::addUnchecked(key, value);
+    }
+    else
+    {
+        // Range of bare values — extract IDs
+        for (const auto& value : std::forward<R>(values))
+            Base::addUnchecked(extractId(value), value);
+    }
 }
 
 /**
@@ -69,7 +79,7 @@ template <typename Value>
 requires HasId<Value>
 void IdObjectMap<Value>::addUnchecked(const Value& value)
 {
-    Base::addUnchecked(value.getId(), value);
+    Base::addUnchecked(extractId(value), value);
 }
 
 /**
@@ -95,7 +105,19 @@ requires HasId<Value>
 template <std::ranges::range R>
 IdObjectMap<Value>::IdObjectMap(R&& values)
 {
-    addUnchecked(std::forward<R>(values));
+    for (const auto& elem : std::forward<R>(values))
+    {
+        if constexpr (requires { elem.second; })
+        {
+            // Range of pairs (from iterating IdObjectMap)
+            Base::addUnchecked(extractId(elem.second), elem.second);
+        }
+        else
+        {
+            // Range of values
+            Base::addUnchecked(extractId(elem), elem);
+        }
+    }
 }
 
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_TPP__

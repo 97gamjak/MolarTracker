@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <ostream>
 #include <unordered_map>
-#include <unordered_set>
 
 /**
  * @brief A strong typedef for IDs to prevent mixing different ID types
@@ -105,6 +104,23 @@ inline constexpr bool isStrongId_v = isStrongId<T>::value;
 
 template <typename T>
 concept IsId = isStrongId_v<T>;
+
+template <typename T>
+concept HasId = requires(T value) { value.getId(); } ||
+                requires(T value) { value->getId(); };
+
+template <HasId T>
+[[nodiscard]]
+auto extractId(const T& value)
+{
+    if constexpr (requires { value.getId(); })
+        return value.getId();
+    else
+        return value->getId();
+}
+
+template <typename T>
+using IdOf = decltype(extractId(std::declval<T>()));
 
 #ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 #include "config/details/strong_id.tpp"

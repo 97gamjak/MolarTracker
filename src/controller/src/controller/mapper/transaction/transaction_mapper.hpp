@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -41,7 +42,7 @@ namespace controller
         [[nodiscard]]
         static drafts::TransactionEntryDraft toEntryDraft(
             const finance::TransactionEntry& entry,
-            const idSet<AccountId>&          externalAccounts
+            const IdSet<AccountId>&          externalAccounts
         );
 
         [[nodiscard]]

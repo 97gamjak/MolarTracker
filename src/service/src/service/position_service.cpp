@@ -41,7 +41,7 @@ namespace service
      * @return std::vector<finance::Position>
      */
     std::vector<finance::Position> PositionService::getAllPositions(
-        const idSet<AccountId>& accountIds
+        const IdSet<AccountId>& accountIds
     )
     {
         const auto positions = _positionRepo->getAllPositions(accountIds);
@@ -59,7 +59,7 @@ namespace service
      * @return std::vector<finance::Position>
      */
     std::vector<finance::Position> PositionService::getAllOpenPositions(
-        const idSet<AccountId>& accountIds
+        const IdSet<AccountId>& accountIds
     )
     {
         const auto positions = _positionRepo->getAllOpenPositions(accountIds);

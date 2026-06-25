@@ -5,6 +5,7 @@
 
 #include "config/id_types.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
+#include "utils/container/id_map.hpp"
 
 namespace finance
 {
@@ -23,8 +24,8 @@ namespace controller
     {
        public:
         static std::vector<drafts::StockTransactionOverview> toStock(
-            const finance::Transactions&                     transactions,
-            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+            const finance::Transactions&            transactions,
+            const IdMap<InstrumentId, std::string>& instrumentNames
         );
 
         static std::vector<drafts::CashTransactionOverview> toCash(

@@ -434,16 +434,16 @@ namespace store
     /**
      * @brief Get the IDs of all external accounts
      *
-     * @return idSet<AccountId>
+     * @return IdSet<AccountId>
      */
-    idSet<AccountId> AccountStore::getExternalAccountIds() const
+    IdSet<AccountId> AccountStore::getExternalAccountIds() const
     {
         const auto options = Options{
             .filter   = IsExternal(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        idSet<AccountId> externalAccountIds;
+        IdSet<AccountId> externalAccountIds;
 
         for (const auto& account : _getValues(options))
             externalAccountIds.insert(account.getId());

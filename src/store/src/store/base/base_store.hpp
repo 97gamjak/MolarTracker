@@ -14,6 +14,7 @@
 #include "store/i_store.hpp"
 #include "store_state.hpp"
 #include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace store
 {
@@ -209,7 +210,7 @@ namespace store
         [[nodiscard]]
         auto _getEntry(Options options = Options()) const;
         [[nodiscard]]
-        idSet<IdType> _getIds(Options options = Options()) const;
+        IdSet<IdType> _getIds(Options options = Options()) const;
 
         IdType      _addEntry(T value);
         void        _addCleanEntries(const std::vector<T>& value);

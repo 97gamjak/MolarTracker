@@ -7,6 +7,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 class QDialog;   // Forward declaration
@@ -14,20 +15,30 @@ class QWidget;   // Forward declaration
 
 namespace utils
 {
+    [[nodiscard]]
     QStringList toQStringList(const std::span<const std::string_view>& vec);
+    [[nodiscard]]
     QStringList toQStringList(const std::span<std::string>& vec);
 
+    [[nodiscard]]
     std::vector<QString> toQStringVector(const std::span<std::string>& vec);
+    [[nodiscard]]
     std::vector<QString> toQStringVector(
         const std::span<const std::string>& vec
     );
+    [[nodiscard]]
+    std::unordered_set<QString> toQStringSet(
+        const std::unordered_set<std::string>& vec
+    );
 
     template <mstd::has_enum_meta EnumMeta>
+    [[nodiscard]]
     QString toQString(EnumMeta value);
 
     void moveDialogToParentScreenCenter(QDialog* dlg, QWidget* parent);
 
     template <typename T, typename... Args>
+    [[nodiscard]]
     T* makeQChild(Args&&... args);
 
 }   // namespace utils

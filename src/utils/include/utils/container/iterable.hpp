@@ -22,6 +22,12 @@ class Iterable
     Iterable(const Container& items);
     // cppcheck-suppress noExplicitConstructor
     Iterable(Container&& items);
+
+    Iterable(const Iterable& other)                = default;
+    Iterable& operator=(const Iterable& other)     = default;
+    Iterable(Iterable&& other) noexcept            = default;
+    Iterable& operator=(Iterable&& other) noexcept = default;
+    ~Iterable()                                    = default;
     // NOLINTEND(google-explicit-constructor, hicpp-explicit-conversions)
 
     auto begin();
@@ -32,7 +38,6 @@ class Iterable
     [[nodiscard]] bool empty() const;
     [[nodiscard]] auto size() const;
 
-   protected:
     [[nodiscard]] Container&       getItems();
     [[nodiscard]] const Container& getItems() const;
 };

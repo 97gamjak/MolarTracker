@@ -5,20 +5,24 @@
 
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
     class Stock;
     class Option;
 
+    struct StockFilter
+    {
+        IdSet<StockId>      stockIds;
+        IdSet<InstrumentId> instrumentIds;
+
+        [[nodiscard]]
+        filter::Predicate<Stock> makePredicates() const;
+    };
+
     [[nodiscard]]
     filter::Predicate<Stock> HasTicker(const std::string& ticker);
-
-    [[nodiscard]]
-    filter::Predicate<Stock> HasInstrumentId(InstrumentId id);
-
-    [[nodiscard]]
-    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids);
 
     [[nodiscard]]
     filter::Predicate<Option> HasOptionName(const std::string& name);
