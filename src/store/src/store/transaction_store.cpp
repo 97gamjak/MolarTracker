@@ -136,8 +136,6 @@ namespace store
         }
 
         _logCache(LOG_CATEGORY, LogLevel::Trace);
-
-        _notifyOnCommit();
     }
 
     /**

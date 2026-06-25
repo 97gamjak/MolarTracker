@@ -200,8 +200,6 @@ namespace store
             }
         }
 
-        _notifyOnCommit();
-
         // here now we set our ids because they are now clean!
         // we use the unchecked version as ids are unique due to store handling!
         _session.setUnchecked(_getValues());

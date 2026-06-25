@@ -166,8 +166,6 @@ namespace store
                 }
             }
         }
-
-        _notifyOnCommit();
     }
 
     /**

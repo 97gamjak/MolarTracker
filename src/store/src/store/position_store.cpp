@@ -182,8 +182,6 @@ namespace store
                 }
             }
         }
-
-        _notifyOnCommit();
     }
 
     /**

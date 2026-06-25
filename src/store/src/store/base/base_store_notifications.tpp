@@ -51,21 +51,6 @@ namespace store
     }
 
     /**
-     * @brief Notifies subscribers of commit events.
-     *
-     * @tparam T
-     * @tparam IdType
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyOnCommit()
-    {
-        _notifyAdded(true);
-        _notifyRemoved(true);
-        _notifyUpdated(true);
-        _alreadyNotified = false;
-    }
-
-    /**
      * @brief Notifies subscribers of store changes.
      *
      * @tparam T

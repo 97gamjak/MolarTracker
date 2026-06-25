@@ -221,8 +221,6 @@ namespace store
 
         void _clearEntries();
 
-        void _notifyOnCommit();
-
         void _logCache(const std::string& category, LogLevel level);
 
         [[nodiscard]] const IdIdMap<IdType>& _getIdRemap() const;
