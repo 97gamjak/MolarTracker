@@ -1,6 +1,8 @@
 #ifndef __CACHE__INCLUDE__CACHE__SINGLE_CACHE_TPP__
 #define __CACHE__INCLUDE__CACHE__SINGLE_CACHE_TPP__
 
+#include <format>
+
 #include "single_cache.hpp"
 
 namespace cache
