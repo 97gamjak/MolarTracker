@@ -69,8 +69,12 @@ namespace cache
         if (const auto& entry = find(findFunc))
             return entry;
 
-        auto       value = loadFunc();
-        const auto key   = value->getId();
+        auto value = loadFunc();
+
+        if (value == nullptr)
+            return nullptr;
+
+        const auto key = value->getId();
         _add(key, value);
         return value;
     }
