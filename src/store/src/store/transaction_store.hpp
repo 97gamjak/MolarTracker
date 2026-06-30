@@ -83,7 +83,7 @@ namespace store
         finance::Transactions getTransactions() const override;
 
         [[nodiscard]]
-        unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+        IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const override;
 

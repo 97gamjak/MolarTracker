@@ -9,7 +9,6 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "config/strong_id.hpp"
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
 #include "drafts/position_draft.hpp"
@@ -61,7 +60,7 @@ namespace controller
 
         /// A mapping of account IDs to their corresponding open stock position
         /// details, used for displaying the account details in the UI
-        unorderedIdMap<AccountId, std::vector<OpenStockPositionDetail>>
+        IdMap<AccountId, std::vector<OpenStockPositionDetail>>
             openPositionDetails;
 
         Details(

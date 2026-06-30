@@ -42,9 +42,6 @@ using TradeLegId = StrongId<TradeLegTag>;
 struct PositionTag {};
 using PositionId = StrongId<PositionTag>;
 
-template <typename T>
-using positionMap = unorderedIdMap<PositionId, T>;
-
 // clang-format on
 
 template <typename T>

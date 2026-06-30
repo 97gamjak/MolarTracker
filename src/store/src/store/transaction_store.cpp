@@ -1,7 +1,6 @@
 #include "store/transaction_store.hpp"
 
 #include <format>
-#include <unordered_map>
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
@@ -303,16 +302,15 @@ namespace store
      * transactions in the store will be considered when determining stock
      * positions.
      *
-     * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
+     * @return IdMap<PositionId, finance::StockPositionTransaction>
      * A mapping of position IDs to StockPositionTransaction objects, this
      * allows the caller to easily access the details of each open stock
      * position based on its position ID.
      */
-    unorderedIdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
+    IdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
         getStockPositions(const finance::TransactionFilter& filter) const
     {
-        unorderedIdMap<PositionId, finance::StockPositionTransaction>
-            stockPositions;
+        IdMap<PositionId, finance::StockPositionTransaction> stockPositions;
 
         const auto transactions = getTransactions(filter).stocks();
 
@@ -325,7 +323,7 @@ namespace store
                     finance::StockPositionTransaction(positionId);
             }
 
-            if (!stockPositions.at(positionId).addPosition(transaction))
+            if (!stockPositions[positionId].addPosition(transaction))
             {
                 LOG_ERROR(
                     "Failed to add stock transaction to position id: " +

@@ -5,7 +5,7 @@
 #include <qwidget.h>
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
+#include "utils/container/id_map.hpp"
 
 namespace drafts
 {
@@ -58,8 +58,8 @@ namespace ui
             const std::vector<drafts::CashTransactionOverview>&
                 cashTransactions,
             const std::vector<drafts::StockTransactionOverview>&
-                                                          stockTransactions,
-            const unorderedIdMap<AccountId, std::string>& accountIdToName
+                                                 stockTransactions,
+            const IdMap<AccountId, std::string>& accountIdToName
         );
 
        private:
