@@ -80,8 +80,11 @@ namespace store
         bool               checkDeleted
     ) const
     {
+        finance::StockFilter filter;
+        filter.tickers.combine({ticker});
+
         const auto options = Options{
-            .filter   = finance::HasTicker(ticker),
+            .filter   = filter.makePredicates(),
             .deletion = checkDeleted ? DeletionPolicy::IncludeDelete
                                      : DeletionPolicy::ExcludeDelete
         };

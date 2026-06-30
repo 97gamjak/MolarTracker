@@ -34,19 +34,6 @@ namespace finance
         return predicate;
     }
 
-    /**
-     * @brief Create a Predicate to filter stocks by ticker
-     *
-     * @param ticker The ticker symbol to filter by
-     * @return filter::Predicate<Stock>
-     */
-    filter::Predicate<Stock> HasTicker(const std::string& ticker)
-    {
-        return filter::makePredicate<Stock>(
-            [ticker](const Stock& stock) { return stock.getTicker() == ticker; }
-        );
-    }
-
     filter::Predicate<Option> HasOptionName(const std::string& name)
     {
         return filter::makePredicate<Option>(

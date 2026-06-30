@@ -29,11 +29,6 @@ namespace finance
         filter::Predicate<Stock> makePredicates() const;
     };
 
-    // TODO: remove these
-
-    [[nodiscard]]
-    filter::Predicate<Stock> HasTicker(const std::string& ticker);
-
     [[nodiscard]]
     filter::Predicate<Option> HasOptionName(const std::string& name);
 
