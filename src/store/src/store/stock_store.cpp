@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <format>
 #include <utility>
-#include <vector>
 
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
@@ -26,17 +25,16 @@ namespace store
      * @param instrumentIdSeq
      */
     StockStore::StockStore(
-        InstrumentServicePtr instrumentService,
-        InstrumentIdSeq&     instrumentIdSeq
+        std::shared_ptr<service::IInstrumentService> instrumentService,
+        InstrumentIdSeq&                             instrumentIdSeq
     )
-        : BaseStore<finance::Stock, StockId>(true),
-          _instrumentService(std::move(instrumentService)),
+        : _instrumentService(std::move(instrumentService)),
           _instrumentIdSeq(instrumentIdSeq)
     {
         // empty id set returns all stocks
         const auto& stocks = _instrumentService->getStocks({});
 
-        _addCleanEntries(stocks);
+        _addCleanEntries(stocks.getValues());
     }
 
     /**
@@ -82,16 +80,18 @@ namespace store
         bool               checkDeleted
     ) const
     {
+        finance::StockFilter filter;
+        filter.tickers.combine({ticker});
+
         const auto options = Options{
-            .filter   = finance::HasTicker(ticker),
+            .filter   = filter.makePredicates(),
             .deletion = checkDeleted ? DeletionPolicy::IncludeDelete
                                      : DeletionPolicy::ExcludeDelete
         };
 
         auto exists = _getEntry(options).has_value();
 
-        if (!isFullCache())
-            exists |= _instrumentService->stockExists(ticker);
+        exists |= _instrumentService->stockExists(ticker);
 
         return exists;
     }
@@ -167,53 +167,21 @@ namespace store
             }
         }
 
-        _notifyOnCommit();
+        _notifyCommit();
     }
 
     /**
-     * @brief Get a list of all stocks in the store
+     * @brief Get a stock by its instrument ID
      *
-     * @return finance::Stocks
+     * @param id The instrument ID
+     * @return std::optional<Stock>
      */
-    finance::Stocks StockStore::getStocks() const { return getStocks({}); }
-
-    /**
-     * @brief Get a list of all stocks in the store
-     *
-     * @param ids The set of instrument IDs to retrieve stocks for
-     * @return finance::Stocks
-     */
-    finance::Stocks StockStore::getStocks(const idSet<InstrumentId>& ids) const
+    std::optional<Stock> StockStore::getStock(StockId id) const
     {
-        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
-        if (!ids.empty())
-            options.filter = finance::HasInstrumentId(ids);
+        finance::StockFilter filter;
+        filter.stockIds.combine({id});
 
-        auto entries = _getValues(options);
-
-        finance::Stocks stocks;
-
-        for (const auto& entry : entries)
-            stocks.addUnchecked(entry);
-
-        if (!isFullCache())
-        {
-            options.deletion = DeletionPolicy::IncludeDelete;
-
-            for (const auto& stock : _instrumentService->getStocks(ids))
-            {
-                const auto alreadyInStore = std::ranges::any_of(
-                    _getValues(options),
-                    [&](const Stock& stockInStore)
-                    { return stockInStore.getId() == stock.getId(); }
-                );
-
-                if (!alreadyInStore)
-                    stocks.addUnchecked(stock);
-            }
-        }
-
-        return stocks;
+        return _getStock(filter);
     }
 
     /**
@@ -224,46 +192,20 @@ namespace store
      */
     std::optional<Stock> StockStore::getStock(InstrumentId id) const
     {
-        const auto options = Options{
-            .filter   = finance::HasInstrumentId(id),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-        auto stocksView = _getValues(options);
+        finance::StockFilter filter;
+        filter.instrumentIds.combine({id});
 
-        std::vector<Stock> stocks = {stocksView.begin(), stocksView.end()};
-
-        if (stocksView.empty())
-        {
-            if (isFullCache())
-                return std::nullopt;
-
-            const auto dbStocks = _instrumentService->getStocks({id});
-
-            stocks.insert(stocks.end(), dbStocks.begin(), dbStocks.end());
-
-            if (stocks.empty())
-                return std::nullopt;
-        }
-
-        if (stocks.size() > 1)
-            throw std::runtime_error("Multiple stocks found");
-
-        return stocks.front();
+        return _getStock(filter);
     }
 
-    /**
-     * @brief Get a list of all stock tickers in the store
-     *
-     * @return std::vector<std::string>
-     */
-    std::vector<std::string> StockStore::getAllTickers() const
+    std::optional<finance::Stock> StockStore::getStock(
+        const std::string& ticker
+    ) const
     {
-        std::vector<std::string> tickers;
+        finance::StockFilter filter;
+        filter.tickers.combine({ticker});
 
-        for (const auto& [id, stock] : getStocks())
-            tickers.push_back(stock.getTicker());
-
-        return tickers;
+        return _getStock(filter);
     }
 
     /**
@@ -276,43 +218,10 @@ namespace store
     {
         std::unordered_map<std::string, InstrumentId> tickerMap;
 
-        for (const auto& [id, stock] : getStocks())
+        for (const auto& [id, stock] : getStocks({}))
             tickerMap[stock.getTicker()] = stock.getInstrumentId();
 
         return tickerMap;
-    }
-
-    /**
-     * @brief Get a mapping of instrument IDs to their names
-     *
-     * @return unorderedIdMap<InstrumentId, std::string>
-     */
-    unorderedIdMap<InstrumentId, std::string> StockStore::
-        getInstrumentIdToNameMap() const
-    {
-        unorderedIdMap<InstrumentId, std::string> map;
-
-        for (const auto& [id, stock] : getStocks())
-            map[stock.getInstrumentId()] = stock.getTicker();
-
-        return map;
-    }
-
-    /**
-     * @brief Get the instrument ID for a given stock ticker
-     *
-     * @param ticker The stock ticker
-     * @return std::optional<InstrumentId>
-     */
-    std::optional<InstrumentId> StockStore::getInstrumentId(
-        const std::string& ticker
-    ) const
-    {
-        for (const auto& [id, stock] : getStocks())
-            if (stock.getTicker() == ticker)
-                return stock.getInstrumentId();
-
-        return std::nullopt;
     }
 
     /**
@@ -327,29 +236,152 @@ namespace store
     }
 
     /**
-     * @brief Subscribe to changes in the stock store, this will notify the
-     * subscriber whenever a stock is added, modified or deleted in the store.
+     * @brief Subscribe to stock added events
      *
-     * @param func The function to be called when a change occurs, this function
-     * should take a StockId as a parameter and return void, it will be called
-     * with the ID of the stock that was changed.
-     * @param subscriber A pointer to the subscriber object, this is used to
-     * identify the subscriber and manage the subscription, it can be any
-     * pointer (e.g. to a class instance) and is not used by the store itself,
-     * but it should be unique for each subscriber to avoid conflicts.
-     * @return Connection An object representing the subscription, this can be
-     * used to manage the subscription (e.g. to unsubscribe) and should be
-     * stored by the subscriber if they want to manage their subscriptions.
+     * @param func The callback function to be called when a stock is added
+     * @param subscriber The subscriber object that will receive the event
+     *
+     * @return Connection The connection object for managing the subscription
      */
-    Connection StockStore::subscribeToStoreChange(
-        StoreChanged<StockId>::func func,
-        void*                       subscriber
+    Connection StockStore::subscribeToStockAdded(
+        OnStoreItemAdded<Stock>::func func,
+        void*                         subscriber
     )
     {
-        return BaseStore<finance::Stock, StockId>::subscribeToStoreChange(
+        return BaseStore<finance::Stock, StockId>::subscribeToEntryAdded(
             func,
             subscriber
         );
+    }
+
+    /**
+     * @brief Subscribe to stock updated events
+     *
+     * @param func The callback function to be called when a stock is updated
+     * @param subscriber The subscriber object that will receive the event
+     *
+     * @return Connection The connection object for managing the subscription
+     */
+    Connection StockStore::subscribeToStockUpdated(
+        OnStoreItemUpdated<Stock>::func func,
+        void*                           subscriber
+    )
+    {
+        return BaseStore<finance::Stock, StockId>::subscribeToEntryUpdated(
+            func,
+            subscriber
+        );
+    }
+
+    /**
+     * @brief Subscribe to stock removed events
+     *
+     * @param func The callback function to be called when a stock is removed
+     * @param subscriber The subscriber object that will receive the event
+     *
+     * @return Connection The connection object for managing the subscription
+     */
+    Connection StockStore::subscribeToStockRemoved(
+        OnStoreItemRemoved<StockId>::func func,
+        void*                             subscriber
+    )
+    {
+        return BaseStore<finance::Stock, StockId>::subscribeToEntryRemoved(
+            func,
+            subscriber
+        );
+    }
+
+    /**
+     * @brief Get a stock based on the provided filter, this method retrieves
+     * stocks from the store that match the given filter criteria. If multiple
+     * stocks match the filter, an exception is thrown. If no stocks match, an
+     * empty optional is returned.
+     *
+     * @param filter The filter to apply when retrieving stocks
+     * @return std::optional<Stock>
+     */
+    std::optional<Stock> StockStore::_getStock(
+        const finance::StockFilter& filter
+    ) const
+    {
+        const auto stocks = getStocks(filter);
+
+        if (stocks.size() > 1)
+            throw std::runtime_error("Multiple stocks found");
+
+        if (stocks.empty())
+            return std::nullopt;
+
+        return stocks.begin()->second;
+    }
+
+    /**
+     * @brief Get a list of all stocks in the store
+     *
+     * @param filter The filter to apply when retrieving stocks
+     * @return finance::Stocks
+     */
+    finance::Stocks StockStore::getStocks(
+        const finance::StockFilter& filter
+    ) const
+    {
+        auto options = Options{
+            .filter   = filter.makePredicates(),
+            .deletion = DeletionPolicy::ExcludeDelete,
+        };
+
+        auto entries = _getValues(options);
+
+        finance::Stocks stocks;
+
+        for (const auto& entry : entries)
+            stocks.addUnchecked(entry);
+
+        options.deletion = DeletionPolicy::IncludeDelete;
+
+        for (const auto& [stockId, stock] :
+             _instrumentService->getStocks(filter))
+        {
+            const auto alreadyInStore = std::ranges::any_of(
+                _getValues(options),
+                [_stockId = stockId](const Stock& stockInStore)
+                { return stockInStore.getId() == _stockId; }
+            );
+
+            if (!alreadyInStore)
+                stocks.addUnchecked(stock);
+        }
+
+        return stocks;
+    }
+
+    /**
+     * @brief Subscribe to commit events, this allows subscribers to be notified
+     * when a commit occurs in the stock store, providing them with the mapping
+     * of old instrument IDs to new instrument IDs.
+     *
+     * @param func The callback function to be called when a commit occurs
+     * @param subscriber The subscriber object that will receive the event
+     * @return Connection The connection object for managing the subscription
+     */
+    Connection StockStore::subscribeToCommit(
+        const OnCommit::func& func,
+        void*                 subscriber
+    )
+    {
+        return _onCommit.on<OnCommit>(func, subscriber);
+    }
+
+    /**
+     * @brief Notify subscribers of a commit event, this method is called
+     * internally when a commit occurs in the stock store, and it notifies all
+     * subscribers with the mapping of old instrument IDs to new instrument IDs.
+     *
+     */
+    void StockStore::_notifyCommit()
+    {
+        _onCommit.notify<OnCommit>(_getIdRemap(), getInstrumentIdMap());
     }
 
 }   // namespace store

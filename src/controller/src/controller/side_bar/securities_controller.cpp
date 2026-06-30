@@ -3,6 +3,7 @@
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 
+#include "cache/stock_cache.hpp"
 #include "controller/mapper/stock_mapper.hpp"
 #include "finance/finance_error.hpp"
 #include "finance/instrument/stock.hpp"
@@ -15,46 +16,81 @@
 namespace controller
 {
     /**
+     * @brief Struct representing the UI components of the
+     * SecuritiesSideBarController.
+     *
+     */
+    struct SecuritiesSideBarController::UI
+    {
+        /// Pointer to the stacked widget
+        QStackedWidget* stackedWidget;
+        /// Widget for displaying stock overview infos
+        ui::StockOverviewWidget* stockOverviewWidget = nullptr;
+        /// Widget for looking up stock tickers
+        ui::TickerLookupWidget* tickerLookupWidget = nullptr;
+        /// Optional accepted stock quote
+        std::optional<finance::Stock> acceptedQuote = std::nullopt;
+
+        explicit UI(QStackedWidget* stackedWidget);
+    };
+
+    /**
+     * @brief Construct a new Securities Side Bar Controller:: UI object
+     *
+     * @param stackedWidget_ Pointer to the stacked widget
+     */
+    SecuritiesSideBarController::UI::UI(QStackedWidget* stackedWidget_)
+        : stackedWidget(stackedWidget_),
+          stockOverviewWidget(new ui::StockOverviewWidget()),
+          tickerLookupWidget(new ui::TickerLookupWidget())
+    {
+        stackedWidget->addWidget(stockOverviewWidget);
+    }
+
+    /**
      * @brief Construct a new Securities Side Bar Controller:: Securities Side
      * Bar Controller object
      *
      * @param mainWindow
      * @param stockStore
+     * @param stockCache
      * @param stackedWidget
      */
     SecuritiesSideBarController::SecuritiesSideBarController(
         QMainWindow*                               mainWindow,
         const std::shared_ptr<store::IStockStore>& stockStore,
+        const std::shared_ptr<cache::StockCache>&  stockCache,
         QStackedWidget*                            stackedWidget
     )
         : SideBarCategoryController(new ui::SecuritiesCategory(), mainWindow),
-          _stockOverviewWidget(new ui::StockOverviewWidget()),
-          _tickerLookupWidget(new ui::TickerLookupWidget()),
+          _ui(std::make_unique<UI>(stackedWidget)),
           _stockStore(stockStore),
-          _stackedWidget(stackedWidget)
+          _stockCache(stockCache),
+          _connections(std::make_unique<Connections>())
     {
-        _stackedWidget->addWidget(_stockOverviewWidget);
+        _ui->stackedWidget->addWidget(_ui->stockOverviewWidget);
 
         connect(
-            _tickerLookupWidget->getFindButton(),
+            _ui->tickerLookupWidget->getFindButton(),
             &QPushButton::clicked,
             this,
             &SecuritiesSideBarController::_onFindTickerButtonClicked
         );
 
         connect(
-            _tickerLookupWidget->getAcceptButton(),
+            _ui->tickerLookupWidget->getAcceptButton(),
             &QPushButton::clicked,
             this,
             &SecuritiesSideBarController::_onAcceptTickerButtonClicked
         );
+
+        _connections->add(_stockCache->subscribeToChanged(
+            [this]() { _updateStockOverview(); },
+            this
+        ));
     }
 
-    /**
-     * @brief Refresh the securities overview.
-     *
-     */
-    void SecuritiesSideBarController::refresh() {}
+    SecuritiesSideBarController::~SecuritiesSideBarController() = default;
 
     /**
      * @brief Slot called when securities are selected.
@@ -62,11 +98,8 @@ namespace controller
      */
     void SecuritiesSideBarController::onSecuritiesSelected()
     {
-        const auto stocks =
-            StockMapper::toStockInfoDrafts(_stockStore->getStocks());
-
-        _stockOverviewWidget->getModel()->setRows(stocks);
-        _stackedWidget->setCurrentWidget(_stockOverviewWidget);
+        _updateStockOverview();
+        _ui->stackedWidget->setCurrentWidget(_ui->stockOverviewWidget);
     }
 
     /**
@@ -96,19 +129,19 @@ namespace controller
      */
     void SecuritiesSideBarController::_onFindTickerButtonClicked()
     {
-        const auto ticker = _tickerLookupWidget->getTickerInput();
+        const auto ticker = _ui->tickerLookupWidget->getTickerInput();
 
         const auto result = finance::Stock::retrieveTickerInfo(ticker);
 
         if (!result)
         {
-            _tickerLookupWidget->displayError(result.error().toString());
-            _acceptedQuote = std::nullopt;
+            _ui->tickerLookupWidget->displayError(result.error().toString());
+            _ui->acceptedQuote = std::nullopt;
             return;
         }
 
-        _acceptedQuote = result.value();
-        _tickerLookupWidget->displayQuote(
+        _ui->acceptedQuote = result.value();
+        _ui->tickerLookupWidget->displayQuote(
             StockMapper::toStockInfoDraft(result.value())
         );
     }
@@ -119,19 +152,20 @@ namespace controller
      */
     void SecuritiesSideBarController::_onAcceptTickerButtonClicked()
     {
-        if (_acceptedQuote)
+        if (_ui->acceptedQuote)
         {
-            const auto result = _stockStore->addStock(_acceptedQuote.value());
+            const auto result =
+                _stockStore->addStock(_ui->acceptedQuote.value());
 
             if (result != store::StockStoreResult::Ok)
-                _tickerLookupWidget->displayError("Failed to add stock");
+                _ui->tickerLookupWidget->displayError("Failed to add stock");
         }
 
-        _tickerLookupWidget->clearResult();
-        _tickerLookupWidget->hide();
+        _ui->tickerLookupWidget->clearResult();
+        _ui->tickerLookupWidget->hide();
 
-        if (_acceptedQuote)
-            emit stockCreated(_acceptedQuote.value());
+        if (_ui->acceptedQuote)
+            emit stockCreated(_ui->acceptedQuote.value());
     }
 
     /**
@@ -141,8 +175,21 @@ namespace controller
      */
     void SecuritiesSideBarController::createStock(const std::string& ticker)
     {
-        _tickerLookupWidget->setTicker(ticker);
-        _tickerLookupWidget->show();
+        _ui->tickerLookupWidget->setTicker(ticker);
+        _ui->tickerLookupWidget->show();
+    }
+
+    /**
+     * @brief Update the stock overview widget with the latest stock information
+     * from the cache.
+     *
+     */
+    void SecuritiesSideBarController::_updateStockOverview()
+    {
+        const auto stocks =
+            StockMapper::toStockInfoDrafts(_stockCache->getAllStocks());
+
+        _ui->stockOverviewWidget->getModel()->setRows(stocks);
     }
 
 }   // namespace controller

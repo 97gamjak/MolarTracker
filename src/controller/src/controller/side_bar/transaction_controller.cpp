@@ -1,8 +1,10 @@
 #include "transaction_controller.hpp"
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 
+#include "cache/stock_cache.hpp"
 #include "config/constants/github_constants.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
@@ -37,7 +39,6 @@ using finance::Position;
 using store::IAccountStore;
 using store::IOptionStore;
 using store::IPositionStore;
-using store::IStockStore;
 using store::ITransactionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
@@ -68,7 +69,7 @@ namespace controller
         Dialogs(
             const std::vector<drafts::AccountDraft>& cashAccounts,
             const std::vector<drafts::AccountDraft>& securityAccounts,
-            const std::vector<std::string>&          tickers,
+            const std::unordered_set<std::string>&   tickers,
             QMainWindow*                             mainWindow
         );
     };
@@ -85,7 +86,7 @@ namespace controller
     TransactionSideBarController::Dialogs::Dialogs(
         const std::vector<drafts::AccountDraft>& cashAccounts,
         const std::vector<drafts::AccountDraft>& securityAccounts,
-        const std::vector<std::string>&          tickers,
+        const std::unordered_set<std::string>&   tickers,
         QMainWindow*                             mainWindow
     )
         : cash(new DepositWithdrawalWidget(
@@ -115,7 +116,7 @@ namespace controller
      * @param undoStack The undo stack for the application
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
-     * @param stockStore The stock store for the application
+     * @param stockCache The stock cache for the application
      * @param optionStore The option store for the application
      * @param positionStore The position store for the application
      * @param transactionController The transaction controller for the
@@ -127,7 +128,7 @@ namespace controller
         cmd::UndoStack&                           undoStack,
         const std::shared_ptr<IAccountStore>&     accountStore,
         const std::shared_ptr<ITransactionStore>& transactionStore,
-        const std::shared_ptr<IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>& stockCache,
         const std::shared_ptr<IOptionStore>&      optionStore,
         const std::shared_ptr<IPositionStore>&    positionStore,
         TransactionController&                    transactionController,
@@ -139,7 +140,7 @@ namespace controller
           _accountStore(accountStore),
           _transactionStore(transactionStore),
           _positionStore(positionStore),
-          _stockStore(stockStore),
+          _stockCache(stockCache),
           _optionStore(optionStore),
           _dialogs(nullptr),
           _transactionController(transactionController),
@@ -155,7 +156,7 @@ namespace controller
         _dialogs = std::make_unique<Dialogs>(
             cashAccounts,
             securityAccounts,
-            _stockStore->getAllTickers(),
+            _stockCache->getAllStocks().getTickers(),
             mainWindow
         );
 
@@ -194,11 +195,13 @@ namespace controller
             &TransactionSideBarController::_onCreateTickerRequested
         );
 
-        _connections->add(_stockStore->subscribeToStoreChange(
-            [&]()
+        _connections->add(_stockCache->subscribeToAdded(
+            [&](const StockId& /*key*/,
+                const std::shared_ptr<const finance::Stock>& /*value*/)
             {
-                _dialogs->stock->updateTickers(_stockStore->getAllTickers());
-                _dialogs->option->updateTickers(_stockStore->getAllTickers());
+                const auto& tickers = _stockCache->getAllStocks().getTickers();
+                _dialogs->stock->updateTickers(tickers);
+                _dialogs->option->updateTickers(tickers);
             },
             this
         ));
@@ -257,7 +260,9 @@ namespace controller
             _dialogs->stock->updateReferenceAccounts(
                 AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
-            _dialogs->stock->updateTickers(_stockStore->getAllTickers());
+            _dialogs->stock->updateTickers(
+                _stockCache->getAllStocks().getTickers()
+            );
             _dialogs->stock->refresh();
 
             _dialogs->stock->show();
@@ -270,7 +275,9 @@ namespace controller
             _dialogs->option->updateReferenceAccounts(
                 AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
-            _dialogs->option->updateTickers(_stockStore->getAllTickers());
+            _dialogs->option->updateTickers(
+                _stockCache->getAllStocks().getTickers()
+            );
             _dialogs->option->refresh();
 
             _dialogs->option->show();
@@ -340,14 +347,23 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto result = convertTickerToInstrumentId(draft, _stockStore);
-        if (!result)
-            throw std::logic_error(result.error());
+        const auto& stock = _stockCache->getStock(draft.getTicker());
+        if (!stock)
+        {
+            const auto msg =
+                "Failed to retrieve stock data for underlying ticker: " +
+                draft.getTicker();
+
+            LOG_ERROR(msg);
+            throw std::logic_error(msg);
+        }
+
+        draft.setInstrumentId(stock->getInstrumentId());
 
         auto drafts = getOpenStockPositions(
             draft.getSecurityAccount(),
             _positionStore,
-            _stockStore,
+            _stockCache,
             _transactionStore
         );
 
@@ -422,26 +438,20 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto result = convertTickerToInstrumentId(draft, _stockStore);
-
-        if (!result)
-            throw std::logic_error(result.error());
-
-        const auto stock =
-            _stockStore->getStock(draft.getUnderlyingInstrumentId());
-
+        const auto& stock = _stockCache->getStock(draft.getUnderlyingTicker());
         if (!stock)
         {
             const auto msg =
-                "Failed to retrieve stock data for underlying "
-                "instrument with ID " +
-                draft.getUnderlyingInstrumentId().toString();
+                "Failed to retrieve stock data for underlying ticker: " +
+                draft.getUnderlyingTicker();
 
             LOG_ERROR(msg);
             throw std::logic_error(msg);
         }
 
-        const auto option = OptionMapper::toOption(draft, stock.value());
+        draft.setUnderlyingInstrumentId(stock->getInstrumentId());
+
+        const auto option = OptionMapper::toOption(draft, *stock);
 
         const auto optionResult = _optionStore->addOption(option);
 

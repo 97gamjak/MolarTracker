@@ -14,6 +14,7 @@
 #include "store/i_store.hpp"
 #include "store_state.hpp"
 #include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace store
 {
@@ -99,8 +100,7 @@ namespace store
                           OnStoreItemAdded<T>,
                           OnStoreItemUpdated<T>,
                           OnStoreItemRemoved<IdType>,
-                          OnIdRemap<IdType>,
-                          StoreChanged<IdType>>
+                          OnIdRemap<IdType>>
 
     {
        public:
@@ -110,8 +110,7 @@ namespace store
             OnStoreItemAdded<T>,
             OnStoreItemUpdated<T>,
             OnStoreItemRemoved<IdType>,
-            OnIdRemap<IdType>,
-            StoreChanged<IdType>>;
+            OnIdRemap<IdType>>;
 
         /// Type alias for filter options used when querying entries in the
         /// store.
@@ -131,25 +130,12 @@ namespace store
 
         /// Map for remapping IDs
         IdIdMap<IdType> _idRemap;
-        /// Vector for tracking updated entries
-        std::vector<T> _updated;
-        /// Vector for tracking added entries
-        std::vector<T> _added;
-        /// Vector for tracking removed entry IDs
-        std::vector<IdType> _removed;
 
         /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
 
-        /// Flag indicating whether the store has already notified subscribers
-        bool _alreadyNotified = false;
-
-        /// Flag indicating whether the store is fully cached
-        bool _fullCache = false;
-
        public:
         BaseStore() = default;
-        explicit BaseStore(bool fullCache);
 
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
@@ -160,12 +146,6 @@ namespace store
             OnDirtyChanged::func func,
             void*                user
         ) override;
-
-        // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToIdRemap(
-            OnIdRemap<IdType>::func func,
-            void*                   user
-        );
 
         // cppcheck-suppress functionConst -- false positive
         [[nodiscard]] Connection subscribeToEntryRemoved(
@@ -185,15 +165,6 @@ namespace store
             void*                       user
         );
 
-        // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToStoreChange(
-            StoreChanged<IdType>::func func,
-            void*                      user
-        );
-
-        [[nodiscard]]
-        bool isFullCache() const;
-
         void clearIdRemap() override;
 
        protected:
@@ -209,7 +180,7 @@ namespace store
         [[nodiscard]]
         auto _getEntry(Options options = Options()) const;
         [[nodiscard]]
-        idSet<IdType> _getIds(Options options = Options()) const;
+        IdSet<IdType> _getIds(Options options = Options()) const;
 
         IdType      _addEntry(T value);
         void        _addCleanEntries(const std::vector<T>& value);
@@ -219,8 +190,6 @@ namespace store
         StoreResult _deleteEntry(IdType id);
 
         void _clearEntries();
-
-        void _notifyOnCommit();
 
         void _logCache(const std::string& category, LogLevel level);
 
@@ -238,10 +207,9 @@ namespace store
         void                 _markPotentiallyDirty();
         [[nodiscard]] IdType _generateNewId();
 
-        void _notifyUpdated(bool checkAlreadyNotified);
-        void _notifyAdded(bool checkAlreadyNotified);
-        void _notifyRemoved(bool checkAlreadyNotified);
-        void _notifyStoreChanged(bool checkAlreadyNotified);
+        void _notifyUpdated(const T& value);
+        void _notifyAdded(const T& value);
+        void _notifyRemoved(const IdType& id);
     };
 
     /**

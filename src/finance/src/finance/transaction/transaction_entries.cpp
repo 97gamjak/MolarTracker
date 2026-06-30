@@ -28,7 +28,7 @@ namespace finance
      * @return TransactionEntries The filtered transaction entries.
      */
     TransactionEntries TransactionEntries::filter(
-        const idSet<AccountId>& accountIds
+        const IdSet<AccountId>& accountIds
     ) const
     {
         TransactionEntries filtered;

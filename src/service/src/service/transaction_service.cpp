@@ -45,7 +45,7 @@ namespace service
      * transactions.
      */
     std::vector<finance::DomainTransaction> TransactionService::getTransactions(
-        const idSet<AccountId>&           accountIds,
+        const IdSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
     {

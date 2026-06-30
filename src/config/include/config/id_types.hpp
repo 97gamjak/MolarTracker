@@ -15,6 +15,9 @@ using InstrumentId = StrongId<InstrumentTag>;
 
 using InstrumentIdSeq = IdSequence<InstrumentId>;
 
+template <typename T>
+concept HasInstrumentId = requires(T type) { type.getInstrumentId(); };
+
 struct StockTag {};
 using StockId = StrongId<StockTag>;
 

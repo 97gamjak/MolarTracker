@@ -1,49 +1,46 @@
 #include "finance/instrument/instrument_predicates.hpp"
 
 #include "filter/predicate.hpp"
+#include "finance/filter/predicates.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
 
 namespace finance
 {
-    /**
-     * @brief Create a Predicate to filter stocks by ticker
-     *
-     * @param ticker The ticker symbol to filter by
-     * @return filter::Predicate<Stock>
-     */
-    filter::Predicate<Stock> HasTicker(const std::string& ticker)
-    {
-        return filter::makePredicate<Stock>(
-            [ticker](const Stock& stock) { return stock.getTicker() == ticker; }
-        );
-    }
 
     /**
-     * @brief Create a Predicate to filter stocks by instrument ID
+     * @brief Create a set of predicates for filtering stocks based on the
+     * criteria specified in the StockFilter struct. This function generates a
+     * composite predicate that can be used to filter stocks by their IDs,
+     * instrument IDs, and tickers.
      *
-     * @param id The instrument ID to filter by
-     * @return filter::Predicate<Stock>
+     * @return filter::Predicate<Stock> A composite predicate for filtering
+     * stocks.
      */
-    filter::Predicate<Stock> HasInstrumentId(InstrumentId id)
+    filter::Predicate<Stock> StockFilter::makePredicates() const
     {
-        return filter::makePredicate<Stock>(
-            [id](const Stock& stock) { return stock.getInstrumentId() == id; }
-        );
-    }
+        filter::Predicate<Stock> predicate =
+            filter::makeEmptyPredicate<Stock>();
 
-    /**
-     * @brief Create a Predicate to filter stocks by instrument ID
-     *
-     * @param ids The instrument ID to filter by
-     * @return filter::Predicate<Stock>
-     */
-    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids)
-    {
-        return filter::makePredicate<Stock>(
-            [ids](const Stock& stock)
-            { return ids.contains(stock.getInstrumentId()); }
-        );
+        if (!stockIds.empty())
+        {
+            predicate &= checkId<Stock>(stockIds);
+        }
+
+        if (!instrumentIds.empty())
+        {
+            predicate &= checkInstrumentId<Stock>(instrumentIds);
+        }
+
+        if (!tickers.empty())
+        {
+            predicate &= filter::makePredicate<Stock>(
+                [this](const Stock& stock)
+                { return tickers.contains(stock.getTicker()); }
+            );
+        }
+
+        return predicate;
     }
 
     filter::Predicate<Option> HasOptionName(const std::string& name)

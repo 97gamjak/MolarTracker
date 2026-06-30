@@ -7,7 +7,6 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
-#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
@@ -47,19 +46,6 @@ namespace store
     {
        public:
         virtual ~ITransactionStore() = default;
-
-        /**
-         * @brief Commit all changes to the database
-         *
-         * @param accountIdRemap Mapping of account IDs
-         * @param instrumentIdRemap Mapping of instrument IDs
-         * @param positionIdRemap Mapping of position IDs
-         */
-        virtual void commit(
-            const IdIdMap<AccountId>&    accountIdRemap,
-            const IdIdMap<InstrumentId>& instrumentIdRemap,
-            const IdIdMap<PositionId>&   positionIdRemap
-        ) = 0;
 
         /**
          * @brief Add a cash transaction to the store

@@ -2,9 +2,9 @@
 
 #include <qstackedwidget.h>
 
+#include "cache/stock_cache.hpp"
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 #include "store/i_account_store.hpp"
-#include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
 
@@ -18,20 +18,20 @@ namespace controller
      * @param undoStack
      * @param transactionStore
      * @param accountStore
-     * @param stockStore
+     * @param stockCache
      * @param stackedWidget
      */
     TransactionController::TransactionController(
         cmd::UndoStack&                                  undoStack,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
         const std::shared_ptr<store::IAccountStore>&     accountStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>&        stockCache,
         QStackedWidget*                                  stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),
           _accountStore(accountStore),
-          _stockStore(stockStore),
+          _stockCache(stockCache),
           _stackedWidget(stackedWidget),
           _transactionDetailView(new ui::TransactionsOverview(_stackedWidget))
     {
@@ -79,10 +79,8 @@ namespace controller
         const auto transactions = _transactionStore->getTransactions();
 
         const auto cashDrafts = TransactionOverviewMapper::toCash(transactions);
-        const auto stockDrafts = TransactionOverviewMapper::toStock(
-            transactions,
-            _stockStore->getInstrumentIdToNameMap()
-        );
+        const auto stockDrafts =
+            TransactionOverviewMapper::toStock(transactions, _stockCache);
 
         _transactionDetailView->refresh(
             cashDrafts,

@@ -96,6 +96,23 @@ namespace settings
     }
 
     /**
+     * @brief Get the CacheSettings object
+     *
+     * @return CacheSettings&
+     */
+    CacheSettings& Settings::getCacheSettings() { return _cacheSettings; }
+
+    /**
+     * @brief Get the CacheSettings object (const version)
+     *
+     * @return const CacheSettings&
+     */
+    const CacheSettings& Settings::getCacheSettings() const
+    {
+        return _cacheSettings;
+    }
+
+    /**
      * @brief Serialize settings to JSON and save to file
      *
      */

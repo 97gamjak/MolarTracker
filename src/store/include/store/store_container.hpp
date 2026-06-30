@@ -19,6 +19,7 @@ namespace store
     class IProfileStore;       // Forward declaration
     class IAccountStore;       // Forward declaration
     class IStockStore;         // Forward declaration
+    class IStockStoreReader;   // Forward declaration
     class IPositionStore;      // Forward declaration
     class ITransactionStore;   // Forward declaration
     class IStore;              // Forward declaration
@@ -60,22 +61,20 @@ namespace store
             void*                       user
         );
 
-        [[nodiscard]] const std::shared_ptr<IProfileStore>& getProfileStore(
+        [[nodiscard]] std::shared_ptr<IProfileStore> getProfileStore() const;
+
+        [[nodiscard]] std::shared_ptr<IAccountStore> getAccountStore() const;
+
+        [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore(
         ) const;
 
-        [[nodiscard]] const std::shared_ptr<IAccountStore>& getAccountStore(
+        [[nodiscard]] std::shared_ptr<IStockStore>       getStockStore() const;
+        [[nodiscard]] std::shared_ptr<IStockStoreReader> getStockStoreReader(
         ) const;
 
-        [[nodiscard]] const std::shared_ptr<ITransactionStore>& getTransactionStore(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IOptionStore> getOptionStore() const;
 
-        [[nodiscard]] const std::shared_ptr<IStockStore>& getStockStore() const;
-
-        [[nodiscard]] const std::shared_ptr<IOptionStore>& getOptionStore(
-        ) const;
-
-        [[nodiscard]] const std::shared_ptr<IPositionStore>& getPositionStore(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IPositionStore> getPositionStore() const;
     };
 
 }   // namespace store

@@ -3,12 +3,14 @@
 
 #include <utility>
 
+#include "orm/query_options.hpp"
 #include "sql_models/option_row.hpp"
 
 namespace finance
 {
-    class Stock;    // Forward declaration
-    class Option;   // Forward declaration
+    class Stock;          // Forward declaration
+    class Option;         // Forward declaration
+    struct StockFilter;   // Forward declaration
 }   // namespace finance
 
 struct InstrumentRow;
@@ -38,6 +40,9 @@ namespace repo
         static std::pair<InstrumentRow, OptionRow> fromOption(
             const finance::Option& option
         );
+
+        [[nodiscard]]
+        static orm::Query toStockQuery(const finance::StockFilter& filter);
 
         [[nodiscard]]
         static finance::Option toOption(

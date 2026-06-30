@@ -136,8 +136,6 @@ namespace store
         }
 
         _logCache(LOG_CATEGORY, LogLevel::Trace);
-
-        _notifyOnCommit();
     }
 
     /**
@@ -263,7 +261,7 @@ namespace store
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
-        idSet<TransactionId> transactionIds;
+        IdSet<TransactionId> transactionIds;
 
         std::vector<finance::DomainTransaction> results;
 
@@ -560,11 +558,11 @@ namespace store
     {
         return subscribeToEntryAdded(
             [func = std::move(func),
-             this](const std::vector<finance::DomainTransaction>& transactions)
+             this](const finance::DomainTransaction& transaction)
             {
                 func(
                     finance::Transactions(
-                        transactions,
+                        {transaction},
                         _session->accountSession
                     )
                 );
