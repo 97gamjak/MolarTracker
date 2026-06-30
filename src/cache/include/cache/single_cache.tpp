@@ -278,8 +278,8 @@ namespace cache
         {
             throw std::runtime_error(
                 std::format(
-                    "Invalid ID change from {} to {}. Old ID must be positive "
-                    "and new ID must be negative.",
+                    "Invalid ID change from {} to {}. Old ID must be negative "
+                    "and new ID must be positive.",
                     oldKey.toString(),
                     newKey.toString()
                 )
