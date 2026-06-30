@@ -116,7 +116,7 @@ namespace controller
      * @param undoStack The undo stack for the application
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
-     * @param stockStore The stock store for the application
+     * @param stockCache The stock cache for the application
      * @param optionStore The option store for the application
      * @param positionStore The position store for the application
      * @param transactionController The transaction controller for the

@@ -12,6 +12,16 @@ namespace controller
 
     namespace
     {
+        /**
+         * @brief Converts a StockTransaction to a
+         * drafts::StockTransactionOverview, this will extract the relevant
+         * information from the stock transaction and format it for display in
+         * the transaction overview.
+         *
+         * @param transaction
+         * @param stockCache
+         * @return drafts::StockTransactionOverview
+         */
         StockTransactionOverview toStockOverview(
             const finance::StockTransaction&          transaction,
             const std::shared_ptr<cache::StockCache>& stockCache
@@ -61,6 +71,17 @@ namespace controller
         }
     }   // namespace
 
+    /**
+     * @brief Converts a vector of StockTransaction to a vector of
+     * drafts::StockTransactionOverview, this will iterate over the list of
+     * stock transactions and convert each one to a StockTransactionOverview
+     * draft using the toStockOverview function, and return the resulting list
+     * of drafts for display in the transaction overview.
+     *
+     * @param transactions
+     * @param stockCache
+     * @return std::vector<drafts::StockTransactionOverview>
+     */
     std::vector<StockTransactionOverview> TransactionOverviewMapper::toStock(
         const finance::Transactions&              transactions,
         const std::shared_ptr<cache::StockCache>& stockCache

@@ -21,9 +21,12 @@ namespace finance
      */
     struct StockFilter
     {
-        IdSet<StockId>      stockIds;
+        /// Set of stock IDs to filter by
+        IdSet<StockId> stockIds;
+        /// Set of instrument IDs to filter by
         IdSet<InstrumentId> instrumentIds;
-        Set<std::string>    tickers;
+        /// Set of tickers to filter by
+        Set<std::string> tickers;
 
         [[nodiscard]]
         filter::Predicate<Stock> makePredicates() const;

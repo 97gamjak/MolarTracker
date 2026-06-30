@@ -288,6 +288,11 @@ namespace store
         return _stores->stockStore;
     }
 
+    /**
+     * @brief Get the StockStoreReader (const version)
+     *
+     * @return std::shared_ptr<IStockStoreReader>
+     */
     std::shared_ptr<IStockStoreReader> StoreContainer::getStockStoreReader(
     ) const
     {

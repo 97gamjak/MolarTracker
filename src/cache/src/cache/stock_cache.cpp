@@ -13,6 +13,14 @@ REGISTER_LOG_CATEGORY("Cache.StockCache");
 namespace cache
 {
 
+    /**
+     * @brief Handle the event when a value is added to the cache, this method
+     * updates the instrument ID map with the new stock's instrument ID and
+     * stock ID.
+     *
+     * @param key The key of the value that was added to the cache.
+     * @param value A shared pointer to the value that was added to the cache.
+     */
     void StockCache::_onAdded(
         const StockId&                               key,
         const std::shared_ptr<const finance::Stock>& value
@@ -22,6 +30,17 @@ namespace cache
             _instrumentIdMap.addUnchecked(value->getInstrumentId(), key);
     }
 
+    /**
+     * @brief Handle the event when a value is updated in the cache, this method
+     * updates the instrument ID map with the new stock's instrument ID and
+     * stock ID, and removes the old stock's instrument ID from the map.
+     *
+     * @param key The key of the value that was updated in the cache.
+     * @param oldValue A shared pointer to the old value that was replaced in
+     * the cache.
+     * @param value A shared pointer to the new value that was added to the
+     * cache.
+     */
     void StockCache::_onUpdated(
         const StockId&                               key,
         const std::shared_ptr<const finance::Stock>& oldValue,
@@ -35,12 +54,25 @@ namespace cache
             _instrumentIdMap.addUnchecked(value->getInstrumentId(), key);
     }
 
+    /**
+     * @brief Handle the event when a value is removed from the cache, this
+     * method removes the stock's instrument ID from the instrument ID map.
+     *
+     * @param key The key of the value that was removed from the cache.
+     */
     void StockCache::_onRemoved(const StockId& key)
     {
         _instrumentIdMap.erase_if([&key](const auto& pair)
                                   { return pair.second == key; });
     }
 
+    /**
+     * @brief Handle the event when a stock's ID is changed, this method updates
+     * the instrument ID map with the new stock ID.
+     *
+     * @param oldKey The old key of the stock.
+     * @param newKey The new key of the stock.
+     */
     void StockCache::_onIdChanged(
         const StockId& /*oldKey*/,
         const StockId& newKey
@@ -51,6 +83,11 @@ namespace cache
         _instrumentIdMap.addUnchecked(stock->getInstrumentId(), newKey);
     }
 
+    /**
+     * @brief Construct a new Stock Cache:: Stock Cache object
+     *
+     * @param reader
+     */
     StockCache::StockCache(
         const std::shared_ptr<store::IStockStoreReader>& reader
     )
@@ -88,12 +125,15 @@ namespace cache
         ));
     }
 
-    bool StockCache::_maxCapacityReached() const
-    {
-        // has no max capacity for now TODO:
-        return false;
-    }
-
+    /**
+     * @brief Load a stock from the store using its stock ID, this method
+     * retrieves the stock from the store and returns a shared pointer to the
+     * stock if it exists, otherwise it returns nullptr.
+     *
+     * @param key The stock ID of the stock to be loaded from the store.
+     * @return std::shared_ptr<const finance::Stock> A shared pointer to the
+     * loaded stock, or nullptr if the stock does not exist in the store.
+     */
     std::shared_ptr<const finance::Stock> StockCache::_load(const StockId& key)
     {
         const auto stock = _reader->getStock(key);
@@ -106,6 +146,15 @@ namespace cache
         return nullptr;
     }
 
+    /**
+     * @brief Load all stocks from the store using a filter, this method
+     * retrieves the stocks from the store and returns a map of stock IDs to
+     * shared pointers to the stocks.
+     *
+     * @param filter The filter to apply when loading stocks from the store.
+     * @return IdObjectMap<std::shared_ptr<const finance::Stock>> A map of stock
+     * IDs to shared pointers to the loaded stocks.
+     */
     IdObjectMap<std::shared_ptr<const finance::Stock>> StockCache::_loadAll(
         const finance::StockFilter& filter
     )
@@ -119,11 +168,26 @@ namespace cache
         return result;
     }
 
+    /**
+     * @brief Get all stocks from the cache, this method retrieves all stocks
+     * currently in the cache and returns a StocksView containing shared
+     * pointers to the stocks.
+     *
+     * @return finance::StocksView
+     */
     finance::StocksView StockCache::getAllStocks()
     {
         return getBulk([this]() { return _loadAll({}); }).getItems();
     }
 
+    /**
+     * @brief Get stocks from the cache using a set of instrument IDs, this
+     * method retrieves the stocks associated with the provided instrument IDs
+     * and returns a StocksView containing shared pointers to the stocks.
+     *
+     * @param ids The set of instrument IDs for which to retrieve stocks.
+     * @return finance::StocksView
+     */
     finance::StocksView StockCache::getStocks(const IdSet<InstrumentId>& ids)
     {
         finance::StocksView stocks;
@@ -152,7 +216,6 @@ namespace cache
             _add(stockId, stockPtr);
         }
 
-        // TODO: make this error handling better!
         if (notFound != storeStocks.getInstrumentIds())
         {
             for (const auto& id : notFound - storeStocks.getInstrumentIds())
@@ -170,6 +233,15 @@ namespace cache
         return stocks;
     }
 
+    /**
+     * @brief Handle the event when the store commits changes, this method
+     * updates the cache with the new stock IDs and instrument IDs, ensuring
+     * that the cache remains consistent with the store.
+     *
+     * @param stockIdMap A map of old stock IDs to new stock IDs.
+     * @param instrumentIdMap A map of old instrument IDs to new instrument
+     * IDs.
+     */
     void StockCache::_onStoreCommit(
         const IdIdMap<StockId>&      stockIdMap,
         const IdIdMap<InstrumentId>& instrumentIdMap
@@ -203,6 +275,15 @@ namespace cache
         }
     }
 
+    /**
+     * @brief Get a stock from the cache using its instrument ID, if the stock
+     * is not present in the cache, it will be loaded from the store and added
+     * to the cache.
+     *
+     * @param instrumentId The instrument ID of the stock to retrieve.
+     * @return std::shared_ptr<const finance::Stock> A shared pointer to the
+     * cached stock, or nullptr if the stock could not be loaded.
+     */
     std::shared_ptr<const finance::Stock> StockCache::getStock(
         InstrumentId instrumentId
     )
@@ -213,6 +294,15 @@ namespace cache
         );
     }
 
+    /**
+     * @brief Get a stock from the cache using its ticker symbol, if the stock
+     * is not present in the cache, it will be loaded from the store and added
+     * to the cache.
+     *
+     * @param ticker The ticker symbol of the stock to retrieve.
+     * @return std::shared_ptr<const finance::Stock> A shared pointer to the
+     * cached stock, or nullptr if the stock could not be loaded.
+     */
     std::shared_ptr<const finance::Stock> StockCache::getStock(
         const std::string& ticker
     )
@@ -239,6 +329,14 @@ namespace cache
         );
     }
 
+    /**
+     * @brief Find a stock in the cache using its instrument ID, if the stock
+     * is not present in the cache, nullptr will be returned.
+     *
+     * @param instrumentId The instrument ID of the stock to find.
+     * @return std::shared_ptr<const finance::Stock> A shared pointer to the
+     * cached stock, or nullptr if the stock is not present in the cache.
+     */
     std::shared_ptr<const finance::Stock> StockCache::_find(
         InstrumentId instrumentId
     )
@@ -252,6 +350,16 @@ namespace cache
         return nullptr;
     }
 
+    /**
+     * @brief Load a stock from the store using its instrument ID, this method
+     * retrieves the stock from the store and returns a shared pointer to the
+     * stock if it exists, otherwise it returns nullptr.
+     *
+     * @param instrumentId The instrument ID of the stock to be loaded from the
+     * store.
+     * @return std::shared_ptr<const finance::Stock> A shared pointer to the
+     * loaded stock, or nullptr if the stock does not exist in the store.
+     */
     std::shared_ptr<const finance::Stock> StockCache::_load(
         InstrumentId instrumentId
     )

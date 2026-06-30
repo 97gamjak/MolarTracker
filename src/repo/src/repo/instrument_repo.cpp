@@ -46,7 +46,7 @@ namespace repo
      * stocks that are not marked as deleted, and will include stocks that are
      * new or modified but not yet saved to the database.
      *
-     * @param ids The set of instrument IDs to retrieve stocks for
+     * @param filter The filter criteria for selecting stocks
      * @return finance::Stocks
      */
     finance::Stocks InstrumentRepo::getStocks(

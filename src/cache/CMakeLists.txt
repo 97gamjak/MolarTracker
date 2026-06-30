@@ -20,4 +20,5 @@ target_link_libraries(molartracker_cache
     molartracker_utils
     molartracker_config
     molartracker_logging
+    molartracker_settings
 )

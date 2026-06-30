@@ -53,6 +53,7 @@ namespace controller
      *
      * @param mainWindow
      * @param stockStore
+     * @param stockCache
      * @param stackedWidget
      */
     SecuritiesSideBarController::SecuritiesSideBarController(
@@ -178,6 +179,11 @@ namespace controller
         _ui->tickerLookupWidget->show();
     }
 
+    /**
+     * @brief Update the stock overview widget with the latest stock information
+     * from the cache.
+     *
+     */
     void SecuritiesSideBarController::_updateStockOverview()
     {
         const auto stocks =

@@ -47,6 +47,7 @@ namespace controller
 
        private:
         struct UI;
+        /// Pointer to the UI components of the controller
         std::unique_ptr<UI> _ui;
 
         /// Reference to the stock store
@@ -55,6 +56,7 @@ namespace controller
         /// Reference to the stock cache
         std::shared_ptr<cache::StockCache> _stockCache;
 
+        /// Connections for managing signal-slot connections
         std::unique_ptr<Connections> _connections;
 
        public:

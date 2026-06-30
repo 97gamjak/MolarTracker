@@ -68,6 +68,42 @@ namespace cache
         _connections.add(std::move(connection));
     }
 
+    /**
+     * @brief Update the maximum capacity of the cache, representing the maximum
+     * number of cached key-value pairs allowed in the cache.
+     *
+     * @param newMaxCapacity The new maximum capacity to be set.
+     */
+    template <typename Key, typename Value>
+    void BaseCache<Key, Value>::updateMaxCapacity(std::size_t newMaxCapacity)
+    {
+        _maxCapacity = newMaxCapacity;
+    }
+
+    /**
+     * @brief Check if the maximum capacity of the cache has been reached.
+     *
+     * @return true if the maximum capacity has been reached, false
+     * otherwise.
+     */
+    template <typename Key, typename Value>
+    bool BaseCache<Key, Value>::_maxCapacityReached() const
+    {
+        return _getMaxCapacity() > 0 && size() >= _getMaxCapacity();
+    }
+
+    /**
+     * @brief Get the maximum capacity of the cache, representing the maximum
+     * number of cached key-value pairs allowed in the cache.
+     *
+     * @return std::size_t The maximum capacity of the cache.
+     */
+    template <typename Key, typename Value>
+    std::size_t BaseCache<Key, Value>::_getMaxCapacity() const
+    {
+        return _maxCapacity;
+    }
+
 }   // namespace cache
 
 #endif   // __CACHE__INCLUDE__CACHE__BASE_CACHE_TPP__

@@ -37,6 +37,7 @@ namespace controller
         settings::Settings _settings;
         /// application context
         store::StoreContainer _storeContainer;
+        /// cache container for managing cache instances
         cache::CacheContainer _caches;
         /// main window of the application
         std::shared_ptr<ui::MainWindow> _mainWindow;
@@ -73,7 +74,7 @@ namespace controller
          */
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
-              _caches(_storeContainer),
+              _caches(_settings.getCacheSettings(), _storeContainer),
               _mainWindow(std::make_shared<ui::MainWindow>()),
               _handlers(_settings),
               _priceCache(std::make_shared<finance::PriceCache>()),

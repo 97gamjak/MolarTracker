@@ -87,7 +87,7 @@ namespace controller
      *
      * @param accountStore_
      * @param positionStore_
-     * @param stockStore_
+     * @param stockCache_
      * @param transactionStore_
      * @param priceCache_
      * @param undoStack_
@@ -121,7 +121,7 @@ namespace controller
      * @param undoStack
      * @param accountStore
      * @param positionStore
-     * @param stockStore
+     * @param stockCache
      * @param transactionStore
      * @param priceCache
      * @param stackedWidget

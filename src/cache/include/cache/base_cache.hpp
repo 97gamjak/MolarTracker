@@ -34,6 +34,7 @@ namespace cache
     template <typename Key, typename Value>
     struct OnUpdated
     {
+        /// Type alias for the updated callback function
         using func = std::function<
             void(const Key& key, const std::shared_ptr<const Value>& value)>;
     };
@@ -127,6 +128,10 @@ namespace cache
         /// Connections for cache events, allowing for event notifications.
         Connections _connections;
 
+        /// The maximum capacity of the cache, representing the maximum number
+        /// of cached key-value pairs allowed in the cache.
+        std::size_t _maxCapacity = 0;
+
        public:
         virtual ~BaseCache() = default;
 
@@ -156,6 +161,8 @@ namespace cache
         [[nodiscard]] const CacheStats& stats() const;
         void                            resetStats();
 
+        void updateMaxCapacity(std::size_t newMaxCapacity);
+
        protected:
         void _recordHit();
         void _recordMiss();
@@ -163,14 +170,9 @@ namespace cache
 
         void _addConnection(Connection&& connection);
 
-        /**
-         * @brief Check if the cache has reached its maximum capacity.
-         *
-         * @return true if the cache has reached its maximum capacity, false
-         * otherwise.
-         */
-        [[nodiscard]]
-        virtual bool _maxCapacityReached() const = 0;
+        [[nodiscard]] bool _maxCapacityReached() const;
+
+        [[nodiscard]] virtual std::size_t _getMaxCapacity() const;
     };
 
 }   // namespace cache

@@ -133,6 +133,17 @@ namespace repo
         };
     }
 
+    /**
+     * @brief Create a query for filtering stocks based on the criteria
+     * specified in the StockFilter struct, this factory method takes a
+     * StockFilter object as input and generates an orm::Query object that can
+     * be used to query the database for stocks that match the specified
+     * criteria, allowing for filtering by stock IDs, instrument IDs, and
+     * tickers.
+     *
+     * @param filter
+     * @return orm::Query
+     */
     orm::Query InstrumentFactory::toStockQuery(
         const finance::StockFilter& filter
     )

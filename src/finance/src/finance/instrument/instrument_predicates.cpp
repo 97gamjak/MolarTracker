@@ -8,6 +8,15 @@
 namespace finance
 {
 
+    /**
+     * @brief Create a set of predicates for filtering stocks based on the
+     * criteria specified in the StockFilter struct. This function generates a
+     * composite predicate that can be used to filter stocks by their IDs,
+     * instrument IDs, and tickers.
+     *
+     * @return filter::Predicate<Stock> A composite predicate for filtering
+     * stocks.
+     */
     filter::Predicate<Stock> StockFilter::makePredicates() const
     {
         filter::Predicate<Stock> predicate =

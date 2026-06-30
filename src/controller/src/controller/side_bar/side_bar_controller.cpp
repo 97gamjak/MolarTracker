@@ -24,6 +24,7 @@ namespace controller
      *
      * @param undoStack The undo stack for the application
      * @param storeContainer The store container for the application
+     * @param cacheContainer The cache container for the application
      * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack

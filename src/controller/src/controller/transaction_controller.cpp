@@ -18,7 +18,7 @@ namespace controller
      * @param undoStack
      * @param transactionStore
      * @param accountStore
-     * @param stockStore
+     * @param stockCache
      * @param stackedWidget
      */
     TransactionController::TransactionController(

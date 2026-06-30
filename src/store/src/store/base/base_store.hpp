@@ -195,8 +195,6 @@ namespace store
 
         [[nodiscard]] const IdIdMap<IdType>& _getIdRemap() const;
 
-        void _notifyCommit();
-
        private:
         static bool _evalDeletionPolicy(
             const Entry&   entry,

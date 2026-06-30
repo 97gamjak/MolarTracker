@@ -37,7 +37,7 @@ namespace store
      *
      * @tparam T
      * @tparam IdType
-     * @param value
+     * @param id
      */
     template <typename T, typename IdType>
     void BaseStore<T, IdType>::_notifyRemoved(const IdType& id)

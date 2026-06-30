@@ -90,6 +90,7 @@ namespace store
         /**
          * @brief Get a list of all stocks in the store
          *
+         * @param filter The filter to apply when retrieving stocks
          * @return finance::Stocks
          */
         [[nodiscard]]
@@ -98,9 +99,13 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief Get a mapping of instrument IDs to their names
+         * @brief Subscribe to stock added events
          *
-         * @return unorderedIdMap<InstrumentId, std::string>
+         * @param func The callback function to be called when a stock is added
+         * @param subscriber The subscriber object that will receive the event
+         *
+         * @return Connection The connection object for managing the
+         * subscription
          */
         [[nodiscard]]
         virtual Connection subscribeToStockAdded(

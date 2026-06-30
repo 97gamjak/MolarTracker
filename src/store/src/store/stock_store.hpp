@@ -24,6 +24,7 @@ namespace store
                        public IStockStoreReader
     {
        private:
+        /// observable for commit events
         Observable<OnCommit> _onCommit;
         /// The Instrument service
         std::shared_ptr<service::IInstrumentService> _instrumentService;

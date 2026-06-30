@@ -128,7 +128,10 @@ namespace settings
      * @return Connection
      */
     template <typename Derived, typename T>
-    Connection ParamMixin<Derived, T>::subscribe(ChangedFn func, void* user)
+    Connection ParamMixin<Derived, T>::subscribe(
+        ParamValueChanged<T>::func func,
+        void*                      user
+    )
     {
         return _self()._core.subscribe(func, user);
     }
@@ -145,7 +148,7 @@ namespace settings
      */
     template <typename Derived, typename T>
     Connection ParamMixin<Derived, T>::subscribeToOptional(
-        ChangedFnOptional func,
+        ParamOptionalChanged<T>::func func,
         void*             user
     )
     {

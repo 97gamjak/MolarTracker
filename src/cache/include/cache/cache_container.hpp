@@ -5,9 +5,15 @@
 
 namespace store
 {
-    class StoreReaders;
     class StoreContainer;
 }   // namespace store
+
+namespace settings
+{
+    class CacheSettings;
+}   // namespace settings
+
+class Connections;
 
 namespace cache
 {
@@ -26,8 +32,14 @@ namespace cache
         /// Shared pointer to the StockCache instance managed by this container.
         std::shared_ptr<StockCache> _stockCache;
 
+        /// Connections for cache events, allowing for event notifications.
+        std::unique_ptr<Connections> _connections;
+
        public:
-        explicit CacheContainer(const store::StoreContainer& storeContainer);
+        explicit CacheContainer(
+            settings::CacheSettings&     settings,
+            const store::StoreContainer& storeContainer
+        );
         ~CacheContainer();
 
         [[nodiscard]] const std::shared_ptr<StockCache>& getStockCache() const;

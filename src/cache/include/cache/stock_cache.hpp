@@ -33,8 +33,11 @@ namespace cache
     class StockCache : public SingleCache<StockId, finance::Stock>
     {
        private:
+        /// Shared pointer to the stock store reader
         std::shared_ptr<store::IStockStoreReader> _reader;
 
+        /// Map of instrument IDs to stock IDs, used for efficient lookup of
+        /// stocks by their associated instrument IDs.
         IdIdMap<InstrumentId, StockId> _instrumentIdMap;
 
        public:
@@ -44,20 +47,21 @@ namespace cache
 
         [[nodiscard]]
         finance::StocksView getAllStocks();
+
         [[nodiscard]]
         finance::StocksView getStocks(const IdSet<InstrumentId>& ids);
+
         [[nodiscard]]
         std::shared_ptr<const finance::Stock> getStock(
             InstrumentId instrumentId
         );
+
         [[nodiscard]]
         std::shared_ptr<const finance::Stock> getStock(
             const std::string& ticker
         );
 
        protected:
-        [[nodiscard]] bool _maxCapacityReached() const override;
-
         [[nodiscard]]
         std::shared_ptr<const finance::Stock> _load(
             const StockId& key
@@ -91,8 +95,6 @@ namespace cache
             const IdIdMap<StockId>&      stockIdMap,
             const IdIdMap<InstrumentId>& instrumentIdMap
         );
-
-        void _updateInstrumentIdMap(StockId stockId, InstrumentId instrumentId);
 
         [[nodiscard]]
         std::shared_ptr<const finance::Stock> _find(InstrumentId instrumentId);
