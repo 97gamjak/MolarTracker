@@ -100,8 +100,7 @@ namespace store
                           OnStoreItemAdded<T>,
                           OnStoreItemUpdated<T>,
                           OnStoreItemRemoved<IdType>,
-                          OnIdRemap<IdType>,
-                          StoreChanged<IdType>>
+                          OnIdRemap<IdType>>
 
     {
        public:
@@ -111,8 +110,7 @@ namespace store
             OnStoreItemAdded<T>,
             OnStoreItemUpdated<T>,
             OnStoreItemRemoved<IdType>,
-            OnIdRemap<IdType>,
-            StoreChanged<IdType>>;
+            OnIdRemap<IdType>>;
 
         /// Type alias for filter options used when querying entries in the
         /// store.
@@ -136,15 +134,8 @@ namespace store
         /// Sequence for generating new IDs
         IdSequence<IdType> _idSequence;
 
-        /// Flag indicating whether the store has already notified subscribers
-        bool _alreadyNotified = false;
-
-        /// Flag indicating whether the store is fully cached
-        bool _fullCache = false;
-
        public:
         BaseStore() = default;
-        explicit BaseStore(bool fullCache);
 
         [[nodiscard]] bool isDirty() const override;
         [[nodiscard]] bool allDirty() const;
@@ -155,12 +146,6 @@ namespace store
             OnDirtyChanged::func func,
             void*                user
         ) override;
-
-        // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToIdRemap(
-            OnIdRemap<IdType>::func func,
-            void*                   user
-        );
 
         // cppcheck-suppress functionConst -- false positive
         [[nodiscard]] Connection subscribeToEntryRemoved(
@@ -179,15 +164,6 @@ namespace store
             OnStoreItemUpdated<T>::func func,
             void*                       user
         );
-
-        // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToStoreChange(
-            StoreChanged<IdType>::func func,
-            void*                      user
-        );
-
-        [[nodiscard]]
-        bool isFullCache() const;
 
         void clearIdRemap() override;
 
@@ -219,6 +195,8 @@ namespace store
 
         [[nodiscard]] const IdIdMap<IdType>& _getIdRemap() const;
 
+        void _notifyCommit();
+
        private:
         static bool _evalDeletionPolicy(
             const Entry&   entry,
@@ -234,7 +212,6 @@ namespace store
         void _notifyUpdated(const T& value);
         void _notifyAdded(const T& value);
         void _notifyRemoved(const IdType& id);
-        void _notifyIdRemap(const std::pair<IdType, IdType>& remap);
     };
 
     /**

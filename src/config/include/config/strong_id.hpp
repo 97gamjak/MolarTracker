@@ -62,6 +62,7 @@ class StrongId final
     bool operator==(const StrongId&) const  = default;
     auto operator<=>(const StrongId&) const = default;
     /// @endcond
+    auto operator<=>(const Rep& value) const;
 
     template <class T, class U>
     friend std::ostream& operator<<(
@@ -106,6 +107,7 @@ template <typename T>
 concept IsId = isStrongId_v<T>;
 
 template <typename T>
+// cppcheck-suppress internalAstError
 concept HasId = requires(T value) { value.getId(); } ||
                 requires(T value) { value->getId(); };
 

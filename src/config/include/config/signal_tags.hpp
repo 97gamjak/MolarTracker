@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
+#include "utils/container/id_id_map.hpp"
 
 /**
  * @brief Common signal tags used across the application, this file defines
@@ -70,18 +70,17 @@ template <typename IdType>
 struct OnIdRemap
 {
     /// Type alias for the remap callback function
-    using func = std::function<void(const std::pair<IdType, IdType>& remap)>;
+    using func = std::function<void(const IdIdMap<IdType>& remap)>;
 };
 
 /**
- * @brief Signal tag for when a store is changed, this can be used to emit an
- * event when a store is changed, allowing other parts of the application to
- * react to the change.
+ * @brief Signal tag for when a commit is made to a store, this can be used to
+ * emit an event when a commit is made, allowing other parts of the application
+ * to react to the commit.
  *
- * @tparam IdType
  */
 template <typename IdType>
-struct StoreChanged
+struct OnCommit
 {
     /// Type alias for the change callback function for the store
     using func = std::function<void()>;

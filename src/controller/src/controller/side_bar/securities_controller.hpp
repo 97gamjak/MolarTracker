@@ -2,8 +2,8 @@
 #define __CONTROLLER__SRC__CONTROLLER__SIDE_BAR__SECURITIES_CONTROLLER_HPP__
 
 #include <QObject>
+#include <memory>
 
-#include "finance/instrument/stock.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace ui
@@ -18,8 +18,19 @@ namespace store
     class IStockStore;   // Forward declaration
 }   // namespace store
 
+namespace cache
+{
+    class StockCache;   // Forward declaration
+}   // namespace cache
+
+namespace finance
+{
+    class Stock;   // Forward declaration
+}   // namespace finance
+
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
+class Connections;      // Forward declaration
 
 namespace controller
 {
@@ -35,28 +46,25 @@ namespace controller
         Q_OBJECT
 
        private:
-        /// Widget for displaying stock overview infos
-        ui::StockOverviewWidget* _stockOverviewWidget = nullptr;
-        /// Widget for looking up stock tickers
-        ui::TickerLookupWidget* _tickerLookupWidget = nullptr;
-
-        /// Optional accepted stock quote
-        std::optional<finance::Stock> _acceptedQuote = std::nullopt;
+        struct UI;
+        std::unique_ptr<UI> _ui;
 
         /// Reference to the stock store
         std::shared_ptr<store::IStockStore> _stockStore;
 
-        /// Pointer to the stacked widget
-        QStackedWidget* _stackedWidget;
+        /// Reference to the stock cache
+        std::shared_ptr<cache::StockCache> _stockCache;
+
+        std::unique_ptr<Connections> _connections;
 
        public:
         explicit SecuritiesSideBarController(
             QMainWindow*                               mainWindow,
             const std::shared_ptr<store::IStockStore>& stockStore,
+            const std::shared_ptr<cache::StockCache>&  stockCache,
             QStackedWidget*                            stackedWidget
         );
-
-        void refresh() override;
+        ~SecuritiesSideBarController() override;
 
         void onSecuritiesSelected();
 
@@ -78,6 +86,7 @@ namespace controller
        private:
         void _onFindTickerButtonClicked();
         void _onAcceptTickerButtonClicked();
+        void _updateStockOverview();
     };
 
 }   // namespace controller

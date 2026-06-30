@@ -106,7 +106,7 @@ namespace controller
         );
         ~TransactionSideBarController() override;
 
-        void refresh() override;
+        void refresh();
 
         void handleContextMenuAction(
             const ui::TransactionCategory* item,

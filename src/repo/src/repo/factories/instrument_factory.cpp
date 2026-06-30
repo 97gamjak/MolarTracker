@@ -145,6 +145,9 @@ namespace repo
         if (!filter.instrumentIds.empty())
             query = query.in<StockRow::instrumentIdField>(filter.instrumentIds);
 
+        if (!filter.tickers.empty())
+            query = query.in<StockRow::tickerField>(filter.tickers);
+
         return query;
     }
 

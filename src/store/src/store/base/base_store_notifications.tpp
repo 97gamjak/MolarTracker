@@ -45,14 +45,6 @@ namespace store
         this->template notify<OnStoreItemRemoved<IdType>>(id);
     }
 
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyIdRemap(
-        const std::pair<IdType, IdType>& remap
-    )
-    {
-        this->template notify<OnIdRemap<IdType>>(remap);
-    }
-
 }   // namespace store
 
 #endif   // __STORE__SRC__STORE__BASE__BASE_STORE_NOTIFICATIONS_TPP__

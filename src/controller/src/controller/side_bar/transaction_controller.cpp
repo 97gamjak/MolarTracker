@@ -1,5 +1,6 @@
 #include "transaction_controller.hpp"
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -38,7 +39,6 @@ using finance::Position;
 using store::IAccountStore;
 using store::IOptionStore;
 using store::IPositionStore;
-using store::IStockStore;
 using store::ITransactionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
@@ -156,7 +156,7 @@ namespace controller
         _dialogs = std::make_unique<Dialogs>(
             cashAccounts,
             securityAccounts,
-            _stockCache->getAllTickers(),
+            _stockCache->getAllStocks().getTickers(),
             mainWindow
         );
 
@@ -196,10 +196,12 @@ namespace controller
         );
 
         _connections->add(_stockCache->subscribeToAdded(
-            [&]()
+            [&](const StockId& /*key*/,
+                const std::shared_ptr<const finance::Stock>& /*value*/)
             {
-                _dialogs->stock->updateTickers(_stockCache->getAllTickers());
-                _dialogs->option->updateTickers(_stockCache->getAllTickers());
+                const auto& tickers = _stockCache->getAllStocks().getTickers();
+                _dialogs->stock->updateTickers(tickers);
+                _dialogs->option->updateTickers(tickers);
             },
             this
         ));
@@ -258,7 +260,9 @@ namespace controller
             _dialogs->stock->updateReferenceAccounts(
                 AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
-            _dialogs->stock->updateTickers(_stockCache->getAllTickers());
+            _dialogs->stock->updateTickers(
+                _stockCache->getAllStocks().getTickers()
+            );
             _dialogs->stock->refresh();
 
             _dialogs->stock->show();
@@ -271,7 +275,9 @@ namespace controller
             _dialogs->option->updateReferenceAccounts(
                 AccountMapper::toDrafts(_accountStore->getCashAccounts())
             );
-            _dialogs->option->updateTickers(_stockCache->getAllTickers());
+            _dialogs->option->updateTickers(
+                _stockCache->getAllStocks().getTickers()
+            );
             _dialogs->option->refresh();
 
             _dialogs->option->show();
@@ -341,9 +347,18 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto result = convertTickerToInstrumentId(draft, _stockCache);
-        if (!result)
-            throw std::logic_error(result.error());
+        const auto& stock = _stockCache->getStock(draft.getTicker());
+        if (!stock)
+        {
+            const auto msg =
+                "Failed to retrieve stock data for underlying ticker: " +
+                draft.getTicker();
+
+            LOG_ERROR(msg);
+            throw std::logic_error(msg);
+        }
+
+        draft.setInstrumentId(stock->getInstrumentId());
 
         auto drafts = getOpenStockPositions(
             draft.getSecurityAccount(),
@@ -423,26 +438,20 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto result = convertTickerToInstrumentId(draft, _stockCache);
-
-        if (!result)
-            throw std::logic_error(result.error());
-
-        const auto stock =
-            _stockCache->getStock(draft.getUnderlyingInstrumentId());
-
+        const auto& stock = _stockCache->getStock(draft.getUnderlyingTicker());
         if (!stock)
         {
             const auto msg =
-                "Failed to retrieve stock data for underlying "
-                "instrument with ID " +
-                draft.getUnderlyingInstrumentId().toString();
+                "Failed to retrieve stock data for underlying ticker: " +
+                draft.getUnderlyingTicker();
 
             LOG_ERROR(msg);
             throw std::logic_error(msg);
         }
 
-        const auto option = OptionMapper::toOption(draft, stock.value());
+        draft.setUnderlyingInstrumentId(stock->getInstrumentId());
+
+        const auto option = OptionMapper::toOption(draft, *stock);
 
         const auto optionResult = _optionStore->addOption(option);
 

@@ -23,6 +23,14 @@ namespace finance
             predicate &= checkInstrumentId<Stock>(instrumentIds);
         }
 
+        if (!tickers.empty())
+        {
+            predicate &= filter::makePredicate<Stock>(
+                [this](const Stock& stock)
+                { return tickers.contains(stock.getTicker()); }
+            );
+        }
+
         return predicate;
     }
 

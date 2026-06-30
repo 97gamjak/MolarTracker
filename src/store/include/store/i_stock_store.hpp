@@ -3,19 +3,18 @@
 
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
 #include "utils/container/id_id_map.hpp"
-#include "utils/container/set.hpp"
 
 class Connection;   // Forward declaration
 
 namespace finance
 {
-    class Stock;   // forward declaration
+    class Stock;          // forward declaration
+    struct StockFilter;   // forward declaration
 }   // namespace finance
 
 namespace store
@@ -32,11 +31,37 @@ namespace store
         StockNotFound,
     };
 
+    /**
+     * @brief Interface for reading stocks from a store
+     *
+     */
     class IStockStoreReader
     {
+       protected:
+        /**
+         * @brief Struct representing a callback for when a commit occurs in the
+         * stock store, this can be used to emit an event when a commit occurs,
+         * allowing other parts of the application to react to the commit event.
+         *
+         */
+        struct OnCommit
+        {
+            /// Type alias for the commit callback function
+            using func = std::function<void(
+                const IdIdMap<StockId>&      stockIdMap,
+                const IdIdMap<InstrumentId>& instrumentIdMap
+            )>;
+        };
+
        public:
         virtual ~IStockStoreReader() = default;
 
+        /**
+         * @brief Get the Stock based on the given stock ID
+         *
+         * @param id
+         * @return std::optional<finance::Stock>
+         */
         [[nodiscard]]
         virtual std::optional<finance::Stock> getStock(StockId id) const = 0;
 
@@ -52,14 +77,14 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief Get a list of stocks by their instrument IDs
+         * @brief Get the Stock based on the given ticker
          *
-         * @param ids The set of instrument IDs to retrieve stocks for
-         * @return finance::Stocks
+         * @param ticker
+         * @return std::optional<finance::Stock>
          */
         [[nodiscard]]
-        virtual finance::Stocks getStocks(
-            const IdSet<InstrumentId>& ids
+        virtual std::optional<finance::Stock> getStock(
+            const std::string& ticker
         ) const = 0;
 
         /**
@@ -68,53 +93,63 @@ namespace store
          * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual finance::Stocks getStocks() const = 0;
-
-        /**
-         * @brief Get all stock tickers in the store
-         *
-         * @return std::unordered_set<std::string>
-         */
-        [[nodiscard]]
-        virtual std::unordered_set<std::string> getAllTickers() const = 0;
-
-        /**
-         * @brief Get a mapping of stock tickers to their instrument IDs
-         *
-         * @return std::unordered_map<std::string, InstrumentId>
-         */
-        [[nodiscard]]
-        virtual unorderedIdMap<
-            InstrumentId,
-            std::string> getInstrumentIdToNameMap() const = 0;
-
-        /**
-         * @brief Get the instrument ID for a given stock ticker
-         *
-         * @param ticker The stock ticker
-         * @return std::optional<InstrumentId>
-         */
-        [[nodiscard]]
-        virtual std::optional<InstrumentId> getInstrumentId(
-            const std::string& ticker
+        virtual finance::Stocks getStocks(
+            const finance::StockFilter& filter
         ) const = 0;
 
+        /**
+         * @brief Get a mapping of instrument IDs to their names
+         *
+         * @return unorderedIdMap<InstrumentId, std::string>
+         */
         [[nodiscard]]
         virtual Connection subscribeToStockAdded(
             OnStoreItemAdded<finance::Stock>::func func,
             void*                                  subscriber
         ) = 0;
 
+        /**
+         * @brief Subscribe to stock updated events
+         *
+         * @param func The callback function to be called when a stock is
+         * updated
+         * @param subscriber The subscriber object that will receive the event
+         * @return Connection The connection object for managing the
+         * subscription
+         */
         [[nodiscard]]
         virtual Connection subscribeToStockUpdated(
             OnStoreItemUpdated<finance::Stock>::func func,
             void*                                    subscriber
         ) = 0;
 
+        /**
+         * @brief Subscribe to stock removed events
+         *
+         * @param func The callback function to be called when a stock is
+         * removed
+         * @param subscriber The subscriber object that will receive the event
+         * @return Connection The connection object for managing the
+         * subscription
+         */
         [[nodiscard]]
         virtual Connection subscribeToStockRemoved(
             OnStoreItemRemoved<StockId>::func func,
             void*                             subscriber
+        ) = 0;
+
+        /**
+         * @brief Subscribe to commit events
+         *
+         * @param func The callback function to be called when a commit occurs
+         * @param subscriber The subscriber object that will receive the event
+         * @return Connection The connection object for managing the
+         * subscription
+         */
+        [[nodiscard]]
+        virtual Connection subscribeToCommit(
+            const OnCommit::func& func,
+            void*                 subscriber
         ) = 0;
     };
 
@@ -137,32 +172,6 @@ namespace store
          */
         [[nodiscard]]
         virtual StockStoreResult addStock(finance::Stock stock) = 0;
-
-        /**
-         * @brief Subscribe to changes in the stock store, this allows observers
-         * to be notified when the stock store changes, such as when a new stock
-         * is added, or when a stock is updated or deleted. This is useful for
-         * keeping the UI in sync with the underlying data model, and for
-         * allowing other parts of the application to react to changes in the
-         * stock store.
-         *
-         * @param func The callback function to call when the stock store
-         * changes, the function will receive a StockId as a parameter, which
-         * indicates which stock was changed, and the user pointer can be used
-         * to pass additional data to the callback function, the returned
-         * Connection object can be used to unsubscribe from changes
-         * @param subscriber A pointer to the subscriber object, this is used to
-         * identify the subscriber when subscribing and unsubscribing from
-         * changes, it can be any pointer that the subscriber chooses, and will
-         * be passed to the callback function when it is called
-         *
-         * @return Connection
-         */
-        [[nodiscard]]
-        virtual Connection subscribeToStoreChange(
-            StoreChanged<StockId>::func func,
-            void*                       subscriber
-        ) = 0;
     };
 }   // namespace store
 

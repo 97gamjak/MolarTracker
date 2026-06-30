@@ -5,6 +5,7 @@
 
 #include "finance/instrument/stock.hpp"
 #include "utils/container/id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -18,17 +19,20 @@ namespace finance
        public:
         using IdObjectMap<Stock>::IdObjectMap;
 
-        [[nodiscard]] std::unordered_set<std::string> getTickers() const;
+        [[nodiscard]] IdSet<InstrumentId> getInstrumentIds() const;
     };
 
+    /**
+     * @brief Class representing a view of stocks, providing access to
+     * individual stocks by their identifiers.
+     *
+     */
     class StocksView : public IdObjectMap<std::shared_ptr<const Stock>>
     {
        public:
         using IdObjectMap<std::shared_ptr<const Stock>>::IdObjectMap;
 
-        [[nodiscard]]
-        IdMap<InstrumentId, std::string> getInstrumentIdToNameMap() const;
-        // [[nodiscard]] std::unordered_set<std::string> getTickers() const;
+        [[nodiscard]] std::unordered_set<std::string> getTickers() const;
     };
 }   // namespace finance
 

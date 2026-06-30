@@ -5,11 +5,11 @@
 #include <QtConcurrent>
 #include <memory>
 
+#include "cache/stock_cache.hpp"
 #include "connections/connection.hpp"
 #include "finance/price_cache.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "store/i_position_store.hpp"
-#include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
 
 namespace controller
@@ -25,14 +25,14 @@ namespace controller
     PositionController::PositionController(
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>&        stockCache,
         const std::shared_ptr<finance::PriceCache>&      priceCache
     )
         : _pollTimer(new QTimer(this)),
           _priceCache(priceCache),
           _positionStore(positionStore),
           _transactionStore(transactionStore),
-          _stockStore(stockStore),
+          _stockCache(stockCache),
           _expectedSymbolCount(0),
           _connections(std::make_unique<Connections>())
     {
@@ -123,7 +123,7 @@ namespace controller
         const auto instruments   = transactions.securities();
         const auto instrumentIds = instruments.getBaseInstrumentIds();
 
-        const auto tickers = _stockStore->getStocks(instrumentIds).getTickers();
+        const auto tickers = _stockCache->getStocks(instrumentIds).getTickers();
         for (const auto& ticker : tickers)
             _tickers.insert(ticker);
     }

@@ -31,10 +31,24 @@ namespace cache
 
        public:
         [[nodiscard]]
-        std::shared_ptr<const Value> get(const Key& key) override;
+        std::shared_ptr<const Value> get(const Key& key);
+        [[nodiscard]]
+        std::shared_ptr<const Value> find(const Key& key);
 
         [[nodiscard]]
-        IdObjectMap<std::shared_ptr<const Value>> getAll() override;
+        std::shared_ptr<const Value> get(
+            std::function<std::shared_ptr<const Value>()> findFunc,
+            std::function<std::shared_ptr<const Value>()> loadFunc
+        );
+        [[nodiscard]]
+        std::shared_ptr<const Value> find(
+            std::function<std::shared_ptr<const Value>()> findFunc
+        );
+
+        [[nodiscard]]
+        IdObjectMap<std::shared_ptr<const Value>> getBulk(
+            std::function<IdObjectMap<std::shared_ptr<const Value>>()> func
+        );
 
         void invalidate(const Key& key) override;
 
@@ -54,26 +68,38 @@ namespace cache
             typename OnRemoved<Key>::func callback,
             void*                         subscriber
         );
+        Connection subscribeToChanged(
+            typename OnChanged::func callback,
+            void*                    subscriber
+        );
 
        protected:
-        // Derived class implements this — knows how to query the store reader
         [[nodiscard]]
         virtual std::shared_ptr<const Value> _load(const Key& key) = 0;
 
-        [[nodiscard]] virtual IdObjectMap<std::shared_ptr<const Value>> _loadAll(
+        [[nodiscard]]
+        const IdMap<Key, std::shared_ptr<const Value>>& _getEntries() const;
+
+        virtual void _onAdded(
+            const Key&                          key,
+            const std::shared_ptr<const Value>& value
         ) = 0;
+        virtual void _onUpdated(
+            const Key&                          key,
+            const std::shared_ptr<const Value>& oldValue,
+            const std::shared_ptr<const Value>& value
+        )                                                            = 0;
+        virtual void _onRemoved(const Key& key)                      = 0;
+        virtual void _onIdChanged(const Key& old, const Key& newKey) = 0;
 
-        [[nodiscard]] bool maxCapacityReached() const override = 0;
+        void _add(const Key& key, std::shared_ptr<const Value> value);
+        void _addAndNotify(const Key& key, std::shared_ptr<const Value> value);
+        void _update(const Key& key, std::shared_ptr<const Value> value);
+        void _remove(const Key& key);
+        void _changeId(const Key& oldKey, const Key& newKey);
 
-        // Derived class calls these when wiring store signals in constructor
-        void _onStoreAdded(const Key& key, std::shared_ptr<const Value> value);
-
-        void _onStoreUpdated(
-            const Key&                   key,
-            std::shared_ptr<const Value> value
-        );
-
-        void _onStoreRemoved(const Key& key);
+        [[nodiscard]]
+        bool _maxCapacityReached() const override = 0;
     };
 
 }   // namespace cache

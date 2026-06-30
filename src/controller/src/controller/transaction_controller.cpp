@@ -79,10 +79,8 @@ namespace controller
         const auto transactions = _transactionStore->getTransactions();
 
         const auto cashDrafts = TransactionOverviewMapper::toCash(transactions);
-        const auto stockDrafts = TransactionOverviewMapper::toStock(
-            transactions,
-            _stockCache->getStocks().getInstrumentIdToNameMap()
-        );
+        const auto stockDrafts =
+            TransactionOverviewMapper::toStock(transactions, _stockCache);
 
         _transactionDetailView->refresh(
             cashDrafts,

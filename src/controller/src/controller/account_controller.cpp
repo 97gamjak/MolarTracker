@@ -41,10 +41,10 @@ namespace controller
         std::shared_ptr<store::IAccountStore> accountStore;
         /// Reference to the position store
         std::shared_ptr<store::IPositionStore> positionStore;
-        /// Reference to the stock store
-        std::shared_ptr<store::IStockStore> stockStore;
         /// Reference to the transaction store
         std::shared_ptr<store::ITransactionStore> transactionStore;
+        /// Reference to the stock cache
+        std::shared_ptr<cache::StockCache> stockCache;
 
         /// Pointer to the stacked widget
         QStackedWidget* stackedWidget;
@@ -67,7 +67,7 @@ namespace controller
         Details(
             const std::shared_ptr<store::IAccountStore>&     accountStore_,
             const std::shared_ptr<store::IPositionStore>&    positionStore_,
-            const std::shared_ptr<store::IStockStore>&       stockStore_,
+            const std::shared_ptr<cache::StockCache>&        stockCache_,
             const std::shared_ptr<store::ITransactionStore>& transactionStore_,
             const std::shared_ptr<finance::PriceCache>&      priceCache_,
             cmd::UndoStack&                                  undoStack_,
@@ -96,7 +96,7 @@ namespace controller
     AccountController::Details::Details(
         const std::shared_ptr<store::IAccountStore>&     accountStore_,
         const std::shared_ptr<store::IPositionStore>&    positionStore_,
-        const std::shared_ptr<store::IStockStore>&       stockStore_,
+        const std::shared_ptr<cache::StockCache>&        stockCache_,
         const std::shared_ptr<store::ITransactionStore>& transactionStore_,
         const std::shared_ptr<finance::PriceCache>&      priceCache_,
         cmd::UndoStack&                                  undoStack_,
@@ -106,8 +106,8 @@ namespace controller
           priceCache(priceCache_),
           accountStore(accountStore_),
           positionStore(positionStore_),
-          stockStore(stockStore_),
           transactionStore(transactionStore_),
+          stockCache(stockCache_),
           stackedWidget(stackedWidget_),
           accountDetailView(new ui::AccountDetailView(stackedWidget)),
           connections(std::make_unique<Connections>())
@@ -130,7 +130,7 @@ namespace controller
         cmd::UndoStack&                                  undoStack,
         const std::shared_ptr<store::IAccountStore>&     accountStore,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>&        stockCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
         const std::shared_ptr<finance::PriceCache>&      priceCache,
         QStackedWidget*                                  stackedWidget
@@ -139,7 +139,7 @@ namespace controller
               std::make_unique<Details>(
                   accountStore,
                   positionStore,
-                  stockStore,
+                  stockCache,
                   transactionStore,
                   priceCache,
                   undoStack,
@@ -219,7 +219,7 @@ namespace controller
                     getOpenStockPositionDetails(
                         account->getId(),
                         _details->positionStore,
-                        _details->stockStore,
+                        _details->stockCache,
                         _details->transactionStore
                     );
 

@@ -37,14 +37,14 @@ namespace controller
      * @return std::vector<drafts::StockInfoDraft>
      */
     std::vector<drafts::StockInfoDraft> StockMapper::toStockInfoDrafts(
-        const finance::Stocks& stocks
+        const finance::StocksView& stocks
     )
     {
         std::vector<drafts::StockInfoDraft> drafts;
         drafts.reserve(stocks.size());
 
         for (const auto& [id, stock] : stocks)
-            drafts.push_back(toStockInfoDraft(stock));
+            drafts.push_back(toStockInfoDraft(*stock));
 
         return drafts;
     }

@@ -23,11 +23,14 @@ namespace cache
      */
     class CacheContainer
     {
+        /// Shared pointer to the StockCache instance managed by this container.
         std::shared_ptr<StockCache> _stockCache;
 
        public:
         explicit CacheContainer(const store::StoreContainer& storeContainer);
         ~CacheContainer();
+
+        [[nodiscard]] const std::shared_ptr<StockCache>& getStockCache() const;
     };
 }   // namespace cache
 

@@ -12,14 +12,24 @@ namespace finance
     class Stock;
     class Option;
 
+    /**
+     * @brief Struct representing a filter for stocks, this struct is used to
+     * define the criteria for filtering stocks based on their identifiers,
+     * instrument IDs, and tickers. It provides a method to create predicates
+     * that can be used to filter stocks based on the specified criteria.
+     *
+     */
     struct StockFilter
     {
         IdSet<StockId>      stockIds;
         IdSet<InstrumentId> instrumentIds;
+        Set<std::string>    tickers;
 
         [[nodiscard]]
         filter::Predicate<Stock> makePredicates() const;
     };
+
+    // TODO: remove these
 
     [[nodiscard]]
     filter::Predicate<Stock> HasTicker(const std::string& ticker);
