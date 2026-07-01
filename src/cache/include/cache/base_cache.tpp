@@ -21,8 +21,8 @@ namespace cache
      * @brief Reset the cache statistics, clearing hits, misses, and evictions.
      *
      */
-    template <typename Tag, typename Rep>
-    void BaseCache<Tag, Rep>::resetStats()
+    template <typename Key, typename Value>
+    void BaseCache<Key, Value>::resetStats()
     {
         _stats = {};
     }

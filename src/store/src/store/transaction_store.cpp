@@ -319,11 +319,11 @@ namespace store
             const auto positionId = transaction.getPositionId();
             if (!stockPositions.contains(positionId))
             {
-                stockPositions[positionId] =
+                stockPositions.at(positionId) =
                     finance::StockPositionTransaction(positionId);
             }
 
-            if (!stockPositions[positionId].addPosition(transaction))
+            if (!stockPositions.at(positionId).addPosition(transaction))
             {
                 LOG_ERROR(
                     "Failed to add stock transaction to position id: " +

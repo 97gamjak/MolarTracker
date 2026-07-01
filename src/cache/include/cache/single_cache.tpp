@@ -258,6 +258,7 @@ namespace cache
             this->_recordEviction();
         }
 
+        // notify also if cache was not changed to capture store changes!
         Base::_observable.template notify<OnRemoved<Key>>(key);
         Base::_observable.template notify<OnChanged>();
     }

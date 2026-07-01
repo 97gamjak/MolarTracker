@@ -75,7 +75,7 @@ namespace controller
         std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// The position store for the application
         std::shared_ptr<store::IPositionStore> _positionStore;
-        /// The stock store for the application
+        /// The stock cache for the application
         std::shared_ptr<cache::StockCache> _stockCache;
         /// The option store for the application
         std::shared_ptr<store::IOptionStore> _optionStore;

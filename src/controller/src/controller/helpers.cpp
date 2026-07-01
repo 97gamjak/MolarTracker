@@ -66,7 +66,7 @@ namespace controller
 
             const auto& stock = stockCache->getStock(instrumentId);
 
-            if (!stock)
+            if (stock == nullptr)
             {
                 LOG_ERROR(
                     "No stock found for instrument id: " +

@@ -8,9 +8,9 @@
 
 namespace finance
 {
-    class Stock;         // Forward declaration
-    class Option;        // Forward declaration
-    class StockFilter;   // Forward declaration
+    class Stock;          // Forward declaration
+    class Option;         // Forward declaration
+    struct StockFilter;   // Forward declaration
 }   // namespace finance
 
 struct InstrumentRow;

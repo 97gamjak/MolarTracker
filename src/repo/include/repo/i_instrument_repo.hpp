@@ -12,7 +12,7 @@ namespace finance
     struct StockInsertionResult;
     class Option;
     struct OptionInsertionResult;
-    class StockFilter;
+    struct StockFilter;
 }   // namespace finance
 
 namespace repo

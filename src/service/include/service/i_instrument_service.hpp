@@ -11,7 +11,7 @@ namespace finance
     struct StockInsertionResult;    // forward declaration
     class Option;                   // forward declaration
     struct OptionInsertionResult;   // forward declaration
-    class StockFilter;              // forward declaration
+    struct StockFilter;             // forward declaration
 
 }   // namespace finance
 

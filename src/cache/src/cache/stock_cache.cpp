@@ -78,6 +78,9 @@ namespace cache
         const StockId& newKey
     )
     {
+        if (!_getEntries().contains(newKey))
+            return;
+
         const auto stock = _getEntries()[newKey];
         _instrumentIdMap.removeUnchecked(stock->getInstrumentId());
         _instrumentIdMap.addUnchecked(stock->getInstrumentId(), newKey);
