@@ -381,7 +381,7 @@ namespace store
      */
     void StockStore::_notifyCommit()
     {
-        _onCommit.notify<OnCommit>(_getIdRemap(), getInstrumentIdMap());
+        _onCommit.notify<OnCommit>(getIdRemap(), getInstrumentIdMap());
     }
 
 }   // namespace store

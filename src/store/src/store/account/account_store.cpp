@@ -364,35 +364,6 @@ namespace store
     }
 
     /**
-     * @brief Get a mapping of account IDs to account names for all active
-     * accounts in the store, this allows callers to easily look up the name of
-     * an account based on its ID, which can be useful for display purposes or
-     * when performing operations that require referencing accounts by their ID,
-     * and provides a convenient way to access the account names without having
-     * to retrieve the full account data for each account.
-     *
-     * @return IdMap<AccountId, std::string> A
-     * map where the keys are account IDs and the values are the corresponding
-     * account names for all active accounts in the store, this allows for
-     * efficient lookups of account names based on their IDs and can be used in
-     * various parts of the application where such mappings are needed.
-     */
-    IdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap() const
-    {
-        const auto options = Options{
-            .filter   = IsAccountActive(),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-
-        IdMap<AccountId, std::string> accountIdToName;
-
-        for (const auto& account : _getValues(options))
-            accountIdToName.addUnchecked(account.getId(), account.getName());
-
-        return accountIdToName;
-    }
-
-    /**
      * @brief Get the ID of the external account for a given currency, this is
      * used to find the corresponding external account for a cash account based
      * on its currency, and allows callers to retrieve the ID of the external
@@ -471,16 +442,6 @@ namespace store
     const finance::Accounts& AccountStore::getAccountSession() const
     {
         return _session;
-    }
-
-    /**
-     * @brief Get the ID remapping for accounts
-     *
-     * @return const IdIdMap<AccountId>& The ID remapping
-     */
-    const IdIdMap<AccountId>& AccountStore::getIdRemap() const
-    {
-        return _getIdRemap();
     }
 
 }   // namespace store

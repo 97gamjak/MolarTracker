@@ -268,6 +268,17 @@ namespace store
     }
 
     /**
+     * @brief Get the AccountStoreReader (const version)
+     *
+     * @return std::shared_ptr<IAccountStoreReader>
+     */
+    std::shared_ptr<IAccountStoreReader> StoreContainer::getAccountStoreReader(
+    ) const
+    {
+        return _stores->accountStore;
+    }
+
+    /**
      * @brief Get the TransactionStore (const version)
      *
      * @return std::shared_ptr<ITransactionStore>

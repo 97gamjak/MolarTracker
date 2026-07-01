@@ -5,7 +5,7 @@
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
-#include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace store
 {
@@ -27,32 +27,13 @@ namespace store
     };
 
     /**
-     * @brief Store for managing accounts
+     * @brief Interface for reading accounts from the store
      *
      */
-    class IAccountStore
+    class IAccountStoreReader
     {
        public:
-        virtual ~IAccountStore() = default;
-
-        /**
-         * @brief Create a new account
-         *
-         * @param account
-         * @return AccountStoreResult
-         */
-        [[nodiscard]]
-        virtual AccountStoreResult createAccount(
-            const finance::Account& account
-        ) = 0;
-
-        /**
-         * @brief Get a mapping of account IDs to their remapped IDs
-         *
-         * @return const IdIdMap<AccountId>&
-         */
-        [[nodiscard]]
-        virtual const IdIdMap<AccountId>& getIdRemap() const = 0;
+        virtual ~IAccountStoreReader() = default;
 
         /**
          * @brief Get an account by its ID
@@ -90,14 +71,6 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief Get a mapping of account IDs to their names
-         *
-         * @return IdMap<AccountId, std::string>
-         */
-        [[nodiscard]]
-        virtual IdMap<AccountId, std::string> getAccountIdToNameMap() const = 0;
-
-        /**
          * @brief Get an external account by its currency
          *
          * @param currency
@@ -117,6 +90,36 @@ namespace store
         virtual IdSet<AccountId> getExternalAccountIds() const = 0;
 
         /**
+         * @brief Get the account session
+         *
+         * @return const finance::Accounts&
+         */
+        [[nodiscard]]
+        virtual const finance::Accounts& getAccountSession() const = 0;
+        // TODO:
+    };
+
+    /**
+     * @brief Store for managing accounts
+     *
+     */
+    class IAccountStore
+    {
+       public:
+        virtual ~IAccountStore() = default;
+
+        /**
+         * @brief Create a new account
+         *
+         * @param account
+         * @return AccountStoreResult
+         */
+        [[nodiscard]]
+        virtual AccountStoreResult createAccount(
+            const finance::Account& account
+        ) = 0;
+
+        /**
          * @brief Update the active profile
          *
          * @param profileIdOpt
@@ -124,14 +127,6 @@ namespace store
         virtual void updateActiveProfile(
             const std::optional<ProfileId>& profileIdOpt
         ) = 0;
-
-        /**
-         * @brief Get the current account session
-         *
-         * @return const finance::Accounts&
-         */
-        [[nodiscard]]
-        virtual const finance::Accounts& getAccountSession() const = 0;
     };
 
 }   // namespace store

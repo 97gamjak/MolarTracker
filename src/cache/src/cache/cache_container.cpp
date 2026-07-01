@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
 #include "settings/cache_settings.hpp"
 #include "store/store_container.hpp"
@@ -21,12 +22,20 @@ namespace cache
         : _stockCache(
               std::make_shared<StockCache>(storeContainer.getStockStoreReader())
           ),
+          _accountCache(
+              std::make_shared<AccountCache>(
+                  storeContainer.getAccountStoreReader()
+              )
+          ),
           _connections(std::make_unique<Connections>())
     {
         auto& maxCacheSize = settings.getGlobalMaxCacheSize();
         _connections->add(maxCacheSize.subscribe(
             [this](const auto& newSize)
-            { _stockCache->updateMaxCapacity(newSize); },
+            {
+                _stockCache->updateMaxCapacity(newSize);
+                _accountCache->updateMaxCapacity(newSize);
+            },
             _stockCache.get()
         )
 
@@ -43,6 +52,16 @@ namespace cache
     const std::shared_ptr<StockCache>& CacheContainer::getStockCache() const
     {
         return _stockCache;
+    }
+
+    /**
+     * @brief Get the AccountCache instance managed by this container
+     *
+     * @return const std::shared_ptr<AccountCache>&
+     */
+    const std::shared_ptr<AccountCache>& CacheContainer::getAccountCache() const
+    {
+        return _accountCache;
     }
 
 }   // namespace cache

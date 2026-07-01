@@ -22,7 +22,8 @@ namespace store
      *
      */
     class AccountStore : public BaseStore<finance::Account, AccountId>,
-                         public IAccountStore
+                         public IAccountStore,
+                         public IAccountStoreReader
     {
        private:
         /// reference to the account service
@@ -57,8 +58,8 @@ namespace store
         std::vector<finance::Account> getCashAccounts() const override;
         [[nodiscard]]
         std::vector<finance::Account> getSecurityAccounts() const override;
-        [[nodiscard]]
-        IdMap<AccountId, std::string> getAccountIdToNameMap() const override;
+        // [[nodiscard]]
+        // IdMap<AccountId, std::string> getAccountIdToNameMap() const override;
 
         [[nodiscard]]
         std::optional<AccountId> getExternalAccount(
@@ -76,9 +77,6 @@ namespace store
 
         [[nodiscard]]
         const finance::Accounts& getAccountSession() const override;
-
-        [[nodiscard]]
-        const IdIdMap<AccountId>& getIdRemap() const override;
 
        private:
         void _refresh();

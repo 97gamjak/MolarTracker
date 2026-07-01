@@ -3,6 +3,7 @@ add_library(molartracker_cache STATIC
 
     src/cache/base_cache.cpp
     
+    src/cache/account_cache.cpp
     src/cache/stock_cache.cpp
 )
 
