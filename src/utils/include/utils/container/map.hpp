@@ -27,6 +27,7 @@ class Map : public Iterable<std::unordered_map<Key, Value, Hash>>
     [[nodiscard]] const Value& operator[](const Key& key) const;
     [[nodiscard]] Value&       operator[](const Key& key);
     [[nodiscard]] const Value& at(const Key& key) const;
+    [[nodiscard]] Value&       at(const Key& key);
 
     [[nodiscard]] bool add(const Key& key, const Value& value);
     void               addUnchecked(const Key& key, const Value& value);

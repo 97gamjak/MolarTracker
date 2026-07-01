@@ -34,8 +34,7 @@ namespace controller
         filter.setPositionIds(positions.getIds());
         auto positionTxs = transactionStore->getStockPositions(filter);
 
-        std::erase_if(
-            positionTxs,
+        positionTxs.erase_if(
             [&](const auto& pair)
             { return pair.second.getSecurityAccount() != account; }
         );

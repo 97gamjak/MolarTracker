@@ -371,26 +371,23 @@ namespace store
      * and provides a convenient way to access the account names without having
      * to retrieve the full account data for each account.
      *
-     * @return unorderedIdMap<AccountId, std::string> A
+     * @return IdMap<AccountId, std::string> A
      * map where the keys are account IDs and the values are the corresponding
      * account names for all active accounts in the store, this allows for
      * efficient lookups of account names based on their IDs and can be used in
      * various parts of the application where such mappings are needed.
      */
-    unorderedIdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap(
-    ) const
+    IdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap() const
     {
         const auto options = Options{
             .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        unorderedIdMap<AccountId, std::string> accountIdToName;
+        IdMap<AccountId, std::string> accountIdToName;
 
         for (const auto& account : _getValues(options))
-        {
-            accountIdToName.emplace(account.getId(), account.getName());
-        }
+            accountIdToName.addUnchecked(account.getId(), account.getName());
 
         return accountIdToName;
     }

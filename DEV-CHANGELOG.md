@@ -165,6 +165,7 @@ All changes and updates, that are relevant for developers will be documented her
 - make position store an interface and cleanup deps to remove drafts from store deps
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
+- remove unorderedIdMap special type
 
 ### Claude
 

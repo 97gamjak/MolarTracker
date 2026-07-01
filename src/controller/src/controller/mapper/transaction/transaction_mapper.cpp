@@ -101,8 +101,8 @@ namespace controller
      * @return drafts::TradeLegDraft
      */
     drafts::TradeLegDraft TransactionMapper::toTradeLegDraft(
-        const finance::TradeLeg&                         leg,
-        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+        const finance::TradeLeg&                leg,
+        const IdMap<InstrumentId, std::string>& instrumentNames
     )
     {
         std::string instrumentName = "UNKNOWN";
@@ -135,8 +135,8 @@ namespace controller
      * @return std::vector<drafts::TradeLegDraft>
      */
     std::vector<drafts::TradeLegDraft> TransactionMapper::toTradeLegDrafts(
-        const std::vector<finance::TradeLeg>&            legs,
-        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+        const std::vector<finance::TradeLeg>&   legs,
+        const IdMap<InstrumentId, std::string>& instrumentNames
     )
     {
         std::vector<drafts::TradeLegDraft> drafts;

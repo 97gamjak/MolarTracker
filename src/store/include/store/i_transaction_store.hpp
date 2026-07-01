@@ -7,6 +7,7 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "utils/container/id_map.hpp"
 
 namespace finance
 {
@@ -106,10 +107,10 @@ namespace store
          * @brief Get the Stock Positions
          *
          * @param filter
-         * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
+         * @return IdMap<PositionId, finance::StockPositionTransaction>
          */
         [[nodiscard]]
-        virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+        virtual IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const = 0;
 
