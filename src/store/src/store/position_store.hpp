@@ -64,9 +64,6 @@ namespace store
         void commit();
 
         [[nodiscard]]
-        const IdIdMap<PositionId>& getIdRemap() const override;
-
-        [[nodiscard]]
         Connection subscribeToPositionClosed(
             PositionClosed::func func,
             void*                user

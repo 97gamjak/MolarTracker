@@ -185,16 +185,6 @@ namespace store
     }
 
     /**
-     * @brief Get the ID remapping for positions
-     *
-     * @return const IdIdMap<PositionId>&
-     */
-    const IdIdMap<PositionId>& PositionStore::getIdRemap() const
-    {
-        return _getIdRemap();
-    }
-
-    /**
      * @brief Subscribe to position closed events, this allows subscribers to be
      * notified when a position is closed, which can be useful for updating
      *

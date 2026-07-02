@@ -93,7 +93,7 @@ namespace store
          * @brief Get the account session
          *
          * @return const finance::Accounts&
-         */
+         */`
         [[nodiscard]]
         virtual const finance::Accounts& getAccountSession() const = 0;
         // TODO:

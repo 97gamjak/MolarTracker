@@ -62,14 +62,6 @@ namespace store
         virtual finance::Positions getOpenPositions() const = 0;
 
         /**
-         * @brief Get the ID remapping for positions
-         *
-         * @return const IdIdMap<PositionId>&
-         */
-        [[nodiscard]]
-        virtual const IdIdMap<PositionId>& getIdRemap() const = 0;
-
-        /**
          * @brief Subscribe to position closed events, this allows subscribers
          * to be notified when a position is closed, which can be useful for
          * updating the UI or performing other actions in response to a position
