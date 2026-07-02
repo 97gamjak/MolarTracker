@@ -15,25 +15,32 @@ namespace ui
     /**
      * @brief Construct a new Timestamp Field:: Timestamp Field object
      *
+     * @param onlyDateEdit Whether to only allow editing the date (true) or also
+     * allow editing the time (false)
      * @param parent
      */
-    TimestampField::TimestampField(QWidget* parent)
+    TimestampField::TimestampField(bool onlyDateEdit, QWidget* parent)
         : QWidget(parent),
           _dateEdit(makeQChild<QDateEdit>(this)),
-          _timeEdit(makeQChild<QTimeEdit>(this)),
-          _todayButton(makeQChild<QPushButton>("Today", this))
+          _timeEdit(nullptr),
+          _todayButton(makeQChild<QPushButton>("Today", this)),
+          _onlyDateEdit(onlyDateEdit)
     {
         auto* layout = makeQChild<QHBoxLayout>();
         layout->setContentsMargins(0, 0, 0, 0);
         layout->addWidget(_dateEdit);
-        layout->addWidget(_timeEdit);
         layout->addWidget(_todayButton);
         setLayout(layout);
 
         _dateEdit->setDisplayFormat("yyyy-MM-dd");
         _dateEdit->setCalendarPopup(true);
 
-        _timeEdit->setDisplayFormat("HH:mm:ss");
+        if (!_onlyDateEdit)
+        {
+            _timeEdit = makeQChild<QTimeEdit>(this);
+            _timeEdit->setDisplayFormat("HH:mm:ss");
+            layout->addWidget(_timeEdit);
+        }
 
         constexpr auto size = 48;
         _todayButton->setFixedWidth(size);
@@ -55,7 +62,10 @@ namespace ui
      */
     Timestamp TimestampField::getTimestamp() const
     {
-        const QDateTime local{_dateEdit->date(), _timeEdit->time()};
+        const QDateTime local{
+            _dateEdit->date(),
+            _onlyDateEdit ? QTime(0, 0, 0) : _timeEdit->time()
+        };
         return Timestamp{local.toUTC()};
     }
 
@@ -65,7 +75,8 @@ namespace ui
     void TimestampField::_resetToToday()
     {
         _dateEdit->setDate(QDate::currentDate());
-        _timeEdit->setTime(QTime(0, 0, 0));
+        if (!_onlyDateEdit)
+            _timeEdit->setTime(QTime(0, 0, 0));
     }
 
 }   // namespace ui

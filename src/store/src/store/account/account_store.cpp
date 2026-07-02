@@ -4,11 +4,11 @@
 #include <format>
 #include <ranges>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_account_service.hpp"
+#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
 
@@ -39,14 +39,14 @@ namespace store
         // we use the unchecked versions as ids are unique due to store
         // handling!
         _connections.add(subscribeToEntryAdded(
-            [this](const std::vector<finance::Account>& accounts)
-            { _session.addUnchecked(accounts); },
+            [this](const finance::Account& account)
+            { _session.addUnchecked(account); },
             this
         ));
 
         _connections.add(subscribeToEntryRemoved(
-            [this](const std::vector<AccountId>& accountIds)
-            { _session.removeUnchecked(accountIds); },
+            [this](const AccountId& accountId)
+            { _session.removeUnchecked(accountId); },
             this
         ));
 
@@ -199,8 +199,6 @@ namespace store
                 }
             }
         }
-
-        _notifyOnCommit();
 
         // here now we set our ids because they are now clean!
         // we use the unchecked version as ids are unique due to store handling!
@@ -373,26 +371,23 @@ namespace store
      * and provides a convenient way to access the account names without having
      * to retrieve the full account data for each account.
      *
-     * @return unorderedIdMap<AccountId, std::string> A
+     * @return IdMap<AccountId, std::string> A
      * map where the keys are account IDs and the values are the corresponding
      * account names for all active accounts in the store, this allows for
      * efficient lookups of account names based on their IDs and can be used in
      * various parts of the application where such mappings are needed.
      */
-    unorderedIdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap(
-    ) const
+    IdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap() const
     {
         const auto options = Options{
             .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        unorderedIdMap<AccountId, std::string> accountIdToName;
+        IdMap<AccountId, std::string> accountIdToName;
 
         for (const auto& account : _getValues(options))
-        {
-            accountIdToName.emplace(account.getId(), account.getName());
-        }
+            accountIdToName.addUnchecked(account.getId(), account.getName());
 
         return accountIdToName;
     }
@@ -434,16 +429,16 @@ namespace store
     /**
      * @brief Get the IDs of all external accounts
      *
-     * @return idSet<AccountId>
+     * @return IdSet<AccountId>
      */
-    idSet<AccountId> AccountStore::getExternalAccountIds() const
+    IdSet<AccountId> AccountStore::getExternalAccountIds() const
     {
         const auto options = Options{
             .filter   = IsExternal(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        idSet<AccountId> externalAccountIds;
+        IdSet<AccountId> externalAccountIds;
 
         for (const auto& account : _getValues(options))
             externalAccountIds.insert(account.getId());
@@ -481,9 +476,9 @@ namespace store
     /**
      * @brief Get the ID remapping for accounts
      *
-     * @return const unorderedIdMap<AccountId, AccountId>& The ID remapping
+     * @return const IdIdMap<AccountId>& The ID remapping
      */
-    const unorderedIdMap<AccountId, AccountId>& AccountStore::getIdRemap() const
+    const IdIdMap<AccountId>& AccountStore::getIdRemap() const
     {
         return _getIdRemap();
     }

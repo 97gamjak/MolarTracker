@@ -47,7 +47,7 @@ namespace controller
         cmd::UndoStack& _undoStack;
 
         /// Reference to the account store
-        std::shared_ptr<store::IAccountStore>& _accountStore;
+        std::shared_ptr<store::IAccountStore> _accountStore;
 
         /// Reference to the account controller
         AccountController& _accountController;
@@ -57,13 +57,13 @@ namespace controller
 
        public:
         explicit AccountSideBarController(
-            cmd::UndoStack&                        undoStack,
-            std::shared_ptr<store::IAccountStore>& accountStore,
-            AccountController&                     accountController,
-            QMainWindow*                           mainWindow
+            cmd::UndoStack&                              undoStack,
+            const std::shared_ptr<store::IAccountStore>& accountStore,
+            AccountController&                           accountController,
+            QMainWindow*                                 mainWindow
         );
 
-        void refresh() override;
+        void refresh();
 
         void handleContextMenuAction(
             const ui::AccountCategory* item,

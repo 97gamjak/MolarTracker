@@ -3,6 +3,7 @@
 
 #include "config/id_types.hpp"
 #include "finance/positions.hpp"   // to avoid incomplete return type outside
+#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
@@ -61,19 +62,12 @@ namespace store
         virtual finance::Positions getOpenPositions() const = 0;
 
         /**
-         * @brief Commit the current session
-         *
-         */
-        virtual void commit() = 0;
-
-        /**
          * @brief Get the ID remapping for positions
          *
-         * @return const unorderedIdMap<PositionId, PositionId>&
+         * @return const IdIdMap<PositionId>&
          */
         [[nodiscard]]
-        virtual const unorderedIdMap<PositionId, PositionId>& getIdRemap(
-        ) const = 0;
+        virtual const IdIdMap<PositionId>& getIdRemap() const = 0;
 
         /**
          * @brief Subscribe to position closed events, this allows subscribers

@@ -3,7 +3,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "finance/cash.hpp"
+#include "utils/cash.hpp"
 #include "utils/result/error.hpp"
 #include "utils/result/result.hpp"
 #include "utils/timestamp.hpp"
@@ -18,19 +18,19 @@ namespace finance
     {
        private:
         /// The price of the financial instrument.
-        finance::Cash _price;
+        Cash _price;
 
         /// The timestamp of the price quote.
         Timestamp _timestamp;
 
        public:
-        PriceQuote(finance::Cash price, Timestamp timestamp);
+        PriceQuote(Cash price, Timestamp timestamp);
 
         [[nodiscard]]
         static MTResult<PriceQuote> fromJson(const nlohmann::json& json);
 
         [[nodiscard]]
-        const finance::Cash& getPrice() const;
+        const Cash& getPrice() const;
     };
 }   // namespace finance
 

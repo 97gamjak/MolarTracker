@@ -1,4 +1,4 @@
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/trade_leg.hpp"
 
 #include <format>
 
@@ -112,45 +112,10 @@ namespace finance
     }
 
     /**
-     * @brief Construct a new Trade Data:: Trade Data object
+     * @brief Sets the account ID of the trade leg.
      *
-     * @param legs
+     * @param accountId The new account ID for the trade leg.
      */
-    TradeData::TradeData(std::vector<TradeLeg> legs) : _legs(std::move(legs)) {}
-
-    /**
-     * @brief Gets the legs of the trade data.
-     *
-     * @return const std::vector<TradeLeg>& The legs of the trade data.
-     */
-    const std::vector<TradeLeg>& TradeData::getLegs() const { return _legs; }
-
-    /**
-     * @brief Gets the legs of the trade data.
-     *
-     * @return std::vector<TradeLeg>& The legs of the trade data.
-     */
-    std::vector<TradeLeg>& TradeData::getLegs() { return _legs; }
-
-    /**
-     * @brief Adds a leg to the trade data.
-     *
-     * @param leg The trade leg to add.
-     */
-    void TradeData::addLeg(const TradeLeg& leg) { _legs.push_back(leg); }
-
-    /**
-     * @brief Gets the quantity of the trade data.
-     *
-     * @return Quantity The quantity of the trade data.
-     */
-    Quantity TradeData::calculateTotalQuantity() const
-    {
-        Quantity totalQuantity{0};
-        for (const auto& leg : _legs)
-            totalQuantity += leg.getQuantity();
-
-        return totalQuantity;
-    }
+    void TradeLeg::setAccountId(AccountId accountId) { _accountId = accountId; }
 
 }   // namespace finance

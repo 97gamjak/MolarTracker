@@ -3,10 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -15,6 +12,9 @@
 #include "store/account/account_store.hpp"
 #include "store/position_store.hpp"
 #include "store/transaction_store.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -82,7 +82,7 @@ namespace
                 finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     AccountId{1},
-                    finance::Cash{Currency::USD, micro_units{cash}},
+                    Cash{Currency::USD, micro_units{cash}},
                     TransactionEntryType::General
                 }}},
                 std::nullopt

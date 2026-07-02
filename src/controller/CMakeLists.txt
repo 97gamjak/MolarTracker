@@ -10,6 +10,7 @@ qt_add_library(molartracker_controller STATIC
     src/controller/mapper/account_mapper.cpp
     src/controller/mapper/profile_mapper.cpp
     src/controller/mapper/stock_mapper.cpp
+    src/controller/mapper/option_mapper.cpp
 
     src/controller/mapper/transaction/transaction_mapper.cpp
     src/controller/mapper/transaction/transaction_overview_mapper.cpp
@@ -56,13 +57,14 @@ target_link_libraries(molartracker_controller
     PRIVATE
     Qt6::Widgets
     Qt6::Concurrent
-    molartracker_store
-    molartracker_connections
-    molartracker_settings
-    molartracker_logging
-    molartracker_ui
-    molartracker_drafts
+    molartracker_cache
     molartracker_commands
+    molartracker_connections
+    molartracker_drafts
     molartracker_http
+    molartracker_logging
+    molartracker_settings
+    molartracker_store
+    molartracker_ui
     molartracker_vcs
 )

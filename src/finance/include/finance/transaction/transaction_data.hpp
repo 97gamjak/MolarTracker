@@ -3,7 +3,8 @@
 
 #include <variant>
 
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/option_data.hpp"
+#include "finance/transaction/stock_data.hpp"
 
 namespace finance
 {
@@ -11,10 +12,8 @@ namespace finance
     {
     };
 
-    using TransactionData = std::variant<CashData, TradeData>;
+    using TransactionData = std::variant<CashData, StockData, OptionData>;
 
-    [[nodiscard]]
-    Quantity getTotalQuantity(const TransactionData& data);
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_DATA_HPP__

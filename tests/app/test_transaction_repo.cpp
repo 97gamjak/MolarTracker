@@ -23,13 +23,10 @@
 #include <string>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "db/database.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/domain_transaction.hpp"
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -37,6 +34,9 @@
 #include "repo/migration/migration_runner.hpp"
 #include "repo/transaction_repo.hpp"
 #include "test_fixtures.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -88,7 +88,7 @@ namespace
                 finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, amount},
+                    Cash{Currency::USD, amount},
                     TransactionEntryType::General
                 }}},
                 std::move(comment)
@@ -99,13 +99,13 @@ namespace
         {
             constexpr auto     quantity = 100'000'000LL;   // 1.0 in micro-units
             constexpr auto     price = 150'000'000LL;   // $1.50 in micro-units
-            finance::TradeData data;
+            finance::StockData data;
             data.addLeg(
                 finance::TradeLeg{
                     _accountId,
                     _instrumentId,
                     Quantity{quantity},
-                    finance::Cash{Currency::USD, price},
+                    Cash{Currency::USD, price},
                     _positionId
                 }
             );
@@ -119,7 +119,7 @@ namespace
                 finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, price2},
+                    Cash{Currency::USD, price2},
                     TransactionEntryType::General
                 }}},
                 "trade comment"
@@ -288,13 +288,13 @@ TEST_F(
             {finance::TransactionEntry{
                  TransactionEntryId::invalid(),
                  _accountId,
-                 finance::Cash{Currency::USD, price1},
+                 Cash{Currency::USD, price1},
                  TransactionEntryType::General
              },
              finance::TransactionEntry{
                  TransactionEntryId::invalid(),
                  _accountId,
-                 finance::Cash{Currency::EUR, price2},
+                 Cash{Currency::EUR, price2},
                  TransactionEntryType::Fees
              }}
         },
@@ -353,7 +353,7 @@ TEST_F(TransactionRepoFixture, AddTransactionTradeLegIsRetrieved)
 
     ASSERT_EQ(txs.size(), 1U);
 
-    const auto& data = std::get<finance::TradeData>(txs[0].getData());
+    const auto& data = std::get<finance::StockData>(txs[0].getData());
     ASSERT_EQ(data.getLegs().size(), 1U);
 
     const auto& leg = data.getLegs()[0];
@@ -377,6 +377,6 @@ TEST_F(
     ASSERT_EQ(txs.size(), 1U);
     EXPECT_EQ(txs[0].getEntries().size(), 1U);
 
-    const auto& data = std::get<finance::TradeData>(txs[0].getData());
+    const auto& data = std::get<finance::StockData>(txs[0].getData());
     EXPECT_EQ(data.getLegs().size(), 1U);
 }

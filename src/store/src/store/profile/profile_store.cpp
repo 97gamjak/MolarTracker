@@ -354,8 +354,6 @@ namespace store
                     break;
             }
         }
-
-        _notifyOnCommit();
     }
 
     /**

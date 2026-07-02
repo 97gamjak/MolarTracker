@@ -8,6 +8,7 @@
 #include <qstringlistmodel.h>
 
 #include <algorithm>
+#include <unordered_set>
 
 #include "utils/qt_helpers.hpp"
 
@@ -23,11 +24,11 @@ namespace ui
      * @param parent The parent widget for this field
      */
     TickerField::TickerField(
-        const std::vector<std::string>& tickers,
-        QWidget*                        parent
+        const std::unordered_set<std::string>& tickers,
+        QWidget*                               parent
     )
         : QWidget(parent),
-          _tickers(utils::toQStringVector(tickers)),
+          _tickers(utils::toQStringSet(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
           _addButton(makeQChild<QPushButton>("+", this)),
           _completer(new QCompleter(this))
@@ -101,7 +102,7 @@ namespace ui
      */
     void TickerField::addTicker(QString ticker)
     {
-        _tickers.push_back(std::move(ticker));
+        _tickers.insert(std::move(ticker));
         _rebuildCompleter();
     }
 
@@ -168,9 +169,9 @@ namespace ui
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
      */
-    void TickerField::updateTickers(std::vector<QString> tickers)
+    void TickerField::updateTickers(const std::unordered_set<QString>& tickers)
     {
-        _tickers = std::move(tickers);
+        _tickers = tickers;
         _rebuildCompleter();
     }
 

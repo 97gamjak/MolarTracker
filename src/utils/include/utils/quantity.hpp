@@ -1,5 +1,5 @@
-#ifndef __CONFIG__INCLUDE__CONFIG__QUANTITY_HPP__
-#define __CONFIG__INCLUDE__CONFIG__QUANTITY_HPP__
+#ifndef __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
+#define __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
 
 #include <cstdint>
 #include <string>
@@ -93,8 +93,15 @@ class Quantity
     std::uint8_t     precision
 );
 
-#ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__QUANTITY_TPP__
-#include "details/quantity.tpp"
+[[nodiscard]] std::string microUnitsToString(
+    micro_units  value,
+    std::uint8_t precision,
+    std::uint8_t scale,
+    bool         withDecimalPoint = true
+);
+
+#ifndef __UTILS__INCLUDE__UTILS__QUANTITY_TPP__
+#include "quantity.tpp"
 #endif
 
-#endif   // __CONFIG__INCLUDE__CONFIG__QUANTITY_HPP__
+#endif   // __UTILS__INCLUDE__UTILS__QUANTITY_HPP__

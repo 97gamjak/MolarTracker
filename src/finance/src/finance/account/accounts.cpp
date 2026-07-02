@@ -27,7 +27,7 @@ namespace finance
      * external (true), internal (false), or not found (nullopt).
      */
     std::vector<std::optional<bool>> Accounts::isExternal(
-        const idSet<AccountId>& ids
+        const IdSet<AccountId>& ids
     ) const
     {
         std::vector<std::optional<bool>> results;
@@ -44,4 +44,34 @@ namespace finance
         return results;
     }
 
+    /**
+     * @brief Get the corresponding external account ID for a given internal
+     * cash account ID.
+     *
+     * @param cashAccountId The internal cash account ID to find the
+     * corresponding external account for.
+     * @return AccountId The corresponding external account ID, or an invalid
+     * AccountId if no corresponding external account is found.
+     */
+    AccountId Accounts::getCorrespondingExternalAccountId(
+        const AccountId& cashAccountId
+    ) const
+    {
+        for (const auto& [id, account] : *this)
+        {
+            if (!account.isExternal() &&
+                account.getKind() == AccountKind::Cash &&
+                account.getId() == cashAccountId)
+            {
+                // find the corresponding external account
+                for (const auto& [externalId, externalAccount] : *this)
+                {
+                    if (externalAccount.isExternal())
+                        return externalId;
+                }
+            }
+        }
+
+        return AccountId::invalid();
+    }
 }   // namespace finance

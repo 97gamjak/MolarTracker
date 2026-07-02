@@ -6,6 +6,7 @@
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 
 namespace finance
@@ -31,10 +32,22 @@ namespace finance
     {
        public:
         [[nodiscard]]
-        static DomainTransaction toDomain(const CashTransaction& transaction);
+        static DomainTransaction toDomain(
+            const CashTransaction& transaction,
+            const Accounts&        accounts
+        );
 
         [[nodiscard]]
-        static DomainTransaction toDomain(const StockTransaction& transaction);
+        static DomainTransaction toDomain(
+            const StockTransaction& transaction,
+            const Accounts&         accounts
+        );
+
+        [[nodiscard]]
+        static DomainTransaction toDomain(
+            const OptionTransaction& transaction,
+            const Accounts&          accounts
+        );
 
         [[nodiscard]]
         static std::

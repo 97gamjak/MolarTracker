@@ -5,6 +5,7 @@
 #include <qtablewidget.h>
 
 #include "config/id_types.hpp"
+#include "utils/container/id_map.hpp"
 
 namespace drafts
 {
@@ -32,7 +33,7 @@ namespace ui
         std::vector<drafts::CashTransactionOverview> _transactions;
 
         /// A map of account IDs to account names for display purposes
-        unorderedIdMap<AccountId, std::string> _accountIdToName;
+        IdMap<AccountId, std::string> _accountIdToName;
 
        public:
         explicit CashTransactionTableModel(QObject* parent = nullptr);
@@ -45,7 +46,7 @@ namespace ui
 
         void setTransactions(
             std::vector<drafts::CashTransactionOverview> transactions,
-            unorderedIdMap<AccountId, std::string>       accountIdToName
+            IdMap<AccountId, std::string>                accountIdToName
         );
 
         [[nodiscard]]

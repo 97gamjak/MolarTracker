@@ -15,8 +15,17 @@ using InstrumentId = StrongId<InstrumentTag>;
 
 using InstrumentIdSeq = IdSequence<InstrumentId>;
 
+template <typename T>
+concept HasInstrumentId = requires(T type) { type.getInstrumentId(); };
+
 struct StockTag {};
 using StockId = StrongId<StockTag>;
+
+struct OptionTag {};
+using OptionId = StrongId<OptionTag>;
+
+struct TransactionOptionTag {};
+using TransactionOptionId = StrongId<TransactionOptionTag>;
 
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
@@ -32,9 +41,6 @@ using TradeLegId = StrongId<TradeLegTag>;
 
 struct PositionTag {};
 using PositionId = StrongId<PositionTag>;
-
-template <typename T>
-using positionMap = unorderedIdMap<PositionId, T>;
 
 // clang-format on
 

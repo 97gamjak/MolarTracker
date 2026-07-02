@@ -1,7 +1,7 @@
 #include "drafts/position_draft.hpp"
 
-#include "config/quantity.hpp"
 #include "drafts/stock_draft.hpp"
+#include "utils/quantity.hpp"
 
 namespace drafts
 {
@@ -76,9 +76,9 @@ namespace drafts
         StockInfoDraft           stockInfo,
         Timestamp                createdAt,
         Quantity                 quantity,
-        finance::Cash            averagePrice,
-        finance::Cash            totalPrice,
-        finance::Cash            realizedPnL,
+        Cash                     averagePrice,
+        Cash                     totalPrice,
+        Cash                     realizedPnL,
         Percentage               realizedPnLPercentage,
         std::optional<Timestamp> closedAt
     )
@@ -102,10 +102,10 @@ namespace drafts
      * position
      */
     void PositionStockDetailDraft::updateUnrealizedPnL(
-        const finance::Cash& currentPrice,
-        const finance::Cash& marketValue,
-        const finance::Cash& unrealizedPnL,
-        Percentage           unrealizedPnLPercentage
+        const Cash& currentPrice,
+        const Cash& marketValue,
+        const Cash& unrealizedPnL,
+        Percentage  unrealizedPnLPercentage
     )
     {
         _currentPrice            = currentPrice;
@@ -124,9 +124,9 @@ namespace drafts
     /**
      * @brief Get the current price of the position detail draft
      *
-     * @return finance::Cash The current price
+     * @return Cash The current price
      */
-    finance::Cash PositionStockDetailDraft::getCurrentPrice() const
+    Cash PositionStockDetailDraft::getCurrentPrice() const
     {
         return _currentPrice;
     }
@@ -134,9 +134,9 @@ namespace drafts
     /**
      * @brief Get the market value of the position detail draft
      *
-     * @return finance::Cash The market value
+     * @return Cash The market value
      */
-    finance::Cash PositionStockDetailDraft::getMarketValue() const
+    Cash PositionStockDetailDraft::getMarketValue() const
     {
         return _marketValue;
     }
@@ -144,9 +144,9 @@ namespace drafts
     /**
      * @brief Get the average price of the position detail draft
      *
-     * @return finance::Cash The average price
+     * @return Cash The average price
      */
-    finance::Cash PositionStockDetailDraft::getAveragePrice() const
+    Cash PositionStockDetailDraft::getAveragePrice() const
     {
         return _averagePrice;
     }
@@ -154,19 +154,16 @@ namespace drafts
     /**
      * @brief Get the total price of the position detail draft
      *
-     * @return finance::Cash The total price
+     * @return Cash The total price
      */
-    finance::Cash PositionStockDetailDraft::getTotalPrice() const
-    {
-        return _totalPrice;
-    }
+    Cash PositionStockDetailDraft::getTotalPrice() const { return _totalPrice; }
 
     /**
      * @brief Get the realized PnL of the position detail draft
      *
-     * @return finance::Cash The realized PnL
+     * @return Cash The realized PnL
      */
-    finance::Cash PositionStockDetailDraft::getRealizedPnL() const
+    Cash PositionStockDetailDraft::getRealizedPnL() const
     {
         return _realizedPnL;
     }
@@ -184,9 +181,9 @@ namespace drafts
     /**
      * @brief Get the unrealized PnL of the position detail draft
      *
-     * @return finance::Cash The unrealized PnL
+     * @return Cash The unrealized PnL
      */
-    finance::Cash PositionStockDetailDraft::getUnrealizedPnL() const
+    Cash PositionStockDetailDraft::getUnrealizedPnL() const
     {
         return _unrealizedPnL;
     }

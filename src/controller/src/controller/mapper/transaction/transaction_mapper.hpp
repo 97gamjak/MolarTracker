@@ -2,22 +2,19 @@
 #define __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_MAPPER_HPP__
 
 #include <string>
-#include <variant>
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "utils/container/id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
     struct CashData;           // forward declaration
-    class TradeData;           // forward declaration
+    class StockData;           // forward declaration
     class TransactionEntry;    // forward declaration
     class DomainTransaction;   // forward declaration
     class TradeLeg;            // forward declaration
-
-    using TransactionData =
-        std::variant<CashData, TradeData>;   // forward declaration
-
 }   // namespace finance
 
 namespace drafts
@@ -46,7 +43,7 @@ namespace controller
         [[nodiscard]]
         static drafts::TransactionEntryDraft toEntryDraft(
             const finance::TransactionEntry& entry,
-            const idSet<AccountId>&          externalAccounts
+            const IdSet<AccountId>&          externalAccounts
         );
 
         [[nodiscard]]
@@ -66,14 +63,14 @@ namespace controller
 
         [[nodiscard]]
         static drafts::TradeLegDraft toTradeLegDraft(
-            const finance::TradeLeg&                         leg,
-            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+            const finance::TradeLeg&                leg,
+            const IdMap<InstrumentId, std::string>& instrumentNames
         );
 
         [[nodiscard]]
         static std::vector<drafts::TradeLegDraft> toTradeLegDrafts(
-            const std::vector<finance::TradeLeg>&            legs,
-            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+            const std::vector<finance::TradeLeg>&   legs,
+            const IdMap<InstrumentId, std::string>& instrumentNames
         );
     };
 

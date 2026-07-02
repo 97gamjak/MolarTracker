@@ -54,8 +54,8 @@ namespace drafts
     CashTransactionOverview::CashTransactionOverview(
         Timestamp                  timestamp,
         std::optional<std::string> comment,
-        finance::Cash              amount,
-        finance::Cash              fees,
+        Cash                       amount,
+        Cash                       fees,
         AccountId                  cashAccount,
         AccountId                  externalAccount
     )
@@ -70,24 +70,18 @@ namespace drafts
     /**
      * @brief Gets the amount of the cash transaction overview draft.
      *
-     * @return const finance::Cash& The amount of the cash transaction overview
+     * @return const Cash& The amount of the cash transaction overview
      * draft.
      */
-    const finance::Cash& CashTransactionOverview::getAmount() const
-    {
-        return _amount;
-    }
+    const Cash& CashTransactionOverview::getAmount() const { return _amount; }
 
     /**
      * @brief Gets the fees of the cash transaction overview draft.
      *
-     * @return const finance::Cash& The fees of the cash transaction overview
+     * @return const Cash& The fees of the cash transaction overview
      * draft.
      */
-    const finance::Cash& CashTransactionOverview::getFees() const
-    {
-        return _fees;
-    }
+    const Cash& CashTransactionOverview::getFees() const { return _fees; }
 
     /**
      * @brief Gets the cash account ID of the cash transaction overview draft.
@@ -129,8 +123,8 @@ namespace drafts
         Timestamp                  timestamp,
         std::optional<std::string> comment,
         Quantity                   quantity,
-        finance::Cash              unitPrice,
-        finance::Cash              fees,
+        Cash                       unitPrice,
+        Cash                       fees,
         std::string                ticker,
         AccountId                  securityAccount,
         AccountId                  cashAccount
@@ -189,10 +183,10 @@ namespace drafts
     /**
      * @brief Gets the unit price of the stock transaction overview draft.
      *
-     * @return const finance::Cash& The unit price of the stock transaction
+     * @return const Cash& The unit price of the stock transaction
      * overview draft.
      */
-    const finance::Cash& StockTransactionOverview::getUnitPrice() const
+    const Cash& StockTransactionOverview::getUnitPrice() const
     {
         return _unitPrice;
     }
@@ -200,12 +194,9 @@ namespace drafts
     /**
      * @brief Gets the total fees of the stock transaction overview draft.
      *
-     * @return const finance::Cash& The total fees of the stock transaction
+     * @return const Cash& The total fees of the stock transaction
      * overview draft.
      */
-    const finance::Cash& StockTransactionOverview::getTotalFees() const
-    {
-        return _fees;
-    }
+    const Cash& StockTransactionOverview::getTotalFees() const { return _fees; }
 
 }   // namespace drafts

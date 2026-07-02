@@ -10,6 +10,7 @@
 #include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"
+#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
@@ -55,10 +56,10 @@ namespace store
         ~TransactionStore() override;
 
         void commit(
-            const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
-        ) override;
+            const IdIdMap<AccountId>&    accountIdRemap,
+            const IdIdMap<InstrumentId>& instrumentIdRemap,
+            const IdIdMap<PositionId>&   positionIdRemap
+        );
 
         [[nodiscard]]
         TransactionStoreResult addCashTransaction(
@@ -70,6 +71,11 @@ namespace store
         ) override;
 
         [[nodiscard]]
+        TransactionStoreResult addOptionTransaction(
+            finance::OptionTransaction transaction
+        ) override;
+
+        [[nodiscard]]
         finance::Transactions getTransactions(
             const finance::TransactionFilter& filter
         ) const override;
@@ -77,7 +83,7 @@ namespace store
         finance::Transactions getTransactions() const override;
 
         [[nodiscard]]
-        unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+        IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const override;
 
@@ -88,15 +94,9 @@ namespace store
         ) override;
 
        private:
-        void _onAccountIdRemap(
-            const unorderedIdMap<AccountId, AccountId>& remap
-        );
-        void _onInstrumentIdRemap(
-            const unorderedIdMap<InstrumentId, InstrumentId>& remap
-        );
-        void _onPositionIdRemap(
-            const unorderedIdMap<PositionId, PositionId>& remap
-        );
+        void _onAccountIdRemap(const IdIdMap<AccountId>& remap);
+        void _onInstrumentIdRemap(const IdIdMap<InstrumentId>& remap);
+        void _onPositionIdRemap(const IdIdMap<PositionId>& remap);
     };
 
 }   // namespace store

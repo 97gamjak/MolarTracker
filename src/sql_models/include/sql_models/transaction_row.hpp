@@ -1,13 +1,13 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ROW_HPP__
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/where_expr.hpp"
+#include "utils/finance.hpp"
 #include "utils/timestamp.hpp"
 
 /**
@@ -41,6 +41,18 @@ struct TransactionRow : public orm::ORMModel<"transaction_">
 
     /// auto generate the fields() function using the ORM_FIELDS macro
     ORM_FIELDS(TransactionRow, id, timestamp, status, comment, type);
+
+    /// Helper type alias for defining foreign key fields referencing the id
+    /// field of the transaction table, this allows for concise definitions of
+    /// foreign key fields that reference the transaction table with a specified
+    /// deletion behavior (e.g., cascade or restrict)
+    template <orm::fixed_string tableName, orm::DeletionType T>
+    using ForeignId = orm::Field<
+        "transaction_id",
+        TransactionId,
+        tableName,
+        orm::foreign_key_t<T, TransactionRow, decltype(TransactionRow::id)>,
+        orm::not_null_t>;
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ROW_HPP__

@@ -3,8 +3,9 @@
 
 #include "base_repo.hpp"
 #include "config/id_types.hpp"
+#include "finance/instrument/option.hpp"
 #include "repo/i_instrument_repo.hpp"
-#include "sql_models/stock_row.hpp"
+#include "sql_models/instrument_row.hpp"
 
 namespace repo
 {
@@ -17,17 +18,10 @@ namespace repo
         using BaseRepo::BaseRepo;
 
         [[nodiscard]]
-        std::vector<std::string> getTickers() override;
+        finance::Stocks getStocks(const finance::StockFilter& filter) override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
-        ) override;
-
-        [[nodiscard]]
-        std::optional<finance::Stock> getStock(
-            const std::string& ticker
-        ) override;
+        std::vector<finance::Option> getOptions() override;
 
         [[nodiscard]]
         finance::StockInsertionResult addStock(
@@ -35,13 +29,19 @@ namespace repo
         ) override;
 
         [[nodiscard]]
+        finance::OptionInsertionResult addOption(
+            const finance::Option& option
+        ) override;
+
+        [[nodiscard]]
         bool stockExists(const std::string& ticker) override;
+
+        [[nodiscard]]
+        bool optionExists(const finance::Option& option) override;
 
        private:
         [[nodiscard]]
-        std::vector<StockRow> _getStockRows(
-            const idSet<InstrumentId>& ids = {}
-        );
+        InstrumentId _addInstrument(const InstrumentRow& instrumentRow);
     };
 }   // namespace repo
 

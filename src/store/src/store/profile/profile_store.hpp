@@ -65,7 +65,7 @@ namespace store
         [[nodiscard]]
         ProfileStoreResult removeProfile(const domain::Profile& draft) override;
 
-        void commit() override;
+        void commit();
 
         [[nodiscard]]
         Connection subscribeToProfileChange(

@@ -7,12 +7,14 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "utils/container/id_map.hpp"
 
 namespace finance
 {
     class Account;             // Forward declaration
     class TransactionFilter;   // Forward declaration
     class Transactions;        // Forward declaration
+    class OptionTransaction;   // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -47,19 +49,6 @@ namespace store
         virtual ~ITransactionStore() = default;
 
         /**
-         * @brief Commit all changes to the database
-         *
-         * @param accountIdRemap Mapping of account IDs
-         * @param instrumentIdRemap Mapping of instrument IDs
-         * @param positionIdRemap Mapping of position IDs
-         */
-        virtual void commit(
-            const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-            const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-            const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
-        ) = 0;
-
-        /**
          * @brief Add a cash transaction to the store
          *
          * @param transaction The cash transaction to add
@@ -79,6 +68,17 @@ namespace store
         [[nodiscard]]
         virtual TransactionStoreResult addStockTransaction(
             finance::StockTransaction transaction
+        ) = 0;
+
+        /**
+         * @brief Add an option transaction to the store
+         *
+         * @param transaction The option transaction to add
+         * @return TransactionStoreResult The result of the operation
+         */
+        [[nodiscard]]
+        virtual TransactionStoreResult addOptionTransaction(
+            finance::OptionTransaction transaction
         ) = 0;
 
         /**
@@ -107,10 +107,10 @@ namespace store
          * @brief Get the Stock Positions
          *
          * @param filter
-         * @return unorderedIdMap<PositionId, finance::StockPositionTransaction>
+         * @return IdMap<PositionId, finance::StockPositionTransaction>
          */
         [[nodiscard]]
-        virtual unorderedIdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
+        virtual IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
             const finance::TransactionFilter& filter
         ) const = 0;
 

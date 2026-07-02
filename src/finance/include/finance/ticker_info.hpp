@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "config/finance.hpp"
+#include "utils/finance.hpp"
 #include "utils/result/error.hpp"
 
 namespace finance

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "cache/cache_container.hpp"
 #include "commands/undo_stack.hpp"
 #include "config/constants/constants.hpp"
 #include "controller/account_controller.hpp"
@@ -36,6 +37,8 @@ namespace controller
         settings::Settings _settings;
         /// application context
         store::StoreContainer _storeContainer;
+        /// cache container for managing cache instances
+        cache::CacheContainer _caches;
         /// main window of the application
         std::shared_ptr<ui::MainWindow> _mainWindow;
         /// undo stack for managing commands
@@ -71,6 +74,7 @@ namespace controller
          */
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
+              _caches(_settings.getCacheSettings(), _storeContainer),
               _mainWindow(std::make_shared<ui::MainWindow>()),
               _handlers(_settings),
               _priceCache(std::make_shared<finance::PriceCache>()),
@@ -79,7 +83,7 @@ namespace controller
                   _undoStack,
                   _storeContainer.getAccountStore(),
                   _storeContainer.getPositionStore(),
-                  _storeContainer.getStockStore(),
+                  _caches.getStockCache(),
                   _storeContainer.getTransactionStore(),
                   _priceCache,
                   _mainWindow->getCentralWidget()
@@ -88,13 +92,13 @@ namespace controller
                   _undoStack,
                   _storeContainer.getTransactionStore(),
                   _storeContainer.getAccountStore(),
-                  _storeContainer.getStockStore(),
+                  _caches.getStockCache(),
                   _mainWindow->getCentralWidget()
               ),
               _positionController(
                   _storeContainer.getPositionStore(),
                   _storeContainer.getTransactionStore(),
-                  _storeContainer.getStockStore(),
+                  _caches.getStockCache(),
                   _priceCache
               ),
               _vcsController(
@@ -111,6 +115,7 @@ namespace controller
               _sideBarController(
                   _undoStack,
                   _storeContainer,
+                  _caches,
                   _mainWindow.get(),
                   &_mainWindow->getSideBar(),
                   _mainWindow->getCentralWidget(),

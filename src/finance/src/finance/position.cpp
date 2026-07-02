@@ -1,5 +1,7 @@
 #include "finance/position.hpp"
 
+#include <format>
+
 namespace finance
 {
     /**
@@ -53,6 +55,21 @@ namespace finance
             [isOpen](const Position& position)
             { return isOpen == !position.getClosedAt().has_value(); }
         };
+    }
+
+    /**
+     * @brief Get a string representation of the position.
+     *
+     * @return std::string
+     */
+    std::string Position::toString() const
+    {
+        return std::format(
+            "Position(id={}, createdAt={}, closedAt={})",
+            _id.toString(),
+            _createdAt.humanReadable(),
+            _closedAt.has_value() ? _closedAt->humanReadable() : "null"
+        );
     }
 
 }   // namespace finance

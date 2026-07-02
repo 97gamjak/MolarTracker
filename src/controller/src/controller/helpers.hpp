@@ -1,7 +1,6 @@
 #ifndef __CONTROLLER__SRC__CONTROLLER__HELPERS_HPP__
 #define __CONTROLLER__SRC__CONTROLLER__HELPERS_HPP__
 
-#include <expected>
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,17 +11,22 @@
 
 namespace store
 {
-    class IStockStore;         // Forward declaration
     class ITransactionStore;   // Forward declaration
     class IPositionStore;      // Forward declaration
 }   // namespace store
 
 namespace drafts
 {
-    class CreateStockTransactionDraft;   // Forward declaration
-    class PositionDraft;                 // Forward declaration
-    class PositionStockDetailDraft;      // Forward declaration
+    class CreateStockTransactionDraft;    // Forward declaration
+    class CreateOptionTransactionDraft;   // Forward declaration
+    class PositionDraft;                  // Forward declaration
+    class PositionStockDetailDraft;       // Forward declaration
 }   // namespace drafts
+
+namespace cache
+{
+    class StockCache;   // Forward declaration
+}   // namespace cache
 
 /**
  * @brief Detail struct for open stock positions, containing the position draft,
@@ -41,22 +45,17 @@ struct OpenStockPositionDetail
 
 namespace controller
 {
-    std::expected<void, std::string> convertTickerToInstrumentId(
-        drafts::CreateStockTransactionDraft&       draft,
-        const std::shared_ptr<store::IStockStore>& stockStore
-    );
-
     std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>&        stockCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     );
 
     std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<cache::StockCache>&        stockCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     );
 

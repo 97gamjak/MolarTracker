@@ -10,7 +10,10 @@
 #include "config/id_types.hpp"
 #include "domain/profile.hpp"
 #include "finance/account/account.hpp"
+#include "finance/instrument/instrument_predicates.hpp"
+#include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
+#include "finance/instrument/stocks.hpp"
 #include "finance/position.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -139,31 +142,20 @@ namespace tests
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::set<std::string> stocksInDb;
-        int                   addStockCallCount = 0;
+        std::set<std::string> optionsInDb;
+        int                   addStockCallCount  = 0;
+        int                   addOptionCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextStockId      = 1;
+        int _nextOptionId     = 1;
         int _nextInstrumentId = 1;
 
        public:
-        [[nodiscard]] std::vector<std::string> getTickers() override
+        [[nodiscard]] std::vector<finance::Option> getOptions() override
         {
             return {};
-        }
-
-        [[nodiscard]] std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& /*ids*/
-        ) override
-        {
-            return {};
-        }
-
-        [[nodiscard]] std::optional<finance::Stock> getStock(
-            const std::string& /*ticker*/
-        ) override
-        {
-            return std::nullopt;
         }
 
         [[nodiscard]] finance::StockInsertionResult addStock(
@@ -177,9 +169,51 @@ namespace tests
             };
         }
 
+        [[nodiscard]] finance::OptionInsertionResult addOption(
+            const finance::Option& /*stock*/
+        ) override
+        {
+            addOptionCallCount++;
+            return finance::OptionInsertionResult{
+                .optionId     = OptionId{_nextOptionId++},
+                .instrumentId = InstrumentId{_nextInstrumentId++}
+            };
+        }
+
         [[nodiscard]] bool stockExists(const std::string& ticker) override
         {
             return stocksInDb.contains(ticker);
+        }
+
+        [[nodiscard]] bool optionExists(const finance::Option& option) override
+        {
+            return optionsInDb.contains(option.getName());
+        }
+
+        [[nodiscard]] finance::Stocks getStocks(
+            const finance::StockFilter& filter
+        ) override
+        {
+            finance::Stocks stocks;
+
+            for (const auto& ticker : stocksInDb)
+            {
+                finance::Stock stock{
+                    ticker,
+                    Currency::USD,
+                    "Company Name",
+                    "Company Description",
+                    "Exchange",
+                    "Sector",
+                    "Industry",
+                    AssetClass::Stock
+                };
+
+                if (filter::evaluatePredicate(filter.makePredicates(), stock))
+                    stocks.addUnchecked(stock);
+            }
+
+            return stocks;
         }
     };
 
@@ -203,14 +237,14 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::Position> getAllPositions(
-            const idSet<AccountId>& /*accountIds*/
+            const IdSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
         }
 
         [[nodiscard]] std::vector<finance::Position> getAllOpenPositions(
-            const idSet<AccountId>& /*accountIds*/
+            const IdSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
@@ -237,7 +271,7 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::DomainTransaction> getTransactions(
-            const idSet<AccountId>& /*accountIds*/,
+            const IdSet<AccountId>& /*accountIds*/,
             const finance::TransactionFilter& /*filter*/
         ) override
         {

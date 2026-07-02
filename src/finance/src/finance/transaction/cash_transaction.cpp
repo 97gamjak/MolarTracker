@@ -1,8 +1,8 @@
 #include "finance/transaction/cash_transaction.hpp"
 
 #include "config/id_types.hpp"
-#include "finance/cash.hpp"
 #include "finance/transaction/transaction_entries.hpp"
+#include "utils/cash.hpp"
 
 namespace finance
 {
@@ -28,29 +28,17 @@ namespace finance
         Cash                       fees,
         std::optional<std::string> comment
     )
-        : Transaction(id, timestamp, status, std::move(comment)),
-          _cashAccount(cashAccount),
-          _externalAccount(externalAccount),
-          _amount(amount),
-          _fees(fees)
+        : Transaction(
+              id,
+              timestamp,
+              status,
+              cashAccount,
+              externalAccount,
+              fees,
+              std::move(comment)
+          ),
+          _amount(amount)
     {
-    }
-
-    /**
-     * @brief Get the cash account ID associated with the cash transaction
-     *
-     * @return AccountId
-     */
-    AccountId CashTransaction::getCashAccountId() const { return _cashAccount; }
-
-    /**
-     * @brief Get the external account ID associated with the cash transaction
-     *
-     * @return AccountId
-     */
-    AccountId CashTransaction::getExternalAccountId() const
-    {
-        return _externalAccount;
     }
 
     /**
@@ -61,25 +49,26 @@ namespace finance
     Cash CashTransaction::getAmount() const { return _amount; }
 
     /**
-     * @brief Get the fees associated with the cash transaction
-     *
-     * @return Cash
-     */
-    Cash CashTransaction::getFees() const { return _fees; }
-
-    /**
      * @brief Get the transaction entries associated with the cash transaction
+     *
+     * @param externalAccount The external account ID, if applicable, this is
+     * used to determine the direction of the cash flow for the amount and fees
+     * entries, if the entry is for the external account it will negate the
+     * amount to reflect the cash flow correctly, and if the entry is for the
+     * cash account it will use the amount as is.
      *
      * @return TransactionEntries
      */
-    TransactionEntries CashTransaction::getTransactionEntries() const
+    TransactionEntries CashTransaction::getEntries(
+        AccountId externalAccount
+    ) const
     {
         TransactionEntries entries;
 
-        entries.add(_getAmountEntry(false));
-        entries.add(_getAmountEntry(true));
-        entries.add(_getFeeEntry(false));
-        entries.add(_getFeeEntry(true));
+        entries.add(_getAmountEntry());
+        entries.add(_getAmountEntry(externalAccount));
+        entries.add(_getFeeEntry());
+        entries.add(_getFeeEntry(externalAccount));
 
         return entries;
     }
@@ -93,32 +82,20 @@ namespace finance
      * @param external
      * @return TransactionEntry
      */
-    TransactionEntry CashTransaction::_getAmountEntry(bool external) const
+    TransactionEntry CashTransaction::_getAmountEntry(
+        std::optional<AccountId> external
+    ) const
     {
-        return TransactionEntry{
-            TransactionEntryId::invalid(),
-            external ? _externalAccount : _cashAccount,
-            external ? -_amount : _amount,
-            TransactionEntryType::General
-        };
-    }
+        const auto accountId =
+            external.has_value() ? external.value() : getCashAccountId();
 
-    /**
-     * @brief Get the fee entry for the cash transaction, this will create a
-     * transaction entry for the fees of the cash transaction, if the entry is
-     * for the external account it will negate the fees to reflect the cash
-     * flow correctly.
-     *
-     * @param external
-     * @return TransactionEntry
-     */
-    TransactionEntry CashTransaction::_getFeeEntry(bool external) const
-    {
+        const auto amount = external.has_value() ? -_amount : _amount;
+
         return TransactionEntry{
             TransactionEntryId::invalid(),
-            external ? _externalAccount : _cashAccount,
-            external ? -_fees : _fees,
-            TransactionEntryType::Fees
+            accountId,
+            amount,
+            TransactionEntryType::General
         };
     }
 

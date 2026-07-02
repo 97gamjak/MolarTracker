@@ -116,6 +116,15 @@ All changes and updates, that are relevant for developers will be documented her
 - Add fees to creating stock and cash transactions
 - Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
 - Make stock store a fully cached store with possibility to switch to a dirty-only cache store
+- Implement first version of Option SQL model
+- Extend transaction row sql model with some option specific data
+- Extend domain transaction type to have now `OptionData`
+- Make it possible to open (create) option transactions
+
+#### Cache
+
+- Introduce Cache base classes
+- Introduce StockCache and split StockStore into read and write
 
 #### UI
 
@@ -173,6 +182,7 @@ All changes and updates, that are relevant for developers will be documented her
 - make position store an interface and cleanup deps to remove drafts from store deps
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
+- remove unorderedIdMap special type
 
 ### Claude
 

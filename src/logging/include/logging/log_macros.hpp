@@ -4,6 +4,7 @@
 #include <format>     // IWYU pragma: keep
 #include <iostream>   // IWYU pragma: keep
 #include <map>
+#include <mstd/error.hpp>
 #include <string_view>
 
 #include "logging/log_category.hpp"      // IWYU pragma: keep
@@ -131,7 +132,32 @@ namespace logging::detail
 #define LOG_CATEGORY std::string(logging::detail::getCategory(__FILE__))
 
 #define MT_DEBUG std::cerr
-
 // NOLINTEND(cppcoreguidelines-macro-usage)
+
+namespace logging
+{
+    /**
+     * @brief A macro to indicate that a code path must be implemented, this is
+     * used as a placeholder for code that has not yet been implemented, and it
+     * will cause a compile-time error if it is ever reached.
+     *
+     */
+    template <int Todo>
+    void mustImplement()
+    {
+        // cppcheck-suppress knownConditionTrueFalse
+        if constexpr (Todo > 0)
+        {
+            MSTD_COMPILE_FAIL("REACHED MUST_BE_IMPLEMENTED");
+        }
+        else
+        {
+            LOG_ERROR(
+                "Reached a MUST_BE_IMPLEMENTED code path, this should never "
+                "happen"
+            );
+        }
+    }
+}   // namespace logging
 
 #endif   // __LOGGING__INCLUDE__LOGGING__LOG_MACROS_HPP__

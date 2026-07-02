@@ -2,10 +2,10 @@
 
 #include <stdexcept>
 
-#include "config/finance.hpp"
-#include "finance/currency.hpp"
 #include "json/json.hpp"
 #include "logging/log_macros.hpp"
+#include "utils/currency.hpp"
+#include "utils/finance.hpp"
 #include "utils/result/error.hpp"
 
 REGISTER_LOG_CATEGORY("Finance.PriceQuote");
@@ -18,7 +18,7 @@ namespace finance
      * @param price The price of the financial instrument.
      * @param timestamp The timestamp of the price quote.
      */
-    PriceQuote::PriceQuote(finance::Cash price, Timestamp timestamp)
+    PriceQuote::PriceQuote(Cash price, Timestamp timestamp)
         : _price(price), _timestamp(timestamp)
     {
     }
@@ -85,10 +85,10 @@ namespace finance
     /**
      * @brief Get the price of the financial instrument.
      *
-     * @return const finance::Cash& The price of the financial instrument.
+     * @return const Cash& The price of the financial instrument.
      */
     [[nodiscard]]
-    const finance::Cash& PriceQuote::getPrice() const
+    const Cash& PriceQuote::getPrice() const
     {
         return _price;
     }

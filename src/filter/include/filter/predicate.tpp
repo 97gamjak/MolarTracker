@@ -12,6 +12,12 @@ namespace filter
         return Predicate<T>{std::move(func)};
     }
 
+    template <typename T>
+    Predicate<T> makeEmptyPredicate()
+    {
+        return Predicate<T>{EmptyNode<PredicateFunc<T>>{}};
+    }
+
     /**
      * @brief Visitor for evaluating a predicate expression against an input
      * value.

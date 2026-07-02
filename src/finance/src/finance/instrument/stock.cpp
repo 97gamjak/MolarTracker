@@ -1,9 +1,9 @@
 #include "finance/instrument/stock.hpp"
 
-#include "config/finance.hpp"
-#include "finance/currency.hpp"
 #include "finance/ticker_info.hpp"
 #include "finance/yf_client.hpp"
+#include "utils/currency.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {

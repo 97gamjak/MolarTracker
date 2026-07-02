@@ -23,10 +23,10 @@ namespace finance
         /**
          * @brief Get the Base Instrument Ids
          *
-         * @return idSet<InstrumentId>
+         * @return IdSet<InstrumentId>
          */
         [[nodiscard]]
-        virtual idSet<InstrumentId> getBaseInstrumentIds() const = 0;
+        virtual IdSet<InstrumentId> getBaseInstrumentIds() const = 0;
     };
 
     /**
@@ -39,7 +39,7 @@ namespace finance
        public:
         void sort();
 
-        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**
@@ -71,7 +71,7 @@ namespace finance
         SecurityView& operator=(const SecurityView&) = delete;
         SecurityView& operator=(SecurityView&&)      = delete;
 
-        [[nodiscard]] idSet<InstrumentId> getBaseInstrumentIds() const override;
+        [[nodiscard]] IdSet<InstrumentId> getBaseInstrumentIds() const override;
     };
 
     /**

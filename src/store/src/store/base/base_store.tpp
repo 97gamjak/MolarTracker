@@ -16,18 +16,6 @@ namespace store
 {
 
     /**
-     * @brief Construct a new Base Store< T,  Id Type>:: Base Store object
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param fullCache
-     */
-    template <typename T, typename IdType>
-    BaseStore<T, IdType>::BaseStore(bool fullCache) : _fullCache(fullCache)
-    {
-    }
-
-    /**
      * @brief Checks if an entry with the given ID is marked as deleted in the
      * store.
      *
@@ -167,12 +155,12 @@ namespace store
      * @tparam T
      * @tparam IdType
      * @param options
-     * @return idSet<IdType>
+     * @return IdSet<IdType>
      */
     template <typename T, typename IdType>
-    idSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
+    IdSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
     {
-        idSet<IdType> ids;
+        IdSet<IdType> ids;
         for (const auto& entry : _entries)
             if (options.eval(entry))
                 ids.insert(getId(entry.value));
@@ -252,8 +240,7 @@ namespace store
 
         _entries.push_back(Entry{value, StoreState::New});
 
-        _added.push_back(value);
-        _notifyAdded(false);
+        _notifyAdded(value);
 
         return value.getId();
     }
@@ -271,8 +258,6 @@ namespace store
     {
         for (const auto& item : value)
             _entries.push_back(Entry{item, StoreState::Clean});
-
-        _notifyStoreChanged(false);
     }
 
     /**
@@ -301,8 +286,7 @@ namespace store
         entry->value = value;
         entry->state = state;
 
-        _updated.push_back(entry->value);
-        _notifyUpdated(false);
+        _notifyUpdated(value);
         return StoreResult::Ok;
     }
 
@@ -364,8 +348,7 @@ namespace store
         if (result != StoreResult::Ok)
             return result;
 
-        _removed.push_back(id);
-        _notifyRemoved(false);
+        _notifyRemoved(id);
         _markPotentiallyDirty();
 
         return StoreResult::Ok;
@@ -481,24 +464,12 @@ namespace store
     }
 
     /**
-     * @brief Checks if the store is fully cached.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @return true if the store is fully cached, false otherwise.
-     */
-    template <typename T, typename IdType>
-    bool BaseStore<T, IdType>::isFullCache() const
-    {
-        return _fullCache;
-    }
-
-    /**
      * @brief logs the contents of the store's cache for debugging purposes.
-     * This method checks if logging is enabled for the specified category and
-     * log level, and if so, it logs the number of entries in the cache and the
-     * details of each entry, including its value and state. This can be useful
-     * for debugging and understanding the current state of the store's cache.
+     * This method checks if logging is enabled for the specified category
+     * and log level, and if so, it logs the number of entries in the cache
+     * and the details of each entry, including its value and state. This
+     * can be useful for debugging and understanding the current state of
+     * the store's cache.
      *
      * @tparam T
      * @tparam IdType
@@ -540,12 +511,26 @@ namespace store
      *
      * @tparam T
      * @tparam IdType
-     * @return const IdMap&
+     * @return const IdIdMap<IdType>&
      */
     template <typename T, typename IdType>
-    auto BaseStore<T, IdType>::_getIdRemap() const -> const IdMap&
+    const IdIdMap<IdType>& BaseStore<T, IdType>::_getIdRemap() const
     {
         return _idRemap;
+    }
+
+    /**
+     * @brief Clears the ID remapping map for the store. This is used to
+     * reset the ID remapping state, typically after a commit or when the
+     * remapping is no longer needed.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::clearIdRemap()
+    {
+        _idRemap.clear();
     }
 
 }   // namespace store

@@ -4,8 +4,8 @@
 #include <optional>
 
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
-#include "finance/cash.hpp"
+#include "utils/cash.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace drafts
@@ -49,32 +49,26 @@ namespace drafts
     {
        private:
         /// The amount of the cash transaction
-        finance::Cash _amount;
+        Cash _amount;
 
         /// The fees associated with the cash transaction
-        finance::Cash _fees;
+        Cash _fees;
 
         /// The account ID associated with the cash transaction
         AccountId _accountId;
 
-        /// The external account ID associated with the cash transaction, if any
-        AccountId _externalAccount = AccountId::invalid();
-
        public:
         explicit CreateCashTransactionDraft(
             Timestamp                  timestamp,
-            finance::Cash              amount,
-            finance::Cash              fees,
+            Cash                       amount,
+            Cash                       fees,
             AccountId                  accountId,
             std::optional<std::string> comment = std::nullopt
         );
 
-        void setExternalAccount(AccountId externalAccount);
-
-        [[nodiscard]] const finance::Cash& getAmount() const;
-        [[nodiscard]] const finance::Cash& getFees() const;
-        [[nodiscard]] AccountId            getAccountId() const;
-        [[nodiscard]] AccountId            getExternalAccount() const;
+        [[nodiscard]] const Cash& getAmount() const;
+        [[nodiscard]] const Cash& getFees() const;
+        [[nodiscard]] AccountId   getAccountId() const;
     };
 
     /**
@@ -92,9 +86,9 @@ namespace drafts
         /// The quantity of the stock being transacted
         Quantity _quantity;
         /// The unit price of the stock being transacted
-        finance::Cash _unitPrice;
+        Cash _unitPrice;
         /// The fees associated with the stock transaction
-        finance::Cash _fees;
+        Cash _fees;
 
         /// The security account ID associated with the stock transaction
         AccountId _securityAccount;
@@ -103,8 +97,6 @@ namespace drafts
 
         /// The instrument ID associated with the stock transaction
         InstrumentId _instrumentId = InstrumentId::invalid();
-        /// The external account ID associated with the stock transaction
-        AccountId _externalAccount = AccountId::invalid();
         /// The position ID associated with the stock transaction
         PositionId _positionId = PositionId::invalid();
 
@@ -113,27 +105,104 @@ namespace drafts
             Timestamp                  timestamp,
             std::string                ticker,
             Quantity                   quantity,
-            finance::Cash              unitPrice,
-            finance::Cash              fees,
+            Cash                       unitPrice,
+            Cash                       fees,
             AccountId                  securityAccount,
             AccountId                  cashAccount,
             std::optional<std::string> comment = std::nullopt
         );
 
-        void setExternalAccount(AccountId externalAccount);
         void setInstrumentId(InstrumentId instrumentId);
         void setPositionId(PositionId positionId);
 
-        [[nodiscard]] AccountId            getSecurityAccount() const;
-        [[nodiscard]] AccountId            getCashAccount() const;
-        [[nodiscard]] AccountId            getExternalAccount() const;
-        [[nodiscard]] InstrumentId         getInstrumentId() const;
-        [[nodiscard]] std::string          getTicker() const;
-        [[nodiscard]] const Quantity&      getQuantity() const;
-        [[nodiscard]] const finance::Cash& getUnitPrice() const;
-        [[nodiscard]] const finance::Cash& getFees() const;
-        [[nodiscard]] PositionId           getPositionId() const;
+        [[nodiscard]] AccountId       getSecurityAccount() const;
+        [[nodiscard]] AccountId       getCashAccount() const;
+        [[nodiscard]] InstrumentId    getInstrumentId() const;
+        [[nodiscard]] std::string     getTicker() const;
+        [[nodiscard]] const Quantity& getQuantity() const;
+        [[nodiscard]] const Cash&     getUnitPrice() const;
+        [[nodiscard]] const Cash&     getFees() const;
+        [[nodiscard]] PositionId      getPositionId() const;
     };
+
+    /**
+     * @brief Create an option transaction draft.
+     *
+     * This class is used to create a draft for an option transaction,
+     * encapsulating all the necessary information to initiate the
+     * transaction.
+     */
+    class CreateOptionTransactionDraft : public CreateTransactionDraft
+    {
+       private:
+        /// The underlying ticker of the option being transacted
+        std::string _underlyingTicker;
+
+        /// The expiration date of the option being transacted
+        Timestamp _expiration;
+
+        /// The option type (call or put) of the option being transacted
+        OptionType _optionType;
+
+        /// The quantity of the option being transacted
+        Quantity _quantity;
+        /// The strike price of the option being transacted
+        Cash _strikePrice;
+        /// The amount of the option being transacted
+        Cash _amount;
+        /// The fees associated with the option transaction
+        Cash _fees;
+
+        /// The contract size of the option being transacted
+        std::int64_t _contractSize;
+
+        /// The security account ID associated with the option transaction
+        AccountId _securityAccount;
+        /// The cash account ID associated with the option transaction
+        AccountId _cashAccount;
+
+        /// The instrument ID associated with the option transaction
+        InstrumentId _instrumentId = InstrumentId::invalid();
+        /// The underlying instrument ID associated with the option transaction
+        InstrumentId _underlyingInstrumentId = InstrumentId::invalid();
+        /// The position ID associated with the option transaction
+        PositionId _positionId = PositionId::invalid();
+
+       public:
+        explicit CreateOptionTransactionDraft(
+            Timestamp                  timestamp,
+            std::string                ticker,
+            Timestamp                  expiration,
+            OptionType                 optionType,
+            Quantity                   quantity,
+            Cash                       amount,
+            Cash                       strikePrice,
+            Cash                       fees,
+            std::int64_t               contractSize,
+            AccountId                  securityAccount,
+            AccountId                  cashAccount,
+            std::optional<std::string> comment = std::nullopt
+        );
+
+        void setInstrumentId(InstrumentId instrumentId);
+        void setUnderlyingInstrumentId(InstrumentId underlyingInstrumentId);
+        void setPositionId(PositionId positionId);
+
+        [[nodiscard]] AccountId          getSecurityAccount() const;
+        [[nodiscard]] AccountId          getCashAccount() const;
+        [[nodiscard]] InstrumentId       getInstrumentId() const;
+        [[nodiscard]] InstrumentId       getUnderlyingInstrumentId() const;
+        [[nodiscard]] const Quantity&    getQuantity() const;
+        [[nodiscard]] const Cash&        getStrikePrice() const;
+        [[nodiscard]] const Cash&        getAmount() const;
+        [[nodiscard]] const Cash&        getFees() const;
+        [[nodiscard]] PositionId         getPositionId() const;
+        [[nodiscard]] const std::string& getUnderlyingTicker() const;
+        [[nodiscard]] Timestamp          getExpiration() const;
+        [[nodiscard]] OptionType         getOptionType() const;
+        [[nodiscard]] std::int64_t       getContractSize() const;
+    };
+
 }   // namespace drafts
 
 #endif   // __DRAFTS__INCLUDE__DRAFTS__TRANSACTION__TRANSACTION_CREATE_DRAFT_HPP__

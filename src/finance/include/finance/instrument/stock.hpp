@@ -4,8 +4,8 @@
 #include <expected>
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
+#include "utils/finance.hpp"
 #include "utils/result/error.hpp"
 
 namespace finance

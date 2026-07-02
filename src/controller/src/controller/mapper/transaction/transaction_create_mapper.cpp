@@ -1,7 +1,8 @@
 #include "transaction_create_mapper.hpp"
 
-#include "config/finance.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
+#include "finance/transaction/option_transaction.hpp"
+#include "utils/finance.hpp"
 
 namespace controller
 {
@@ -9,7 +10,7 @@ namespace controller
      * @brief Maps a CreateCashTransactionDraft to a CashTransaction.
      *
      * @param draft
-     * @return finance::CashTransaction
+     * @return CashTransaction
      */
     finance::CashTransaction TransactionCreateMapper::fromCreateCashDraft(
         const drafts::CreateCashTransactionDraft& draft
@@ -20,7 +21,7 @@ namespace controller
             draft.getTimestamp(),
             TransactionStatus::Completed,
             draft.getAccountId(),
-            draft.getExternalAccount(),
+            AccountId::invalid(),
             draft.getAmount(),
             draft.getFees(),
             draft.getComment()
@@ -44,11 +45,41 @@ namespace controller
             draft.getInstrumentId(),
             draft.getSecurityAccount(),
             draft.getCashAccount(),
-            draft.getExternalAccount(),
+            AccountId::invalid(),
             draft.getQuantity(),
             draft.getUnitPrice(),
             draft.getFees(),
             draft.getPositionId(),
+            draft.getComment()
+        };
+    }
+
+    /**
+     * @brief Maps a CreateOptionTransactionDraft to an OptionTransaction.
+     *
+     * @param draft
+     * @return finance::OptionTransaction
+     */
+    finance::OptionTransaction TransactionCreateMapper::fromCreateOptionDraft(
+        const drafts::CreateOptionTransactionDraft& draft
+    )
+    {
+        return finance::OptionTransaction{
+            TransactionId::invalid(),   // will be created
+            draft.getTimestamp(),
+            TransactionStatus::Completed,
+            draft.getInstrumentId(),
+            draft.getUnderlyingInstrumentId(),
+            draft.getSecurityAccount(),
+            draft.getCashAccount(),
+            AccountId::invalid(),
+            draft.getQuantity(),
+            draft.getStrikePrice(),
+            draft.getAmount(),
+            draft.getFees(),
+            draft.getPositionId(),
+            TransactionOptionAction::Open,
+            std::nullopt,   // rolled option will be set when rolling
             draft.getComment()
         };
     }

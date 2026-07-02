@@ -1,12 +1,13 @@
 #include "finance/transaction/domain_transaction.hpp"
 
+#include <algorithm>
 #include <utility>
 #include <variant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "finance/transaction/trade_data.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_data.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
@@ -29,7 +30,7 @@ namespace finance
         TransactionEntries         entries,
         std::optional<std::string> comment
     )
-        : Transaction(id, timestamp, status, std::move(comment)),
+        : BaseTransaction(id, timestamp, status, std::move(comment)),
           _data(std::move(data)),
           _entries(std::move(entries))
     {
@@ -43,14 +44,11 @@ namespace finance
      */
     std::string DomainTransaction::toString() const
     {
-        std::string result = Transaction::toString();
+        std::string result = BaseTransaction::toString();
 
         // clang-format off
         result += "DomainTransaction {\n";
-        if (std::holds_alternative<CashData>(_data))
-            result += "CashData\n";
-        else if (std::holds_alternative<TradeData>(_data))
-            result += "TradeData\n";
+        result += TransactionDataTypeMeta::toString(getType()) + "\n";
         for (const auto& leg : getLegs())
             result += "    - Leg: " + leg.toString() + "\n";
 
@@ -68,16 +66,26 @@ namespace finance
      * legs associated with the transaction, which contain information about
      * the instruments being traded, the quantities, and the unit prices.
      *
-     * @return std::vector<TradeLeg> A vector of TradeLeg objects representing
-     * the legs of the transaction. If the transaction does not contain trade
-     * data, an empty vector is returned.
+     * @return TradeLegs A vector of TradeLeg objects
+     * representing the legs of the transaction. If the transaction does not
+     * contain trade data, an empty vector is returned.
      */
-    std::vector<TradeLeg> DomainTransaction::getLegs() const
+    const TradeLegs& DomainTransaction::getLegs() const
     {
-        if (std::holds_alternative<TradeData>(_data))
-            return std::get<TradeData>(_data).getLegs();
+        switch (getType())
+        {
+            case TransactionDataType::Stock:
+                return std::get<StockData>(_data).getLegs();
+            case TransactionDataType::Option:
+                return std::get<OptionData>(_data).getLegs();
+            case TransactionDataType::Cash:
+            {
+                static const TradeLegs emptyLegs;
+                return emptyLegs;
+            }
+        }
 
-        return {};
+        std::unreachable();
     }
 
     /**
@@ -90,14 +98,6 @@ namespace finance
     {
         return _entries;
     }
-
-    /**
-     * @brief Gets the entries associated with the transaction.
-     *
-     * @return TransactionEntries& The entries of the
-     * transaction.
-     */
-    TransactionEntries& DomainTransaction::getEntries() { return _entries; }
 
     /**
      * @brief Adds an entry to the transaction.
@@ -124,9 +124,14 @@ namespace finance
                 return TransactionDataType::Cash;
             }
 
-            TransactionDataType operator()(const TradeData& /*data*/) const
+            TransactionDataType operator()(const StockData& /*data*/) const
             {
                 return TransactionDataType::Stock;
+            }
+
+            TransactionDataType operator()(const OptionData& /*data*/) const
+            {
+                return TransactionDataType::Option;
             }
         };
 
@@ -141,89 +146,118 @@ namespace finance
     const TransactionData& DomainTransaction::getData() const { return _data; }
 
     /**
-     * @brief Gets the data associated with the transaction.
-     *
-     * @return TransactionData& The data of the transaction.
-     */
-    TransactionData& DomainTransaction::getData() { return _data; }
-
-    /**
-     * @brief Gets the instrument IDs associated with the transaction, this is
-     * used to determine which instruments are involved in the transaction, and
-     * can be useful for various operations such as filtering transactions by
-     * instrument or analyzing the instruments involved in a set of
-     * transactions.
-     *
-     * @return std::vector<InstrumentId> A vector of instrument IDs associated
-     * with the transaction, this includes all instruments that are part of the
-     * transaction's data (e.g., trade legs) and any relevant entries.
-     */
-    std::vector<InstrumentId> DomainTransaction::getInstrumentIds() const
-    {
-        return std::visit(
-            GetIdVisitor<InstrumentId, decltype(&TradeLeg::getInstrumentId)>{
-                &TradeLeg::getInstrumentId
-            },
-            _data
-        );
-    }
-
-    /**
-     * @brief Calculates the total sum of the transaction by summing the
-     * cash amounts of all entries, this is used to ensure that the
-     * transaction is balanced (i.e., the total sum should be zero for a
-     * valid transaction), and can be used for validation before committing
-     * the transaction to the database.
-     *
-     * @return Cash The total sum of the transaction, calculated by summing
-     * the cash amounts of all entries.
-     */
-    Cash DomainTransaction::calculateTotalSum() const
-    {
-        if (_entries.empty())
-            return {};
-
-        Cash total;
-
-        for (const auto& entry : _entries)
-            total += entry.getCash();
-
-        if (std::holds_alternative<TradeData>(_data))
-            for (const auto& leg : std::get<TradeData>(_data).getLegs())
-                total += leg.getCash();
-
-        return total;
-    }
-
-    /**
-     * @brief Calculates the total quantity of the transaction.
-     *
-     * @return Quantity
-     */
-    Quantity DomainTransaction::calculateTotalQuantity() const
-    {
-        return getTotalQuantity(_data);
-    }
-
-    /**
      * @brief Adds a leg to the transaction.
      *
      * @param leg The trade leg to add.
      */
     void DomainTransaction::addLeg(const TradeLeg& leg)
     {
-        struct Visitor
+        switch (getType())
         {
-            TradeLeg leg;
-            void     operator()(TradeData& data) const { data.addLeg(leg); }
-
-            void operator()(CashData& /*data*/) const
+            case TransactionDataType::Stock:
             {
-                throw std::logic_error("Cannot add legs to cash transactions");
+                auto& data = std::get<StockData>(_data);
+                data.addLeg(leg);
+                break;
             }
-        };
+            case TransactionDataType::Option:
+            {
+                auto& data = std::get<OptionData>(_data);
+                data.addLeg(leg);
+                break;
+            }
+            case TransactionDataType::Cash:
+                throw std::logic_error(
+                    "Cannot add trade legs to cash transactions"
+                );
+        }
+    }
 
-        std::visit(Visitor{leg}, _data);
+    /**
+     * @brief Sets the trade legs for the transaction, this is used to update
+     * the trade legs associated with the transaction, which contain information
+     * about the instruments being traded, the quantities, and the unit prices.
+     * This allows for modifying the transaction's details after it has been
+     * created, and can be useful for scenarios where the transaction needs to
+     * be adjusted or corrected. If the transaction type is Cash, this function
+     * will throw a logic_error since cash transactions do not have trade legs.
+     *
+     * @param legs The new set of TradeLegs to associate with the transaction.
+     */
+    void DomainTransaction::setLegs(const TradeLegs& legs)
+    {
+        switch (getType())
+        {
+            case TransactionDataType::Stock:
+            {
+                auto& data = std::get<StockData>(_data);
+                data.setLegs(legs);
+                break;
+            }
+            case TransactionDataType::Option:
+            {
+                auto& data = std::get<OptionData>(_data);
+                data.setLegs(legs);
+                break;
+            }
+            case TransactionDataType::Cash:
+                throw std::logic_error(
+                    "Cannot set trade legs on cash transactions"
+                );
+        }
+    }
+
+    /**
+     * @brief Sets the entries for the transaction, this is used to update the
+     * entries associated with the transaction, which may include cash
+     * movements, fees, and other relevant information. This allows for
+     * modifying the transaction's details after it has been created, and can be
+     * useful for scenarios where the transaction needs to be adjusted or
+     * corrected.
+     *
+     * @param entries The new set of TransactionEntries to associate with the
+     * transaction.
+     */
+    void DomainTransaction::setEntries(const TransactionEntries& entries)
+    {
+        _entries = entries;
+    }
+
+    /**
+     * @brief Checks if the transaction has a specific position ID
+     *
+     * @param id
+     * @return true
+     * @return false
+     */
+    bool DomainTransaction::hasPositionId(PositionId id) const
+    {
+        switch (getType())
+        {
+            case TransactionDataType::Stock:
+                return std::get<StockData>(_data).getPositionId() == id;
+            case TransactionDataType::Option:
+                return std::get<OptionData>(_data).getPositionId() == id;
+            case TransactionDataType::Cash:
+                return false;
+        }
+
+        std::unreachable();
+    }
+
+    /**
+     * @brief Checks if the transaction has a specific instrument ID
+     *
+     * @param id
+     * @return true
+     * @return false
+     */
+    bool DomainTransaction::hasInstrumentId(InstrumentId id) const
+    {
+        return std::ranges::any_of(
+            getLegs(),
+            [id](const auto& leg) { return leg.getInstrumentId() == id; }
+        );
     }
 
 }   // namespace finance

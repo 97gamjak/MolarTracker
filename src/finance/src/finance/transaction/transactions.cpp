@@ -1,5 +1,7 @@
 #include "finance/transaction/transactions.hpp"
 
+#include <algorithm>
+
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
@@ -25,11 +27,11 @@ namespace finance
     /**
      * @brief Get the Base Instrument Ids from the stock transactions
      *
-     * @return idSet<InstrumentId>
+     * @return IdSet<InstrumentId>
      */
-    idSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
+    IdSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
     {
-        idSet<InstrumentId> instrumentIds;
+        IdSet<InstrumentId> instrumentIds;
         for (const auto& transaction : getItems())
             instrumentIds.insert(transaction.getBaseInstrumentId());
 
@@ -49,9 +51,9 @@ namespace finance
     /**
      * @brief Get the Base Instrument Ids from the security view
      *
-     * @return idSet<InstrumentId>
+     * @return IdSet<InstrumentId>
      */
-    idSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
+    IdSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
     {
         return _stockTransactions.getBaseInstrumentIds();
     }
@@ -125,6 +127,9 @@ namespace finance
                     _stockTransactions.add(stockTx.value());
                     break;
                 }
+                case TransactionDataType::Option:
+                    logging::mustImplement<TxDataTypeNotImplError>();
+                    break;
             }
         }
     }

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "service/i_position_service.hpp"
+#include "utils/container/set.hpp"
 
 namespace repo
 {
@@ -32,12 +33,12 @@ namespace service
 
         [[nodiscard]]
         std::vector<finance::Position> getAllPositions(
-            const idSet<AccountId>& accountIds
+            const IdSet<AccountId>& accountIds
         ) override;
 
         [[nodiscard]]
         std::vector<finance::Position> getAllOpenPositions(
-            const idSet<AccountId>& accountIds
+            const IdSet<AccountId>& accountIds
         ) override;
     };
 

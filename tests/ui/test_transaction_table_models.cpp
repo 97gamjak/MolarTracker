@@ -2,14 +2,14 @@
 
 #include <QVariant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
-#include "finance/cash.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -25,7 +25,7 @@ namespace
     {
         return drafts::TransactionEntryDraft{
             accountId,
-            finance::Cash{currency, amount},
+            Cash{currency, amount},
             TransactionEntryType::General,
             isExternal
         };
@@ -40,7 +40,7 @@ namespace
             Timestamp{},
             comment,
             entry.getCash(),
-            finance::Cash{entry.getCurrency(), 1},
+            Cash{entry.getCurrency(), 1},
             AccountId{1},
             AccountId{0}
         };
@@ -55,8 +55,8 @@ namespace
             Timestamp{},
             std::nullopt,
             quantity,
-            finance::Cash{Currency::USD, amount},
-            finance::Cash{Currency::USD, fees},
+            Cash{Currency::USD, amount},
+            Cash{Currency::USD, fees},
             "AAPL",
             AccountId{2},
             AccountId{1}

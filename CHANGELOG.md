@@ -26,6 +26,7 @@ All changes and updates, that are relevant for a user will be documented here
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs
 - show open positions in security accounts overview pages
+- Make it possible to open (create) option transactions
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
