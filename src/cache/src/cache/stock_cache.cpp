@@ -96,7 +96,7 @@ namespace cache
     )
         : _reader(reader)
     {
-        _addConnection(_reader->subscribeToStockAdded(
+        _addConnection(_reader->subscribeToAdded(
             [this](const auto& stock)
             {
                 _addAndNotify(
@@ -106,7 +106,7 @@ namespace cache
             },
             this
         ));
-        _addConnection(_reader->subscribeToStockUpdated(
+        _addConnection(_reader->subscribeToUpdated(
             [this](const auto& stock)
             {
                 _update(
@@ -116,7 +116,7 @@ namespace cache
             },
             this
         ));
-        _addConnection(_reader->subscribeToStockRemoved(
+        _addConnection(_reader->subscribeToRemoved(
             [this](const auto& stockId) { _remove(stockId); },
             this
         ));

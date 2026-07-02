@@ -82,10 +82,6 @@ namespace controller
         const auto stockDrafts =
             TransactionOverviewMapper::toStock(transactions, _stockCache);
 
-        _transactionDetailView->refresh(
-            cashDrafts,
-            stockDrafts,
-            _accountStore->getAccountIdToNameMap()
-        );
+        _transactionDetailView->refresh(cashDrafts, stockDrafts);
     }
 }   // namespace controller

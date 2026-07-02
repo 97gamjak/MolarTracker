@@ -40,6 +40,8 @@ namespace store
         /// Connections for handling signals related to account store updates
         Connections _connections;
 
+        Observable<OnCommit> _onCommit;
+
        public:
         explicit AccountStore(
             const std::shared_ptr<service::IAccountService>& accountService
@@ -77,6 +79,14 @@ namespace store
 
         [[nodiscard]]
         const finance::Accounts& getAccountSession() const override;
+
+        [[nodiscard]]
+        Connection subscribeToCommit(
+            OnCommit::func func,
+            void*          subscriber
+        ) override;
+
+        SUBSCRIBE_OVERRIDE(finance::Account, AccountId)
 
        private:
         void _refresh();

@@ -18,7 +18,7 @@ namespace drafts
        private:
         /// The ID of the account, this is optional because it may not be set
         /// when creating a new account
-        AccountId _id = AccountId::invalid();
+        AccountId _id;
 
         /// The status of the account, this is optional because it may not be
         /// set

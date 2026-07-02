@@ -104,9 +104,11 @@ namespace cache
          * cache.
          */
         virtual void _onAdded(
-            const Key&                          key,
-            const std::shared_ptr<const Value>& value
-        ) = 0;
+            const Key& /*key*/,
+            const std::shared_ptr<const Value>& /*value*/
+        )
+        {
+        }
 
         /**
          * @brief Handle the event when a value is updated in the cache, this
@@ -121,10 +123,12 @@ namespace cache
          * cache.
          */
         virtual void _onUpdated(
-            const Key&                          key,
-            const std::shared_ptr<const Value>& oldValue,
-            const std::shared_ptr<const Value>& value
-        ) = 0;
+            const Key& /*key*/,
+            const std::shared_ptr<const Value>& /*oldValue*/,
+            const std::shared_ptr<const Value>& /*value*/
+        )
+        {
+        }
 
         /**
          * @brief Handle the event when a value is removed from the cache, this
@@ -134,7 +138,7 @@ namespace cache
          *
          * @param key The key of the value that was removed from the cache.
          */
-        virtual void _onRemoved(const Key& key) = 0;
+        virtual void _onRemoved(const Key& /*key*/) {}
 
         /**
          * @brief Handle the event when a value's key is changed in the cache,
@@ -146,7 +150,7 @@ namespace cache
          * @param old The old key of the value that was changed in the cache.
          * @param newKey The new key of the value that was changed in the cache.
          */
-        virtual void _onIdChanged(const Key& old, const Key& newKey) = 0;
+        virtual void _onIdChanged(const Key& /*old*/, const Key& /*newKey*/) {}
 
         [[nodiscard]]
         const IdMap<Key, std::shared_ptr<const Value>>& _getEntries() const;

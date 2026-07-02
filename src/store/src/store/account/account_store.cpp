@@ -203,6 +203,8 @@ namespace store
         // here now we set our ids because they are now clean!
         // we use the unchecked version as ids are unique due to store handling!
         _session.setUnchecked(_getValues());
+
+        _onCommit.notify<OnCommit>(getIdRemap());
     }
 
     /**
@@ -442,6 +444,14 @@ namespace store
     const finance::Accounts& AccountStore::getAccountSession() const
     {
         return _session;
+    }
+
+    Connection AccountStore::subscribeToCommit(
+        OnCommit::func func,
+        void*          subscriber
+    )
+    {
+        return _onCommit.on<OnCommit>(func, subscriber);
     }
 
 }   // namespace store

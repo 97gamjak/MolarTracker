@@ -6,7 +6,7 @@
 
 namespace store
 {
-    class IAccountStore;   // forward declaration
+    class IAccountStoreReader;   // forward declaration
 }   // namespace store
 
 namespace cache
@@ -23,12 +23,18 @@ namespace cache
     {
        private:
         /// Shared pointer to the account store
-        std::shared_ptr<store::IAccountStore> _reader;
+        std::shared_ptr<store::IAccountStoreReader> _reader;
 
        public:
         explicit AccountCache(
-            const std::shared_ptr<store::IAccountStore>& reader
+            const std::shared_ptr<store::IAccountStoreReader>& reader
         );
+
+       protected:
+        [[nodiscard]]
+        std::shared_ptr<const finance::Account> _load(
+            const AccountId& accountId
+        ) override;
     };
 
 }   // namespace cache

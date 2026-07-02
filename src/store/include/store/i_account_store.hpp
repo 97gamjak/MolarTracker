@@ -2,9 +2,12 @@
 #define __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 
 #include "config/id_types.hpp"
+#include "connections/connection.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
+#include "subscriptions.hpp"
+#include "utils/container/id_id_map.hpp"
 #include "utils/container/set.hpp"
 
 namespace store
@@ -32,6 +35,12 @@ namespace store
      */
     class IAccountStoreReader
     {
+       protected:
+        struct OnCommit
+        {
+            using func = std::function<void(const IdIdMap<AccountId>&)>;
+        };
+
        public:
         virtual ~IAccountStoreReader() = default;
 
@@ -93,10 +102,18 @@ namespace store
          * @brief Get the account session
          *
          * @return const finance::Accounts&
-         */`
+         */
         [[nodiscard]]
         virtual const finance::Accounts& getAccountSession() const = 0;
         // TODO:
+
+        [[nodiscard]]
+        virtual Connection subscribeToCommit(
+            OnCommit::func func,
+            void*          subscriber
+        ) = 0;
+
+        SUBSCRIBE_VIRTUAL(finance::Account, AccountId)
     };
 
     /**

@@ -90,12 +90,11 @@ namespace ui
      */
     void TransactionsOverview::refresh(
         const std::vector<drafts::CashTransactionOverview>&  cashTransactions,
-        const std::vector<drafts::StockTransactionOverview>& stockTransactions,
-        const IdMap<AccountId, std::string>&                 accountIdToName
+        const std::vector<drafts::StockTransactionOverview>& stockTransactions
     )
     {
-        _cashModel->setTransactions(cashTransactions, accountIdToName);
-        _stockModel->setTransactions(stockTransactions, accountIdToName);
+        _cashModel->setTransactions(cashTransactions);
+        _stockModel->setTransactions(stockTransactions);
     }
 
     /**
