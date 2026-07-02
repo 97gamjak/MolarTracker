@@ -1,5 +1,7 @@
 #include "drafts/transaction/transaction_overview_draft.hpp"
 
+#include <utility>
+
 namespace drafts
 {
 
@@ -9,12 +11,16 @@ namespace drafts
      *
      * @param timestamp
      * @param comment
+     * @param cashAccount
      */
     TransactionOverviewDraft::TransactionOverviewDraft(
         Timestamp                  timestamp,
-        std::optional<std::string> comment
+        std::optional<std::string> comment,
+        AccountDraft               cashAccount
     )
-        : _timestamp(timestamp), _comment(std::move(comment))
+        : _timestamp(timestamp),
+          _comment(std::move(comment)),
+          _cashAccount(std::move(cashAccount))
     {
     }
 
@@ -41,6 +47,17 @@ namespace drafts
     }
 
     /**
+     * @brief Gets the cash account of the transaction overview draft.
+     *
+     * @return const AccountDraft& The cash account of the transaction overview
+     * draft.
+     */
+    const AccountDraft& TransactionOverviewDraft::getCashAccount() const
+    {
+        return _cashAccount;
+    }
+
+    /**
      * @brief Construct a new Cash Transaction Overview:: Cash Transaction
      * Overview object
      *
@@ -56,14 +73,15 @@ namespace drafts
         std::optional<std::string> comment,
         Cash                       amount,
         Cash                       fees,
-        AccountId                  cashAccount,
-        AccountId                  externalAccount
+        AccountDraft               cashAccount
     )
-        : TransactionOverviewDraft(timestamp, std::move(comment)),
+        : TransactionOverviewDraft(
+              timestamp,
+              std::move(comment),
+              std::move(cashAccount)
+          ),
           _amount(amount),
-          _fees(fees),
-          _cashAccount(cashAccount),
-          _externalAccount(externalAccount)
+          _fees(fees)
     {
     }
 
@@ -82,29 +100,6 @@ namespace drafts
      * draft.
      */
     const Cash& CashTransactionOverview::getFees() const { return _fees; }
-
-    /**
-     * @brief Gets the cash account ID of the cash transaction overview draft.
-     *
-     * @return AccountId The cash account ID of the cash transaction overview
-     * draft.
-     */
-    AccountId CashTransactionOverview::getCashAccount() const
-    {
-        return _cashAccount;
-    }
-
-    /**
-     * @brief Gets the external account ID of the cash transaction overview
-     * draft.
-     *
-     * @return AccountId The external account ID of the cash transaction
-     * overview draft.
-     */
-    AccountId CashTransactionOverview::getExternalAccount() const
-    {
-        return _externalAccount;
-    }
 
     /**
      * @brief Construct a new Stock Transaction Overview:: Stock Transaction
@@ -126,16 +121,19 @@ namespace drafts
         Cash                       unitPrice,
         Cash                       fees,
         std::string                ticker,
-        AccountId                  securityAccount,
-        AccountId                  cashAccount
+        AccountDraft               securityAccount,
+        AccountDraft               cashAccount
     )
-        : TransactionOverviewDraft(timestamp, std::move(comment)),
+        : TransactionOverviewDraft(
+              timestamp,
+              std::move(comment),
+              std::move(cashAccount)
+          ),
           _quantity(quantity),
           _unitPrice(unitPrice),
           _fees(fees),
           _ticker(std::move(ticker)),
-          _securityAccount(securityAccount),
-          _cashAccount(cashAccount)
+          _securityAccount(std::move(securityAccount))
     {
     }
 
@@ -144,29 +142,21 @@ namespace drafts
      *
      * @return std::string The ticker of the stock transaction overview draft.
      */
-    std::string StockTransactionOverview::getTicker() const { return _ticker; }
+    const std::string& StockTransactionOverview::getTicker() const
+    {
+        return _ticker;
+    }
 
     /**
      * @brief Gets the security account ID of the stock transaction overview
      * draft.
      *
-     * @return AccountId The security account ID of the stock transaction
+     * @return const AccountDraft& The security account of the stock transaction
      * overview draft.
      */
-    AccountId StockTransactionOverview::getSecurityAccount() const
+    const AccountDraft& StockTransactionOverview::getSecurityAccount() const
     {
         return _securityAccount;
-    }
-
-    /**
-     * @brief Gets the cash account ID of the stock transaction overview draft.
-     *
-     * @return AccountId The cash account ID of the stock transaction overview
-     * draft.
-     */
-    AccountId StockTransactionOverview::getCashAccount() const
-    {
-        return _cashAccount;
     }
 
     /**
