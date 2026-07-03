@@ -1,8 +1,10 @@
 #ifndef __CACHE__INCLUDE__CACHE__ACCOUNT_CACHE_HPP__
 #define __CACHE__INCLUDE__CACHE__ACCOUNT_CACHE_HPP__
 
+#include "config/error.hpp"
 #include "finance/account/account.hpp"
 #include "single_cache.hpp"
+#include "utils/finance.hpp"
 
 namespace store
 {
@@ -35,6 +37,26 @@ namespace cache
         std::shared_ptr<const finance::Account> _load(
             const AccountId& accountId
         ) override;
+    };
+
+    class AccountCacheUtils
+    {
+       public:
+        static MTResult<std::shared_ptr<const finance::Account>, FinanceError> getCashAccount(
+            const AccountId&                     accountId,
+            const std::shared_ptr<AccountCache>& accountCache
+        );
+
+        static MTResult<std::shared_ptr<const finance::Account>, FinanceError> getSecurityAccount(
+            const AccountId&                     accountId,
+            const std::shared_ptr<AccountCache>& accountCache
+        );
+
+        static MTResult<std::shared_ptr<const finance::Account>, FinanceError> _getAccount(
+            const AccountId&                     accountId,
+            const AccountKind&                   kind,
+            const std::shared_ptr<AccountCache>& accountCache
+        );
     };
 
 }   // namespace cache

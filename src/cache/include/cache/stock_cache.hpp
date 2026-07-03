@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "config/error.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/instrument/stocks.hpp"
@@ -101,6 +102,15 @@ namespace cache
 
         [[nodiscard]]
         std::shared_ptr<const finance::Stock> _load(InstrumentId instrumentId);
+    };
+
+    class StockCacheUtils
+    {
+       public:
+        static MTResult<std::shared_ptr<const finance::Stock>, FinanceError> getStock(
+            InstrumentId                       instrumentId,
+            const std::shared_ptr<StockCache>& stockCache
+        );
     };
 
 }   // namespace cache

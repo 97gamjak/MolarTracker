@@ -15,8 +15,8 @@
  */
 template <typename EnumType>
 requires mstd::has_enum_meta<EnumType>
-Error<EnumType>::Error(EnumType type, std::string message)
-    : _type(type), _message(std::move(message))
+Error<EnumType>::Error(EnumType type, std::optional<std::string> message)
+    : _type(type), _message(message.value_or(ErrorTypeMeta::toString(type)))
 {
 }
 
@@ -76,7 +76,29 @@ Error<NewEnumType> Error<EnumType>::toError(
     NewEnumType  newType
 )
 {
-    return Error<NewEnumType>{newType, error.getMessage()};
+    auto newError = Error<NewEnumType>{newType, error.getMessage()};
+
+    for (const auto& subError : error._subErrors)
+        newError._subErrors.push_back(
+            Error<NewEnumType>::toError(subError, newType)
+        );
+
+    return newError;
 }
 
+template <typename EnumType>
+requires mstd::has_enum_meta<EnumType>
+Error<EnumType> Error<EnumType>::fromError(
+    const Error&               error,
+    EnumType                   newType,
+    std::optional<std::string> newMessage
+)
+{
+    auto newError = Error<EnumType>{newType, newMessage};
+
+    for (const auto& subError : error._subErrors)
+        newError._subErrors.push_back(subError);
+
+    return newError;
+}
 #endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__ERROR_TPP__

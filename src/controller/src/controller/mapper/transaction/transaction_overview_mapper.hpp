@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "config/error.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 
 namespace finance
@@ -13,7 +14,8 @@ namespace finance
 
 namespace cache
 {
-    class StockCache;   // Forward declaration
+    class StockCache;     // Forward declaration
+    class AccountCache;   // Forward declaration
 }   // namespace cache
 
 namespace controller
@@ -27,13 +29,15 @@ namespace controller
     class TransactionOverviewMapper
     {
        public:
-        static std::vector<drafts::StockTransactionOverview> toStock(
-            const finance::Transactions&              transactions,
-            const std::shared_ptr<cache::StockCache>& stockCache
+        static MTResult<std::vector<drafts::StockTransactionOverview>, FinanceError> toStock(
+            const finance::Transactions&                transactions,
+            const std::shared_ptr<cache::StockCache>&   stockCache,
+            const std::shared_ptr<cache::AccountCache>& accountCache
         );
 
-        static std::vector<drafts::CashTransactionOverview> toCash(
-            const finance::Transactions& transactions
+        static MTResult<std::vector<drafts::CashTransactionOverview>, FinanceError> toCash(
+            const finance::Transactions&                transactions,
+            const std::shared_ptr<cache::AccountCache>& accountCache
         );
     };
 
