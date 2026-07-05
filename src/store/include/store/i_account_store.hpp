@@ -8,7 +8,6 @@
 #include "finance/account/accounts.hpp"
 #include "subscriptions.hpp"
 #include "utils/container/id_id_map.hpp"
-#include "utils/container/set.hpp"
 
 namespace store
 {
@@ -36,8 +35,14 @@ namespace store
     class IAccountStoreReader
     {
        protected:
+        /**
+         * @brief Structure representing the commit event for account changes.
+         *
+         */
         struct OnCommit
         {
+            /// Type alias for the commit callback function, which takes a
+            /// reference to an IdIdMap of AccountId as its parameter.
             using func = std::function<void(const IdIdMap<AccountId>&)>;
         };
 
@@ -62,50 +67,6 @@ namespace store
          */
         [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
         ) const = 0;
-
-        /**
-         * @brief Get all cash accounts
-         *
-         * @return std::vector<finance::Account>
-         */
-        [[nodiscard]] virtual std::vector<finance::Account> getCashAccounts(
-        ) const = 0;
-
-        /**
-         * @brief Get all security accounts
-         *
-         * @return std::vector<finance::Account>
-         */
-        [[nodiscard]] virtual std::vector<finance::Account> getSecurityAccounts(
-        ) const = 0;
-
-        /**
-         * @brief Get an external account by its currency
-         *
-         * @param currency
-         * @return std::optional<AccountId>
-         */
-        [[nodiscard]]
-        virtual std::optional<AccountId> getExternalAccount(
-            Currency currency
-        ) const = 0;
-
-        /**
-         * @brief Get all external account IDs
-         *
-         * @return IdSet<AccountId>
-         */
-        [[nodiscard]]
-        virtual IdSet<AccountId> getExternalAccountIds() const = 0;
-
-        /**
-         * @brief Get the account session
-         *
-         * @return const finance::Accounts&
-         */
-        [[nodiscard]]
-        virtual const finance::Accounts& getAccountSession() const = 0;
-        // TODO:
 
         [[nodiscard]]
         virtual Connection subscribeToCommit(

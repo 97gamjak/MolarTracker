@@ -14,8 +14,8 @@
 
 namespace finance
 {
-    class Account;    // Forward declaration
-    class Accounts;   // Forward declaration
+    class Account;        // Forward declaration
+    class AccountsView;   // Forward declaration
 }   // namespace finance
 
 namespace service
@@ -39,19 +39,13 @@ namespace store
         /// The Transaction service
         std::shared_ptr<service::ITransactionService> _transactionService;
 
-        struct Session;
-        /// The session object for managing the session state of transactions in
-        /// the store
-        std::unique_ptr<Session> _session;
-
         /// Connections for various events
         Connections _connections;
 
        public:
         explicit TransactionStore(
             const std::shared_ptr<service::ITransactionService>&
-                                     transactionService,
-            const finance::Accounts& accountSession
+                transactionService
         );
         ~TransactionStore() override;
 
@@ -63,28 +57,35 @@ namespace store
 
         [[nodiscard]]
         TransactionStoreResult addCashTransaction(
-            finance::CashTransaction transaction
+            finance::CashTransaction     transaction,
+            const finance::AccountsView& accounts
         ) override;
         [[nodiscard]]
         TransactionStoreResult addStockTransaction(
-            finance::StockTransaction transaction
+            finance::StockTransaction    transaction,
+            const finance::AccountsView& accounts
         ) override;
 
         [[nodiscard]]
         TransactionStoreResult addOptionTransaction(
-            finance::OptionTransaction transaction
+            finance::OptionTransaction   transaction,
+            const finance::AccountsView& accounts
         ) override;
 
         [[nodiscard]]
         finance::Transactions getTransactions(
-            const finance::TransactionFilter& filter
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
         ) const override;
         [[nodiscard]]
-        finance::Transactions getTransactions() const override;
+        finance::Transactions getTransactions(
+            const finance::AccountsView& accounts
+        ) const override;
 
         [[nodiscard]]
         IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
         ) const override;
 
         [[nodiscard]]

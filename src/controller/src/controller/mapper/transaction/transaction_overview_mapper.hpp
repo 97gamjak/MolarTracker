@@ -29,13 +29,13 @@ namespace controller
     class TransactionOverviewMapper
     {
        public:
-        static MTResult<std::vector<drafts::StockTransactionOverview>, FinanceError> toStock(
+        static Result<std::vector<drafts::StockTransactionOverview>, FinanceError> toStockOverview(
             const finance::Transactions&                transactions,
             const std::shared_ptr<cache::StockCache>&   stockCache,
             const std::shared_ptr<cache::AccountCache>& accountCache
         );
 
-        static MTResult<std::vector<drafts::CashTransactionOverview>, FinanceError> toCash(
+        static Result<std::vector<drafts::CashTransactionOverview>, FinanceError> toCash(
             const finance::Transactions&                transactions,
             const std::shared_ptr<cache::AccountCache>& accountCache
         );

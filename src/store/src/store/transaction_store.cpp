@@ -21,47 +21,15 @@ namespace store
 {
 
     /**
-     * @brief Internal session struct for TransactionStore, this struct holds a
-     * reference to the AccountSession and is used to manage the session state
-     * of transactions in the store.
-     *
-     */
-    struct TransactionStore::Session
-    {
-        /// A reference to the AccountSession
-        const finance::Accounts& accountSession;
-
-        /**
-         * @brief Construct a new Session object
-         *
-         * @param accountSession_
-         */
-        explicit Session(const finance::Accounts& accountSession_)
-            : accountSession(accountSession_)
-        {
-        }
-
-        ~Session() = default;
-
-        // delete copy and moving
-        Session(const Session&)            = delete;
-        Session(Session&&)                 = delete;
-        Session& operator=(const Session&) = delete;
-        Session& operator=(Session&&)      = delete;
-    };
-
-    /**
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
      * @param accountSession
      */
     TransactionStore::TransactionStore(
-        const std::shared_ptr<service::ITransactionService>& transactionService,
-        const finance::Accounts&                             accountSession
+        const std::shared_ptr<service::ITransactionService>& transactionService
     )
-        : _transactionService(transactionService),
-          _session(std::make_unique<Session>(accountSession))
+        : _transactionService(transactionService)
     {
     }
 
@@ -144,16 +112,14 @@ namespace store
      * @return TransactionStoreResult The result of the operation
      */
     TransactionStoreResult TransactionStore::addCashTransaction(
-        finance::CashTransaction transaction
+        finance::CashTransaction     transaction,
+        const finance::AccountsView& accounts
     )
     {
         LOG_ENTRY;
 
         _addEntry(
-            finance::TransactionConverter::toDomain(
-                transaction,
-                _session->accountSession
-            )
+            finance::TransactionConverter::toDomain(transaction, accounts)
         );
 
         return TransactionStoreResult::Ok;
@@ -166,32 +132,28 @@ namespace store
      * @return TransactionStoreResult The result of the operation
      */
     TransactionStoreResult TransactionStore::addStockTransaction(
-        finance::StockTransaction transaction
+        finance::StockTransaction    transaction,
+        const finance::AccountsView& accounts
     )
     {
         LOG_ENTRY;
 
         _addEntry(
-            finance::TransactionConverter::toDomain(
-                transaction,
-                _session->accountSession
-            )
+            finance::TransactionConverter::toDomain(transaction, accounts)
         );
 
         return TransactionStoreResult::Ok;
     }
 
     TransactionStoreResult TransactionStore::addOptionTransaction(
-        finance::OptionTransaction transaction
+        finance::OptionTransaction   transaction,
+        const finance::AccountsView& accounts
     )
     {
         LOG_ENTRY;
 
         _addEntry(
-            finance::TransactionConverter::toDomain(
-                transaction,
-                _session->accountSession
-            )
+            finance::TransactionConverter::toDomain(transaction, accounts)
         );
 
         return TransactionStoreResult::Ok;
@@ -208,9 +170,11 @@ namespace store
      *
      * @return finance::Transactions
      */
-    finance::Transactions TransactionStore::getTransactions() const
+    finance::Transactions TransactionStore::getTransactions(
+        const finance::AccountsView& accounts
+    ) const
     {
-        return getTransactions(finance::TransactionFilter());
+        return getTransactions(finance::TransactionFilter(), accounts);
     }
 
     /**
@@ -233,10 +197,11 @@ namespace store
      * and reflects any changes made to them in the store.
      */
     finance::Transactions TransactionStore::getTransactions(
-        const finance::TransactionFilter& filter
+        const finance::TransactionFilter& filter,
+        const finance::AccountsView&      accounts
     ) const
     {
-        const auto accountIds = _session->accountSession.getIds();
+        const auto accountIds = accounts.getIds();
 
         if (accountIds.empty())
             return {};
@@ -275,7 +240,7 @@ namespace store
                 results.push_back(transaction);
 
         finance::Transactions result;
-        result.addTransactions(results, _session->accountSession);
+        result.addTransactions(results, accounts);
 
         LOG_DEBUG(
             std::format(
@@ -308,11 +273,14 @@ namespace store
      * position based on its position ID.
      */
     IdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
-        getStockPositions(const finance::TransactionFilter& filter) const
+        getStockPositions(
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
+        ) const
     {
         IdMap<PositionId, finance::StockPositionTransaction> stockPositions;
 
-        const auto transactions = getTransactions(filter).stocks();
+        const auto transactions = getTransactions(filter, accounts).stocks();
 
         for (const auto& transaction : transactions)
         {
@@ -555,16 +523,9 @@ namespace store
     )
     {
         return subscribeToEntryAdded(
-            [func = std::move(func),
-             this](const finance::DomainTransaction& transaction)
-            {
-                func(
-                    finance::Transactions(
-                        {transaction},
-                        _session->accountSession
-                    )
-                );
-            },
+            [func =
+                 std::move(func)](const finance::DomainTransaction& transaction)
+            { func(transaction); },
             user
         );
     }

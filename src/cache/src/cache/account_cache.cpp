@@ -1,5 +1,6 @@
 #include "cache/account_cache.hpp"
 
+#include "finance/account/accounts.hpp"
 #include "store/i_account_store.hpp"
 
 namespace cache
@@ -75,6 +76,43 @@ namespace cache
         }
 
         return nullptr;
+    }
+
+    /**
+     * @brief Load all accounts from the store, this method retrieves all
+     * accounts from the store and returns a map of account IDs to shared
+     * pointers to the accounts.
+     *
+     * @return finance::AccountsView::Type A map of account IDs to shared
+     * pointers to the loaded accounts.
+     */
+    finance::AccountsView AccountCache::getAllAccounts()
+    {
+        return getBulk([this]() { return _loadAll(); }).getItems();
+    }
+
+    /**
+     * @brief Load all accounts from the store, this method retrieves all
+     * accounts from the store and returns a map of account IDs to shared
+     * pointers to the accounts.
+     *
+     * @return finance::AccountsView::Type A map of account IDs to shared
+     * pointers to the loaded accounts.
+     */
+    finance::AccountsView::Type AccountCache::_loadAll()
+    {
+        const auto accounts = _reader->getAllAccounts();
+
+        finance::AccountsView::Type accountMap;
+
+        for (const auto& account : accounts)
+        {
+            accountMap.addUnchecked(
+                std::make_shared<const finance::Account>(account)
+            );
+        }
+
+        return accountMap;
     }
 
 }   // namespace cache

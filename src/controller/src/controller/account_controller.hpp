@@ -25,7 +25,6 @@ namespace drafts
 
 namespace store
 {
-    class IAccountStore;       // Forward declaration
     class IPositionStore;      // Forward declaration
     class ITransactionStore;   // Forward declaration
 }   // namespace store
@@ -36,6 +35,11 @@ namespace ui
     class CreateAccountDialog;   // Forward declaration
     class AccountDetailView;     // Forward declaration
 }   // namespace ui
+
+namespace cache
+{
+    class AccountCache;   // Forward declaration
+}   // namespace cache
 
 namespace cmd
 {
@@ -65,10 +69,10 @@ namespace controller
        public:
         AccountController(
             cmd::UndoStack&                                  undoStack,
-            const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::IPositionStore>&    positionStore,
-            const std::shared_ptr<cache::StockCache>&        stockCache,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
+            const std::shared_ptr<cache::AccountCache>&      accountCache,
+            const std::shared_ptr<cache::StockCache>&        stockCache,
             const std::shared_ptr<finance::PriceCache>&      priceCache,
             QStackedWidget*                                  stackedWidget
         );

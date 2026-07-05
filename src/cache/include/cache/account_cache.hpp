@@ -1,8 +1,9 @@
 #ifndef __CACHE__INCLUDE__CACHE__ACCOUNT_CACHE_HPP__
 #define __CACHE__INCLUDE__CACHE__ACCOUNT_CACHE_HPP__
 
-#include "config/error.hpp"
+#include "error/finance_error.hpp"
 #include "finance/account/account.hpp"
+#include "finance/account/accounts.hpp"
 #include "single_cache.hpp"
 #include "utils/finance.hpp"
 
@@ -32,30 +33,43 @@ namespace cache
             const std::shared_ptr<store::IAccountStoreReader>& reader
         );
 
+        [[nodiscard]]
+        finance::AccountsView getAllAccounts();
+
        protected:
         [[nodiscard]]
         std::shared_ptr<const finance::Account> _load(
             const AccountId& accountId
         ) override;
+
+       private:
+        [[nodiscard]]
+        finance::AccountsView::Type _loadAll();
     };
 
+    /**
+     * @brief Utility class for working with the AccountCache, providing methods
+     * for retrieving accounts from the cache with additional validation and
+     * error handling.
+     *
+     */
     class AccountCacheUtils
     {
        public:
-        static MTResult<std::shared_ptr<const finance::Account>, FinanceError> getCashAccount(
+        static FinanceResult<std::shared_ptr<const finance::Account>> getCashAccount(
             const AccountId&                     accountId,
             const std::shared_ptr<AccountCache>& accountCache
         );
 
-        static MTResult<std::shared_ptr<const finance::Account>, FinanceError> getSecurityAccount(
+        static FinanceResult<std::shared_ptr<const finance::Account>> getSecurityAccount(
             const AccountId&                     accountId,
             const std::shared_ptr<AccountCache>& accountCache
         );
 
-        static MTResult<std::shared_ptr<const finance::Account>, FinanceError> _getAccount(
+        static FinanceResult<std::shared_ptr<const finance::Account>> getAccount(
             const AccountId&                     accountId,
-            const AccountKind&                   kind,
-            const std::shared_ptr<AccountCache>& accountCache
+            const std::shared_ptr<AccountCache>& accountCache,
+            const std::optional<AccountKind>&    kind = std::nullopt
         );
     };
 

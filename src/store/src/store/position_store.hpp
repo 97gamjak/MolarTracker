@@ -9,7 +9,7 @@
 
 namespace finance
 {
-    class Accounts;   // Forward declaration
+    class AccountsView;
 }   // namespace finance
 
 namespace store
@@ -37,17 +37,12 @@ namespace store
         /// The Position service
         std::shared_ptr<service::IPositionService> _positionService;
 
-        struct Session;
-        /// The current session data
-        std::unique_ptr<Session> _session;
-
         /// The position events observable
         std::unique_ptr<Observable<PositionClosed>> _positionEvents;
 
        public:
         explicit PositionStore(
-            std::shared_ptr<service::IPositionService> positionService,
-            const finance::Accounts&                   accountSession
+            std::shared_ptr<service::IPositionService> positionService
         );
 
         ~PositionStore() override;
@@ -56,10 +51,14 @@ namespace store
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
-        finance::Positions getOpenPositions() const override;
+        finance::Positions getOpenPositions(
+            const finance::AccountsView& accounts
+        ) const override;
 
         [[nodiscard]]
-        finance::Positions getAllPositions() const override;
+        finance::Positions getAllPositions(
+            const finance::AccountsView& accounts
+        ) const override;
 
         void commit();
 

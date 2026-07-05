@@ -66,7 +66,6 @@ namespace drafts
      * @param amount
      * @param fees
      * @param cashAccount
-     * @param externalAccount
      */
     CashTransactionOverview::CashTransactionOverview(
         Timestamp                  timestamp,

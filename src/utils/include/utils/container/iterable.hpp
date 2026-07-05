@@ -16,6 +16,9 @@ class Iterable
     Container _items;
 
    public:
+    /// Type alias for the underlying container type
+    using Underlying = Container;
+
     Iterable() = default;
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
     // cppcheck-suppress noExplicitConstructor

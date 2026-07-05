@@ -12,6 +12,7 @@
 namespace finance
 {
     class Account;             // Forward declaration
+    class AccountsView;        // Forward declaration
     class TransactionFilter;   // Forward declaration
     class Transactions;        // Forward declaration
     class OptionTransaction;   // Forward declaration
@@ -36,7 +37,8 @@ namespace store
     struct OnTransactionAdded
     {
         /// The callback function type for when a transaction is added
-        using func = std::function<void(finance::Transactions transactions)>;
+        using func =
+            std::function<void(finance::DomainTransaction transaction)>;
     };
 
     /**
@@ -56,7 +58,8 @@ namespace store
          */
         [[nodiscard]]
         virtual TransactionStoreResult addCashTransaction(
-            finance::CashTransaction transaction
+            finance::CashTransaction     transaction,
+            const finance::AccountsView& accounts
         ) = 0;
 
         /**
@@ -67,7 +70,8 @@ namespace store
          */
         [[nodiscard]]
         virtual TransactionStoreResult addStockTransaction(
-            finance::StockTransaction transaction
+            finance::StockTransaction    transaction,
+            const finance::AccountsView& accounts
         ) = 0;
 
         /**
@@ -78,7 +82,8 @@ namespace store
          */
         [[nodiscard]]
         virtual TransactionStoreResult addOptionTransaction(
-            finance::OptionTransaction transaction
+            finance::OptionTransaction   transaction,
+            const finance::AccountsView& accounts
         ) = 0;
 
         /**
@@ -91,17 +96,21 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Transactions getTransactions(
-            const finance::TransactionFilter& filter
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
+         * @param accounts The accounts view to filter transactions
          * @return finance::Transactions The list of
          * transactions
          */
         [[nodiscard]]
-        virtual finance::Transactions getTransactions() const = 0;
+        virtual finance::Transactions getTransactions(
+            const finance::AccountsView& accounts
+        ) const = 0;
 
         /**
          * @brief Get the Stock Positions
@@ -111,7 +120,8 @@ namespace store
          */
         [[nodiscard]]
         virtual IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
         ) const = 0;
 
         /**

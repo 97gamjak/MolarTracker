@@ -2,6 +2,7 @@
 
 #include "drafts/account_draft.hpp"
 #include "finance/account/account.hpp"
+#include "finance/account/accounts.hpp"
 
 namespace controller
 {
@@ -32,9 +33,7 @@ namespace controller
     /**
      * @brief Convert a vector of finance::Account to a vector of AccountDraft
      *
-     * @param accounts The vector of finance::Account to convert, these are the
-     * domain model representations of accounts, and contain all the details of
-     * the accounts as they exist in the business logic layer.
+     * @param accounts
      * @return std::vector<AccountDraft> A vector of corresponding
      * AccountDrafts, these are the draft model representations of accounts, and
      * are used for transferring data between the business logic and the UI,
@@ -42,13 +41,13 @@ namespace controller
      * structured differently to better suit the needs of the UI.
      */
     std::vector<drafts::AccountDraft> AccountMapper::toDrafts(
-        const std::vector<finance::Account>& accounts
+        const finance::AccountsView& accounts
     )
     {
         std::vector<drafts::AccountDraft> drafts;
         drafts.reserve(accounts.size());
-        for (const auto& account : accounts)
-            drafts.push_back(toDraft(account));
+        for (const auto& [id, account] : accounts)
+            drafts.push_back(toDraft(*account));
 
         return drafts;
     }

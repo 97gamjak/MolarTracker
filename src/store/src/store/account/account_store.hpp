@@ -33,13 +33,12 @@ namespace store
         /// accounts to load and manage in the store
         ProfileId _activeProfileId = ProfileId::invalid();
 
-        /// The session object for managing the session state of accounts in the
-        /// store
-        finance::Accounts _session;
-
         /// Connections for handling signals related to account store updates
         Connections _connections;
 
+        /// Observable for commit events, this allows other parts of the
+        /// application to subscribe to commit events and react accordingly when
+        /// changes are committed in the account store
         Observable<OnCommit> _onCommit;
 
        public:
@@ -56,29 +55,12 @@ namespace store
         std::optional<finance::Account> getAccount(AccountId id) const override;
         [[nodiscard]]
         std::vector<finance::Account> getAllAccounts() const override;
-        [[nodiscard]]
-        std::vector<finance::Account> getCashAccounts() const override;
-        [[nodiscard]]
-        std::vector<finance::Account> getSecurityAccounts() const override;
-        // [[nodiscard]]
-        // IdMap<AccountId, std::string> getAccountIdToNameMap() const override;
-
-        [[nodiscard]]
-        std::optional<AccountId> getExternalAccount(
-            Currency currency
-        ) const override;
-
-        [[nodiscard]]
-        IdSet<AccountId> getExternalAccountIds() const override;
 
         void commit();
 
         void updateActiveProfile(
             const std::optional<ProfileId>& profileIdOpt
         ) override;
-
-        [[nodiscard]]
-        const finance::Accounts& getAccountSession() const override;
 
         [[nodiscard]]
         Connection subscribeToCommit(

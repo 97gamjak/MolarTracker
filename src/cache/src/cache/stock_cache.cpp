@@ -155,14 +155,14 @@ namespace cache
      * shared pointers to the stocks.
      *
      * @param filter The filter to apply when loading stocks from the store.
-     * @return IdObjectMap<std::shared_ptr<const finance::Stock>> A map of stock
+     * @return finance::StocksView::Type A map of stock
      * IDs to shared pointers to the loaded stocks.
      */
-    IdObjectMap<std::shared_ptr<const finance::Stock>> StockCache::_loadAll(
+    finance::StocksView::Type StockCache::_loadAll(
         const finance::StockFilter& filter
     )
     {
-        IdObjectMap<std::shared_ptr<const finance::Stock>> result;
+        finance::StocksView::Type result;
         for (const auto& [id, stock] : _reader->getStocks(filter))
         {
             result.addUnchecked(std::make_shared<const finance::Stock>(stock));

@@ -99,9 +99,6 @@ namespace cache
          * logic for handling the addition of a new key-value pair to the cache,
          * such as logging or triggering other actions.
          *
-         * @param key The key of the value that was added to the cache.
-         * @param value A shared pointer to the value that was added to the
-         * cache.
          */
         virtual void _onAdded(
             const Key& /*key*/,
@@ -116,11 +113,6 @@ namespace cache
          * logic for handling the update of an existing key-value pair in the
          * cache, such as logging or triggering other actions.
          *
-         * @param key The key of the value that was updated in the cache.
-         * @param oldValue A shared pointer to the old value that was replaced
-         * in the cache.
-         * @param value A shared pointer to the new value that was added to the
-         * cache.
          */
         virtual void _onUpdated(
             const Key& /*key*/,
@@ -136,7 +128,6 @@ namespace cache
          * logic for handling the removal of a key-value pair from the cache,
          * such as logging or triggering other actions.
          *
-         * @param key The key of the value that was removed from the cache.
          */
         virtual void _onRemoved(const Key& /*key*/) {}
 
@@ -147,8 +138,6 @@ namespace cache
          * key-value pair in the cache, such as logging or triggering other
          * actions.
          *
-         * @param old The old key of the value that was changed in the cache.
-         * @param newKey The new key of the value that was changed in the cache.
          */
         virtual void _onIdChanged(const Key& /*old*/, const Key& /*newKey*/) {}
 

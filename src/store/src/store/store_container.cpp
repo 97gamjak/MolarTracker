@@ -90,14 +90,12 @@ namespace store
           ),
           positionStore(
               std::make_shared<PositionStore>(
-                  serviceContainer.getPositionService(),
-                  accountStore->getAccountSession()
+                  serviceContainer.getPositionService()
               )
           ),
           transactionStore(
               std::make_shared<TransactionStore>(
-                  serviceContainer.getTransactionService(),
-                  accountStore->getAccountSession()
+                  serviceContainer.getTransactionService()
               )
           )
     {

@@ -3,9 +3,9 @@
 
 #include <string>
 
+#include "error/http_error.hpp"
 #include "finance/price_quote.hpp"
 #include "finance/ticker_info.hpp"
-#include "http/http_error.hpp"
 
 namespace http
 {
@@ -15,8 +15,6 @@ namespace http
 
 namespace finance
 {
-    class YahooFinanceError;   // Forward declaration
-
     /**
      * @brief Yahoo Finance API credentials
      *
@@ -43,7 +41,7 @@ namespace finance
 
        public:
         // Fetches cookie + crumb. Call once before any ticker requests.
-        [[nodiscard]] std::expected<void, http::HttpError> authenticate();
+        [[nodiscard]] Result<void, HttpError> authenticate();
 
         [[nodiscard]] bool isAuthenticated() const;
 
@@ -66,12 +64,12 @@ namespace finance
 
        public:
         [[nodiscard]]
-        static std::expected<TickerInfo, YahooFinanceError> fetchTickerInfo(
+        static Result<TickerInfo, YFinanceError> fetchTickerInfo(
             const std::string& ticker
         );
 
         [[nodiscard]]
-        static std::expected<PriceQuote, YahooFinanceError> fetchPrice(
+        static Result<PriceQuote, YFinanceError> fetchPrice(
             const std::string& ticker
         );
 
@@ -80,7 +78,7 @@ namespace finance
         static http::HttpRequest _buildRequest(const std::string& path);
 
         [[nodiscard]]
-        static std::expected<http::HttpResponse, YahooFinanceError> _getRequest(
+        static Result<http::HttpResponse, YFinanceError> _getRequest(
             const std::string& path
         );
     };

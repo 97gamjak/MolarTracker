@@ -47,7 +47,8 @@ namespace finance
 
 namespace cache
 {
-    class StockCache;   // Forward declaration
+    class StockCache;     // Forward declaration
+    class AccountCache;   // Forward declaration
 }   // namespace cache
 
 class QMainWindow;   // Forward declaration
@@ -69,12 +70,12 @@ namespace controller
        private:
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
-        /// The account store for the application
-        std::shared_ptr<store::IAccountStore> _accountStore;
         /// The transaction store for the application
         std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// The position store for the application
         std::shared_ptr<store::IPositionStore> _positionStore;
+        /// The account cache for the application
+        std::shared_ptr<cache::AccountCache> _accountCache;
         /// The stock cache for the application
         std::shared_ptr<cache::StockCache> _stockCache;
         /// The option store for the application
@@ -95,11 +96,11 @@ namespace controller
        public:
         TransactionSideBarController(
             cmd::UndoStack&                                  undoStack,
-            const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
-            const std::shared_ptr<cache::StockCache>&        stockCache,
             const std::shared_ptr<store::IOptionStore>&      optionStore,
             const std::shared_ptr<store::IPositionStore>&    positionStore,
+            const std::shared_ptr<cache::AccountCache>&      accountCache,
+            const std::shared_ptr<cache::StockCache>&        stockCache,
             TransactionController&       transactionController,
             SecuritiesSideBarController& stockController,
             QMainWindow*                 mainWindow

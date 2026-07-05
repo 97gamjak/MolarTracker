@@ -6,7 +6,8 @@
 
 namespace finance
 {
-    class Position;   // Forward declaration
+    class Position;       // Forward declaration
+    class AccountsView;   // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -47,18 +48,26 @@ namespace store
         /**
          * @brief Get all Positions
          *
-         * @return finance::Positions
-         */
-        [[nodiscard]]
-        virtual finance::Positions getAllPositions() const = 0;
-
-        /**
-         * @brief Get all open Positions
+         * @param accounts The accounts view to filter positions by
          *
          * @return finance::Positions
          */
         [[nodiscard]]
-        virtual finance::Positions getOpenPositions() const = 0;
+        virtual finance::Positions getAllPositions(
+            const finance::AccountsView& accounts
+        ) const = 0;
+
+        /**
+         * @brief Get all open Positions
+         *
+         * @param accounts The accounts view to filter positions by
+         *
+         * @return finance::Positions
+         */
+        [[nodiscard]]
+        virtual finance::Positions getOpenPositions(
+            const finance::AccountsView& accounts
+        ) const = 0;
 
         /**
          * @brief Subscribe to position closed events, this allows subscribers

@@ -91,38 +91,6 @@ TEST_F(AccountStoreTest, GetAllAccountsReturnsCreatedAccount)
     EXPECT_EQ(accounts[0].getName(), "Savings");
 }
 
-TEST_F(AccountStoreTest, GetCashAccountsReturnsOnlyCashAccounts)
-{
-    setActiveProfile();
-    static_cast<void>(
-        _store->createAccount(makeAccount("CashAcc", AccountKind::Cash))
-    );
-    static_cast<void>(
-        _store->createAccount(makeAccount("SecAcc", AccountKind::Security))
-    );
-
-    const auto cashAccounts = _store->getCashAccounts();
-
-    ASSERT_EQ(cashAccounts.size(), 1U);
-    EXPECT_EQ(cashAccounts[0].getName(), "CashAcc");
-}
-
-TEST_F(AccountStoreTest, GetSecurityAccountsReturnsOnlySecurityAccounts)
-{
-    setActiveProfile();
-    static_cast<void>(
-        _store->createAccount(makeAccount("CashAcc", AccountKind::Cash))
-    );
-    static_cast<void>(
-        _store->createAccount(makeAccount("SecAcc", AccountKind::Security))
-    );
-
-    const auto secAccounts = _store->getSecurityAccounts();
-
-    ASSERT_EQ(secAccounts.size(), 1U);
-    EXPECT_EQ(secAccounts[0].getName(), "SecAcc");
-}
-
 TEST_F(AccountStoreTest, UpdateActiveProfileLoadsAccountsFromService)
 {
     _mockService->preloadedAccounts.emplace_back(
@@ -159,18 +127,6 @@ TEST_F(AccountStoreTest, CommitNewAccountCallsService)
     _store->commit();
 
     EXPECT_GE(_mockService->createCallCount, 1);
-}
-
-TEST_F(AccountStoreTest, CreateCashAccountAlsoCreatesExternalAccount)
-{
-    setActiveProfile();
-    static_cast<void>(_store->createAccount(
-        makeAccount("CashAcc", AccountKind::Cash, Currency::EUR)
-    ));
-
-    EXPECT_NO_THROW(
-        static_cast<void>(_store->getExternalAccount(Currency::EUR))
-    );
 }
 
 TEST_F(AccountStoreTest, IsDirtyFalseInitially)

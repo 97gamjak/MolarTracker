@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
 #include "config/constants/github_constants.hpp"
 #include "connections/connection.hpp"
@@ -18,7 +19,6 @@
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
 #include "logging/log_macros.hpp"
-#include "store/i_account_store.hpp"
 #include "store/i_option_store.hpp"
 #include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
@@ -36,12 +36,14 @@ REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
 using finance::Position;
 
-using store::IAccountStore;
 using store::IOptionStore;
 using store::IPositionStore;
 using store::ITransactionStore;
 using store::TransactionStoreResult;
 using store::TransactionStoreResultMeta;
+
+using cache::AccountCache;
+using cache::StockCache;
 
 using ui::DepositWithdrawalWidget;
 using ui::ErrorDialog;
@@ -49,6 +51,8 @@ using ui::OptionWidget;
 using ui::PositionSelectionDialog;
 using ui::StockWidget;
 using ui::TransactionCategory;
+
+using drafts::AccountDraft;
 
 namespace controller
 {
@@ -67,10 +71,10 @@ namespace controller
         QPointer<ui::OptionWidget> option = nullptr;
 
         Dialogs(
-            const std::vector<drafts::AccountDraft>& cashAccounts,
-            const std::vector<drafts::AccountDraft>& securityAccounts,
-            const std::unordered_set<std::string>&   tickers,
-            QMainWindow*                             mainWindow
+            const std::vector<AccountDraft>&       cashAccounts,
+            const std::vector<AccountDraft>&       securityAccounts,
+            const std::unordered_set<std::string>& tickers,
+            QMainWindow*                           mainWindow
         );
     };
 
@@ -84,10 +88,10 @@ namespace controller
      * @param mainWindow
      */
     TransactionSideBarController::Dialogs::Dialogs(
-        const std::vector<drafts::AccountDraft>& cashAccounts,
-        const std::vector<drafts::AccountDraft>& securityAccounts,
-        const std::unordered_set<std::string>&   tickers,
-        QMainWindow*                             mainWindow
+        const std::vector<AccountDraft>&       cashAccounts,
+        const std::vector<AccountDraft>&       securityAccounts,
+        const std::unordered_set<std::string>& tickers,
+        QMainWindow*                           mainWindow
     )
         : cash(new DepositWithdrawalWidget(
               TransactionType::Deposit,   // dummy type
@@ -114,7 +118,7 @@ namespace controller
      * Transaction Side Bar Controller object
      *
      * @param undoStack The undo stack for the application
-     * @param accountStore The account store for the application
+     * @param accountCache The account cache for the application
      * @param transactionStore The transaction store for the application
      * @param stockCache The stock cache for the application
      * @param optionStore The option store for the application
@@ -126,20 +130,20 @@ namespace controller
      */
     TransactionSideBarController::TransactionSideBarController(
         cmd::UndoStack&                           undoStack,
-        const std::shared_ptr<IAccountStore>&     accountStore,
         const std::shared_ptr<ITransactionStore>& transactionStore,
-        const std::shared_ptr<cache::StockCache>& stockCache,
         const std::shared_ptr<IOptionStore>&      optionStore,
         const std::shared_ptr<IPositionStore>&    positionStore,
+        const std::shared_ptr<AccountCache>&      accountCache,
+        const std::shared_ptr<StockCache>&        stockCache,
         TransactionController&                    transactionController,
         SecuritiesSideBarController&              stockController,
         QMainWindow*                              mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
-          _accountStore(accountStore),
           _transactionStore(transactionStore),
           _positionStore(positionStore),
+          _accountCache(accountCache),
           _stockCache(stockCache),
           _optionStore(optionStore),
           _dialogs(nullptr),
@@ -147,11 +151,13 @@ namespace controller
           _stockController(stockController),
           _connections(std::make_unique<Connections>())
     {
-        const auto cashAccounts =
-            AccountMapper::toDrafts(_accountStore->getCashAccounts());
+        const auto cashAccountsView = _accountCache->getAllAccounts().cash();
+        const auto securityAccountsView =
+            _accountCache->getAllAccounts().securities();
 
+        const auto cashAccounts = AccountMapper::toDrafts(cashAccountsView);
         const auto securityAccounts =
-            AccountMapper::toDrafts(_accountStore->getSecurityAccounts());
+            AccountMapper::toDrafts(securityAccountsView);
 
         _dialogs = std::make_unique<Dialogs>(
             cashAccounts,
@@ -246,7 +252,7 @@ namespace controller
 
             _dialogs->cash->setTransactionType(type);
             _dialogs->cash->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                AccountMapper::toDrafts(_accountCache->getAllAccounts().cash())
             );
             _dialogs->cash->refresh();
 
@@ -255,10 +261,12 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _dialogs->stock->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                AccountMapper::toDrafts(
+                    _accountCache->getAllAccounts().securities()
+                )
             );
             _dialogs->stock->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                AccountMapper::toDrafts(_accountCache->getAllAccounts().cash())
             );
             _dialogs->stock->updateTickers(
                 _stockCache->getAllStocks().getTickers()
@@ -270,10 +278,12 @@ namespace controller
         else if (action == item->getCreateOptionTransactionAction())
         {
             _dialogs->option->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                AccountMapper::toDrafts(
+                    _accountCache->getAllAccounts().securities()
+                )
             );
             _dialogs->option->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                AccountMapper::toDrafts(_accountCache->getAllAccounts().cash())
             );
             _dialogs->option->updateTickers(
                 _stockCache->getAllStocks().getTickers()

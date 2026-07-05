@@ -7,7 +7,7 @@
 #include <QObject>
 #include <format>
 
-#include "commands/account/create_account_command.hpp"
+#include "cache/account_cache.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
@@ -16,8 +16,8 @@
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "side_bar/account_controller.hpp"
-#include "store/i_account_store.hpp"
 #include "ui/account/account_detail_view.hpp"
+#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
 
@@ -37,7 +37,7 @@ namespace controller
         std::shared_ptr<finance::PriceCache> priceCache;
 
         /// Reference to the account store
-        std::shared_ptr<store::IAccountStore> accountStore;
+        std::shared_ptr<cache::AccountCache> accountCache;
         /// Reference to the position store
         std::shared_ptr<store::IPositionStore> positionStore;
         /// Reference to the transaction store
@@ -64,7 +64,7 @@ namespace controller
             openPositionDetails;
 
         Details(
-            const std::shared_ptr<store::IAccountStore>&     accountStore_,
+            const std::shared_ptr<cache::AccountCache>&      accountCache_,
             const std::shared_ptr<store::IPositionStore>&    positionStore_,
             const std::shared_ptr<cache::StockCache>&        stockCache_,
             const std::shared_ptr<store::ITransactionStore>& transactionStore_,
@@ -84,7 +84,7 @@ namespace controller
     /**
      * @brief Construct a new Account Controller:: Details:: Details object
      *
-     * @param accountStore_
+     * @param accountCache_
      * @param positionStore_
      * @param stockCache_
      * @param transactionStore_
@@ -93,7 +93,7 @@ namespace controller
      * @param stackedWidget_
      */
     AccountController::Details::Details(
-        const std::shared_ptr<store::IAccountStore>&     accountStore_,
+        const std::shared_ptr<cache::AccountCache>&      accountCache_,
         const std::shared_ptr<store::IPositionStore>&    positionStore_,
         const std::shared_ptr<cache::StockCache>&        stockCache_,
         const std::shared_ptr<store::ITransactionStore>& transactionStore_,
@@ -103,7 +103,7 @@ namespace controller
     )
         : undoStack(undoStack_),
           priceCache(priceCache_),
-          accountStore(accountStore_),
+          accountCache(accountCache_),
           positionStore(positionStore_),
           transactionStore(transactionStore_),
           stockCache(stockCache_),
@@ -118,7 +118,7 @@ namespace controller
      * @brief Controller for managing account-related actions
      *
      * @param undoStack
-     * @param accountStore
+     * @param accountCache
      * @param positionStore
      * @param stockCache
      * @param transactionStore
@@ -127,16 +127,16 @@ namespace controller
      */
     AccountController::AccountController(
         cmd::UndoStack&                                  undoStack,
-        const std::shared_ptr<store::IAccountStore>&     accountStore,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
-        const std::shared_ptr<cache::StockCache>&        stockCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
+        const std::shared_ptr<cache::AccountCache>&      accountCache,
+        const std::shared_ptr<cache::StockCache>&        stockCache,
         const std::shared_ptr<finance::PriceCache>&      priceCache,
         QStackedWidget*                                  stackedWidget
     )
         : _details(
               std::make_unique<Details>(
-                  accountStore,
+                  accountCache,
                   positionStore,
                   stockCache,
                   transactionStore,
@@ -195,17 +195,21 @@ namespace controller
     {
         LOG_ENTRY;
 
-        const auto account = _details->accountStore->getAccount(id);
+        const auto accountResult =
+            cache::AccountCacheUtils::getAccount(id, _details->accountCache);
 
-        if (!account.has_value())
+        if (!accountResult)
         {
-            LOG_WARNING(
-                std::format("Account with ID {} not found", id.value())
+            ui::ErrorDialog::show(
+                accountResult.error(),
+                "Account with ID " + id.toString() + " not found"
             );
             return;
         }
 
-        const auto accountDraft = AccountMapper::toDraft(account.value());
+        const auto& account = *accountResult;
+
+        const auto accountDraft = AccountMapper::toDraft(*account);
 
         switch (account->getKind())
         {

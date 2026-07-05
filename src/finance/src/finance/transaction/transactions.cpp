@@ -100,7 +100,7 @@ namespace finance
                                 "Failed to convert transaction with ID {} to "
                                 "cash transaction: {}",
                                 transaction.getId().toString(),
-                                cashTx.error().message
+                                cashTx.error().toString()
                             )
                         );
                         continue;
@@ -119,7 +119,7 @@ namespace finance
                                 "Failed to convert transaction with ID {} to "
                                 "stock transaction: {}",
                                 transaction.getId().toString(),
-                                stockTx.error().message
+                                stockTx.error().toString()
                             )
                         );
                         continue;

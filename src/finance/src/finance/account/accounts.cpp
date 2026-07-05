@@ -53,25 +53,60 @@ namespace finance
      * @return AccountId The corresponding external account ID, or an invalid
      * AccountId if no corresponding external account is found.
      */
-    AccountId Accounts::getCorrespondingExternalAccountId(
-        const AccountId& cashAccountId
-    ) const
+    Result<AccountId, FinanceError> AccountsView::
+        getCorrespondingExternalAccountId(const AccountId& cashAccountId) const
     {
         for (const auto& [id, account] : *this)
         {
-            if (!account.isExternal() &&
-                account.getKind() == AccountKind::Cash &&
-                account.getId() == cashAccountId)
+            if (!account->isExternal() &&
+                account->getKind() == AccountKind::Cash &&
+                account->getId() == cashAccountId)
             {
                 // find the corresponding external account
                 for (const auto& [externalId, externalAccount] : *this)
                 {
-                    if (externalAccount.isExternal())
+                    if (externalAccount->isExternal())
                         return externalId;
                 }
             }
         }
 
-        return AccountId::invalid();
+        return FinanceError{
+            FinanceErrorType::AccountNotFound,
+            "No corresponding external account found for cash account: " +
+                cashAccountId.toString()
+        };
+    }
+
+    /**
+     * @brief Filter accounts to include only cash accounts.
+     *
+     * @return AccountsView A new AccountsView object containing only cash
+     * accounts.
+     */
+    AccountsView AccountsView::cash() const
+    {
+        AccountsView filtered;
+        for (const auto& [id, account] : *this)
+            if (account->getKind() == AccountKind::Cash)
+                filtered.addUnchecked(account);
+
+        return filtered;
+    }
+
+    /**
+     * @brief Filter accounts to include only security accounts.
+     *
+     * @return AccountsView A new AccountsView object containing only security
+     * accounts.
+     */
+    AccountsView AccountsView::securities() const
+    {
+        AccountsView filtered;
+        for (const auto& [id, account] : *this)
+            if (account->getKind() == AccountKind::Security)
+                filtered.addUnchecked(account);
+
+        return filtered;
     }
 }   // namespace finance
