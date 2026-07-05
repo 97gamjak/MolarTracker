@@ -5,6 +5,7 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -56,20 +57,20 @@ namespace store
         );
 
         [[nodiscard]]
-        TransactionStoreResult addCashTransaction(
-            finance::CashTransaction     transaction,
-            const finance::AccountsView& accounts
+        FinanceResult<void> addCashTransaction(
+            const finance::CashTransaction& transaction,
+            const finance::AccountsView&    accounts
         ) override;
         [[nodiscard]]
-        TransactionStoreResult addStockTransaction(
-            finance::StockTransaction    transaction,
-            const finance::AccountsView& accounts
+        FinanceResult<void> addStockTransaction(
+            const finance::StockTransaction& transaction,
+            const finance::AccountsView&     accounts
         ) override;
 
         [[nodiscard]]
-        TransactionStoreResult addOptionTransaction(
-            finance::OptionTransaction   transaction,
-            const finance::AccountsView& accounts
+        FinanceResult<void> addOptionTransaction(
+            const finance::OptionTransaction& transaction,
+            const finance::AccountsView&      accounts
         ) override;
 
         [[nodiscard]]

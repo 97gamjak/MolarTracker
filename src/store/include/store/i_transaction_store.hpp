@@ -6,6 +6,7 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
 #include "utils/container/id_map.hpp"
 
@@ -54,36 +55,36 @@ namespace store
          * @brief Add a cash transaction to the store
          *
          * @param transaction The cash transaction to add
-         * @return TransactionStoreResult The result of the operation
+         * @return FinanceResult<void> The result of the operation
          */
         [[nodiscard]]
-        virtual TransactionStoreResult addCashTransaction(
-            finance::CashTransaction     transaction,
-            const finance::AccountsView& accounts
+        virtual FinanceResult<void> addCashTransaction(
+            const finance::CashTransaction& transaction,
+            const finance::AccountsView&    accounts
         ) = 0;
 
         /**
          * @brief Add a stock transaction to the store
          *
          * @param transaction The stock transaction to add
-         * @return TransactionStoreResult The result of the operation
+         * @return FinanceResult<void> The result of the operation
          */
         [[nodiscard]]
-        virtual TransactionStoreResult addStockTransaction(
-            finance::StockTransaction    transaction,
-            const finance::AccountsView& accounts
+        virtual FinanceResult<void> addStockTransaction(
+            const finance::StockTransaction& transaction,
+            const finance::AccountsView&     accounts
         ) = 0;
 
         /**
          * @brief Add an option transaction to the store
          *
          * @param transaction The option transaction to add
-         * @return TransactionStoreResult The result of the operation
+         * @return FinanceResult<void> The result of the operation
          */
         [[nodiscard]]
-        virtual TransactionStoreResult addOptionTransaction(
-            finance::OptionTransaction   transaction,
-            const finance::AccountsView& accounts
+        virtual FinanceResult<void> addOptionTransaction(
+            const finance::OptionTransaction& transaction,
+            const finance::AccountsView&      accounts
         ) = 0;
 
         /**

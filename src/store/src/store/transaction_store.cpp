@@ -109,54 +109,80 @@ namespace store
      * @brief Add a cash transaction to the store
      *
      * @param transaction The cash transaction to add
-     * @return TransactionStoreResult The result of the operation
+     * @return FinanceResult<void> The result of the operation
      */
-    TransactionStoreResult TransactionStore::addCashTransaction(
-        finance::CashTransaction     transaction,
-        const finance::AccountsView& accounts
+    FinanceResult<void> TransactionStore::addCashTransaction(
+        const finance::CashTransaction& transaction,
+        const finance::AccountsView&    accounts
     )
     {
         LOG_ENTRY;
 
-        _addEntry(
-            finance::TransactionConverter::toDomain(transaction, accounts)
-        );
+        const auto& tx =
+            finance::TransactionConverter::toDomain(transaction, accounts);
 
-        return TransactionStoreResult::Ok;
+        if (!tx)
+        {
+            return tx.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to convert CashTransaction to DomainTransaction"
+            );
+        }
+
+        _addEntry(*tx);
+
+        return FinanceResult<void>::ok();
     }
 
     /**
      * @brief Add a stock transaction to the store
      *
      * @param transaction The stock transaction to add
-     * @return TransactionStoreResult The result of the operation
+     * @return FinanceResult<void> The result of the operation
      */
-    TransactionStoreResult TransactionStore::addStockTransaction(
-        finance::StockTransaction    transaction,
-        const finance::AccountsView& accounts
+    FinanceResult<void> TransactionStore::addStockTransaction(
+        const finance::StockTransaction& transaction,
+        const finance::AccountsView&     accounts
     )
     {
         LOG_ENTRY;
 
-        _addEntry(
-            finance::TransactionConverter::toDomain(transaction, accounts)
-        );
+        const auto& tx =
+            finance::TransactionConverter::toDomain(transaction, accounts);
 
-        return TransactionStoreResult::Ok;
+        if (!tx)
+        {
+            return tx.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to convert StockTransaction to DomainTransaction"
+            );
+        }
+        _addEntry(*tx);
+
+        return FinanceResult<void>::ok();
     }
 
-    TransactionStoreResult TransactionStore::addOptionTransaction(
-        finance::OptionTransaction   transaction,
-        const finance::AccountsView& accounts
+    FinanceResult<void> TransactionStore::addOptionTransaction(
+        const finance::OptionTransaction& transaction,
+        const finance::AccountsView&      accounts
     )
     {
         LOG_ENTRY;
 
-        _addEntry(
-            finance::TransactionConverter::toDomain(transaction, accounts)
-        );
+        const auto& tx =
+            finance::TransactionConverter::toDomain(transaction, accounts);
 
-        return TransactionStoreResult::Ok;
+        if (!tx)
+        {
+            return tx.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to convert OptionTransaction to DomainTransaction"
+            );
+        }
+
+        _addEntry(*tx);
+
+        return FinanceResult<void>::ok();
     }
 
     /**

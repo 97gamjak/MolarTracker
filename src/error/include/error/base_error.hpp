@@ -7,6 +7,7 @@
 #include <mstd/type_traits.hpp>
 #include <optional>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 template <typename T>
@@ -123,6 +124,13 @@ class Result : public std::expected<T, E>
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     Result(const E& error);
+
+    // TODO: put this to tpp file
+    static Result ok()
+    requires std::is_void_v<T>
+    {
+        return std::expected<T, E>{};
+    }
 };
 
 #ifndef __ERROR__INCLUDE__ERROR__BASE_ERROR_TPP__
