@@ -112,7 +112,9 @@ namespace store
             void*                 subscriber
         ) = 0;
 
+        /// @cond DOXYGEN_IGNORE
         SUBSCRIBE_VIRTUAL(finance::Stock, StockId)
+        /// @endcond
     };
 
     /**

@@ -55,6 +55,7 @@ namespace store
          * @brief Add a cash transaction to the store
          *
          * @param transaction The cash transaction to add
+         * @param accounts The accounts view to filter transactions
          * @return FinanceResult<void> The result of the operation
          */
         [[nodiscard]]
@@ -67,6 +68,7 @@ namespace store
          * @brief Add a stock transaction to the store
          *
          * @param transaction The stock transaction to add
+         * @param accounts The accounts view to filter transactions
          * @return FinanceResult<void> The result of the operation
          */
         [[nodiscard]]
@@ -79,6 +81,7 @@ namespace store
          * @brief Add an option transaction to the store
          *
          * @param transaction The option transaction to add
+         * @param accounts The accounts view to filter transactions
          * @return FinanceResult<void> The result of the operation
          */
         [[nodiscard]]
@@ -91,6 +94,7 @@ namespace store
          * @brief Get all transactions in the store
          *
          * @param filter The filter to apply
+         * @param accounts The accounts view to filter transactions
          *
          * @return finance::Transactions The list of
          * transactions
@@ -117,6 +121,7 @@ namespace store
          * @brief Get the Stock Positions
          *
          * @param filter
+         * @param accounts
          * @return IdMap<PositionId, finance::StockPositionTransaction>
          */
         [[nodiscard]]

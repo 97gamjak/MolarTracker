@@ -58,7 +58,9 @@ namespace controller
         std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// Reference to the stock cache for retrieving stock data (e.g.
         /// tickers)
-        std::shared_ptr<cache::StockCache>   _stockCache;
+        std::shared_ptr<cache::StockCache> _stockCache;
+        /// Reference to the account cache for retrieving account data (e.g.
+        /// account IDs)
         std::shared_ptr<cache::AccountCache> _accountCache;
 
         /// The expected number of symbols to be fetched in the price update,

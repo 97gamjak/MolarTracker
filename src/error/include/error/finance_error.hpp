@@ -38,6 +38,17 @@ using YFinanceResult = Result<T, YFinanceError>;
 template <>
 struct FromError<HttpError, YFinanceError>
 {
+    /**
+     * @brief Converts an error of type HttpError to an error of type
+     * YFinanceError, preserving the error message and sub-errors.
+     *
+     * @param error The original HttpError to convert.
+     * @param newMessage An optional new error message to use for the converted
+     * error. If not provided, the original error message will be used.
+     * @return YFinanceError A new YFinanceError object with the same message
+     * and sub-errors as the original HttpError.
+     */
+    // NOLINTNEXTLINE(misc-no-recursion)
     static YFinanceError apply(
         const HttpError&                  error,
         const std::optional<std::string>& newMessage = std::nullopt

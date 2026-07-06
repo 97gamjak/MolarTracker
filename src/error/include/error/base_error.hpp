@@ -26,6 +26,7 @@ concept IsError = requires(T type) {
 template <typename ErrorType>
 struct ErrorWrapper
 {
+    /// The wrapped error type, which must satisfy the IsError concept.
     ErrorType error;
 
     [[nodiscard]]
@@ -99,6 +100,19 @@ class Error
 template <IsError OldErrorType, IsError NewErrorType>
 struct FromError
 {
+    /**
+     * @brief Converts an error of type OldErrorType to an error of type
+     * NewErrorType, preserving the error message and sub-errors.
+     *
+     * @param error The original error of type OldErrorType to convert.
+     * @param newType The new error type to convert to, of type
+     * NewErrorType::ErrorType.
+     * @param newMessage An optional new error message to use for the
+     * converted error. If not provided, the original error message will be
+     * used.
+     * @return NewErrorType A new error of type NewErrorType with the same
+     * message and sub-errors as the original error.
+     */
     static NewErrorType apply(
         const OldErrorType&               error,
         const NewErrorType::ErrorType&    newType,
@@ -142,7 +156,12 @@ class Result : public std::expected<T, E>
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     Result(const E& error);
 
-    // TODO: put this to tpp file
+    /**
+     * @brief Creates a Result object representing a successful operation with
+     * no value.
+     *
+     * @return Result
+     */
     static Result ok()
     requires std::is_void_v<T>
     {

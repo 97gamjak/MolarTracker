@@ -5,6 +5,18 @@
 
 namespace ui
 {
+    /**
+     * @brief Show an error dialog for a given error, this method creates and
+     * displays an error dialog with the specified error message and optional
+     * details. If a custom message is provided, it will be displayed in the
+     * dialog, otherwise the error's string representation will be used.
+     *
+     * @tparam Error The type of the error, which must satisfy the IsError
+     * concept.
+     * @param error The error object to display in the dialog.
+     * @param msg An optional custom message to display in the dialog.
+     * @param parent An optional parent widget for the dialog.
+     */
     template <typename Error>
     void ErrorDialog::show(
         const Error&                      error,

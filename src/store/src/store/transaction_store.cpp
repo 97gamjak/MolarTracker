@@ -24,7 +24,6 @@ namespace store
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
-     * @param accountSession
      */
     TransactionStore::TransactionStore(
         const std::shared_ptr<service::ITransactionService>& transactionService
@@ -109,6 +108,7 @@ namespace store
      * @brief Add a cash transaction to the store
      *
      * @param transaction The cash transaction to add
+     * @param accounts The accounts view to filter transactions
      * @return FinanceResult<void> The result of the operation
      */
     FinanceResult<void> TransactionStore::addCashTransaction(
@@ -138,6 +138,7 @@ namespace store
      * @brief Add a stock transaction to the store
      *
      * @param transaction The stock transaction to add
+     * @param accounts The accounts view to filter transactions
      * @return FinanceResult<void> The result of the operation
      */
     FinanceResult<void> TransactionStore::addStockTransaction(
@@ -186,13 +187,16 @@ namespace store
     }
 
     /**
-     * @brief Get all transactions from the store, this retrieves all
-     * transactions that are currently in the store, including both new
-     * transactions that have not yet been committed to the database and
-     * existing transactions that have been loaded from the database. The
-     * returned transactions will reflect any changes made to them in the store,
-     * but they will not be saved to the database until the commit method is
-     * called.
+     * @brief Get all transactions from the store
+     *
+     * This retrieves all transactions that are currently in the store,
+     * including both new transactions that have not yet been committed to the
+     * database and existing transactions that have been loaded from the
+     * database. The returned transactions will reflect any changes made to them
+     * in the store, but they will not be saved to the database until the commit
+     * method is called.
+     *
+     * @param accounts The accounts view to filter transactions
      *
      * @return finance::Transactions
      */
@@ -217,6 +221,7 @@ namespace store
      * include in the results, such as filtering by date range, transaction
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
+     * @param accounts The accounts view to filter transactions
      *
      * @return finance::Transactions A vector of transactions
      * currently in the store, this includes both new and existing transactions,
@@ -292,6 +297,7 @@ namespace store
      * attributes of the transactions. If no filter is provided, all
      * transactions in the store will be considered when determining stock
      * positions.
+     * @param accounts The accounts view to filter transactions
      *
      * @return IdMap<PositionId, finance::StockPositionTransaction>
      * A mapping of position IDs to StockPositionTransaction objects, this

@@ -10,8 +10,9 @@ namespace finance
     /**
      * @brief Construct a new Position:: Position object
      *
-     * @param createdAt
-     * @param closedAt
+     * @param accountId The ID of the account associated with the position.
+     * @param createdAt The creation timestamp of the position.
+     * @param closedAt The closing timestamp of the position, if it exists.
      */
     Position::Position(
         AccountId                accountId,
@@ -50,6 +51,11 @@ namespace finance
      */
     std::optional<Timestamp> Position::getClosedAt() const { return _closedAt; }
 
+    /**
+     * @brief Get the account ID associated with the position.
+     *
+     * @return AccountId
+     */
     AccountId Position::getAccountId() const { return _accountId; }
 
     /**
@@ -66,6 +72,12 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Predicate to check if a position is associated with any of the
+     * given account IDs.
+     *
+     * @return filter::Predicate<Position>
+     */
     filter::Predicate<Position> IsPositionForAccounts(
         const IdSet<AccountId>& accountIds
     )

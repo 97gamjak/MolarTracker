@@ -20,6 +20,7 @@ namespace controller
      * @param positionStore
      * @param transactionStore
      * @param stockCache
+     * @param accountCache
      * @param priceCache
      */
     PositionController::PositionController(

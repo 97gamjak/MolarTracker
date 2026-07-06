@@ -60,7 +60,7 @@ namespace store
         /**
          * @brief Get all open Positions
          *
-         * @param accounts The accounts view to filter positions by
+         * @param accountIds The set of account IDs to filter positions by
          *
          * @return finance::Positions
          */

@@ -12,6 +12,7 @@ namespace repo
      * @brief Create a Position from a PositionRow.
      *
      * @param row The PositionRow to convert.
+     * @param accountId The ID of the account associated with the position.
      * @return The created Position.
      */
     finance::Position PositionFactory::fromPositionRow(

@@ -362,6 +362,29 @@ namespace store
         return _observable.on<OnCommit>(func, subscriber);
     }
 
+    /**
+     * @brief Subscribe to profile changed events in the account store, this
+     * allows other parts of the application to be notified when the active
+     * profile changes in the account store, enabling them to react accordingly,
+     * such as updating UI elements or triggering other actions based on the
+     * new active profile.
+     *
+     * @param func The callback function to be called when a profile changed
+     * event occurs, this function should accept no parameters and return void,
+     * allowing the subscriber to perform any necessary actions when the active
+     * profile changes.
+     * @param subscriber A pointer to the subscriber object that will receive
+     * the profile changed event, this allows the account store to manage the
+     * lifetime of the subscription and ensure that the callback function is
+     * called on the correct subscriber object when a profile changed event
+     * occurs.
+     * @return Connection A Connection object representing the subscription,
+     * which can be used to manage the subscription, such as disconnecting from
+     * the profile changed events when the subscriber is no longer interested in
+     * receiving them, or when the subscriber is being destroyed, ensuring that
+     * the subscription is properly cleaned up and does not lead to dangling
+     * pointers or memory leaks.
+     */
     Connection AccountStore::subscribeToProfileChanged(
         OnProfileChanged::func func,
         void*                  subscriber

@@ -42,6 +42,7 @@ namespace store
     /**
      * @brief Get all positions
      *
+     * @param accounts The accounts view to filter positions by
      * @return finance::Positions
      */
     finance::Positions PositionStore::getAllPositions(
@@ -74,6 +75,7 @@ namespace store
     /**
      * @brief Get all open positions
      *
+     * @param accountIds The set of account IDs to filter positions by
      * @return finance::Positions
      */
     finance::Positions PositionStore::getOpenPositions(

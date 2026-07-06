@@ -16,9 +16,10 @@ namespace ui
     /**
      * @brief Construct a new Error Dialog:: Error Dialog object
      *
-     * @param title
-     * @param message
-     * @param parent
+     * @param title The title of the error dialog.
+     * @param message The error message to display.
+     * @param details Optional detailed error message.
+     * @param parent The parent widget for the dialog.
      */
     ErrorDialog::ErrorDialog(
         const QString&                title,

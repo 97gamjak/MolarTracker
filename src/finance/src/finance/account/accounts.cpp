@@ -68,6 +68,12 @@ namespace finance
         return filtered;
     }
 
+    /**
+     * @brief Filter accounts to exclude external accounts.
+     *
+     * @return AccountsView A new AccountsView object containing only
+     * non-external accounts.
+     */
     AccountsView AccountsView::removeExternal() const
     {
         AccountsView filtered;
@@ -78,6 +84,12 @@ namespace finance
         return filtered;
     }
 
+    /**
+     * @brief Check if an account is external based on its ID.
+     *
+     * @param accountId The ID of the account to check.
+     * @return true if the account is external, false otherwise.
+     */
     bool AccountsView::isExternal(const AccountId& accountId) const
     {
         if (contains(accountId))

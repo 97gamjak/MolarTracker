@@ -64,6 +64,8 @@ namespace controller
         /// Pointer to the create account dialog
         QPointer<ui::CreateAccountDialog> _createAccountDialog;
 
+        /// Pointer to the connections object for managing signal-slot
+        /// connections
         std::unique_ptr<Connections> _connections;
 
        public:
