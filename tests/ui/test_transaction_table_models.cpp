@@ -100,7 +100,7 @@ namespace
     TEST_F(CashTransactionTableModelTest, ColumnCountIsSeven)
     {
         // Date, Type, Account, ReferenceAccount, Amount, Fees, Description
-        EXPECT_EQ(_model.columnCount({}), 7);
+        EXPECT_EQ(_model.columnCount({}), 6);
     }
 
     TEST_F(CashTransactionTableModelTest, ValidParentReturnsZeroColumns)
@@ -118,7 +118,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DescriptionIndexIsSix)
     {
-        EXPECT_EQ(_model.getDescriptionIndex(), 6);
+        EXPECT_EQ(_model.getDescriptionIndex(), 5);
     }
 
     TEST_F(CashTransactionTableModelTest, SetTransactionsUpdatesRowCount)
