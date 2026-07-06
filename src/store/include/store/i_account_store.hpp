@@ -5,7 +5,6 @@
 #include "connections/connection.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
-#include "finance/account/accounts.hpp"
 #include "subscriptions.hpp"
 #include "utils/container/id_id_map.hpp"
 
@@ -46,6 +45,11 @@ namespace store
             using func = std::function<void(const IdIdMap<AccountId>&)>;
         };
 
+        struct OnProfileChanged
+        {
+            using func = std::function<void()>;
+        };
+
        public:
         virtual ~IAccountStoreReader() = default;
 
@@ -72,6 +76,12 @@ namespace store
         virtual Connection subscribeToCommit(
             OnCommit::func func,
             void*          subscriber
+        ) = 0;
+
+        [[nodiscard]]
+        virtual Connection subscribeToProfileChanged(
+            OnProfileChanged::func func,
+            void*                  subscriber
         ) = 0;
 
         SUBSCRIBE_VIRTUAL(finance::Account, AccountId)

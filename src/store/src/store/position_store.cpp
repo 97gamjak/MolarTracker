@@ -77,18 +77,17 @@ namespace store
      * @return finance::Positions
      */
     finance::Positions PositionStore::getOpenPositions(
-        const finance::AccountsView& accounts
+        const IdSet<AccountId>& accountIds
     ) const
     {
         LOG_ENTRY;
-
-        const auto accountIds = accounts.getIds();
 
         if (accountIds.empty())
             return {};
 
         auto options = Options{
-            .filter   = finance::IsPositionOpen(),
+            .filter = finance::IsPositionOpen() &&
+                      finance::IsPositionForAccounts(accountIds),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 

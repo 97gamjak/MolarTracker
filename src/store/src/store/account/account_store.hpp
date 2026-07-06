@@ -6,7 +6,6 @@
 
 #include "config/id_types.hpp"
 #include "finance/account/account.hpp"
-#include "finance/account/accounts.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_account_store.hpp"
 
@@ -39,7 +38,7 @@ namespace store
         /// Observable for commit events, this allows other parts of the
         /// application to subscribe to commit events and react accordingly when
         /// changes are committed in the account store
-        Observable<OnCommit> _onCommit;
+        Observable<OnCommit, OnProfileChanged> _observable;
 
        public:
         explicit AccountStore(
@@ -66,6 +65,12 @@ namespace store
         Connection subscribeToCommit(
             OnCommit::func func,
             void*          subscriber
+        ) override;
+
+        [[nodiscard]]
+        Connection subscribeToProfileChanged(
+            OnProfileChanged::func func,
+            void*                  subscriber
         ) override;
 
         SUBSCRIBE_OVERRIDE(finance::Account, AccountId)

@@ -31,6 +31,10 @@ using FinanceResult = Result<T, FinanceError>;
 template <typename T>
 using YFinanceResult = Result<T, YFinanceError>;
 
+/**
+ * @brief Converts an error of type HttpError to an error of type YFinanceError,
+ * preserving the error message and sub-errors.
+ */
 template <>
 struct FromError<HttpError, YFinanceError>
 {

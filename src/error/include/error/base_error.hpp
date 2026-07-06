@@ -16,6 +16,13 @@ concept IsError = requires(T type) {
     typename T::ErrorTypeMeta;
 };
 
+/**
+ * @brief A wrapper for an error type, providing a uniform interface for
+ * accessing error messages.
+ *
+ * @tparam Error The error type to wrap, which must satisfy the IsError
+ * concept.
+ */
 template <typename ErrorType>
 struct ErrorWrapper
 {
@@ -42,7 +49,8 @@ class Error
     /// metadata about the EnumType.
     using ErrorTypeMeta = mstd::enum_meta_t<ErrorType>;
 
-    friend struct ErrorWrapper<Error>;
+    template <typename>
+    friend struct ErrorWrapper;
 
    private:
     /// The type of the error
@@ -74,11 +82,20 @@ class Error
         const std::optional<std::string>& newMessage = std::nullopt
     ) const;
 
-   private:
+   protected:
     [[nodiscard]]
     const std::string& getMessage() const;
 };
 
+/**
+ * @brief Converts an error of type OldErrorType to an error of type
+ * NewErrorType, preserving the error message and sub-errors.
+ *
+ * @tparam OldErrorType The original error type, which must satisfy the
+ * IsError concept.
+ * @tparam NewErrorType The target error type, which must satisfy the
+ * IsError concept.
+ */
 template <IsError OldErrorType, IsError NewErrorType>
 struct FromError
 {
@@ -129,7 +146,7 @@ class Result : public std::expected<T, E>
     static Result ok()
     requires std::is_void_v<T>
     {
-        return std::expected<T, E>{};
+        return {};
     }
 };
 

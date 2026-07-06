@@ -154,7 +154,7 @@ namespace finance
      */
     FinanceResult<CashTransaction> TransactionConverter::toCash(
         const DomainTransaction& transaction,
-        const Accounts&          accounts
+        const AccountsView&      accounts
     )
     {
         const auto& entries = transaction.getEntries();
@@ -185,14 +185,11 @@ namespace finance
             };
         }
 
-        const auto internalAccounts = accounts.filterExternal(false);
-        const auto externalAccounts = accounts.filterExternal(true);
-
         size_t internalIndex{};
 
-        if (internalAccounts.contains(amountEntries[0].getAccountId()))
+        if (!accounts.isExternal(amountEntries[0].getAccountId()))
             internalIndex = 0;
-        else if (internalAccounts.contains(amountEntries[1].getAccountId()))
+        else if (!accounts.isExternal(amountEntries[1].getAccountId()))
             internalIndex = 1;
         else
         {
@@ -208,7 +205,7 @@ namespace finance
             amountEntries[1 - internalIndex].getAccountId();
         const auto amount = amountEntries[internalIndex].getCash();
 
-        if (!externalAccounts.contains(externalAccountId))
+        if (!accounts.isExternal(externalAccountId))
         {
             return FinanceError{
                 FinanceErrorType::InvalidTransaction,

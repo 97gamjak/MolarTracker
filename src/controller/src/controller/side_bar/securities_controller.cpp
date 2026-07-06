@@ -5,7 +5,6 @@
 
 #include "cache/stock_cache.hpp"
 #include "controller/mapper/stock_mapper.hpp"
-#include "finance/finance_error.hpp"
 #include "finance/instrument/stock.hpp"
 #include "store/i_stock_store.hpp"
 #include "ui/securities/stock_info_model.hpp"

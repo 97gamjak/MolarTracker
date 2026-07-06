@@ -51,7 +51,7 @@ namespace finance
         [[nodiscard]]
         static FinanceResult<CashTransaction> toCash(
             const DomainTransaction& transaction,
-            const Accounts&          accounts
+            const AccountsView&      accounts
         );
 
         [[nodiscard]]

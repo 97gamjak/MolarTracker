@@ -1,5 +1,7 @@
 #include "cache/account_cache.hpp"
 
+#include <iostream>
+
 #include "finance/account/accounts.hpp"
 #include "store/i_account_store.hpp"
 
@@ -52,6 +54,10 @@ namespace cache
             },
             this
         ));
+
+        _addConnection(
+            _reader->subscribeToProfileChanged([this]() { clear(); }, this)
+        );
     }
 
     /**
@@ -101,7 +107,7 @@ namespace cache
      */
     finance::AccountsView::Type AccountCache::_loadAll()
     {
-        const auto accounts = _reader->getAllAccounts();
+        const auto& accounts = _reader->getAllAccounts();
 
         finance::AccountsView::Type accountMap;
 
@@ -111,6 +117,9 @@ namespace cache
                 std::make_shared<const finance::Account>(account)
             );
         }
+
+        std::cout << "Loaded " << accountMap.size() << " accounts from store"
+                  << std::endl;
 
         return accountMap;
     }

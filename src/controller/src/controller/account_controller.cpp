@@ -223,6 +223,7 @@ namespace controller
                         account->getId(),
                         _details->positionStore,
                         _details->stockCache,
+                        _details->accountCache,
                         _details->transactionStore
                     );
 

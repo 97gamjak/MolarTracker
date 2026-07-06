@@ -62,9 +62,17 @@ namespace controller
           _undoStack(undoStack),
           _accountStore(accountStore),
           _accountCache(accountCache),
-          _accountController(accountController)
+          _accountController(accountController),
+          _connections(std::make_unique<Connections>())
     {
+        _connections->add(
+            _accountCache->subscribeToChanged([this]() { refresh(); }, this)
+        );
+
+        refresh();
     }
+
+    AccountSideBarController::~AccountSideBarController() = default;
 
     /**
      * @brief Refresh the account category in the side bar, this will clear all
@@ -80,7 +88,7 @@ namespace controller
             return;
 
         category->clearAccounts();
-        const auto accounts = _accountCache->getAllAccounts();
+        const auto accounts = _accountCache->getAllAccounts().removeExternal();
 
         for (const auto& [id, account] : accounts)
         {

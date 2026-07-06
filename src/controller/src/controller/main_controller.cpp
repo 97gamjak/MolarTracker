@@ -99,6 +99,7 @@ namespace controller
                   _storeContainer.getPositionStore(),
                   _storeContainer.getTransactionStore(),
                   _caches.getStockCache(),
+                  _caches.getAccountCache(),
                   _priceCache
               ),
               _vcsController(

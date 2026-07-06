@@ -186,7 +186,7 @@ namespace store
             }
         }
 
-        _onCommit.notify<OnCommit>(getIdRemap());
+        _observable.notify<OnCommit>(getIdRemap());
     }
 
     /**
@@ -235,6 +235,8 @@ namespace store
         // profile is updated. If the store is dirty, it means that there are
         // unsaved changes and we probably update from an invalid profile id
         _refresh();
+
+        _observable.notify<OnProfileChanged>();
     }
 
     /**
@@ -286,13 +288,31 @@ namespace store
     std::vector<finance::Account> AccountStore::getAllAccounts() const
     {
         const auto options = Options{
-            .filter   = !IsExternal() && IsAccountActive(),
+            .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
         auto accounts = _getValues(options);
 
-        return {accounts.begin(), accounts.end()};
+        std::vector<finance::Account> result = {
+            accounts.begin(),
+            accounts.end()
+        };
+
+        for (const auto& account :
+             _accountService->getAllAccounts(_activeProfileId))
+        {
+            if (std::ranges::find_if(
+                    result,
+                    [&](const finance::Account& account_)
+                    { return account_.getId() == account.getId(); }
+                ) == result.end())
+            {
+                result.push_back(account);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -339,7 +359,15 @@ namespace store
         void*          subscriber
     )
     {
-        return _onCommit.on<OnCommit>(func, subscriber);
+        return _observable.on<OnCommit>(func, subscriber);
+    }
+
+    Connection AccountStore::subscribeToProfileChanged(
+        OnProfileChanged::func func,
+        void*                  subscriber
+    )
+    {
+        return _observable.on<OnProfileChanged>(func, subscriber);
     }
 
 }   // namespace store

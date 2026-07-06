@@ -130,8 +130,6 @@ namespace controller
         );
 
         void _onCreateTickerRequested(const std::string& ticker);
-
-        static bool _checkAddTransaction(store::TransactionStoreResult result);
     };
 }   // namespace controller
 

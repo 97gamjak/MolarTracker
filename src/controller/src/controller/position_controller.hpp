@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "cache/account_cache.hpp"
 #include "finance/price_quote.hpp"
 
 class QTimer;   // Forward declaration
@@ -20,7 +21,8 @@ namespace store
 
 namespace cache
 {
-    class StockCache;   // Forward declaration
+    class StockCache;     // Forward declaration
+    class AccountCache;   // Forward declaration
 }   // namespace cache
 
 namespace finance
@@ -56,7 +58,8 @@ namespace controller
         std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// Reference to the stock cache for retrieving stock data (e.g.
         /// tickers)
-        std::shared_ptr<cache::StockCache> _stockCache;
+        std::shared_ptr<cache::StockCache>   _stockCache;
+        std::shared_ptr<cache::AccountCache> _accountCache;
 
         /// The expected number of symbols to be fetched in the price update,
         /// used for gating updates to the price cache
@@ -74,6 +77,7 @@ namespace controller
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
             const std::shared_ptr<cache::StockCache>&        stockCache,
+            const std::shared_ptr<cache::AccountCache>&      accountCache,
             const std::shared_ptr<finance::PriceCache>&      priceCache
         );
         ~PositionController() override;

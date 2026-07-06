@@ -40,7 +40,10 @@ namespace
 
 TEST_F(PositionServiceTest, CreatePositionReturnsValidId)
 {
-    const finance::Position position{Timestamp::fromInt64(TEST_TS)};
+    const finance::Position position{
+        AccountId{1},
+        Timestamp::fromInt64(TEST_TS)
+    };
 
     const auto id = _service->createPosition(position);
 
@@ -63,8 +66,14 @@ TEST_F(PositionServiceTest, GetAllOpenPositionsEmptyForEmptyAccountSet)
 
 TEST_F(PositionServiceTest, CreateMultiplePositionsIdsAreDistinct)
 {
-    const finance::Position position1{Timestamp::fromInt64(TEST_TS)};
-    const finance::Position position2{Timestamp::fromInt64(TEST_TS + 1)};
+    const finance::Position position1{
+        AccountId{1},
+        Timestamp::fromInt64(TEST_TS)
+    };
+    const finance::Position position2{
+        AccountId{1},
+        Timestamp::fromInt64(TEST_TS + 1)
+    };
 
     const auto id1 = _service->createPosition(position1);
     const auto id2 = _service->createPosition(position2);

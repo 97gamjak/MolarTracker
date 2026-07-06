@@ -52,7 +52,7 @@ namespace store
 
         [[nodiscard]]
         finance::Positions getOpenPositions(
-            const finance::AccountsView& accounts
+            const IdSet<AccountId>& accountIds
         ) const override;
 
         [[nodiscard]]

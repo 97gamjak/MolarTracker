@@ -5,6 +5,7 @@
 
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
+#include "utils/container/set.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
@@ -20,6 +21,9 @@ namespace finance
         /// Position ID
         PositionId _id;
 
+        /// Account ID associated with the position
+        AccountId _accountId;
+
         /// Creation timestamp
         Timestamp _createdAt;
         /// Closing timestamp
@@ -27,6 +31,7 @@ namespace finance
 
        public:
         explicit Position(
+            AccountId                accountId,
             Timestamp                createdAt,
             std::optional<Timestamp> closedAt = std::nullopt
         );
@@ -34,6 +39,7 @@ namespace finance
         void setId(PositionId id);
 
         [[nodiscard]] PositionId               getId() const;
+        [[nodiscard]] AccountId                getAccountId() const;
         [[nodiscard]] Timestamp                getCreatedAt() const;
         [[nodiscard]] std::optional<Timestamp> getClosedAt() const;
 
@@ -41,6 +47,10 @@ namespace finance
     };
 
     filter::Predicate<Position> IsPositionOpen(bool isOpen = true);
+
+    filter::Predicate<Position> IsPositionForAccounts(
+        const IdSet<AccountId>& accountIds
+    );
 
 }   // namespace finance
 

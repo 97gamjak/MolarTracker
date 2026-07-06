@@ -33,7 +33,8 @@ namespace cache
     class AccountCache;   // Forward declaration
 }   // namespace cache
 
-class QAction;   // Forward declaration
+class QAction;       // Forward declaration
+class Connections;   // Forward declaration
 
 namespace controller
 {
@@ -63,6 +64,8 @@ namespace controller
         /// Pointer to the create account dialog
         QPointer<ui::CreateAccountDialog> _createAccountDialog;
 
+        std::unique_ptr<Connections> _connections;
+
        public:
         explicit AccountSideBarController(
             cmd::UndoStack&                              undoStack,
@@ -71,6 +74,7 @@ namespace controller
             AccountController&                           accountController,
             QMainWindow*                                 mainWindow
         );
+        ~AccountSideBarController() override;
 
         void refresh();
 

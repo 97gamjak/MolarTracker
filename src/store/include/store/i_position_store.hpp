@@ -66,7 +66,7 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Positions getOpenPositions(
-            const finance::AccountsView& accounts
+            const IdSet<AccountId>& accountIds
         ) const = 0;
 
         /**

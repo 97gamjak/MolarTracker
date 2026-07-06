@@ -313,7 +313,7 @@ namespace store
             const auto positionId = transaction.getPositionId();
             if (!stockPositions.contains(positionId))
             {
-                stockPositions.at(positionId) =
+                stockPositions[positionId] =
                     finance::StockPositionTransaction(positionId);
             }
 

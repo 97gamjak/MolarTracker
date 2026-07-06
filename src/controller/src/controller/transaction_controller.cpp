@@ -2,6 +2,7 @@
 
 #include <qstackedwidget.h>
 
+#include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 #include "store/i_transaction_store.hpp"
@@ -76,7 +77,8 @@ namespace controller
         if (focus)
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
-        const auto transactions = _transactionStore->getTransactions();
+        const auto transactions =
+            _transactionStore->getTransactions(_accountCache->getAllAccounts());
 
         const auto cashDrafts =
             TransactionOverviewMapper::toCash(transactions, _accountCache);

@@ -1,5 +1,7 @@
 #include "account_service.hpp"
 
+#include <iostream>
+
 #include "finance/account/account.hpp"
 #include "repo/i_account_repo.hpp"
 
@@ -29,7 +31,13 @@ namespace service
         const ProfileId& profileId
     ) const
     {
-        return _accountRepo->getAllAccounts(profileId);
+        const auto& accounts = _accountRepo->getAllAccounts(profileId);
+
+        std::cout << "Retrieved " << accounts.size()
+                  << " accounts from repo for profile " << profileId.toString()
+                  << std::endl;
+
+        return accounts;
     }
 
     /**

@@ -2,6 +2,9 @@
 
 #include <format>
 
+#include "filter/predicate.hpp"
+#include "utils/container/set.hpp"
+
 namespace finance
 {
     /**
@@ -10,8 +13,12 @@ namespace finance
      * @param createdAt
      * @param closedAt
      */
-    Position::Position(Timestamp createdAt, std::optional<Timestamp> closedAt)
-        : _createdAt(createdAt), _closedAt(closedAt)
+    Position::Position(
+        AccountId                accountId,
+        Timestamp                createdAt,
+        std::optional<Timestamp> closedAt
+    )
+        : _accountId(accountId), _createdAt(createdAt), _closedAt(closedAt)
     {
     }
 
@@ -43,6 +50,8 @@ namespace finance
      */
     std::optional<Timestamp> Position::getClosedAt() const { return _closedAt; }
 
+    AccountId Position::getAccountId() const { return _accountId; }
+
     /**
      * @brief Predicate to check if a position is open (i.e. has no closing
      * timestamp)
@@ -54,6 +63,16 @@ namespace finance
         return filter::Predicate<Position>{
             [isOpen](const Position& position)
             { return isOpen == !position.getClosedAt().has_value(); }
+        };
+    }
+
+    filter::Predicate<Position> IsPositionForAccounts(
+        const IdSet<AccountId>& accountIds
+    )
+    {
+        return filter::Predicate<Position>{
+            [accountIds](const Position& position)
+            { return accountIds.contains(position.getAccountId()); }
         };
     }
 

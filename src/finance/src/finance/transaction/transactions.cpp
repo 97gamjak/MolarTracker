@@ -66,7 +66,7 @@ namespace finance
      */
     Transactions::Transactions(
         const std::vector<DomainTransaction>& transactions,
-        const Accounts&                       accounts
+        const AccountsView&                   accounts
     )
     {
         addTransactions(transactions, accounts);
@@ -82,7 +82,7 @@ namespace finance
      */
     void Transactions::addTransactions(
         const std::vector<DomainTransaction>& transactions,
-        const Accounts&                       accounts
+        const AccountsView&                   accounts
     )
     {
         for (const auto& transaction : transactions)

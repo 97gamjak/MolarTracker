@@ -1,5 +1,6 @@
 #include "helpers.hpp"
 
+#include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
 #include "controller/mapper/stock_mapper.hpp"
 #include "drafts/position_draft.hpp"
@@ -26,13 +27,17 @@ namespace controller
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<cache::StockCache>&        stockCache,
+        const std::shared_ptr<cache::AccountCache>&      accountCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
-        const auto positions = positionStore->getOpenPositions();
+        const auto positions = positionStore->getOpenPositions({account});
         auto       filter    = finance::TransactionFilter();
         filter.setPositionIds(positions.getIds());
-        auto positionTxs = transactionStore->getStockPositions(filter);
+        auto positionTxs = transactionStore->getStockPositions(
+            filter,
+            accountCache->getAllAccounts()
+        );
 
         positionTxs.erase_if(
             [&](const auto& pair)
@@ -112,6 +117,7 @@ namespace controller
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<cache::StockCache>&        stockCache,
+        const std::shared_ptr<cache::AccountCache>&      accountCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     )
     {
@@ -119,6 +125,7 @@ namespace controller
             account,
             positionStore,
             stockCache,
+            accountCache,
             transactionStore
         );
 

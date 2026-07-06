@@ -4,27 +4,9 @@
 #include "error/finance_error.hpp"
 #include "finance/account/account.hpp"
 #include "utils/container/id_map.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {
-    /**
-     * @brief A collection of financial accounts.
-     */
-    class Accounts : public IdObjectMap<Account>
-    {
-       public:
-        using IdObjectMap<Account>::IdObjectMap;
-
-        [[nodiscard]]
-        Accounts filterExternal(bool external) const;
-
-        [[nodiscard]]
-        std::vector<std::optional<bool>> isExternal(
-            const IdSet<AccountId>& ids
-        ) const;
-    };
-
     /**
      * @brief A view of financial accounts, providing a read-only interface to
      * access account data.
@@ -41,9 +23,15 @@ namespace finance
         AccountsView securities() const;
 
         [[nodiscard]]
+        AccountsView removeExternal() const;
+
+        [[nodiscard]]
         Result<AccountId, FinanceError> getCorrespondingExternalAccountId(
             const AccountId& cashAccountId
         ) const;
+
+        [[nodiscard]]
+        bool isExternal(const AccountId& accountId) const;
     };
 }   // namespace finance
 

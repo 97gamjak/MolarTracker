@@ -39,8 +39,7 @@ namespace controller
             const FinanceError&    result
         )
         {
-            return FinanceError::fromError(
-                result,
+            return result.convert(
                 FinanceErrorType::InvalidTransaction,
                 std::format(
                     "Failed to convert transaction with ID {} to "
@@ -60,9 +59,11 @@ namespace controller
          * @param stockCache
          * @param accountCache
          *
-         * @return drafts::StockTransactionOverview
+         * @return FinanceResult<drafts::StockTransactionOverview> A result
+         * containing either a StockTransactionOverview draft or a FinanceError
+         * if the conversion failed
          */
-        Result<StockTransactionOverview, FinanceError> _toStockOverview(
+        FinanceResult<StockTransactionOverview> _toStockOverview(
             const finance::StockTransaction&     transaction,
             const std::shared_ptr<StockCache>&   stockCache,
             const std::shared_ptr<AccountCache>& accountCache
@@ -117,7 +118,7 @@ namespace controller
          *
          * @return Result<drafts::CashTransactionOverview, FinanceError>
          */
-        Result<drafts::CashTransactionOverview, FinanceError> _toCashOverview(
+        FinanceResult<drafts::CashTransactionOverview> _toCashOverview(
             const finance::CashTransaction&      transaction,
             const std::shared_ptr<AccountCache>& accountCache
         )
@@ -151,9 +152,9 @@ namespace controller
      * @param stockCache
      * @param accountCache
      *
-     * @return Result<std::vector<StockTransactionOverview>, FinanceError>
+     * @return FinanceResult<std::vector<StockTransactionOverview>>
      */
-    Result<std::vector<StockTransactionOverview>, FinanceError> TransactionOverviewMapper::
+    FinanceResult<std::vector<StockTransactionOverview>> TransactionOverviewMapper::
         toStockOverview(
             const finance::Transactions&         transactions,
             const std::shared_ptr<StockCache>&   stockCache,
@@ -186,15 +187,15 @@ namespace controller
      * @param transactions
      * @param accountCache
      *
-     * @return Result<std::vector<CashTransactionOverview>, FinanceError>
+     * @return FinanceResult<std::vector<CashTransactionOverview>>
      */
-    Result<std::vector<CashTransactionOverview>, FinanceError> TransactionOverviewMapper::
+    FinanceResult<std::vector<CashTransactionOverview>> TransactionOverviewMapper::
         toCash(
             const finance::Transactions&         transactions,
             const std::shared_ptr<AccountCache>& accountCache
         )
     {
-        std::vector<drafts::CashTransactionOverview> result;
+        std::vector<CashTransactionOverview> result;
 
         for (const auto& transaction : transactions.cash())
         {

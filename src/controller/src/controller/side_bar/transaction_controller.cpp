@@ -39,8 +39,6 @@ using finance::Position;
 using store::IOptionStore;
 using store::IPositionStore;
 using store::ITransactionStore;
-using store::TransactionStoreResult;
-using store::TransactionStoreResultMeta;
 
 using cache::AccountCache;
 using cache::StockCache;
@@ -324,10 +322,20 @@ namespace controller
         const auto transaction =
             TransactionCreateMapper::fromCreateCashDraft(draft);
 
-        const auto result = _transactionStore->addCashTransaction(transaction);
+        const auto result = _transactionStore->addCashTransaction(
+            transaction,
+            _accountCache->getAllAccounts()
+        );
 
-        if (!_checkAddTransaction(result))
+        if (!result)
+        {
+            ErrorDialog::show(
+                result.error(),
+                "Could not add cash transaction",
+                _dialogs->cash
+            );
             return;
+        }
 
         // TODO(97gamjak): add here commands
         _dialogs->cash->close();
@@ -370,10 +378,13 @@ namespace controller
 
         draft.setInstrumentId(stock->getInstrumentId());
 
+        const auto securityAccount = draft.getSecurityAccount();
+
         auto drafts = getOpenStockPositions(
-            draft.getSecurityAccount(),
+            securityAccount,
             _positionStore,
             _stockCache,
+            _accountCache,
             _transactionStore
         );
 
@@ -408,7 +419,7 @@ namespace controller
 
         if (!positionId.isValid())
         {
-            auto position = Position(draft.getTimestamp());
+            auto position = Position(securityAccount, draft.getTimestamp());
             positionId    = _positionStore->createPosition(position);
         }
 
@@ -417,11 +428,20 @@ namespace controller
         const auto transaction =
             TransactionCreateMapper::fromCreateStockDraft(draft);
 
-        const auto txAddResult =
-            _transactionStore->addStockTransaction(transaction);
+        const auto txAddResult = _transactionStore->addStockTransaction(
+            transaction,
+            _accountCache->getAllAccounts()
+        );
 
-        if (!_checkAddTransaction(txAddResult))
+        if (!txAddResult)
+        {
+            ErrorDialog::show(
+                txAddResult.error(),
+                "Could not add stock transaction",
+                _dialogs->stock
+            );
             return;
+        }
 
         // TODO(97gamjak): add here commands and also error handling
         _dialogs->stock->close();
@@ -478,7 +498,8 @@ namespace controller
 
         draft.setInstrumentId(optionResult.value());
 
-        auto       position   = Position(draft.getTimestamp());
+        auto position =
+            Position(draft.getSecurityAccount(), draft.getTimestamp());
         const auto positionId = _positionStore->createPosition(position);
 
         draft.setPositionId(positionId);
@@ -486,11 +507,20 @@ namespace controller
         const auto transaction =
             TransactionCreateMapper::fromCreateOptionDraft(draft);
 
-        const auto txAddResult =
-            _transactionStore->addOptionTransaction(transaction);
+        const auto txAddResult = _transactionStore->addOptionTransaction(
+            transaction,
+            _accountCache->getAllAccounts()
+        );
 
-        if (!_checkAddTransaction(txAddResult))
+        if (!txAddResult)
+        {
+            ErrorDialog::show(
+                txAddResult.error(),
+                "Could not add option transaction",
+                _dialogs->option
+            );
             return;
+        }
 
         // TODO(97gamjak): add here commands and also error handling
         _dialogs->option->close();
@@ -520,37 +550,6 @@ namespace controller
     )
     {
         _stockController.createStock(ticker);
-    }
-
-    /**
-     * @brief Check the result of adding a transaction to the store
-     *
-     * @param result The result of the transaction store add operation
-     * @return true if the transaction was added successfully, false otherwise
-     */
-    bool TransactionSideBarController::_checkAddTransaction(
-        store::TransactionStoreResult result
-    )
-    {
-        switch (result)
-        {
-            case TransactionStoreResult::Ok:
-                return true;
-
-            case TransactionStoreResult::Error:
-            case TransactionStoreResult::TransactionSumNotZero:
-            {
-                const auto msg = "Failed to create cash transaction: " +
-                                 TransactionStoreResultMeta::toString(result) +
-                                 ". " + GithubConstants::getCreateIssueError();
-
-                LOG_ERROR(msg);
-                ErrorDialog::show(msg);
-                return false;
-            }
-        }
-
-        std::unreachable();
     }
 
 }   // namespace controller

@@ -6,6 +6,12 @@
 
 #include "base_error.hpp"
 
+template <typename Error>
+const std::string& ErrorWrapper<Error>::getMessage() const
+{
+    return error.getMessage();
+}
+
 /**
  * @brief Constructs an Error object.
  *
@@ -48,6 +54,39 @@ requires mstd::has_enum_meta<EnumType>
 std::string Error<EnumType>::getTypeStr() const
 {
     return ErrorTypeMeta::toString(_type);
+}
+
+template <typename EnumType>
+requires mstd::has_enum_meta<EnumType>
+const std::vector<Error<EnumType>>& Error<EnumType>::getSubErrors() const
+{
+    return _subErrors;
+}
+
+template <typename EnumType>
+requires mstd::has_enum_meta<EnumType>
+const std::string& Error<EnumType>::getMessage() const
+{
+    return _message;
+}
+
+template <typename EnumType>
+requires mstd::has_enum_meta<EnumType>
+Error<EnumType> Error<EnumType>::convert(
+    const EnumType&                   newType,
+    const std::optional<std::string>& newMessage
+) const
+{
+    std::vector<Error<EnumType>> subErrors;
+    for (const auto& subError : _subErrors)
+    {
+        subErrors.push_back(subError.convert(newType, newMessage));
+    }
+    return Error<EnumType>(
+        newType,
+        newMessage.value_or(ErrorTypeMeta::toString(newType)),
+        std::move(subErrors)
+    );
 }
 
 /**
