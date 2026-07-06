@@ -30,11 +30,11 @@ class HttpError : public Error<HttpErrorType>
    public:
     HttpError(
         HttpErrorType                      type,
-        std::string                        message,
+        const std::string&                 message,
         int                                statusCode,
         std::map<std::string, std::string> responseHeaders
     );
-    HttpError(HttpErrorType type, std::string message);
+    HttpError(HttpErrorType type, const std::string& message);
     ~HttpError() override = default;
 
     [[nodiscard]]

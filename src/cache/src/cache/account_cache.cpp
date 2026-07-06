@@ -1,9 +1,10 @@
 #include "cache/account_cache.hpp"
 
-#include <iostream>
-
 #include "finance/account/accounts.hpp"
+#include "logging/log_macros.hpp"
 #include "store/i_account_store.hpp"
+
+REGISTER_LOG_CATEGORY("Cache.AccountCache");
 
 namespace cache
 {
@@ -118,8 +119,9 @@ namespace cache
             );
         }
 
-        std::cout << "Loaded " << accountMap.size() << " accounts from store"
-                  << std::endl;
+        LOG_DEBUG(
+            std::format("Loaded {} accounts from store", accountMap.size())
+        );
 
         return accountMap;
     }

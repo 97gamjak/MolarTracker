@@ -12,7 +12,7 @@
  */
 HttpError::HttpError(
     HttpErrorType                      type,
-    std::string                        message,
+    const std::string&                 message,
     int                                statusCode,
     std::map<std::string, std::string> responseHeaders
 )
@@ -28,7 +28,7 @@ HttpError::HttpError(
  * @param type The type of the HTTP error.
  * @param message A descriptive message for the error.
  */
-HttpError::HttpError(HttpErrorType type, std::string message)
+HttpError::HttpError(HttpErrorType type, const std::string& message)
     : Error<HttpErrorType>(type, message), _statusCode{0}
 {
 }

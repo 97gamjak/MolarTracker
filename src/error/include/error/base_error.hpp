@@ -153,8 +153,10 @@ class Result : public std::expected<T, E>
    public:
     using std::expected<T, E>::expected;
 
-    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
+    // cppcheck-suppress noExplicitConstructor
     Result(const E& error);
+    // NOLINTEND(google-explicit-constructor, hicpp-explicit-conversions)
 
     /**
      * @brief Creates a Result object representing a successful operation with
