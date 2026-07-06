@@ -1,6 +1,7 @@
 #ifndef __ERROR__INCLUDE__ERROR__HTTP_ERROR_HPP__
 #define __ERROR__INCLUDE__ERROR__HTTP_ERROR_HPP__
 
+#include <cstdint>
 #include <map>
 
 #include "base_error.hpp"
