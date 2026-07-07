@@ -21,6 +21,16 @@ namespace finance
     )
         : _accountId(accountId), _createdAt(createdAt), _closedAt(closedAt)
     {
+        if (_closedAt.has_value() && _closedAt.value() < _createdAt)
+        {
+            throw std::invalid_argument(
+                std::format(
+                    "Closed timestamp {} cannot be before created timestamp {}",
+                    _closedAt.value().humanReadable(),
+                    _createdAt.humanReadable()
+                )
+            );
+        }
     }
 
     /**
