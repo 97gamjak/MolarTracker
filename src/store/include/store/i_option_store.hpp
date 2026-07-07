@@ -11,6 +11,13 @@ namespace finance
 
 namespace store
 {
+    /**
+     * @brief Read Only interface for the OptionStore, this interface defines
+     * the read-only operations that can be performed on the option store,
+     * allowing for a structured way to access options within the application
+     * without modifying the underlying data storage for options.
+     *
+     */
     class IOptionStoreReader
     {
        public:
