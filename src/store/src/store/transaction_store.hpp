@@ -5,6 +5,7 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -14,8 +15,8 @@
 
 namespace finance
 {
-    class Account;    // Forward declaration
-    class Accounts;   // Forward declaration
+    class Account;        // Forward declaration
+    class AccountsView;   // Forward declaration
 }   // namespace finance
 
 namespace service
@@ -39,19 +40,13 @@ namespace store
         /// The Transaction service
         std::shared_ptr<service::ITransactionService> _transactionService;
 
-        struct Session;
-        /// The session object for managing the session state of transactions in
-        /// the store
-        std::unique_ptr<Session> _session;
-
         /// Connections for various events
         Connections _connections;
 
        public:
         explicit TransactionStore(
             const std::shared_ptr<service::ITransactionService>&
-                                     transactionService,
-            const finance::Accounts& accountSession
+                transactionService
         );
         ~TransactionStore() override;
 
@@ -62,29 +57,36 @@ namespace store
         );
 
         [[nodiscard]]
-        TransactionStoreResult addCashTransaction(
-            finance::CashTransaction transaction
+        FinanceResult<void> addCashTransaction(
+            const finance::CashTransaction& transaction,
+            const finance::AccountsView&    accounts
         ) override;
         [[nodiscard]]
-        TransactionStoreResult addStockTransaction(
-            finance::StockTransaction transaction
+        FinanceResult<void> addStockTransaction(
+            const finance::StockTransaction& transaction,
+            const finance::AccountsView&     accounts
         ) override;
 
         [[nodiscard]]
-        TransactionStoreResult addOptionTransaction(
-            finance::OptionTransaction transaction
+        FinanceResult<void> addOptionTransaction(
+            const finance::OptionTransaction& transaction,
+            const finance::AccountsView&      accounts
         ) override;
 
         [[nodiscard]]
         finance::Transactions getTransactions(
-            const finance::TransactionFilter& filter
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
         ) const override;
         [[nodiscard]]
-        finance::Transactions getTransactions() const override;
+        finance::Transactions getTransactions(
+            const finance::AccountsView& accounts
+        ) const override;
 
         [[nodiscard]]
         IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
         ) const override;
 
         [[nodiscard]]

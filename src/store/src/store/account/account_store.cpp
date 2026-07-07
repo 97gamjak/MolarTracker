@@ -36,20 +36,6 @@ namespace store
     )
         : _accountService(accountService)
     {
-        // we use the unchecked versions as ids are unique due to store
-        // handling!
-        _connections.add(subscribeToEntryAdded(
-            [this](const finance::Account& account)
-            { _session.addUnchecked(account); },
-            this
-        ));
-
-        _connections.add(subscribeToEntryRemoved(
-            [this](const AccountId& accountId)
-            { _session.removeUnchecked(accountId); },
-            this
-        ));
-
         _refresh();
     }
 
@@ -200,9 +186,7 @@ namespace store
             }
         }
 
-        // here now we set our ids because they are now clean!
-        // we use the unchecked version as ids are unique due to store handling!
-        _session.setUnchecked(_getValues());
+        _observable.notify<OnCommit>(getIdRemap());
     }
 
     /**
@@ -251,6 +235,8 @@ namespace store
         // profile is updated. If the store is dirty, it means that there are
         // unsaved changes and we probably update from an invalid profile id
         _refresh();
+
+        _observable.notify<OnProfileChanged>();
     }
 
     /**
@@ -286,7 +272,6 @@ namespace store
             LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
-            _session.setUnchecked(_getValues());
         }
     }
 
@@ -303,147 +288,31 @@ namespace store
     std::vector<finance::Account> AccountStore::getAllAccounts() const
     {
         const auto options = Options{
-            .filter   = !IsExternal() && IsAccountActive(),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-
-        auto accounts = _getValues(options);
-
-        return {accounts.begin(), accounts.end()};
-    }
-
-    /**
-     * @brief get all cash accounts in the store, this allows callers to
-     * retrieve only the cash accounts managed by the store, which can be useful
-     * for display purposes or for operations that specifically involve cash
-     * accounts, and provides a way to filter the accounts based on their type
-     * and status.
-     *
-     * @return std::vector<finance::Account> A vector of account drafts
-     * representing the cash accounts currently in the store, each draft
-     * contains the necessary information about a cash account that can be used
-     * for display or further processing, and the caller can use this vector to
-     * access the cash account data as needed.
-     */
-    std::vector<finance::Account> AccountStore::getCashAccounts() const
-    {
-        const auto options = Options{
-            .filter   = IsAccountType(AccountKind::Cash) && IsAccountActive(),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-
-        auto accounts = _getValues(options);
-
-        return {accounts.begin(), accounts.end()};
-    }
-
-    /**
-     * @brief Get all security accounts in the store
-     *
-     * This allows callers to retrieve only the security accounts managed by the
-     * store, which can be useful for display purposes or for operations that
-     * specifically involve security accounts, and provides a way to filter the
-     * accounts based on their type and status.
-     *
-     * @return std::vector<finance::Account> A vector of account drafts
-     * representing the security accounts currently in the store, each draft
-     * contains the necessary information about a security account that can be
-     * used for display or further processing, and the caller can use this
-     * vector to access the security account data as needed.
-     */
-    std::vector<finance::Account> AccountStore::getSecurityAccounts() const
-    {
-        const auto options = Options{
-            .filter = IsAccountType(AccountKind::Security) && IsAccountActive(),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-
-        auto accounts = _getValues(options);
-
-        return {accounts.begin(), accounts.end()};
-    }
-
-    /**
-     * @brief Get a mapping of account IDs to account names for all active
-     * accounts in the store, this allows callers to easily look up the name of
-     * an account based on its ID, which can be useful for display purposes or
-     * when performing operations that require referencing accounts by their ID,
-     * and provides a convenient way to access the account names without having
-     * to retrieve the full account data for each account.
-     *
-     * @return IdMap<AccountId, std::string> A
-     * map where the keys are account IDs and the values are the corresponding
-     * account names for all active accounts in the store, this allows for
-     * efficient lookups of account names based on their IDs and can be used in
-     * various parts of the application where such mappings are needed.
-     */
-    IdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap() const
-    {
-        const auto options = Options{
             .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        IdMap<AccountId, std::string> accountIdToName;
+        auto accounts = _getValues(options);
 
-        for (const auto& account : _getValues(options))
-            accountIdToName.addUnchecked(account.getId(), account.getName());
-
-        return accountIdToName;
-    }
-
-    /**
-     * @brief Get the ID of the external account for a given currency, this is
-     * used to find the corresponding external account for a cash account based
-     * on its currency, and allows callers to retrieve the ID of the external
-     * account that is associated with a specific currency, which can be useful
-     * for operations that involve cash accounts and their corresponding
-     * external accounts.
-     *
-     * @param currency The currency for which to find the external account, this
-     * specifies the currency of the cash account for which we want to find the
-     * corresponding external account, and is used as a filter criterion when
-     * searching for the external account in the store.
-     * @return AccountId The ID of the external account associated with the
-     * given currency, if found, this is the identifier of the external account
-     * that corresponds to the specified currency, and can be used for various
-     * operations that require referencing the external account.
-     */
-    std::optional<AccountId> AccountStore::getExternalAccount(
-        Currency currency
-    ) const
-    {
-        const auto options = Options{
-            .filter   = IsExternal() && HasCurrency(currency),
-            .deletion = DeletionPolicy::ExcludeDelete
+        std::vector<finance::Account> result = {
+            accounts.begin(),
+            accounts.end()
         };
 
-        const auto account = _get(options);
+        for (const auto& account :
+             _accountService->getAllAccounts(_activeProfileId))
+        {
+            if (std::ranges::find_if(
+                    result,
+                    [&](const finance::Account& account_)
+                    { return account_.getId() == account.getId(); }
+                ) == result.end())
+            {
+                result.push_back(account);
+            }
+        }
 
-        if (account.has_value())
-            return account->getId();
-
-        return std::nullopt;
-    }
-
-    /**
-     * @brief Get the IDs of all external accounts
-     *
-     * @return IdSet<AccountId>
-     */
-    IdSet<AccountId> AccountStore::getExternalAccountIds() const
-    {
-        const auto options = Options{
-            .filter   = IsExternal(),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-
-        IdSet<AccountId> externalAccountIds;
-
-        for (const auto& account : _getValues(options))
-            externalAccountIds.insert(account.getId());
-
-        return externalAccountIds;
+        return result;
     }
 
     /**
@@ -464,23 +333,64 @@ namespace store
     }
 
     /**
-     * @brief Get the account session
+     * @brief Subscribe to commit events in the account store, this allows other
+     * parts of the application to be notified when changes are committed in the
+     * account store, enabling them to react accordingly, such as updating UI
+     * elements or triggering other actions based on the committed changes.
      *
-     * @return const finance::Accounts& The account session
+     * @param func The callback function to be called when a commit event
+     * occurs, this function should accept a reference to an IdIdMap of
+     * AccountId, which represents the mapping of old account IDs to new
+     * account IDs after the commit, allowing the subscriber to understand how
+     * the account IDs have changed as a result of the commit.
+     * @param subscriber A pointer to the subscriber object that will receive
+     * the commit event, this allows the account store to manage the lifetime
+     * of the subscription and ensure that the callback function is called on
+     * the correct subscriber object when a commit event occurs.
+     * @return Connection A Connection object representing the subscription,
+     * which can be used to manage the subscription, such as disconnecting from
+     * the commit events when the subscriber is no longer interested in
+     * receiving them, or when the subscriber is being destroyed, ensuring that
+     * the subscription is properly cleaned up and does not lead to dangling
+     * pointers or memory leaks.
      */
-    const finance::Accounts& AccountStore::getAccountSession() const
+    Connection AccountStore::subscribeToCommit(
+        OnCommit::func func,
+        void*          subscriber
+    )
     {
-        return _session;
+        return _observable.on<OnCommit>(func, subscriber);
     }
 
     /**
-     * @brief Get the ID remapping for accounts
+     * @brief Subscribe to profile changed events in the account store, this
+     * allows other parts of the application to be notified when the active
+     * profile changes in the account store, enabling them to react accordingly,
+     * such as updating UI elements or triggering other actions based on the
+     * new active profile.
      *
-     * @return const IdIdMap<AccountId>& The ID remapping
+     * @param func The callback function to be called when a profile changed
+     * event occurs, this function should accept no parameters and return void,
+     * allowing the subscriber to perform any necessary actions when the active
+     * profile changes.
+     * @param subscriber A pointer to the subscriber object that will receive
+     * the profile changed event, this allows the account store to manage the
+     * lifetime of the subscription and ensure that the callback function is
+     * called on the correct subscriber object when a profile changed event
+     * occurs.
+     * @return Connection A Connection object representing the subscription,
+     * which can be used to manage the subscription, such as disconnecting from
+     * the profile changed events when the subscriber is no longer interested in
+     * receiving them, or when the subscriber is being destroyed, ensuring that
+     * the subscription is properly cleaned up and does not lead to dangling
+     * pointers or memory leaks.
      */
-    const IdIdMap<AccountId>& AccountStore::getIdRemap() const
+    Connection AccountStore::subscribeToProfileChanged(
+        OnProfileChanged::func func,
+        void*                  subscriber
+    )
     {
-        return _getIdRemap();
+        return _observable.on<OnProfileChanged>(func, subscriber);
     }
 
 }   // namespace store

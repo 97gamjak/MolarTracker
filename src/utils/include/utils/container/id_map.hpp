@@ -42,6 +42,9 @@ class IdObjectMap : public IdMap<IdOf<Value>, Value>
    public:
     using IdMap<IdOf<Value>, Value>::IdMap;
 
+    /// Type alias for the IdObjectMap type
+    using Type = IdObjectMap<Value>;
+
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
     template <std::ranges::range R>
     IdObjectMap(R&& values);

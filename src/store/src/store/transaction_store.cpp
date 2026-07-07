@@ -21,47 +21,14 @@ namespace store
 {
 
     /**
-     * @brief Internal session struct for TransactionStore, this struct holds a
-     * reference to the AccountSession and is used to manage the session state
-     * of transactions in the store.
-     *
-     */
-    struct TransactionStore::Session
-    {
-        /// A reference to the AccountSession
-        const finance::Accounts& accountSession;
-
-        /**
-         * @brief Construct a new Session object
-         *
-         * @param accountSession_
-         */
-        explicit Session(const finance::Accounts& accountSession_)
-            : accountSession(accountSession_)
-        {
-        }
-
-        ~Session() = default;
-
-        // delete copy and moving
-        Session(const Session&)            = delete;
-        Session(Session&&)                 = delete;
-        Session& operator=(const Session&) = delete;
-        Session& operator=(Session&&)      = delete;
-    };
-
-    /**
      * @brief Construct a new Transaction Store object
      *
      * @param transactionService
-     * @param accountSession
      */
     TransactionStore::TransactionStore(
-        const std::shared_ptr<service::ITransactionService>& transactionService,
-        const finance::Accounts&                             accountSession
+        const std::shared_ptr<service::ITransactionService>& transactionService
     )
-        : _transactionService(transactionService),
-          _session(std::make_unique<Session>(accountSession))
+        : _transactionService(transactionService)
     {
     }
 
@@ -141,76 +108,103 @@ namespace store
      * @brief Add a cash transaction to the store
      *
      * @param transaction The cash transaction to add
-     * @return TransactionStoreResult The result of the operation
+     * @param accounts The accounts view to filter transactions
+     * @return FinanceResult<void> The result of the operation
      */
-    TransactionStoreResult TransactionStore::addCashTransaction(
-        finance::CashTransaction transaction
+    FinanceResult<void> TransactionStore::addCashTransaction(
+        const finance::CashTransaction& transaction,
+        const finance::AccountsView&    accounts
     )
     {
         LOG_ENTRY;
 
-        _addEntry(
-            finance::TransactionConverter::toDomain(
-                transaction,
-                _session->accountSession
-            )
-        );
+        const auto& tx =
+            finance::TransactionConverter::toDomain(transaction, accounts);
 
-        return TransactionStoreResult::Ok;
+        if (!tx)
+        {
+            return tx.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to convert CashTransaction to DomainTransaction"
+            );
+        }
+
+        _addEntry(*tx);
+
+        return FinanceResult<void>::ok();
     }
 
     /**
      * @brief Add a stock transaction to the store
      *
      * @param transaction The stock transaction to add
-     * @return TransactionStoreResult The result of the operation
+     * @param accounts The accounts view to filter transactions
+     * @return FinanceResult<void> The result of the operation
      */
-    TransactionStoreResult TransactionStore::addStockTransaction(
-        finance::StockTransaction transaction
+    FinanceResult<void> TransactionStore::addStockTransaction(
+        const finance::StockTransaction& transaction,
+        const finance::AccountsView&     accounts
     )
     {
         LOG_ENTRY;
 
-        _addEntry(
-            finance::TransactionConverter::toDomain(
-                transaction,
-                _session->accountSession
-            )
-        );
+        const auto& tx =
+            finance::TransactionConverter::toDomain(transaction, accounts);
 
-        return TransactionStoreResult::Ok;
+        if (!tx)
+        {
+            return tx.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to convert StockTransaction to DomainTransaction"
+            );
+        }
+        _addEntry(*tx);
+
+        return FinanceResult<void>::ok();
     }
 
-    TransactionStoreResult TransactionStore::addOptionTransaction(
-        finance::OptionTransaction transaction
+    FinanceResult<void> TransactionStore::addOptionTransaction(
+        const finance::OptionTransaction& transaction,
+        const finance::AccountsView&      accounts
     )
     {
         LOG_ENTRY;
 
-        _addEntry(
-            finance::TransactionConverter::toDomain(
-                transaction,
-                _session->accountSession
-            )
-        );
+        const auto& tx =
+            finance::TransactionConverter::toDomain(transaction, accounts);
 
-        return TransactionStoreResult::Ok;
+        if (!tx)
+        {
+            return tx.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to convert OptionTransaction to DomainTransaction"
+            );
+        }
+
+        _addEntry(*tx);
+
+        return FinanceResult<void>::ok();
     }
 
     /**
-     * @brief Get all transactions from the store, this retrieves all
-     * transactions that are currently in the store, including both new
-     * transactions that have not yet been committed to the database and
-     * existing transactions that have been loaded from the database. The
-     * returned transactions will reflect any changes made to them in the store,
-     * but they will not be saved to the database until the commit method is
-     * called.
+     * @brief Get all transactions from the store
+     *
+     * This retrieves all transactions that are currently in the store,
+     * including both new transactions that have not yet been committed to the
+     * database and existing transactions that have been loaded from the
+     * database. The returned transactions will reflect any changes made to them
+     * in the store, but they will not be saved to the database until the commit
+     * method is called.
+     *
+     * @param accounts The accounts view to filter transactions
      *
      * @return finance::Transactions
      */
-    finance::Transactions TransactionStore::getTransactions() const
+    finance::Transactions TransactionStore::getTransactions(
+        const finance::AccountsView& accounts
+    ) const
     {
-        return getTransactions(finance::TransactionFilter());
+        return getTransactions(finance::TransactionFilter(), accounts);
     }
 
     /**
@@ -227,16 +221,18 @@ namespace store
      * include in the results, such as filtering by date range, transaction
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
+     * @param accounts The accounts view to filter transactions
      *
      * @return finance::Transactions A vector of transactions
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
     finance::Transactions TransactionStore::getTransactions(
-        const finance::TransactionFilter& filter
+        const finance::TransactionFilter& filter,
+        const finance::AccountsView&      accounts
     ) const
     {
-        const auto accountIds = _session->accountSession.getIds();
+        const auto accountIds = accounts.getIds();
 
         if (accountIds.empty())
             return {};
@@ -275,7 +271,7 @@ namespace store
                 results.push_back(transaction);
 
         finance::Transactions result;
-        result.addTransactions(results, _session->accountSession);
+        result.addTransactions(results, accounts);
 
         LOG_DEBUG(
             std::format(
@@ -301,6 +297,7 @@ namespace store
      * attributes of the transactions. If no filter is provided, all
      * transactions in the store will be considered when determining stock
      * positions.
+     * @param accounts The accounts view to filter transactions
      *
      * @return IdMap<PositionId, finance::StockPositionTransaction>
      * A mapping of position IDs to StockPositionTransaction objects, this
@@ -308,18 +305,21 @@ namespace store
      * position based on its position ID.
      */
     IdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
-        getStockPositions(const finance::TransactionFilter& filter) const
+        getStockPositions(
+            const finance::TransactionFilter& filter,
+            const finance::AccountsView&      accounts
+        ) const
     {
         IdMap<PositionId, finance::StockPositionTransaction> stockPositions;
 
-        const auto transactions = getTransactions(filter).stocks();
+        const auto transactions = getTransactions(filter, accounts).stocks();
 
         for (const auto& transaction : transactions)
         {
             const auto positionId = transaction.getPositionId();
             if (!stockPositions.contains(positionId))
             {
-                stockPositions.at(positionId) =
+                stockPositions[positionId] =
                     finance::StockPositionTransaction(positionId);
             }
 
@@ -555,16 +555,9 @@ namespace store
     )
     {
         return subscribeToEntryAdded(
-            [func = std::move(func),
-             this](const finance::DomainTransaction& transaction)
-            {
-                func(
-                    finance::Transactions(
-                        {transaction},
-                        _session->accountSession
-                    )
-                );
-            },
+            [func =
+                 std::move(func)](const finance::DomainTransaction& transaction)
+            { func(transaction); },
             user
         );
     }

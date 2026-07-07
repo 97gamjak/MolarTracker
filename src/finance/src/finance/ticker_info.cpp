@@ -1,5 +1,6 @@
 #include "finance/ticker_info.hpp"
 
+#include "error/finance_error.hpp"
 #include "json/json.hpp"
 
 namespace finance
@@ -51,9 +52,9 @@ namespace finance
      * @brief Create a TickerInfo object from a JSON object.
      *
      * @param json The JSON object containing ticker information.
-     * @return std::expected<TickerInfo, FinanceError>
+     * @return Result<TickerInfo, FinanceError>
      */
-    std::expected<TickerInfo, FinanceError> TickerInfo::fromJson(
+    Result<TickerInfo, FinanceError> TickerInfo::fromJson(
         const nlohmann::json& json
     )
     {
@@ -79,10 +80,10 @@ namespace finance
 
         if (!currencyOpt)
         {
-            return std::unexpected(FinanceError(
+            return FinanceError{
                 FinanceErrorType::CurrencyUnknown,
                 "Unknown currency " + currencyStr
-            ));
+            };
         }
 
         info.currency = currencyOpt.value();

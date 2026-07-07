@@ -2,11 +2,12 @@
 
 #include <qstackedwidget.h>
 
+#include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
-#include "store/i_account_store.hpp"
 #include "store/i_transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
+#include "ui/utils/error.hpp"
 
 namespace controller
 {
@@ -17,20 +18,20 @@ namespace controller
      *
      * @param undoStack
      * @param transactionStore
-     * @param accountStore
+     * @param accountCache
      * @param stockCache
      * @param stackedWidget
      */
     TransactionController::TransactionController(
         cmd::UndoStack&                                  undoStack,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
-        const std::shared_ptr<store::IAccountStore>&     accountStore,
+        const std::shared_ptr<cache::AccountCache>&      accountCache,
         const std::shared_ptr<cache::StockCache>&        stockCache,
         QStackedWidget*                                  stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),
-          _accountStore(accountStore),
+          _accountCache(accountCache),
           _stockCache(stockCache),
           _stackedWidget(stackedWidget),
           _transactionDetailView(new ui::TransactionsOverview(_stackedWidget))
@@ -76,16 +77,39 @@ namespace controller
         if (focus)
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
-        const auto transactions = _transactionStore->getTransactions();
+        const auto transactions =
+            _transactionStore->getTransactions(_accountCache->getAllAccounts());
 
-        const auto cashDrafts = TransactionOverviewMapper::toCash(transactions);
-        const auto stockDrafts =
-            TransactionOverviewMapper::toStock(transactions, _stockCache);
+        const auto cashDrafts =
+            TransactionOverviewMapper::toCash(transactions, _accountCache);
 
-        _transactionDetailView->refresh(
-            cashDrafts,
-            stockDrafts,
-            _accountStore->getAccountIdToNameMap()
+        if (!cashDrafts)
+        {
+            ui::ErrorDialog::show(
+                cashDrafts.error(),
+                "Could not load cash transactions for the transaction overview",
+                _transactionDetailView
+            );
+            return;
+        }
+
+        const auto stockDrafts = TransactionOverviewMapper::toStockOverview(
+            transactions,
+            _stockCache,
+            _accountCache
         );
+
+        if (!stockDrafts)
+        {
+            ui::ErrorDialog::show(
+                stockDrafts.error(),
+                "Could not load stock transactions for the transaction "
+                "overview",
+                _transactionDetailView
+            );
+            return;
+        }
+
+        _transactionDetailView->refresh(*cashDrafts, *stockDrafts);
     }
 }   // namespace controller

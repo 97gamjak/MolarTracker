@@ -149,9 +149,10 @@ namespace cache
     template <typename Key, typename Value>
     void SingleCache<Key, Value>::clear()
     {
-        this->_recordEviction();
         _fullyLoaded = false;
-        _entries.clear();
+        auto keys    = _entries.getKeys();
+        for (const auto& key : keys)
+            _remove(key);
     }
 
     /**

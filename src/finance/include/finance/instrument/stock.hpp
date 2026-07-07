@@ -1,16 +1,15 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
 #define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
 
-#include <expected>
 #include <string>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "utils/finance.hpp"
 
 namespace finance
 {
-    class YahooFinanceError;   // forward declaration
-    struct TickerInfo;         // forward declaration
+    struct TickerInfo;   // forward declaration
 
     /**
      * @brief A class representing a stock instrument, this is used to represent
@@ -64,7 +63,7 @@ namespace finance
         );
 
         [[nodiscard]]
-        static std::expected<Stock, YahooFinanceError> retrieveTickerInfo(
+        static FinanceResult<Stock> retrieveTickerInfo(
             const std::string& ticker
         );
 

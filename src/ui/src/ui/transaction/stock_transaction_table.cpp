@@ -78,16 +78,13 @@ namespace ui
      * @brief Sets the transactions for the model.
      *
      * @param transactions The transactions to set.
-     * @param accountIdToName The mapping of account IDs to account names.
      */
     void StockTransactionTableModel::setTransactions(
-        std::vector<drafts::StockTransactionOverview> transactions,
-        IdMap<AccountId, std::string>                 accountIdToName
+        std::vector<drafts::StockTransactionOverview> transactions
     )
     {
         beginResetModel();
-        _transactions    = std::move(transactions);
-        _accountIdToName = std::move(accountIdToName);
+        _transactions = std::move(transactions);
         endResetModel();
     }
 
@@ -210,7 +207,7 @@ namespace ui
     QVariant StockTransactionTableModel::_displayData(
         const drafts::StockTransactionOverview& transaction,
         int                                     col
-    ) const
+    )
     {
         switch (getColFromIndex(col))
         {
@@ -230,20 +227,15 @@ namespace ui
                 return QString::fromStdString(transaction.getTicker());
             case StockTransactionColumn::Account:
             {
-                const auto id = transaction.getSecurityAccount();
+                const auto& account = transaction.getSecurityAccount();
 
-                if (!_accountIdToName.contains(id) || !id.isValid())
-                    return "";
-
-                return QString::fromStdString(_accountIdToName.at(id));
+                return QString::fromStdString(account.getName());
             }
             case StockTransactionColumn::ReferenceAccount:
             {
-                const auto id = transaction.getCashAccount();
-                if (!_accountIdToName.contains(id) || !id.isValid())
-                    return "";
+                const auto& account = transaction.getCashAccount();
 
-                return QString::fromStdString(_accountIdToName.at(id));
+                return QString::fromStdString(account.getName());
             }
             case StockTransactionColumn::Quantity:
                 return QString::fromStdString(

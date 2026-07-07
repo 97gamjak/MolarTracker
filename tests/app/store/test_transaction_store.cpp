@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "config/id_types.hpp"
+#include "finance/account/accounts.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entry.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -32,7 +33,7 @@ namespace
         std::shared_ptr<tests::MockTransactionService> _mockTransactionService;
         InstrumentIdSeq                                _idSeq;
         store::AccountStore                            _accountStore;
-        finance::Accounts                              _accountSession;
+        finance::AccountsView                          _accountSession;
         store::PositionStore                           _positionStore;
         std::unique_ptr<store::TransactionStore>       _store;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
@@ -49,10 +50,9 @@ namespace
                   std::make_shared<tests::MockTransactionService>()
               },
               _accountStore{_mockAccountService},
-              _positionStore{_mockPositionService, _accountSession},
+              _positionStore{_mockPositionService},
               _store{std::make_unique<store::TransactionStore>(
-                  _mockTransactionService,
-                  _accountSession
+                  _mockTransactionService
               )}
         {
         }

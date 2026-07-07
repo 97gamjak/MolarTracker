@@ -85,17 +85,14 @@ namespace ui
      *
      * @param cashTransactions The list of cash transactions to display.
      * @param stockTransactions The list of stock transactions to display.
-     * @param accountIdToName A mapping of account IDs to account names for
-     * display purposes.
      */
     void TransactionsOverview::refresh(
         const std::vector<drafts::CashTransactionOverview>&  cashTransactions,
-        const std::vector<drafts::StockTransactionOverview>& stockTransactions,
-        const IdMap<AccountId, std::string>&                 accountIdToName
+        const std::vector<drafts::StockTransactionOverview>& stockTransactions
     )
     {
-        _cashModel->setTransactions(cashTransactions, accountIdToName);
-        _stockModel->setTransactions(stockTransactions, accountIdToName);
+        _cashModel->setTransactions(cashTransactions);
+        _stockModel->setTransactions(stockTransactions);
     }
 
     /**

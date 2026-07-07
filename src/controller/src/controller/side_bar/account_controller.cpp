@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <format>
 
+#include "cache/account_cache.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/mapper/account_mapper.hpp"
@@ -30,6 +31,12 @@ namespace controller
      * access the account data and perform operations on it (e.g. creating,
      * deleting, or modifying accounts), this allows the account side bar
      * controller to interact with the account data in a consistent way.
+     * @param accountCache A reference to the account cache, this is used to
+     * access cached account data and improve performance by reducing the need
+     * to access the account store for frequently accessed account data, this
+     * allows the account side bar controller to efficiently retrieve account
+     * data without incurring the overhead of accessing the store for every
+     * request.
      * @param accountController A reference to the account controller, this is
      * used to delegate account-related actions (e.g. when an account is
      * selected in the side bar), this allows the account side bar controller to
@@ -47,15 +54,25 @@ namespace controller
     AccountSideBarController::AccountSideBarController(
         cmd::UndoStack&                              undoStack,
         const std::shared_ptr<store::IAccountStore>& accountStore,
+        const std::shared_ptr<cache::AccountCache>&  accountCache,
         AccountController&                           accountController,
         QMainWindow*                                 mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
           _accountStore(accountStore),
-          _accountController(accountController)
+          _accountCache(accountCache),
+          _accountController(accountController),
+          _connections(std::make_unique<Connections>())
     {
+        _connections->add(
+            _accountCache->subscribeToChanged([this]() { refresh(); }, this)
+        );
+
+        refresh();
     }
+
+    AccountSideBarController::~AccountSideBarController() = default;
 
     /**
      * @brief Refresh the account category in the side bar, this will clear all
@@ -71,13 +88,13 @@ namespace controller
             return;
 
         category->clearAccounts();
-        const auto accounts = _accountStore->getAllAccounts();
+        const auto accounts = _accountCache->getAllAccounts().removeExternal();
 
-        for (const auto& account : accounts)
+        for (const auto& [id, account] : accounts)
         {
             category->addAccount(
-                account.getId(),
-                QString::fromStdString(account.getName())
+                id,
+                QString::fromStdString(account->getName())
             );
         }
     }

@@ -7,7 +7,8 @@
 
 namespace finance
 {
-    class Account;   // Forward declaration
+    class Account;        // Forward declaration
+    class AccountsView;   // Forward declaration
 }   // namespace finance
 
 namespace controller
@@ -29,7 +30,7 @@ namespace controller
 
         [[nodiscard]]
         static std::vector<drafts::AccountDraft> toDrafts(
-            const std::vector<finance::Account>& accounts
+            const finance::AccountsView& accounts
         );
 
         [[nodiscard]]

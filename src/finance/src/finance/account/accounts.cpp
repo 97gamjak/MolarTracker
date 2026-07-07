@@ -3,48 +3,6 @@
 namespace finance
 {
     /**
-     * @brief Filter accounts based on whether they are external or not.
-     *
-     * @param external If true, returns only external accounts; if false,
-     * returns only internal accounts.
-     * @return Accounts A new Accounts object containing the filtered accounts.
-     */
-    Accounts Accounts::filterExternal(bool external) const
-    {
-        Accounts filtered;
-        for (const auto& [id, account] : *this)
-            if (account.isExternal() == external)
-                filtered.addUnchecked(account);
-
-        return filtered;
-    }
-
-    /**
-     * @brief Checks if the specified account IDs are external.
-     *
-     * @param ids The account IDs to check.
-     * @return A vector of optional booleans indicating whether each account is
-     * external (true), internal (false), or not found (nullopt).
-     */
-    std::vector<std::optional<bool>> Accounts::isExternal(
-        const IdSet<AccountId>& ids
-    ) const
-    {
-        std::vector<std::optional<bool>> results;
-        results.reserve(ids.size());
-
-        for (const auto& id : ids)
-        {
-            if (contains(id))
-                results.emplace_back(at(id).isExternal());
-            else
-                results.emplace_back(std::nullopt);
-        }
-
-        return results;
-    }
-
-    /**
      * @brief Get the corresponding external account ID for a given internal
      * cash account ID.
      *
@@ -53,25 +11,100 @@ namespace finance
      * @return AccountId The corresponding external account ID, or an invalid
      * AccountId if no corresponding external account is found.
      */
-    AccountId Accounts::getCorrespondingExternalAccountId(
-        const AccountId& cashAccountId
-    ) const
+    Result<AccountId, FinanceError> AccountsView::
+        getCorrespondingExternalAccountId(const AccountId& cashAccountId) const
     {
         for (const auto& [id, account] : *this)
         {
-            if (!account.isExternal() &&
-                account.getKind() == AccountKind::Cash &&
-                account.getId() == cashAccountId)
+            if (!account->isExternal() &&
+                account->getKind() == AccountKind::Cash &&
+                account->getId() == cashAccountId)
             {
                 // find the corresponding external account
                 for (const auto& [externalId, externalAccount] : *this)
                 {
-                    if (externalAccount.isExternal())
+                    if (externalAccount->isExternal())
                         return externalId;
                 }
             }
         }
 
-        return AccountId::invalid();
+        return FinanceError{
+            FinanceErrorType::AccountNotFound,
+            "No corresponding external account found for cash account: " +
+                cashAccountId.toString()
+        };
+    }
+
+    /**
+     * @brief Filter accounts to include only cash accounts.
+     *
+     * @return AccountsView A new AccountsView object containing only cash
+     * accounts.
+     */
+    AccountsView AccountsView::cash() const
+    {
+        AccountsView filtered;
+        for (const auto& [id, account] : *this)
+            if (account->getKind() == AccountKind::Cash)
+                filtered.addUnchecked(account);
+
+        return filtered;
+    }
+
+    /**
+     * @brief Filter accounts to include only security accounts.
+     *
+     * @return AccountsView A new AccountsView object containing only security
+     * accounts.
+     */
+    AccountsView AccountsView::securities() const
+    {
+        AccountsView filtered;
+        for (const auto& [id, account] : *this)
+            if (account->getKind() == AccountKind::Security)
+                filtered.addUnchecked(account);
+
+        return filtered;
+    }
+
+    /**
+     * @brief Filter accounts to exclude external accounts.
+     *
+     * @return AccountsView A new AccountsView object containing only
+     * non-external accounts.
+     */
+    AccountsView AccountsView::removeExternal() const
+    {
+        AccountsView filtered;
+        for (const auto& [id, account] : *this)
+            if (!account->isExternal())
+                filtered.addUnchecked(account);
+
+        return filtered;
+    }
+
+    /**
+     * @brief Check if an account is external based on its ID.
+     *
+     * @param accountId The ID of the account to check.
+     * @return FinanceResult<bool> A result containing true if the account is
+     * external, false if it is not, or a FinanceError if the account is not
+     * found.
+     */
+    FinanceResult<bool> AccountsView::isExternal(
+        const AccountId& accountId
+    ) const
+    {
+        if (contains(accountId))
+        {
+            const auto& account = at(accountId);
+            return account->isExternal();
+        }
+
+        return FinanceError{
+            FinanceErrorType::AccountNotFound,
+            "Account not found: " + accountId.toString()
+        };
     }
 }   // namespace finance

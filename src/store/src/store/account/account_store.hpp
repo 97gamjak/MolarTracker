@@ -6,7 +6,6 @@
 
 #include "config/id_types.hpp"
 #include "finance/account/account.hpp"
-#include "finance/account/accounts.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_account_store.hpp"
 
@@ -22,7 +21,8 @@ namespace store
      *
      */
     class AccountStore : public BaseStore<finance::Account, AccountId>,
-                         public IAccountStore
+                         public IAccountStore,
+                         public IAccountStoreReader
     {
        private:
         /// reference to the account service
@@ -32,12 +32,13 @@ namespace store
         /// accounts to load and manage in the store
         ProfileId _activeProfileId = ProfileId::invalid();
 
-        /// The session object for managing the session state of accounts in the
-        /// store
-        finance::Accounts _session;
-
         /// Connections for handling signals related to account store updates
         Connections _connections;
+
+        /// Observable for commit events, this allows other parts of the
+        /// application to subscribe to commit events and react accordingly when
+        /// changes are committed in the account store
+        Observable<OnCommit, OnProfileChanged> _observable;
 
        public:
         explicit AccountStore(
@@ -53,20 +54,6 @@ namespace store
         std::optional<finance::Account> getAccount(AccountId id) const override;
         [[nodiscard]]
         std::vector<finance::Account> getAllAccounts() const override;
-        [[nodiscard]]
-        std::vector<finance::Account> getCashAccounts() const override;
-        [[nodiscard]]
-        std::vector<finance::Account> getSecurityAccounts() const override;
-        [[nodiscard]]
-        IdMap<AccountId, std::string> getAccountIdToNameMap() const override;
-
-        [[nodiscard]]
-        std::optional<AccountId> getExternalAccount(
-            Currency currency
-        ) const override;
-
-        [[nodiscard]]
-        IdSet<AccountId> getExternalAccountIds() const override;
 
         void commit();
 
@@ -75,10 +62,18 @@ namespace store
         ) override;
 
         [[nodiscard]]
-        const finance::Accounts& getAccountSession() const override;
+        Connection subscribeToCommit(
+            OnCommit::func func,
+            void*          subscriber
+        ) override;
 
         [[nodiscard]]
-        const IdIdMap<AccountId>& getIdRemap() const override;
+        Connection subscribeToProfileChanged(
+            OnProfileChanged::func func,
+            void*                  subscriber
+        ) override;
+
+        SUBSCRIBE_OVERRIDE(finance::Account, AccountId)
 
        private:
         void _refresh();

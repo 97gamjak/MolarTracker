@@ -4,9 +4,6 @@
 #include <qabstractitemmodel.h>
 #include <qtablewidget.h>
 
-#include "config/id_types.hpp"
-#include "utils/container/id_map.hpp"
-
 namespace drafts
 {
     class CashTransactionOverview;   // Forward declaration
@@ -32,9 +29,6 @@ namespace ui
         /// The list of transactions to display in the table
         std::vector<drafts::CashTransactionOverview> _transactions;
 
-        /// A map of account IDs to account names for display purposes
-        IdMap<AccountId, std::string> _accountIdToName;
-
        public:
         explicit CashTransactionTableModel(QObject* parent = nullptr);
         ~CashTransactionTableModel() override;
@@ -45,8 +39,7 @@ namespace ui
         [[nodiscard]] static int getDateIndex();
 
         void setTransactions(
-            std::vector<drafts::CashTransactionOverview> transactions,
-            IdMap<AccountId, std::string>                accountIdToName
+            std::vector<drafts::CashTransactionOverview> transactions
         );
 
         [[nodiscard]]
@@ -67,10 +60,10 @@ namespace ui
 
        private:
         [[nodiscard]]
-        QVariant _displayData(
+        static QVariant _displayData(
             const drafts::CashTransactionOverview& transaction,
             int                                    col
-        ) const;
+        );
 
         [[nodiscard]]
         static QVariant _decorationData(

@@ -90,14 +90,12 @@ namespace store
           ),
           positionStore(
               std::make_shared<PositionStore>(
-                  serviceContainer.getPositionService(),
-                  accountStore->getAccountSession()
+                  serviceContainer.getPositionService()
               )
           ),
           transactionStore(
               std::make_shared<TransactionStore>(
-                  serviceContainer.getTransactionService(),
-                  accountStore->getAccountSession()
+                  serviceContainer.getTransactionService()
               )
           )
     {
@@ -263,6 +261,17 @@ namespace store
      * @return std::shared_ptr<IAccountStore>
      */
     std::shared_ptr<IAccountStore> StoreContainer::getAccountStore() const
+    {
+        return _stores->accountStore;
+    }
+
+    /**
+     * @brief Get the AccountStoreReader (const version)
+     *
+     * @return std::shared_ptr<IAccountStoreReader>
+     */
+    std::shared_ptr<IAccountStoreReader> StoreContainer::getAccountStoreReader(
+    ) const
     {
         return _stores->accountStore;
     }

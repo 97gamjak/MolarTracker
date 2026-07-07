@@ -25,7 +25,8 @@ namespace drafts
 
 namespace cache
 {
-    class StockCache;   // Forward declaration
+    class StockCache;     // Forward declaration
+    class AccountCache;   // Forward declaration
 }   // namespace cache
 
 /**
@@ -49,6 +50,7 @@ namespace controller
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<cache::StockCache>&        stockCache,
+        const std::shared_ptr<cache::AccountCache>&      accountCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     );
 
@@ -56,6 +58,7 @@ namespace controller
         AccountId                                        account,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<cache::StockCache>&        stockCache,
+        const std::shared_ptr<cache::AccountCache>&      accountCache,
         const std::shared_ptr<store::ITransactionStore>& transactionStore
     );
 

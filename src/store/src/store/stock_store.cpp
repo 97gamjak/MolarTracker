@@ -236,63 +236,6 @@ namespace store
     }
 
     /**
-     * @brief Subscribe to stock added events
-     *
-     * @param func The callback function to be called when a stock is added
-     * @param subscriber The subscriber object that will receive the event
-     *
-     * @return Connection The connection object for managing the subscription
-     */
-    Connection StockStore::subscribeToStockAdded(
-        OnStoreItemAdded<Stock>::func func,
-        void*                         subscriber
-    )
-    {
-        return BaseStore<finance::Stock, StockId>::subscribeToEntryAdded(
-            func,
-            subscriber
-        );
-    }
-
-    /**
-     * @brief Subscribe to stock updated events
-     *
-     * @param func The callback function to be called when a stock is updated
-     * @param subscriber The subscriber object that will receive the event
-     *
-     * @return Connection The connection object for managing the subscription
-     */
-    Connection StockStore::subscribeToStockUpdated(
-        OnStoreItemUpdated<Stock>::func func,
-        void*                           subscriber
-    )
-    {
-        return BaseStore<finance::Stock, StockId>::subscribeToEntryUpdated(
-            func,
-            subscriber
-        );
-    }
-
-    /**
-     * @brief Subscribe to stock removed events
-     *
-     * @param func The callback function to be called when a stock is removed
-     * @param subscriber The subscriber object that will receive the event
-     *
-     * @return Connection The connection object for managing the subscription
-     */
-    Connection StockStore::subscribeToStockRemoved(
-        OnStoreItemRemoved<StockId>::func func,
-        void*                             subscriber
-    )
-    {
-        return BaseStore<finance::Stock, StockId>::subscribeToEntryRemoved(
-            func,
-            subscriber
-        );
-    }
-
-    /**
      * @brief Get a stock based on the provided filter, this method retrieves
      * stocks from the store that match the given filter criteria. If multiple
      * stocks match the filter, an exception is thrown. If no stocks match, an
@@ -381,7 +324,7 @@ namespace store
      */
     void StockStore::_notifyCommit()
     {
-        _onCommit.notify<OnCommit>(_getIdRemap(), getInstrumentIdMap());
+        _onCommit.notify<OnCommit>(getIdRemap(), getInstrumentIdMap());
     }
 
 }   // namespace store

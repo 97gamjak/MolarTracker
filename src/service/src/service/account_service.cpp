@@ -1,7 +1,10 @@
 #include "account_service.hpp"
 
 #include "finance/account/account.hpp"
+#include "logging/log_macros.hpp"
 #include "repo/i_account_repo.hpp"
+
+REGISTER_LOG_CATEGORY("Service.AccountService");
 
 namespace service
 {
@@ -29,7 +32,17 @@ namespace service
         const ProfileId& profileId
     ) const
     {
-        return _accountRepo->getAllAccounts(profileId);
+        const auto& accounts = _accountRepo->getAllAccounts(profileId);
+
+        LOG_DEBUG(
+            std::format(
+                "Retrieved {} accounts from repo for profile {}",
+                accounts.size(),
+                profileId.toString()
+            )
+        );
+
+        return accounts;
     }
 
     /**

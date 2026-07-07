@@ -5,8 +5,8 @@
 #include <string>
 
 #include "config/id_types.hpp"
-#include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
+#include "subscriptions.hpp"
 #include "utils/container/id_id_map.hpp"
 
 class Connection;   // Forward declaration
@@ -99,51 +99,6 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief Subscribe to stock added events
-         *
-         * @param func The callback function to be called when a stock is added
-         * @param subscriber The subscriber object that will receive the event
-         *
-         * @return Connection The connection object for managing the
-         * subscription
-         */
-        [[nodiscard]]
-        virtual Connection subscribeToStockAdded(
-            OnStoreItemAdded<finance::Stock>::func func,
-            void*                                  subscriber
-        ) = 0;
-
-        /**
-         * @brief Subscribe to stock updated events
-         *
-         * @param func The callback function to be called when a stock is
-         * updated
-         * @param subscriber The subscriber object that will receive the event
-         * @return Connection The connection object for managing the
-         * subscription
-         */
-        [[nodiscard]]
-        virtual Connection subscribeToStockUpdated(
-            OnStoreItemUpdated<finance::Stock>::func func,
-            void*                                    subscriber
-        ) = 0;
-
-        /**
-         * @brief Subscribe to stock removed events
-         *
-         * @param func The callback function to be called when a stock is
-         * removed
-         * @param subscriber The subscriber object that will receive the event
-         * @return Connection The connection object for managing the
-         * subscription
-         */
-        [[nodiscard]]
-        virtual Connection subscribeToStockRemoved(
-            OnStoreItemRemoved<StockId>::func func,
-            void*                             subscriber
-        ) = 0;
-
-        /**
          * @brief Subscribe to commit events
          *
          * @param func The callback function to be called when a commit occurs
@@ -156,6 +111,10 @@ namespace store
             const OnCommit::func& func,
             void*                 subscriber
         ) = 0;
+
+        /// @cond DOXYGEN_IGNORE
+        SUBSCRIBE_VIRTUAL(finance::Stock, StockId)
+        /// @endcond
     };
 
     /**

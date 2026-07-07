@@ -12,12 +12,20 @@ namespace repo
      * @brief Create a Position from a PositionRow.
      *
      * @param row The PositionRow to convert.
+     * @param accountId The ID of the account associated with the position.
      * @return The created Position.
      */
-    finance::Position PositionFactory::fromPositionRow(const PositionRow& row)
+    finance::Position PositionFactory::fromPositionRow(
+        const PositionRow& row,
+        AccountId          accountId
+    )
     {
-        auto position =
-            finance::Position{row.createdAt.value(), row.closedAt.value()};
+        auto position = finance::Position{
+            row.id.value(),
+            accountId,
+            row.createdAt.value(),
+            row.closedAt.value()
+        };
 
         position.setId(row.id.value());
 
@@ -27,18 +35,19 @@ namespace repo
     /**
      * @brief Create a vector of Positions from a vector of PositionRows.
      *
-     * @param rows The vector of PositionRows to convert.
+     * @param rows The vector of pairs of PositionRows and AccountIds to
+     * convert.
      * @return The created vector of Positions.
      */
     std::vector<finance::Position> PositionFactory::fromPositionRows(
-        const std::vector<PositionRow>& rows
+        const std::vector<std::pair<PositionRow, AccountId>>& rows
     )
     {
         std::vector<finance::Position> positions;
         positions.reserve(rows.size());
 
-        for (const auto& row : rows)
-            positions.push_back(fromPositionRow(row));
+        for (const auto& [row, accountId] : rows)
+            positions.push_back(fromPositionRow(row, accountId));
 
         return positions;
     }
