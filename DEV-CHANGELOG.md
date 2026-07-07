@@ -4,6 +4,20 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### Logging — age-based log file cleanup (MOLTRACK-60)
+
+- Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,
+  reboot-required); schema key `maxLogAgeDays`, min 0
+- Add `logging::LogFileCleaner::cleanByAge()` in `src/logging/` — scans a
+  directory for regular files matching a prefix/suffix and deletes those whose
+  `last_write_time` exceeds the configured age; no-op when `maxAgeDays == 0`;
+  best-effort (per-file errors suppressed via `std::error_code`)
+- `LogManager::initialize()` now calls `_cleanupOldLogFiles()` before
+  constructing the `RingFile`, ensuring stale session logs are pruned at every
+  startup
+
 ### CI
 
 - Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all

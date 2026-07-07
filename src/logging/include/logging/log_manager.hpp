@@ -101,6 +101,7 @@ namespace logging
         void _initializeRingFileLogger(
             const settings::LoggingSettings& settings
         );
+        void _cleanupOldLogFiles(const settings::LoggingSettings& settings);
     };
 
 }   // namespace logging

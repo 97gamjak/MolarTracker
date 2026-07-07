@@ -119,6 +119,26 @@ namespace settings
         /// max log file size in megabytes minimum value
         static constexpr size_t MAX_LOG_FILE_SIZE_MB_MIN = 1;
 
+        /*******************
+         * Max Log Age Days *
+         *******************/
+
+        /// max log age in days key
+        static constexpr const char* MAX_LOG_AGE_DAYS_KEY = "maxLogAgeDays";
+        /// max log age in days title
+        static constexpr const char* MAX_LOG_AGE_DAYS_TITLE =
+            "Max Log Age (Days)";
+        /// max log age in days description
+        static constexpr const char* MAX_LOG_AGE_DAYS_DESC =
+            "Maximum age of log files in days. Log files older than this "
+            "limit are deleted at startup. Set to 0 to disable age-based "
+            "cleanup. Changing this setting will require a restart of the "
+            "application to take effect.";
+        /// max log age in days default value
+        static constexpr size_t MAX_LOG_AGE_DAYS_DEFAULT = 30;
+        /// max log age in days minimum value (0 = disabled)
+        static constexpr size_t MAX_LOG_AGE_DAYS_MIN = 0;
+
         /********************
          * Default Log Level *
          ********************/
@@ -193,6 +213,13 @@ namespace settings
             Schema::MAX_LOG_FILE_SIZE_MB_DESC
         };
 
+        /// The maximum age of log files in days (0 = disabled)
+        NumericParam<size_t> _maxLogAgeDays{
+            Schema::MAX_LOG_AGE_DAYS_KEY,
+            Schema::MAX_LOG_AGE_DAYS_TITLE,
+            Schema::MAX_LOG_AGE_DAYS_DESC
+        };
+
         /// The default log level for all categories
         EnumParam<LogLevel> _defaultLogLevel{
             Schema::DEFAULT_LOG_LEVEL_KEY,
@@ -208,6 +235,7 @@ namespace settings
         [[nodiscard]] std::string getLogFileSuffix() const;
         [[nodiscard]] size_t      getMaxLogFiles() const;
         [[nodiscard]] size_t      getMaxLogFileSizeMB() const;
+        [[nodiscard]] size_t      getMaxLogAgeDays() const;
 
         [[nodiscard]] EnumParam<LogLevel>&       getDefaultLogLevelParam();
         [[nodiscard]] const EnumParam<LogLevel>& getDefaultLogLevelParam(
