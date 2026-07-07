@@ -150,7 +150,8 @@ namespace cache
     void SingleCache<Key, Value>::clear()
     {
         _fullyLoaded = false;
-        for (const auto& [key, value] : _entries)
+        auto keys    = _entries.getKeys();
+        for (const auto& key : keys)
             _remove(key);
     }
 
