@@ -21,6 +21,7 @@ namespace repo
     )
     {
         auto position = finance::Position{
+            row.id.value(),
             accountId,
             row.createdAt.value(),
             row.closedAt.value()

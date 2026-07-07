@@ -7,6 +7,7 @@
 #include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
 #include "config/constants/github_constants.hpp"
+#include "config/id_types.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
 #include "controller/mapper/account_mapper.hpp"
@@ -419,8 +420,12 @@ namespace controller
 
         if (!positionId.isValid())
         {
-            auto position = Position(securityAccount, draft.getTimestamp());
-            positionId    = _positionStore->createPosition(position);
+            auto position = Position(
+                PositionId::invalid(),   // will be populated by store
+                securityAccount,
+                draft.getTimestamp()
+            );
+            positionId = _positionStore->createPosition(position);
         }
 
         draft.setPositionId(positionId);
@@ -498,8 +503,11 @@ namespace controller
 
         draft.setInstrumentId(optionResult.value());
 
-        auto position =
-            Position(draft.getSecurityAccount(), draft.getTimestamp());
+        auto position = Position(
+            PositionId::invalid(),   // will be populated by store
+            draft.getSecurityAccount(),
+            draft.getTimestamp()
+        );
         const auto positionId = _positionStore->createPosition(position);
 
         draft.setPositionId(positionId);

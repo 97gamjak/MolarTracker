@@ -34,7 +34,11 @@ namespace
 
 TEST_F(PositionStoreTest, CreatePositionReturnsValidLocalId)
 {
-    const finance::Position pos{AccountId{1}, Timestamp::fromInt64(TEST_TS)};
+    const finance::Position pos{
+        PositionId::invalid(),
+        AccountId{1},
+        Timestamp::fromInt64(TEST_TS)
+    };
 
     const auto id = _store->createPosition(pos);
 
@@ -63,7 +67,11 @@ TEST_F(PositionStoreTest, IsDirtyFalseInitially)
 TEST_F(PositionStoreTest, IsDirtyTrueAfterCreatePosition)
 {
     static_cast<void>(_store->createPosition(
-        finance::Position{AccountId{1}, Timestamp::fromInt64(TEST_TS)}
+        finance::Position{
+            PositionId{-2},
+            AccountId{1},
+            Timestamp::fromInt64(TEST_TS)
+        }
     ));
 
     EXPECT_TRUE(_store->isDirty());
@@ -72,7 +80,11 @@ TEST_F(PositionStoreTest, IsDirtyTrueAfterCreatePosition)
 TEST_F(PositionStoreTest, CommitNewPositionCallsService)
 {
     static_cast<void>(_store->createPosition(
-        finance::Position{AccountId{1}, Timestamp::fromInt64(TEST_TS)}
+        finance::Position{
+            PositionId{-2},
+            AccountId{1},
+            Timestamp::fromInt64(TEST_TS)
+        }
     ));
 
     _store->commit();
@@ -83,10 +95,18 @@ TEST_F(PositionStoreTest, CommitNewPositionCallsService)
 TEST_F(PositionStoreTest, CreateMultiplePositionsIdsAreDistinct)
 {
     const auto id1 = _store->createPosition(
-        finance::Position{AccountId{1}, Timestamp::fromInt64(TEST_TS)}
+        finance::Position{
+            PositionId::invalid(),
+            AccountId{1},
+            Timestamp::fromInt64(TEST_TS)
+        }
     );
     const auto id2 = _store->createPosition(
-        finance::Position{AccountId{1}, Timestamp::fromInt64(TEST_TS + 1)}
+        finance::Position{
+            PositionId::invalid(),
+            AccountId{1},
+            Timestamp::fromInt64(TEST_TS + 1)
+        }
     );
 
     EXPECT_NE(id1, id2);

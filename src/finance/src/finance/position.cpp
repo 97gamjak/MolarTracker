@@ -10,16 +10,21 @@ namespace finance
     /**
      * @brief Construct a new Position:: Position object
      *
+     * @param positionId The position id
      * @param accountId The ID of the account associated with the position.
      * @param createdAt The creation timestamp of the position.
      * @param closedAt The closing timestamp of the position, if it exists.
      */
     Position::Position(
+        PositionId               positionId,
         AccountId                accountId,
         Timestamp                createdAt,
         std::optional<Timestamp> closedAt
     )
-        : _accountId(accountId), _createdAt(createdAt), _closedAt(closedAt)
+        : _id(positionId),
+          _accountId(accountId),
+          _createdAt(createdAt),
+          _closedAt(closedAt)
     {
         if (_closedAt.has_value() && _closedAt.value() < _createdAt)
         {

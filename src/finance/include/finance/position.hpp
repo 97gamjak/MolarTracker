@@ -31,6 +31,7 @@ namespace finance
 
        public:
         explicit Position(
+            PositionId               positionId,
             AccountId                accountId,
             Timestamp                createdAt,
             std::optional<Timestamp> closedAt = std::nullopt

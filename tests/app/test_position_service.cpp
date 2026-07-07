@@ -41,6 +41,7 @@ namespace
 TEST_F(PositionServiceTest, CreatePositionReturnsValidId)
 {
     const finance::Position position{
+        PositionId::invalid(),
         AccountId{1},
         Timestamp::fromInt64(TEST_TS)
     };
@@ -67,10 +68,12 @@ TEST_F(PositionServiceTest, GetAllOpenPositionsEmptyForEmptyAccountSet)
 TEST_F(PositionServiceTest, CreateMultiplePositionsIdsAreDistinct)
 {
     const finance::Position position1{
+        PositionId::invalid(),
         AccountId{1},
         Timestamp::fromInt64(TEST_TS)
     };
     const finance::Position position2{
+        PositionId::invalid(),
         AccountId{1},
         Timestamp::fromInt64(TEST_TS + 1)
     };
