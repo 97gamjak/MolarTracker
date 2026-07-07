@@ -11,6 +11,7 @@
 
 #define FINANCE_ERROR_TYPE_LIST(X) \
     X(StockNotFound)               \
+    X(OptionAlreadyExists)         \
     X(AccountNotFound)             \
     X(InvalidTransaction)          \
     X(InvalidAccount)              \

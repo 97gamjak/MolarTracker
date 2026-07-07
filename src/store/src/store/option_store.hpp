@@ -24,12 +24,8 @@ namespace store
                         public IOptionStore
     {
        private:
-        /// The type of the Instrument service pointer
-        using InstrumentServicePtr =
-            std::shared_ptr<service::IInstrumentService>;
-
         /// The Instrument service
-        InstrumentServicePtr _instrumentService;
+        std::shared_ptr<service::IInstrumentService> _instrumentService;
 
         /// The instrument ID sequence
         InstrumentIdSeq& _instrumentIdSeq;
@@ -39,8 +35,8 @@ namespace store
 
        public:
         explicit OptionStore(
-            InstrumentServicePtr instrumentService,
-            InstrumentIdSeq&     instrumentIdSeq
+            std::shared_ptr<service::IInstrumentService> instrumentService,
+            InstrumentIdSeq&                             instrumentIdSeq
         );
 
         ~OptionStore() override                    = default;
@@ -50,12 +46,10 @@ namespace store
         OptionStore& operator=(OptionStore&&)      = delete;
 
         [[nodiscard]]
-        std::expected<InstrumentId, OptionStoreResult> addOption(
-            finance::Option option
-        ) override;
+        FinanceResult<InstrumentId> addOption(finance::Option option) override;
 
         [[nodiscard]]
-        const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
+        const IdIdMap<InstrumentId>& getInstrumentIdMap() const;
 
         void commit(const IdIdMap<InstrumentId>& reMap);
 

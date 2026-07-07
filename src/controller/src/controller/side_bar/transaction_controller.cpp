@@ -6,7 +6,6 @@
 
 #include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
-#include "config/constants/github_constants.hpp"
 #include "config/id_types.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
@@ -492,13 +491,19 @@ namespace controller
 
         if (!optionResult)
         {
-            const auto msg =
-                "Failed to add option: " +
-                std::to_string(static_cast<int>(optionResult.error())) + ". " +
-                GithubConstants::getCreateIssueError();
+            LOG_ERROR(
+                std::format(
+                    "Failed to add option to store: {}",
+                    optionResult.error().toString()
+                )
+            );
 
-            LOG_ERROR(msg);
-            throw std::logic_error(msg);
+            ErrorDialog::show(
+                optionResult.error(),
+                "Could not add option to store",
+                _dialogs->option
+            );
+            return;
         }
 
         draft.setInstrumentId(optionResult.value());

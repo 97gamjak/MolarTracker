@@ -1,11 +1,8 @@
 #ifndef __STORE__INCLUDE__STORE__I_OPTION_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_OPTION_STORE_HPP__
 
-#include <cstdint>
-#include <expected>
-
 #include "config/id_types.hpp"
-#include "utils/container/id_id_map.hpp"
+#include "error/finance_error.hpp"
 
 namespace finance
 {
@@ -14,12 +11,10 @@ namespace finance
 
 namespace store
 {
-    enum class OptionStoreResult : std::uint8_t
+    class IOptionStoreReader
     {
-        Ok,
-        Error,
-        OptionAlreadyExists,
-        OptionNotFound,
+       public:
+        virtual ~IOptionStoreReader() = default;
     };
 
     /**
@@ -43,27 +38,14 @@ namespace store
          *
          * @param option The Option object containing the details of the option
          * to add to the store
-         * @return std::expected<InstrumentId, OptionStoreResult> The generated
+         * @return FinanceResult<InstrumentId> The generated
          * InstrumentId if successful, or an OptionStoreResult error code if
          * there was an error or if the option already exists in the store
          */
         [[nodiscard]]
-        virtual std::expected<InstrumentId, OptionStoreResult> addOption(
+        virtual FinanceResult<InstrumentId> addOption(
             finance::Option option
         ) = 0;
-
-        /**
-         * @brief Get the mapping of instrument IDs to their remapped IDs, this
-         * is used to track the remapping of instrument IDs during commit
-         * operations, allowing callers to access the current state of ID
-         * remapping in the store and understand how original instrument IDs
-         * have been mapped to new IDs after changes have been committed.
-         *
-         * @return const IdIdMap<InstrumentId>& The mapping of original
-         * InstrumentIds to their remapped InstrumentIds after commit operations
-         */
-        [[nodiscard]]
-        virtual const IdIdMap<InstrumentId>& getInstrumentIdMap() const = 0;
     };
 }   // namespace store
 

@@ -5,6 +5,7 @@
 #include "config/id_types.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
+#include "service/i_instrument_service.hpp"
 
 namespace store
 {
@@ -15,15 +16,12 @@ namespace store
      * @param instrumentIdSeq
      */
     OptionStore::OptionStore(
-        InstrumentServicePtr instrumentService,
-        InstrumentIdSeq&     instrumentIdSeq
+        std::shared_ptr<service::IInstrumentService> instrumentService,
+        InstrumentIdSeq&                             instrumentIdSeq
     )
         : _instrumentService(std::move(instrumentService)),
           _instrumentIdSeq(instrumentIdSeq)
     {
-        const auto options = _instrumentService->getOptions();
-
-        _addCleanEntries(options);
     }
 
     /**
@@ -33,11 +31,9 @@ namespace store
      * store, and returns the new instrument ID.
      *
      * @param option
-     * @return std::expected<InstrumentId, OptionStoreResult>
+     * @return FinanceResult<InstrumentId>
      */
-    std::expected<InstrumentId, OptionStoreResult> OptionStore::addOption(
-        finance::Option option
-    )
+    FinanceResult<InstrumentId> OptionStore::addOption(finance::Option option)
     {
         const auto name = option.getName();
 
@@ -51,7 +47,13 @@ namespace store
                 )
             );
 
-            return std::unexpected(OptionStoreResult::OptionAlreadyExists);
+            return FinanceError{
+                FinanceErrorType::OptionAlreadyExists,
+                std::format(
+                    "Option with name {} already exists in the database",
+                    name
+                )
+            };
         }
 
         const auto instrumentId = _instrumentIdSeq.next();

@@ -125,6 +125,7 @@ All changes and updates, that are relevant for developers will be documented her
 - Introduce Cache base classes
 - Introduce StockCache and split StockStore into read and write
 - Introduce AccountCache and split AccountStore into read and write
+- Prepare for introducing Option Cache
 
 #### UI
 
