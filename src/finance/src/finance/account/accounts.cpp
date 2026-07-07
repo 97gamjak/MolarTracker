@@ -88,9 +88,13 @@ namespace finance
      * @brief Check if an account is external based on its ID.
      *
      * @param accountId The ID of the account to check.
-     * @return true if the account is external, false otherwise.
+     * @return FinanceResult<bool> A result containing true if the account is
+     * external, false if it is not, or a FinanceError if the account is not
+     * found.
      */
-    bool AccountsView::isExternal(const AccountId& accountId) const
+    FinanceResult<bool> AccountsView::isExternal(
+        const AccountId& accountId
+    ) const
     {
         if (contains(accountId))
         {
@@ -98,6 +102,9 @@ namespace finance
             return account->isExternal();
         }
 
-        return false;
+        return FinanceError{
+            FinanceErrorType::AccountNotFound,
+            "Account not found: " + accountId.toString()
+        };
     }
 }   // namespace finance

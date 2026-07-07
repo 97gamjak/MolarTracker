@@ -31,7 +31,7 @@ namespace finance
         ) const;
 
         [[nodiscard]]
-        bool isExternal(const AccountId& accountId) const;
+        FinanceResult<bool> isExternal(const AccountId& accountId) const;
     };
 }   // namespace finance
 

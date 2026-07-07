@@ -187,9 +187,33 @@ namespace finance
 
         size_t internalIndex{};
 
-        if (!accounts.isExternal(amountEntries[0].getAccountId()))
+        const auto isExternal0 =
+            accounts.isExternal(amountEntries[0].getAccountId());
+
+        if (!isExternal0)
+        {
+            return isExternal0.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Invalid DomainTransaction: Could not determine if account is "
+                "external"
+            );
+        }
+
+        const auto isExternal1 =
+            accounts.isExternal(amountEntries[1].getAccountId());
+
+        if (!isExternal1)
+        {
+            return isExternal1.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Invalid DomainTransaction: Could not determine if account is "
+                "external"
+            );
+        }
+
+        if (!isExternal0.value())
             internalIndex = 0;
-        else if (!accounts.isExternal(amountEntries[1].getAccountId()))
+        else if (!isExternal1.value())
             internalIndex = 1;
         else
         {
@@ -205,7 +229,18 @@ namespace finance
             amountEntries[1 - internalIndex].getAccountId();
         const auto amount = amountEntries[internalIndex].getCash();
 
-        if (!accounts.isExternal(externalAccountId))
+        const auto isExternalExternal = accounts.isExternal(externalAccountId);
+
+        if (!isExternalExternal)
+        {
+            return isExternalExternal.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Invalid DomainTransaction: Could not determine if account is "
+                "external"
+            );
+        }
+
+        if (!isExternalExternal.value())
         {
             return FinanceError{
                 FinanceErrorType::InvalidTransaction,
