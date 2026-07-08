@@ -57,14 +57,6 @@ namespace db
      */
     void BackupManager::createBackup(
         Database&                    db,
-        const std::filesystem::path& backupDir
-    )
-    {
-        createBackup(db, backupDir, RetentionPolicy{});
-    }
-
-    void BackupManager::createBackup(
-        Database&                    db,
         const std::filesystem::path& backupDir,
         const RetentionPolicy&       policy
     )

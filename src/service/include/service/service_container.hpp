@@ -8,6 +8,11 @@ namespace repo
     class RepoContainer;   // Forward declaration
 }   // namespace repo
 
+namespace settings
+{
+    class BackupSettings;   // Forward declaration
+}   // namespace settings
+
 namespace service
 {
 
@@ -38,7 +43,9 @@ namespace service
         std::shared_ptr<IPositionService> _positionService;
 
        public:
-        explicit ServiceContainer();
+        explicit ServiceContainer(
+            const settings::BackupSettings& backupSettings
+        );
         ~ServiceContainer();
 
         [[nodiscard]] std::shared_ptr<IProfileService> getProfileService();

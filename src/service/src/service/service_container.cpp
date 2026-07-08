@@ -18,9 +18,11 @@ namespace service
      * @brief Construct a new Service Container object
      *
      */
-    ServiceContainer::ServiceContainer()
+    ServiceContainer::ServiceContainer(
+        const settings::BackupSettings& backupSettings
+    )
     try
-        : _repoContainer{std::make_unique<repo::RepoContainer>()},
+        : _repoContainer{std::make_unique<repo::RepoContainer>(backupSettings)},
           _profileService{
               std::make_shared<ProfileService>(_repoContainer->getProfileRepo()
               )},

@@ -12,6 +12,7 @@
 #include "profile_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/repo_errors.hpp"
+#include "settings/backup_settings.hpp"
 #include "transaction_repo.hpp"
 
 REGISTER_LOG_CATEGORY("Repo.Container");
@@ -23,20 +24,25 @@ namespace repo
      * @brief Construct a new Repo Container object
      *
      */
-    RepoContainer::RepoContainer()
+    RepoContainer::RepoContainer(const settings::BackupSettings& backupSettings)
         : _database{std::make_unique<db::Database>(
               Constants::getInstance().getDatabasePath()
           )}
     {
         // Backup before any writes (including migrations). A non-fatal error
         // here must not prevent startup.
-        if (std::filesystem::exists(Constants::getInstance().getDatabasePath()))
+        if (std::filesystem::exists(backupSettings.getBackupDir()) &&
+            backupSettings.isBackupEnabled())
         {
             try
             {
                 db::BackupManager::createBackup(
                     *_database,
-                    Constants::getInstance().getBackupPath()
+                    Constants::getInstance().getBackupPath(),
+                    db::BackupManager::RetentionPolicy{
+                        .recentCount = backupSettings.getRecentCount(),
+                        .weeklyCount = backupSettings.getWeeklyCount()
+                    }
                 );
             }
             catch (const std::exception& e)

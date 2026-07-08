@@ -61,6 +61,7 @@ namespace controller
          */
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
+              _storeContainer{_settings.getBackupSettings()},
               _centralController(_mainWindow.getCentralWidget()),
               _handlers(_settings),
               _accountController(

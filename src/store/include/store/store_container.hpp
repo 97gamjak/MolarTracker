@@ -15,6 +15,11 @@ namespace service
     class ServiceContainer;   // Forward declaration
 }   // namespace service
 
+namespace settings
+{
+    class BackupSettings;   // Forward declaration
+}   // namespace settings
+
 namespace store
 {
 
@@ -54,7 +59,7 @@ namespace store
         std::unique_ptr<Connections> _connections;
 
        public:
-        explicit StoreContainer();
+        explicit StoreContainer(const settings::BackupSettings& backupSettings);
 
         ~StoreContainer();
 

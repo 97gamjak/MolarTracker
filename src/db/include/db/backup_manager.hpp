@@ -33,23 +33,10 @@ namespace db
         struct RetentionPolicy
         {
             /// Number of most-recent backups to keep unconditionally
-            std::size_t recentCount{5};
+            std::size_t recentCount;
             /// Number of calendar weeks in the weekly tier
-            std::size_t weeklyCount{4};
+            std::size_t weeklyCount;
         };
-
-        /**
-         * @brief Create a timestamped backup of the database and prune old
-         * backups according to the retention policy.
-         *
-         * @param db        Open database to back up (source)
-         * @param backupDir Directory where backup files are stored
-         * @param policy    Retention settings (defaults match spec)
-         */
-        static void createBackup(
-            Database&                    db,
-            const std::filesystem::path& backupDir
-        );
 
         static void createBackup(
             Database&                    db,
@@ -57,12 +44,6 @@ namespace db
             const RetentionPolicy&       policy
         );
 
-        /**
-         * @brief List all backup files in the directory, sorted newest first.
-         *
-         * @param backupDir Directory to scan
-         * @return Sorted vector of backup file paths (newest first)
-         */
         [[nodiscard]]
         static std::vector<std::filesystem::path> listBackups(
             const std::filesystem::path& backupDir

@@ -26,8 +26,12 @@ namespace store
      * @brief Construct a new Store Container object
      *
      */
-    StoreContainer::StoreContainer()
-        : _serviceContainer{std::make_unique<service::ServiceContainer>()},
+    StoreContainer::StoreContainer(
+        const settings::BackupSettings& backupSettings
+    )
+        : _serviceContainer{std::make_unique<service::ServiceContainer>(
+              backupSettings
+          )},
           _profileStore{std::make_shared<ProfileStore>(
               _serviceContainer->getProfileService()
           )},

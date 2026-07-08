@@ -14,11 +14,15 @@ namespace settings
           }
     {
         _enableBackup.setDefault(true);
+        _enableBackup.setRebootRequired(true);
         _backupDir.setDefault(Schema::BACKUP_DIR_DEFAULT);
+        _backupDir.setRebootRequired(true);
         _recentCount.setDefault(Schema::RECENT_COUNT_DEFAULT);
         _recentCount.setMinValue(Schema::RECENT_COUNT_MIN);
+        _recentCount.setRebootRequired(true);
         _weeklyCount.setDefault(Schema::WEEKLY_COUNT_DEFAULT);
         _weeklyCount.setMinValue(Schema::WEEKLY_COUNT_MIN);
+        _weeklyCount.setRebootRequired(true);
     }
 
     /**
