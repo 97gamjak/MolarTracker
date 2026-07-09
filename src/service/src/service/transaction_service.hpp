@@ -29,6 +29,11 @@ namespace service
         );
 
         [[nodiscard]]
+        std::optional<finance::DomainTransaction> getTransaction(
+            TransactionId transactionId
+        ) const override;
+
+        [[nodiscard]]
         TransactionId addTransaction(
             const finance::DomainTransaction& transaction
         ) override;

@@ -3,7 +3,9 @@
 #include <memory>
 
 #include "cache/account_cache.hpp"
+#include "cache/position_cache.hpp"
 #include "cache/stock_cache.hpp"
+#include "cache/transaction_cache.hpp"
 #include "settings/cache_settings.hpp"
 #include "store/store_container.hpp"
 
@@ -27,6 +29,16 @@ namespace cache
                   storeContainer.getAccountStoreReader()
               )
           ),
+          _positionCache(
+              std::make_shared<PositionCache>(
+                  storeContainer.getPositionStoreReader()
+              )
+          ),
+          _transactionCache(
+              std::make_shared<TransactionCache>(
+                  storeContainer.getTransactionStoreReader()
+              )
+          ),
           _connections(std::make_unique<Connections>())
     {
         auto& maxCacheSize = settings.getGlobalMaxCacheSize();
@@ -35,6 +47,8 @@ namespace cache
             {
                 _stockCache->updateMaxCapacity(newSize);
                 _accountCache->updateMaxCapacity(newSize);
+                _positionCache->updateMaxCapacity(newSize);
+                _transactionCache->updateMaxCapacity(newSize);
             },
             _stockCache.get()
         )
@@ -62,6 +76,17 @@ namespace cache
     const std::shared_ptr<AccountCache>& CacheContainer::getAccountCache() const
     {
         return _accountCache;
+    }
+
+    /**
+     * @brief Get the PositionCache instance managed by this container
+     *
+     * @return const std::shared_ptr<PositionCache>&
+     */
+    const std::shared_ptr<PositionCache>& CacheContainer::getPositionCache(
+    ) const
+    {
+        return _positionCache;
     }
 
 }   // namespace cache

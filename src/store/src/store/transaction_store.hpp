@@ -34,7 +34,8 @@ namespace store
      */
     class TransactionStore
         : public BaseStore<finance::DomainTransaction, TransactionId>,
-          public ITransactionStore
+          public ITransactionStore,
+          public ITransactionStoreReader
     {
        private:
         /// The Transaction service
@@ -74,13 +75,14 @@ namespace store
         ) override;
 
         [[nodiscard]]
-        finance::Transactions getTransactions(
-            const finance::TransactionFilter& filter,
-            const finance::AccountsView&      accounts
+        std::optional<finance::DomainTransaction> getTransaction(
+            TransactionId transactionId
         ) const override;
+
         [[nodiscard]]
         finance::Transactions getTransactions(
-            const finance::AccountsView& accounts
+            const finance::TransactionFilter& filter,
+            const AccountId&                  accountId
         ) const override;
 
         [[nodiscard]]

@@ -31,7 +31,8 @@ namespace store
      *
      */
     class PositionStore : public BaseStore<finance::Position, PositionId>,
-                          public IPositionStore
+                          public IPositionStore,
+                          public IPositionStoreReader
     {
        private:
         /// The Position service
@@ -53,6 +54,11 @@ namespace store
         [[nodiscard]]
         finance::Positions getOpenPositions(
             const IdSet<AccountId>& accountIds
+        ) const override;
+
+        [[nodiscard]]
+        std::optional<finance::Position> getPosition(
+            PositionId positionId
         ) const override;
 
         [[nodiscard]]

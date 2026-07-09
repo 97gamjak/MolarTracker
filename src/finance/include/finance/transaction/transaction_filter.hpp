@@ -28,6 +28,7 @@ namespace finance
         void setPositionIds(const IdSet<PositionId>& positionIds);
         [[nodiscard]] IdSet<PositionId> getPositionIds() const;
 
+        void setTransactionIds(const IdSet<TransactionId>& transactionIds);
         [[nodiscard]] IdSet<TransactionId> getTransactionIds() const;
 
         [[nodiscard]]

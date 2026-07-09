@@ -34,6 +34,11 @@ namespace service
             const finance::Position& position
         ) = 0;
 
+        [[nodiscard]]
+        virtual std::optional<finance::Position> getPosition(
+            PositionId positionId
+        ) const = 0;
+
         /**
          * @brief Get all Positions
          *

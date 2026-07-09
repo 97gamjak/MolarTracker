@@ -26,6 +26,11 @@ namespace repo
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
+        std::optional<finance::Position> getPosition(
+            PositionId positionId
+        ) override;
+
+        [[nodiscard]]
         std::vector<finance::Position> getAllPositions(
             const IdSet<AccountId>& accountIds
         ) override;

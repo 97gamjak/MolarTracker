@@ -164,7 +164,7 @@ namespace finance
      *
      * @param transactions
      */
-    void PnLAvg::calculatePnL(StockTransactions& transactions)
+    void PnLAvg::calculatePnL(StockTransactionsView& transactions)
     {
         transactions.sort();
         Quantity quantity{0};
@@ -175,14 +175,14 @@ namespace finance
 
         for (const auto& transaction : transactions)
         {
-            const auto qty    = transaction.getQuantity();
-            const auto price  = transaction.getUnitPrice();
+            const auto qty    = transaction->getQuantity();
+            const auto price  = transaction->getUnitPrice();
             const auto oldQty = quantity;
 
             if (getCurrency() == Currency::Unknown)
                 setCurrency(price.getCurrency());
 
-            fees     += transaction.getFees();
+            fees     += transaction->getFees();
             quantity += qty;
 
             if (qty > 0)

@@ -33,6 +33,11 @@ namespace repo
             const finance::Position& position
         ) = 0;
 
+        [[nodiscard]]
+        virtual std::optional<finance::Position> getPosition(
+            PositionId positionId
+        ) = 0;
+
         /**
          * @brief Get all Positions
          *

@@ -32,6 +32,11 @@ namespace service
         PositionId createPosition(const finance::Position& position) override;
 
         [[nodiscard]]
+        std::optional<finance::Position> getPosition(
+            PositionId positionId
+        ) const override;
+
+        [[nodiscard]]
         std::vector<finance::Position> getAllPositions(
             const IdSet<AccountId>& accountIds
         ) override;

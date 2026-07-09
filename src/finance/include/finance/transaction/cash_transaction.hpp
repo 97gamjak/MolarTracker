@@ -1,6 +1,8 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__CASH_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__CASH_TRANSACTION_HPP__
 
+#include <memory>
+
 #include "config/id_types.hpp"
 #include "finance/transaction/transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
@@ -42,6 +44,8 @@ namespace finance
             std::optional<AccountId> external = std::nullopt
         ) const;
     };
+
+    using CashTransactionView = std::shared_ptr<const CashTransaction>;
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__CASH_TRANSACTION_HPP__

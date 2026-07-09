@@ -55,7 +55,7 @@ namespace finance
         _baseInstrument  = txs.getBaseInstrumentId();
         _securityAccount = txs.getSecurityAccountId();
         _pnlReady        = false;
-        StockTransactions::add(txs);
+        StockTransactionsView::add(txs);
         return true;
     }
 

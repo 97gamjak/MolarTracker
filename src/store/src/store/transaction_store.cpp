@@ -5,6 +5,7 @@
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
+#include "finance/filter/predicates.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/position_transaction.hpp"
@@ -184,6 +185,38 @@ namespace store
         _addEntry(*tx);
 
         return FinanceResult<void>::ok();
+    }
+
+    std::optional<finance::DomainTransaction> TransactionStore::getTransaction(
+        TransactionId id
+    ) const
+    {
+        const auto options = Options{
+            .filter   = finance::checkId<finance::DomainTransaction>(id),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        auto entries = _getValues(options);
+
+        const std::vector<finance::DomainTransaction> transactions(
+            entries.begin(),
+            entries.end()
+        );
+
+        if (transactions.size() > 1)
+        {
+            throw std::runtime_error(
+                std::format(
+                    "Multiple transactions found for transaction ID: {}",
+                    id.toString()
+                )
+            );
+        }
+
+        if (!transactions.empty())
+            return transactions.front();
+
+        return _transactionService->getTransaction(id);
     }
 
     /**

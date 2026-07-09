@@ -58,6 +58,46 @@ namespace repo
     }
 
     /**
+     * @brief Get a Position by its ID
+     *
+     * @param positionId The ID of the position to retrieve
+     * @return std::optional<finance::Position>
+     */
+    std::optional<finance::Position> PositionRepo::getPosition(
+        PositionId positionId
+    )
+    {
+        const auto joins = _createPositionJoins();
+        const auto query = orm::Query{}.where(PositionRow::hasId(positionId));
+
+        auto result = _getCrud().getJoined<PositionRow, TradeLegRow>(
+            _getDb(),
+            joins,
+            query
+        );
+
+        if (result.size() > 1)
+        {
+            throw std::runtime_error(
+                std::format(
+                    "Multiple positions found for position ID: {}",
+                    positionId.toString()
+                )
+            );
+        }
+
+        if (result.empty())
+            return std::nullopt;
+
+        const auto& [positionRow, tradeLegRow] = result.front();
+
+        return PositionFactory::fromPositionRow(
+            positionRow,
+            tradeLegRow.accountId.value()
+        );
+    }
+
+    /**
      * @brief Get all Positions
      *
      * @param accountIds The IDs of the accounts to retrieve positions for.

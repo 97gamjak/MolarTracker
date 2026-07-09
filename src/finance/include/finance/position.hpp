@@ -1,6 +1,7 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__POSITION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__POSITION_HPP__
 
+#include <memory>
 #include <optional>
 
 #include "config/id_types.hpp"
@@ -47,11 +48,14 @@ namespace finance
         [[nodiscard]] std::string toString() const;
     };
 
+    // TODO: remove this and use PositionFilter instead
     filter::Predicate<Position> IsPositionOpen(bool isOpen = true);
 
     filter::Predicate<Position> IsPositionForAccounts(
         const IdSet<AccountId>& accountIds
     );
+
+    using PositionView = std::shared_ptr<const Position>;
 
 }   // namespace finance
 

@@ -6,8 +6,9 @@
 
 namespace finance
 {
-    class Position;       // Forward declaration
-    class AccountsView;   // Forward declaration
+    class Position;         // Forward declaration
+    class AccountsView;     // Forward declaration
+    class PositionFilter;   // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -15,14 +16,55 @@ class Connection;   // Forward declaration
 namespace store
 {
 
-    /**
-     * @brief Structure representing a callback for when a position is closed.
-     *
-     */
-    struct PositionClosed
+    class IPositionStoreReader
     {
-        /// The callback function type for when a position is closed
-        using func = std::function<void(PositionId)>;
+       protected:
+        /**
+         * @brief Structure representing a callback for when a position is
+         * closed.
+         *
+         */
+        struct PositionClosed
+        {
+            /// The callback function type for when a position is closed
+            using func = std::function<void(PositionId)>;
+        };
+
+       public:
+        virtual ~IPositionStoreReader() = default;
+
+        [[nodiscard]]
+        virtual finance::Positions getPositions(
+            const finance::PositionFilter& filter
+        ) const = 0;
+
+        /**
+         * @brief Get a Position by its ID
+         *
+         * @param positionId The ID of the position to retrieve
+         *
+         * @return std::optional<finance::Position>
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Position> getPosition(
+            PositionId positionId
+        ) const = 0;
+
+        /**
+         * @brief Subscribe to position closed events, this allows subscribers
+         * to be notified when a position is closed, which can be useful for
+         * updating the UI or performing other actions in response to a position
+         * being closed.
+         *
+         * @param func
+         * @param user
+         * @return Connection
+         */
+        [[nodiscard]]
+        virtual Connection subscribeToPositionClosed(
+            PositionClosed::func func,
+            void*                user
+        ) = 0;
     };
 
     /**
@@ -43,46 +85,6 @@ namespace store
         [[nodiscard]]
         virtual PositionId createPosition(
             const finance::Position& position
-        ) = 0;
-
-        /**
-         * @brief Get all Positions
-         *
-         * @param accounts The accounts view to filter positions by
-         *
-         * @return finance::Positions
-         */
-        [[nodiscard]]
-        virtual finance::Positions getAllPositions(
-            const finance::AccountsView& accounts
-        ) const = 0;
-
-        /**
-         * @brief Get all open Positions
-         *
-         * @param accountIds The set of account IDs to filter positions by
-         *
-         * @return finance::Positions
-         */
-        [[nodiscard]]
-        virtual finance::Positions getOpenPositions(
-            const IdSet<AccountId>& accountIds
-        ) const = 0;
-
-        /**
-         * @brief Subscribe to position closed events, this allows subscribers
-         * to be notified when a position is closed, which can be useful for
-         * updating the UI or performing other actions in response to a position
-         * being closed.
-         *
-         * @param func
-         * @param user
-         * @return Connection
-         */
-        [[nodiscard]]
-        virtual Connection subscribeToPositionClosed(
-            PositionClosed::func func,
-            void*                user
         ) = 0;
     };
 

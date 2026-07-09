@@ -31,6 +31,12 @@ namespace service
         return _transactionRepo->addTransaction(transaction);
     }
 
+    std::optional<finance::DomainTransaction> TransactionService::
+        getTransaction(TransactionId transactionId) const
+    {
+        return _transactionRepo->getTransaction(transactionId);
+    }
+
     /**
      * @brief Retrieves all transactions from the repository.
      *

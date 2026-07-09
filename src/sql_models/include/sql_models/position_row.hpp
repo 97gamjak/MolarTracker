@@ -29,6 +29,9 @@ struct PositionRow : public orm::ORMModel<"position">
 
     [[nodiscard]]
     static orm::WhereExpr IsOpen();
+
+    [[nodiscard]]
+    static orm::WhereExpr hasId(PositionId positionId);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__POSITION_ROW_HPP__

@@ -33,6 +33,13 @@ namespace finance
         return _positionIds;
     }
 
+    void TransactionFilter::setTransactionIds(
+        const IdSet<TransactionId>& transactionIds
+    )
+    {
+        _transactionIds = transactionIds;
+    }
+
     /**
      * @brief get the transaction IDs used to filter transactions
      *

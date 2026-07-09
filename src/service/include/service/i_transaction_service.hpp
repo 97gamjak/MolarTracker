@@ -35,6 +35,11 @@ namespace service
             const finance::DomainTransaction& transaction
         ) = 0;
 
+        [[nodiscard]]
+        virtual std::optional<finance::DomainTransaction> getTransaction(
+            TransactionId transactionId
+        ) const = 0;
+
         /**
          * @brief Retrieves all transactions from the service.
          *

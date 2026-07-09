@@ -287,6 +287,12 @@ namespace store
         return _stores->transactionStore;
     }
 
+    std::shared_ptr<ITransactionStoreReader> StoreContainer::
+        getTransactionStoreReader() const
+    {
+        return _stores->transactionStore;
+    }
+
     /**
      * @brief Get the StockStore (const version)
      *
@@ -324,6 +330,17 @@ namespace store
      * @return std::shared_ptr<IPositionStore>
      */
     std::shared_ptr<IPositionStore> StoreContainer::getPositionStore() const
+    {
+        return _stores->positionStore;
+    }
+
+    /**
+     * @brief Get the PositionStoreReader (const version)
+     *
+     * @return std::shared_ptr<IPositionStoreReader>
+     */
+    std::shared_ptr<IPositionStoreReader> StoreContainer::
+        getPositionStoreReader() const
     {
         return _stores->positionStore;
     }

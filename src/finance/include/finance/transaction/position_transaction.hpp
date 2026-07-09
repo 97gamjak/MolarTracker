@@ -14,7 +14,7 @@ namespace finance
      * transactions related to a specific position, along with PnL information.
      *
      */
-    class StockPositionTransaction : protected StockTransactions
+    class StockPositionTransaction : protected StockTransactionsView
     {
         /// The ID of the position associated with the stock transactions
         PositionId _positionId = PositionId::invalid();
@@ -36,7 +36,7 @@ namespace finance
         /// be added to the position, this will help maintain the integrity of
         /// the position and ensure that all transactions in the position are
         /// related to the same security and account.
-        using StockTransactions::add;
+        using StockTransactionsView::add;
 
        public:
         explicit StockPositionTransaction() = default;
@@ -48,7 +48,7 @@ namespace finance
         [[nodiscard]] AccountId                   getSecurityAccount() const;
         [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
 
-        using StockTransactions::empty;
+        using StockTransactionsView::empty;
     };
 
 }   // namespace finance

@@ -83,6 +83,12 @@ Set<T, Hash> Set<T, Hash>::operator&(const Set<T, Hash>& other) const
     return result;
 }
 
+template <typename T, typename Hash>
+Set<T, Hash> Set<T, Hash>::operator&=(const Set<T, Hash>& other) const
+{
+    return this->operator&(other);
+}
+
 /**
  * @brief Returns a new set that is the difference of the current set and
  * another set.

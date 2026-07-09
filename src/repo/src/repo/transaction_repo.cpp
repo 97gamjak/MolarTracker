@@ -6,6 +6,7 @@
 #include "db/transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
@@ -301,6 +302,31 @@ namespace repo
         }
 
         return results;
+    }
+
+    std::optional<finance::DomainTransaction> TransactionRepo::getTransaction(
+        TransactionId transactionId
+    )
+    {
+        finance::TransactionFilter filter;
+        filter.setTransactionIds({transactionId});
+
+        const auto transactions = getTransactions({}, filter);
+
+        if (transactions.empty())
+            return std::nullopt;
+
+        if (transactions.size() > 1)
+        {
+            throw std::runtime_error(
+                std::format(
+                    "Multiple transactions found for transaction ID: {}",
+                    transactionId.toString()
+                )
+            );
+        }
+
+        return transactions[0];
     }
 
 }   // namespace repo

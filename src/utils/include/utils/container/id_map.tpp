@@ -2,6 +2,7 @@
 #define __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_TPP__
 
 #include "id_map.hpp"
+#include "utils/container/set.hpp"
 
 /**
  * @brief Sets the values in the map based on a range of values with IDs.
@@ -94,8 +95,7 @@ void IdObjectMap<Value>::addUnchecked(const Value& value)
  * @return A set of all the IDs currently in the map.
  */
 template <IsId Key, typename Value>
-auto IdMap<Key, Value>::getIds() const
-    -> std::unordered_set<Key, typename Key::Hash>
+auto IdMap<Key, Value>::getIds() const -> IdSet<Key>
 {
     return Base::getKeys();
 }

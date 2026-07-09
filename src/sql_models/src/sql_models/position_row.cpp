@@ -11,3 +11,8 @@ orm::WhereExpr PositionRow::IsOpen()
 {
     return orm::makeIsNull<closedAtField>();
 }
+
+orm::WhereExpr PositionRow::hasId(PositionId positionId)
+{
+    return orm::makeWhere<idField>(positionId, filter::Operator::Equal);
+}

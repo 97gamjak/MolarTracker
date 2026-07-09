@@ -228,7 +228,8 @@ namespace tests
         int _nextId = 1;
 
        public:
-        [[nodiscard]] PositionId createPosition(
+        [[nodiscard]]
+        PositionId createPosition(
             const finance::Position& /*position*/
         ) override
         {
@@ -236,14 +237,24 @@ namespace tests
             return PositionId{_nextId++};
         }
 
-        [[nodiscard]] std::vector<finance::Position> getAllPositions(
+        [[nodiscard]]
+        std::optional<finance::Position> getPosition(
+            PositionId /*positionId*/
+        ) const override
+        {
+            return std::nullopt;
+        }
+
+        [[nodiscard]]
+        std::vector<finance::Position> getAllPositions(
             const IdSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
         }
 
-        [[nodiscard]] std::vector<finance::Position> getAllOpenPositions(
+        [[nodiscard]]
+        std::vector<finance::Position> getAllOpenPositions(
             const IdSet<AccountId>& /*accountIds*/
         ) override
         {
@@ -262,12 +273,21 @@ namespace tests
         int _nextId = 1;
 
        public:
-        [[nodiscard]] TransactionId addTransaction(
+        [[nodiscard]]
+        TransactionId addTransaction(
             const finance::DomainTransaction& /*transaction*/
         ) override
         {
             addCallCount++;
             return TransactionId{_nextId++};
+        }
+
+        [[nodiscard]]
+        std::optional<finance::DomainTransaction> getTransaction(
+            TransactionId /*transactionId*/
+        ) const override
+        {
+            return std::nullopt;
         }
 
         [[nodiscard]] std::vector<finance::DomainTransaction> getTransactions(

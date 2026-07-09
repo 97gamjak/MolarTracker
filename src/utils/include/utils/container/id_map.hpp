@@ -3,6 +3,7 @@
 
 #include "config/strong_id.hpp"
 #include "map.hpp"
+#include "utils/container/set.hpp"
 
 /**
  * @brief A map that associates IDs with values.
@@ -20,7 +21,8 @@ class IdMap : public Map<Key, Value, typename Key::Hash>
    public:
     using Map<Key, Value, typename Key::Hash>::Map;
 
-    [[nodiscard]] std::unordered_set<Key, typename Key::Hash> getIds() const;
+    [[nodiscard]]
+    IdSet<Key> getIds() const;
 };
 
 /**

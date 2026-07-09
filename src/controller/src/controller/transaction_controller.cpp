@@ -4,8 +4,8 @@
 
 #include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
+#include "cache/transaction_cache.hpp"
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
-#include "store/i_transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
 #include "ui/utils/error.hpp"
 
@@ -23,14 +23,14 @@ namespace controller
      * @param stackedWidget
      */
     TransactionController::TransactionController(
-        cmd::UndoStack&                                  undoStack,
-        const std::shared_ptr<store::ITransactionStore>& transactionStore,
-        const std::shared_ptr<cache::AccountCache>&      accountCache,
-        const std::shared_ptr<cache::StockCache>&        stockCache,
-        QStackedWidget*                                  stackedWidget
+        cmd::UndoStack&                                 undoStack,
+        const std::shared_ptr<cache::TransactionCache>& transactionCache,
+        const std::shared_ptr<cache::AccountCache>&     accountCache,
+        const std::shared_ptr<cache::StockCache>&       stockCache,
+        QStackedWidget*                                 stackedWidget
     )
         : _undoStack(undoStack),
-          _transactionStore(transactionStore),
+          _transactionCache(transactionCache),
           _accountCache(accountCache),
           _stockCache(stockCache),
           _stackedWidget(stackedWidget),
@@ -78,7 +78,7 @@ namespace controller
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
         const auto transactions =
-            _transactionStore->getTransactions(_accountCache->getAllAccounts());
+            _transactionCache->getTransactions(_accountCache->getAllAccounts());
 
         const auto cashDrafts =
             TransactionOverviewMapper::toCash(transactions, _accountCache);

@@ -1,6 +1,7 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 
+#include <memory>
 #include "config/id_types.hpp"
 #include "finance/transaction/security_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
@@ -52,6 +53,8 @@ namespace finance
        private:
         [[nodiscard]] TransactionEntry _getAmountEntry() const;
     };
+
+    using StockTransactionView = std::shared_ptr<const StockTransaction>;
 }   // namespace finance
 
 #endif   // __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__

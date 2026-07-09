@@ -71,4 +71,28 @@ namespace service
         return positions;
     }
 
+    /**
+     * @brief Get a Position by its ID
+     *
+     * @param positionId The ID of the position to retrieve
+     *
+     * @return std::optional<finance::Position>
+     */
+    std::optional<finance::Position> PositionService::getPosition(
+        PositionId positionId
+    ) const
+    {
+        const auto position = _positionRepo->getPosition(positionId);
+
+        LOG_DEBUG(
+            std::format(
+                "Retrieved position with ID {}: {}",
+                positionId.toString(),
+                position ? "found" : "not found"
+            )
+        );
+
+        return position;
+    }
+
 }   // namespace service

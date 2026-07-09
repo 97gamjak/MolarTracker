@@ -16,15 +16,17 @@ namespace service
 namespace store
 {
 
-    class IProfileStore;         // Forward declaration
-    class IAccountStore;         // Forward declaration
-    class IAccountStoreReader;   // Forward declaration
-    class IStockStore;           // Forward declaration
-    class IStockStoreReader;     // Forward declaration
-    class IPositionStore;        // Forward declaration
-    class ITransactionStore;     // Forward declaration
-    class IStore;                // Forward declaration
-    class IOptionStore;          // Forward declaration
+    class IProfileStore;             // Forward declaration
+    class IAccountStore;             // Forward declaration
+    class IAccountStoreReader;       // Forward declaration
+    class IStockStore;               // Forward declaration
+    class IStockStoreReader;         // Forward declaration
+    class IPositionStore;            // Forward declaration
+    class IPositionStoreReader;      // Forward declaration
+    class ITransactionStore;         // Forward declaration
+    class ITransactionStoreReader;   // Forward declaration
+    class IStore;                    // Forward declaration
+    class IOptionStore;              // Forward declaration
 
     /**
      * @brief Container for all stores
@@ -76,6 +78,9 @@ namespace store
 
         [[nodiscard]]
         std::shared_ptr<ITransactionStore> getTransactionStore() const;
+        [[nodiscard]]
+        std::shared_ptr<ITransactionStoreReader> getTransactionStoreReader(
+        ) const;
 
         [[nodiscard]]
         std::shared_ptr<IStockStore> getStockStore() const;
@@ -84,7 +89,10 @@ namespace store
 
         [[nodiscard]] std::shared_ptr<IOptionStore> getOptionStore() const;
 
-        [[nodiscard]] std::shared_ptr<IPositionStore> getPositionStore() const;
+        [[nodiscard]]
+        std::shared_ptr<IPositionStore> getPositionStore() const;
+        [[nodiscard]]
+        std::shared_ptr<IPositionStoreReader> getPositionStoreReader() const;
     };
 
 }   // namespace store

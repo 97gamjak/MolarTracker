@@ -9,7 +9,7 @@
 
 namespace finance
 {
-    class Transactions;   // Forward declaration
+    class TransactionsView;   // Forward declaration
 }   // namespace finance
 
 namespace cache
@@ -30,13 +30,13 @@ namespace controller
     {
        public:
         static FinanceResult<std::vector<drafts::StockTransactionOverview>> toStockOverview(
-            const finance::Transactions&                transactions,
+            const finance::TransactionsView&            transactions,
             const std::shared_ptr<cache::StockCache>&   stockCache,
             const std::shared_ptr<cache::AccountCache>& accountCache
         );
 
         static FinanceResult<std::vector<drafts::CashTransactionOverview>> toCash(
-            const finance::Transactions&                transactions,
+            const finance::TransactionsView&            transactions,
             const std::shared_ptr<cache::AccountCache>& accountCache
         );
     };

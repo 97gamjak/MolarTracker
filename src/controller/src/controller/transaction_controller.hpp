@@ -7,9 +7,8 @@
 
 namespace store
 {
-    class ITransactionStore;   // Forward declaration
-    class IAccountStore;       // Forward declaration
-    class IStockStore;         // Forward declaration
+    class IAccountStore;   // Forward declaration
+    class IStockStore;     // Forward declaration
 }   // namespace store
 
 namespace cmd
@@ -28,6 +27,7 @@ namespace cache
 {
     class StockCache;
     class AccountCache;
+    class TransactionCache;
 }   // namespace cache
 
 namespace controller
@@ -45,8 +45,8 @@ namespace controller
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
 
-        /// Reference to the transaction store
-        std::shared_ptr<store::ITransactionStore> _transactionStore;
+        /// Reference to the transaction cache
+        std::shared_ptr<cache::TransactionCache> _transactionCache;
         /// Reference to the account cache
         std::shared_ptr<cache::AccountCache> _accountCache;
         /// Reference to the stock cache
@@ -59,11 +59,11 @@ namespace controller
 
        public:
         TransactionController(
-            cmd::UndoStack&                                  undoStack,
-            const std::shared_ptr<store::ITransactionStore>& transactionStore,
-            const std::shared_ptr<cache::AccountCache>&      accountCache,
-            const std::shared_ptr<cache::StockCache>&        stockCache,
-            QStackedWidget*                                  stackedWidget
+            cmd::UndoStack&                                 undoStack,
+            const std::shared_ptr<cache::TransactionCache>& transactionCache,
+            const std::shared_ptr<cache::AccountCache>&     accountCache,
+            const std::shared_ptr<cache::StockCache>&       stockCache,
+            QStackedWidget*                                 stackedWidget
         );
 
         void transactionOverviewSelected(bool focus);

@@ -4,6 +4,7 @@
 
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/account/accounts.hpp"
+#include "finance/filter/predicates.hpp"
 #include "finance/positions.hpp"
 #include "logging/log_macros.hpp"
 #include "store/base/base_store.hpp"
@@ -113,6 +114,46 @@ namespace store
         );
 
         return positions;
+    }
+
+    /**
+     * @brief Get a position by its ID
+     *
+     * @param positionId The ID of the position to retrieve
+     * @return std::optional<finance::Position>
+     */
+    std::optional<finance::Position> PositionStore::getPosition(
+        PositionId positionId
+    ) const
+    {
+        LOG_ENTRY;
+
+        auto options = Options{
+            .filter   = finance::checkId<finance::Position>(positionId),
+            .deletion = DeletionPolicy::IncludeDelete
+        };
+
+        auto positions = _getValues(options);
+
+        std::vector<finance::Position> positionsVec(
+            positions.begin(),
+            positions.end()
+        );
+
+        if (positionsVec.size() > 1)
+        {
+            throw std::runtime_error(
+                std::format(
+                    "Multiple positions found for position ID: {}",
+                    positionId.toString()
+                )
+            );
+        }
+
+        if (!positionsVec.empty() && positionsVec.size() == 1)
+            return positionsVec.front();
+
+        return _positionService->getPosition(positionId);
     }
 
     /**

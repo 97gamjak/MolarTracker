@@ -1,11 +1,13 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTIONS_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTIONS_HPP__
 
+#include <memory>
 #include <vector>
 
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
+#include "utils/container/id_map.hpp"
 
 namespace finance
 {
@@ -33,8 +35,8 @@ namespace finance
      * @brief Class for managing stock transactions.
      *
      */
-    class StockTransactions : public Vector<StockTransaction>,
-                              public ISecurityTransactions
+    class StockTransactionsView : public Vector<StockTransactionView>,
+                                  public ISecurityTransactions
     {
        public:
         void sort();
@@ -46,7 +48,7 @@ namespace finance
      * @brief Class for managing cash transactions.
      *
      */
-    class CashTransactions : public Vector<CashTransaction>
+    class CashTransactionsView : public Vector<CashTransactionView>
     {
        public:
     };
@@ -59,10 +61,10 @@ namespace finance
     {
        private:
         /// The stock transactions that are part of the security view
-        const StockTransactions& _stockTransactions;
+        const StockTransactionsView& _stockTransactions;
 
        public:
-        explicit SecurityView(const StockTransactions& stockTransactions);
+        explicit SecurityView(const StockTransactionsView& stockTransactions);
         ~SecurityView() override = default;
 
         // delete copy and move constructors
@@ -82,9 +84,9 @@ namespace finance
     {
        private:
         /// The list of cash transactions
-        CashTransactions _cashTransactions;
+        CashTransactionsView _cashTransactions;
         /// The list of stock transactions
-        StockTransactions _stockTransactions;
+        StockTransactionsView _stockTransactions;
 
        public:
         Transactions() = default;
@@ -97,16 +99,28 @@ namespace finance
             const AccountsView&                   accounts
         );
 
-        [[nodiscard]] const CashTransactions& cash() const;
-
-        [[nodiscard]] const StockTransactions& stocks() const;
-
         [[nodiscard]] SecurityView securities() const;
 
         [[nodiscard]] bool empty() const;
 
        private:
         [[nodiscard]] std::vector<const Transaction*> _getTransactions() const;
+    };
+
+    class TransactionsView
+    {
+        IdObjectMap<StockTransactionView> _stockTransactions;
+        IdObjectMap<CashTransactionView>  _cashTransactions;
+
+       public:
+        explicit TransactionsView(
+            const std::vector<std::shared_ptr<const DomainTransaction>>&
+                                transactions,
+            const AccountsView& accounts
+        );
+
+        [[nodiscard]] const CashTransactionsView&  cash() const;
+        [[nodiscard]] const StockTransactionsView& stocks() const;
     };
 }   // namespace finance
 
