@@ -27,7 +27,6 @@ namespace ui
 namespace cache
 {
     class StockCache;
-    class AccountCache;
 }   // namespace cache
 
 namespace controller
@@ -47,8 +46,8 @@ namespace controller
 
         /// Reference to the transaction store
         std::shared_ptr<store::ITransactionStore> _transactionStore;
-        /// Reference to the account cache
-        std::shared_ptr<cache::AccountCache> _accountCache;
+        /// Reference to the account store
+        std::shared_ptr<store::IAccountStore> _accountStore;
         /// Reference to the stock cache
         std::shared_ptr<cache::StockCache> _stockCache;
 
@@ -61,7 +60,7 @@ namespace controller
         TransactionController(
             cmd::UndoStack&                                  undoStack,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
-            const std::shared_ptr<cache::AccountCache>&      accountCache,
+            const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<cache::StockCache>&        stockCache,
             QStackedWidget*                                  stackedWidget
         );

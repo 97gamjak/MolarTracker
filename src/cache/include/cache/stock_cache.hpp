@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "config/id_types.hpp"
-#include "error/finance_error.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/instrument/stocks.hpp"
 #include "single_cache.hpp"
@@ -68,6 +67,11 @@ namespace cache
             const StockId& key
         ) override;
 
+        [[nodiscard]]
+        IdObjectMap<std::shared_ptr<const finance::Stock>> _loadAll(
+            const finance::StockFilter& filter
+        );
+
         void _onAdded(
             const StockId&                               key,
             const std::shared_ptr<const finance::Stock>& value
@@ -97,25 +101,6 @@ namespace cache
 
         [[nodiscard]]
         std::shared_ptr<const finance::Stock> _load(InstrumentId instrumentId);
-
-       private:
-        [[nodiscard]]
-        finance::StocksView::Type _loadAll(const finance::StockFilter& filter);
-    };
-
-    /**
-     * @brief Utility class for working with the StockCache, providing methods
-     * for retrieving stocks from the cache with additional validation and error
-     * handling.
-     *
-     */
-    class StockCacheUtils
-    {
-       public:
-        static FinanceResult<std::shared_ptr<const finance::Stock>> getStock(
-            InstrumentId                       instrumentId,
-            const std::shared_ptr<StockCache>& stockCache
-        );
     };
 
 }   // namespace cache

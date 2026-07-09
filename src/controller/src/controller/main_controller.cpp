@@ -81,17 +81,17 @@ namespace controller
               _centralController(_mainWindow->getCentralWidget()),
               _accountController(
                   _undoStack,
+                  _storeContainer.getAccountStore(),
                   _storeContainer.getPositionStore(),
-                  _storeContainer.getTransactionStore(),
-                  _caches.getAccountCache(),
                   _caches.getStockCache(),
+                  _storeContainer.getTransactionStore(),
                   _priceCache,
                   _mainWindow->getCentralWidget()
               ),
               _transactionController(
                   _undoStack,
                   _storeContainer.getTransactionStore(),
-                  _caches.getAccountCache(),
+                  _storeContainer.getAccountStore(),
                   _caches.getStockCache(),
                   _mainWindow->getCentralWidget()
               ),
@@ -99,7 +99,6 @@ namespace controller
                   _storeContainer.getPositionStore(),
                   _storeContainer.getTransactionStore(),
                   _caches.getStockCache(),
-                  _caches.getAccountCache(),
                   _priceCache
               ),
               _vcsController(

@@ -17,8 +17,7 @@ class Connections;
 
 namespace cache
 {
-    class StockCache;     // forward declaration
-    class AccountCache;   // forward declaration
+    class StockCache;   // forward declaration
 
     /**
      * @brief Container for managing cache instances, this class is responsible
@@ -33,10 +32,6 @@ namespace cache
         /// Shared pointer to the StockCache instance managed by this container.
         std::shared_ptr<StockCache> _stockCache;
 
-        /// Shared pointer to the AccountCache instance managed by this
-        /// container.
-        std::shared_ptr<AccountCache> _accountCache;
-
         /// Connections for cache events, allowing for event notifications.
         std::unique_ptr<Connections> _connections;
 
@@ -47,11 +42,7 @@ namespace cache
         );
         ~CacheContainer();
 
-        [[nodiscard]]
-        const std::shared_ptr<StockCache>& getStockCache() const;
-
-        [[nodiscard]]
-        const std::shared_ptr<AccountCache>& getAccountCache() const;
+        [[nodiscard]] const std::shared_ptr<StockCache>& getStockCache() const;
     };
 }   // namespace cache
 

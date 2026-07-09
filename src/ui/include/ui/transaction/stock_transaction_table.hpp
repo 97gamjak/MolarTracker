@@ -4,6 +4,9 @@
 #include <qabstractitemmodel.h>
 #include <qtablewidget.h>
 
+#include "config/id_types.hpp"
+#include "utils/container/id_map.hpp"
+
 namespace drafts
 {
     class StockTransactionOverview;   // Forward declaration
@@ -23,6 +26,9 @@ namespace ui
         /// The list of transactions to display in the table
         std::vector<drafts::StockTransactionOverview> _transactions;
 
+        /// A map of account IDs to account names for display purposes
+        IdMap<AccountId, std::string> _accountIdToName;
+
        public:
         explicit StockTransactionTableModel(QObject* parent = nullptr);
         ~StockTransactionTableModel() override;
@@ -33,7 +39,8 @@ namespace ui
         [[nodiscard]] static int getDateIndex();
 
         void setTransactions(
-            std::vector<drafts::StockTransactionOverview> transactions
+            std::vector<drafts::StockTransactionOverview> transactions,
+            IdMap<AccountId, std::string>                 accountIdToName
         );
 
         [[nodiscard]]
@@ -54,10 +61,10 @@ namespace ui
 
        private:
         [[nodiscard]]
-        static QVariant _displayData(
+        QVariant _displayData(
             const drafts::StockTransactionOverview& transaction,
             int                                     col
-        );
+        ) const;
 
         [[nodiscard]]
         static QVariant _decorationData(

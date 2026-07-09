@@ -5,7 +5,6 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QVBoxLayout>
-#include <optional>
 
 #include "utils/qt_helpers.hpp"
 
@@ -16,16 +15,14 @@ namespace ui
     /**
      * @brief Construct a new Error Dialog:: Error Dialog object
      *
-     * @param title The title of the error dialog.
-     * @param message The error message to display.
-     * @param details Optional detailed error message.
-     * @param parent The parent widget for the dialog.
+     * @param title
+     * @param message
+     * @param parent
      */
     ErrorDialog::ErrorDialog(
-        const QString&                title,
-        const QString&                message,
-        const std::optional<QString>& details,
-        QWidget*                      parent
+        const QString& title,
+        const QString& message,
+        QWidget*       parent
     )
         : Dialog(parent)
     {
@@ -58,14 +55,6 @@ namespace ui
         topRow->addSpacing(topRowSpacing);
         topRow->addWidget(msgLabel, 1);
         layout->addLayout(topRow);
-
-        if (details.has_value())
-        {
-            auto* detailsLabel = makeQChild<QLabel>(*details, this);
-            detailsLabel->setWordWrap(true);
-            detailsLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-            layout->addWidget(detailsLabel);
-        }
 
         // OK button
         auto* btnRow = makeQChild<QHBoxLayout>();
@@ -103,7 +92,7 @@ namespace ui
         QWidget*       parent
     )
     {
-        ErrorDialog dlg(title, message, std::nullopt, parent);
+        ErrorDialog dlg(title, message, parent);
         dlg.exec();
     }
 

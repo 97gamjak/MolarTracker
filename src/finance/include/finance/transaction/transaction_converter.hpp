@@ -1,7 +1,8 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_CONVERTER_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_CONVERTER_HPP__
 
-#include "error/finance_error.hpp"
+#include <expected>
+
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -31,33 +32,35 @@ namespace finance
     {
        public:
         [[nodiscard]]
-        static FinanceResult<DomainTransaction> toDomain(
+        static DomainTransaction toDomain(
             const CashTransaction& transaction,
-            const AccountsView&    accounts
+            const Accounts&        accounts
         );
 
         [[nodiscard]]
-        static FinanceResult<DomainTransaction> toDomain(
+        static DomainTransaction toDomain(
             const StockTransaction& transaction,
-            const AccountsView&     accounts
+            const Accounts&         accounts
         );
 
         [[nodiscard]]
-        static FinanceResult<DomainTransaction> toDomain(
+        static DomainTransaction toDomain(
             const OptionTransaction& transaction,
-            const AccountsView&      accounts
+            const Accounts&          accounts
         );
 
         [[nodiscard]]
-        static FinanceResult<CashTransaction> toCash(
-            const DomainTransaction& transaction,
-            const AccountsView&      accounts
-        );
+        static std::
+            expected<CashTransaction, TransactionConversionError> toCash(
+                const DomainTransaction& transaction,
+                const Accounts&          accounts
+            );
 
         [[nodiscard]]
-        static FinanceResult<StockTransaction> toStock(
-            const DomainTransaction& transaction
-        );
+        static std::
+            expected<StockTransaction, TransactionConversionError> toStock(
+                const DomainTransaction& transaction
+            );
     };
 }   // namespace finance
 

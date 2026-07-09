@@ -4,6 +4,9 @@
 #include <qsortfilterproxymodel.h>
 #include <qwidget.h>
 
+#include "config/id_types.hpp"
+#include "utils/container/id_map.hpp"
+
 namespace drafts
 {
     class CashTransactionOverview;    // Forward declaration
@@ -55,7 +58,8 @@ namespace ui
             const std::vector<drafts::CashTransactionOverview>&
                 cashTransactions,
             const std::vector<drafts::StockTransactionOverview>&
-                stockTransactions
+                                                 stockTransactions,
+            const IdMap<AccountId, std::string>& accountIdToName
         );
 
        private:

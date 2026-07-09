@@ -20,14 +20,12 @@ namespace controller
      * @param positionStore
      * @param transactionStore
      * @param stockCache
-     * @param accountCache
      * @param priceCache
      */
     PositionController::PositionController(
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
         const std::shared_ptr<cache::StockCache>&        stockCache,
-        const std::shared_ptr<cache::AccountCache>&      accountCache,
         const std::shared_ptr<finance::PriceCache>&      priceCache
     )
         : _pollTimer(new QTimer(this)),
@@ -35,7 +33,6 @@ namespace controller
           _positionStore(positionStore),
           _transactionStore(transactionStore),
           _stockCache(stockCache),
-          _accountCache(accountCache),
           _expectedSymbolCount(0),
           _connections(std::make_unique<Connections>())
     {
@@ -57,12 +54,8 @@ namespace controller
         _initTickers();
 
         _connections->add(_transactionStore->subscribeToTransactionAdded(
-            [this](const finance::DomainTransaction& transaction)
+            [this](const finance::Transactions& transactions)
             {
-                finance::Transactions transactions{
-                    std::vector<finance::DomainTransaction>{transaction},
-                    _accountCache->getAllAccounts()
-                };
                 _collectTickers(transactions);
                 _fetchPrices();
             },
@@ -145,18 +138,12 @@ namespace controller
      */
     void PositionController::_initTickers()
     {
-        const auto ids =
-            _positionStore
-                ->getOpenPositions(_accountCache->getAllAccounts().getIds())
-                .getIds();
+        const auto ids = _positionStore->getOpenPositions().getIds();
 
         finance::TransactionFilter filter;
         filter.setPositionIds(ids);
 
-        const auto transactions = _transactionStore->getTransactions(
-            filter,
-            _accountCache->getAllAccounts()
-        );
+        const auto transactions = _transactionStore->getTransactions(filter);
         _collectTickers(transactions);
     }
 

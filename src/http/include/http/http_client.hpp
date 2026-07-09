@@ -1,7 +1,9 @@
 #ifndef __HTTP__INCLUDE__HTTP__HTTP_CLIENT_HPP__
 #define __HTTP__INCLUDE__HTTP__HTTP_CLIENT_HPP__
 
-#include "error/http_error.hpp"
+#include <expected>
+
+#include "http_error.hpp"
 #include "http_request.hpp"
 
 namespace http
@@ -15,7 +17,9 @@ namespace http
     {
        public:
         [[nodiscard]]
-        static Result<HttpResponse, HttpError> get(const HttpRequest& request);
+        static std::expected<HttpResponse, HttpError> get(
+            const HttpRequest& request
+        );
 
         [[nodiscard]]
         static std::string urlEncode(const std::string& value);

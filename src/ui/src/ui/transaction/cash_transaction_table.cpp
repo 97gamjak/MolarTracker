@@ -17,12 +17,13 @@ namespace ui
 {
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define COLUMN_LIST(X) \
-    X(Date)            \
-    X(Type)            \
-    X(Account)         \
-    X(Amount)          \
-    X(Fees)            \
+#define COLUMN_LIST(X)  \
+    X(Date)             \
+    X(Type)             \
+    X(Account)          \
+    X(ReferenceAccount) \
+    X(Amount)           \
+    X(Fees)             \
     X(Description)
 
     MSTD_ENUM(CashTransactionColumn, std::uint8_t, COLUMN_LIST);
@@ -37,6 +38,9 @@ namespace ui
          */
         QString getColLabel(CashTransactionColumn col)
         {
+            if (col == CashTransactionColumn::ReferenceAccount)
+                return "Reference Account";
+
             return QString::fromStdString(
                 CashTransactionColumnMeta::toString(col)
             );
@@ -71,13 +75,16 @@ namespace ui
      * @brief Sets the transactions for the model.
      *
      * @param transactions The transactions to set.
+     * @param accountIdToName The mapping of account IDs to account names.
      */
     void CashTransactionTableModel::setTransactions(
-        std::vector<drafts::CashTransactionOverview> transactions
+        std::vector<drafts::CashTransactionOverview> transactions,
+        IdMap<AccountId, std::string>                accountIdToName
     )
     {
         beginResetModel();
-        _transactions = std::move(transactions);
+        _transactions    = std::move(transactions);
+        _accountIdToName = std::move(accountIdToName);
         endResetModel();
     }
 
@@ -200,7 +207,7 @@ namespace ui
     QVariant CashTransactionTableModel::_displayData(
         const drafts::CashTransactionOverview& transaction,
         int                                    col
-    )
+    ) const
     {
         switch (getColFromIndex(col))
         {
@@ -218,9 +225,19 @@ namespace ui
                 return QString::fromStdString("");
             case CashTransactionColumn::Account:
             {
-                const auto& account = transaction.getCashAccount();
+                const auto id = transaction.getCashAccount();
+                if (!_accountIdToName.contains(id))
+                    return "";
 
-                return QString::fromStdString(account.getName());
+                return QString::fromStdString(_accountIdToName.at(id));
+            }
+            case CashTransactionColumn::ReferenceAccount:
+            {
+                const auto id = transaction.getExternalAccount();
+                if (!_accountIdToName.contains(id))
+                    return "";
+
+                return QString::fromStdString(_accountIdToName.at(id));
             }
             case CashTransactionColumn::Amount:
                 return QString::fromStdString(

@@ -15,5 +15,4 @@ target_link_libraries(molartracker_http
     CURL::libcurl
     PRIVATE
     mstd
-    molartracker_error
 )

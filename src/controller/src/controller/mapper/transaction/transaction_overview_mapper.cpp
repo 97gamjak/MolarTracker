@@ -1,54 +1,17 @@
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 
-#include "cache/account_cache.hpp"
 #include "cache/stock_cache.hpp"
-#include "controller/mapper/account_mapper.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transactions.hpp"
 
-using cache::AccountCache;
-using cache::AccountCacheUtils;
-using cache::StockCache;
-using cache::StockCacheUtils;
-using drafts::CashTransactionOverview;
-using drafts::StockTransactionOverview;
-
 namespace controller
 {
+    using drafts::StockTransactionOverview;
+
     namespace
     {
-
-        /**
-         * @brief Helper function to create a FinanceError for transaction
-         * overview conversion failures, this function takes a transaction and
-         * an existing FinanceError, and returns a new FinanceError with
-         * additional context about the failure, including the transaction ID.
-         *
-         * @tparam TransactionType The type of the transaction (e.g.,
-         * StockTransaction or CashTransaction)
-         * @param transactions The transaction that failed to convert
-         * @param result The existing FinanceError that caused the failure
-         * @return FinanceError A new FinanceError with additional context about
-         * the failure
-         */
-        template <typename TransactionType>
-        FinanceError toOverviewError(
-            const TransactionType& transactions,
-            const FinanceError&    result
-        )
-        {
-            return result.convert(
-                FinanceErrorType::InvalidTransaction,
-                std::format(
-                    "Failed to convert transaction with ID {} to "
-                    "overview",
-                    transactions.getId().toString()
-                )
-            );
-        }
-
         /**
          * @brief Converts a StockTransaction to a
          * drafts::StockTransactionOverview, this will extract the relevant
@@ -57,43 +20,20 @@ namespace controller
          *
          * @param transaction
          * @param stockCache
-         * @param accountCache
-         *
-         * @return FinanceResult<drafts::StockTransactionOverview> A result
-         * containing either a StockTransactionOverview draft or a FinanceError
-         * if the conversion failed
+         * @return drafts::StockTransactionOverview
          */
-        FinanceResult<StockTransactionOverview> _toStockOverview(
-            const finance::StockTransaction&     transaction,
-            const std::shared_ptr<StockCache>&   stockCache,
-            const std::shared_ptr<AccountCache>& accountCache
+        StockTransactionOverview toStockOverview(
+            const finance::StockTransaction&          transaction,
+            const std::shared_ptr<cache::StockCache>& stockCache
         )
         {
             const auto instrumentId = transaction.getBaseInstrumentId();
 
-            const auto& stock =
-                StockCacheUtils::getStock(instrumentId, stockCache);
+            const auto& stock = stockCache->getStock(instrumentId);
 
-            if (!stock)
-                return toOverviewError(transaction, stock.error());
-
-            const auto& ticker = (*stock)->getTicker();
-
-            const auto& securityAccount = AccountCacheUtils::getSecurityAccount(
-                transaction.getSecurityAccountId(),
-                accountCache
-            );
-
-            if (!securityAccount)
-                return toOverviewError(transaction, securityAccount.error());
-
-            const auto& cashAccount = AccountCacheUtils::getCashAccount(
-                transaction.getCashAccountId(),
-                accountCache
-            );
-
-            if (!cashAccount)
-                return toOverviewError(transaction, cashAccount.error());
+            std::string ticker = "Unknown";
+            if (stock)
+                ticker = stock->getTicker();
 
             return StockTransactionOverview(
                 transaction.getTimestamp(),
@@ -102,8 +42,8 @@ namespace controller
                 transaction.getUnitPrice(),
                 transaction.getFees(),
                 ticker,
-                AccountMapper::toDraft(**securityAccount),
-                AccountMapper::toDraft(**cashAccount)
+                transaction.getSecurityAccountId(),
+                transaction.getCashAccountId()
             );
         }
 
@@ -114,29 +54,19 @@ namespace controller
          * the transaction overview.
          *
          * @param transaction
-         * @param accountCache
-         *
-         * @return Result<drafts::CashTransactionOverview, FinanceError>
+         * @return drafts::CashTransactionOverview
          */
-        FinanceResult<drafts::CashTransactionOverview> _toCashOverview(
-            const finance::CashTransaction&      transaction,
-            const std::shared_ptr<AccountCache>& accountCache
+        drafts::CashTransactionOverview toCashOverview(
+            const finance::CashTransaction& transaction
         )
         {
-            const auto& cashAccount = AccountCacheUtils::getCashAccount(
-                transaction.getCashAccountId(),
-                accountCache
-            );
-
-            if (!cashAccount)
-                return toOverviewError(transaction, cashAccount.error());
-
             return drafts::CashTransactionOverview(
                 transaction.getTimestamp(),
                 transaction.getComment(),
                 transaction.getAmount(),
                 transaction.getFees(),
-                AccountMapper::toDraft(**cashAccount)
+                transaction.getCashAccountId(),
+                transaction.getExternalAccountId()
             );
         }
     }   // namespace
@@ -150,28 +80,18 @@ namespace controller
      *
      * @param transactions
      * @param stockCache
-     * @param accountCache
-     *
-     * @return FinanceResult<std::vector<StockTransactionOverview>>
+     * @return std::vector<drafts::StockTransactionOverview>
      */
-    FinanceResult<std::vector<StockTransactionOverview>> TransactionOverviewMapper::
-        toStockOverview(
-            const finance::Transactions&         transactions,
-            const std::shared_ptr<StockCache>&   stockCache,
-            const std::shared_ptr<AccountCache>& accountCache
-        )
+    std::vector<StockTransactionOverview> TransactionOverviewMapper::toStock(
+        const finance::Transactions&              transactions,
+        const std::shared_ptr<cache::StockCache>& stockCache
+    )
     {
         std::vector<StockTransactionOverview> result;
 
         for (const auto& transaction : transactions.stocks())
         {
-            const auto& overview =
-                _toStockOverview(transaction, stockCache, accountCache);
-
-            if (!overview)
-                return overview.error();
-
-            result.push_back(*overview);
+            result.push_back(toStockOverview(transaction, stockCache));
         }
 
         return result;
@@ -185,26 +105,16 @@ namespace controller
      * drafts for display in the transaction overview.
      *
      * @param transactions
-     * @param accountCache
-     *
-     * @return FinanceResult<std::vector<CashTransactionOverview>>
+     * @return std::vector<drafts::CashTransactionOverview>
      */
-    FinanceResult<std::vector<CashTransactionOverview>> TransactionOverviewMapper::
-        toCash(
-            const finance::Transactions&         transactions,
-            const std::shared_ptr<AccountCache>& accountCache
-        )
+    std::vector<drafts::CashTransactionOverview> TransactionOverviewMapper::
+        toCash(const finance::Transactions& transactions)
     {
-        std::vector<CashTransactionOverview> result;
+        std::vector<drafts::CashTransactionOverview> result;
 
         for (const auto& transaction : transactions.cash())
         {
-            const auto& overview = _toCashOverview(transaction, accountCache);
-
-            if (!overview)
-                return overview.error();
-
-            result.push_back(*overview);
+            result.push_back(toCashOverview(transaction));
         }
 
         return result;

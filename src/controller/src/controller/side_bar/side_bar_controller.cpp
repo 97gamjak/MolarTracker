@@ -48,7 +48,6 @@ namespace controller
           _accountSideBarController(
               undoStack,
               storeContainer.getAccountStore(),
-              cacheContainer.getAccountCache(),
               accountController,
               mainWindow
           ),
@@ -60,11 +59,11 @@ namespace controller
           ),
           _transactionSideBarController(
               undoStack,
+              storeContainer.getAccountStore(),
               storeContainer.getTransactionStore(),
+              cacheContainer.getStockCache(),
               storeContainer.getOptionStore(),
               storeContainer.getPositionStore(),
-              cacheContainer.getAccountCache(),
-              cacheContainer.getStockCache(),
               transactionController,
               _securitiesSideBarController,
               mainWindow

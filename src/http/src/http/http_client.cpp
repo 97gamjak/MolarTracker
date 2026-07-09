@@ -15,17 +15,20 @@ namespace http
      * @param request The HTTP request to send
      * @return The HTTP response or an error
      */
-    Result<HttpResponse, HttpError> HttpClient::get(const HttpRequest& request)
+    std::expected<HttpResponse, HttpError> HttpClient::get(
+        const HttpRequest& request
+    )
     {
         CURL* curl = curl_easy_init();
         if (curl == nullptr)
         {
-            return HttpError{
-                HttpErrorType::CurlInit,
-                "curl_easy_init returned null",
-                0,
-                {}
-            };
+            return std::unexpected(
+                HttpError{
+                    .kind            = HttpErrorKind::CurlInit,
+                    .message         = "curl_easy_init returned null",
+                    .responseHeaders = {},
+                }
+            );
         }
 
         // RAII cleanup
@@ -61,12 +64,13 @@ namespace http
 
         if (res != CURLE_OK)
         {
-            return HttpError{
-                HttpErrorType::CurlPerform,
-                curl_easy_strerror(res),
-                0,
-                std::move(responseHeaders),
-            };
+            return std::unexpected(
+                HttpError{
+                    .kind            = HttpErrorKind::CurlPerform,
+                    .message         = curl_easy_strerror(res),
+                    .responseHeaders = std::move(responseHeaders),
+                }
+            );
         }
 
         std::int64_t statusCode{};
@@ -75,12 +79,14 @@ namespace http
         constexpr std::int64_t HTTP_STATUS_CODE_BAD_REQUEST = 400;
         if (statusCode >= HTTP_STATUS_CODE_BAD_REQUEST)
         {
-            return HttpError{
-                HttpErrorType::BadStatus,
-                "HTTP error " + std::to_string(statusCode),
-                static_cast<int>(statusCode),
-                responseHeaders,
-            };
+            return std::unexpected(
+                HttpError{
+                    .kind       = HttpErrorKind::BadStatus,
+                    .statusCode = static_cast<int>(statusCode),
+                    .message    = "HTTP error " + std::to_string(statusCode),
+                    .responseHeaders = responseHeaders,
+                }
+            );
         }
 
         return HttpResponse{

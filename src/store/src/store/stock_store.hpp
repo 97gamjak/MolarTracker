@@ -5,12 +5,12 @@
 #include <unordered_map>
 
 #include "config/id_types.hpp"
+#include "config/signal_tags.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/instrument/stocks.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
-#include "store/subscriptions.hpp"
 #include "utils/container/id_id_map.hpp"
 
 namespace store
@@ -78,12 +78,28 @@ namespace store
         const IdIdMap<InstrumentId>& getInstrumentIdMap() const;
 
         [[nodiscard]]
+        Connection subscribeToStockAdded(
+            OnStoreItemAdded<finance::Stock>::func func,
+            void*                                  subscriber
+        ) override;
+
+        [[nodiscard]]
+        Connection subscribeToStockUpdated(
+            OnStoreItemUpdated<finance::Stock>::func func,
+            void*                                    subscriber
+        ) override;
+
+        [[nodiscard]]
+        Connection subscribeToStockRemoved(
+            OnStoreItemRemoved<StockId>::func func,
+            void*                             subscriber
+        ) override;
+
+        [[nodiscard]]
         Connection subscribeToCommit(
             const OnCommit::func& func,
             void*                 subscriber
         ) override;
-
-        SUBSCRIBE_OVERRIDE(finance::Stock, StockId)
 
        private:
         [[nodiscard]] std::optional<finance::Stock> _getStock(

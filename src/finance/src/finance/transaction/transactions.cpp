@@ -66,7 +66,7 @@ namespace finance
      */
     Transactions::Transactions(
         const std::vector<DomainTransaction>& transactions,
-        const AccountsView&                   accounts
+        const Accounts&                       accounts
     )
     {
         addTransactions(transactions, accounts);
@@ -82,7 +82,7 @@ namespace finance
      */
     void Transactions::addTransactions(
         const std::vector<DomainTransaction>& transactions,
-        const AccountsView&                   accounts
+        const Accounts&                       accounts
     )
     {
         for (const auto& transaction : transactions)
@@ -100,7 +100,7 @@ namespace finance
                                 "Failed to convert transaction with ID {} to "
                                 "cash transaction: {}",
                                 transaction.getId().toString(),
-                                cashTx.error().toString()
+                                cashTx.error().message
                             )
                         );
                         continue;
@@ -119,7 +119,7 @@ namespace finance
                                 "Failed to convert transaction with ID {} to "
                                 "stock transaction: {}",
                                 transaction.getId().toString(),
-                                stockTx.error().toString()
+                                stockTx.error().message
                             )
                         );
                         continue;

@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "config/id_types.hpp"
-
 namespace finance
 {
     class Position;   // Forward declaration
@@ -21,13 +19,10 @@ namespace repo
     class PositionFactory
     {
        public:
-        static finance::Position fromPositionRow(
-            const PositionRow& row,
-            AccountId          accountId
-        );
+        static finance::Position fromPositionRow(const PositionRow& row);
 
         static std::vector<finance::Position> fromPositionRows(
-            const std::vector<std::pair<PositionRow, AccountId>>& rows
+            const std::vector<PositionRow>& rows
         );
 
         static PositionRow toPositionRow(const finance::Position& position);

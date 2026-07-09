@@ -9,7 +9,7 @@
 
 namespace finance
 {
-    class AccountsView;   // forward declaration
+    class Accounts;
 
     /**
      * @brief Interface for managing security-related transactions.
@@ -90,11 +90,11 @@ namespace finance
         Transactions() = default;
         Transactions(
             const std::vector<DomainTransaction>& transactions,
-            const AccountsView&                   accounts
+            const Accounts&                       accounts
         );
         void addTransactions(
             const std::vector<DomainTransaction>& transactions,
-            const AccountsView&                   accounts
+            const Accounts&                       accounts
         );
 
         [[nodiscard]] const CashTransactions& cash() const;

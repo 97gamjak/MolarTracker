@@ -2,40 +2,17 @@
 
 #include <format>
 
-#include "filter/predicate.hpp"
-#include "utils/container/set.hpp"
-
 namespace finance
 {
     /**
      * @brief Construct a new Position:: Position object
      *
-     * @param positionId The position id
-     * @param accountId The ID of the account associated with the position.
-     * @param createdAt The creation timestamp of the position.
-     * @param closedAt The closing timestamp of the position, if it exists.
+     * @param createdAt
+     * @param closedAt
      */
-    Position::Position(
-        PositionId               positionId,
-        AccountId                accountId,
-        Timestamp                createdAt,
-        std::optional<Timestamp> closedAt
-    )
-        : _id(positionId),
-          _accountId(accountId),
-          _createdAt(createdAt),
-          _closedAt(closedAt)
+    Position::Position(Timestamp createdAt, std::optional<Timestamp> closedAt)
+        : _createdAt(createdAt), _closedAt(closedAt)
     {
-        if (_closedAt.has_value() && _closedAt.value() < _createdAt)
-        {
-            throw std::invalid_argument(
-                std::format(
-                    "Closed timestamp {} cannot be before created timestamp {}",
-                    _closedAt.value().humanReadable(),
-                    _createdAt.humanReadable()
-                )
-            );
-        }
     }
 
     /**
@@ -67,13 +44,6 @@ namespace finance
     std::optional<Timestamp> Position::getClosedAt() const { return _closedAt; }
 
     /**
-     * @brief Get the account ID associated with the position.
-     *
-     * @return AccountId
-     */
-    AccountId Position::getAccountId() const { return _accountId; }
-
-    /**
      * @brief Predicate to check if a position is open (i.e. has no closing
      * timestamp)
      *
@@ -84,22 +54,6 @@ namespace finance
         return filter::Predicate<Position>{
             [isOpen](const Position& position)
             { return isOpen == !position.getClosedAt().has_value(); }
-        };
-    }
-
-    /**
-     * @brief Predicate to check if a position is associated with any of the
-     * given account IDs.
-     *
-     * @return filter::Predicate<Position>
-     */
-    filter::Predicate<Position> IsPositionForAccounts(
-        const IdSet<AccountId>& accountIds
-    )
-    {
-        return filter::Predicate<Position>{
-            [accountIds](const Position& position)
-            { return accountIds.contains(position.getAccountId()); }
         };
     }
 
