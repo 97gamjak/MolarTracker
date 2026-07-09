@@ -167,8 +167,6 @@ namespace store
 
         void clearIdRemap() override;
 
-        [[nodiscard]] const IdIdMap<IdType>& getIdRemap() const;
-
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
@@ -194,6 +192,8 @@ namespace store
         void _clearEntries();
 
         void _logCache(const std::string& category, LogLevel level);
+
+        [[nodiscard]] const IdIdMap<IdType>& _getIdRemap() const;
 
        private:
         static bool _evalDeletionPolicy(

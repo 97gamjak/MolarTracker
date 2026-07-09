@@ -74,16 +74,12 @@ namespace repo
         const auto joins = _createPositionJoins();
         const auto query = _createPositionQuery(accountIds);
 
-        auto result = _getCrud().getJoined<PositionRow, TradeLegRow>(
-            _getDb(),
-            joins,
-            query
-        );
+        auto result = _getCrud().getJoined<PositionRow>(_getDb(), joins, query);
 
-        std::vector<std::pair<PositionRow, AccountId>> positionRows;
+        std::vector<PositionRow> positionRows;
         positionRows.reserve(result.size());
-        for (const auto& [row, leg] : result)
-            positionRows.emplace_back(row, leg.accountId.value());
+        for (const auto& [row] : result)
+            positionRows.push_back(row);
 
         return PositionFactory::fromPositionRows(positionRows);
     }
@@ -106,16 +102,12 @@ namespace repo
         const auto query =
             _createPositionQuery(accountIds).where(PositionRow::IsOpen());
 
-        auto result = _getCrud().getJoined<PositionRow, TradeLegRow>(
-            _getDb(),
-            joins,
-            query
-        );
+        auto result = _getCrud().getJoined<PositionRow>(_getDb(), joins, query);
 
-        std::vector<std::pair<PositionRow, AccountId>> positionRows;
+        std::vector<PositionRow> positionRows;
         positionRows.reserve(result.size());
-        for (const auto& [row, leg] : result)
-            positionRows.emplace_back(row, leg.accountId.value());
+        for (const auto& [row] : result)
+            positionRows.push_back(row);
 
         return PositionFactory::fromPositionRows(positionRows);
     }

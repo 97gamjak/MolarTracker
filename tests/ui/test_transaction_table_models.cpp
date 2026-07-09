@@ -3,10 +3,8 @@
 #include <QVariant>
 
 #include "config/id_types.hpp"
-#include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
-#include "finance/account/account.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
 #include "utils/cash.hpp"
@@ -43,13 +41,8 @@ namespace
             comment,
             entry.getCash(),
             Cash{entry.getCurrency(), 1},
-            drafts::AccountDraft{
-                entry.getAccountId(),
-                AccountStatus::Active,
-                "Test Account",
-                entry.getCurrency(),
-                AccountKind::Cash
-            }
+            AccountId{1},
+            AccountId{0}
         };
     }
 
@@ -65,20 +58,8 @@ namespace
             Cash{Currency::USD, amount},
             Cash{Currency::USD, fees},
             "AAPL",
-            drafts::AccountDraft{
-                AccountId{1},
-                AccountStatus::Active,
-                "Test Security Account",
-                Currency::USD,
-                AccountKind::Security
-            },
-            drafts::AccountDraft{
-                AccountId{2},
-                AccountStatus::Active,
-                "Test Cash Account",
-                Currency::USD,
-                AccountKind::Cash
-            }
+            AccountId{2},
+            AccountId{1}
         };
     }
 
@@ -100,12 +81,12 @@ namespace
     TEST_F(CashTransactionTableModelTest, ColumnCountIsSeven)
     {
         // Date, Type, Account, ReferenceAccount, Amount, Fees, Description
-        EXPECT_EQ(_model.columnCount({}), 6);
+        EXPECT_EQ(_model.columnCount({}), 7);
     }
 
     TEST_F(CashTransactionTableModelTest, ValidParentReturnsZeroColumns)
     {
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx()}, {});
         const auto parent = _model.index(0, 0);
         ASSERT_TRUE(parent.isValid());
         EXPECT_EQ(_model.columnCount(parent), 0);
@@ -118,19 +99,19 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DescriptionIndexIsSix)
     {
-        EXPECT_EQ(_model.getDescriptionIndex(), 5);
+        EXPECT_EQ(_model.getDescriptionIndex(), 6);
     }
 
     TEST_F(CashTransactionTableModelTest, SetTransactionsUpdatesRowCount)
     {
-        _model.setTransactions({makeCashTx(), makeCashTx()});
+        _model.setTransactions({makeCashTx(), makeCashTx()}, {});
         EXPECT_EQ(_model.rowCount({}), 2);
     }
 
     TEST_F(CashTransactionTableModelTest, SetTransactionsReplacesExisting)
     {
-        _model.setTransactions({makeCashTx(), makeCashTx()});
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx(), makeCashTx()}, {});
+        _model.setTransactions({makeCashTx()}, {});
         EXPECT_EQ(_model.rowCount({}), 1);
     }
 
@@ -142,7 +123,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DataOutOfRangeReturnsNullVariant)
     {
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx()}, {});
         const auto idx  = _model.index(99, 0);
         const auto data = _model.data(idx, Qt::DisplayRole);
         EXPECT_FALSE(data.isValid());
@@ -150,7 +131,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DataDisplayRoleDescriptionColumn)
     {
-        _model.setTransactions({makeCashTx("My Note")});
+        _model.setTransactions({makeCashTx("My Note")}, {});
         const auto idx = _model.index(
             0,
             ui::CashTransactionTableModel::getDescriptionIndex()
@@ -161,7 +142,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DataDisplayRoleDateColumnIsNotEmpty)
     {
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx()}, {});
         const auto idx =
             _model.index(0, ui::CashTransactionTableModel::getDateIndex());
         const auto data = _model.data(idx, Qt::DisplayRole);
@@ -170,7 +151,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DataTextAlignmentRoleReturnsVariant)
     {
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx()}, {});
         const auto idx  = _model.index(0, 0);
         const auto data = _model.data(idx, Qt::TextAlignmentRole);
         EXPECT_TRUE(data.isValid());
@@ -178,7 +159,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, DataUnknownRoleReturnsNullVariant)
     {
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx()}, {});
         const auto idx  = _model.index(0, 0);
         const auto data = _model.data(idx, Qt::UserRole + 999);
         EXPECT_FALSE(data.isValid());
@@ -200,7 +181,7 @@ namespace
 
     TEST_F(CashTransactionTableModelTest, FlagsOnValidIndexEnabledAndSelectable)
     {
-        _model.setTransactions({makeCashTx()});
+        _model.setTransactions({makeCashTx()}, {});
         const auto idx   = _model.index(0, 0);
         const auto flags = _model.flags(idx);
         EXPECT_TRUE((flags & Qt::ItemIsEnabled) != 0);
@@ -237,7 +218,7 @@ namespace
 
     TEST_F(StockTransactionTableModelTest, ValidParentReturnsZeroColumns)
     {
-        _model.setTransactions({makeStockTx()});
+        _model.setTransactions({makeStockTx()}, {});
         const auto parent = _model.index(0, 0);
         ASSERT_TRUE(parent.isValid());
         EXPECT_EQ(_model.columnCount(parent), 0);
@@ -255,7 +236,7 @@ namespace
 
     TEST_F(StockTransactionTableModelTest, SetTransactionsUpdatesRowCount)
     {
-        _model.setTransactions({makeStockTx()});
+        _model.setTransactions({makeStockTx()}, {});
         EXPECT_EQ(_model.rowCount({}), 1);
     }
 
@@ -278,7 +259,7 @@ namespace
         FlagsOnValidIndexEnabledAndSelectable
     )
     {
-        _model.setTransactions({makeStockTx()});
+        _model.setTransactions({makeStockTx()}, {});
         const auto idx   = _model.index(0, 0);
         const auto flags = _model.flags(idx);
         EXPECT_TRUE((flags & Qt::ItemIsEnabled) != 0);

@@ -514,7 +514,7 @@ namespace store
      * @return const IdIdMap<IdType>&
      */
     template <typename T, typename IdType>
-    const IdIdMap<IdType>& BaseStore<T, IdType>::getIdRemap() const
+    const IdIdMap<IdType>& BaseStore<T, IdType>::_getIdRemap() const
     {
         return _idRemap;
     }

@@ -14,15 +14,54 @@ namespace store
 {
 
     /**
+     * @brief Session data for PositionStore
+     *
+     */
+    struct PositionStore::Session
+    {
+        /// the account session
+        const finance::Accounts& accountSession;
+
+        /**
+         * @brief Construct a new Session object
+         *
+         * @param accountSession_
+         */
+        explicit Session(const finance::Accounts& accountSession_)
+            : accountSession(accountSession_)
+        {
+        }
+
+        ~Session() = default;
+
+        // delete copy and move
+        Session(const Session&)            = delete;
+        Session(Session&&)                 = delete;
+        Session& operator=(const Session&) = delete;
+        Session& operator=(Session&&)      = delete;
+    };
+
+    /**
      * @brief Construct a new Position Store:: Position Store object
      *
      * @param positionService
+     * @param accountSession
      */
     PositionStore::PositionStore(
-        std::shared_ptr<service::IPositionService> positionService
+        std::shared_ptr<service::IPositionService> positionService,
+        const finance::Accounts&                   accountSession
     )
-        : _positionService(std::move(positionService))
+        : _positionService(std::move(positionService)),
+          _session(std::make_unique<Session>(accountSession))
     {
+        const auto accountIds = _session->accountSession.getIds();
+        if (!accountIds.empty())
+        {
+            const auto openPositions =
+                _positionService->getAllOpenPositions(accountIds);
+
+            _addCleanEntries(openPositions);
+        }
     }
 
     PositionStore::~PositionStore() = default;
@@ -42,14 +81,11 @@ namespace store
     /**
      * @brief Get all positions
      *
-     * @param accounts The accounts view to filter positions by
      * @return finance::Positions
      */
-    finance::Positions PositionStore::getAllPositions(
-        const finance::AccountsView& accounts
-    ) const
+    finance::Positions PositionStore::getAllPositions() const
     {
-        const auto accountIds = accounts.getIds();
+        const auto accountIds = _session->accountSession.getIds();
 
         if (accountIds.empty())
             return {};
@@ -75,21 +111,19 @@ namespace store
     /**
      * @brief Get all open positions
      *
-     * @param accountIds The set of account IDs to filter positions by
      * @return finance::Positions
      */
-    finance::Positions PositionStore::getOpenPositions(
-        const IdSet<AccountId>& accountIds
-    ) const
+    finance::Positions PositionStore::getOpenPositions() const
     {
         LOG_ENTRY;
+
+        const auto accountIds = _session->accountSession.getIds();
 
         if (accountIds.empty())
             return {};
 
         auto options = Options{
-            .filter = finance::IsPositionOpen() &&
-                      finance::IsPositionForAccounts(accountIds),
+            .filter   = finance::IsPositionOpen(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
@@ -148,6 +182,16 @@ namespace store
                 }
             }
         }
+    }
+
+    /**
+     * @brief Get the ID remapping for positions
+     *
+     * @return const IdIdMap<PositionId>&
+     */
+    const IdIdMap<PositionId>& PositionStore::getIdRemap() const
+    {
+        return _getIdRemap();
     }
 
     /**

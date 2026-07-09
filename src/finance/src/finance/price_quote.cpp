@@ -1,7 +1,9 @@
 #include "finance/price_quote.hpp"
 
+#include <expected>
 #include <stdexcept>
 
+#include "finance/finance_error.hpp"
 #include "json/json.hpp"
 #include "logging/log_macros.hpp"
 #include "utils/currency.hpp"
@@ -26,9 +28,9 @@ namespace finance
      * @brief Create a PriceQuote object from JSON.
      *
      * @param json The JSON object containing the price quote data.
-     * @return Result<PriceQuote, FinanceError>
+     * @return std::expected<PriceQuote, FinanceError>
      */
-    Result<PriceQuote, FinanceError> PriceQuote::fromJson(
+    std::expected<PriceQuote, FinanceError> PriceQuote::fromJson(
         const nlohmann::json& json
     )
     {
@@ -42,10 +44,10 @@ namespace finance
 
         if (!currencyOpt)
         {
-            return FinanceError(
+            return std::unexpected(FinanceError(
                 FinanceErrorType::CurrencyUnknown,
                 "Unknown currency " + currencyStr
-            );
+            ));
         }
         const auto currency = currencyOpt.value();
 
@@ -61,17 +63,17 @@ namespace finance
         }
         catch (const std::overflow_error& e)
         {
-            return FinanceError(
+            return std::unexpected(FinanceError(
                 FinanceErrorType::PriceOverflow,
                 "Invalid price " + priceStr + ": " + e.what()
-            );
+            ));
         }
         catch (const std::invalid_argument& e)
         {
-            return FinanceError(
+            return std::unexpected(FinanceError(
                 FinanceErrorType::InvalidPriceString,
                 "Invalid price " + priceStr + ": " + e.what()
-            );
+            ));
         }
 
         const auto time = json::safeGet<int64_t>(data, "regularMarketTime");

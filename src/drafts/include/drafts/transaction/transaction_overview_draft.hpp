@@ -4,7 +4,7 @@
 #include <optional>
 #include <string>
 
-#include "drafts/account_draft.hpp"
+#include "config/id_types.hpp"
 #include "utils/cash.hpp"
 #include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
@@ -25,19 +25,14 @@ namespace drafts
         /// An optional comment associated with the transaction
         std::optional<std::string> _comment;
 
-        /// The cash account ID associated with the cash transaction
-        AccountDraft _cashAccount;
-
        public:
         explicit TransactionOverviewDraft(
             Timestamp                  timestamp,
-            std::optional<std::string> comment,
-            AccountDraft               cashAccount
+            std::optional<std::string> comment
         );
 
         [[nodiscard]] const Timestamp&                  getTimestamp() const;
         [[nodiscard]] const std::optional<std::string>& getComment() const;
-        [[nodiscard]] const AccountDraft&               getCashAccount() const;
     };
 
     /**
@@ -52,17 +47,25 @@ namespace drafts
         /// The fees associated with the cash transaction
         Cash _fees;
 
+        /// The cash account ID associated with the cash transaction
+        AccountId _cashAccount;
+        /// The external account ID associated with the cash transaction
+        AccountId _externalAccount;
+
        public:
         explicit CashTransactionOverview(
             Timestamp                  timestamp,
             std::optional<std::string> comment,
             Cash                       amount,
             Cash                       fees,
-            AccountDraft               cashAccount
+            AccountId                  cashAccount,
+            AccountId                  externalAccount
         );
 
         [[nodiscard]] const Cash& getAmount() const;
         [[nodiscard]] const Cash& getFees() const;
+        [[nodiscard]] AccountId   getCashAccount() const;
+        [[nodiscard]] AccountId   getExternalAccount() const;
     };
 
     /**
@@ -83,7 +86,9 @@ namespace drafts
         std::string _ticker;
 
         /// The security account ID associated with the stock transaction
-        AccountDraft _securityAccount;
+        AccountId _securityAccount;
+        /// The cash account ID associated with the stock transaction
+        AccountId _cashAccount;
 
        public:
         explicit StockTransactionOverview(
@@ -93,12 +98,13 @@ namespace drafts
             Cash                       unitPrice,
             Cash                       fees,
             std::string                ticker,
-            AccountDraft               securityAccount,
-            AccountDraft               cashAccount
+            AccountId                  securityAccount,
+            AccountId                  cashAccount
         );
 
-        [[nodiscard]] const std::string&  getTicker() const;
-        [[nodiscard]] const AccountDraft& getSecurityAccount() const;
+        [[nodiscard]] std::string getTicker() const;
+        [[nodiscard]] AccountId   getSecurityAccount() const;
+        [[nodiscard]] AccountId   getCashAccount() const;
 
         [[nodiscard]] const Quantity& getQuantity() const;
         [[nodiscard]] const Cash&     getUnitPrice() const;

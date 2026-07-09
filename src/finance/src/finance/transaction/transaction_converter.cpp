@@ -4,7 +4,6 @@
 #include <variant>
 
 #include "config/id_types.hpp"
-#include "error/finance_error.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
@@ -14,20 +13,6 @@
 
 namespace finance
 {
-    namespace
-    {
-        [[nodiscard]]
-        FinanceError toDomainTransactionError(
-            const FinanceError& error,
-            const std::string&  message
-        )
-        {
-            return error.convert(
-                FinanceErrorType::InvalidTransaction,
-                "Could not convert" + message + "to DomainTransaction"
-            );
-        }
-    }   // namespace
     /**
      * @brief Converts a CashTransaction to a DomainTransaction, this
      * will take the relevant information from the cash transaction and format
@@ -37,22 +22,23 @@ namespace finance
      * @param transaction
      * @param accounts
      *
-     * @return FinanceResult<DomainTransaction>
+     * @return DomainTransaction
      */
-    FinanceResult<DomainTransaction> TransactionConverter::toDomain(
+    DomainTransaction TransactionConverter::toDomain(
         const CashTransaction& transaction,
-        const AccountsView&    accounts
+        const Accounts&        accounts
     )
     {
-        const auto cashId = transaction.getCashAccountId();
         const auto externalAccountId =
-            accounts.getCorrespondingExternalAccountId(cashId);
+            accounts.getCorrespondingExternalAccountId(
+                transaction.getCashAccountId()
+            );
 
-        if (!externalAccountId)
+        if (!externalAccountId.isValid())
         {
-            return toDomainTransactionError(
-                externalAccountId.error(),
-                "CashTransaction"
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
             );
         }
 
@@ -61,7 +47,7 @@ namespace finance
             transaction.getTimestamp(),
             transaction.getStatus(),
             CashData{},
-            transaction.getEntries(externalAccountId.value())
+            transaction.getEntries(externalAccountId)
         };
     }
 
@@ -74,11 +60,11 @@ namespace finance
      * @param transaction
      * @param accounts
      *
-     * @return FinanceResult<DomainTransaction>
+     * @return DomainTransaction
      */
-    FinanceResult<DomainTransaction> TransactionConverter::toDomain(
+    DomainTransaction TransactionConverter::toDomain(
         const StockTransaction& transaction,
-        const AccountsView&     accounts
+        const Accounts&         accounts
     )
     {
         const auto externalAccountId =
@@ -86,20 +72,19 @@ namespace finance
                 transaction.getCashAccountId()
             );
 
-        if (!externalAccountId)
+        if (!externalAccountId.isValid())
         {
-            return toDomainTransactionError(
-                externalAccountId.error(),
-                "StockTransaction"
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
             );
         }
-
         return DomainTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),
             transaction.getStockData(),
-            transaction.getEntries(*externalAccountId)
+            transaction.getEntries(externalAccountId)
         };
     }
 
@@ -113,11 +98,11 @@ namespace finance
      * @param transaction
      * @param accounts
      *
-     * @return FinanceResult<DomainTransaction>
+     * @return DomainTransaction
      */
-    FinanceResult<DomainTransaction> TransactionConverter::toDomain(
+    DomainTransaction TransactionConverter::toDomain(
         const OptionTransaction& transaction,
-        const AccountsView&      accounts
+        const Accounts&          accounts
     )
     {
         const auto externalAccountId =
@@ -125,11 +110,11 @@ namespace finance
                 transaction.getCashAccountId()
             );
 
-        if (!externalAccountId)
+        if (!externalAccountId.isValid())
         {
-            return toDomainTransactionError(
-                externalAccountId.error(),
-                "OptionTransaction"
+            throw std::runtime_error(
+                "No corresponding external account found for cash account: " +
+                transaction.getCashAccountId().toString()
             );
         }
 
@@ -138,7 +123,7 @@ namespace finance
             transaction.getTimestamp(),
             transaction.getStatus(),
             transaction.getOptionData(),
-            transaction.getEntries(*externalAccountId)
+            transaction.getEntries(externalAccountId)
         };
     }
 
@@ -150,20 +135,17 @@ namespace finance
      *
      * @param transaction
      * @param accounts
-     * @return FinanceResult<CashTransaction>
+     * @return std::expected<CashTransaction, TransactionConversionError>
      */
-    FinanceResult<CashTransaction> TransactionConverter::toCash(
-        const DomainTransaction& transaction,
-        const AccountsView&      accounts
-    )
+    std::expected<CashTransaction, TransactionConversionError> TransactionConverter::
+        toCash(const DomainTransaction& transaction, const Accounts& accounts)
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: No cash entries found"
-            };
+            return std::unexpected(
+                TransactionConversionError{"No cash entries found"}
+            );
         }
 
         auto amountEntries = entries.filter(TransactionEntryType::General);
@@ -171,56 +153,32 @@ namespace finance
 
         if (amountEntries.size() != 2)
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Invalid number of amount entries"
-            };
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of amount entries"}
+            );
         }
 
         if (feeEntries.size() != 2 && !feeEntries.empty())
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Invalid number of fee entries"
-            };
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of fee entries"}
+            );
         }
+
+        const auto internalAccounts = accounts.filterExternal(false);
+        const auto externalAccounts = accounts.filterExternal(true);
 
         size_t internalIndex{};
 
-        const auto isExternal0 =
-            accounts.isExternal(amountEntries[0].getAccountId());
-
-        if (!isExternal0)
-        {
-            return isExternal0.error().convert(
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Could not determine if account is "
-                "external"
-            );
-        }
-
-        const auto isExternal1 =
-            accounts.isExternal(amountEntries[1].getAccountId());
-
-        if (!isExternal1)
-        {
-            return isExternal1.error().convert(
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Could not determine if account is "
-                "external"
-            );
-        }
-
-        if (!isExternal0.value())
+        if (internalAccounts.contains(amountEntries[0].getAccountId()))
             internalIndex = 0;
-        else if (!isExternal1.value())
+        else if (internalAccounts.contains(amountEntries[1].getAccountId()))
             internalIndex = 1;
         else
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: No internal account found"
-            };
+            return std::unexpected(
+                TransactionConversionError{"No internal account found"}
+            );
         }
 
         const auto internalAccountId =
@@ -229,23 +187,11 @@ namespace finance
             amountEntries[1 - internalIndex].getAccountId();
         const auto amount = amountEntries[internalIndex].getCash();
 
-        const auto isExternalExternal = accounts.isExternal(externalAccountId);
-
-        if (!isExternalExternal)
+        if (!externalAccounts.contains(externalAccountId))
         {
-            return isExternalExternal.error().convert(
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Could not determine if account is "
-                "external"
+            return std::unexpected(
+                TransactionConversionError{"No external account found"}
             );
-        }
-
-        if (!isExternalExternal.value())
-        {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: No external account found"
-            };
         }
 
         Cash fees{amountEntries[0].getCurrency(), 0};
@@ -255,19 +201,17 @@ namespace finance
             if (internalAccountId != feeEntries[0].getAccountId() &&
                 internalAccountId != feeEntries[1].getAccountId())
             {
-                return FinanceError{
-                    FinanceErrorType::InvalidTransaction,
-                    "Invalid DomainTransaction: Invalid fee entry accounts"
-                };
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
             }
 
             if (externalAccountId != feeEntries[0].getAccountId() &&
                 externalAccountId != feeEntries[1].getAccountId())
             {
-                return FinanceError{
-                    FinanceErrorType::InvalidTransaction,
-                    "Invalid DomainTransaction: Invalid fee entry accounts"
-                };
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
             }
 
             if (internalAccountId == feeEntries[0].getAccountId())
@@ -295,19 +239,17 @@ namespace finance
      * transaction entries for the stock trades associated with the transaction.
      *
      * @param transaction
-     * @return FinanceResult<StockTransaction>
+     * @return std::expected<StockTransaction, TransactionConversionError>
      */
-    FinanceResult<StockTransaction> TransactionConverter::toStock(
-        const DomainTransaction& transaction
-    )
+    std::expected<StockTransaction, TransactionConversionError> TransactionConverter::
+        toStock(const DomainTransaction& transaction)
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: No cash entries found"
-            };
+            return std::unexpected(
+                TransactionConversionError{"No cash entries found"}
+            );
         }
 
         auto amountEntries = entries.filter(TransactionEntryType::General);
@@ -315,20 +257,18 @@ namespace finance
 
         if (amountEntries.size() != 1)
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Invalid number of amount entries"
-            };
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of amount entries"}
+            );
         }
 
         const auto cashAccountId = amountEntries[0].getAccountId();
 
         if (feeEntries.size() != 2 && !feeEntries.empty())
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Invalid number of fee entries"
-            };
+            return std::unexpected(
+                TransactionConversionError{"Invalid number of fee entries"}
+            );
         }
 
         Cash fees{amountEntries[0].getCurrency(), 0};
@@ -339,19 +279,17 @@ namespace finance
             if (cashAccountId != feeEntries[0].getAccountId() &&
                 cashAccountId != feeEntries[1].getAccountId())
             {
-                return FinanceError{
-                    FinanceErrorType::InvalidTransaction,
-                    "Invalid DomainTransaction: Invalid fee entry accounts"
-                };
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
             }
 
             if (cashAccountId != feeEntries[0].getAccountId() &&
                 cashAccountId != feeEntries[1].getAccountId())
             {
-                return FinanceError{
-                    FinanceErrorType::InvalidTransaction,
-                    "Invalid DomainTransaction: Invalid fee entry accounts"
-                };
+                return std::unexpected(
+                    TransactionConversionError{"Invalid fee entry accounts"}
+                );
             }
 
             if (cashAccountId == feeEntries[0].getAccountId())
@@ -368,10 +306,9 @@ namespace finance
 
         if (!std::holds_alternative<StockData>(transaction.getData()))
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Invalid transaction data"
-            };
+            return std::unexpected(
+                TransactionConversionError{"Invalid transaction data"}
+            );
         }
 
         const auto data = std::get<StockData>(transaction.getData());
@@ -379,10 +316,9 @@ namespace finance
         const auto& legs = data.getLegs();
         if (legs.size() != 1)
         {
-            return FinanceError{
-                FinanceErrorType::InvalidTransaction,
-                "Invalid DomainTransaction: Invalid trade legs"
-            };
+            return std::unexpected(
+                TransactionConversionError{"Invalid trade legs"}
+            );
         }
 
         return StockTransaction{

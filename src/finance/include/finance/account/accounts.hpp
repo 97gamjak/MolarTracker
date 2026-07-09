@@ -1,37 +1,32 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNTS_HPP__
 #define __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNTS_HPP__
 
-#include "error/finance_error.hpp"
 #include "finance/account/account.hpp"
 #include "utils/container/id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
     /**
-     * @brief A view of financial accounts, providing a read-only interface to
-     * access account data.
+     * @brief A collection of financial accounts.
      */
-    class AccountsView : public IdObjectMap<std::shared_ptr<const Account>>
+    class Accounts : public IdObjectMap<Account>
     {
        public:
-        using IdObjectMap<std::shared_ptr<const Account>>::IdObjectMap;
+        using IdObjectMap<Account>::IdObjectMap;
 
         [[nodiscard]]
-        AccountsView cash() const;
+        Accounts filterExternal(bool external) const;
 
         [[nodiscard]]
-        AccountsView securities() const;
-
-        [[nodiscard]]
-        AccountsView removeExternal() const;
-
-        [[nodiscard]]
-        Result<AccountId, FinanceError> getCorrespondingExternalAccountId(
-            const AccountId& cashAccountId
+        std::vector<std::optional<bool>> isExternal(
+            const IdSet<AccountId>& ids
         ) const;
 
         [[nodiscard]]
-        FinanceResult<bool> isExternal(const AccountId& accountId) const;
+        AccountId getCorrespondingExternalAccountId(
+            const AccountId& cashAccountId
+        ) const;
     };
 }   // namespace finance
 

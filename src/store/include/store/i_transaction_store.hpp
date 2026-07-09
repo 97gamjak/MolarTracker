@@ -6,14 +6,12 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
-#include "error/finance_error.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
 #include "utils/container/id_map.hpp"
 
 namespace finance
 {
     class Account;             // Forward declaration
-    class AccountsView;        // Forward declaration
     class TransactionFilter;   // Forward declaration
     class Transactions;        // Forward declaration
     class OptionTransaction;   // Forward declaration
@@ -38,8 +36,7 @@ namespace store
     struct OnTransactionAdded
     {
         /// The callback function type for when a transaction is added
-        using func =
-            std::function<void(finance::DomainTransaction transaction)>;
+        using func = std::function<void(finance::Transactions transactions)>;
     };
 
     /**
@@ -55,79 +52,66 @@ namespace store
          * @brief Add a cash transaction to the store
          *
          * @param transaction The cash transaction to add
-         * @param accounts The accounts view to filter transactions
-         * @return FinanceResult<void> The result of the operation
+         * @return TransactionStoreResult The result of the operation
          */
         [[nodiscard]]
-        virtual FinanceResult<void> addCashTransaction(
-            const finance::CashTransaction& transaction,
-            const finance::AccountsView&    accounts
+        virtual TransactionStoreResult addCashTransaction(
+            finance::CashTransaction transaction
         ) = 0;
 
         /**
          * @brief Add a stock transaction to the store
          *
          * @param transaction The stock transaction to add
-         * @param accounts The accounts view to filter transactions
-         * @return FinanceResult<void> The result of the operation
+         * @return TransactionStoreResult The result of the operation
          */
         [[nodiscard]]
-        virtual FinanceResult<void> addStockTransaction(
-            const finance::StockTransaction& transaction,
-            const finance::AccountsView&     accounts
+        virtual TransactionStoreResult addStockTransaction(
+            finance::StockTransaction transaction
         ) = 0;
 
         /**
          * @brief Add an option transaction to the store
          *
          * @param transaction The option transaction to add
-         * @param accounts The accounts view to filter transactions
-         * @return FinanceResult<void> The result of the operation
+         * @return TransactionStoreResult The result of the operation
          */
         [[nodiscard]]
-        virtual FinanceResult<void> addOptionTransaction(
-            const finance::OptionTransaction& transaction,
-            const finance::AccountsView&      accounts
+        virtual TransactionStoreResult addOptionTransaction(
+            finance::OptionTransaction transaction
         ) = 0;
 
         /**
          * @brief Get all transactions in the store
          *
          * @param filter The filter to apply
-         * @param accounts The accounts view to filter transactions
          *
          * @return finance::Transactions The list of
          * transactions
          */
         [[nodiscard]]
         virtual finance::Transactions getTransactions(
-            const finance::TransactionFilter& filter,
-            const finance::AccountsView&      accounts
+            const finance::TransactionFilter& filter
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
-         * @param accounts The accounts view to filter transactions
          * @return finance::Transactions The list of
          * transactions
          */
         [[nodiscard]]
-        virtual finance::Transactions getTransactions(
-            const finance::AccountsView& accounts
-        ) const = 0;
+        virtual finance::Transactions getTransactions() const = 0;
 
         /**
          * @brief Get the Stock Positions
          *
          * @param filter
-         * @param accounts
          * @return IdMap<PositionId, finance::StockPositionTransaction>
          */
         [[nodiscard]]
         virtual IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter,
-            const finance::AccountsView&      accounts
+            const finance::TransactionFilter& filter
         ) const = 0;
 
         /**

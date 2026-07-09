@@ -16,15 +16,14 @@ namespace service
 namespace store
 {
 
-    class IProfileStore;         // Forward declaration
-    class IAccountStore;         // Forward declaration
-    class IAccountStoreReader;   // Forward declaration
-    class IStockStore;           // Forward declaration
-    class IStockStoreReader;     // Forward declaration
-    class IPositionStore;        // Forward declaration
-    class ITransactionStore;     // Forward declaration
-    class IStore;                // Forward declaration
-    class IOptionStore;          // Forward declaration
+    class IProfileStore;       // Forward declaration
+    class IAccountStore;       // Forward declaration
+    class IStockStore;         // Forward declaration
+    class IStockStoreReader;   // Forward declaration
+    class IPositionStore;      // Forward declaration
+    class ITransactionStore;   // Forward declaration
+    class IStore;              // Forward declaration
+    class IOptionStore;        // Forward declaration
 
     /**
      * @brief Container for all stores
@@ -62,25 +61,16 @@ namespace store
             void*                       user
         );
 
-        //
-        // NOTE: no const ref returns here because of the shared_ptrs to be able
-        // to return readers and writers from the same stored shared_ptr
-        //
-
         [[nodiscard]] std::shared_ptr<IProfileStore> getProfileStore() const;
 
-        [[nodiscard]]
-        std::shared_ptr<IAccountStore> getAccountStore() const;
-        [[nodiscard]]
-        std::shared_ptr<IAccountStoreReader> getAccountStoreReader() const;
+        [[nodiscard]] std::shared_ptr<IAccountStore> getAccountStore() const;
 
-        [[nodiscard]]
-        std::shared_ptr<ITransactionStore> getTransactionStore() const;
+        [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore(
+        ) const;
 
-        [[nodiscard]]
-        std::shared_ptr<IStockStore> getStockStore() const;
-        [[nodiscard]]
-        std::shared_ptr<IStockStoreReader> getStockStoreReader() const;
+        [[nodiscard]] std::shared_ptr<IStockStore>       getStockStore() const;
+        [[nodiscard]] std::shared_ptr<IStockStoreReader> getStockStoreReader(
+        ) const;
 
         [[nodiscard]] std::shared_ptr<IOptionStore> getOptionStore() const;
 

@@ -28,13 +28,7 @@ namespace store
     class IAccountStore;   // Forward declaration
 }   // namespace store
 
-namespace cache
-{
-    class AccountCache;   // Forward declaration
-}   // namespace cache
-
-class QAction;       // Forward declaration
-class Connections;   // Forward declaration
+class QAction;   // Forward declaration
 
 namespace controller
 {
@@ -52,31 +46,22 @@ namespace controller
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
 
-        /// the account store
+        /// Reference to the account store
         std::shared_ptr<store::IAccountStore> _accountStore;
 
-        /// the account cache
-        std::shared_ptr<cache::AccountCache> _accountCache;
-
-        /// the account controller
+        /// Reference to the account controller
         AccountController& _accountController;
 
         /// Pointer to the create account dialog
         QPointer<ui::CreateAccountDialog> _createAccountDialog;
 
-        /// Pointer to the connections object for managing signal-slot
-        /// connections
-        std::unique_ptr<Connections> _connections;
-
        public:
         explicit AccountSideBarController(
             cmd::UndoStack&                              undoStack,
             const std::shared_ptr<store::IAccountStore>& accountStore,
-            const std::shared_ptr<cache::AccountCache>&  accountCache,
             AccountController&                           accountController,
             QMainWindow*                                 mainWindow
         );
-        ~AccountSideBarController() override;
 
         void refresh();
 
