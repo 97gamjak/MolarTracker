@@ -6,6 +6,7 @@
 #include "finance/instrument/option.hpp"
 #include "repo/i_instrument_repo.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/stock_row.hpp"
 
 namespace repo
 {
@@ -18,10 +19,20 @@ namespace repo
         using BaseRepo::BaseRepo;
 
         [[nodiscard]]
-        finance::Stocks getStocks(const finance::StockFilter& filter) override;
+        std::vector<std::string> getTickers() override;
+
+        [[nodiscard]]
+        std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids
+        ) override;
 
         [[nodiscard]]
         std::vector<finance::Option> getOptions() override;
+
+        [[nodiscard]]
+        std::optional<finance::Stock> getStock(
+            const std::string& ticker
+        ) override;
 
         [[nodiscard]]
         finance::StockInsertionResult addStock(
@@ -40,6 +51,11 @@ namespace repo
         bool optionExists(const finance::Option& option) override;
 
        private:
+        [[nodiscard]]
+        std::vector<StockRow> _getStockRows(
+            const idSet<InstrumentId>& ids = {}
+        );
+
         [[nodiscard]]
         InstrumentId _addInstrument(const InstrumentRow& instrumentRow);
     };

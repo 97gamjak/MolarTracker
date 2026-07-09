@@ -3,7 +3,6 @@
 #include <QMainWindow>
 
 #include "account_controller.hpp"
-#include "cache/cache_container.hpp"
 #include "controller/account_controller.hpp"
 #include "logging/log_macros.hpp"
 #include "store/store_container.hpp"
@@ -24,7 +23,6 @@ namespace controller
      *
      * @param undoStack The undo stack for the application
      * @param storeContainer The store container for the application
-     * @param cacheContainer The cache container for the application
      * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
@@ -34,14 +32,13 @@ namespace controller
     // TODO(97gamjak): would be probably best to remove dependency on central
     // stack here
     SideBarController::SideBarController(
-        cmd::UndoStack&              undoStack,
-        const store::StoreContainer& storeContainer,
-        const cache::CacheContainer& cacheContainer,
-        QMainWindow*                 mainWindow,
-        ui::SideBar*                 sideBar,
-        QStackedWidget*              centralStack,
-        AccountController&           accountController,
-        TransactionController&       transactionController
+        cmd::UndoStack&        undoStack,
+        store::StoreContainer& storeContainer,
+        QMainWindow*           mainWindow,
+        ui::SideBar*           sideBar,
+        QStackedWidget*        centralStack,
+        AccountController&     accountController,
+        TransactionController& transactionController
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
@@ -54,14 +51,13 @@ namespace controller
           _securitiesSideBarController(
               mainWindow,
               storeContainer.getStockStore(),
-              cacheContainer.getStockCache(),
               centralStack
           ),
           _transactionSideBarController(
               undoStack,
               storeContainer.getAccountStore(),
               storeContainer.getTransactionStore(),
-              cacheContainer.getStockCache(),
+              storeContainer.getStockStore(),
               storeContainer.getOptionStore(),
               storeContainer.getPositionStore(),
               transactionController,

@@ -39,14 +39,14 @@ namespace store
         // we use the unchecked versions as ids are unique due to store
         // handling!
         _connections.add(subscribeToEntryAdded(
-            [this](const finance::Account& account)
-            { _session.addUnchecked(account); },
+            [this](const std::vector<finance::Account>& accounts)
+            { _session.addUnchecked(accounts); },
             this
         ));
 
         _connections.add(subscribeToEntryRemoved(
-            [this](const AccountId& accountId)
-            { _session.removeUnchecked(accountId); },
+            [this](const std::vector<AccountId>& accountIds)
+            { _session.removeUnchecked(accountIds); },
             this
         ));
 
@@ -199,6 +199,8 @@ namespace store
                 }
             }
         }
+
+        _notifyOnCommit();
 
         // here now we set our ids because they are now clean!
         // we use the unchecked version as ids are unique due to store handling!
@@ -429,16 +431,16 @@ namespace store
     /**
      * @brief Get the IDs of all external accounts
      *
-     * @return IdSet<AccountId>
+     * @return idSet<AccountId>
      */
-    IdSet<AccountId> AccountStore::getExternalAccountIds() const
+    idSet<AccountId> AccountStore::getExternalAccountIds() const
     {
         const auto options = Options{
             .filter   = IsExternal(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        IdSet<AccountId> externalAccountIds;
+        idSet<AccountId> externalAccountIds;
 
         for (const auto& account : _getValues(options))
             externalAccountIds.insert(account.getId());

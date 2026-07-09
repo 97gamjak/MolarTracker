@@ -6,7 +6,7 @@
 #include <qwidget.h>
 
 #include <optional>
-#include <unordered_set>
+#include <vector>
 
 class QLineEdit;     // Forward declaration
 class QPushButton;   // Forward declaration
@@ -29,7 +29,7 @@ namespace ui
 
        private:
         /// The list of available ticker symbols for autocomplete
-        std::unordered_set<QString> _tickers;
+        std::vector<QString> _tickers;
 
         /// The line edit for entering the ticker symbol
         QLineEdit* _lineEdit;
@@ -43,13 +43,13 @@ namespace ui
 
        public:
         explicit TickerField(
-            const std::unordered_set<std::string>& tickers,
-            QWidget*                               parent = nullptr
+            const std::vector<std::string>& tickers,
+            QWidget*                        parent = nullptr
         );
 
         void addTicker(QString ticker);
 
-        void updateTickers(const std::unordered_set<QString>& tickers);
+        void updateTickers(std::vector<QString> tickers);
         void selectTicker(const QString& ticker);
 
         [[nodiscard]] std::optional<std::string> getTicker() const;

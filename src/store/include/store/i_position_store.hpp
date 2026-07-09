@@ -62,6 +62,12 @@ namespace store
         virtual finance::Positions getOpenPositions() const = 0;
 
         /**
+         * @brief Commit the current session
+         *
+         */
+        virtual void commit() = 0;
+
+        /**
          * @brief Get the ID remapping for positions
          *
          * @return const IdIdMap<PositionId>&

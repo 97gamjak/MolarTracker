@@ -63,7 +63,7 @@ namespace controller
             QMainWindow*                                 mainWindow
         );
 
-        void refresh();
+        void refresh() override;
 
         void handleContextMenuAction(
             const ui::AccountCategory* item,

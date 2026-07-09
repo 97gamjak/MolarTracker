@@ -42,6 +42,15 @@ namespace controller
         );
 
         [[nodiscard]] ui::Category* getCategory() const;
+
+        /**
+         * @brief Refresh the category, this should update the items in the
+         * category to reflect the current state of the underlying data, this
+         * will be called when the underlying data changes and the category
+         * needs to be updated to reflect those changes
+         *
+         */
+        virtual void refresh() = 0;
     };
 }   // namespace controller
 

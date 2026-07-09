@@ -6,8 +6,8 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
+#include "config/strong_id.hpp"
 #include "finance/instrument/stock.hpp"
-#include "finance/instrument/stocks.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
@@ -20,14 +20,15 @@ namespace store
      *
      */
     class StockStore : public BaseStore<finance::Stock, StockId>,
-                       public IStockStore,
-                       public IStockStoreReader
+                       public IStockStore
     {
        private:
-        /// observable for commit events
-        Observable<OnCommit> _onCommit;
+        /// The type of the Instrument service pointer
+        using InstrumentServicePtr =
+            std::shared_ptr<service::IInstrumentService>;
+
         /// The Instrument service
-        std::shared_ptr<service::IInstrumentService> _instrumentService;
+        InstrumentServicePtr _instrumentService;
 
         /// The instrument ID sequence
         InstrumentIdSeq& _instrumentIdSeq;
@@ -37,8 +38,8 @@ namespace store
 
        public:
         explicit StockStore(
-            std::shared_ptr<service::IInstrumentService> instrumentService,
-            InstrumentIdSeq&                             instrumentIdSeq
+            InstrumentServicePtr instrumentService,
+            InstrumentIdSeq&     instrumentIdSeq
         );
 
         ~StockStore() override                   = default;
@@ -52,61 +53,43 @@ namespace store
 
         [[nodiscard]]
         finance::Stocks getStocks(
-            const finance::StockFilter& filter
+            const idSet<InstrumentId>& ids
         ) const override;
+
+        [[nodiscard]]
+        finance::Stocks getStocks() const override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(InstrumentId id) const override;
 
         [[nodiscard]]
-        std::optional<finance::Stock> getStock(StockId id) const override;
-
-        [[nodiscard]]
-        std::optional<finance::Stock> getStock(
-            const std::string& ticker
-        ) const override;
+        std::vector<std::string> getAllTickers() const override;
 
         [[nodiscard]]
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
+        unorderedIdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        ) const override;
+
+        [[nodiscard]]
         bool stockExists(const std::string& ticker, bool checkDeleted) const;
 
-        void commit();
+        [[nodiscard]]
+        std::optional<InstrumentId> getInstrumentId(
+            const std::string& ticker
+        ) const override;
+
+        void commit() override;
 
         [[nodiscard]]
-        const IdIdMap<InstrumentId>& getInstrumentIdMap() const;
+        const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
 
         [[nodiscard]]
-        Connection subscribeToStockAdded(
-            OnStoreItemAdded<finance::Stock>::func func,
-            void*                                  subscriber
+        Connection subscribeToStoreChange(
+            StoreChanged<StockId>::func func,
+            void*                       subscriber
         ) override;
-
-        [[nodiscard]]
-        Connection subscribeToStockUpdated(
-            OnStoreItemUpdated<finance::Stock>::func func,
-            void*                                    subscriber
-        ) override;
-
-        [[nodiscard]]
-        Connection subscribeToStockRemoved(
-            OnStoreItemRemoved<StockId>::func func,
-            void*                             subscriber
-        ) override;
-
-        [[nodiscard]]
-        Connection subscribeToCommit(
-            const OnCommit::func& func,
-            void*                 subscriber
-        ) override;
-
-       private:
-        [[nodiscard]] std::optional<finance::Stock> _getStock(
-            const finance::StockFilter& filter
-        ) const;
-
-        void _notifyCommit();
     };
 }   // namespace store
 

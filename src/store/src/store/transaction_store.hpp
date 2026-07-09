@@ -59,7 +59,7 @@ namespace store
             const IdIdMap<AccountId>&    accountIdRemap,
             const IdIdMap<InstrumentId>& instrumentIdRemap,
             const IdIdMap<PositionId>&   positionIdRemap
-        );
+        ) override;
 
         [[nodiscard]]
         TransactionStoreResult addCashTransaction(

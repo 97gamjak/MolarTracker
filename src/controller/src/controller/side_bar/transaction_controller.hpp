@@ -45,11 +45,6 @@ namespace finance
     class DomainTransaction;   // Forward declaration
 }   // namespace finance
 
-namespace cache
-{
-    class StockCache;   // Forward declaration
-}   // namespace cache
-
 class QMainWindow;   // Forward declaration
 class Connections;   // Forward declaration
 
@@ -75,8 +70,8 @@ namespace controller
         std::shared_ptr<store::ITransactionStore> _transactionStore;
         /// The position store for the application
         std::shared_ptr<store::IPositionStore> _positionStore;
-        /// The stock cache for the application
-        std::shared_ptr<cache::StockCache> _stockCache;
+        /// The stock store for the application
+        std::shared_ptr<store::IStockStore> _stockStore;
         /// The option store for the application
         std::shared_ptr<store::IOptionStore> _optionStore;
 
@@ -97,7 +92,7 @@ namespace controller
             cmd::UndoStack&                                  undoStack,
             const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
-            const std::shared_ptr<cache::StockCache>&        stockCache,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
             const std::shared_ptr<store::IOptionStore>&      optionStore,
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             TransactionController&       transactionController,
@@ -106,7 +101,7 @@ namespace controller
         );
         ~TransactionSideBarController() override;
 
-        void refresh();
+        void refresh() override;
 
         void handleContextMenuAction(
             const ui::TransactionCategory* item,

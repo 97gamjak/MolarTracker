@@ -3,7 +3,6 @@
 #include "config/id_types.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
-#include "finance/instrument/stocks.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
 #include "repo/factories/instrument_factory.hpp"
@@ -13,6 +12,28 @@
 
 namespace repo
 {
+
+    /**
+     * @brief Get a list of all stock rows in the database, this is a helper
+     * method that retrieves all rows from the stock table, which can then be
+     * used to construct Stock objects for use in the application, ensuring that
+     * the data from the database is correctly mapped to the properties of the
+     * Stock objects.
+     *
+     * @param ids The set of instrument IDs to retrieve stock rows for
+     * @return std::vector<StockRow>
+     */
+    std::vector<StockRow> InstrumentRepo::_getStockRows(
+        const idSet<InstrumentId>& ids
+    )
+    {
+        orm::Query query{};
+
+        if (!ids.empty())
+            query = query.in<StockRow::instrumentIdField>(ids);
+
+        return _getCrud().get<StockRow>(_getDb(), query);
+    }
 
     /**
      * @brief helper method to add an instrument to the database, this will
@@ -42,24 +63,37 @@ namespace repo
     }
 
     /**
+     * @brief get a list of all stock tickers in the database
+     *
+     * @return std::vector<std::string>
+     */
+    std::vector<std::string> InstrumentRepo::getTickers()
+    {
+        auto results = _getStockRows() |
+                       std::views::transform([](const StockRow& row)
+                                             { return row.ticker.value(); });
+
+        return {results.begin(), results.end()};
+    }
+
+    /**
      * @brief get a list of all stocks in the database, this will return all
      * stocks that are not marked as deleted, and will include stocks that are
      * new or modified but not yet saved to the database.
      *
-     * @param filter The filter criteria for selecting stocks
-     * @return finance::Stocks
+     * @param ids The set of instrument IDs to retrieve stocks for
+     * @return std::vector<finance::Stock>
      */
-    finance::Stocks InstrumentRepo::getStocks(
-        const finance::StockFilter& filter
+    std::vector<finance::Stock> InstrumentRepo::getStocks(
+        const idSet<InstrumentId>& ids
     )
     {
-        const auto query = InstrumentFactory::toStockQuery(filter);
-        auto       results =
-            _getCrud().get<StockRow>(_getDb(), query) |
+        auto results =
+            _getStockRows(ids) |
             std::views::transform([](const StockRow& row)
                                   { return InstrumentFactory::toStock(row); });
 
-        return results;
+        return {results.begin(), results.end()};
     }
 
     /**
@@ -92,6 +126,30 @@ namespace repo
             );
 
         return {options.begin(), options.end()};
+    }
+
+    /**
+     * @brief get a stock by its ticker symbol, this allows callers to retrieve
+     * a specific stock from the database based on its ticker, which is a
+     * common identifier for stocks and can be used to quickly access the
+     * stock's details without needing to know its instrument ID.
+     *
+     * @param ticker The ticker symbol of the stock to retrieve
+     * @return std::optional<finance::Stock> The Stock object if found, or an
+     * empty optional if no stock with the given ticker exists in the database
+     */
+    std::optional<finance::Stock> InstrumentRepo::getStock(
+        const std::string& ticker
+    )
+    {
+        const auto query = orm::Query{}.where(StockRow::hasTicker(ticker));
+
+        auto result = _getCrud().getUnique<StockRow>(_getDb(), query);
+
+        if (!result)
+            return std::nullopt;
+
+        return InstrumentFactory::toStock(result.value());
     }
 
     /**

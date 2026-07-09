@@ -26,7 +26,6 @@ target_link_libraries(molartracker_utils
     Qt6::Widgets
     json
     molartracker_exceptions
-    molartracker_config
 )
 
 set_property(TARGET molartracker_utils APPEND PROPERTY

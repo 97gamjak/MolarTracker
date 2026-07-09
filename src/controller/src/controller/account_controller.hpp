@@ -13,11 +13,6 @@ class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 class QStackedWidget;   // Forward declaration
 
-namespace cache
-{
-    class StockCache;   // Forward declaration
-}   // namespace cache
-
 namespace drafts
 {
     class AccountDraft;   // Forward declaration
@@ -27,6 +22,7 @@ namespace store
 {
     class IAccountStore;       // Forward declaration
     class IPositionStore;      // Forward declaration
+    class IStockStore;         // Forward declaration
     class ITransactionStore;   // Forward declaration
 }   // namespace store
 
@@ -67,7 +63,7 @@ namespace controller
             cmd::UndoStack&                                  undoStack,
             const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::IPositionStore>&    positionStore,
-            const std::shared_ptr<cache::StockCache>&        stockCache,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
             const std::shared_ptr<finance::PriceCache>&      priceCache,
             QStackedWidget*                                  stackedWidget

@@ -61,7 +61,7 @@ namespace store
         [[nodiscard]]
         finance::Positions getAllPositions() const override;
 
-        void commit();
+        void commit() override;
 
         [[nodiscard]]
         const IdIdMap<PositionId>& getIdRemap() const override;

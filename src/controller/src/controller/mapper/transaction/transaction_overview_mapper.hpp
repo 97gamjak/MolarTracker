@@ -1,20 +1,15 @@
 #ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_OVERVIEW_MAPPER_HPP__
 #define __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_OVERVIEW_MAPPER_HPP__
 
-#include <memory>
 #include <vector>
 
+#include "config/id_types.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 
 namespace finance
 {
     class Transactions;   // Forward declaration
 }   // namespace finance
-
-namespace cache
-{
-    class StockCache;   // Forward declaration
-}   // namespace cache
 
 namespace controller
 {
@@ -28,8 +23,8 @@ namespace controller
     {
        public:
         static std::vector<drafts::StockTransactionOverview> toStock(
-            const finance::Transactions&              transactions,
-            const std::shared_ptr<cache::StockCache>& stockCache
+            const finance::Transactions&                     transactions,
+            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
         );
 
         static std::vector<drafts::CashTransactionOverview> toCash(

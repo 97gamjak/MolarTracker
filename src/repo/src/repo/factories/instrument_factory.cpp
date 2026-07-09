@@ -2,10 +2,8 @@
 
 #include <string>
 
-#include "finance/instrument/instrument_predicates.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
-#include "orm/query_options.hpp"
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/option_row.hpp"
 #include "sql_models/stock_row.hpp"
@@ -131,35 +129,6 @@ namespace repo
             row.expirationDate.value(),
             row.contractSize.value()
         };
-    }
-
-    /**
-     * @brief Create a query for filtering stocks based on the criteria
-     * specified in the StockFilter struct, this factory method takes a
-     * StockFilter object as input and generates an orm::Query object that can
-     * be used to query the database for stocks that match the specified
-     * criteria, allowing for filtering by stock IDs, instrument IDs, and
-     * tickers.
-     *
-     * @param filter
-     * @return orm::Query
-     */
-    orm::Query InstrumentFactory::toStockQuery(
-        const finance::StockFilter& filter
-    )
-    {
-        orm::Query query{};
-
-        if (!filter.stockIds.empty())
-            query = query.in<StockRow::idField>(filter.stockIds);
-
-        if (!filter.instrumentIds.empty())
-            query = query.in<StockRow::instrumentIdField>(filter.instrumentIds);
-
-        if (!filter.tickers.empty())
-            query = query.in<StockRow::tickerField>(filter.tickers);
-
-        return query;
     }
 
 }   // namespace repo

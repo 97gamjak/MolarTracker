@@ -36,11 +36,20 @@ namespace service
             const std::shared_ptr<repo::IInstrumentRepo>& instrumentRepo
         );
 
+        [[nodiscard]] std::vector<std::string> getTickers() override;
+
+        [[nodiscard]]
+        std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids
+        ) override;
+
         [[nodiscard]]
         std::vector<finance::Option> getOptions() override;
 
         [[nodiscard]]
-        finance::Stocks getStocks(const finance::StockFilter& filter) override;
+        std::optional<finance::Stock> getStock(
+            const std::string& ticker
+        ) override;
 
         [[nodiscard]]
         finance::StockInsertionResult addStock(

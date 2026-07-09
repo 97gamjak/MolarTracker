@@ -81,7 +81,6 @@ target_include_directories(mstd
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
 
-add_subdirectory(cache)
 add_subdirectory(commands)
 add_subdirectory(config)
 add_subdirectory(connections)

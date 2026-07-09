@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -43,7 +42,7 @@ namespace service
          */
         [[nodiscard]]
         virtual std::vector<finance::Position> getAllPositions(
-            const IdSet<AccountId>& accountIds
+            const idSet<AccountId>& accountIds
         ) = 0;
 
         /**
@@ -55,7 +54,7 @@ namespace service
          */
         [[nodiscard]]
         virtual std::vector<finance::Position> getAllOpenPositions(
-            const IdSet<AccountId>& accountIds
+            const idSet<AccountId>& accountIds
         ) = 0;
     };
 

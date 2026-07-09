@@ -8,7 +8,6 @@
 #include <QString>
 #include <QWidget>
 #include <string>
-#include <unordered_set>
 
 namespace utils
 {
@@ -49,23 +48,6 @@ namespace utils
         for (const auto& str : vec)
             list.push_back(QString::fromStdString(str));
         return list;
-    }
-
-    /**
-     * @brief Converts a span of strings to a set of QStrings
-     *
-     * @param vec The input span of strings
-     * @return std::unordered_set<QString> The converted set of QStrings
-     */
-    std::unordered_set<QString> toQStringSet(
-        const std::unordered_set<std::string>& vec
-    )
-    {
-        std::unordered_set<QString> set;
-        set.reserve(vec.size());
-        for (const auto& str : vec)
-            set.insert(QString::fromStdString(str));
-        return set;
     }
 
     /**

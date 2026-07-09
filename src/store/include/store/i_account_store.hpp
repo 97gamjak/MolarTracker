@@ -111,10 +111,16 @@ namespace store
         /**
          * @brief Get all external account IDs
          *
-         * @return IdSet<AccountId>
+         * @return idSet<AccountId>
          */
         [[nodiscard]]
-        virtual IdSet<AccountId> getExternalAccountIds() const = 0;
+        virtual idSet<AccountId> getExternalAccountIds() const = 0;
+
+        /**
+         * @brief Commit the current changes
+         *
+         */
+        virtual void commit() = 0;
 
         /**
          * @brief Update the active profile

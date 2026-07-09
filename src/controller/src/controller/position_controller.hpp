@@ -16,12 +16,8 @@ namespace store
 {
     class IPositionStore;      // Forward declaration
     class ITransactionStore;   // Forward declaration
+    class IStockStore;         // Forward declaration
 }   // namespace store
-
-namespace cache
-{
-    class StockCache;   // Forward declaration
-}   // namespace cache
 
 namespace finance
 {
@@ -54,9 +50,9 @@ namespace controller
         std::shared_ptr<store::IPositionStore> _positionStore;
         /// Reference to the transaction store for retrieving transaction data
         std::shared_ptr<store::ITransactionStore> _transactionStore;
-        /// Reference to the stock cache for retrieving stock data (e.g.
+        /// Reference to the stock store for retrieving stock data (e.g.
         /// tickers)
-        std::shared_ptr<cache::StockCache> _stockCache;
+        std::shared_ptr<store::IStockStore> _stockStore;
 
         /// The expected number of symbols to be fetched in the price update,
         /// used for gating updates to the price cache
@@ -73,7 +69,7 @@ namespace controller
         PositionController(
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
-            const std::shared_ptr<cache::StockCache>&        stockCache,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
             const std::shared_ptr<finance::PriceCache>&      priceCache
         );
         ~PositionController() override;

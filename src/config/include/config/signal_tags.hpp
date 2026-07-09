@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "config/id_types.hpp"
-#include "utils/container/id_id_map.hpp"
+#include "config/strong_id.hpp"
 
 /**
  * @brief Common signal tags used across the application, this file defines
@@ -31,7 +31,7 @@ template <typename T>
 struct OnStoreItemAdded
 {
     /// Type alias for the add callback function
-    using func = std::function<void(const T& item)>;
+    using func = std::function<void(const std::vector<T>& item)>;
 };
 
 /**
@@ -44,7 +44,7 @@ template <typename T>
 struct OnStoreItemUpdated
 {
     /// Type alias for the update callback function
-    using func = std::function<void(const T& item)>;
+    using func = std::function<void(const std::vector<T>& item)>;
 };
 
 /**
@@ -57,7 +57,7 @@ template <typename IdType>
 struct OnStoreItemRemoved
 {
     /// Type alias for the remove callback function
-    using func = std::function<void(const IdType& item)>;
+    using func = std::function<void(const std::vector<IdType>& item)>;
 };
 
 /**
@@ -70,17 +70,18 @@ template <typename IdType>
 struct OnIdRemap
 {
     /// Type alias for the remap callback function
-    using func = std::function<void(const IdIdMap<IdType>& remap)>;
+    using func = std::function<void(const unorderedIdMap<IdType, IdType>& map)>;
 };
 
 /**
- * @brief Signal tag for when a commit is made to a store, this can be used to
- * emit an event when a commit is made, allowing other parts of the application
- * to react to the commit.
+ * @brief Signal tag for when a store is changed, this can be used to emit an
+ * event when a store is changed, allowing other parts of the application to
+ * react to the change.
  *
+ * @tparam IdType
  */
 template <typename IdType>
-struct OnCommit
+struct StoreChanged
 {
     /// Type alias for the change callback function for the store
     using func = std::function<void()>;

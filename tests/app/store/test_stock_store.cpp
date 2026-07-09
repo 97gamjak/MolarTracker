@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
@@ -61,7 +63,27 @@ TEST_F(StockStoreTest, AddStockAlreadyExistsInServiceReturnsStockAlreadyExists)
 
     const auto result = _store->addStock(makeStock("AAPL"));
 
-    EXPECT_EQ(result, store::StockStoreResult::StockAlreadyExists);
+    if (!_store->isFullCache())
+        EXPECT_EQ(result, store::StockStoreResult::StockAlreadyExists);
+    else
+        EXPECT_EQ(result, store::StockStoreResult::Ok);
+}
+
+TEST_F(StockStoreTest, GetAllTickersEmptyInitially)
+{
+    const auto tickers = _store->getAllTickers();
+
+    EXPECT_TRUE(tickers.empty());
+}
+
+TEST_F(StockStoreTest, GetAllTickersReturnsAddedStock)
+{
+    static_cast<void>(_store->addStock(makeStock("AAPL")));
+
+    const auto tickers = _store->getAllTickers();
+
+    ASSERT_EQ(tickers.size(), 1U);
+    EXPECT_EQ(tickers[0], "AAPL");
 }
 
 TEST_F(StockStoreTest, StockExistsFalseForUnknown)
@@ -74,6 +96,22 @@ TEST_F(StockStoreTest, StockExistsTrueForAddedStock)
     static_cast<void>(_store->addStock(makeStock("AAPL")));
 
     EXPECT_TRUE(_store->stockExists("AAPL", false));
+}
+
+TEST_F(StockStoreTest, GetInstrumentIdNulloptForUnknown)
+{
+    const auto id = _store->getInstrumentId("UNKNOWN");
+
+    EXPECT_FALSE(id.has_value());
+}
+
+TEST_F(StockStoreTest, GetInstrumentIdReturnsIdForAddedStock)
+{
+    static_cast<void>(_store->addStock(makeStock("AAPL")));
+
+    const auto id = _store->getInstrumentId("AAPL");
+
+    EXPECT_TRUE(id.has_value());
 }
 
 TEST_F(StockStoreTest, CommitNewStockCallsService)

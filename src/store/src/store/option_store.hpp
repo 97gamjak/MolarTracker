@@ -57,7 +57,7 @@ namespace store
         [[nodiscard]]
         const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
 
-        void commit(const IdIdMap<InstrumentId>& reMap);
+        void commit(const IdIdMap<InstrumentId>& reMap) override;
 
         [[nodiscard]]
         bool optionExists(const finance::Option& option) const;

@@ -3,7 +3,6 @@
 
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -18,17 +17,17 @@ namespace finance
     {
        private:
         /// The set of position IDs to filter transactions by
-        IdSet<PositionId> _positionIds;
+        idSet<PositionId> _positionIds;
         /// The set of transaction IDs to filter transactions by
-        IdSet<TransactionId> _transactionIds;
+        idSet<TransactionId> _transactionIds;
 
        public:
         TransactionFilter() = default;
 
-        void setPositionIds(const IdSet<PositionId>& positionIds);
-        [[nodiscard]] IdSet<PositionId> getPositionIds() const;
+        void setPositionIds(const idSet<PositionId>& positionIds);
+        [[nodiscard]] idSet<PositionId> getPositionIds() const;
 
-        [[nodiscard]] IdSet<TransactionId> getTransactionIds() const;
+        [[nodiscard]] idSet<TransactionId> getTransactionIds() const;
 
         [[nodiscard]]
         filter::Predicate<DomainTransaction> getPredicate() const;
@@ -38,11 +37,11 @@ namespace finance
     };
 
     filter::Predicate<DomainTransaction> HasPositionId(
-        const IdSet<PositionId>& positionIds
+        const idSet<PositionId>& positionIds
     );
 
     filter::Predicate<DomainTransaction> HasTransactionId(
-        const IdSet<TransactionId>& transactionIds
+        const idSet<TransactionId>& transactionIds
     );
 
 }   // namespace finance

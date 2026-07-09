@@ -28,11 +28,6 @@ namespace cmd
     class UndoStack;   // Forward declaration
 }   // namespace cmd
 
-namespace cache
-{
-    class CacheContainer;   // Forward declaration
-}   // namespace cache
-
 namespace controller
 {
 
@@ -65,14 +60,13 @@ namespace controller
 
        public:
         explicit SideBarController(
-            cmd::UndoStack&              undoStack,
-            const store::StoreContainer& storeContainer,
-            const cache::CacheContainer& cacheContainer,
-            QMainWindow*                 mainWindow,
-            ui::SideBar*                 sideBar,
-            QStackedWidget*              centralStack,
-            AccountController&           accountController,
-            TransactionController&       transactionController
+            cmd::UndoStack&        undoStack,
+            store::StoreContainer& storeContainer,
+            QMainWindow*           mainWindow,
+            ui::SideBar*           sideBar,
+            QStackedWidget*        centralStack,
+            AccountController&     accountController,
+            TransactionController& transactionController
         );
 
         void refresh();

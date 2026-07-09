@@ -1,6 +1,6 @@
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 
-#include "cache/stock_cache.hpp"
+#include "config/strong_id.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
@@ -13,27 +13,26 @@ namespace controller
     namespace
     {
         /**
-         * @brief Converts a StockTransaction to a
-         * drafts::StockTransactionOverview, this will extract the relevant
+         * @brief Converts a finance::StockTransaction to a
+         * StockTransactionOverview draft, this will extract the relevant
          * information from the stock transaction and format it for display in
-         * the transaction overview.
+         * the transaction overview, including resolving the instrument ID to a
+         * ticker symbol using the provided mapping of instrument IDs to names.
          *
          * @param transaction
-         * @param stockCache
-         * @return drafts::StockTransactionOverview
+         * @param instrumentNames
+         * @return StockTransactionOverview
          */
         StockTransactionOverview toStockOverview(
-            const finance::StockTransaction&          transaction,
-            const std::shared_ptr<cache::StockCache>& stockCache
+            const finance::StockTransaction&                 transaction,
+            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
         )
         {
-            const auto instrumentId = transaction.getBaseInstrumentId();
+            const auto  instrumentId = transaction.getBaseInstrumentId();
+            std::string ticker       = "UNKNOWN";
 
-            const auto& stock = stockCache->getStock(instrumentId);
-
-            std::string ticker = "Unknown";
-            if (stock)
-                ticker = stock->getTicker();
+            if (instrumentNames.contains(instrumentId))
+                ticker = instrumentNames.at(instrumentId);
 
             return StockTransactionOverview(
                 transaction.getTimestamp(),
@@ -72,26 +71,26 @@ namespace controller
     }   // namespace
 
     /**
-     * @brief Converts a vector of StockTransaction to a vector of
-     * drafts::StockTransactionOverview, this will iterate over the list of
-     * stock transactions and convert each one to a StockTransactionOverview
-     * draft using the toStockOverview function, and return the resulting list
-     * of drafts for display in the transaction overview.
+     * @brief Converts a vector of finance::StockTransaction to a vector of
+     * StockTransactionOverview drafts, this will iterate over the list of stock
+     * transactions and convert each one to a StockTransactionOverview draft
+     * using the toStockOverview function, and return the resulting list of
+     * drafts for display in the transaction overview.
      *
      * @param transactions
-     * @param stockCache
-     * @return std::vector<drafts::StockTransactionOverview>
+     * @param instrumentNames
+     * @return std::vector<StockTransactionOverview>
      */
     std::vector<StockTransactionOverview> TransactionOverviewMapper::toStock(
-        const finance::Transactions&              transactions,
-        const std::shared_ptr<cache::StockCache>& stockCache
+        const finance::Transactions&                     transactions,
+        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
     )
     {
         std::vector<StockTransactionOverview> result;
 
         for (const auto& transaction : transactions.stocks())
         {
-            result.push_back(toStockOverview(transaction, stockCache));
+            result.push_back(toStockOverview(transaction, instrumentNames));
         }
 
         return result;

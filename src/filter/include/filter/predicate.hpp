@@ -17,9 +17,6 @@ namespace filter
     Predicate<T> makePredicate(PredicateFunc<T> func);
 
     template <typename T>
-    Predicate<T> makeEmptyPredicate();
-
-    template <typename T>
     bool evaluatePredicate(const Predicate<T>& predicate, const T& input);
 
 }   // namespace filter

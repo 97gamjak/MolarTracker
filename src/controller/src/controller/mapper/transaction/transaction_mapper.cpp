@@ -24,7 +24,7 @@ namespace controller
      */
     drafts::TransactionEntryDraft TransactionMapper::toEntryDraft(
         const finance::TransactionEntry& entry,
-        const IdSet<AccountId>&          externalAccounts
+        const idSet<AccountId>&          externalAccounts
     )
     {
         return drafts::TransactionEntryDraft{

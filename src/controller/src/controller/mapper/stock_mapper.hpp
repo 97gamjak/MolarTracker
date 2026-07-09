@@ -7,8 +7,8 @@
 
 namespace finance
 {
-    class Stock;        // Forward declaration
-    class StocksView;   // Forward declaration
+    class Stock;    // Forward declaration
+    class Stocks;   // Forward declaration
 }   // namespace finance
 
 namespace controller
@@ -26,7 +26,7 @@ namespace controller
 
         [[nodiscard]]
         static std::vector<drafts::StockInfoDraft> toStockInfoDrafts(
-            const finance::StocksView& stocks
+            const finance::Stocks& stocks
         );
     };
 

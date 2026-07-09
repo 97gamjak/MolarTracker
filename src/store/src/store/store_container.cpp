@@ -35,22 +35,34 @@ namespace store
         std::vector<IStore*> allStores;
 
         /// The Profile store
-        std::shared_ptr<ProfileStore> profileStore;
+        std::shared_ptr<ProfileStore> profileStoreImpl;
+        /// The IProfileStore interface for the profile store
+        std::shared_ptr<IProfileStore> profileStore;
 
         /// The Account store
-        std::shared_ptr<AccountStore> accountStore;
+        std::shared_ptr<AccountStore> accountStoreImpl;
+        /// The IAccountStore interface for the account store
+        std::shared_ptr<IAccountStore> accountStore;
 
         /// The stock store
-        std::shared_ptr<StockStore> stockStore;
+        std::shared_ptr<StockStore> stockStoreImpl;
+        /// The IStockStore interface for the stock store
+        std::shared_ptr<IStockStore> stockStore;
 
         /// The option store
-        std::shared_ptr<OptionStore> optionStore;
+        std::shared_ptr<OptionStore> optionStoreImpl;
+        /// The IOptionStore interface for the option store
+        std::shared_ptr<IOptionStore> optionStore;
 
         /// The Position store
-        std::shared_ptr<PositionStore> positionStore;
+        std::shared_ptr<PositionStore> positionStoreImpl;
+        /// The IPositionStore interface for the position store
+        std::shared_ptr<IPositionStore> positionStore;
 
         /// The Transaction store
-        std::shared_ptr<TransactionStore> transactionStore;
+        std::shared_ptr<TransactionStore> transactionStoreImpl;
+        /// The ITransactionStore interface for the transaction store
+        std::shared_ptr<ITransactionStore> transactionStore;
 
         StoreImpl(
             service::ServiceContainer& serviceContainer,
@@ -68,45 +80,51 @@ namespace store
         service::ServiceContainer& serviceContainer,
         InstrumentIdSeq&           instrumentIdSeq
     )
-        : profileStore(
+        : profileStoreImpl(
               std::make_shared<ProfileStore>(serviceContainer.getProfileService(
               ))
           ),
-          accountStore(
+          profileStore(profileStoreImpl),
+          accountStoreImpl(
               std::make_shared<AccountStore>(serviceContainer.getAccountService(
               ))
           ),
-          stockStore(
+          accountStore(accountStoreImpl),
+          stockStoreImpl(
               std::make_shared<StockStore>(
                   serviceContainer.getInstrumentService(),
                   instrumentIdSeq
               )
           ),
-          optionStore(
+          stockStore(stockStoreImpl),
+          optionStoreImpl(
               std::make_shared<OptionStore>(
                   serviceContainer.getInstrumentService(),
                   instrumentIdSeq
               )
           ),
-          positionStore(
+          optionStore(optionStoreImpl),
+          positionStoreImpl(
               std::make_shared<PositionStore>(
                   serviceContainer.getPositionService(),
                   accountStore->getAccountSession()
               )
           ),
-          transactionStore(
+          positionStore(positionStoreImpl),
+          transactionStoreImpl(
               std::make_shared<TransactionStore>(
                   serviceContainer.getTransactionService(),
                   accountStore->getAccountSession()
               )
-          )
+          ),
+          transactionStore(transactionStoreImpl)
     {
-        allStores.push_back(profileStore.get());
-        allStores.push_back(accountStore.get());
-        allStores.push_back(stockStore.get());
-        allStores.push_back(optionStore.get());
-        allStores.push_back(positionStore.get());
-        allStores.push_back(transactionStore.get());
+        allStores.push_back(profileStoreImpl.get());
+        allStores.push_back(accountStoreImpl.get());
+        allStores.push_back(stockStoreImpl.get());
+        allStores.push_back(optionStoreImpl.get());
+        allStores.push_back(positionStoreImpl.get());
+        allStores.push_back(transactionStoreImpl.get());
     }
 
     /**
@@ -250,9 +268,10 @@ namespace store
     /**
      * @brief Get the ProfileStore (const version)
      *
-     * @return std::shared_ptr<IProfileStore>
+     * @return const ProfileStore&
      */
-    std::shared_ptr<IProfileStore> StoreContainer::getProfileStore() const
+    const std::shared_ptr<IProfileStore>& StoreContainer::getProfileStore(
+    ) const
     {
         return _stores->profileStore;
     }
@@ -260,9 +279,10 @@ namespace store
     /**
      * @brief Get the AccountStore (const version)
      *
-     * @return std::shared_ptr<IAccountStore>
+     * @return const std::shared_ptr<IAccountStore>&
      */
-    std::shared_ptr<IAccountStore> StoreContainer::getAccountStore() const
+    const std::shared_ptr<IAccountStore>& StoreContainer::getAccountStore(
+    ) const
     {
         return _stores->accountStore;
     }
@@ -270,10 +290,10 @@ namespace store
     /**
      * @brief Get the TransactionStore (const version)
      *
-     * @return std::shared_ptr<ITransactionStore>
+     * @return const std::shared_ptr<ITransactionStore>&
      */
-    std::shared_ptr<ITransactionStore> StoreContainer::getTransactionStore(
-    ) const
+    const std::shared_ptr<ITransactionStore>& StoreContainer::
+        getTransactionStore() const
     {
         return _stores->transactionStore;
     }
@@ -281,20 +301,9 @@ namespace store
     /**
      * @brief Get the StockStore (const version)
      *
-     * @return std::shared_ptr<IStockStore>
+     * @return const std::shared_ptr<IStockStore>&
      */
-    std::shared_ptr<IStockStore> StoreContainer::getStockStore() const
-    {
-        return _stores->stockStore;
-    }
-
-    /**
-     * @brief Get the StockStoreReader (const version)
-     *
-     * @return std::shared_ptr<IStockStoreReader>
-     */
-    std::shared_ptr<IStockStoreReader> StoreContainer::getStockStoreReader(
-    ) const
+    const std::shared_ptr<IStockStore>& StoreContainer::getStockStore() const
     {
         return _stores->stockStore;
     }
@@ -302,9 +311,9 @@ namespace store
     /**
      * @brief Get the OptionStore (const version)
      *
-     * @return std::shared_ptr<IOptionStore>
+     * @return const std::shared_ptr<IOptionStore>&
      */
-    std::shared_ptr<IOptionStore> StoreContainer::getOptionStore() const
+    const std::shared_ptr<IOptionStore>& StoreContainer::getOptionStore() const
     {
         return _stores->optionStore;
     }
@@ -312,9 +321,10 @@ namespace store
     /**
      * @brief Get the PositionStore (const version)
      *
-     * @return std::shared_ptr<IPositionStore>
+     * @return const std::shared_ptr<IPositionStore>&
      */
-    std::shared_ptr<IPositionStore> StoreContainer::getPositionStore() const
+    const std::shared_ptr<IPositionStore>& StoreContainer::getPositionStore(
+    ) const
     {
         return _stores->positionStore;
     }

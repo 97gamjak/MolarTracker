@@ -10,10 +10,8 @@
 #include "config/id_types.hpp"
 #include "domain/profile.hpp"
 #include "finance/account/account.hpp"
-#include "finance/instrument/instrument_predicates.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/stock.hpp"
-#include "finance/instrument/stocks.hpp"
 #include "finance/position.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
@@ -153,9 +151,28 @@ namespace tests
         int _nextInstrumentId = 1;
 
        public:
+        [[nodiscard]] std::vector<std::string> getTickers() override
+        {
+            return {};
+        }
+
+        [[nodiscard]] std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& /*ids*/
+        ) override
+        {
+            return {};
+        }
+
         [[nodiscard]] std::vector<finance::Option> getOptions() override
         {
             return {};
+        }
+
+        [[nodiscard]] std::optional<finance::Stock> getStock(
+            const std::string& /*ticker*/
+        ) override
+        {
+            return std::nullopt;
         }
 
         [[nodiscard]] finance::StockInsertionResult addStock(
@@ -189,32 +206,6 @@ namespace tests
         {
             return optionsInDb.contains(option.getName());
         }
-
-        [[nodiscard]] finance::Stocks getStocks(
-            const finance::StockFilter& filter
-        ) override
-        {
-            finance::Stocks stocks;
-
-            for (const auto& ticker : stocksInDb)
-            {
-                finance::Stock stock{
-                    ticker,
-                    Currency::USD,
-                    "Company Name",
-                    "Company Description",
-                    "Exchange",
-                    "Sector",
-                    "Industry",
-                    AssetClass::Stock
-                };
-
-                if (filter::evaluatePredicate(filter.makePredicates(), stock))
-                    stocks.addUnchecked(stock);
-            }
-
-            return stocks;
-        }
     };
 
     class MockPositionService : public service::IPositionService
@@ -237,14 +228,14 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::Position> getAllPositions(
-            const IdSet<AccountId>& /*accountIds*/
+            const idSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
         }
 
         [[nodiscard]] std::vector<finance::Position> getAllOpenPositions(
-            const IdSet<AccountId>& /*accountIds*/
+            const idSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
@@ -271,7 +262,7 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::DomainTransaction> getTransactions(
-            const IdSet<AccountId>& /*accountIds*/,
+            const idSet<AccountId>& /*accountIds*/,
             const finance::TransactionFilter& /*filter*/
         ) override
         {

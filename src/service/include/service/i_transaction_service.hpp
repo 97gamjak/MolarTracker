@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -49,7 +48,7 @@ namespace service
          */
         [[nodiscard]]
         virtual std::vector<finance::DomainTransaction> getTransactions(
-            const IdSet<AccountId>&           accountIds,
+            const idSet<AccountId>&           accountIds,
             const finance::TransactionFilter& filter
         ) = 0;
     };

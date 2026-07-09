@@ -4,15 +4,14 @@
 #include <string>
 #include <vector>
 
-#include "finance/instrument/stock.hpp"    // for return type of getStock
-#include "finance/instrument/stocks.hpp"   // for return type of getStocks
+#include "config/id_types.hpp"
 
 namespace finance
 {
+    class Stock;
     struct StockInsertionResult;
     class Option;
     struct OptionInsertionResult;
-    struct StockFilter;
 }   // namespace finance
 
 namespace repo
@@ -28,14 +27,22 @@ namespace repo
         virtual ~IInstrumentRepo() = default;
 
         /**
-         * @brief get a list of all stocks in the database
+         * @brief Get a list of all stock tickers in the database
          *
-         * @param filter The filter to apply when retrieving stocks
-         * @return finance::Stocks
+         * @return std::vector<std::string>
          */
         [[nodiscard]]
-        virtual finance::Stocks getStocks(
-            const finance::StockFilter& filter
+        virtual std::vector<std::string> getTickers() = 0;
+
+        /**
+         * @brief get a list of all stocks in the database
+         *
+         * @param ids The set of instrument IDs to retrieve stocks for
+         * @return std::vector<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::vector<finance::Stock> getStocks(
+            const idSet<InstrumentId>& ids
         ) = 0;
 
         /**
@@ -45,6 +52,17 @@ namespace repo
          */
         [[nodiscard]]
         virtual std::vector<finance::Option> getOptions() = 0;
+
+        /**
+         * @brief Get a stock by its ticker symbol
+         *
+         * @param ticker The ticker symbol of the stock to retrieve
+         * @return std::optional<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Stock> getStock(
+            const std::string& ticker
+        ) = 0;
 
         /**
          * @brief Add a stock instrument to the database, this involves

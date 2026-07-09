@@ -8,7 +8,6 @@
 
 #include <QComboBox>
 #include <QPointer>
-#include <unordered_set>
 
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
@@ -70,7 +69,7 @@ namespace ui
         Fields(
             const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
-            const std::unordered_set<std::string>&   tickers,
+            const std::vector<std::string>&          tickers,
             QWidget*                                 parent
         );
 
@@ -96,7 +95,7 @@ namespace ui
     OptionWidget::Fields::Fields(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
-        const std::unordered_set<std::string>&   tickers,
+        const std::vector<std::string>&          tickers,
         QWidget*                                 parent
     )
         : accountCombo(new AccountCombo(accounts, parent)),
@@ -292,7 +291,7 @@ namespace ui
     OptionWidget::OptionWidget(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
-        const std::unordered_set<std::string>&   tickers,
+        const std::vector<std::string>&          tickers,
         QWidget*                                 parent
     )
         : Dialog(parent),
@@ -481,11 +480,14 @@ namespace ui
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
      */
-    void OptionWidget::updateTickers(
-        const std::unordered_set<std::string>& tickers
-    )
+    void OptionWidget::updateTickers(const std::vector<std::string>& tickers)
     {
-        _fields->tickerField->updateTickers(utils::toQStringSet(tickers));
+        std::vector<QString> qTickers;
+        qTickers.reserve(tickers.size());
+        for (const auto& ticker : tickers)
+            qTickers.emplace_back(QString::fromStdString(ticker));
+
+        _fields->tickerField->updateTickers(std::move(qTickers));
     }
 
     /**

@@ -9,30 +9,14 @@ namespace finance
      *
      * @return std::unordered_set<std::string>
      */
-    std::unordered_set<std::string> StocksView::getTickers() const
+    std::unordered_set<std::string> Stocks::getTickers() const
     {
         std::unordered_set<std::string> tickers;
         tickers.reserve(size());
 
         for (const auto& [id, stock] : *this)
-            tickers.insert(stock->getTicker());
+            tickers.insert(stock.getTicker());
 
         return tickers;
     }
-
-    /**
-     * @brief Get the set of instrument IDs for all stocks in the collection.
-     *
-     * @return IdSet<InstrumentId>
-     */
-    IdSet<InstrumentId> Stocks::getInstrumentIds() const
-    {
-        IdSet<InstrumentId> instrumentIds;
-
-        for (const auto& [id, stock] : *this)
-            instrumentIds.insert(stock.getInstrumentId());
-
-        return instrumentIds;
-    }
-
 }   // namespace finance

@@ -3,7 +3,6 @@
 
 #include <qwidget.h>
 
-#include <unordered_set>
 #include <vector>
 
 #include "ui/base/dialog.hpp"
@@ -55,7 +54,7 @@ namespace ui
         explicit StockWidget(
             const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
-            const std::unordered_set<std::string>&   tickers,
+            const std::vector<std::string>&          tickers,
             QWidget*                                 parent = nullptr
         );
 
@@ -65,7 +64,7 @@ namespace ui
         void updateReferenceAccounts(
             std::vector<drafts::AccountDraft> referenceAccounts
         );
-        void updateTickers(const std::unordered_set<std::string>& tickers);
+        void updateTickers(const std::vector<std::string>& tickers);
         void refresh();
 
        signals:

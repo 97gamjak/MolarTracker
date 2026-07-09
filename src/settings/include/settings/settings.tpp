@@ -18,7 +18,6 @@ namespace settings
         std::forward<Func>(func)(_generalSettings);
         std::forward<Func>(func)(_uiSettings);
         std::forward<Func>(func)(_loggingSettings);
-        std::forward<Func>(func)(_cacheSettings);
     }
 
     /**
@@ -34,7 +33,6 @@ namespace settings
         std::forward<Func>(func)(_generalSettings);
         std::forward<Func>(func)(_uiSettings);
         std::forward<Func>(func)(_loggingSettings);
-        std::forward<Func>(func)(_cacheSettings);
     }
 
 }   // namespace settings

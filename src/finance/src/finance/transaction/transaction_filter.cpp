@@ -18,7 +18,7 @@ namespace finance
      *
      * @param positionIds The set of position IDs to filter transactions by
      */
-    void TransactionFilter::setPositionIds(const IdSet<PositionId>& positionIds)
+    void TransactionFilter::setPositionIds(const idSet<PositionId>& positionIds)
     {
         _positionIds = positionIds;
     }
@@ -26,9 +26,9 @@ namespace finance
     /**
      * @brief Get the position IDs used to filter transactions
      *
-     * @return IdSet<PositionId> The set of position IDs used for filtering
+     * @return idSet<PositionId> The set of position IDs used for filtering
      */
-    IdSet<PositionId> TransactionFilter::getPositionIds() const
+    idSet<PositionId> TransactionFilter::getPositionIds() const
     {
         return _positionIds;
     }
@@ -36,9 +36,9 @@ namespace finance
     /**
      * @brief get the transaction IDs used to filter transactions
      *
-     * @return IdSet<TransactionId>
+     * @return idSet<TransactionId>
      */
-    IdSet<TransactionId> TransactionFilter::getTransactionIds() const
+    idSet<TransactionId> TransactionFilter::getTransactionIds() const
     {
         return _transactionIds;
     }
@@ -75,7 +75,7 @@ namespace finance
      * can be used to filter transactions based on the specified position IDs
      */
     filter::Predicate<DomainTransaction> HasPositionId(
-        const IdSet<PositionId>& positionIds
+        const idSet<PositionId>& positionIds
     )
     {
         return filter::makePredicate<DomainTransaction>(
@@ -98,7 +98,7 @@ namespace finance
      * @return filter::Predicate<DomainTransaction>
      */
     filter::Predicate<DomainTransaction> HasTransactionId(
-        const IdSet<TransactionId>& transactionIds
+        const idSet<TransactionId>& transactionIds
     )
     {
         return filter::makePredicate<DomainTransaction>(

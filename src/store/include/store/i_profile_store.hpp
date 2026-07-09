@@ -111,6 +111,12 @@ namespace store
         ) = 0;
 
         /**
+         * @brief Commit the current changes
+         *
+         */
+        virtual void commit() = 0;
+
+        /**
          * @brief Subscribe to profile changes
          *
          * @param func The callback function to call on profile changes

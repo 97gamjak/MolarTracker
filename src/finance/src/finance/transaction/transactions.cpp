@@ -27,11 +27,11 @@ namespace finance
     /**
      * @brief Get the Base Instrument Ids from the stock transactions
      *
-     * @return IdSet<InstrumentId>
+     * @return idSet<InstrumentId>
      */
-    IdSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
+    idSet<InstrumentId> StockTransactions::getBaseInstrumentIds() const
     {
-        IdSet<InstrumentId> instrumentIds;
+        idSet<InstrumentId> instrumentIds;
         for (const auto& transaction : getItems())
             instrumentIds.insert(transaction.getBaseInstrumentId());
 
@@ -51,9 +51,9 @@ namespace finance
     /**
      * @brief Get the Base Instrument Ids from the security view
      *
-     * @return IdSet<InstrumentId>
+     * @return idSet<InstrumentId>
      */
-    IdSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
+    idSet<InstrumentId> SecurityView::getBaseInstrumentIds() const
     {
         return _stockTransactions.getBaseInstrumentIds();
     }

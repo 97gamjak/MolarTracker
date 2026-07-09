@@ -6,7 +6,7 @@
 
 namespace finance
 {
-    class Positions : public IdObjectMap<Position>
+    class Positions : public IdMap<Position>
     {
     };
 }   // namespace finance

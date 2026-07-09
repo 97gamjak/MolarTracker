@@ -66,9 +66,9 @@ namespace store
         ) const override;
 
         [[nodiscard]]
-        IdSet<AccountId> getExternalAccountIds() const override;
+        idSet<AccountId> getExternalAccountIds() const override;
 
-        void commit();
+        void commit() override;
 
         void updateActiveProfile(
             const std::optional<ProfileId>& profileIdOpt

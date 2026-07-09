@@ -51,7 +51,7 @@ namespace repo
      * @return orm::Query
      */
     orm::Query PositionRepo::_createPositionQuery(
-        const IdSet<AccountId>& accountIds
+        const idSet<AccountId>& accountIds
     )
     {
         return orm::Query{}.in<TradeLegRow::accountIdField>(accountIds);
@@ -65,7 +65,7 @@ namespace repo
      * @return std::vector<finance::Position>
      */
     std::vector<finance::Position> PositionRepo::getAllPositions(
-        const IdSet<AccountId>& accountIds
+        const idSet<AccountId>& accountIds
     )
     {
         if (accountIds.empty())
@@ -92,7 +92,7 @@ namespace repo
      * @return std::vector<finance::Position>
      */
     std::vector<finance::Position> PositionRepo::getAllOpenPositions(
-        const IdSet<AccountId>& accountIds
+        const idSet<AccountId>& accountIds
     )
     {
         if (accountIds.empty())

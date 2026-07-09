@@ -118,11 +118,6 @@ All changes and updates, that are relevant for developers will be documented her
 - Extend domain transaction type to have now `OptionData`
 - Make it possible to open (create) option transactions
 
-#### Cache
-
-- Introduce Cache base classes
-- Introduce StockCache and split StockStore into read and write
-
 #### UI
 
 - Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages

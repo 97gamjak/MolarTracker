@@ -18,7 +18,8 @@ namespace store
         InstrumentServicePtr instrumentService,
         InstrumentIdSeq&     instrumentIdSeq
     )
-        : _instrumentService(std::move(instrumentService)),
+        : BaseStore<finance::Option, OptionId>(true),
+          _instrumentService(std::move(instrumentService)),
           _instrumentIdSeq(instrumentIdSeq)
     {
         const auto options = _instrumentService->getOptions();
@@ -141,6 +142,8 @@ namespace store
                 }
             }
         }
+
+        _notifyOnCommit();
     }
 
     /**
@@ -161,7 +164,10 @@ namespace store
 
         auto exists = _getEntry(options).has_value();
 
-        exists |= _instrumentService->optionExists(option);
+        if (!isFullCache())
+        {
+            exists |= _instrumentService->optionExists(option);
+        }
 
         return exists;
     }
