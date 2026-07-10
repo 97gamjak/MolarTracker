@@ -68,7 +68,7 @@ namespace controller
         Dialogs(
             const std::vector<drafts::AccountDraft>& cashAccounts,
             const std::vector<drafts::AccountDraft>& securityAccounts,
-            const std::vector<std::string>&          tickers,
+            const Set<std::string>&                  tickers,
             QMainWindow*                             mainWindow
         );
     };
@@ -85,7 +85,7 @@ namespace controller
     TransactionSideBarController::Dialogs::Dialogs(
         const std::vector<drafts::AccountDraft>& cashAccounts,
         const std::vector<drafts::AccountDraft>& securityAccounts,
-        const std::vector<std::string>&          tickers,
+        const Set<std::string>&                  tickers,
         QMainWindow*                             mainWindow
     )
         : cash(new DepositWithdrawalWidget(

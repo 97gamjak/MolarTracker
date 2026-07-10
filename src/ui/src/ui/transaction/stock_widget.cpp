@@ -19,6 +19,7 @@
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
 #include "utils/cash.hpp"
+#include "utils/container/set.hpp"
 #include "utils/currency.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -68,7 +69,7 @@ namespace ui
         Fields(
             const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
-            const std::unordered_set<std::string>&   tickers,
+            const Set<std::string>&                  tickers,
             QWidget*                                 parent
         );
 
@@ -94,7 +95,7 @@ namespace ui
     StockWidget::Fields::Fields(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
-        const std::unordered_set<std::string>&   tickers,
+        const Set<std::string>&                  tickers,
         QWidget*                                 parent
     )
         : accountCombo(new AccountCombo(accounts, parent)),
@@ -247,7 +248,7 @@ namespace ui
     StockWidget::StockWidget(
         const std::vector<drafts::AccountDraft>& accounts,
         const std::vector<drafts::AccountDraft>& referenceAccounts,
-        const std::unordered_set<std::string>&   tickers,
+        const Set<std::string>&                  tickers,
         QWidget*                                 parent
     )
         : Dialog(parent),
@@ -427,14 +428,11 @@ namespace ui
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
      */
-    void StockWidget::updateTickers(
-        const std::unordered_set<std::string>& tickers
-    )
+    void StockWidget::updateTickers(const Set<std::string>& tickers)
     {
-        std::unordered_set<QString> qTickers;
-        qTickers.reserve(tickers.size());
+        Set<QString> qTickers;
         for (const auto& ticker : tickers)
-            qTickers.emplace(QString::fromStdString(ticker));
+            qTickers.insert(QString::fromStdString(ticker));
 
         _fields->tickerField->updateTickers(qTickers);
     }

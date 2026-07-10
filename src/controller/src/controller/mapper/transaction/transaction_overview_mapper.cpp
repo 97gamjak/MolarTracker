@@ -1,10 +1,10 @@
 #include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 
-#include "config/strong_id.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transactions.hpp"
+#include "utils/container/id_map.hpp"
 
 namespace controller
 {
@@ -24,8 +24,8 @@ namespace controller
          * @return StockTransactionOverview
          */
         StockTransactionOverview toStockOverview(
-            const finance::StockTransaction&                 transaction,
-            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+            const finance::StockTransaction&        transaction,
+            const IdMap<InstrumentId, std::string>& instrumentNames
         )
         {
             const auto  instrumentId = transaction.getBaseInstrumentId();
@@ -82,8 +82,8 @@ namespace controller
      * @return std::vector<StockTransactionOverview>
      */
     std::vector<StockTransactionOverview> TransactionOverviewMapper::toStock(
-        const finance::Transactions&                     transactions,
-        const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+        const finance::Transactions&            transactions,
+        const IdMap<InstrumentId, std::string>& instrumentNames
     )
     {
         std::vector<StockTransactionOverview> result;

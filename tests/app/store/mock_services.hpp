@@ -157,7 +157,7 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& /*ids*/
+            const IdSet<InstrumentId>& /*ids*/
         ) override
         {
             return {};
@@ -228,14 +228,14 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::Position> getAllPositions(
-            const idSet<AccountId>& /*accountIds*/
+            const IdSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
         }
 
         [[nodiscard]] std::vector<finance::Position> getAllOpenPositions(
-            const idSet<AccountId>& /*accountIds*/
+            const IdSet<AccountId>& /*accountIds*/
         ) override
         {
             return {};
@@ -262,7 +262,7 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::DomainTransaction> getTransactions(
-            const idSet<AccountId>& /*accountIds*/,
+            const IdSet<AccountId>& /*accountIds*/,
             const finance::TransactionFilter& /*filter*/
         ) override
         {

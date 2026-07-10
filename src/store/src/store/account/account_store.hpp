@@ -66,7 +66,7 @@ namespace store
         ) const override;
 
         [[nodiscard]]
-        idSet<AccountId> getExternalAccountIds() const override;
+        IdSet<AccountId> getExternalAccountIds() const override;
 
         void commit() override;
 

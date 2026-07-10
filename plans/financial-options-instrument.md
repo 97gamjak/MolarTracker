@@ -121,7 +121,7 @@ Add pure-virtual methods parallel to the stock ones:
 ```cpp
 [[nodiscard]]
 virtual std::vector<finance::Option> getOptions(
-    const idSet<InstrumentId>& ids) = 0;
+    const IdSet<InstrumentId>& ids) = 0;
 
 [[nodiscard]]
 virtual std::optional<finance::Option> getOption(
@@ -146,7 +146,7 @@ virtual bool optionExists(
 
 Follow the exact pattern of the existing stock methods:
 
-- Private `_getOptionRows(const idSet<InstrumentId>&)`.
+- Private `_getOptionRows(const IdSet<InstrumentId>&)`.
 - `getOptions()` — transform rows via `InstrumentFactory::toOption()`.
 - `getOption()` — `orm::Crud::getUnique<OptionRow>()` with a `WhereExpr` on all four key fields.
 - `addOption()` — paired insert: `InstrumentRow` first, then `OptionRow`; throw `RepositoryException` on failure (same pattern as `addStock()`).

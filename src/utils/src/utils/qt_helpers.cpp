@@ -55,14 +55,11 @@ namespace utils
      * @brief Converts a span of strings to a set of QStrings
      *
      * @param vec The input span of strings
-     * @return std::unordered_set<QString> The converted set of QStrings
+     * @return Set<QString> The converted set of QStrings
      */
-    std::unordered_set<QString> toQStringSet(
-        const std::unordered_set<std::string>& vec
-    )
+    Set<QString> toQStringSet(const Set<std::string>& vec)
     {
-        std::unordered_set<QString> set;
-        set.reserve(vec.size());
+        Set<QString> set;
         for (const auto& str : vec)
             set.insert(QString::fromStdString(str));
         return set;

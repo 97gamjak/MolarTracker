@@ -5,6 +5,7 @@
 
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -18,7 +19,7 @@ namespace finance
     filter::Predicate<Stock> HasInstrumentId(InstrumentId id);
 
     [[nodiscard]]
-    filter::Predicate<Stock> HasInstrumentId(const idSet<InstrumentId>& ids);
+    filter::Predicate<Stock> HasInstrumentId(const IdSet<InstrumentId>& ids);
 
     [[nodiscard]]
     filter::Predicate<Option> HasOptionName(const std::string& name);

@@ -137,4 +137,13 @@ bool Set<T, Hash>::intersects(const Set<T, Hash>& other) const
     return !(this->operator&(other)).empty();
 }
 
+template <typename T, typename Hash>
+const T& Set<T, Hash>::front() const
+{
+    if (IterableBase::_items.empty())
+        throw std::out_of_range("Set is empty");
+
+    return *(IterableBase::_items.begin());
+}
+
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__

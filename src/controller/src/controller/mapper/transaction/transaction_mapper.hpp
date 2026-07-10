@@ -43,7 +43,7 @@ namespace controller
         [[nodiscard]]
         static drafts::TransactionEntryDraft toEntryDraft(
             const finance::TransactionEntry& entry,
-            const idSet<AccountId>&          externalAccounts
+            const IdSet<AccountId>&          externalAccounts
         );
 
         [[nodiscard]]

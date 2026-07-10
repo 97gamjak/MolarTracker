@@ -7,8 +7,9 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <vector>
+
+#include "utils/container/set.hpp"
 
 class QDialog;   // Forward declaration
 class QWidget;   // Forward declaration
@@ -27,9 +28,7 @@ namespace utils
         const std::span<const std::string>& vec
     );
     [[nodiscard]]
-    std::unordered_set<QString> toQStringSet(
-        const std::unordered_set<std::string>& vec
-    );
+    Set<QString> toQStringSet(const Set<std::string>& vec);
 
     template <mstd::has_enum_meta EnumMeta>
     [[nodiscard]]

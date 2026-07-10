@@ -23,7 +23,7 @@ namespace repo
 
         [[nodiscard]]
         std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) override;
 
         [[nodiscard]]
@@ -53,7 +53,7 @@ namespace repo
        private:
         [[nodiscard]]
         std::vector<StockRow> _getStockRows(
-            const idSet<InstrumentId>& ids = {}
+            const IdSet<InstrumentId>& ids = {}
         );
 
         [[nodiscard]]

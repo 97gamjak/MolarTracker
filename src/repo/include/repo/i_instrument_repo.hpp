@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -42,7 +43,7 @@ namespace repo
          */
         [[nodiscard]]
         virtual std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) = 0;
 
         /**

@@ -1,7 +1,5 @@
 #include "finance/instrument/stocks.hpp"
 
-#include <unordered_set>
-
 namespace finance
 {
     /**
@@ -9,10 +7,9 @@ namespace finance
      *
      * @return std::unordered_set<std::string>
      */
-    std::unordered_set<std::string> Stocks::getTickers() const
+    Set<std::string> Stocks::getTickers() const
     {
-        std::unordered_set<std::string> tickers;
-        tickers.reserve(size());
+        Set<std::string> tickers;
 
         for (const auto& [id, stock] : *this)
             tickers.insert(stock.getTicker());

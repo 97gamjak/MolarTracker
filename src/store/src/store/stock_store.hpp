@@ -53,7 +53,7 @@ namespace store
 
         [[nodiscard]]
         finance::Stocks getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) const override;
 
         [[nodiscard]]
@@ -63,13 +63,13 @@ namespace store
         std::optional<finance::Stock> getStock(InstrumentId id) const override;
 
         [[nodiscard]]
-        std::vector<std::string> getAllTickers() const override;
+        Set<std::string> getAllTickers() const override;
 
         [[nodiscard]]
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
-        unorderedIdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        IdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
         ) const override;
 
         [[nodiscard]]

@@ -40,7 +40,7 @@ namespace service
 
         [[nodiscard]]
         std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) override;
 
         [[nodiscard]]

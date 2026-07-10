@@ -23,10 +23,7 @@ namespace ui
      * @param tickers A list of ticker symbols to initialize the field with
      * @param parent The parent widget for this field
      */
-    TickerField::TickerField(
-        const std::unordered_set<std::string>& tickers,
-        QWidget*                               parent
-    )
+    TickerField::TickerField(const Set<std::string>& tickers, QWidget* parent)
         : QWidget(parent),
           _tickers(utils::toQStringSet(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
@@ -169,7 +166,7 @@ namespace ui
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
      */
-    void TickerField::updateTickers(const std::unordered_set<QString>& tickers)
+    void TickerField::updateTickers(const Set<QString>& tickers)
     {
         _tickers = tickers;
         _rebuildCompleter();

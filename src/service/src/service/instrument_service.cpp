@@ -35,7 +35,7 @@ namespace service
      * @return std::vector<finance::Stock>
      */
     std::vector<finance::Stock> InstrumentService::getStocks(
-        const idSet<InstrumentId>& ids
+        const IdSet<InstrumentId>& ids
     )
     {
         return _instrumentRepo->getStocks(ids);

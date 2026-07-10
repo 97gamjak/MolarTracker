@@ -36,6 +36,8 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
     Set operator&(const Set<T, Hash>& other) const;
     Set operator-(const Set<T, Hash>& other) const;
 
+    const T& front() const;
+
     bool operator==(const Set<T, Hash>& other) const;
 
     bool intersects(const Set<T, Hash>& other) const;
