@@ -81,7 +81,8 @@ namespace controller
         _settingsMenuController = std::make_unique<SettingsMenuController>(
             *mainWindow,
             menuBar.getSettingsMenu(),
-            settings
+            settings,
+            storeContainer
         );
 
         _helpMenuController = std::make_unique<HelpMenuController>(

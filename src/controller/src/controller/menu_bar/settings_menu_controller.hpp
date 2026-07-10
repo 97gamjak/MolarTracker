@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <filesystem>
-#include <functional>
 
 class QMainWindow;   // Forward declaration
 
@@ -17,6 +16,11 @@ namespace settings
     class Settings;   // Forward declaration
 }   // namespace settings
 
+namespace store
+{
+    class StoreContainer;   // Forward declaration
+}   // namespace store
+
 namespace controller
 {
     /**
@@ -27,12 +31,6 @@ namespace controller
     {
         Q_OBJECT
 
-       public:
-        /// Callback type invoked with the chosen backup path when the user
-        /// confirms a restore
-        using RestoreCallback =
-            std::function<void(const std::filesystem::path&)>;
-
        private:
         /// Reference to the main window
         QMainWindow& _mainWindow;
@@ -40,11 +38,8 @@ namespace controller
         ui::SettingsMenu& _settingsMenu;
         /// Reference to the application settings
         settings::Settings& _settings;
-        /// Optional callback wired from MainController for restore
-        RestoreCallback _restoreCallback;
-
-       public:
-        void setRestoreCallback(RestoreCallback callback);
+        /// Reference to the store container for managing application state
+        store::StoreContainer& _storeContainer;
 
        private slots:
         void _onPreferencesRequested();
@@ -52,10 +47,14 @@ namespace controller
 
        public:
         explicit SettingsMenuController(
-            QMainWindow&        mainWindow,
-            ui::SettingsMenu&   settingsMenu,
-            settings::Settings& settings
+            QMainWindow&           mainWindow,
+            ui::SettingsMenu&      settingsMenu,
+            settings::Settings&    settings,
+            store::StoreContainer& storeContainer
         );
+
+       private:
+        void _restoreFromBackup(const std::filesystem::path& backupFile);
     };
 
 }   // namespace controller

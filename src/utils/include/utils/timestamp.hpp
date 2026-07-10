@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 #define __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 
+#include <optional>
 #include <string>
 
 // TODO(97gamjak): migrate to mstd later on
@@ -24,9 +25,18 @@ class Timestamp
     /// Indicates whether the return timestamp should be converted to local time
     bool _localTime = true;
 
+    static constexpr auto humanReadableFmt = "{:%Y-%m-%d %H:%M:%S}";
+
    public:
     Timestamp();
     explicit Timestamp(const QDateTime& dateTime);
+
+    [[nodiscard]]
+    static Timestamp Null();
+    [[nodiscard]]
+    static Timestamp fromInt64(int64_t value);
+    [[nodiscard]]
+    static std::optional<Timestamp> fromHumanReadable(const std::string& value);
 
     // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] std::string iso8601() const;
@@ -42,9 +52,11 @@ class Timestamp
 
     [[nodiscard]] int64_t toInt64() const;
 
-    [[nodiscard]] static Timestamp fromInt64(int64_t value);
-
     [[nodiscard]] QDateTime toQDateTime() const;
+
+    [[nodiscard]] int          year() const;
+    [[nodiscard]] unsigned int month() const;
+    [[nodiscard]] unsigned int day() const;
 
    private:
     explicit Timestamp(int64_t timePoint);

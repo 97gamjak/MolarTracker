@@ -96,7 +96,7 @@ std::string Timestamp::iso8601TimeMs() const
 std::string Timestamp::humanReadable() const
 {
     return std::format(
-        "{:%Y-%m-%d %H:%M:%S}",
+        humanReadableFmt,
         floor<seconds>(toTimePoint(_toLocalTime()))
     );
 }
@@ -138,6 +138,8 @@ Timestamp::Timestamp(int64_t timePoint) : _timePoint(timePoint) {}
  */
 Timestamp Timestamp::fromInt64(int64_t value) { return Timestamp(value); }
 
+Timestamp Timestamp::Null() { return Timestamp(0); }
+
 #ifdef __QT_ENABLED__
 /**
  * @brief Constructs a Timestamp object from a QDateTime object.
@@ -161,3 +163,36 @@ QDateTime Timestamp::toQDateTime() const
     return QDateTime::fromMSecsSinceEpoch(toInt64());
 }
 #endif
+
+std::optional<Timestamp> Timestamp::fromHumanReadable(const std::string& value)
+{
+    std::istringstream       stream{value};
+    std::chrono::sys_seconds timePoint;
+    stream >> std::chrono::parse(Timestamp::humanReadableFmt, timePoint);
+
+    if (stream.fail())
+        return std::nullopt;
+
+    return Timestamp(
+        duration_cast<milliseconds>(timePoint.time_since_epoch()).count()
+    );
+}
+
+int Timestamp::year() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const std::chrono::year_month_day ymd{days};
+    return static_cast<int>(ymd.year());
+}
+unsigned int Timestamp::month() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const std::chrono::year_month_day ymd{days};
+    return static_cast<unsigned int>(ymd.month());
+}
+unsigned int Timestamp::day() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const std::chrono::year_month_day ymd{days};
+    return static_cast<unsigned int>(ymd.day());
+}

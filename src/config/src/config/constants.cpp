@@ -59,6 +59,18 @@ std::filesystem::path Constants::getConfigPath() const { return _configPath; }
  */
 std::filesystem::path Constants::getDataPath() const { return _dataPath; }
 
+std::string Constants::getDatabaseFileExtension()
+{
+    return ConstantsSchema::_databaseFileExtension;
+}
+
+std::string Constants::getDatabaseFileName()
+{
+    const auto& prefix = getFilePrefix();
+    const auto& ext    = getDatabaseFileExtension();
+    return prefix + "." + ext;
+}
+
 /**
  * @brief Get the database file path
  *
@@ -66,7 +78,7 @@ std::filesystem::path Constants::getDataPath() const { return _dataPath; }
  */
 std::filesystem::path Constants::getDatabasePath() const
 {
-    return _dataPath / ConstantsSchema::_databaseFile;
+    return _dataPath / getDatabaseFileName();
 }
 
 /**

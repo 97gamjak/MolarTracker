@@ -95,14 +95,6 @@ namespace controller
         {
             _handlers.getDirtyStateHandler()
                 .subscribe(_storeContainer, _settings, &_mainWindow);
-
-            _menuBarController.getSettingsMenuController().setRestoreCallback(
-                [this](const std::filesystem::path& backupFile)
-                {
-                    _storeContainer.restoreFromBackup(backupFile);
-                    _sideBarController.refresh();
-                }
-            );
         }
     };
 

@@ -7,6 +7,8 @@
 #include <optional>
 #include <vector>
 
+#include "utils/timestamp.hpp"
+
 namespace db
 {
     class Database;   // Forward declaration
@@ -56,10 +58,9 @@ namespace db
         );
 
         [[nodiscard]]
-        static std::
-            optional<std::chrono::system_clock::time_point> _parseTimestamp(
-                const std::filesystem::path& p
-            );
+        static std::optional<Timestamp> _parseTimestamp(
+            const std::filesystem::path& path
+        );
     };
 
 }   // namespace db

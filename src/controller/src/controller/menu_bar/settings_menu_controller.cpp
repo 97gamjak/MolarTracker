@@ -6,6 +6,7 @@
 #include "config/constants.hpp"
 #include "db/backup_manager.hpp"
 #include "settings/settings.hpp"
+#include "store/store_container.hpp"
 #include "ui/backup/restore_backup_dialog.hpp"
 #include "ui/menu_bar/settings_menu.hpp"
 #include "ui/settings/settings_dialog.hpp"
@@ -23,14 +24,16 @@ namespace controller
      * @param settings
      */
     SettingsMenuController::SettingsMenuController(
-        QMainWindow&        mainWindow,
-        ui::SettingsMenu&   settingsMenu,
-        settings::Settings& settings
+        QMainWindow&           mainWindow,
+        ui::SettingsMenu&      settingsMenu,
+        settings::Settings&    settings,
+        store::StoreContainer& storeContainer
     )
         : QObject{&mainWindow},
           _mainWindow(mainWindow),
           _settingsMenu(settingsMenu),
-          _settings(settings)
+          _settings(settings),
+          _storeContainer(storeContainer)
     {
         connect(
             &_settingsMenu,
@@ -45,17 +48,6 @@ namespace controller
             this,
             &SettingsMenuController::_onRestoreFromBackupRequested
         );
-    }
-
-    /**
-     * @brief Store the callback that will be invoked after the user confirms
-     * a restore, to let MainController perform the actual close/copy/reopen.
-     *
-     * @param callback
-     */
-    void SettingsMenuController::setRestoreCallback(RestoreCallback callback)
-    {
-        _restoreCallback = std::move(callback);
     }
 
     /**
@@ -83,8 +75,7 @@ namespace controller
 
         if (dialog->exec() == QDialog::Accepted && dialog->selectedBackup())
         {
-            if (_restoreCallback)
-                _restoreCallback(*dialog->selectedBackup());
+            _restoreFromBackup(*dialog->selectedBackup());
         }
     }
 
@@ -114,6 +105,14 @@ namespace controller
             settings::Settings::fromJson(snapShot, _settings);
             _settings.save();
         }
+    }
+
+    void SettingsMenuController::_restoreFromBackup(
+        const std::filesystem::path& backupFile
+    )
+    {
+        _storeContainer.restoreFromBackup(backupFile);
+        // TODO(97gamjak): restart app
     }
 
 }   // namespace controller

@@ -6,13 +6,13 @@
 #include <chrono>
 #include <cstddef>
 #include <filesystem>
-#include <format>
 #include <map>
 #include <optional>
 #include <set>
 #include <string>
 #include <vector>
 
+#include "config/constants.hpp"
 #include "db/database.hpp"
 #include "db/db_exception.hpp"
 #include "logging/log_macros.hpp"
@@ -20,14 +20,13 @@
 
 REGISTER_LOG_CATEGORY("DB.BackupManager");
 
+using std::chrono::year_month_day;
+
 namespace db
 {
 
     namespace
     {
-        constexpr std::string_view k_prefix = "molartracker_";
-        constexpr std::string_view k_suffix = ".db";
-
         /**
          * @brief Opens a new SQLite connection at the given path (read/write,
          * create if absent). Caller must close the handle.
@@ -63,8 +62,10 @@ namespace db
     {
         std::filesystem::create_directories(backupDir);
 
-        const auto destName = std::string{k_prefix} + Timestamp().fileSafe() +
-                              std::string{k_suffix};
+        const auto destName = Constants::getFilePrefix() +
+                              Timestamp().fileSafe() + "." +
+                              Constants::getDatabaseFileExtension();
+
         const auto destPath = (backupDir / destName).string();
 
         LOG_INFO("Creating database backup: " + destPath);
@@ -111,26 +112,26 @@ namespace db
         {
             if (!entry.is_regular_file())
                 continue;
-            const auto& p    = entry.path();
-            const auto  stem = p.stem().string();
-            if (!stem.starts_with(k_prefix))
+
+            const auto& path = entry.path();
+            const auto  stem = path.stem().string();
+
+            if (!stem.starts_with(Constants::getFilePrefix()))
                 continue;
-            if (p.extension() != k_suffix)
+
+            if (path.extension() != Constants::getDatabaseFileExtension())
                 continue;
-            if (_parseTimestamp(p).has_value())
-                result.push_back(p);
+
+            if (_parseTimestamp(path).has_value())
+                result.push_back(path);
         }
 
         std::ranges::sort(
             result,
-            [](const auto& a, const auto& b)
+            [](const auto& left, const auto& right)
             {
-                return _parseTimestamp(a).value_or(
-                           std::chrono::system_clock::time_point{}
-                       ) >
-                       _parseTimestamp(b).value_or(
-                           std::chrono::system_clock::time_point{}
-                       );
+                return _parseTimestamp(left).value_or(Timestamp::Null()) >
+                       _parseTimestamp(right).value_or(Timestamp::Null());
             }
         );
 
@@ -155,8 +156,6 @@ namespace db
         const RetentionPolicy&                    policy
     )
     {
-        using namespace std::chrono;
-
         std::set<std::filesystem::path> keep;
 
         // ── Tier 1: N most recent ──────────────────────────────────────────
@@ -170,22 +169,22 @@ namespace db
         std::map<std::pair<int, unsigned>, std::filesystem::path> weekMap;
         for (std::size_t i = recentEnd; i < sorted.size(); ++i)
         {
-            const auto ts = _parseTimestamp(sorted[i]);
-            if (!ts.has_value())
+            const auto timeStamp = _parseTimestamp(sorted[i]);
+            if (!timeStamp.has_value())
                 continue;
 
-            const auto           days = floor<std::chrono::days>(*ts);
+            const auto           days = floor<std::chrono::days>(*timeStamp);
             const year_month_day ymd{days};
 
             // Simple week number: days since epoch / 7
             const auto weekNum = static_cast<unsigned>(
-                static_cast<long long>(days.time_since_epoch().count()) / 7
+                static_cast<std::int64_t>(days.time_since_epoch().count()) / 7
             );
 
             const auto key =
                 std::make_pair(static_cast<int>(ymd.year()), weekNum);
 
-            if (weekMap.find(key) == weekMap.end())
+            if (!weekMap.contains(key))
                 weekMap[key] = sorted[i];
         }
 
@@ -202,19 +201,19 @@ namespace db
         std::map<std::pair<int, unsigned>, std::filesystem::path> monthMap;
         for (std::size_t i = recentEnd; i < sorted.size(); ++i)
         {
-            const auto ts = _parseTimestamp(sorted[i]);
-            if (!ts.has_value())
+            const auto timeStamp = _parseTimestamp(sorted[i]);
+            if (!timeStamp.has_value())
                 continue;
             if (keep.contains(sorted[i]))
                 continue;
 
-            const auto           days = floor<std::chrono::days>(*ts);
+            const auto           days = floor<std::chrono::days>(*timeStamp);
             const year_month_day ymd{days};
             const auto           key = std::make_pair(
                 static_cast<int>(ymd.year()),
                 static_cast<unsigned>(ymd.month())
             );
-            if (monthMap.find(key) == monthMap.end())
+            if (!monthMap.contains(key))
                 monthMap[key] = sorted[i];
         }
         for (const auto& [key, path] : monthMap)
@@ -231,53 +230,23 @@ namespace db
     }
 
     /**
-     * @brief Parse the timestamp embedded in a backup filename of the form
-     * `molartracker_YYYYMMDD_HHMMSS.db`.
+     * @brief Parse the timestamp embedded in a backup filename.
      *
      * @param p Path to parse
      * @return Parsed time point, or std::nullopt if the name does not match
      */
-    std::optional<std::chrono::system_clock::time_point> BackupManager::
-        _parseTimestamp(const std::filesystem::path& p)
+    std::optional<Timestamp> BackupManager::_parseTimestamp(
+        const std::filesystem::path& path
+    )
     {
-        const auto stem = p.stem().string();
+        const auto stem = path.stem().string();
 
-        if (!stem.starts_with(k_prefix))
+        if (!stem.starts_with(Constants::getFilePrefix()))
             return std::nullopt;
 
-        // Extract the timestamp portion: after prefix, expect
-        // YYYYMMDD_HHMMSS (15 chars)
-        const auto tsStr = stem.substr(k_prefix.size());   // "YYYYMMDD_HHMMSS"
-        if (tsStr.size() < 15)
-            return std::nullopt;
-
-        // YYYYMMDD_HHMMSS
-        int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,cert-err34-c)
-        if (std::sscanf(
-                tsStr.c_str(),
-                "%4d%2d%2d_%2d%2d%2d",
-                &year,
-                &month,
-                &day,
-                &hour,
-                &min,
-                &sec
-            ) != 6)
-            return std::nullopt;
-
-        using namespace std::chrono;
-        const auto ymd = year_month_day{
-            std::chrono::year{year},
-            std::chrono::month{static_cast<unsigned>(month)},
-            std::chrono::day{static_cast<unsigned>(day)}
-        };
-        if (!ymd.ok())
-            return std::nullopt;
-
-        const auto tp =
-            sys_days{ymd} + hours{hour} + minutes{min} + seconds{sec};
-        return tp;
+        return Timestamp::fromHumanReadable(
+            stem.substr(Constants::getFilePrefix().size())
+        );
     }
 
 }   // namespace db
