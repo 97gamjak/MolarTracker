@@ -8,7 +8,6 @@
 #include <QString>
 #include <QWidget>
 #include <string>
-#include <unordered_set>
 
 namespace utils
 {

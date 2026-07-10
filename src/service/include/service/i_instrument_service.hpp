@@ -10,10 +10,10 @@
 
 namespace finance
 {
-    class Stock;                   // forward declaration
-    class StockInsertionResult;    // forward declaration
-    class Option;                  // forward declaration
-    class OptionInsertionResult;   // forward declaration
+    class Stock;                    // forward declaration
+    struct StockInsertionResult;    // forward declaration
+    class Option;                   // forward declaration
+    struct OptionInsertionResult;   // forward declaration
 
 }   // namespace finance
 

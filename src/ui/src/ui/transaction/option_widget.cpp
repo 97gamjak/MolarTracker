@@ -8,7 +8,6 @@
 
 #include <QComboBox>
 #include <QPointer>
-#include <unordered_set>
 
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"

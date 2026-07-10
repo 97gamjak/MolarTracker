@@ -137,6 +137,15 @@ bool Set<T, Hash>::intersects(const Set<T, Hash>& other) const
     return !(this->operator&(other)).empty();
 }
 
+/**
+ * @brief Returns the first element in the set.
+ *
+ * @tparam T The type of elements in the set.
+ * @tparam Hash The hash function used for hashing the elements (default is
+ * std::hash<T>).
+ * @return A const reference to the first element in the set.
+ * @throws std::out_of_range if the set is empty.
+ */
 template <typename T, typename Hash>
 const T& Set<T, Hash>::front() const
 {

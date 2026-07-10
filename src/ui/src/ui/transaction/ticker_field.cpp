@@ -8,7 +8,6 @@
 #include <qstringlistmodel.h>
 
 #include <algorithm>
-#include <unordered_set>
 
 #include "utils/qt_helpers.hpp"
 
@@ -97,9 +96,9 @@ namespace ui
      * @param ticker The ticker symbol to add to the field, this should be a
      * valid ticker symbol that can be used for creating stock transactions.
      */
-    void TickerField::addTicker(QString ticker)
+    void TickerField::addTicker(const QString& ticker)
     {
-        _tickers.insert(std::move(ticker));
+        _tickers.insert(ticker);
         _rebuildCompleter();
     }
 

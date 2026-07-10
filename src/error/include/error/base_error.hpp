@@ -71,9 +71,13 @@ class Error
 
     virtual ~Error() = default;
 
-    [[nodiscard]] EnumType            getType() const;
-    [[nodiscard]] std::string         getTypeStr() const;
+    /// @cond DOXYGEN_IGNORE
+    [[nodiscard]] EnumType getType() const;
+    /// @endcond
+    [[nodiscard]] std::string getTypeStr() const;
+    /// @cond DOXYGEN_IGNORE
     [[nodiscard]] virtual std::string toString() const;
+    /// @endcond
 
     [[nodiscard]]
     const std::vector<Error>& getSubErrors() const;
@@ -84,8 +88,10 @@ class Error
     ) const;
 
    protected:
+    /// @cond DOXYGEN_IGNORE
     [[nodiscard]]
     const std::string& getMessage() const;
+    /// @endcond
 };
 
 /**

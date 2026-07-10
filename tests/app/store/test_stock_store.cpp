@@ -3,7 +3,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"

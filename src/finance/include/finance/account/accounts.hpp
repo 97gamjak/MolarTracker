@@ -1,7 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNTS_HPP__
 #define __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNTS_HPP__
 
-#include "config/strong_id.hpp"
 #include "finance/account/account.hpp"
 #include "utils/container/id_map.hpp"
 #include "utils/container/set.hpp"

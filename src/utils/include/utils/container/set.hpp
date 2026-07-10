@@ -27,8 +27,10 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
 
     Set(std::initializer_list<T> initList);
 
+    // cppcheck-suppress functionStatic -- false positive
     [[nodiscard]] bool contains(const T& value) const;
 
+    // cppcheck-suppress functionStatic -- false positive
     void insert(const T& value);
 
     void combine(const Set<T, Hash>& other);
@@ -36,6 +38,7 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
     Set operator&(const Set<T, Hash>& other) const;
     Set operator-(const Set<T, Hash>& other) const;
 
+    // cppcheck-suppress functionStatic -- false positive
     const T& front() const;
 
     bool operator==(const Set<T, Hash>& other) const;

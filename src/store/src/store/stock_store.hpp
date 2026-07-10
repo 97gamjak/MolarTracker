@@ -6,7 +6,6 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
-#include "config/strong_id.hpp"
 #include "finance/instrument/stock.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"

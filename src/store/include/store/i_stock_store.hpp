@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"

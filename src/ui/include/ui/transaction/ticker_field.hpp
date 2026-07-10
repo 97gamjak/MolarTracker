@@ -48,7 +48,7 @@ namespace ui
             QWidget*                parent = nullptr
         );
 
-        void addTicker(QString ticker);
+        void addTicker(const QString& ticker);
 
         void updateTickers(const Set<QString>& tickers);
         void selectTicker(const QString& ticker);

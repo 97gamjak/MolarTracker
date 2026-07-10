@@ -3,7 +3,6 @@
 
 #include <qwidget.h>
 
-#include <unordered_set>
 #include <vector>
 
 #include "ui/base/dialog.hpp"
