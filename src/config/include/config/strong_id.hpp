@@ -61,6 +61,7 @@ class StrongId final
     bool operator==(const StrongId&) const  = default;
     auto operator<=>(const StrongId&) const = default;
     /// @endcond
+    auto operator<=>(const Rep& value) const;
 
     template <class T, class U>
     friend std::ostream& operator<<(
@@ -97,6 +98,27 @@ struct isStrongId<StrongId<Tag, Rep>> : std::true_type
 
 template <typename T>
 inline constexpr bool isStrongId_v = isStrongId<T>::value;
+
+template <typename T>
+concept IsId = isStrongId_v<T>;
+
+template <typename T>
+// cppcheck-suppress internalAstError
+concept HasId = requires(T value) { value.getId(); } ||
+                requires(T value) { value->getId(); };
+
+template <HasId T>
+[[nodiscard]]
+auto extractId(const T& value)
+{
+    if constexpr (requires { value.getId(); })
+        return value.getId();
+    else
+        return value->getId();
+}
+
+template <typename T>
+using IdOf = decltype(extractId(std::declval<T>()));
 
 #ifndef __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__
 #include "config/details/strong_id.tpp"

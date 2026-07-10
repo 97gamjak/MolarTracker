@@ -16,12 +16,23 @@ class Iterable
     Container _items;
 
    public:
+    /// Type alias for the underlying container type
+    using Underlying = Container;
+
     Iterable() = default;
     // NOLINTBEGIN(google-explicit-constructor, hicpp-explicit-conversions)
     // cppcheck-suppress noExplicitConstructor
     Iterable(const Container& items);
     // cppcheck-suppress noExplicitConstructor
     Iterable(Container&& items);
+
+    /// @cond DOXYGEN_IGNORE
+    Iterable(const Iterable& other)                = default;
+    Iterable& operator=(const Iterable& other)     = default;
+    Iterable(Iterable&& other) noexcept            = default;
+    Iterable& operator=(Iterable&& other) noexcept = default;
+    ~Iterable()                                    = default;
+    /// @endcond
     // NOLINTEND(google-explicit-constructor, hicpp-explicit-conversions)
 
     auto begin();
@@ -32,9 +43,11 @@ class Iterable
     [[nodiscard]] bool empty() const;
     [[nodiscard]] auto size() const;
 
-   protected:
     [[nodiscard]] Container&       getItems();
     [[nodiscard]] const Container& getItems() const;
+
+    template <typename Predicate>
+    auto erase_if(Predicate&& predicate);
 };
 
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_TPP__
