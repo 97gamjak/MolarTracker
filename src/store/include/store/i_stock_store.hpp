@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
@@ -85,10 +84,10 @@ namespace store
         /**
          * @brief Get all stock tickers in the store
          *
-         * @return std::vector<std::string>
+         * @return Set<std::string>
          */
         [[nodiscard]]
-        virtual std::vector<std::string> getAllTickers() const = 0;
+        virtual Set<std::string> getAllTickers() const = 0;
 
         /**
          * @brief Get a mapping of stock tickers to their instrument IDs
@@ -96,9 +95,8 @@ namespace store
          * @return std::unordered_map<std::string, InstrumentId>
          */
         [[nodiscard]]
-        virtual unorderedIdMap<
-            InstrumentId,
-            std::string> getInstrumentIdToNameMap() const = 0;
+        virtual IdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        ) const = 0;
 
         /**
          * @brief Get the instrument ID for a given stock ticker

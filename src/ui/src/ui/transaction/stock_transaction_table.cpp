@@ -82,7 +82,7 @@ namespace ui
      */
     void StockTransactionTableModel::setTransactions(
         std::vector<drafts::StockTransactionOverview> transactions,
-        unorderedIdMap<AccountId, std::string>        accountIdToName
+        IdMap<AccountId, std::string>                 accountIdToName
     )
     {
         beginResetModel();

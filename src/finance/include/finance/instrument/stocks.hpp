@@ -3,6 +3,7 @@
 
 #include "finance/instrument/stock.hpp"
 #include "utils/container/id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
@@ -14,7 +15,7 @@ namespace finance
     class Stocks : public IdObjectMap<Stock>
     {
        public:
-        [[nodiscard]] std::unordered_set<std::string> getTickers() const;
+        [[nodiscard]] Set<std::string> getTickers() const;
     };
 }   // namespace finance
 

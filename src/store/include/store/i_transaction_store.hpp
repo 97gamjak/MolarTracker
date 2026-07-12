@@ -6,8 +6,10 @@
 #include <mstd/enum.hpp>
 
 #include "config/id_types.hpp"
+#include "finance/transaction/position_transaction.hpp"   // needed for public return types
 #include "finance/transaction/transactions.hpp"   // needed for public return types
 #include "utils/container/id_id_map.hpp"
+#include "utils/container/id_map.hpp"
 
 namespace finance
 {

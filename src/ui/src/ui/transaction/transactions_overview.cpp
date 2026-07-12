@@ -91,7 +91,7 @@ namespace ui
     void TransactionsOverview::refresh(
         const std::vector<drafts::CashTransactionOverview>&  cashTransactions,
         const std::vector<drafts::StockTransactionOverview>& stockTransactions,
-        const unorderedIdMap<AccountId, std::string>&        accountIdToName
+        const IdMap<AccountId, std::string>&                 accountIdToName
     )
     {
         _cashModel->setTransactions(cashTransactions, accountIdToName);

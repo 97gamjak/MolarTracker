@@ -79,7 +79,7 @@ namespace ui
      */
     void CashTransactionTableModel::setTransactions(
         std::vector<drafts::CashTransactionOverview> transactions,
-        unorderedIdMap<AccountId, std::string>       accountIdToName
+        IdMap<AccountId, std::string>                accountIdToName
     )
     {
         beginResetModel();

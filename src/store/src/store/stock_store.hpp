@@ -6,7 +6,6 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
-#include "config/strong_id.hpp"
 #include "finance/instrument/stock.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
@@ -63,13 +62,13 @@ namespace store
         std::optional<finance::Stock> getStock(InstrumentId id) const override;
 
         [[nodiscard]]
-        std::vector<std::string> getAllTickers() const override;
+        Set<std::string> getAllTickers() const override;
 
         [[nodiscard]]
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
-        unorderedIdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        IdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
         ) const override;
 
         [[nodiscard]]

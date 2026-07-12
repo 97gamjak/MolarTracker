@@ -13,7 +13,7 @@ namespace finance
     class Accounts : public IdObjectMap<Account>
     {
        public:
-        using IdObjectMap<Account>::IdMap;
+        using IdObjectMap<Account>::IdObjectMap;
 
         [[nodiscard]]
         Accounts filterExternal(bool external) const;

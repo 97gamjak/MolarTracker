@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "utils/container/id_map.hpp"
 #include "utils/container/set.hpp"
 
 namespace finance
@@ -62,14 +63,14 @@ namespace controller
 
         [[nodiscard]]
         static drafts::TradeLegDraft toTradeLegDraft(
-            const finance::TradeLeg&                         leg,
-            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+            const finance::TradeLeg&                leg,
+            const IdMap<InstrumentId, std::string>& instrumentNames
         );
 
         [[nodiscard]]
         static std::vector<drafts::TradeLegDraft> toTradeLegDrafts(
-            const std::vector<finance::TradeLeg>&            legs,
-            const unorderedIdMap<InstrumentId, std::string>& instrumentNames
+            const std::vector<finance::TradeLeg>&   legs,
+            const IdMap<InstrumentId, std::string>& instrumentNames
         );
     };
 

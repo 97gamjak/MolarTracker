@@ -2,7 +2,6 @@
 #define __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
@@ -93,11 +92,10 @@ namespace store
         /**
          * @brief Get a mapping of account IDs to their names
          *
-         * @return unorderedIdMap<AccountId, std::string>
+         * @return IdMap<AccountId, std::string>
          */
         [[nodiscard]]
-        virtual unorderedIdMap<AccountId, std::string> getAccountIdToNameMap(
-        ) const = 0;
+        virtual IdMap<AccountId, std::string> getAccountIdToNameMap() const = 0;
 
         /**
          * @brief Get an external account by its currency

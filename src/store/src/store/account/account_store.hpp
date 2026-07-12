@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
 #include "store/base/base_store.hpp"
@@ -59,8 +58,7 @@ namespace store
         [[nodiscard]]
         std::vector<finance::Account> getSecurityAccounts() const override;
         [[nodiscard]]
-        unorderedIdMap<AccountId, std::string> getAccountIdToNameMap(
-        ) const override;
+        IdMap<AccountId, std::string> getAccountIdToNameMap() const override;
 
         [[nodiscard]]
         std::optional<AccountId> getExternalAccount(

@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
+#include "utils/container/id_id_map.hpp"
 
 /**
  * @brief Common signal tags used across the application, this file defines
@@ -70,7 +70,7 @@ template <typename IdType>
 struct OnIdRemap
 {
     /// Type alias for the remap callback function
-    using func = std::function<void(const unorderedIdMap<IdType, IdType>& map)>;
+    using func = std::function<void(const IdIdMap<IdType>& remap)>;
 };
 
 /**

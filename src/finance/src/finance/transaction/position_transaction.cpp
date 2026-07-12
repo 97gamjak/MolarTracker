@@ -8,7 +8,7 @@
 #include "finance/transaction/pnl.hpp"
 #include "logging/log_macros.hpp"
 
-REGISTER_LOG_CATEGORY("Finance.StockPositionTransaction");
+REGISTER_LOG_CATEGORY("Finance.PositionTransaction");
 
 namespace finance
 {

@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_TPP__
 #define __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_TPP__
 
+#include <ranges>
 #include <utility>
 
 #include "iterable.hpp"
@@ -117,6 +118,21 @@ template <typename Container>
 const Container& Iterable<Container>::getItems() const
 {
     return _items;
+}
+
+/**
+ * @brief Erases elements from the container that satisfy the given predicate.
+ *
+ * @tparam Predicate The type of the predicate function.
+ * @param predicate The predicate function to determine which elements to
+ * erase.
+ * @return The number of elements erased.
+ */
+template <typename Container>
+template <typename Predicate>
+auto Iterable<Container>::erase_if(Predicate&& predicate)
+{
+    return std::erase_if(_items, std::forward<Predicate>(predicate));
 }
 
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_TPP__

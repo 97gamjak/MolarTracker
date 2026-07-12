@@ -30,7 +30,6 @@ namespace finance
          * @return IdSet<InstrumentId>
          */
         [[nodiscard]]
-
         virtual IdSet<InstrumentId> getBaseInstrumentIds() const = 0;
     };
 

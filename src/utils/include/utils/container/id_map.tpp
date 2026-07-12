@@ -39,7 +39,7 @@ template <typename Value>
 requires HasId<Value>
 bool IdObjectMap<Value>::add(const Value& value)
 {
-    return Base::add(value.getId(), value);
+    return Base::add(extractId(value), value);
 }
 
 /**
@@ -54,8 +54,18 @@ requires HasId<Value>
 template <std::ranges::range R>
 void IdObjectMap<Value>::addUnchecked(R&& values)
 {
-    for (const auto& value : std::forward<R>(values))
-        Base::addUnchecked(value.getId(), value);
+    if constexpr (std::same_as<std::decay_t<R>, IdObjectMap<Value>>)
+    {
+        // Direct copy from another IdObjectMap — already has IDs
+        for (const auto& [key, value] : values)
+            Base::addUnchecked(key, value);
+    }
+    else
+    {
+        // Range of bare values — extract IDs
+        for (const auto& value : std::forward<R>(values))
+            Base::addUnchecked(extractId(value), value);
+    }
 }
 
 /**
@@ -69,7 +79,7 @@ template <typename Value>
 requires HasId<Value>
 void IdObjectMap<Value>::addUnchecked(const Value& value)
 {
-    Base::addUnchecked(value.getId(), value);
+    Base::addUnchecked(extractId(value), value);
 }
 
 /**
@@ -79,6 +89,7 @@ void IdObjectMap<Value>::addUnchecked(const Value& value)
  * the map. It uses the getKeys method from the base Map class to retrieve the
  * keys and returns them as an unordered_set.
  *
+ * @tparam Key
  * @tparam Key
  * @tparam Value
  * @return A set of all the IDs currently in the map.

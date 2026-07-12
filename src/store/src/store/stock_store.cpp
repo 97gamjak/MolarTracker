@@ -254,14 +254,14 @@ namespace store
     /**
      * @brief Get a list of all stock tickers in the store
      *
-     * @return std::vector<std::string>
+     * @return Set<std::string>
      */
-    std::vector<std::string> StockStore::getAllTickers() const
+    Set<std::string> StockStore::getAllTickers() const
     {
-        std::vector<std::string> tickers;
+        Set<std::string> tickers;
 
         for (const auto& [id, stock] : getStocks())
-            tickers.push_back(stock.getTicker());
+            tickers.insert(stock.getTicker());
 
         return tickers;
     }
@@ -285,12 +285,12 @@ namespace store
     /**
      * @brief Get a mapping of instrument IDs to their names
      *
-     * @return unorderedIdMap<InstrumentId, std::string>
+     * @return IdMap<InstrumentId, std::string>
      */
-    unorderedIdMap<InstrumentId, std::string> StockStore::
-        getInstrumentIdToNameMap() const
+    IdMap<InstrumentId, std::string> StockStore::getInstrumentIdToNameMap(
+    ) const
     {
-        unorderedIdMap<InstrumentId, std::string> map;
+        IdMap<InstrumentId, std::string> map;
 
         for (const auto& [id, stock] : getStocks())
             map[stock.getInstrumentId()] = stock.getTicker();
