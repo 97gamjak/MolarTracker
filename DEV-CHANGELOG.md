@@ -8,6 +8,19 @@ REVERT CACHE changes but keep error handling
 
 ### Features
 
+#### UI — GitHub bug report from fatal error dialog (MOLTRACK-36)
+
+- Add `ui::BugReportDialog` (`src/ui/exceptions/`) — pre-fills a title and
+  Markdown body (app version, OS via `QSysInfo::prettyProductName`, truncated
+  exception details, log file path) from the exception details, lets the user
+  edit them, then opens GitHub's pre-filled `/issues/new` page via
+  `QDesktopServices::openUrl`; no GitHub token or POST support required since
+  the user submits manually in the browser
+- `ExceptionDialog` gains a "Report Bug" button wired to `BugReportDialog`,
+  replacing the `TODO(97gamjak)` marker for MOLTRACK-53
+- `molartracker_ui` now links `molartracker_http` for
+  `http::HttpClient::urlEncode`
+
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 
 - Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,

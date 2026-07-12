@@ -16,6 +16,7 @@ target_link_libraries(molartracker_ui
     PRIVATE
     Qt6::Widgets                # for QApplication
     molartracker_config         # for constants
+    molartracker_http           # for HttpClient::urlEncode
     molartracker_utils
     molartracker_logging
     molartracker_drafts

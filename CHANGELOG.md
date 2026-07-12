@@ -16,6 +16,9 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Features
 
+- Add a "Report Bug" button to the fatal error dialog; it pre-fills a GitHub
+  issue with the exception details and app/OS info for you to review and
+  submit
 - Automatically check for new MolarTracker releases on startup and every
   24 h; if a newer version is available, a dialog is shown with a link to
   the releases page and a "don't show again for this version" option
