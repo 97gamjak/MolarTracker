@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "config/constants.hpp"
+#include "ui/help/help_dialog.hpp"
 #include "ui/menu_bar/help_menu.hpp"
 
 namespace controller
@@ -25,10 +26,26 @@ namespace controller
     {
         connect(
             &_helpMenu,
+            &ui::HelpMenu::requestHelpPage,
+            this,
+            &HelpMenuController::_onHelpPageRequested
+        );
+        connect(
+            &_helpMenu,
             &ui::HelpMenu::requestAbout,
             this,
             &HelpMenuController::_onAboutRequested
         );
+    }
+
+    /**
+     * @brief Handle help page request
+     *
+     */
+    void HelpMenuController::_onHelpPageRequested()
+    {
+        ui::HelpDialog dlg(&_mainWindow);
+        dlg.exec();
     }
 
     /**
