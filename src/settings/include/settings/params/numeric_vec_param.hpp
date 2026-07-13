@@ -90,6 +90,7 @@ namespace settings
         );
 
         void commit();
+        void resetToDefault();
 
         static void fromJson(
             const nlohmann::json&  jsonData,

@@ -8,6 +8,25 @@ REVERT CACHE changes but keep error handling
 
 ### Features
 
+#### Settings — reset to default values (MOLTRACK-133)
+
+- Add `resetToDefault()` to `settings::ParamCore<T>` — clears `_value` (falling
+  back to `_defaultValue` via `get()`) but only if a default has been
+  configured, otherwise a no-op
+- Add `resetToDefault()` forwarding to `settings::ParamMixin<Derived, T>`,
+  `settings::NumericVecParam<T, N>` (loops its internal `NumericParam<T>`
+  elements), and `settings::ParamContainerMixin<Derived>` (loops
+  `forEachParam`, recursing into nested containers) — this gives every
+  settings container, including `Settings` itself, a working
+  `resetToDefault()` for free
+- `ui::SettingsDialog` gains a "Reset to Defaults" button in the bottom bar;
+  after a `QMessageBox` confirmation it calls `_settings.resetToDefault()`
+  then reuses the existing `saveRequested()`/`accept()` flow (same as Save),
+  since `SettingsDialog`'s param-editor widgets don't live-refresh on
+  external value changes
+- Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
+  `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 
 - Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,

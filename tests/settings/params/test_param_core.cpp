@@ -86,6 +86,28 @@ TEST(ParamCore, UnsetClearsValueFallsBackToDefault)
     EXPECT_EQ(param.get(), 0);   // falls back to default
 }
 
+TEST(ParamCore, ResetToDefaultClearsValueWhenDefaultConfigured)
+{
+    const auto               defaultValue = 7;
+    settings::ParamCore<int> param("k", "T", "D");
+    param.setDefault(defaultValue);
+    param.set(42);
+    EXPECT_EQ(param.get(), 42);
+
+    param.resetToDefault();
+    EXPECT_EQ(param.get(), defaultValue);
+}
+
+TEST(ParamCore, ResetToDefaultIsNoOpWhenNoDefaultConfigured)
+{
+    const auto               paramValue = 42;
+    settings::ParamCore<int> param("k", "T", "D");
+    param.set(paramValue);
+
+    param.resetToDefault();
+    EXPECT_EQ(param.get(), paramValue);
+}
+
 // ============================================================================
 // getOptional
 // ============================================================================

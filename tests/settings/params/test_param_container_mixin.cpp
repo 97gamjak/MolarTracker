@@ -113,6 +113,24 @@ TEST(ParamContainerMixin, IsDirtyTrueAfterCommitAndNewChange)
 }
 
 // ============================================================================
+// resetToDefault
+// ============================================================================
+
+TEST(ParamContainerMixin, ResetToDefaultRestoresParamsWithDefaultConfigured)
+{
+    TestContainer testContainer;
+    testContainer._intParam.setDefault(1);
+    testContainer._intParam.set(42);
+    testContainer._strParam.set(std::string("changed"));   // no default set
+
+    testContainer.resetToDefault();
+
+    EXPECT_EQ(testContainer._intParam.get(), 1);
+    // _strParam has no configured default, so resetToDefault leaves it as-is
+    EXPECT_EQ(testContainer._strParam.get(), std::string("changed"));
+}
+
+// ============================================================================
 // toJson
 // ============================================================================
 

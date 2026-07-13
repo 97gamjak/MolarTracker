@@ -116,6 +116,19 @@ namespace settings
     }
 
     /**
+     * @brief Reset the value of the parameter to its default value, this is a
+     * no-op if no default value has been configured for the parameter
+     *
+     * @tparam T
+     */
+    template <typename T>
+    void ParamCore<T>::resetToDefault()
+    {
+        if (_defaultValue.has_value())
+            unset();
+    }
+
+    /**
      * @brief Commit the current value as the baseline for dirty checking
      *
      * @tparam T
