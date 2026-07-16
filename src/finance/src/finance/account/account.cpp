@@ -1,5 +1,6 @@
 #include "finance/account/account.hpp"
 
+#include <format>
 #include <utility>
 
 #include "utils/finance.hpp"

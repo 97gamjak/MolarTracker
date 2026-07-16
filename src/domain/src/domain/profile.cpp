@@ -1,5 +1,6 @@
 #include "domain/profile.hpp"
 
+#include <format>
 #include <utility>
 
 namespace domain
