@@ -1,7 +1,5 @@
 #include "repo/repo_container.hpp"
 
-#include <filesystem>
-
 #include "account_repo.hpp"
 #include "config/constants/constants.hpp"
 #include "db/backup_manager.hpp"
@@ -21,6 +19,8 @@ namespace repo
 
     /**
      * @brief Construct a new Repo Container object
+     *
+     * @param backupSettings The backup settings to use for creating a backup on
      *
      */
     RepoContainer::RepoContainer(const settings::BackupSettings& backupSettings)

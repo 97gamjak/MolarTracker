@@ -1,7 +1,5 @@
 #include "utils/timestamp.hpp"
 
-#include <iostream>
-
 #ifdef __QT_ENABLED__
 #include <qdatetime.h>
 #endif
@@ -290,5 +288,6 @@ unsigned int Timestamp::day() const
 unsigned int Timestamp::week() const
 {
     const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
-    return static_cast<unsigned int>(days.time_since_epoch().count() / 7);
+    const auto week = days.time_since_epoch().count() / _weekDayCount;
+    return static_cast<unsigned int>(week);
 }

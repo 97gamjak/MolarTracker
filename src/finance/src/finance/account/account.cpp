@@ -115,6 +115,11 @@ namespace finance
         return getKind() == AccountKind::External;
     }
 
+    /**
+     * @brief Get a string representation of the account
+     *
+     * @return std::string
+     */
     std::string Account::toString() const
     {
         return std::format(

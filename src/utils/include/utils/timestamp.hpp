@@ -35,6 +35,9 @@ class Timestamp
     /// std::chrono::parse.
     static constexpr auto _fileSafeParseFmt = "%Y%m%d_%H%M%S";
 
+    /// The number of days in a week, this is used to calculate the week number
+    static constexpr auto _weekDayCount = 7;
+
    public:
     Timestamp();
     explicit Timestamp(const QDateTime& dateTime);

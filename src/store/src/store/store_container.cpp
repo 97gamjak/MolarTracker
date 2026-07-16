@@ -109,6 +109,8 @@ namespace store
     /**
      * @brief Construct a new Store Container object
      *
+     * @param backupSettings The backup settings to use for creating a backup on
+     *
      */
     StoreContainer::StoreContainer(
         const settings::BackupSettings& backupSettings

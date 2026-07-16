@@ -17,6 +17,8 @@ namespace service
     /**
      * @brief Construct a new Service Container object
      *
+     * @param backupSettings The backup settings to use for creating a backup on
+     *
      */
     ServiceContainer::ServiceContainer(
         const settings::BackupSettings& backupSettings

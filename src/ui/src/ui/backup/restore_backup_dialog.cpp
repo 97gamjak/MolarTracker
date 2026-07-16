@@ -61,8 +61,6 @@ namespace ui
                 {
                     if (index.column() == 0)
                     {
-                        const auto stem = path.stem().string();
-
                         const auto timeStamp = Timestamp::fromFileSafe(
                             path.filename().string(),
                             Constants::getFilePrefix(),
@@ -79,10 +77,10 @@ namespace ui
 
                     if (index.column() == 1)
                     {
-                        const auto bytes =
-                            static_cast<qint64>(std::filesystem::file_size(path)
-                            );
-                        return QString{"%1 KB"}.arg((bytes + 1023) / 1024);
+                        const auto bytes = static_cast<std::size_t>(
+                            std::filesystem::file_size(path)
+                        );
+                        return utils::toKBString(bytes);
                     }
                 }
 
@@ -137,7 +135,6 @@ namespace ui
         : Dialog{parent}, _backups{std::move(backups)}
     {
         setWindowTitle("Restore from Backup");
-        setMinimumSize(500, 300);
 
         auto* layout = utils::makeQChild<QVBoxLayout>(this);
 

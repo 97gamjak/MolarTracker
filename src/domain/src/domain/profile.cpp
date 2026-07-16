@@ -68,6 +68,11 @@ namespace domain
         _email = newEmail;
     }
 
+    /**
+     * @brief Convert the profile to a string representation
+     *
+     * @return std::string
+     */
     std::string Profile::toString() const
     {
         std::string emailStr = _email.has_value() ? _email.value() : "N/A";

@@ -13,6 +13,29 @@
 
 namespace controller
 {
+    namespace
+    {
+        /**
+         * @brief Restore the application state from a backup file.
+         *
+         * This function invokes the restoreFromBackup method on the provided
+         * StoreContainer instance, passing the specified backup file path. It
+         * is intended to be called when the user confirms their intention to
+         * restore from a backup.
+         *
+         * @param storeContainer The StoreContainer instance managing the
+         * application state.
+         * @param backupFile The path to the backup file to restore from.
+         */
+        void _restoreFromBackup(
+            store::StoreContainer&       storeContainer,
+            const std::filesystem::path& backupFile
+        )
+        {
+            storeContainer.restoreFromBackup(backupFile);
+            // TODO(97gamjak): restart app
+        }
+    }   // namespace
 
     /**
      * @brief Construct a new Settings Menu Controller:: Settings Menu
@@ -21,6 +44,7 @@ namespace controller
      * @param mainWindow
      * @param settingsMenu
      * @param settings
+     * @param storeContainer
      */
     SettingsMenuController::SettingsMenuController(
         QMainWindow&           mainWindow,
@@ -73,7 +97,7 @@ namespace controller
 
         if (dialog->exec() == QDialog::Accepted && dialog->selectedBackup())
         {
-            _restoreFromBackup(*dialog->selectedBackup());
+            _restoreFromBackup(_storeContainer, *dialog->selectedBackup());
         }
     }
 
@@ -103,14 +127,6 @@ namespace controller
             settings::Settings::fromJson(snapShot, _settings);
             _settings.save();
         }
-    }
-
-    void SettingsMenuController::_restoreFromBackup(
-        const std::filesystem::path& backupFile
-    )
-    {
-        _storeContainer.restoreFromBackup(backupFile);
-        // TODO(97gamjak): restart app
     }
 
 }   // namespace controller

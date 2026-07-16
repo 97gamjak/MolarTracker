@@ -36,7 +36,20 @@ namespace db
      * @brief Destroy the Database:: Database object
      *
      */
-    Database::~Database() { close(); }
+    Database::~Database()
+    {
+        try
+        {
+            close();
+        }
+        catch (const SqliteError& e)
+        {
+            LOG_ERROR(
+                std::string{"Failed to close database during destruction: "} +
+                e.what()
+            );
+        }
+    }
 
     /**
      * @brief Move constructor
@@ -58,7 +71,17 @@ namespace db
     {
         if (this != &other)
         {
-            close();
+            try
+            {
+                close();
+            }
+            catch (const SqliteError& e)
+            {
+                LOG_ERROR(
+                    std::string{"Failed to close database during move: "} +
+                    e.what()
+                );
+            }
             _moveFrom(std::move(other));
         }
 

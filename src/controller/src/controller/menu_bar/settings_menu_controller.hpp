@@ -2,7 +2,6 @@
 #define __CONTROLLER__SRC__CONTROLLER__MENU_BAR__SETTINGS_MENU_CONTROLLER_HPP__
 
 #include <QObject>
-#include <filesystem>
 
 class QMainWindow;   // Forward declaration
 
@@ -52,9 +51,6 @@ namespace controller
             settings::Settings&    settings,
             store::StoreContainer& storeContainer
         );
-
-       private:
-        void _restoreFromBackup(const std::filesystem::path& backupFile);
     };
 
 }   // namespace controller
