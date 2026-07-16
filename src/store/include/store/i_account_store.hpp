@@ -2,10 +2,10 @@
 #define __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 
 #include "config/id_types.hpp"
-#include "config/strong_id.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
+#include "utils/container/id_id_map.hpp"
 
 namespace store
 {
@@ -49,11 +49,10 @@ namespace store
         /**
          * @brief Get a mapping of account IDs to their remapped IDs
          *
-         * @return const unorderedIdMap<AccountId, AccountId>&
+         * @return const IdIdMap<AccountId>&
          */
         [[nodiscard]]
-        virtual const unorderedIdMap<AccountId, AccountId>& getIdRemap(
-        ) const = 0;
+        virtual const IdIdMap<AccountId>& getIdRemap() const = 0;
 
         /**
          * @brief Get an account by its ID
@@ -93,11 +92,10 @@ namespace store
         /**
          * @brief Get a mapping of account IDs to their names
          *
-         * @return unorderedIdMap<AccountId, std::string>
+         * @return IdMap<AccountId, std::string>
          */
         [[nodiscard]]
-        virtual unorderedIdMap<AccountId, std::string> getAccountIdToNameMap(
-        ) const = 0;
+        virtual IdMap<AccountId, std::string> getAccountIdToNameMap() const = 0;
 
         /**
          * @brief Get an external account by its currency
@@ -113,16 +111,10 @@ namespace store
         /**
          * @brief Get all external account IDs
          *
-         * @return idSet<AccountId>
+         * @return IdSet<AccountId>
          */
         [[nodiscard]]
-        virtual idSet<AccountId> getExternalAccountIds() const = 0;
-
-        /**
-         * @brief Commit the current changes
-         *
-         */
-        virtual void commit() = 0;
+        virtual IdSet<AccountId> getExternalAccountIds() const = 0;
 
         /**
          * @brief Update the active profile

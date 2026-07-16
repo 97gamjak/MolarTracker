@@ -3,7 +3,6 @@
 
 #include <filesystem>
 #include <memory>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
@@ -29,6 +28,7 @@ namespace store
     class IPositionStore;      // Forward declaration
     class ITransactionStore;   // Forward declaration
     class IStore;              // Forward declaration
+    class IOptionStore;        // Forward declaration
 
     /**
      * @brief Container for all stores
@@ -41,26 +41,20 @@ namespace store
         std::unique_ptr<service::ServiceContainer> _serviceContainer;
         /// The instrument ID sequence
         InstrumentIdSeq _instrumentIdSeq;
-        /// The Profile store
-        std::shared_ptr<IProfileStore> _profileStore;
-        /// The Account store
-        std::shared_ptr<IAccountStore> _accountStore;
-        /// The stock store
-        std::shared_ptr<IStockStore> _stockStore;
-        /// The Position store
-        std::shared_ptr<IPositionStore> _positionStore;
-        /// The Transaction store
-        std::shared_ptr<ITransactionStore> _transactionStore;
 
-        /// list of all stores
-        std::vector<IStore*> _allStores;
+        struct StoreImpl;
+        /// The implementation of the store container, this is used to hide the
+        /// details of the store implementations and allow for a clean interface
+        /// for the store container, while still providing the necessary
+        /// functionality to manage and access the various stores within the
+        /// application.
+        std::unique_ptr<StoreImpl> _stores;
 
         /// list of connections for all stores
         std::unique_ptr<Connections> _connections;
 
        public:
         explicit StoreContainer(const settings::BackupSettings& backupSettings);
-
         ~StoreContainer();
 
         void               commit();
@@ -74,23 +68,12 @@ namespace store
             void*                       user
         );
 
-        [[nodiscard]] std::shared_ptr<IProfileStore>&       getProfileStore();
-        [[nodiscard]] const std::shared_ptr<IProfileStore>& getProfileStore(
-        ) const;
-
-        [[nodiscard]] std::shared_ptr<IAccountStore>&       getAccountStore();
-        [[nodiscard]] const std::shared_ptr<IAccountStore>& getAccountStore(
-        ) const;
-
-        [[nodiscard]] std::shared_ptr<ITransactionStore>& getTransactionStore();
-        [[nodiscard]] const std::shared_ptr<ITransactionStore>& getTransactionStore(
-        ) const;
-
-        [[nodiscard]] std::shared_ptr<IStockStore>&       getStockStore();
-        [[nodiscard]] const std::shared_ptr<IStockStore>& getStockStore() const;
-
-        [[nodiscard]] std::shared_ptr<IPositionStore>&       getPositionStore();
-        [[nodiscard]] const std::shared_ptr<IPositionStore>& getPositionStore(
+        [[nodiscard]] std::shared_ptr<IProfileStore>  getProfileStore() const;
+        [[nodiscard]] std::shared_ptr<IAccountStore>  getAccountStore() const;
+        [[nodiscard]] std::shared_ptr<IStockStore>    getStockStore() const;
+        [[nodiscard]] std::shared_ptr<IOptionStore>   getOptionStore() const;
+        [[nodiscard]] std::shared_ptr<IPositionStore> getPositionStore() const;
+        [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore(
         ) const;
     };
 

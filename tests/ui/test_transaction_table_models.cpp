@@ -2,13 +2,14 @@
 
 #include <QVariant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
-#include "drafts/transaction_draft.hpp"
-#include "finance/cash.hpp"
+#include "drafts/transaction/transaction_draft.hpp"
+#include "drafts/transaction/transaction_overview_draft.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -24,41 +25,41 @@ namespace
     {
         return drafts::TransactionEntryDraft{
             accountId,
-            finance::Cash{currency, amount},
+            Cash{currency, amount},
             TransactionEntryType::General,
             isExternal
         };
     }
 
-    drafts::TransactionOverviewDraft makeCashTx(
+    drafts::CashTransactionOverview makeCashTx(
         const std::optional<std::string>& comment = std::nullopt
     )
     {
-        return drafts::TransactionOverviewDraft{
-            TransactionDataType::Cash,
+        const auto entry = makeEntry();
+        return drafts::CashTransactionOverview{
             Timestamp{},
-            {makeEntry()},
-            {},
-            comment
+            comment,
+            entry.getCash(),
+            Cash{entry.getCurrency(), 1},
+            AccountId{1},
+            AccountId{0}
         };
     }
 
-    drafts::TransactionOverviewDraft makeStockTx()
+    drafts::StockTransactionOverview makeStockTx()
     {
         const auto amount   = 15000;
+        const auto fees     = 10;
         const auto quantity = Quantity{100'000'000};
-        auto       leg      = drafts::TradeLegDraft{
-            AccountId{2},
-            finance::Cash{Currency::USD, amount},
-            quantity,
-            "AAPL"
-        };
-        return drafts::TransactionOverviewDraft{
-            TransactionDataType::Trade,
+        return drafts::StockTransactionOverview{
             Timestamp{},
-            {makeEntry()},
-            {leg},
-            std::nullopt
+            std::nullopt,
+            quantity,
+            Cash{Currency::USD, amount},
+            Cash{Currency::USD, fees},
+            "AAPL",
+            AccountId{2},
+            AccountId{1}
         };
     }
 
@@ -131,7 +132,10 @@ namespace
     TEST_F(CashTransactionTableModelTest, DataDisplayRoleDescriptionColumn)
     {
         _model.setTransactions({makeCashTx("My Note")}, {});
-        const auto idx  = _model.index(0, _model.getDescriptionIndex());
+        const auto idx = _model.index(
+            0,
+            ui::CashTransactionTableModel::getDescriptionIndex()
+        );
         const auto data = _model.data(idx, Qt::DisplayRole);
         EXPECT_EQ(data.toString(), "My Note");
     }
@@ -139,7 +143,8 @@ namespace
     TEST_F(CashTransactionTableModelTest, DataDisplayRoleDateColumnIsNotEmpty)
     {
         _model.setTransactions({makeCashTx()}, {});
-        const auto idx  = _model.index(0, _model.getDateIndex());
+        const auto idx =
+            _model.index(0, ui::CashTransactionTableModel::getDateIndex());
         const auto data = _model.data(idx, Qt::DisplayRole);
         EXPECT_FALSE(data.toString().isEmpty());
     }

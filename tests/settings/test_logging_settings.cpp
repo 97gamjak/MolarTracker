@@ -97,6 +97,12 @@ TEST(LoggingSettings, NotDirtyAfterSettingThenCommitting)
     EXPECT_FALSE(loggingSettings.isDirty());
 }
 
+TEST(LoggingSettings, DefaultMaxLogAgeDaysIs30)
+{
+    settings::LoggingSettings loggingSettings;
+    EXPECT_EQ(loggingSettings.getMaxLogAgeDays(), std::size_t{30});
+}
+
 TEST(LoggingSettings, ToJsonContainsAllParameterKeys)
 {
     settings::LoggingSettings loggingSettings;
@@ -107,6 +113,7 @@ TEST(LoggingSettings, ToJsonContainsAllParameterKeys)
     EXPECT_TRUE(json.contains("logFileSuffix"));
     EXPECT_TRUE(json.contains("maxLogFiles"));
     EXPECT_TRUE(json.contains("maxLogFileSizeMB"));
+    EXPECT_TRUE(json.contains("maxLogAgeDays"));
     EXPECT_TRUE(json.contains("defaultLogLevel"));
 }
 
@@ -136,6 +143,7 @@ TEST(LoggingSettings, FromJsonRoundTripDefaultsPreserved)
     EXPECT_EQ(ls2.getLogFileSuffix(), ".log");
     EXPECT_EQ(ls2.getMaxLogFiles(), std::size_t{10});
     EXPECT_EQ(ls2.getMaxLogFileSizeMB(), std::size_t{50});
+    EXPECT_EQ(ls2.getMaxLogAgeDays(), std::size_t{30});
 }
 
 TEST(LoggingSettings, FromJsonRoundTripNotDirtyAfterLoad)

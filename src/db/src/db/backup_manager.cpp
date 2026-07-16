@@ -3,7 +3,6 @@
 #include <sqlite3.h>
 
 #include <algorithm>
-#include <chrono>
 #include <cstddef>
 #include <filesystem>
 #include <map>
@@ -12,15 +11,14 @@
 #include <string>
 #include <vector>
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "db/database.hpp"
 #include "db/db_exception.hpp"
 #include "logging/log_macros.hpp"
+#include "settings/backup_settings.hpp"
 #include "utils/timestamp.hpp"
 
 REGISTER_LOG_CATEGORY("DB.BackupManager");
-
-using std::chrono::year_month_day;
 
 namespace db
 {
@@ -44,6 +42,182 @@ namespace db
                 throw SqliteError("BackupManager: failed to open dest " + path);
             return handle;
         }
+
+        std::optional<Timestamp> _parseTimestamp(
+            const std::filesystem::path& path
+        )
+        {
+            const auto fileName = path.filename().string();
+            return Timestamp::fromFileSafe(
+                fileName,
+                Constants::getFilePrefix(),
+                Constants::getDatabaseFileExtension()
+            );
+        }
+
+        /**
+         * @brief Apply the tiered retention policy, deleting files that fall
+         * outside all tiers.
+         *
+         * Tier order (newest first):
+         *   1. Recent — keep `policy.recentCount` files unconditionally
+         *   2. Weekly — keep one file per calendar week for
+         * `policy.weeklyCount` calendar weeks beyond the recent set
+         *   3. Monthly — keep one file per calendar month for all older months
+         *
+         * @param sorted Backup paths sorted newest first
+         * @param policy Retention configuration
+         */
+        void _prune(
+            const std::vector<std::filesystem::path>& sorted,
+            const BackupManager::RetentionPolicy&     policy
+        )
+        {
+            std::set<std::filesystem::path> keep;
+
+            // ── Tier 1: N most recent
+            // ──────────────────────────────────────────
+            const auto recentEnd = std::min(policy.recentCount, sorted.size());
+            for (std::size_t i = 0; i < recentEnd; ++i)
+                keep.insert(sorted[i]);
+
+            // ── Tier 2: Weekly
+            // ──────────────────────────────────────────────── For each ISO
+            // year-week key in the first `weeklyCount` distinct weeks beyond
+            // the recent set, keep the newest (first in sorted order).
+            std::map<std::pair<int, unsigned>, std::filesystem::path> weekMap;
+            for (std::size_t i = recentEnd; i < sorted.size(); ++i)
+            {
+                const auto timeStamp = _parseTimestamp(sorted[i]);
+                if (!timeStamp.has_value())
+                    continue;
+
+                const auto key =
+                    std::make_pair(timeStamp->year(), timeStamp->week());
+
+                if (!weekMap.contains(key))
+                    weekMap[key] = sorted[i];
+            }
+
+            std::size_t weeksAdded = 0;
+            for (const auto& [key, path] : weekMap)
+            {
+                if (weeksAdded >= policy.weeklyCount)
+                    break;
+                keep.insert(path);
+                ++weeksAdded;
+            }
+
+            // ── Tier 3: Monthly (unbounded)
+            // ────────────────────────────────────
+            std::map<std::pair<int, unsigned>, std::filesystem::path> monthMap;
+            for (std::size_t i = recentEnd; i < sorted.size(); ++i)
+            {
+                const auto timeStamp = _parseTimestamp(sorted[i]);
+                if (!timeStamp.has_value())
+                    continue;
+                if (keep.contains(sorted[i]))
+                    continue;
+
+                const auto key =
+                    std::make_pair(timeStamp->year(), timeStamp->month());
+                if (!monthMap.contains(key))
+                    monthMap[key] = sorted[i];
+            }
+            for (const auto& [key, path] : monthMap)
+                keep.insert(path);
+
+            // ── Delete everything not in `keep`
+            // ────────────────────────────────
+            for (const auto& path : sorted)
+            {
+                if (keep.contains(path))
+                    continue;
+                LOG_INFO("Pruning old backup: " + path.string());
+                std::filesystem::remove(path);
+            }
+        }
+
+        /**
+         * @brief Scan the backup directory for files matching the naming
+         * convention and return them sorted newest first.
+         *
+         * @param backupDir Directory to scan
+         * @return Paths sorted newest first
+         */
+        std::vector<std::filesystem::path> _listBackups(
+            const settings::BackupSettings& backupSettings
+        )
+        {
+            if (!backupSettings.isBackupEnabled())
+                return {};
+
+            const auto backupDir = backupSettings.getBackupPath();
+
+            if (!std::filesystem::exists(backupDir))
+                return {};
+
+            std::vector<std::filesystem::path> result;
+            for (const auto& entry :
+                 std::filesystem::directory_iterator(backupDir))
+            {
+                if (!entry.is_regular_file())
+                    continue;
+
+                const auto& path = entry.path();
+                const auto  stem = path.stem().string();
+
+                const auto& filePrefix = Constants::getFilePrefix();
+                if (!stem.starts_with(filePrefix))
+                {
+                    LOG_WARNING(
+                        std::format(
+                            "Found backup file that does not start with "
+                            "configured file prefix: {} -> {}",
+                            filePrefix,
+                            path.string()
+                        )
+                    );
+                    continue;
+                }
+
+                if (path.extension() != Constants::getDatabaseFileExtension())
+                {
+                    LOG_WARNING(
+                        std::format(
+                            "Found backup file that does not have the expected "
+                            "extension: {} -> {}",
+                            Constants::getDatabaseFileExtension(),
+                            path.string()
+                        )
+                    );
+                    continue;
+                }
+
+                if (_parseTimestamp(path).has_value())
+                    result.push_back(path);
+                else
+                {
+                    LOG_WARNING(
+                        std::format(
+                            "Found backup file with invalid timestamp: {}",
+                            path.string()
+                        )
+                    );
+                }
+            }
+
+            std::ranges::sort(
+                result,
+                [](const auto& left, const auto& right)
+                {
+                    return _parseTimestamp(left).value_or(Timestamp::Null()) >
+                           _parseTimestamp(right).value_or(Timestamp::Null());
+                }
+            );
+
+            return result;
+        }
     }   // namespace
 
     /**
@@ -51,22 +225,28 @@ namespace db
      * then apply the tiered retention policy.
      *
      * @param db        Live, open source database
-     * @param backupDir Target directory (created if absent)
-     * @param policy    Retention tier configuration
+     * @param backupSettings Settings controlling backup directory and retention
+     * policy
      */
     void BackupManager::createBackup(
-        Database&                    db,
-        const std::filesystem::path& backupDir,
-        const RetentionPolicy&       policy
+        Database&                       db,
+        const settings::BackupSettings& backupSettings
     )
     {
-        std::filesystem::create_directories(backupDir);
+        if (!backupSettings.isBackupEnabled())
+        {
+            LOG_INFO("BackupManager: backups are disabled, skipping");
+            return;
+        }
 
-        const auto destName = Constants::getFilePrefix() +
-                              Timestamp().fileSafe() + "." +
+        const auto dir = backupSettings.getBackupPath();
+        std::filesystem::create_directories(dir);
+
+        const auto destName = Constants::getFilePrefix() + "_" +
+                              Timestamp().fileSafe() +
                               Constants::getDatabaseFileExtension();
 
-        const auto destPath = (backupDir / destName).string();
+        const auto destPath = (dir / destName).string();
 
         LOG_INFO("Creating database backup: " + destPath);
 
@@ -89,164 +269,33 @@ namespace db
 
         LOG_INFO("Backup complete: " + destPath);
 
-        const auto all = listBackups(backupDir);
-        _prune(all, policy);
+        const auto all = _listBackups(backupSettings);
+        _prune(
+            all,
+            BackupManager::RetentionPolicy{
+                .recentCount = backupSettings.getRecentCount(),
+                .weeklyCount = backupSettings.getWeeklyCount()
+            }
+        );
     }
 
     /**
      * @brief Scan the backup directory for files matching the naming convention
      * and return them sorted newest first.
      *
-     * @param backupDir Directory to scan
+     * @param backupSettings Settings controlling backup directory and retention
+     * policy
      * @return Paths sorted newest first
      */
-    std::vector<std::filesystem::path> BackupManager::listBackups(
-        const std::filesystem::path& backupDir
+    std::vector<std::string> BackupManager::listBackups(
+        const settings::BackupSettings& backupSettings
     )
     {
-        if (!std::filesystem::exists(backupDir))
-            return {};
+        auto backups = _listBackups(backupSettings) |
+                       std::views::transform([](const auto& path)
+                                             { return path.string(); });
 
-        std::vector<std::filesystem::path> result;
-        for (const auto& entry : std::filesystem::directory_iterator(backupDir))
-        {
-            if (!entry.is_regular_file())
-                continue;
-
-            const auto& path = entry.path();
-            const auto  stem = path.stem().string();
-
-            if (!stem.starts_with(Constants::getFilePrefix()))
-                continue;
-
-            if (path.extension() != Constants::getDatabaseFileExtension())
-                continue;
-
-            if (_parseTimestamp(path).has_value())
-                result.push_back(path);
-        }
-
-        std::ranges::sort(
-            result,
-            [](const auto& left, const auto& right)
-            {
-                return _parseTimestamp(left).value_or(Timestamp::Null()) >
-                       _parseTimestamp(right).value_or(Timestamp::Null());
-            }
-        );
-
-        return result;
-    }
-
-    /**
-     * @brief Apply the tiered retention policy, deleting files that fall
-     * outside all tiers.
-     *
-     * Tier order (newest first):
-     *   1. Recent — keep `policy.recentCount` files unconditionally
-     *   2. Weekly — keep one file per calendar week for `policy.weeklyCount`
-     *      calendar weeks beyond the recent set
-     *   3. Monthly — keep one file per calendar month for all older months
-     *
-     * @param sorted Backup paths sorted newest first
-     * @param policy Retention configuration
-     */
-    void BackupManager::_prune(
-        const std::vector<std::filesystem::path>& sorted,
-        const RetentionPolicy&                    policy
-    )
-    {
-        std::set<std::filesystem::path> keep;
-
-        // ── Tier 1: N most recent ──────────────────────────────────────────
-        const auto recentEnd = std::min(policy.recentCount, sorted.size());
-        for (std::size_t i = 0; i < recentEnd; ++i)
-            keep.insert(sorted[i]);
-
-        // ── Tier 2: Weekly ────────────────────────────────────────────────
-        // For each ISO year-week key in the first `weeklyCount` distinct weeks
-        // beyond the recent set, keep the newest (first in sorted order).
-        std::map<std::pair<int, unsigned>, std::filesystem::path> weekMap;
-        for (std::size_t i = recentEnd; i < sorted.size(); ++i)
-        {
-            const auto timeStamp = _parseTimestamp(sorted[i]);
-            if (!timeStamp.has_value())
-                continue;
-
-            const auto           days = floor<std::chrono::days>(*timeStamp);
-            const year_month_day ymd{days};
-
-            // Simple week number: days since epoch / 7
-            const auto weekNum = static_cast<unsigned>(
-                static_cast<std::int64_t>(days.time_since_epoch().count()) / 7
-            );
-
-            const auto key =
-                std::make_pair(static_cast<int>(ymd.year()), weekNum);
-
-            if (!weekMap.contains(key))
-                weekMap[key] = sorted[i];
-        }
-
-        std::size_t weeksAdded = 0;
-        for (const auto& [key, path] : weekMap)
-        {
-            if (weeksAdded >= policy.weeklyCount)
-                break;
-            keep.insert(path);
-            ++weeksAdded;
-        }
-
-        // ── Tier 3: Monthly (unbounded) ────────────────────────────────────
-        std::map<std::pair<int, unsigned>, std::filesystem::path> monthMap;
-        for (std::size_t i = recentEnd; i < sorted.size(); ++i)
-        {
-            const auto timeStamp = _parseTimestamp(sorted[i]);
-            if (!timeStamp.has_value())
-                continue;
-            if (keep.contains(sorted[i]))
-                continue;
-
-            const auto           days = floor<std::chrono::days>(*timeStamp);
-            const year_month_day ymd{days};
-            const auto           key = std::make_pair(
-                static_cast<int>(ymd.year()),
-                static_cast<unsigned>(ymd.month())
-            );
-            if (!monthMap.contains(key))
-                monthMap[key] = sorted[i];
-        }
-        for (const auto& [key, path] : monthMap)
-            keep.insert(path);
-
-        // ── Delete everything not in `keep` ────────────────────────────────
-        for (const auto& path : sorted)
-        {
-            if (keep.contains(path))
-                continue;
-            LOG_INFO("Pruning old backup: " + path.string());
-            std::filesystem::remove(path);
-        }
-    }
-
-    /**
-     * @brief Parse the timestamp embedded in a backup filename.
-     *
-     * @param p Path to parse
-     * @return Parsed time point, or std::nullopt if the name does not match
-     */
-    std::optional<Timestamp> BackupManager::_parseTimestamp(
-        const std::filesystem::path& path
-    )
-    {
-        const auto stem = path.stem().string();
-
-        if (!stem.starts_with(Constants::getFilePrefix()))
-            return std::nullopt;
-
-        return Timestamp::fromHumanReadable(
-            stem.substr(Constants::getFilePrefix().size())
-        );
+        return {backups.begin(), backups.end()};
     }
 
 }   // namespace db

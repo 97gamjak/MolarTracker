@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "db/db_exception.hpp"
 #include "db/statement.hpp"
 #include "logging/log_macros.hpp"
@@ -90,8 +90,17 @@ namespace db
     {
         close();
 
+        if (!std::filesystem::exists(dbPath))
+        {
+            throw SqliteError(
+                std::format("Database file does not exist at path: {}", dbPath)
+            );
+        }
+
         _db     = _open(dbPath);
         _dbPath = dbPath;
+
+        LOG_DEBUG("Opened database at path: " + dbPath);
 
         enableForeignKeys(true);
         setBusyTimeout(Constants::getDbBusyTimeoutMs());
@@ -105,10 +114,21 @@ namespace db
     {
         if (_db != nullptr)
         {
-            sqlite3_close(_db);
+            int returnCode = sqlite3_close(_db);
+            if (returnCode != SQLITE_OK)
+            {
+                throw SqliteError(
+                    std::format(
+                        "sqlite3_close failed: {} ({})",
+                        returnCode,
+                        sqlite3_errmsg(_db)
+                    )
+                );
+            }
+
+            LOG_DEBUG("Closed database at path: " + _dbPath);
             _db = nullptr;
         }
-
         _dbPath.clear();
     }
 

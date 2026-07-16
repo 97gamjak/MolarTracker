@@ -1,15 +1,19 @@
 #include "store/transaction_store.hpp"
 
 #include <format>
-#include <unordered_map>
 
 #include "config/id_types.hpp"
 #include "config/strong_id.hpp"
 #include "finance/account/accounts.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/cash_transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/position_transaction.hpp"
+#include "finance/transaction/transaction_converter.hpp"
+#include "finance/transaction/transaction_filter.hpp"
+#include "finance/transaction/transactions.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_transaction_service.hpp"
+#include "store/i_stock_store.hpp"
 
 REGISTER_LOG_CATEGORY("Store.TransactionStore");
 
@@ -78,12 +82,20 @@ namespace store
      * @param positionIdRemap Mapping of position IDs
      */
     void TransactionStore::commit(
-        const unorderedIdMap<AccountId, AccountId>&       accountIdRemap,
-        const unorderedIdMap<InstrumentId, InstrumentId>& instrumentIdRemap,
-        const unorderedIdMap<PositionId, PositionId>&     positionIdRemap
+        const IdIdMap<AccountId>&    accountIdRemap,
+        const IdIdMap<InstrumentId>& instrumentIdRemap,
+        const IdIdMap<PositionId>&   positionIdRemap
     )
     {
         LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Trace);
+
+        if (!isDirty())
+        {
+            LOG_DEBUG("No changes to commit");
+            return;
+        }
 
         _onAccountIdRemap(accountIdRemap);
         _onInstrumentIdRemap(instrumentIdRemap);
@@ -102,13 +114,14 @@ namespace store
                         )
                     );
 
+                    const auto oldId = entry.value.getId();
                     const auto id =
                         _transactionService->addTransaction(entry.value);
 
                     auto persisted = entry.value;
                     persisted.setId(id);
                     _commitEntry(
-                        entry.value.getId(),
+                        oldId,
                         Entry{.value = persisted, .state = entry.state}
                     );
                     break;
@@ -121,46 +134,67 @@ namespace store
             }
         }
 
+        _logCache(LOG_CATEGORY, LogLevel::Trace);
+
         _notifyOnCommit();
     }
 
     /**
-     * @brief Add a transaction to the store, this adds a new transaction to the
-     * store in a temporary state, which can then be committed to the database
-     * using the commit method. The transaction must have a total sum of zero,
-     * meaning that the sum of all entries in the transaction must equal zero,
-     * ensuring that the transaction is balanced and does not create or destroy
-     * money.
+     * @brief Add a cash transaction to the store
      *
-     * @param transaction The transaction to add to the store, this should be a
-     * complete transaction with all necessary entries and details filled out,
-     * but it will not be saved to the database until the commit method is
-     * called.
-     * @return TransactionStoreResult The result of the add operation, this will
-     * indicate whether the transaction was added successfully or if there was
-     * an error (e.g., if the transaction sum is not zero).
+     * @param transaction The cash transaction to add
+     * @return TransactionStoreResult The result of the operation
      */
-    TransactionStoreResult TransactionStore::addTransaction(
-        finance::Transaction transaction
+    TransactionStoreResult TransactionStore::addCashTransaction(
+        finance::CashTransaction transaction
     )
     {
         LOG_ENTRY;
 
-        const auto cash = transaction.calculateTotalSum();
+        _addEntry(
+            finance::TransactionConverter::toDomain(
+                transaction,
+                _session->accountSession
+            )
+        );
 
-        if (!cash.isZero())
-        {
-            LOG_ERROR(
-                std::format(
-                    "Transaction sum is not zero (={}), cannot add transaction "
-                    "draft",
-                    cash.toString()
-                )
-            );
-            return TransactionStoreResult::TransactionSumNotZero;
-        }
+        return TransactionStoreResult::Ok;
+    }
 
-        _addEntry(std::move(transaction));
+    /**
+     * @brief Add a stock transaction to the store
+     *
+     * @param transaction The stock transaction to add
+     * @return TransactionStoreResult The result of the operation
+     */
+    TransactionStoreResult TransactionStore::addStockTransaction(
+        finance::StockTransaction transaction
+    )
+    {
+        LOG_ENTRY;
+
+        _addEntry(
+            finance::TransactionConverter::toDomain(
+                transaction,
+                _session->accountSession
+            )
+        );
+
+        return TransactionStoreResult::Ok;
+    }
+
+    TransactionStoreResult TransactionStore::addOptionTransaction(
+        finance::OptionTransaction transaction
+    )
+    {
+        LOG_ENTRY;
+
+        _addEntry(
+            finance::TransactionConverter::toDomain(
+                transaction,
+                _session->accountSession
+            )
+        );
 
         return TransactionStoreResult::Ok;
     }
@@ -174,9 +208,9 @@ namespace store
      * but they will not be saved to the database until the commit method is
      * called.
      *
-     * @return std::vector<finance::Transaction>
+     * @return finance::Transactions
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions() const
+    finance::Transactions TransactionStore::getTransactions() const
     {
         return getTransactions(finance::TransactionFilter());
     }
@@ -196,11 +230,11 @@ namespace store
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
      *
-     * @return std::vector<finance::Transaction> A vector of transactions
+     * @return finance::Transactions A vector of transactions
      * currently in the store, this includes both new and existing transactions,
      * and reflects any changes made to them in the store.
      */
-    std::vector<finance::Transaction> TransactionStore::getTransactions(
+    finance::Transactions TransactionStore::getTransactions(
         const finance::TransactionFilter& filter
     ) const
     {
@@ -214,6 +248,12 @@ namespace store
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
+        LOG_DEBUG(
+            std::format(
+                "Retrieving transactions with filter: {}",
+                filter.toString()
+            )
+        );
         auto transactions = _getEntries(options);
 
         auto dbTransactions =
@@ -222,84 +262,83 @@ namespace store
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
-        idSet<TransactionId> transactionIds;
+        IdSet<TransactionId> transactionIds;
 
-        std::vector<finance::Transaction> results;
+        std::vector<finance::DomainTransaction> results;
 
         for (const auto& transaction : transactions)
         {
-            // Only include transactions that are new, for all others the id is
-            // already in the database and we will get it from there
-            if (transaction.state != StoreState::New)
-                transactionIds.insert(transaction.value.getId());
-            else
-                results.push_back(transaction.value);
+            transactionIds.insert(transaction.value.getId());
+            results.push_back(transaction.value);
         }
 
         for (const auto& transaction : dbTransactions)
             if (!transactionIds.contains(transaction.getId()))
                 results.push_back(transaction);
 
-        return results;
+        finance::Transactions result;
+        result.addTransactions(results, _session->accountSession);
+
+        LOG_DEBUG(
+            std::format(
+                "Transactions retrieved: stocks({}), cash({})",
+                result.stocks().size(),
+                result.cash().size()
+            )
+        );
+        return result;
     }
 
     /**
-     * @brief Find transactions by position ID, this retrieves all transactions
-     * that are associated with a specific position ID, allowing the caller to
-     * easily find and work with transactions that are related to a particular
-     * position. This is useful for analyzing the history of a position,
-     * generating reports, or performing any other operations that require
-     * access to the transactions associated with a specific position.
+     * @brief Get stock positions based on transactions in the store, this will
+     * analyze the stock transactions in the store and group them into positions
+     * based on their position IDs, allowing the caller to easily access the
+     * current open positions for stocks based on the transactions that have
+     * been added to the store.
      *
-     * @param positionId The ID of the position for which to find transactions,
-     * this specifies the position that the caller is interested in, and the
-     * returned transactions will be those that are associated with this
-     * position.
+     * @param filter An optional filter to apply when retrieving transactions,
+     * this allows the caller to specify criteria for which transactions to
+     * include in the analysis for determining stock positions, such as
+     * filtering by date range, transaction type, or any other relevant
+     * attributes of the transactions. If no filter is provided, all
+     * transactions in the store will be considered when determining stock
+     * positions.
      *
-     * @return std::vector<finance::Transaction> A vector of transactions that
-     * are associated with the specified position ID, this includes both new and
-     * existing transactions that are related to the given position.
+     * @return IdMap<PositionId, finance::StockPositionTransaction>
+     * A mapping of position IDs to StockPositionTransaction objects, this
+     * allows the caller to easily access the details of each open stock
+     * position based on its position ID.
      */
-    std::vector<finance::Transaction> TransactionStore::
-        findTransactionsByPositionId(PositionId positionId) const
+    IdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
+        getStockPositions(const finance::TransactionFilter& filter) const
     {
-        auto filter = finance::TransactionFilter();
-        filter.setPositionId(positionId);
-        const auto transactions = getTransactions(filter);
+        IdMap<PositionId, finance::StockPositionTransaction> stockPositions;
 
-        return transactions;
-    }
-
-    /**
-     * @brief Get a set of instrument IDs associated with a specific position ID
-     *
-     * @param positionId The ID of the position for which to find instrument IDs
-     * @return idSet<InstrumentId> A set of instrument IDs associated with the
-     * specified position ID
-     */
-    idSet<InstrumentId> TransactionStore::getInstrumentIdsByPositionId(
-        PositionId positionId
-    ) const
-    {
-        idSet<InstrumentId> instrumentIdSet;
-
-        const auto transactions = findTransactionsByPositionId(positionId);
+        const auto transactions = getTransactions(filter).stocks();
 
         for (const auto& transaction : transactions)
         {
-            const auto instrumentIds = transaction.getInstrumentIds();
-
-            if (!instrumentIds.empty())
+            const auto positionId = transaction.getPositionId();
+            if (!stockPositions.contains(positionId))
             {
-                // This will default construct an
-                // empty set if the position ID is
-                // not already in the map
-                for (const auto& instrumentId : instrumentIds)
-                    instrumentIdSet.insert(instrumentId);
+                stockPositions.at(positionId) =
+                    finance::StockPositionTransaction(positionId);
+            }
+
+            if (!stockPositions.at(positionId).addPosition(transaction))
+            {
+                LOG_ERROR(
+                    "Failed to add stock transaction to position id: " +
+                    positionId.toString()
+                );
             }
         }
 
-        return instrumentIdSet;
+        LOG_DEBUG(
+            std::format("Stock positions retrieved: {}", stockPositions.size())
+        );
+
+        return stockPositions;
     }
 
     /**
@@ -307,14 +346,14 @@ namespace store
      *
      * @param remap The mapping of old account IDs to new account IDs
      */
-    void TransactionStore::_onAccountIdRemap(const accountMap<AccountId>& remap)
+    void TransactionStore::_onAccountIdRemap(const IdIdMap<AccountId>& remap)
     {
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
             {
-                // check if this committed transaction references the remapped
-                // ID
+                // check if this committed transaction references the
+                // remapped ID
                 const auto references = std::ranges::any_of(
                     entry.value.getEntries(),
                     [&remap](const auto& entry_)
@@ -332,21 +371,37 @@ namespace store
                 continue;
             }
 
-            bool modified    = false;
-            auto transaction = entry.value;
+            bool modified = false;
 
-            for (auto& transactionEntry : transaction.getEntries())
+            auto txEntries = entry.value.getEntries();
+            for (auto& txEntry : txEntries)
             {
-                if (const auto it = remap.find(transactionEntry.getAccountId());
-                    it != remap.end())
+                const auto id = txEntry.getAccountId();
+                if (remap.contains(id))
                 {
-                    transactionEntry.setAccountId(it->second);
+                    txEntry.setAccountId(remap.at(id));
+                    modified = true;
+                }
+            }
+
+            auto legs = entry.value.getLegs();
+            for (auto& leg : legs)
+            {
+                const auto id = leg.getAccountId();
+                if (remap.contains(id))
+                {
+                    leg.setAccountId(remap.at(id));
                     modified = true;
                 }
             }
 
             if (modified)
-                _updateEntry(transaction, StoreState::New);
+            {
+                auto txCopy = entry.value;
+                txCopy.setEntries(txEntries);
+                txCopy.setLegs(legs);
+                _updateEntry(txCopy, StoreState::New);
+            }
         }
     }
 
@@ -356,21 +411,28 @@ namespace store
      * @param remap The mapping of old instrument IDs to new instrument IDs
      */
     void TransactionStore::_onInstrumentIdRemap(
-        const instrumentMap<InstrumentId>& remap
+        const IdIdMap<InstrumentId>& remap
     )
     {
         LOG_ENTRY;
+
+        LOG_TRACE(
+            std::format(
+                "Remapping instrument IDs in transactions: {}",
+                remap.toString()
+            )
+        );
 
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
             {
-                // check if this committed transaction references the remapped
-                // ID
-                const auto hasId = finance::hasId(
-                    entry.value.getData(),
+                // check if this committed transaction references the
+                // remapped ID
+                const auto hasId = std::ranges::any_of(
                     remap,
-                    &finance::TradeLeg::getInstrumentId
+                    [&entry](const auto& pair)
+                    { return entry.value.hasInstrumentId(pair.first); }
                 );
 
                 if (hasId)
@@ -385,44 +447,33 @@ namespace store
                 continue;
             }
 
-            switch (entry.value.getType())
+            bool               modified = false;
+            finance::TradeLegs legs     = entry.value.getLegs();
+
+            for (auto& leg : legs)
             {
-                case TransactionDataType::Trade:
+                const auto instrumentId = leg.getInstrumentId();
+                if (remap.contains(instrumentId))
                 {
-                    auto  transaction = entry.value;
-                    auto& data =
-                        std::get<finance::TradeData>(transaction.getData());
-
-                    bool modified = false;
-
-                    for (auto& leg : data.getLegs())
-                    {
-                        if (const auto it = remap.find(leg.getInstrumentId());
-                            it != remap.end())
-                        {
-                            LOG_DEBUG(
-                                std::format(
-                                    "Remapping instrument ID in transaction "
-                                    "leg "
-                                    "{}: "
-                                    "{} -> "
-                                    "{}",
-                                    leg.toString(),
-                                    leg.getInstrumentId().toString(),
-                                    it->second.toString()
-                                )
-                            );
-                            leg.setInstrumentId(it->second);
-                            modified = true;
-                        }
-                    }
-
-                    if (modified)
-                        _updateEntry(transaction, StoreState::New);
-                    break;
+                    LOG_DEBUG(
+                        std::format(
+                            "Remapping instrument ID in transaction leg {}: {} "
+                            "-> {}",
+                            leg.toString(),
+                            instrumentId.toString(),
+                            remap.at(instrumentId).toString()
+                        )
+                    );
+                    leg.setInstrumentId(remap.at(instrumentId));
+                    modified = true;
                 }
-                case TransactionDataType::Cash:
-                    break;
+            }
+
+            if (modified)
+            {
+                auto txCopy = entry.value;
+                txCopy.setLegs(legs);
+                _updateEntry(txCopy, StoreState::New);
             }
         }
     }
@@ -432,20 +483,25 @@ namespace store
      *
      * @param remap The mapping of old position IDs to new position IDs
      */
-    void TransactionStore::_onPositionIdRemap(
-        const positionMap<PositionId>& remap
-    )
+    void TransactionStore::_onPositionIdRemap(const IdIdMap<PositionId>& remap)
     {
+        LOG_TRACE(
+            std::format(
+                "Remapping position IDs in transactions: {}",
+                remap.toString()
+            )
+        );
+
         for (const auto& entry : _getEntries())
         {
             if (entry.state != StoreState::New)
             {
-                // check if this committed transaction references the remapped
-                // ID
-                const auto hasId = finance::hasId(
-                    entry.value.getData(),
+                // check if this committed transaction references the
+                // remapped ID
+                const auto hasId = std::ranges::any_of(
                     remap,
-                    &finance::TradeLeg::getPositionId
+                    [&entry](const auto& pair)
+                    { return entry.value.hasPositionId(pair.first); }
                 );
 
                 if (hasId)
@@ -459,45 +515,60 @@ namespace store
                 continue;
             }
 
-            switch (entry.value.getType())
+            bool modified = false;
+
+            auto legs = entry.value.getLegs();
+            for (auto& leg : legs)
             {
-                case TransactionDataType::Trade:
+                const auto positionId = leg.getPositionId();
+                if (remap.contains(positionId))
                 {
-                    auto  transaction = entry.value;
-                    auto& data =
-                        std::get<finance::TradeData>(transaction.getData());
+                    const auto newPositionId = remap.at(positionId);
 
-                    bool modified = false;
-
-                    for (auto& leg : data.getLegs())
-                    {
-                        if (const auto it = remap.find(leg.getPositionId());
-                            it != remap.end())
-                        {
-                            LOG_DEBUG(
-                                std::format(
-                                    "Remapping position ID in transaction leg "
-                                    "{}: "
-                                    "{} -> "
-                                    "{}",
-                                    leg.toString(),
-                                    leg.getPositionId().toString(),
-                                    it->second.toString()
-                                )
-                            );
-                            leg.setPositionId(it->second);
-                            modified = true;
-                        }
-                    }
-
-                    if (modified)
-                        _updateEntry(transaction, StoreState::New);
-                    break;
+                    LOG_DEBUG(
+                        std::format(
+                            "Remapping position ID in transaction "
+                            "leg "
+                            "{}: "
+                            "{} -> "
+                            "{}",
+                            leg.toString(),
+                            positionId.toString(),
+                            newPositionId.toString()
+                        )
+                    );
+                    leg.setPositionId(newPositionId);
+                    modified = true;
                 }
-                case TransactionDataType::Cash:
-                    break;
+            }
+
+            if (modified)
+            {
+                auto txCopy = entry.value;
+                txCopy.setLegs(legs);
+                _updateEntry(txCopy, StoreState::New);
             }
         }
+    }
+
+    Connection TransactionStore::subscribeToTransactionAdded(
+        OnTransactionAdded::func func,
+        void*                    user
+    )
+    {
+        return subscribeToEntryAdded(
+            [func = std::move(func),
+             this](const std::vector<finance::DomainTransaction>& transactions)
+            {
+                func(
+                    finance::Transactions(
+                        transactions,
+                        _session->accountSession
+                    )
+                );
+            },
+            user
+        );
     }
 
     /**
@@ -505,6 +576,11 @@ namespace store
      * clearing the cache is sufficient — the next query will fetch from the
      * restored database.
      */
-    void TransactionStore::reload() { _clearEntries(); }
+    void TransactionStore::reload()
+    {
+        LOG_ENTRY;
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+        _clearEntries();
+    }
 
 }   // namespace store

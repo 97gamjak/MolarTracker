@@ -4,7 +4,60 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
-### Features
+REVERT CACHE changes but keep error handling
+
+#### Finance
+
+- Add position store, service and repo
+- Add position creation when creating transactions
+- Add fees to creating stock and cash transactions
+- Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
+- Make stock store a fully cached store with possibility to switch to a dirty-only cache store
+- Implement first version of Option SQL model
+- Extend transaction row sql model with some option specific data
+- Extend domain transaction type to have now `OptionData`
+- Make it possible to open (create) option transactions
+
+#### UI
+
+- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
+
+#### ORM
+
+- Introduce `.in` for queries to make it easier to create where clauses for ranges
+
+#### Utils
+
+- Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+
+#### VCS
+
+- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
+  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
+    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+  - `vcs::UpdateCheckService` — `QObject` that fires an async
+    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
+    emits `updateAvailable(SemVer)` at most once per distinct version per
+    session
+- Add `SemVer::current()` static method that returns the compile-time
+  version from `MOLARTRACKER_VERSION`
+- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
+  comparison operators
+- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
+  version, a link button to the GitHub releases page, and a
+  "don't show again for this version" checkbox
+- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
+  persists the last dismissed update version to `settings.json`
+- Wire `UpdateCheckService` into `MainController::Impl`; on
+  `updateAvailable` the dismissed version is checked, the dialog is shown,
+  and if dismissed the version is written to settings and saved
 
 #### DB / Backup
 
@@ -40,18 +93,25 @@ All changes and updates, that are relevant for developers will be documented her
 - `SettingsMenuController::setRestoreCallback` wired from
   `MainController::Impl` so the controller can trigger an in-place restore
 
-### Testing
 
-#### UI
+#### Logging — age-based log file cleanup (MOLTRACK-60)
 
-- Add unit test suite for the `src/ui/` layer covering validators
-  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
-  (`StockInfoTableModel`, `CashTransactionTableModel`,
-  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
-  (`AccountItem`, `AccountCategory`), and `EditMenu`
-- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
-  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
-  execution
+- Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,
+  reboot-required); schema key `maxLogAgeDays`, min 0
+- Add `logging::LogFileCleaner::cleanByAge()` in `src/logging/` — scans a
+  directory for regular files matching a prefix/suffix and deletes those whose
+  `last_write_time` exceeds the configured age; no-op when `maxAgeDays == 0`;
+  best-effort (per-file errors suppressed via `std::error_code`)
+- `LogManager::initialize()` now calls `_cleanupOldLogFiles()` before
+  constructing the `RingFile`, ensuring stale session logs are pruned at every
+  startup
+
+### CI
+
+- Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
+  PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
+  (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
+  uploads to Codecov via `codecov/codecov-action@v5`
 
 ### Bug Fix
 
@@ -123,28 +183,14 @@ All changes and updates, that are relevant for developers will be documented her
 - Shared `mock_services.hpp` test helper in `tests/app/store/` providing
   lightweight fakes for all service interfaces
 - New `tests_stores` CMake test executable for store unit tests
-
-### Features
-
-#### Finance
-
-- Add position store, service and repo
-- Add position creation when creating transactions
-- Add fees to creating stock and cash transactions
-- Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
-- Make stock store a fully cached store with possibility to switch to a dirty-only cache store
-
-#### UI
-
-- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
-
-#### ORM
-
-- Introduce `.in` for queries to make it easier to create where clauses for ranges
-
-#### Utils
-
-- Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+- Add unit test suite for the `src/ui/` layer covering validators
+  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
+  (`StockInfoTableModel`, `CashTransactionTableModel`,
+  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
+  (`AccountItem`, `AccountCategory`), and `EditMenu`
+- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
+  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
+  execution
 
 ### Cleanup
 
@@ -161,6 +207,7 @@ All changes and updates, that are relevant for developers will be documented her
 - make position store an interface and cleanup deps to remove drafts from store deps
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
+- remove IdMap special type
 
 ### Claude
 

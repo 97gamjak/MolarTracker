@@ -3,9 +3,8 @@
 #include <filesystem>
 
 #include "account_repo.hpp"
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "db/backup_manager.hpp"
-#include "db/database.hpp"
 #include "instrument_repo.hpp"
 #include "logging/log_macros.hpp"
 #include "position_repo.hpp"
@@ -29,29 +28,15 @@ namespace repo
               Constants::getInstance().getDatabasePath()
           )}
     {
-        // Backup before any writes (including migrations). A non-fatal error
-        // here must not prevent startup.
-        if (std::filesystem::exists(backupSettings.getBackupDir()) &&
-            backupSettings.isBackupEnabled())
+        try
         {
-            try
-            {
-                db::BackupManager::createBackup(
-                    *_database,
-                    Constants::getInstance().getBackupPath(),
-                    db::BackupManager::RetentionPolicy{
-                        .recentCount = backupSettings.getRecentCount(),
-                        .weeklyCount = backupSettings.getWeeklyCount()
-                    }
-                );
-            }
-            catch (const std::exception& e)
-            {
-                LOG_WARNING(
-                    std::string{"Startup backup failed (continuing): "} +
-                    e.what()
-                );
-            }
+            db::BackupManager::createBackup(*_database, backupSettings);
+        }
+        catch (const std::exception& e)
+        {
+            LOG_WARNING(
+                std::string{"Startup backup failed (continuing): "} + e.what()
+            );
         }
 
         _migrationRunner = std::make_unique<MigrationRunner>(*_database);
@@ -78,7 +63,10 @@ namespace repo
     /**
      * @brief Reopen the database connection at the original path.
      */
-    void RepoContainer::reopenDb() { _database->open(_database->getDBPath()); }
+    void RepoContainer::reopenDb()
+    {
+        _database->open(Constants::getInstance().getDatabasePath());
+    }
 
     RepoContainer::~RepoContainer() = default;
 

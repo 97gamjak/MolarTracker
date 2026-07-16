@@ -137,10 +137,11 @@ namespace settings
        public:
         BackupSettings();
 
-        [[nodiscard]] bool        isBackupEnabled() const;
-        [[nodiscard]] std::string getBackupDir() const;
-        [[nodiscard]] std::size_t getRecentCount() const;
-        [[nodiscard]] std::size_t getWeeklyCount() const;
+        [[nodiscard]] bool                  isBackupEnabled() const;
+        [[nodiscard]] std::string           getBackupDir() const;
+        [[nodiscard]] std::filesystem::path getBackupPath() const;
+        [[nodiscard]] std::size_t           getRecentCount() const;
+        [[nodiscard]] std::size_t           getWeeklyCount() const;
 
         template <typename Func>
         void forEachParam(Func&& func) const;

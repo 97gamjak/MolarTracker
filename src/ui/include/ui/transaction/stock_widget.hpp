@@ -1,4 +1,3 @@
-// stock_widget.hpp
 #ifndef __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
 
@@ -6,8 +5,8 @@
 
 #include <vector>
 
-#include "drafts/account_draft.hpp"
 #include "ui/base/dialog.hpp"
+#include "utils/container/set.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
@@ -16,6 +15,7 @@ class QPushButton;   // Forward declaration
 namespace drafts
 {
     class CreateStockTransactionDraft;   // Forward declaration
+    class AccountDraft;                  // Forward declaration
 }   // namespace drafts
 
 namespace ui
@@ -55,7 +55,7 @@ namespace ui
         explicit StockWidget(
             const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
-            const std::vector<std::string>&          tickers,
+            const Set<std::string>&                  tickers,
             QWidget*                                 parent = nullptr
         );
 
@@ -65,7 +65,7 @@ namespace ui
         void updateReferenceAccounts(
             std::vector<drafts::AccountDraft> referenceAccounts
         );
-        void updateTickers(const std::vector<std::string>& tickers);
+        void updateTickers(const Set<std::string>& tickers);
         void refresh();
 
        signals:

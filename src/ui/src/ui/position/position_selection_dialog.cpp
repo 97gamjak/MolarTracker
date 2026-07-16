@@ -9,6 +9,7 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "drafts/position_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
 #include "utils/qt_helpers.hpp"
 
@@ -24,8 +25,8 @@ namespace ui
      * @param parent The parent widget
      */
     PositionSelectionDialog::PositionSelectionDialog(
-        const std::vector<drafts::PositionDraft>& positions,
-        QWidget*                                  parent
+        const std::vector<drafts::PositionStockDetailDraft>& positions,
+        QWidget*                                             parent
     )
         : Dialog{parent},
           _model{makeQChild<PositionSelectionTableModel>(positions, this)},
@@ -98,9 +99,9 @@ namespace ui
     /**
      * @brief Get the currently selected position draft
      *
-     * @return std::optional<drafts::PositionDraft>
+     * @return std::optional<drafts::PositionStockDetailDraft>
      */
-    std::optional<drafts::PositionDraft> PositionSelectionDialog::
+    std::optional<drafts::PositionStockDetailDraft> PositionSelectionDialog::
         selectedPosition() const
     {
         return _selectedPosition;

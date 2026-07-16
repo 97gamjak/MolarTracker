@@ -12,7 +12,7 @@ namespace repo
      * CashAccount
      *
      * @param accountRow
-     * @return finance::CashAccount
+     * @return CashAccount
      */
     finance::Account AccountFactory::toAccountDomain(
         const AccountRow& accountRow

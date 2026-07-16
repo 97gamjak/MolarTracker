@@ -5,9 +5,9 @@
 #include <qlabel.h>
 #include <qregularexpression.h>
 
-#include "config/quantity.hpp"
 #include "logging/log_macros.hpp"
 #include "utils/qt_helpers.hpp"
+#include "utils/quantity.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Validators.AmountLineEdit");
 

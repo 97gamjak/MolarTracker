@@ -10,7 +10,9 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "config/constants/constants.hpp"
 #include "utils/qt_helpers.hpp"
+#include "utils/timestamp.hpp"
 
 namespace ui
 {
@@ -26,53 +28,53 @@ namespace ui
         {
            public:
             explicit BackupTableModel(
-                const std::vector<std::filesystem::path>& backups,
-                QObject*                                  parent = nullptr
+                const std::vector<std::string>& backups,
+                QObject*                        parent = nullptr
             )
                 : QAbstractTableModel{parent}, _backups{backups}
             {
             }
 
+            [[nodiscard]]
             int rowCount(const QModelIndex& parent) const override
             {
                 return parent.isValid() ? 0 : static_cast<int>(_backups.size());
             }
 
+            [[nodiscard]]
             int columnCount(const QModelIndex& parent) const override
             {
                 return parent.isValid() ? 0 : 2;
             }
 
+            [[nodiscard]]
             QVariant data(const QModelIndex& index, int role) const override
             {
                 if (!index.isValid() || index.row() >= rowCount({}))
                     return {};
 
-                const auto& path =
+                const auto& pathStr =
                     _backups[static_cast<std::size_t>(index.row())];
+                const auto& path = std::filesystem::path{pathStr};
 
                 if (role == Qt::DisplayRole)
                 {
                     if (index.column() == 0)
                     {
-                        // Extract timestamp from stem:
-                        // "molartracker_YYYYMMDD_HHMMSS"
-                        const auto            stem = path.stem().string();
-                        constexpr std::size_t prefixLen =
-                            sizeof("molartracker_") - 1;
-                        if (stem.size() >= prefixLen + 15)
-                        {
-                            const auto ts = stem.substr(prefixLen);
-                            // YYYYMMDD_HHMMSS → YYYY-MM-DD HH:MM:SS
-                            return QString{"%1-%2-%3 %4:%5:%6"}
-                                .arg(QString::fromStdString(ts.substr(0, 4)))
-                                .arg(QString::fromStdString(ts.substr(4, 2)))
-                                .arg(QString::fromStdString(ts.substr(6, 2)))
-                                .arg(QString::fromStdString(ts.substr(9, 2)))
-                                .arg(QString::fromStdString(ts.substr(11, 2)))
-                                .arg(QString::fromStdString(ts.substr(13, 2)));
-                        }
-                        return QString::fromStdString(path.filename().string());
+                        const auto stem = path.stem().string();
+
+                        const auto timeStamp = Timestamp::fromFileSafe(
+                            path.filename().string(),
+                            Constants::getFilePrefix(),
+                            Constants::getDatabaseFileExtension()
+                        );
+
+                        if (!timeStamp.has_value())
+                            return QString::fromStdString(
+                                path.filename().string()
+                            );
+
+                        return timeStamp.value().toQDateTime();
                     }
 
                     if (index.column() == 1)
@@ -96,6 +98,7 @@ namespace ui
                 return {};
             }
 
+            [[nodiscard]]
             QVariant headerData(
                 int             section,
                 Qt::Orientation orientation,
@@ -107,6 +110,7 @@ namespace ui
                 return section == 0 ? "Date / Time" : "File Size";
             }
 
+            [[nodiscard]]
             Qt::ItemFlags flags(const QModelIndex& index) const override
             {
                 if (!index.isValid())
@@ -115,7 +119,7 @@ namespace ui
             }
 
            private:
-            const std::vector<std::filesystem::path>& _backups;
+            const std::vector<std::string>& _backups;
         };
 
     }   // namespace
@@ -127,8 +131,8 @@ namespace ui
      * @param parent  Optional parent widget
      */
     RestoreBackupDialog::RestoreBackupDialog(
-        std::vector<std::filesystem::path> backups,
-        QWidget*                           parent
+        std::vector<std::string> backups,
+        QWidget*                 parent
     )
         : Dialog{parent}, _backups{std::move(backups)}
     {
@@ -195,10 +199,9 @@ namespace ui
      * @brief Return the selected backup path, or std::nullopt if the dialog
      * was cancelled or no row was selected.
      *
-     * @return std::optional<std::filesystem::path>
+     * @return std::optional<std::string>
      */
-    std::optional<std::filesystem::path> RestoreBackupDialog::selectedBackup(
-    ) const
+    std::optional<std::string> RestoreBackupDialog::selectedBackup() const
     {
         const auto* selection = _tableView->selectionModel();
         if (selection == nullptr || !selection->hasSelection())

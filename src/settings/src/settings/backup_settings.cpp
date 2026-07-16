@@ -1,5 +1,7 @@
 #include "settings/backup_settings.hpp"
 
+#include "config/constants/constants.hpp"
+
 namespace settings
 {
     /**
@@ -40,6 +42,16 @@ namespace settings
     std::string BackupSettings::getBackupDir() const
     {
         return _backupDir.get();
+    }
+
+    /**
+     * @brief Return the absolute path to the backup directory.
+     *
+     * @return std::filesystem::path
+     */
+    std::filesystem::path BackupSettings::getBackupPath() const
+    {
+        return Constants::getInstance().getDataPath() / getBackupDir();
     }
 
     /**

@@ -6,4 +6,4 @@ compile_commands.json
 .venv
 venv
 .cache
-.out-of-code-insights
+.out-of-code-insights/

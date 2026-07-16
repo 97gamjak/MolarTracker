@@ -11,7 +11,6 @@
 #include <QVBoxLayout>
 
 #include "drafts/stock_draft.hpp"
-#include "finance/ticker_info.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -90,7 +89,7 @@ namespace ui
         _industryLabel->setText(QString::fromStdString(quote.getIndustry()));
         _sectorLabel->setText(QString::fromStdString(quote.getSector()));
         _assetClassLabel->setText(
-            QString::fromStdString(finance::toString(quote.getAssetClass()))
+            QString::fromStdString(toString(quote.getAssetClass()))
         );
 
         _acceptButton->setEnabled(true);

@@ -2,20 +2,31 @@
 #define __FINANCE__INCLUDE__FINANCE__ACCOUNT__ACCOUNTS_HPP__
 
 #include "finance/account/account.hpp"
-#include "utils/iterable.hpp"
+#include "utils/container/id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
     /**
      * @brief A collection of financial accounts.
      */
-    class Accounts : public Iterable<Account>
+    class Accounts : public IdObjectMap<Account>
     {
        public:
-        using Iterable<Account>::Iterable;
+        using IdObjectMap<Account>::IdObjectMap;
 
         [[nodiscard]]
-        idSet<AccountId> getIds() const;
+        Accounts filterExternal(bool external) const;
+
+        [[nodiscard]]
+        std::vector<std::optional<bool>> isExternal(
+            const IdSet<AccountId>& ids
+        ) const;
+
+        [[nodiscard]]
+        AccountId getCorrespondingExternalAccountId(
+            const AccountId& cashAccountId
+        ) const;
     };
 }   // namespace finance
 

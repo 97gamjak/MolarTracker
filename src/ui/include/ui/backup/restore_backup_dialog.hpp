@@ -27,16 +27,15 @@ namespace ui
 
        public:
         explicit RestoreBackupDialog(
-            std::vector<std::filesystem::path> backups,
-            QWidget*                           parent = nullptr
+            std::vector<std::string> backups,
+            QWidget*                 parent = nullptr
         );
 
-        [[nodiscard]] std::optional<std::filesystem::path> selectedBackup(
-        ) const;
+        [[nodiscard]] std::optional<std::string> selectedBackup() const;
 
        private:
         /// The list of backup paths (sorted newest first)
-        std::vector<std::filesystem::path> _backups;
+        std::vector<std::string> _backups;
         /// The table view that displays the backups
         QTableView* _tableView{nullptr};
     };

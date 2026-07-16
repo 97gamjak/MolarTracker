@@ -1,13 +1,16 @@
 #ifndef __DB__INCLUDE__DB__BACKUP_MANAGER_HPP__
 #define __DB__INCLUDE__DB__BACKUP_MANAGER_HPP__
 
-#include <chrono>
 #include <cstddef>
-#include <filesystem>
-#include <optional>
+#include <string>
 #include <vector>
 
-#include "utils/timestamp.hpp"
+namespace settings
+{
+    class BackupSettings;   // Forward declaration
+}   // namespace settings
+
+class Timestamp;   // Forward declaration
 
 namespace db
 {
@@ -16,8 +19,6 @@ namespace db
     /**
      * @brief Manages timestamped SQLite backups with a tiered retention policy.
      *
-     * Backup files are named `molartracker_YYYYMMDD_HHMMSS.db` and stored in a
-     * configurable directory. Pruning applies three tiers:
      *   - Recent:  keep the N most recent backups (default 5)
      *   - Weekly:  for each of W calendar weeks beyond the recent set, keep the
      *              newest backup from that week (default 4 weeks)
@@ -41,25 +42,13 @@ namespace db
         };
 
         static void createBackup(
-            Database&                    db,
-            const std::filesystem::path& backupDir,
-            const RetentionPolicy&       policy
+            Database&                       db,
+            const settings::BackupSettings& backupSettings
         );
 
         [[nodiscard]]
-        static std::vector<std::filesystem::path> listBackups(
-            const std::filesystem::path& backupDir
-        );
-
-       private:
-        static void _prune(
-            const std::vector<std::filesystem::path>& sorted,
-            const RetentionPolicy&                    policy
-        );
-
-        [[nodiscard]]
-        static std::optional<Timestamp> _parseTimestamp(
-            const std::filesystem::path& path
+        static std::vector<std::string> listBackups(
+            const settings::BackupSettings& backupSettings
         );
     };
 

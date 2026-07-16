@@ -51,6 +51,20 @@ namespace utils
     }
 
     /**
+     * @brief Converts a span of strings to a set of QStrings
+     *
+     * @param vec The input span of strings
+     * @return Set<QString> The converted set of QStrings
+     */
+    Set<QString> toQStringSet(const Set<std::string>& vec)
+    {
+        Set<QString> set;
+        for (const auto& str : vec)
+            set.insert(QString::fromStdString(str));
+        return set;
+    }
+
+    /**
      * @brief Converts a span of const strings to a vector of QStrings
      *
      * @param vec The input span of const strings

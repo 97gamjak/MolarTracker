@@ -7,6 +7,8 @@
 #include <optional>
 #include <vector>
 
+#include "drafts/position_draft.hpp"
+
 class Timestamp;   // Forward declaration
 
 namespace drafts
@@ -38,12 +40,12 @@ namespace ui
 
        private:
         /// The list of position drafts
-        std::vector<drafts::PositionDraft> _positions;
+        std::vector<drafts::PositionStockDetailDraft> _positions;
 
        public:
         explicit PositionSelectionTableModel(
-            const std::vector<drafts::PositionDraft>& positions,
-            QObject*                                  parent = nullptr
+            const std::vector<drafts::PositionStockDetailDraft>& positions,
+            QObject* parent = nullptr
         );
 
         [[nodiscard]] int rowCount(const QModelIndex& parent) const override;
@@ -60,7 +62,7 @@ namespace ui
             int             role
         ) const override;
 
-        [[nodiscard]] std::optional<drafts::PositionDraft> positionAt(
+        [[nodiscard]] std::optional<drafts::PositionStockDetailDraft> positionAt(
             int row
         ) const;
 

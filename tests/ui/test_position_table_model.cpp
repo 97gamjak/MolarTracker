@@ -1,22 +1,25 @@
 #include <gtest/gtest.h>
 
 #include <QVariant>
+#include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
+#include "utils/finance.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
 {
     drafts::StockInfoDraft makeStockInfo(const std::string& ticker)
     {
+        const auto shortName = std::string("Short ") + ticker;
+        const auto longName  = std::string("Long ") + ticker;
         return drafts::StockInfoDraft{
             ticker,
-            "Short " + ticker,
-            "Long " + ticker,
+            shortName,
+            longName,
             "NYSE",
             Currency::USD,
             "Technology",
@@ -25,9 +28,25 @@ namespace
         };
     }
 
-    drafts::PositionDraft makePosition(PositionId id, const std::string& ticker)
+    drafts::PositionStockDetailDraft makePosition(
+        PositionId         id,
+        const std::string& ticker
+    )
     {
-        return drafts::PositionDraft{id, makeStockInfo(ticker), Timestamp{}};
+        const auto quantity = Quantity{100};
+        const auto price    = Cash{Currency::USD, 150};
+        const auto total    = price * quantity;
+        return drafts::PositionStockDetailDraft{
+            id,
+            makeStockInfo(ticker),
+            Timestamp{},
+            quantity,
+            price,
+            total,
+            Cash{Currency::USD, 0},
+            Percentage{0.0},
+            std::nullopt
+        };
     }
 
     // -------------------------------------------------------------------------

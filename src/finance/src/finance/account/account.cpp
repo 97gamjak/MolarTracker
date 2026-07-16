@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "config/finance.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
@@ -113,6 +113,18 @@ namespace finance
     bool Account::isExternal() const
     {
         return getKind() == AccountKind::External;
+    }
+
+    std::string Account::toString() const
+    {
+        return std::format(
+            "Account{{id={}, status={}, name={}, currency={}, kind={}}}",
+            _id.toString(),
+            AccountStatusMeta::toString(_status),
+            _name,
+            CurrencyMeta::toString(_currency),
+            AccountKindMeta::toString(getKind())
+        );
     }
 
     /**

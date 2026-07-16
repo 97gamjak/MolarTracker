@@ -6,11 +6,14 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "utils/container/set.hpp"
 
 namespace finance
 {
-    class Stock;                  // forward declaration
-    class StockInsertionResult;   // forward declaration
+    class Stock;                    // forward declaration
+    struct StockInsertionResult;    // forward declaration
+    class Option;                   // forward declaration
+    struct OptionInsertionResult;   // forward declaration
 
 }   // namespace finance
 
@@ -42,8 +45,18 @@ namespace service
          */
         [[nodiscard]]
         virtual std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) = 0;
+
+        /**
+         * @brief get a list of all options in the database, this will return
+         * all options that are not marked as deleted, and will include options
+         * that are new or modified but not yet saved to the database.
+         *
+         * @return std::vector<finance::Option>
+         */
+        [[nodiscard]]
+        virtual std::vector<finance::Option> getOptions() = 0;
 
         /**
          * @brief Get a stock by its ticker symbol
@@ -74,6 +87,23 @@ namespace service
         ) = 0;
 
         /**
+         * @brief Add an option instrument to the database, this involves
+         * inserting a new row into the instrument table and a corresponding row
+         * into the option table, ensuring that the relationships between the
+         * tables are maintained correctly.
+         *
+         * @param option The Option object containing the details of the option
+         * to be added to the database
+         *
+         * @return A struct containing the OptionId and InstrumentId of the
+         * newly added option
+         */
+        [[nodiscard]]
+        virtual finance::OptionInsertionResult addOption(
+            const finance::Option& option
+        ) = 0;
+
+        /**
          * @brief Check if a stock with the given ticker already exists in the
          * database, this is used to prevent duplicate entries and ensure data
          * integrity.
@@ -83,6 +113,19 @@ namespace service
          */
         [[nodiscard]]
         virtual bool stockExists(const std::string& ticker) = 0;
+
+        /**
+         * @brief Check if an option with the given details already exists in
+         * the database, this is used to prevent duplicate entries and ensure
+         * data integrity.
+         *
+         * @param option The Option object containing the details of the option
+         * to check for existence
+         * @return true if an option with the given details exists, false
+         * otherwise
+         */
+        [[nodiscard]]
+        virtual bool optionExists(const finance::Option& option) = 0;
     };
 }   // namespace service
 

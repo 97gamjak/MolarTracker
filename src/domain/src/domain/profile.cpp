@@ -68,6 +68,17 @@ namespace domain
         _email = newEmail;
     }
 
+    std::string Profile::toString() const
+    {
+        std::string emailStr = _email.has_value() ? _email.value() : "N/A";
+        return std::format(
+            "Profile[ID: {}, Name: {}, Email: {}]",
+            _id.toString(),
+            _name,
+            emailStr
+        );
+    }
+
     /**
      * @brief Create a predicate to filter profiles by their ID
      *

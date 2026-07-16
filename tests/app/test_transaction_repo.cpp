@@ -23,19 +23,20 @@
 #include <string>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "db/database.hpp"
-#include "finance/cash.hpp"
-#include "finance/trade_data.hpp"
-#include "finance/transaction.hpp"
-#include "finance/transaction_entry.hpp"
-#include "finance/transaction_filter.hpp"
+#include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/stock_data.hpp"
+#include "finance/transaction/transaction_entries.hpp"
+#include "finance/transaction/transaction_entry.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "repo/i_transaction_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/transaction_repo.hpp"
 #include "test_fixtures.hpp"
+#include "utils/cash.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace
@@ -74,53 +75,53 @@ namespace
             _db.execute("INSERT INTO position (opened_at) VALUES (1)");
         }
 
-        [[nodiscard]] finance::Transaction makeCashTx(
+        [[nodiscard]] finance::DomainTransaction makeCashTx(
             std::optional<std::string> comment = std::nullopt,
             micro_units                amount  = 100'000LL
         ) const
         {
-            return finance::Transaction{
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 finance::CashData{},
-                {finance::TransactionEntry{
+                finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, amount},
+                    Cash{Currency::USD, amount},
                     TransactionEntryType::General
-                }},
+                }}},
                 std::move(comment)
             };
         }
 
-        [[nodiscard]] finance::Transaction makeTradeTx() const
+        [[nodiscard]] finance::DomainTransaction makeTradeTx() const
         {
             constexpr auto     quantity = 100'000'000LL;   // 1.0 in micro-units
             constexpr auto     price = 150'000'000LL;   // $1.50 in micro-units
-            finance::TradeData data;
+            finance::StockData data;
             data.addLeg(
                 finance::TradeLeg{
                     _accountId,
                     _instrumentId,
                     Quantity{quantity},
-                    finance::Cash{Currency::USD, price},
+                    Cash{Currency::USD, price},
                     _positionId
                 }
             );
 
             constexpr auto price2 = -15'000'000'000LL;
-            return finance::Transaction{
+            return finance::DomainTransaction{
                 TransactionId::invalid(),
                 Timestamp::fromInt64(TEST_TS),
                 TransactionStatus::Completed,
                 data,
-                {finance::TransactionEntry{
+                finance::TransactionEntries{{finance::TransactionEntry{
                     TransactionEntryId::invalid(),
                     _accountId,
-                    finance::Cash{Currency::USD, price2},
+                    Cash{Currency::USD, price2},
                     TransactionEntryType::General
-                }},
+                }}},
                 "trade comment"
             };
         }
@@ -264,7 +265,7 @@ TEST_F(TransactionRepoFixture, AddTransactionCashSingleEntryEntryIsRetrieved)
     ASSERT_EQ(txs.size(), 1U);
     ASSERT_EQ(txs[0].getEntries().size(), 1U);
 
-    const auto& entry = txs[0].getEntries()[0];
+    const auto& entry = txs[0].getEntries().front();
     EXPECT_EQ(entry.getAccountId(), _accountId);
     EXPECT_EQ(entry.getAmount(), 250'000LL);
     EXPECT_EQ(entry.getCurrency(), Currency::USD);
@@ -278,23 +279,25 @@ TEST_F(
     const auto price1 = 100'000LL;   // $1.00 in micro-units
     const auto price2 = 200'000LL;   // $2.00 in
 
-    finance::Transaction transaction{
+    finance::DomainTransaction transaction{
         TransactionId::invalid(),
         Timestamp::fromInt64(TEST_TS),
         TransactionStatus::Completed,
         finance::CashData{},
-        {finance::TransactionEntry{
-             TransactionEntryId::invalid(),
-             _accountId,
-             finance::Cash{Currency::USD, price1},
-             TransactionEntryType::General
-         },
-         finance::TransactionEntry{
-             TransactionEntryId::invalid(),
-             _accountId,
-             finance::Cash{Currency::EUR, price2},
-             TransactionEntryType::Fees
-         }},
+        finance::TransactionEntries{
+            {finance::TransactionEntry{
+                 TransactionEntryId::invalid(),
+                 _accountId,
+                 Cash{Currency::USD, price1},
+                 TransactionEntryType::General
+             },
+             finance::TransactionEntry{
+                 TransactionEntryId::invalid(),
+                 _accountId,
+                 Cash{Currency::EUR, price2},
+                 TransactionEntryType::Fees
+             }}
+        },
         std::nullopt
     };
 
@@ -338,7 +341,7 @@ TEST_F(TransactionRepoFixture, AddTransactionTradeTypeIsDataTypeTrade)
         _repo.getTransactions({_accountId}, finance::TransactionFilter{});
 
     ASSERT_EQ(txs.size(), 1U);
-    EXPECT_EQ(txs[0].getType(), TransactionDataType::Trade);
+    EXPECT_EQ(txs[0].getType(), TransactionDataType::Stock);
 }
 
 TEST_F(TransactionRepoFixture, AddTransactionTradeLegIsRetrieved)
@@ -350,7 +353,7 @@ TEST_F(TransactionRepoFixture, AddTransactionTradeLegIsRetrieved)
 
     ASSERT_EQ(txs.size(), 1U);
 
-    const auto& data = std::get<finance::TradeData>(txs[0].getData());
+    const auto& data = std::get<finance::StockData>(txs[0].getData());
     ASSERT_EQ(data.getLegs().size(), 1U);
 
     const auto& leg = data.getLegs()[0];
@@ -374,6 +377,6 @@ TEST_F(
     ASSERT_EQ(txs.size(), 1U);
     EXPECT_EQ(txs[0].getEntries().size(), 1U);
 
-    const auto& data = std::get<finance::TradeData>(txs[0].getData());
+    const auto& data = std::get<finance::StockData>(txs[0].getData());
     EXPECT_EQ(data.getLegs().size(), 1U);
 }

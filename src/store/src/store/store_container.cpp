@@ -3,15 +3,14 @@
 #include <algorithm>
 #include <filesystem>
 #include <memory>
-#include <optional>
-#include <string>
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "connections/connection.hpp"
 #include "logging/log_macros.hpp"
 #include "service/service_container.hpp"
 #include "store/account/account_store.hpp"
 #include "store/i_profile_store.hpp"
+#include "store/option_store.hpp"
 #include "store/position_store.hpp"
 #include "store/profile/profile_store.hpp"
 #include "store/stock_store.hpp"
@@ -23,6 +22,91 @@ namespace store
 {
 
     /**
+     * @brief Implementation of the StoreContainer, this class is responsible
+     * for managing the various stores in the application, providing a
+     * centralized location for accessing and managing the different stores, and
+     * handling the interactions between them, such as committing changes,
+     * clearing dirty states, and checking if any store is dirty, allowing for a
+     * structured and organized way to manage the data stores within the
+     * application.
+     *
+     */
+    struct StoreContainer::StoreImpl
+    {
+        /// list of all stores
+        std::vector<IStore*> allStores;
+
+        /// The Profile store
+        std::shared_ptr<ProfileStore> profileStore;
+        /// The Account store
+        std::shared_ptr<AccountStore> accountStore;
+        /// The stock store
+        std::shared_ptr<StockStore> stockStore;
+        /// The option store
+        std::shared_ptr<OptionStore> optionStore;
+        /// The Position store
+        std::shared_ptr<PositionStore> positionStore;
+        /// The Transaction store
+        std::shared_ptr<TransactionStore> transactionStore;
+
+        StoreImpl(
+            service::ServiceContainer& serviceContainer,
+            InstrumentIdSeq&           instrumentIdSeq
+        );
+    };
+
+    /**
+     * @brief Construct a new Store Container:: Store Impl:: Store Impl object
+     *
+     * @param serviceContainer
+     * @param instrumentIdSeq
+     */
+    StoreContainer::StoreImpl::StoreImpl(
+        service::ServiceContainer& serviceContainer,
+        InstrumentIdSeq&           instrumentIdSeq
+    )
+        : profileStore(
+              std::make_shared<ProfileStore>(serviceContainer.getProfileService(
+              ))
+          ),
+          accountStore(
+              std::make_shared<AccountStore>(serviceContainer.getAccountService(
+              ))
+          ),
+          stockStore(
+              std::make_shared<StockStore>(
+                  serviceContainer.getInstrumentService(),
+                  instrumentIdSeq
+              )
+          ),
+          optionStore(
+              std::make_shared<OptionStore>(
+                  serviceContainer.getInstrumentService(),
+                  instrumentIdSeq
+              )
+          ),
+          positionStore(
+              std::make_shared<PositionStore>(
+                  serviceContainer.getPositionService(),
+                  accountStore->getAccountSession()
+              )
+          ),
+          transactionStore(
+              std::make_shared<TransactionStore>(
+                  serviceContainer.getTransactionService(),
+                  accountStore->getAccountSession()
+              )
+          )
+    {
+        allStores.push_back(profileStore.get());
+        allStores.push_back(accountStore.get());
+        allStores.push_back(stockStore.get());
+        allStores.push_back(optionStore.get());
+        allStores.push_back(positionStore.get());
+        allStores.push_back(transactionStore.get());
+    }
+
+    /**
      * @brief Construct a new Store Container object
      *
      */
@@ -32,55 +116,15 @@ namespace store
         : _serviceContainer{std::make_unique<service::ServiceContainer>(
               backupSettings
           )},
-          _profileStore{std::make_shared<ProfileStore>(
-              _serviceContainer->getProfileService()
-          )},
-          _accountStore{std::make_shared<AccountStore>(
-              _serviceContainer->getAccountService()
-          )},
-          _stockStore{std::make_shared<StockStore>(
-              _serviceContainer->getInstrumentService(),
-              _instrumentIdSeq
-          )},
-          _positionStore{std::make_shared<PositionStore>(
-              _serviceContainer->getPositionService(),
-              _accountStore->getAccountSession()
-          )},
-          _transactionStore{std::make_shared<TransactionStore>(
-              _serviceContainer->getTransactionService(),
-              _accountStore->getAccountSession()
-          )},
+          _stores{
+              std::make_unique<StoreImpl>(*_serviceContainer, _instrumentIdSeq)
+          },
           _connections{std::make_unique<Connections>()}
     {
-        auto* profileStore = dynamic_cast<ProfileStore*>(_profileStore.get());
-        auto* accountStore = dynamic_cast<AccountStore*>(_accountStore.get());
-        auto* stockStore   = dynamic_cast<StockStore*>(_stockStore.get());
-        auto* positionStore =
-            dynamic_cast<PositionStore*>(_positionStore.get());
-        auto* transactionStore =
-            dynamic_cast<TransactionStore*>(_transactionStore.get());
-
-        if (profileStore == nullptr || !_profileStore)
-            throw std::runtime_error("Failed to initialize profile store");
-        if (accountStore == nullptr || !_accountStore)
-            throw std::runtime_error("Failed to initialize account store");
-        if (stockStore == nullptr || !_stockStore)
-            throw std::runtime_error("Failed to initialize stock store");
-        if (positionStore == nullptr || !_positionStore)
-            throw std::runtime_error("Failed to initialize position store");
-        if (transactionStore == nullptr || !_transactionStore)
-            throw std::runtime_error("Failed to initialize transaction store");
-
-        _allStores.push_back(profileStore);
-        _allStores.push_back(accountStore);
-        _allStores.push_back(transactionStore);
-        _allStores.push_back(stockStore);
-        _allStores.push_back(positionStore);
-
-        _connections->add(_profileStore->subscribeToProfileChange(
+        _connections->add(_stores->profileStore->subscribeToProfileChange(
             [&](const std::optional<ProfileId>& profileId)
-            { _accountStore->updateActiveProfile(profileId); },
-            &_accountStore
+            { _stores->accountStore->updateActiveProfile(profileId); },
+            &_stores->accountStore
         ));
     }
 
@@ -98,20 +142,41 @@ namespace store
     {
         LOG_INFO("Saving all temporary changes to database");
 
-        _profileStore->commit();
+        _stores->profileStore->commit();
         // here the id of the active profile store was already updated via
         // the observer in account store
-        _accountStore->commit();
+        _stores->accountStore->commit();
 
-        _positionStore->commit();
+        _stores->positionStore->commit();
 
-        _stockStore->commit();
+        _stores->stockStore->commit();
 
-        _transactionStore->commit(
-            _accountStore->getIdRemap(),
-            _stockStore->getInstrumentIdMap(),
-            _positionStore->getIdRemap()
-        );
+        auto instrumentIdRemap = _stores->stockStore->getInstrumentIdMap();
+
+        _stores->optionStore->commit(instrumentIdRemap);
+
+        const auto& accountIdRemap  = _stores->accountStore->getIdRemap();
+        const auto& positionIdRemap = _stores->positionStore->getIdRemap();
+
+        if (!instrumentIdRemap.combine(_stores->optionStore->getInstrumentIdMap(
+            )))
+        {
+            throw std::runtime_error(
+                "Failed to combine instrument ID remaps from stock and option "
+                "stores"
+            );
+        }
+
+        _stores->transactionStore
+            ->commit(accountIdRemap, instrumentIdRemap, positionIdRemap);
+
+        for (auto* store : _stores->allStores)
+        {
+            if (store == nullptr)
+                throw std::runtime_error("Store is null");
+
+            store->clearIdRemap();
+        }
     }
 
     /**
@@ -120,7 +185,7 @@ namespace store
      */
     void StoreContainer::clearPotentiallyDirty()
     {
-        for (auto* store : _allStores)
+        for (auto* store : _stores->allStores)
         {
             if (store == nullptr)
                 throw std::runtime_error("Store is null");
@@ -137,7 +202,7 @@ namespace store
     bool StoreContainer::isDirty() const
     {
         return std::ranges::any_of(
-            _allStores,
+            _stores->allStores,
             [](const auto* store)
             {
                 if (store == nullptr)
@@ -161,9 +226,9 @@ namespace store
      * @param user A user-defined pointer that will be passed to the
      * callback function when it is called, this can be used to provide
      * additional context for the callback function
-     * @return Connections A Connections object representing the subscriptions,
-     * these can be used to unsubscribe from changes by calling disconnect() on
-     * them or by letting them go out of scope
+     * @return Connections A Connections object representing the
+     * subscriptions, these can be used to unsubscribe from changes by
+     * calling disconnect() on them or by letting them go out of scope
      */
     Connections StoreContainer::subscribeToDirty(
         const OnDirtyChanged::func& func,
@@ -172,7 +237,7 @@ namespace store
     {
         Connections connections;
 
-        for (auto* store : _allStores)
+        for (auto* store : _stores->allStores)
         {
             if (store == nullptr)
                 throw std::runtime_error("Store is null");
@@ -186,105 +251,62 @@ namespace store
     /**
      * @brief Get the ProfileStore
      *
-     * @return std::shared_ptr<IProfileStore>&
+     * @return std::shared_ptr<IProfileStore>
      */
-    std::shared_ptr<IProfileStore>& StoreContainer::getProfileStore()
+    std::shared_ptr<IProfileStore> StoreContainer::getProfileStore() const
     {
-        return _profileStore;
-    }
-
-    /**
-     * @brief Get the ProfileStore (const version)
-     *
-     * @return const ProfileStore&
-     */
-    const std::shared_ptr<IProfileStore>& StoreContainer::getProfileStore(
-    ) const
-    {
-        return _profileStore;
+        return _stores->profileStore;
     }
 
     /**
      * @brief Get the AccountStore
      *
-     * @return std::shared_ptr<IAccountStore>&
+     * @return std::shared_ptr<IAccountStore>
      */
-    std::shared_ptr<IAccountStore>& StoreContainer::getAccountStore()
+    std::shared_ptr<IAccountStore> StoreContainer::getAccountStore() const
     {
-        return _accountStore;
-    }
-
-    /**
-     * @brief Get the AccountStore (const version)
-     *
-     * @return const std::shared_ptr<IAccountStore>&
-     */
-    const std::shared_ptr<IAccountStore>& StoreContainer::getAccountStore(
-    ) const
-    {
-        return _accountStore;
+        return _stores->accountStore;
     }
 
     /**
      * @brief Get the TransactionStore
      *
-     * @return std::shared_ptr<ITransactionStore>&
+     * @return std::shared_ptr<ITransactionStore>
      */
-    std::shared_ptr<ITransactionStore>& StoreContainer::getTransactionStore()
+    std::shared_ptr<ITransactionStore> StoreContainer::getTransactionStore(
+    ) const
     {
-        return _transactionStore;
-    }
-
-    /**
-     * @brief Get the TransactionStore (const version)
-     *
-     * @return const std::shared_ptr<ITransactionStore>&
-     */
-    const std::shared_ptr<ITransactionStore>& StoreContainer::
-        getTransactionStore() const
-    {
-        return _transactionStore;
+        return _stores->transactionStore;
     }
 
     /**
      * @brief Get the StockStore
      *
-     * @return std::shared_ptr<IStockStore>&
+     * @return std::shared_ptr<IStockStore>
      */
-    std::shared_ptr<IStockStore>& StoreContainer::getStockStore()
+    std::shared_ptr<IStockStore> StoreContainer::getStockStore() const
     {
-        return _stockStore;
+        return _stores->stockStore;
     }
 
     /**
-     * @brief Get the StockStore (const version)
+     * @brief Get the OptionStore
      *
-     * @return const std::shared_ptr<IStockStore>&
+     * @return std::shared_ptr<IOptionStore>
      */
-    const std::shared_ptr<IStockStore>& StoreContainer::getStockStore() const
+    std::shared_ptr<IOptionStore> StoreContainer::getOptionStore() const
     {
-        return _stockStore;
+        return _stores->optionStore;
     }
 
     /**
      * @brief Get the PositionStore
      *
-     * @return std::shared_ptr<IPositionStore>&
+     * @return std::shared_ptr<IPositionStore>
      */
-    std::shared_ptr<IPositionStore>& StoreContainer::getPositionStore()
+    std::shared_ptr<IPositionStore> StoreContainer::getPositionStore() const
     {
-        return _positionStore;
-    }
-
-    /**
-     * @brief Get the PositionStore (const version)
-     *
-     * @return const std::shared_ptr<IPositionStore>&
-     */
-    const std::shared_ptr<IPositionStore>& StoreContainer::getPositionStore(
-    ) const
-    {
-        return _positionStore;
+        return _stores->positionStore;
     }
 
     /**
@@ -315,7 +337,7 @@ namespace store
 
         _serviceContainer->reopenDb();
 
-        for (auto* store : _allStores)
+        for (auto* store : _stores->allStores)
         {
             if (store != nullptr)
                 store->reload();

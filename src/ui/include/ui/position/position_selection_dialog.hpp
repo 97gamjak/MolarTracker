@@ -34,16 +34,17 @@ namespace ui
         QPushButton* _cancelBtn;
 
         /// The currently selected position
-        std::optional<drafts::PositionDraft> _selectedPosition;
+        std::optional<drafts::PositionStockDetailDraft> _selectedPosition;
 
        public:
         explicit PositionSelectionDialog(
-            const std::vector<drafts::PositionDraft>& positions,
-            QWidget*                                  parent = nullptr
+            const std::vector<drafts::PositionStockDetailDraft>& positions,
+            QWidget* parent = nullptr
         );
 
         [[nodiscard]]
-        std::optional<drafts::PositionDraft> selectedPosition() const;
+        std::optional<drafts::PositionStockDetailDraft> selectedPosition(
+        ) const;
 
        private:
         void _onSelectionChanged();

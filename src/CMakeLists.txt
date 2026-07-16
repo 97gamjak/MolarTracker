@@ -60,7 +60,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c2y-extensions")
+endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c2y-extensions")
 endif()
 
 add_library(json INTERFACE)
@@ -83,6 +87,7 @@ add_subdirectory(connections)
 add_subdirectory(controller)
 add_subdirectory(db)
 add_subdirectory(domain)
+add_subdirectory(error)
 add_subdirectory(drafts)
 add_subdirectory(exceptions)
 add_subdirectory(filter)
@@ -98,6 +103,7 @@ add_subdirectory(sql_models)
 add_subdirectory(store)
 add_subdirectory(ui)
 add_subdirectory(utils)
+add_subdirectory(vcs)
 
 target_link_libraries(MolarTracker
     PRIVATE 

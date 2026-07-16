@@ -7,9 +7,9 @@
 #include <qsortfilterproxymodel.h>
 #include <qtableview.h>
 
+#include "drafts/transaction/transaction_overview_draft.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
-#include "ui/transaction/transaction_table.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -55,8 +55,24 @@ namespace ui
             &QSortFilterProxyModel::setFilterFixedString
         );
 
-        _setupTable(_cashTable, _cashProxy, _cashModel);
-        _setupTable(_stockTable, _stockProxy, _stockModel);
+        auto* cashHeader  = _setupTable(_cashTable, _cashProxy);
+        auto* stockHeader = _setupTable(_stockTable, _stockProxy);
+        _cashTable->sortByColumn(
+            CashTransactionTableModel::getDateIndex(),
+            Qt::DescendingOrder
+        );
+        _stockTable->sortByColumn(
+            StockTransactionTableModel::getDateIndex(),
+            Qt::DescendingOrder
+        );
+        cashHeader->setSectionResizeMode(
+            CashTransactionTableModel::getDescriptionIndex(),
+            QHeaderView::Stretch
+        );
+        stockHeader->setSectionResizeMode(
+            StockTransactionTableModel::getDescriptionIndex(),
+            QHeaderView::Stretch
+        );
 
         auto* layout = utils::makeQChild<QVBoxLayout>(this);
         layout->addWidget(search);
@@ -73,10 +89,9 @@ namespace ui
      * display purposes.
      */
     void TransactionsOverview::refresh(
-        const std::vector<drafts::TransactionOverviewDraft>& cashTransactions,
-        const std::vector<drafts::TransactionOverviewDraft>& stockTransactions,
-        const std::unordered_map<AccountId, std::string, AccountId::Hash>&
-            accountIdToName
+        const std::vector<drafts::CashTransactionOverview>&  cashTransactions,
+        const std::vector<drafts::StockTransactionOverview>& stockTransactions,
+        const IdMap<AccountId, std::string>&                 accountIdToName
     )
     {
         _cashModel->setTransactions(cashTransactions, accountIdToName);
@@ -92,13 +107,13 @@ namespace ui
      *
      * @param table The table view to set up.
      * @param proxy The proxy model to use for filtering.
-     * @param model The model to use for the table view.
      *
+     * @return QHeaderView* The header view of the configured table, which can
+     * be used for further customization if needed.
      */
-    void TransactionsOverview::_setupTable(
+    QHeaderView* TransactionsOverview::_setupTable(
         QTableView*            table,
-        QSortFilterProxyModel* proxy,
-        TransactionTableModel* model
+        QSortFilterProxyModel* proxy
     )
     {
         table->setModel(proxy);
@@ -119,15 +134,8 @@ namespace ui
         // resize to content size
         header->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-        // description takes remaining space
-        header->setSectionResizeMode(
-            model->getDescriptionIndex(),
-            QHeaderView::Stretch
-        );
-
         header->setSortIndicatorShown(true);
 
-        // sensible default sort: newest first
-        table->sortByColumn(model->getDateIndex(), Qt::DescendingOrder);
+        return header;
     }
 }   // namespace ui

@@ -173,22 +173,17 @@ namespace store
     /**
      * @brief Get a list of all stocks in the store
      *
-     * @return std::vector<finance::Stock>
+     * @return finance::Stocks
      */
-    std::vector<finance::Stock> StockStore::getStocks() const
-    {
-        return getStocks({});
-    }
+    finance::Stocks StockStore::getStocks() const { return getStocks({}); }
 
     /**
      * @brief Get a list of all stocks in the store
      *
      * @param ids The set of instrument IDs to retrieve stocks for
-     * @return std::vector<finance::Stock>
+     * @return finance::Stocks
      */
-    std::vector<finance::Stock> StockStore::getStocks(
-        const idSet<InstrumentId>& ids
-    ) const
+    finance::Stocks StockStore::getStocks(const IdSet<InstrumentId>& ids) const
     {
         auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
         if (!ids.empty())
@@ -196,10 +191,10 @@ namespace store
 
         auto entries = _getValues(options);
 
-        std::vector<Stock> stocks;
+        finance::Stocks stocks;
 
         for (const auto& entry : entries)
-            stocks.push_back(entry);
+            stocks.addUnchecked(entry);
 
         if (!isFullCache())
         {
@@ -214,7 +209,7 @@ namespace store
                 );
 
                 if (!alreadyInStore)
-                    stocks.push_back(stock);
+                    stocks.addUnchecked(stock);
             }
         }
 
@@ -259,14 +254,14 @@ namespace store
     /**
      * @brief Get a list of all stock tickers in the store
      *
-     * @return std::vector<std::string>
+     * @return Set<std::string>
      */
-    std::vector<std::string> StockStore::getAllTickers() const
+    Set<std::string> StockStore::getAllTickers() const
     {
-        std::vector<std::string> tickers;
+        Set<std::string> tickers;
 
-        for (const auto& stock : getStocks())
-            tickers.push_back(stock.getTicker());
+        for (const auto& [id, stock] : getStocks())
+            tickers.insert(stock.getTicker());
 
         return tickers;
     }
@@ -281,7 +276,7 @@ namespace store
     {
         std::unordered_map<std::string, InstrumentId> tickerMap;
 
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             tickerMap[stock.getTicker()] = stock.getInstrumentId();
 
         return tickerMap;
@@ -290,13 +285,14 @@ namespace store
     /**
      * @brief Get a mapping of instrument IDs to their names
      *
-     * @return instrumentMap<std::string>
+     * @return IdMap<InstrumentId, std::string>
      */
-    instrumentMap<std::string> StockStore::getInstrumentIdToNameMap() const
+    IdMap<InstrumentId, std::string> StockStore::getInstrumentIdToNameMap(
+    ) const
     {
-        instrumentMap<std::string> map;
+        IdMap<InstrumentId, std::string> map;
 
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             map[stock.getInstrumentId()] = stock.getTicker();
 
         return map;
@@ -312,7 +308,7 @@ namespace store
         const std::string& ticker
     ) const
     {
-        for (const auto& stock : getStocks())
+        for (const auto& [id, stock] : getStocks())
             if (stock.getTicker() == ticker)
                 return stock.getInstrumentId();
 
@@ -323,10 +319,9 @@ namespace store
      * @brief Get the mapping of old instrument IDs to new instrument IDs after
      * a commit
      *
-     * @return const unorderedIdMap<InstrumentId, InstrumentId>&
+     * @return const IdIdMap<InstrumentId>&
      */
-    const unorderedIdMap<InstrumentId, InstrumentId>& StockStore::
-        getInstrumentIdMap() const
+    const IdIdMap<InstrumentId>& StockStore::getInstrumentIdMap() const
     {
         return _instrumentIdMap;
     }
@@ -362,6 +357,10 @@ namespace store
      */
     void StockStore::reload()
     {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
         _clearEntries();
         const auto stocks = _instrumentService->getStocks({});
         _addCleanEntries(stocks);

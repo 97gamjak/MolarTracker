@@ -3,15 +3,13 @@
 
 #include <vector>
 
+#include "drafts/stock_draft.hpp"
+
 namespace finance
 {
-    class Stock;   // forward declaration
+    class Stock;    // Forward declaration
+    class Stocks;   // Forward declaration
 }   // namespace finance
-
-namespace drafts
-{
-    class StockInfoDraft;   // forward declaration
-}   // namespace drafts
 
 namespace controller
 {
@@ -28,7 +26,7 @@ namespace controller
 
         [[nodiscard]]
         static std::vector<drafts::StockInfoDraft> toStockInfoDrafts(
-            const std::vector<finance::Stock>& stocks
+            const finance::Stocks& stocks
         );
     };
 

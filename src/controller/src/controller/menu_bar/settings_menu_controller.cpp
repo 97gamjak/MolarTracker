@@ -3,7 +3,6 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
-#include "config/constants.hpp"
 #include "db/backup_manager.hpp"
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
@@ -56,9 +55,8 @@ namespace controller
      */
     void SettingsMenuController::_onRestoreFromBackupRequested()
     {
-        const auto backups = db::BackupManager::listBackups(
-            Constants::getInstance().getBackupPath()
-        );
+        const auto backups =
+            db::BackupManager::listBackups(_settings.getBackupSettings());
 
         if (backups.empty())
         {

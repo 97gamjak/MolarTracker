@@ -378,6 +378,10 @@ namespace store
      */
     void ProfileStore::reload()
     {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
         _clearEntries();
         const auto profiles = _profileService->getAll();
         _addCleanEntries(profiles);

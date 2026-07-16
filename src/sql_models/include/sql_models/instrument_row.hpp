@@ -34,9 +34,12 @@ struct InstrumentRow : public orm::ORMModel<"instrument">
     /// field of the instrument table, this allows for concise definitions of
     /// foreign key fields that reference the instrument table with a specified
     /// deletion behavior (e.g., cascade or restrict)
-    template <orm::fixed_string tableName, orm::DeletionType T>
+    template <
+        orm::fixed_string tableName,
+        orm::DeletionType T,
+        orm::fixed_string fieldName = "instrument_id">
     using ForeignId = orm::Field<
-        "instrument_id",
+        fieldName,
         InstrumentId,
         tableName,
         orm::foreign_key_t<T, InstrumentRow, decltype(InstrumentRow::id)>,

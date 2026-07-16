@@ -3,10 +3,13 @@
 #include <expected>
 #include <stdexcept>
 
-#include "config/finance.hpp"
-#include "finance/currency.hpp"
 #include "finance/finance_error.hpp"
 #include "json/json.hpp"
+#include "logging/log_macros.hpp"
+#include "utils/currency.hpp"
+#include "utils/finance.hpp"
+
+REGISTER_LOG_CATEGORY("Finance.PriceQuote");
 
 namespace finance
 {
@@ -16,7 +19,7 @@ namespace finance
      * @param price The price of the financial instrument.
      * @param timestamp The timestamp of the price quote.
      */
-    PriceQuote::PriceQuote(finance::Cash price, Timestamp timestamp)
+    PriceQuote::PriceQuote(Cash price, Timestamp timestamp)
         : _price(price), _timestamp(timestamp)
     {
     }
@@ -34,6 +37,8 @@ namespace finance
         const auto& data =
             json.at("quoteSummary").at("result").at(0).at("price");
 
+        LOG_TRACE(std::format("Parsing price quote JSON: {}", data.dump()));
+
         const auto currencyStr = json::safeGet<std::string>(data, "currency");
         const auto currencyOpt = CurrencyMeta::from_string(currencyStr);
 
@@ -46,8 +51,9 @@ namespace finance
         }
         const auto currency = currencyOpt.value();
 
-        const auto priceStr =
-            json::safeGet<std::string>(data, "regularMarketPreviousClose");
+        const auto priceStr = std::to_string(
+            json::safeGet<double>(data.at("regularMarketPreviousClose"), "raw")
+        );
 
         micro_units price = 0;
 
@@ -77,6 +83,17 @@ namespace finance
             Cash{currency, price},
             timeStamp,
         };
+    }
+
+    /**
+     * @brief Get the price of the financial instrument.
+     *
+     * @return const Cash& The price of the financial instrument.
+     */
+    [[nodiscard]]
+    const Cash& PriceQuote::getPrice() const
+    {
+        return _price;
     }
 
 }   // namespace finance

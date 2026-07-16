@@ -2,8 +2,7 @@
 
 #include <qstackedwidget.h>
 
-#include "controller/mapper/transaction_mapper.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
@@ -78,27 +77,12 @@ namespace controller
             _stackedWidget->setCurrentWidget(_transactionDetailView);
 
         const auto transactions = _transactionStore->getTransactions();
-        const auto drafts       = TransactionMapper::toOverviewDrafts(
+
+        const auto cashDrafts = TransactionOverviewMapper::toCash(transactions);
+        const auto stockDrafts = TransactionOverviewMapper::toStock(
             transactions,
-            _stockStore->getInstrumentIdToNameMap(),
-            _accountStore->getExternalAccountIds()
+            _stockStore->getInstrumentIdToNameMap()
         );
-
-        std::vector<drafts::TransactionOverviewDraft> cashDrafts;
-        std::vector<drafts::TransactionOverviewDraft> stockDrafts;
-
-        for (const auto& draft : drafts)
-        {
-            switch (draft.getType())
-            {
-                case TransactionDataType::Cash:
-                    cashDrafts.push_back(draft);
-                    break;
-                case TransactionDataType::Trade:
-                    stockDrafts.push_back(draft);
-                    break;
-            }
-        }
 
         _transactionDetailView->refresh(
             cashDrafts,

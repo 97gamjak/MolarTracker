@@ -1,5 +1,6 @@
 add_library(molartracker_logging STATIC
     src/logging/log_manager.cpp
+    src/logging/log_file_cleaner.cpp
     src/logging/log_entry_scope.cpp
     src/logging/log_object.cpp
     src/logging/log_category.cpp
