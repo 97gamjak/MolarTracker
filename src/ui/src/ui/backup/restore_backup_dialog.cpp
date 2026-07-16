@@ -77,9 +77,7 @@ namespace ui
 
                     if (index.column() == 1)
                     {
-                        const auto bytes = static_cast<std::size_t>(
-                            std::filesystem::file_size(path)
-                        );
+                        const auto bytes = std::filesystem::file_size(path);
                         return utils::toKBString(bytes);
                     }
                 }

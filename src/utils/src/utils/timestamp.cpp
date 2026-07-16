@@ -232,15 +232,18 @@ std::optional<Timestamp> Timestamp::fromFileSafe(
             ? valueWithoutPrefix.substr(0, valueWithoutPrefix.size() - 1)
             : valueWithoutPrefix;
 
-    std::istringstream       stream{valueWithoutPrefix};
-    std::chrono::sys_seconds timePoint;
-    stream >> std::chrono::parse(_fileSafeParseFmt, timePoint);
+    std::istringstream stream{valueWithoutPrefix};
+    std::tm            time{};
+    stream >> std::get_time(&time, _fileSafeParseFmt);
 
     if (stream.fail())
         return std::nullopt;
 
+    const auto clock =
+        std::chrono::system_clock::from_time_t(std::mktime(&time));
+
     return Timestamp(
-        duration_cast<milliseconds>(timePoint.time_since_epoch()).count()
+        duration_cast<milliseconds>(clock.time_since_epoch()).count()
     );
 }
 
