@@ -117,12 +117,6 @@ namespace store
         virtual IdSet<AccountId> getExternalAccountIds() const = 0;
 
         /**
-         * @brief Commit the current changes
-         *
-         */
-        virtual void commit() = 0;
-
-        /**
          * @brief Update the active profile
          *
          * @param profileIdOpt

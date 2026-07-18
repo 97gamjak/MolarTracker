@@ -43,7 +43,7 @@ namespace repo
             std::to_string(DB_VERSION)
         );
 
-        db.makeBackup();
+        // Backup is now handled by RepoContainer before migration runs.
 
         _migrations = Migrations{dbVersion, DB_VERSION};
 

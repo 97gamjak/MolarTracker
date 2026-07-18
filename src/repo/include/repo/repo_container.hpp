@@ -8,6 +8,11 @@ namespace db
     class Database;   // Forward declaration
 }   // namespace db
 
+namespace settings
+{
+    class BackupSettings;   // Forward declaration
+}   // namespace settings
+
 namespace repo
 {
 
@@ -43,7 +48,7 @@ namespace repo
         std::shared_ptr<IPositionRepo> _positionRepo;
 
        public:
-        explicit RepoContainer();
+        explicit RepoContainer(const settings::BackupSettings& backupSettings);
         ~RepoContainer();
 
         [[nodiscard]] std::shared_ptr<IProfileRepo>       getProfileRepo();
@@ -65,6 +70,9 @@ namespace repo
         [[nodiscard]] std::shared_ptr<IPositionRepo>       getPositionRepo();
         [[nodiscard]] std::shared_ptr<const IPositionRepo> getPositionRepo(
         ) const;
+
+        void closeDb();
+        void reopenDb();
     };
 
 }   // namespace repo

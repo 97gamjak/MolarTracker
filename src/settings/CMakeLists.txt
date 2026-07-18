@@ -1,4 +1,5 @@
 add_library(molartracker_settings STATIC
+    src/settings/backup_settings.cpp
     src/settings/settings.cpp
     src/settings/ui_settings.cpp
     src/settings/log_viewer_settings.cpp

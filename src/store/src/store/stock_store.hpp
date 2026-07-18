@@ -79,7 +79,8 @@ namespace store
             const std::string& ticker
         ) const override;
 
-        void commit() override;
+        void commit();
+        void reload() override;
 
         [[nodiscard]]
         const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;

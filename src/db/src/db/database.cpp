@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <format>
+#include <fstream>
 #include <ranges>
 #include <string>
 #include <utility>
@@ -29,6 +30,22 @@ namespace db
         if (!path.is_absolute())
             path = std::filesystem::absolute(path);
 
+        if (!std::filesystem::exists(path))
+        {
+            LOG_INFO("Database file does not exist at path: " + path.string());
+            LOG_INFO("Creating new database file at path: " + path.string());
+            std::ofstream ofs(path);
+            if (!ofs)
+            {
+                throw SqliteError(
+                    std::format(
+                        "Failed to create database file at path: {}",
+                        path.string()
+                    )
+                );
+            }
+        }
+
         open(path.string());
     }
 
@@ -36,7 +53,20 @@ namespace db
      * @brief Destroy the Database:: Database object
      *
      */
-    Database::~Database() { close(); }
+    Database::~Database()
+    {
+        try
+        {
+            close();
+        }
+        catch (const SqliteError& e)
+        {
+            LOG_ERROR(
+                std::string{"Failed to close database during destruction: "} +
+                e.what()
+            );
+        }
+    }
 
     /**
      * @brief Move constructor
@@ -58,7 +88,17 @@ namespace db
     {
         if (this != &other)
         {
-            close();
+            try
+            {
+                close();
+            }
+            catch (const SqliteError& e)
+            {
+                LOG_ERROR(
+                    std::string{"Failed to close database during move: "} +
+                    e.what()
+                );
+            }
             _moveFrom(std::move(other));
         }
 
@@ -90,8 +130,17 @@ namespace db
     {
         close();
 
+        if (!std::filesystem::exists(dbPath))
+        {
+            throw SqliteError(
+                std::format("Database file does not exist at path: {}", dbPath)
+            );
+        }
+
         _db     = _open(dbPath);
         _dbPath = dbPath;
+
+        LOG_DEBUG("Opened database at path: " + dbPath);
 
         enableForeignKeys(true);
         setBusyTimeout(Constants::getDbBusyTimeoutMs());
@@ -105,10 +154,21 @@ namespace db
     {
         if (_db != nullptr)
         {
-            sqlite3_close(_db);
+            int returnCode = sqlite3_close(_db);
+            if (returnCode != SQLITE_OK)
+            {
+                throw SqliteError(
+                    std::format(
+                        "sqlite3_close failed: {} ({})",
+                        returnCode,
+                        sqlite3_errmsg(_db)
+                    )
+                );
+            }
+
+            LOG_DEBUG("Closed database at path: " + _dbPath);
             _db = nullptr;
         }
-
         _dbPath.clear();
     }
 

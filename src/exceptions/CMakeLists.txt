@@ -2,6 +2,7 @@ add_library(molartracker_exceptions STATIC
     src/exceptions/base.cpp
     src/exceptions/file_exceptions.cpp
     src/exceptions/not_yet_implemented.cpp
+    src/exceptions/out_of_range.cpp
 )
 
 target_include_directories(molartracker_exceptions

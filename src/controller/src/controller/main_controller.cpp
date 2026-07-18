@@ -1,5 +1,6 @@
 #include "controller/main_controller.hpp"
 
+#include <filesystem>
 #include <memory>
 
 #include "commands/undo_stack.hpp"
@@ -9,6 +10,7 @@
 #include "controller/ensure_profile_controller.hpp"
 #include "controller/handlers/handlers.hpp"
 #include "controller/menu_bar/menu_bar_controller.hpp"
+#include "controller/menu_bar/settings_menu_controller.hpp"
 #include "controller/position_controller.hpp"
 #include "controller/side_bar/side_bar_controller.hpp"
 #include "controller/transaction_controller.hpp"
@@ -71,6 +73,7 @@ namespace controller
          */
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
+              _storeContainer{_settings.getBackupSettings()},
               _mainWindow(std::make_shared<ui::MainWindow>()),
               _handlers(_settings),
               _priceCache(std::make_shared<finance::PriceCache>()),
@@ -137,6 +140,7 @@ namespace controller
         // already initialized while constructing AppContext
 
         settings::Settings settings{Constants::getInstance().getConfigPath()};
+
         // initialize settings
         auto& loggingSettings = settings.getLoggingSettings();
 

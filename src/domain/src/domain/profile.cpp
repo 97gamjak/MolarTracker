@@ -1,5 +1,6 @@
 #include "domain/profile.hpp"
 
+#include <format>
 #include <utility>
 
 namespace domain
@@ -66,6 +67,22 @@ namespace domain
     void Profile::setEmail(const std::optional<std::string>& newEmail)
     {
         _email = newEmail;
+    }
+
+    /**
+     * @brief Convert the profile to a string representation
+     *
+     * @return std::string
+     */
+    std::string Profile::toString() const
+    {
+        std::string emailStr = _email.has_value() ? _email.value() : "N/A";
+        return std::format(
+            "Profile[ID: {}, Name: {}, Email: {}]",
+            _id.toString(),
+            _name,
+            emailStr
+        );
     }
 
     /**
