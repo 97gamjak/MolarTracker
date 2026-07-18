@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <format>
+#include <fstream>
 #include <ranges>
 #include <string>
 #include <utility>
@@ -28,6 +29,22 @@ namespace db
         std::filesystem::path path = dbPath;
         if (!path.is_absolute())
             path = std::filesystem::absolute(path);
+
+        if (!std::filesystem::exists(path))
+        {
+            LOG_INFO("Database file does not exist at path: " + path.string());
+            LOG_INFO("Creating new database file at path: " + path.string());
+            std::ofstream ofs(path);
+            if (!ofs)
+            {
+                throw SqliteError(
+                    std::format(
+                        "Failed to create database file at path: {}",
+                        path.string()
+                    )
+                );
+            }
+        }
 
         open(path.string());
     }
