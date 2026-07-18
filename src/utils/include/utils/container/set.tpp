@@ -1,6 +1,7 @@
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
 #define __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
 
+#include "exceptions/out_of_range.hpp"
 #include "set.hpp"
 
 /**
@@ -144,13 +145,13 @@ bool Set<T, Hash>::intersects(const Set<T, Hash>& other) const
  * @tparam Hash The hash function used for hashing the elements (default is
  * std::hash<T>).
  * @return A const reference to the first element in the set.
- * @throws std::out_of_range if the set is empty.
+ * @throws OutOfRange if the set is empty.
  */
 template <typename T, typename Hash>
 const T& Set<T, Hash>::front() const
 {
     if (IterableBase::_items.empty())
-        throw std::out_of_range("Set is empty");
+        throw OutOfRange("Set is empty");
 
     return *(IterableBase::_items.begin());
 }
