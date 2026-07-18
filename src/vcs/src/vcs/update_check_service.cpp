@@ -25,8 +25,7 @@ namespace vcs
         );
         connect(
             &_watcher,
-            &QFutureWatcher<
-                std::expected<utils::SemVer, http::HttpError>>::finished,
+            &QFutureWatcher<HttpResult<utils::SemVer>>::finished,
             this,
             &UpdateCheckService::_onFetchFinished
         );
@@ -77,7 +76,7 @@ namespace vcs
         if (!result)
         {
             LOG_WARNING(
-                "Update check failed: " + std::string{result.error().message}
+                "Update check failed: " + std::string{result.error().toString()}
             );
             return;
         }

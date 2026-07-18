@@ -69,6 +69,7 @@ class Quantity
 
     friend Quantity operator+(const Quantity& lhs, const Quantity& rhs);
     friend Quantity operator-(const Quantity& lhs, const Quantity& rhs);
+    friend Quantity operator*(const Quantity& lhs, const Quantity& rhs);
     friend Quantity operator*(const Quantity& lhs, micro_units rhs);
 
     /********************

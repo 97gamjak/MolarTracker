@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/positions.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/pnl.hpp"
@@ -27,7 +28,7 @@ namespace finance
     {
     }
 
-    const std::shared_ptr<PnL>& PositionTransaction::getPnL()
+    PnLResult<const std::shared_ptr<PnL>&> PositionTransaction::getPnL()
     {
         if (!_pnl)
         {
@@ -39,24 +40,65 @@ namespace finance
             switch (getInstrumentType())
             {
                 case InstrumentType::Stock:
-                    _pnl->calculatePnL(_transactions.stocks());
-                    break;
-                case InstrumentType::Option:
                 {
-                    // TODO: combine pnls!
-                    const auto optionsResult = _transactions.options();
-                    if (!optionsResult)
+                    StockPnLs stocks;
+                    for (const auto& tx : _transactions.stocks())
+                    {
+                        stocks.add(
+                            StockPnL{
+                                .quantity  = tx.getQuantity(),
+                                .unitPrice = tx.getUnitPrice(),
+                                .fees      = tx.getFees(),
+                                .timestamp = tx.getTimestamp()
+                            }
+                        );
+                    }
+                    const auto pnlResult = _pnl->calculatePnL(stocks);
+                    if (!pnlResult)
                     {
                         LOG_ERROR(
                             std::format(
                                 "Failed to calculate PnL for position {}: {}",
                                 getId().toString(),
-                                optionsResult.error().message
+                                pnlResult.error().toString()
                             )
                         );
-                        break;
+                        return PnLError::NotYetImplemented();
                     }
-                    _pnl->calculatePnL(optionsResult.value());
+                    break;
+                }
+                case InstrumentType::Option:
+                {
+                    // TODO: combine pnls!
+                    OptionPnLs optionPnLs;
+                    for (const auto& tx : _transactions.options())
+                    {
+                        optionPnLs.add(
+                            OptionPnL{
+                                .strike       = tx.getStrike(),
+                                .type         = tx.getOptionType(),
+                                .buySell      = tx.getBuySell(),
+                                .action       = tx.getAction(),
+                                .quantity     = tx.getQuantity(),
+                                .contractSize = tx.getContractSize(),
+                                .premium      = tx.getPremium(),
+                                .fees         = tx.getFees(),
+                                .timestamp    = tx.getTimestamp()
+                            }
+                        );
+                    }
+                    const auto pnlResult = _pnl->calculatePnL(optionPnLs);
+                    if (!pnlResult)
+                    {
+                        LOG_ERROR(
+                            std::format(
+                                "Failed to calculate PnL for position {}: {}",
+                                getId().toString(),
+                                pnlResult.error().toString()
+                            )
+                        );
+                        return PnLError::NotYetImplemented();
+                    }
                     break;
                 }
             }

@@ -37,7 +37,7 @@ namespace gateway
         );
 
         [[nodiscard]]
-        finance::PositionTransactions getOpenPositionTransactions(
+        FinanceResult<finance::PositionTransactions> getOpenPositionTransactions(
             const IdSet<AccountId>& accountIds
         ) const;
 

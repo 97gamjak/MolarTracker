@@ -115,6 +115,9 @@ target_link_libraries(MolarTracker
     molartracker_exceptions
 )
 
+set(CMAKE_AUTORCC ON)
+target_sources(MolarTracker PRIVATE ${CMAKE_SOURCE_DIR}/resources/resources.qrc)
+
 set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
         ${CMAKE_BINARY_DIR}/bin

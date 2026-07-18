@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/position.hpp"
 #include "pnl.hpp"
 #include "transactions.hpp"
@@ -49,12 +50,13 @@ namespace finance
 
         [[nodiscard]] const Transactions& getTransactions() const;
 
-        [[nodiscard]] PositionId                  getId() const;
-        [[nodiscard]] InstrumentType              getInstrumentType() const;
-        [[nodiscard]] InstrumentId                getBaseInstrument() const;
-        [[nodiscard]] AccountId                   getSecurityAccount() const;
-        [[nodiscard]] const std::shared_ptr<PnL>& getPnL();
-        [[nodiscard]] const Position&             getPosition() const;
+        [[nodiscard]] PositionId      getId() const;
+        [[nodiscard]] InstrumentType  getInstrumentType() const;
+        [[nodiscard]] InstrumentId    getBaseInstrument() const;
+        [[nodiscard]] AccountId       getSecurityAccount() const;
+        [[nodiscard]] const Position& getPosition() const;
+
+        [[nodiscard]] PnLResult<const std::shared_ptr<PnL>&> getPnL();
 
         [[nodiscard]]
         static PositionTransaction fromTransactions(

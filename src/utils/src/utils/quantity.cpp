@@ -145,6 +145,11 @@ Quantity operator*(const Quantity& lhs, micro_units rhs)
     return Quantity(lhs._value * rhs);
 }
 
+Quantity operator*(const Quantity& lhs, const Quantity& rhs)
+{
+    return lhs * rhs._value;
+}
+
 /**
  * @brief Negate the quantity.
  *

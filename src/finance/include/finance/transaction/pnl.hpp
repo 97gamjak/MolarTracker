@@ -3,12 +3,48 @@
 
 #include <vector>
 
-#include "finance/transaction/transactions.hpp"
+#include "error/finance_error.hpp"
 #include "utils/cash.hpp"
+#include "utils/container/vector.hpp"
 #include "utils/percentage.hpp"
+#include "utils/timestamp.hpp"
 
 namespace finance
 {
+
+    struct StockPnL
+    {
+        Quantity  quantity;
+        Cash      unitPrice;
+        Cash      fees;
+        Timestamp timestamp;
+    };
+
+    class StockPnLs : public Vector<StockPnL>
+    {
+       public:
+        void sort();
+    };
+
+    struct OptionPnL
+    {
+        Cash                    strike;
+        OptionBuySell           buySell;
+        OptionType              type;
+        TransactionOptionAction action;
+        Quantity                quantity;
+        Quantity                contractSize;
+        Cash                    premium;
+        Cash                    fees;
+        Timestamp               timestamp;
+    };
+
+    class OptionPnLs : public Vector<OptionPnL>
+    {
+       public:
+        void sort();
+    };
+
     /**
      * @brief Base class for calculating profit and loss (PnL) for financial
      * transactions.
@@ -48,8 +84,8 @@ namespace finance
         PnL()          = default;
         virtual ~PnL() = default;
 
-        virtual void calculatePnL(const StockTransactions& txs)  = 0;
-        virtual void calculatePnL(const OptionTransactions& txs) = 0;
+        virtual PnLResult<void> calculatePnL(StockPnLs transactions)  = 0;
+        virtual PnLResult<void> calculatePnL(OptionPnLs transactions) = 0;
 
         [[nodiscard]] Quantity     getQuantity() const;
         [[nodiscard]] virtual Cash getAverageCost() const;
@@ -72,9 +108,11 @@ namespace finance
     {
        public:
         using PnL::PnL;
-        void calculatePnL(const StockTransactions& txs) override;
-        void calculatePnL(const OptionTransactions& /*transactions*/) override
+        PnLResult<void> calculatePnL(StockPnLs transactions) override;
+        PnLResult<void> calculatePnL(OptionPnLs /*transactions*/) override
         {
+            // TODO: remove this overload
+            return PnLError::NotYetImplemented();
         }
     };
 
@@ -94,22 +132,22 @@ namespace finance
             Quantity      qty;
         };
 
+       private:
+        Cash                 _unrealizedPnL;
+        std::optional<Cash>  _currentUnderlyingPrice;
+        Quantity             _contractSize;
+        std::vector<OpenLeg> _openLegs;
+
         [[nodiscard]] Cash getUnrealizedPnL() const override;
 
         void setCurrentUnderlyingPrice(const Cash& price);
 
        protected:
         void setUnrealizedPnL(const Cash& unrealizedPnL);
-        void setContractSize(std::int64_t contractSize);
+        void setContractSize(const Quantity& contractSize);
         void setOpenLegs(std::vector<OpenLeg> legs);
 
-        [[nodiscard]] std::int64_t getContractSize() const;
-
-       private:
-        Cash                 _unrealizedPnL;
-        std::optional<Cash>  _currentUnderlyingPrice;
-        std::int64_t         _contractSize{0};
-        std::vector<OpenLeg> _openLegs;
+        [[nodiscard]] Quantity getContractSize() const;
     };
 
     /**
@@ -118,8 +156,12 @@ namespace finance
     class PnLAvgOption : public PnLOption
     {
        public:
-        void calculatePnL(const StockTransactions& /*transactions*/) override {}
-        void calculatePnL(const OptionTransactions& txs) override;
+        PnLResult<void> calculatePnL(StockPnLs /*transactions*/) override
+        {
+            // TODO: remove this overload
+            return PnLError::NotYetImplemented();
+        }
+        PnLResult<void> calculatePnL(OptionPnLs transactions) override;
     };
 
 }   // namespace finance

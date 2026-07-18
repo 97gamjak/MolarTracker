@@ -5,6 +5,7 @@
 #include <expected>
 #include <vector>
 
+#include "error/finance_error.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/instrument/options.hpp"
 #include "finance/transaction/option_transaction.hpp"
@@ -48,7 +49,7 @@ namespace finance
     {
         IdSet<InstrumentId> instrumentIds;
         for (const auto& transaction : getItems())
-            instrumentIds.insert(transaction.getBaseInstrumentId());
+            instrumentIds.insert(transaction.getInstrumentId());
 
         return instrumentIds;
     }
@@ -57,7 +58,7 @@ namespace finance
     {
         IdSet<InstrumentId> instrumentIds;
         for (const auto& transaction : getItems())
-            instrumentIds.insert(transaction.getBaseInstrumentId());
+            instrumentIds.insert(transaction.getInstrumentId());
 
         return instrumentIds;
     }
@@ -78,11 +79,11 @@ namespace finance
      * @param optionTransactions
      */
     SecurityView::SecurityView(
-        const StockTransactions&                       stockTransactions,
-        const std::vector<OptionTransactionTemporary>& optionTransactions
+        StockTransactions  stockTransactions,
+        OptionTransactions optionTransactions
     )
-        : _stockTransactions(stockTransactions),
-          _optionTransactions(optionTransactions)
+        : _stockTransactions(std::move(stockTransactions)),
+          _optionTransactions(std::move(optionTransactions))
     {
     }
 
@@ -97,12 +98,10 @@ namespace finance
 
         IdSet<InstrumentId> ids;
         for (const auto& tx : _optionTransactions)
-            ids.insert(tx.getBaseInstrumentId());
+            ids.insert(tx.getInstrumentId());
         instrumentIds.combine(ids);
         return instrumentIds;
     }
-
-    // TODO: split this file up
 
     class Transactions::TransactionsImpl
     {
@@ -113,53 +112,33 @@ namespace finance
         StockTransactions _stockTransactions;
         /// The list of option transactions
         OptionTransactions _optionTransactions;
-        /// The list of temporary option transactions
-        std::vector<OptionTransactionTemporary> _temporaryOptionTransactions;
-
-        /// true to have empty options at the beginning as true TODO:
-        bool _optionsPopulated = true;
 
        public:
-        void add(const OptionTransactionTemporary& tx);
-        void addOption(const OptionTransaction& tx);
+        void add(const OptionTransaction& tx);
         void add(const CashTransaction& tx);
         void add(const StockTransaction& tx);
 
-        [[nodiscard]] const CashTransactions&  cash() const;
-        [[nodiscard]] const StockTransactions& stocks() const;
-        [[nodiscard]] std::expected<OptionTransactions, TransactionConversionError> options(
-        ) const;
-        [[nodiscard]] SecurityView securities() const;
+        [[nodiscard]] const CashTransactions&   cash() const;
+        [[nodiscard]] const StockTransactions&  stocks() const;
+        [[nodiscard]] const OptionTransactions& options() const;
+        [[nodiscard]] SecurityView              securities() const;
 
         [[nodiscard]] std::vector<const Transaction*> getTransactions() const;
-
-        [[nodiscard]] IdSet<InstrumentId> getNeededOptionPopulation() const;
-
-        [[nodiscard]] bool populateOptions(const finance::Options& options);
     };
 
     SecurityView Transactions::TransactionsImpl::securities() const
     {
-        return SecurityView(_stockTransactions, _temporaryOptionTransactions);
+        return SecurityView(_stockTransactions, _optionTransactions);
     }
 
-    void Transactions::TransactionsImpl::add(
-        const OptionTransactionTemporary& tx
-    )
-    {
-        _optionsPopulated = false;
-        _temporaryOptionTransactions.push_back(tx);
-    }
-
-    void Transactions::TransactionsImpl::addOption(const OptionTransaction& tx)
+    void Transactions::TransactionsImpl::add(const OptionTransaction& tx)
     {
         _optionTransactions.add(tx);
-        _temporaryOptionTransactions.push_back(tx);
     }
 
     void Transactions::addTransaction(const OptionTransaction& tx)
     {
-        _impl->addOption(tx);
+        _impl->add(tx);
     }
 
     void Transactions::addTransaction(const StockTransaction& tx)
@@ -177,56 +156,8 @@ namespace finance
         _stockTransactions.add(tx);
     }
 
-    [[nodiscard]] IdSet<InstrumentId> Transactions::TransactionsImpl::
-        getNeededOptionPopulation() const
+    Transactions::Transactions() : _impl(std::make_shared<TransactionsImpl>())
     {
-        if (_optionsPopulated)
-            return {};
-
-        const auto populatedIds = _optionTransactions.getIds();
-
-        IdSet<InstrumentId> neededOptionPopulation;
-        for (const auto& tx : _temporaryOptionTransactions)
-        {
-            if (!std::ranges::any_of(
-                    populatedIds,
-                    [&tx](const TransactionId& id) { return id == tx.getId(); }
-                ))
-            {
-                neededOptionPopulation.insert(tx.getBaseInstrumentId());
-            }
-        }
-        return neededOptionPopulation;
-    }
-
-    bool Transactions::TransactionsImpl::populateOptions(
-        const finance::Options& options
-    )
-    {
-        if (_optionsPopulated)
-            return true;
-
-        _optionsPopulated = true;
-
-        for (const auto& tx : _temporaryOptionTransactions)
-        {
-            const auto& option = options.getOption(tx.getBaseInstrumentId());
-            if (option)
-            {
-                _optionTransactions.add(OptionTransaction(tx, *option));
-            }
-            _optionsPopulated = false;
-            LOG_ERROR(
-                std::format(
-                    "Failed to populate option transaction with ID {}: option "
-                    "data not found for underlying instrument ID {}",
-                    tx.getId().toString(),
-                    tx.getBaseInstrumentId().toString()
-                )
-            );
-        }
-
-        return _optionsPopulated;
     }
 
     /**
@@ -241,7 +172,10 @@ namespace finance
     )
         : _impl(std::make_shared<TransactionsImpl>())
     {
-        addTransactions(transactions, accounts);
+        const auto error = addTransactions(transactions, accounts);
+
+        if (!error)
+            LOG_ERROR(error.error().toString());
     }
 
     Transactions::Transactions(
@@ -258,7 +192,7 @@ namespace finance
             _impl->add(tx);
 
         for (const auto& tx : options)
-            _impl->addOption(tx);
+            _impl->add(tx);
     }
 
     Transactions::~Transactions() = default;
@@ -271,7 +205,7 @@ namespace finance
      * @param transactions
      * @param accounts
      */
-    void Transactions::addTransactions(
+    FinanceResult<void> Transactions::addTransactions(
         const std::vector<DomainTransaction>& transactions,
         const Accounts&                       accounts
     )
@@ -286,15 +220,14 @@ namespace finance
                         TransactionConverter::toCash(transaction, accounts);
                     if (!cashTx)
                     {
-                        LOG_ERROR(
-                            std::format(
-                                "Failed to convert transaction with ID {} to "
-                                "cash transaction: {}",
-                                transaction.getId().toString(),
-                                cashTx.error().message
-                            )
+                        const auto newError = cashTx.error().convert(
+                            FinanceErrorType::InvalidTransaction,
+                            "Failed to convert transaction with ID " +
+                                transaction.getId().toString() +
+                                " to cash transaction"
                         );
-                        continue;
+                        LOG_ERROR(newError.toString());
+                        return newError;
                     }
                     _impl->add(cashTx.value());
                     break;
@@ -305,15 +238,14 @@ namespace finance
                         TransactionConverter::toStock(transaction);
                     if (!stockTx)
                     {
-                        LOG_ERROR(
-                            std::format(
-                                "Failed to convert transaction with ID {} to "
-                                "stock transaction: {}",
-                                transaction.getId().toString(),
-                                stockTx.error().message
-                            )
+                        const auto error = stockTx.error().convert(
+                            FinanceErrorType::InvalidTransaction,
+                            "Failed to convert transaction with ID " +
+                                transaction.getId().toString() +
+                                " to stock transaction"
                         );
-                        continue;
+                        LOG_ERROR(error.toString());
+                        return error;
                     }
                     _impl->add(stockTx.value());
                     break;
@@ -324,21 +256,22 @@ namespace finance
                         TransactionConverter::toOption(transaction);
                     if (!optionTx)
                     {
-                        LOG_ERROR(
-                            std::format(
-                                "Failed to convert transaction with ID {} to "
-                                "option transaction: {}",
-                                transaction.getId().toString(),
-                                optionTx.error().message
-                            )
+                        const auto error = optionTx.error().convert(
+                            FinanceErrorType::InvalidTransaction,
+                            "Failed to convert transaction with ID " +
+                                transaction.getId().toString() +
+                                " to option transaction"
                         );
-                        continue;
+                        LOG_ERROR(error.toString());
+                        return error;
                     }
                     _impl->add(optionTx.value());
                     break;
                 }
             }
         }
+
+        return FinanceResult<void>{};
     }
 
     /**
@@ -381,28 +314,19 @@ namespace finance
     /**
      * @brief Get the list of option transactions
      *
-     * @return std::expected<const OptionTransactions&,
-     * TransactionConversionError>
+     * @return OptionTransactions
      */
-    std::expected<OptionTransactions, TransactionConversionError> Transactions::
-        TransactionsImpl::options() const
+    const OptionTransactions& Transactions::TransactionsImpl::options() const
     {
-        if (_optionsPopulated)
-            return {_optionTransactions};
-
-        return std::unexpected<TransactionConversionError>(
-            "options where not correctly populated!"
-        );
+        return _optionTransactions;
     }
 
     /**
      * @brief Get the list of option transactions
      *
-     * @return std::expected<const OptionTransactions&,
-     * TransactionConversionError>
+     * @return OptionTransactions
      */
-    std::expected<OptionTransactions, TransactionConversionError> Transactions::
-        options() const
+    const OptionTransactions& Transactions::options() const
     {
         return _impl->options();
     }
@@ -438,7 +362,7 @@ namespace finance
      */
     bool Transactions::containsOptions() const
     {
-        return !_impl->options().has_value() || !_impl->options()->empty();
+        return !_impl->options().empty();
     }
 
     /**
@@ -490,18 +414,7 @@ namespace finance
             }
         }
 
-        const auto optionTxs = options();
-
-        if (!optionTxs)
-        {
-            LOG_ERROR(
-                "Failed to get options for grouping by position: " +
-                optionTxs.error().message
-            );
-            return positionMap;
-        }
-
-        for (const auto& transaction : optionTxs.value())
+        for (const auto& transaction : options())
         {
             const auto positionId = transaction.getPositionId();
             if (positionId.isValid())
@@ -514,16 +427,6 @@ namespace finance
         }
 
         return positionMap;
-    }
-
-    IdSet<InstrumentId> Transactions::getNeededOptionPopulation() const
-    {
-        return _impl->getNeededOptionPopulation();
-    }
-
-    bool Transactions::populateOptions(const finance::Options& options)
-    {
-        return _impl->populateOptions(options);
     }
 
     Transactions Transactions::filter(const IdSet<AccountId>& accountIds) const

@@ -75,11 +75,11 @@ namespace store
         ) override;
 
         [[nodiscard]]
-        finance::Transactions getTransactions(
+        FinanceResult<finance::Transactions> getTransactions(
             const finance::TransactionFilter& filter
         ) const override;
         [[nodiscard]]
-        finance::Transactions getTransactions() const override;
+        FinanceResult<finance::Transactions> getTransactions() const override;
 
         [[nodiscard]]
         Connection subscribeToTransactionAdded(

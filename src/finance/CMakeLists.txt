@@ -8,7 +8,6 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/position.cpp
     ${SOURCE_DIR}/price_quote.cpp
     ${SOURCE_DIR}/price_cache.cpp
-    ${SOURCE_DIR}/finance_error.cpp
 
     ${SOURCE_DIR}/transaction/cash_transaction.cpp
     ${SOURCE_DIR}/transaction/domain_transaction.cpp
@@ -50,6 +49,7 @@ target_link_libraries(molartracker_finance
     molartracker_filter
     molartracker_http   # TODO(97gamjak): try to move this dependency to private
     molartracker_connections
+    molartracker_error
     PRIVATE
     molartracker_config
     molartracker_exceptions

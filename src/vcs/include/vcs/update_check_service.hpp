@@ -7,7 +7,7 @@
 #include <expected>
 #include <optional>
 
-#include "http/http_error.hpp"
+#include "error/http_error.hpp"
 #include "utils/version.hpp"
 
 namespace vcs
@@ -29,7 +29,7 @@ namespace vcs
         /// The timer for scheduling periodic checks
         QTimer _timer;
         /// The watcher for the async GitHub fetch operation
-        QFutureWatcher<std::expected<utils::SemVer, http::HttpError>> _watcher;
+        QFutureWatcher<HttpResult<utils::SemVer>> _watcher;
         /// The last version that was notified to the user, used for
         /// deduplication of updateAvailable() signals within the same session
         std::optional<utils::SemVer> _lastNotifiedVersion;

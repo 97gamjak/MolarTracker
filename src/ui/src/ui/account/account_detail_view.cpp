@@ -40,6 +40,10 @@ namespace ui
         StockPositionTableModel* stockTable;
         /// The option position table model
         OptionPositionTableModel* optionTable;
+        /// The stock positions section title
+        QLabel* stockTableTitle;
+        /// The option positions section title
+        QLabel* optionTableTitle;
 
         /// The stacked widget
         QStackedWidget* stackedWidget;
@@ -78,6 +82,8 @@ namespace ui
           optionTableView(new OptionPositionTableView()),
           stockTable(new StockPositionTableModel()),
           optionTable(new OptionPositionTableModel()),
+          stockTableTitle(new QLabel("Stock Positions")),
+          optionTableTitle(new QLabel("Option Positions")),
           stackedWidget(new QStackedWidget()),
           cashAccountWidget(new QWidget()),
           securityAccountWidget(new QWidget()),
@@ -101,6 +107,8 @@ namespace ui
         stockTable->setObjectName("stockTable");
         optionTableView->setObjectName("optionTableView");
         optionTable->setObjectName("optionTable");
+        stockTableTitle->setObjectName("stockTableTitle");
+        optionTableTitle->setObjectName("optionTableTitle");
         stackedWidget->setObjectName("stackedWidget");
         cashAccountWidget->setObjectName("cashAccountWidget");
         securityAccountWidget->setObjectName("securityAccountWidget");
@@ -116,7 +124,12 @@ namespace ui
         cashAccountWidget->setLayout(cashAccountLayout);
         stackedWidget->addWidget(cashAccountWidget);
 
+        stockTableTitle->setProperty("class", "sectionTitle");
+        optionTableTitle->setProperty("class", "sectionTitle");
+
+        securityAccountLayout->addWidget(stockTableTitle);
         securityAccountLayout->addWidget(stockTableView);
+        securityAccountLayout->addWidget(optionTableTitle);
         securityAccountLayout->addWidget(optionTableView);
         stockTableView->setModel(stockTable);
         optionTableView->setModel(optionTable);

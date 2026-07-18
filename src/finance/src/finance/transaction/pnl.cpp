@@ -1,5 +1,6 @@
 #include "finance/transaction/pnl.hpp"
 
+#include "error/finance_error.hpp"
 #include "utils/cash.hpp"
 #include "utils/finance.hpp"
 
@@ -172,10 +173,10 @@ namespace finance
      * PnL, and unrealized PnL based on the transactions and current price
      *
      * @param txs
+     * @return PnLResult<void>
      */
-    void PnLAvg::calculatePnL(const StockTransactions& txs)
+    PnLResult<void> PnLAvg::calculatePnL(StockPnLs transactions)
     {
-        auto transactions = txs;
         transactions.sort();
         Quantity quantity{0};
         Cash     fees;
@@ -183,15 +184,15 @@ namespace finance
         Cash     realizedPnL;
         Cash     realizedCostBasis;
 
-        for (const auto& transaction : transactions)
+        for (const auto& tx : transactions)
         {
-            const auto qty   = transaction.getQuantity();
-            const auto price = transaction.getUnitPrice();
+            const auto qty   = tx.quantity;
+            const auto price = tx.unitPrice;
 
             if (getCurrency() == Currency::Unknown)
                 setCurrency(price.getCurrency());
 
-            fees     += transaction.getFees();
+            fees     += tx.fees;
             quantity += qty;
 
             if (qty > 0)
@@ -210,6 +211,8 @@ namespace finance
         setRealizedPnL(realizedPnL);
         setRealizedCostBasis(realizedCostBasis);
         setFees(fees);
+
+        return {};
     }
 
     void PnLOption::setUnrealizedPnL(const Cash& unrealizedPnL)
@@ -217,7 +220,7 @@ namespace finance
         _unrealizedPnL = unrealizedPnL;
     }
 
-    void PnLOption::setContractSize(std::int64_t contractSize)
+    void PnLOption::setContractSize(const Quantity& contractSize)
     {
         _contractSize = contractSize;
     }
@@ -227,7 +230,7 @@ namespace finance
         _openLegs = std::move(legs);
     }
 
-    std::int64_t PnLOption::getContractSize() const { return _contractSize; }
+    Quantity PnLOption::getContractSize() const { return _contractSize; }
 
     void PnLOption::setCurrentUnderlyingPrice(const Cash& price)
     {
@@ -279,9 +282,8 @@ namespace finance
         return _unrealizedPnL + intrinsic;
     }
 
-    void PnLAvgOption::calculatePnL(const OptionTransactions& txs)
+    PnLResult<void> PnLAvgOption::calculatePnL(OptionPnLs transactions)
     {
-        auto transactions = txs;
         transactions.sort();
 
         Quantity             quantity{0};
@@ -296,40 +298,37 @@ namespace finance
         using enum OptionBuySell;
         using enum TransactionOptionAction;
 
-        for (const auto& transaction : transactions)
+        for (const auto& tx : transactions)
         {
-            const auto strikePrice = transaction.getStrikePrice();
-            const auto buySell     = transaction.getBuySell();
-            const auto type        = transaction.getOptionType();
-            const auto action      = transaction.getAction();
-            const auto qty         = transaction.getQuantity();
-            const auto premium     = transaction.getAmount();
-            const auto oldQty      = quantity;
+            const auto oldQty = quantity;
 
-            if (getContractSize() == 0)
-                setContractSize(transaction.getContractSize());
-            else if (getContractSize() != transaction.getContractSize())
-                throw std::runtime_error(
+            if (getContractSize().isZero())
+                setContractSize(tx.contractSize);
+            else if (getContractSize() != tx.contractSize)
+            {
+                return PnLError{
+                    PnLErrorType::InconsistentContractSize,
                     "Inconsistent contract size in option transactions"
-                );
+                };
+            }
 
             if (getCurrency() == Currency::Unknown)
-                setCurrency(premium.getCurrency());
+                setCurrency(tx.premium.getCurrency());
 
-            fees += transaction.getFees();
+            fees += tx.fees;
 
             Cash realized;
             Cash costReduction;
 
             if (!oldQty.isZero())
             {
-                realized      = unrealizedPnL / oldQty * qty;
-                costReduction = totalCost / oldQty * qty;
+                realized      = unrealizedPnL / oldQty * tx.quantity;
+                costReduction = totalCost / oldQty * tx.quantity;
             }
 
-            const auto cost = strikePrice * (qty * getContractSize());
+            const auto cost = tx.strike * (tx.quantity * getContractSize());
 
-            switch (action)
+            switch (tx.action)
             {
                 case Open:
                 case RollOpen:
@@ -338,32 +337,32 @@ namespace finance
                         openLegs,
                         [&](const OpenLeg& leg)
                         {
-                            return leg.optionType == type &&
-                                   leg.buySell == buySell &&
-                                   leg.strikePrice == strikePrice;
+                            return leg.optionType == tx.type &&
+                                   leg.buySell == tx.buySell &&
+                                   leg.strikePrice == tx.strike;
                         }
                     );
 
                     if (it != openLegs.end())
-                        it->qty += qty;
+                        it->qty += tx.quantity;
                     else
                     {
                         openLegs.push_back(
-                            {.optionType  = type,
-                             .buySell     = buySell,
-                             .strikePrice = strikePrice,
-                             .qty         = qty}
+                            {.optionType  = tx.type,
+                             .buySell     = tx.buySell,
+                             .strikePrice = tx.strike,
+                             .qty         = tx.quantity}
                         );
                     }
 
-                    if (buySell == Buy)
+                    if (tx.buySell == Buy)
                     {
-                        unrealizedPnL -= premium;
-                        totalCost     += premium;
+                        unrealizedPnL -= tx.premium;
+                        totalCost     += tx.premium;
                     }
                     else
                     {
-                        unrealizedPnL += premium;
+                        unrealizedPnL += tx.premium;
                         totalCost     += cost;
                     }
                     break;
@@ -371,20 +370,20 @@ namespace finance
                 case Close:
                 case RollClose:
                 {
-                    const auto openSide = (buySell == Buy) ? Sell : Buy;
+                    const auto openSide = (tx.buySell == Buy) ? Sell : Buy;
                     auto       it       = std::ranges::find_if(
                         openLegs,
                         [&](const OpenLeg& leg)
                         {
-                            return leg.optionType == type &&
+                            return leg.optionType == tx.type &&
                                    leg.buySell == openSide &&
-                                   leg.strikePrice == strikePrice;
+                                   leg.strikePrice == tx.strike;
                         }
                     );
 
                     if (it != openLegs.end())
                     {
-                        it->qty -= qty;
+                        it->qty -= tx.quantity;
                         if (it->qty.isZero())
                             openLegs.erase(it);
                     }
@@ -393,23 +392,23 @@ namespace finance
                     totalCost         -= costReduction;
                     realizedCostBasis += costReduction;
 
-                    if (buySell == Buy)
-                        realizedPnL += (realized - premium);
+                    if (tx.buySell == Buy)
+                        realizedPnL += (realized - tx.premium);
                     else
-                        realizedPnL += (realized + premium);
+                        realizedPnL += (realized + tx.premium);
 
                     break;
                 }
                 case Exercised:
                 {
-                    const auto openSide = (buySell == Buy) ? Sell : Buy;
+                    const auto openSide = (tx.buySell == Buy) ? Sell : Buy;
                     auto       it       = std::ranges::find_if(
                         openLegs,
                         [&](const OpenLeg& leg)
                         {
-                            return leg.optionType == type &&
+                            return leg.optionType == tx.type &&
                                    leg.buySell == openSide &&
-                                   leg.strikePrice == strikePrice;
+                                   leg.strikePrice == tx.strike;
                         }
                     );
 
@@ -436,6 +435,8 @@ namespace finance
         setRealizedCostBasis(realizedCostBasis);
         setFees(fees);
         setOpenLegs(std::move(openLegs));
+
+        return {};
     }
 
 }   // namespace finance

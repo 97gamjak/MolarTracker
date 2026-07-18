@@ -1,13 +1,15 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTIONS_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTIONS_HPP__
 
+#include <memory>
 #include <vector>
 
+#include "error/finance_error.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
-#include "finance/transaction/transaction_converter.hpp"
+#include "utils/container/id_map.hpp"
 #include "utils/container/set.hpp"
 
 namespace finance
@@ -85,12 +87,12 @@ namespace finance
         StockTransactions _stockTransactions;
 
         /// The option transactions that are part of the security view
-        std::vector<OptionTransactionTemporary> _optionTransactions;
+        OptionTransactions _optionTransactions;
 
        public:
         explicit SecurityView(
-            const StockTransactions&                       stockTransactions,
-            const std::vector<OptionTransactionTemporary>& optionTransactions
+            StockTransactions  stockTransactions,
+            OptionTransactions optionTransactions
         );
         ~SecurityView() override = default;
 
@@ -115,7 +117,7 @@ namespace finance
         std::shared_ptr<TransactionsImpl> _impl;
 
        public:
-        Transactions() = default;
+        Transactions();
         Transactions(
             const std::vector<DomainTransaction>& transactions,
             const Accounts&                       accounts
@@ -127,7 +129,8 @@ namespace finance
         );
         ~Transactions();
 
-        void addTransactions(
+        [[nodiscard]]
+        FinanceResult<void> addTransactions(
             const std::vector<DomainTransaction>& transactions,
             const Accounts&                       accounts
         );
@@ -139,21 +142,13 @@ namespace finance
         const CashTransactions& cash() const;
         [[nodiscard]]
         const StockTransactions& stocks() const;
-
         [[nodiscard]]
-        std::expected<OptionTransactions, TransactionConversionError> options(
-        ) const;
+        const OptionTransactions& options() const;
         [[nodiscard]]
         SecurityView securities() const;
 
         [[nodiscard]] bool empty() const;
         [[nodiscard]] bool containsOptions() const;
-
-        [[nodiscard]]
-        IdSet<InstrumentId> getNeededOptionPopulation() const;
-
-        [[nodiscard]]
-        bool populateOptions(const finance::Options& options);
 
         [[nodiscard]]
         IdMap<PositionId, Transactions> groupByPosition() const;

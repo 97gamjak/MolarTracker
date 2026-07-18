@@ -346,11 +346,24 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        auto drafts = getOpenStockPositions(
+        auto draftsResult = getOpenStockPositions(
             draft.getSecurityAccount(),
             _positionGateway,
             _stockStore
         );
+
+        if (!draftsResult)
+        {
+            LOG_ERROR(draftsResult.error().toString());
+            ui::ErrorDialog::show(
+                draftsResult.error(),
+                "Failed to create stock transaction",
+                _dialogs->stock
+            );
+            return;
+        }
+
+        auto& drafts = draftsResult.value();
 
         // TODO(97gamjak): as soon as coordinators are available this will be
         // handled by them

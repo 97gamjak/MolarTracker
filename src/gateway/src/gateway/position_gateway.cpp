@@ -1,12 +1,12 @@
 #include "gateway/position_gateway.hpp"
 
-#include <stdexcept>
-
 #include "finance/transaction/transaction_filter.hpp"
-#include "store/i_account_store.hpp"
+#include "logging/log_macros.hpp"
 #include "store/i_option_store.hpp"
 #include "store/i_position_store.hpp"
 #include "store/i_transaction_store.hpp"
+
+REGISTER_LOG_CATEGORY("Gateway.PositionGateway");
 
 namespace gateway
 {
@@ -22,21 +22,29 @@ namespace gateway
     {
     }
 
-    finance::PositionTransactions PositionGateway::getOpenPositionTransactions(
-        const IdSet<AccountId>& accountIds
-    ) const
+    FinanceResult<finance::PositionTransactions> PositionGateway::
+        getOpenPositionTransactions(const IdSet<AccountId>& accountIds) const
     {
         const auto [positions, filter] = _getOpenPositionsFilter();
 
-        auto txs = _transactionStore->getTransactions(filter);
+        auto txsResult = _transactionStore->getTransactions(filter);
+
+        if (!txsResult)
+            return txsResult.error();
+
+        auto txs = txsResult.value();
 
         const auto options = _getNeededOptions(txs);
 
-        if (!txs.populateOptions(options))
+        const auto populateResult = txs.populateOptions(options);
+        if (!populateResult)
         {
-            throw std::runtime_error(
-                "Failed to populate options for open position transactions"
+            const auto error = populateResult.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to populate options for transactions"
             );
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         return finance::PositionTransactions::fromTransactions(

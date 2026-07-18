@@ -6,6 +6,7 @@
 #include <mstd/error.hpp>
 #include <mstd/type_traits.hpp>
 #include <optional>
+#include <source_location>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -32,6 +33,9 @@ struct ErrorWrapper
     [[nodiscard]]
     const std::string& getMessage() const;
 };
+
+template <typename E>
+concept HasNotYetImplementedValue = requires { E::NotYetImplemented; };
 
 /**
  * @brief An error object
@@ -62,11 +66,19 @@ class Error
     /// and tracking of related errors.
     std::vector<Error> _subErrors;
 
+#ifndef NDEBUG
+    std::source_location _location;
+#endif
+
    public:
     explicit Error(
         EnumType                   type,
         std::optional<std::string> message   = std::nullopt,
         std::vector<Error>         subErrors = {}
+#ifndef NDEBUG
+        ,
+        std::source_location location = std::source_location::current()
+#endif
     );
 
     virtual ~Error() = default;
@@ -84,14 +96,22 @@ class Error
 
     Error convert(
         const EnumType&                   newType,
-        const std::optional<std::string>& newMessage = std::nullopt
+        const std::optional<std::string>& newMessage  = std::nullopt,
+        bool                              addSubError = true
     ) const;
+
+    [[nodiscard]]
+    static Error NotYetImplemented()
+    requires HasNotYetImplementedValue<EnumType>;
 
    protected:
     /// @cond DOXYGEN_IGNORE
     [[nodiscard]]
     const std::string& getMessage() const;
     /// @endcond
+
+   private:
+    bool operator==(const Error& other) const;
 };
 
 /**

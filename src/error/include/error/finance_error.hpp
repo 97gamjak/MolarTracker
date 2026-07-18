@@ -19,17 +19,26 @@
     X(InvalidPriceString)          \
     X(PriceOverflow)
 
+#define PNL_ERROR_TYPE_LIST(X)  \
+    X(InconsistentContractSize) \
+    X(NotYetImplemented)
+
 MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_TYPE_LIST);
 MSTD_ENUM(YFinanceErrorType, std::uint8_t, YFINANCE_ERROR_TYPE_LIST);
+MSTD_ENUM(PnLErrorType, std::uint8_t, PNL_ERROR_TYPE_LIST);
 
 using FinanceError  = Error<FinanceErrorType>;
 using YFinanceError = Error<YFinanceErrorType>;
+using PnLError      = Error<PnLErrorType>;
 
 template <typename T>
 using FinanceResult = Result<T, FinanceError>;
 
 template <typename T>
 using YFinanceResult = Result<T, YFinanceError>;
+
+template <typename T>
+using PnLResult = Result<T, PnLError>;
 
 /**
  * @brief Converts an error of type HttpError to an error of type YFinanceError,

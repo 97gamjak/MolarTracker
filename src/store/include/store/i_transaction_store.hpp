@@ -102,22 +102,23 @@ namespace store
          *
          * @param filter The filter to apply
          *
-         * @return finance::Transactions The list of
+         * @return FinanceResult<finance::Transactions> The list of
          * transactions
          */
         [[nodiscard]]
-        virtual finance::Transactions getTransactions(
+        virtual FinanceResult<finance::Transactions> getTransactions(
             const finance::TransactionFilter& filter
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
-         * @return finance::Transactions The list of
+         * @return FinanceResult<finance::Transactions> The list of
          * transactions
          */
         [[nodiscard]]
-        virtual finance::Transactions getTransactions() const = 0;
+        virtual FinanceResult<finance::Transactions> getTransactions(
+        ) const = 0;
 
         /**
          * @brief Subscribe to transaction added events, this allows subscribers

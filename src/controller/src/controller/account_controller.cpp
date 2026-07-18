@@ -21,6 +21,7 @@
 #include "store/i_account_store.hpp"
 #include "store/i_option_store.hpp"
 #include "ui/account/account_detail_view.hpp"
+#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
 
@@ -233,23 +234,46 @@ namespace controller
                 break;
             case AccountKind::Security:
             {
-                const auto positions =
-                    _details->positionGateway->getOpenPositionTransactions(
-                        {account->getId()}
+                const auto stocksResult = getOpenStockPositionDetails(
+                    account->getId(),
+                    _details->positionGateway,
+                    _details->stockStore
+                );
+                const auto optionsResult = getOpenOptionPositionDetails(
+                    account->getId(),
+                    _details->positionGateway,
+                    _details->optionStore
+                );
+
+                if (!stocksResult)
+                {
+                    LOG_ERROR(stocksResult.error().toString());
+                    ui::ErrorDialog::show(
+                        stocksResult.error(),
+                        "Failed to retrieve open stock positions for account "
+                        "overview",
+                        _details->stackedWidget
                     );
+                    return;
+                }
+
+                if (!optionsResult)
+                {
+                    LOG_ERROR(optionsResult.error().toString());
+                    ui::ErrorDialog::show(
+                        optionsResult.error(),
+                        "Failed to retrieve open option positions for account "
+                        "overview",
+                        _details->stackedWidget
+                    );
+                    return;
+                }
+
                 _details->openStockPositions[account->getId()] =
-                    getOpenStockPositionDetails(
-                        account->getId(),
-                        _details->positionGateway,
-                        _details->stockStore
-                    );
+                    stocksResult.value();
 
                 _details->openOptionPositions[account->getId()] =
-                    getOpenOptionPositionDetails(
-                        account->getId(),
-                        _details->positionGateway,
-                        _details->optionStore
-                    );
+                    optionsResult.value();
 
                 LOG_DEBUG(
                     std::format(

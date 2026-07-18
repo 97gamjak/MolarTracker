@@ -73,19 +73,19 @@ namespace controller
         const std::shared_ptr<store::IStockStore>& stockStore
     );
 
-    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
+    FinanceResult<std::vector<drafts::PositionStockDetailDraft>> getOpenStockPositions(
         AccountId                                        account,
         const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IStockStore>&       stockStore
     );
 
-    std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
+    FinanceResult<std::vector<OpenStockPositionDetail>> getOpenStockPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IStockStore>&       stockStore
     );
 
-    std::vector<OpenOptionPositionDetail> getOpenOptionPositionDetails(
+    FinanceResult<std::vector<OpenOptionPositionDetail>> getOpenOptionPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IOptionStore>&      optionStore

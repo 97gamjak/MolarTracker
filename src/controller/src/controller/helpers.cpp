@@ -64,21 +64,23 @@ namespace controller
      * @param positionStore
      * @param stockStore
      * @param transactionStore
-     * @return std::vector<drafts::PositionDraft>
+     * @return FinanceResult<std::vector<OpenStockPositionDetail>>
      */
-    std::vector<OpenStockPositionDetail> getOpenStockPositionDetails(
+    FinanceResult<std::vector<OpenStockPositionDetail>> getOpenStockPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IStockStore>&       stockStore
     )
     {
         const auto positions =
-            positionGateway->getOpenPositionTransactions({account})
-                .getStockPositions();
+            positionGateway->getOpenPositionTransactions({account});
+
+        if (!positions)
+            return positions.error();
 
         std::vector<OpenStockPositionDetail> drafts;
 
-        for (auto position : positions)
+        for (auto position : positions.value().getStockPositions())
         {
             const auto instrumentId = position.getBaseInstrument();
 
@@ -124,9 +126,9 @@ namespace controller
      * @param positionStore
      * @param stockStore
      * @param transactionStore
-     * @return std::vector<drafts::PositionDraft>
+     * @return FinanceResult<std::vector<drafts::PositionStockDetailDraft>>
      */
-    std::vector<drafts::PositionStockDetailDraft> getOpenStockPositions(
+    FinanceResult<std::vector<drafts::PositionStockDetailDraft>> getOpenStockPositions(
         AccountId                                        account,
         const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IStockStore>&       stockStore
@@ -135,23 +137,30 @@ namespace controller
         const auto details =
             getOpenStockPositionDetails(account, positionGateway, stockStore);
 
+        if (!details)
+            return details.error();
+
         std::vector<drafts::PositionStockDetailDraft> drafts;
-        drafts.reserve(details.size());
-        for (const auto& detail : details)
+        drafts.reserve(details.value().size());
+        for (const auto& detail : details.value())
             drafts.push_back(detail.positionDraft);
 
         return drafts;
     }
 
-    std::vector<OpenOptionPositionDetail> getOpenOptionPositionDetails(
+    FinanceResult<std::vector<OpenOptionPositionDetail>> getOpenOptionPositionDetails(
         AccountId                                        account,
         const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IOptionStore>&      optionStore
     )
     {
-        const auto positions =
-            positionGateway->getOpenPositionTransactions({account})
-                .getOptionPositions();
+        const auto positionsResult =
+            positionGateway->getOpenPositionTransactions({account});
+
+        if (!positionsResult)
+            return positionsResult.error();
+
+        const auto positions = positionsResult.value().getOptionPositions();
 
         std::vector<OpenOptionPositionDetail> drafts;
 
@@ -165,11 +174,15 @@ namespace controller
 
             if (options.empty() || options.size() > 1)
             {
-                LOG_ERROR(
-                    "No option found for instrument id: " +
-                    position.getId().toString()
-                );
-                continue;
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    std::format(
+                        "Failed to retrieve option data for instrument id: {}",
+                        instrumentId.toString()
+                    )
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             const auto stock = options.getValues()[0].getUnderlying();

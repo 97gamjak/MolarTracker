@@ -207,9 +207,10 @@ namespace store
      * but they will not be saved to the database until the commit method is
      * called.
      *
-     * @return finance::Transactions
+     * @return FinanceResult<finance::Transactions>
      */
-    finance::Transactions TransactionStore::getTransactions() const
+    FinanceResult<finance::Transactions> TransactionStore::getTransactions(
+    ) const
     {
         return getTransactions(finance::TransactionFilter());
     }
@@ -229,11 +230,9 @@ namespace store
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
      *
-     * @return finance::Transactions A vector of transactions
-     * currently in the store, this includes both new and existing transactions,
-     * and reflects any changes made to them in the store.
+     * @return FinanceResult<finance::Transactions>
      */
-    finance::Transactions TransactionStore::getTransactions(
+    FinanceResult<finance::Transactions> TransactionStore::getTransactions(
         const finance::TransactionFilter& filter
     ) const
     {
@@ -275,17 +274,29 @@ namespace store
             if (!transactionIds.contains(transaction.getId()))
                 results.push_back(transaction);
 
-        finance::Transactions result;
-        result.addTransactions(results, _session->accountSession);
+        finance::Transactions txs;
+        const auto&           result =
+            txs.addTransactions(results, _session->accountSession);
+
+        if (!result)
+        {
+            const auto& error = result.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to add transactions to Transactions object"
+            );
+            LOG_ERROR(error.toString());
+            return error;
+        }
 
         LOG_DEBUG(
             std::format(
-                "Transactions retrieved: stocks({}), cash({})",
-                result.stocks().size(),
-                result.cash().size()
+                "Transactions retrieved: stocks({}), cash({}), options({})",
+                txs.stocks().size(),
+                txs.cash().size(),
+                txs.options().size()
             )
         );
-        return result;
+        return txs;
     }
 
     /**

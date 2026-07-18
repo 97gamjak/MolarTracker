@@ -3,6 +3,7 @@
 
 #include <expected>
 
+#include "error/finance_error.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -11,18 +12,6 @@
 
 namespace finance
 {
-    /**
-     * @brief Structure representing an error that occurs during transaction
-     * conversion.
-     *
-     */
-    struct TransactionConversionError
-    {
-        /// A message describing the error that occurred during transaction
-        /// conversion.
-        std::string message;
-    };
-
     /**
      * @brief Converter class for transforming between domain transactions and
      * specific transaction types (cash and stock).
@@ -50,23 +39,20 @@ namespace finance
         );
 
         [[nodiscard]]
-        static std::
-            expected<CashTransaction, TransactionConversionError> toCash(
-                const DomainTransaction& transaction,
-                const Accounts&          accounts
-            );
+        static FinanceResult<CashTransaction> toCash(
+            const DomainTransaction& transaction,
+            const Accounts&          accounts
+        );
 
         [[nodiscard]]
-        static std::
-            expected<StockTransaction, TransactionConversionError> toStock(
-                const DomainTransaction& transaction
-            );
+        static FinanceResult<StockTransaction> toStock(
+            const DomainTransaction& transaction
+        );
 
         [[nodiscard]]
-        static std::
-            expected<OptionTransactionTemporary, TransactionConversionError> toOption(
-                const DomainTransaction& transaction
-            );
+        static FinanceResult<OptionTransaction> toOption(
+            const DomainTransaction& transaction
+        );
     };
 }   // namespace finance
 

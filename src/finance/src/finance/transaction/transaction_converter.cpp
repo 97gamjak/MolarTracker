@@ -4,12 +4,16 @@
 #include <variant>
 
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
+#include "logging/log_macros.hpp"
 #include "utils/finance.hpp"
+
+REGISTER_LOG_CATEGORY("Finance.Transaction.TransactionConverter")
 
 namespace finance
 {
@@ -135,17 +139,27 @@ namespace finance
      *
      * @param transaction
      * @param accounts
-     * @return std::expected<CashTransaction, TransactionConversionError>
+     * @return FinanceResult<CashTransaction>
      */
-    std::expected<CashTransaction, TransactionConversionError> TransactionConverter::
-        toCash(const DomainTransaction& transaction, const Accounts& accounts)
+    FinanceResult<CashTransaction> TransactionConverter::toCash(
+        const DomainTransaction& transaction,
+        const Accounts&          accounts
+    )
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
         {
-            return std::unexpected(
-                TransactionConversionError{"No cash entries found"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                std::format(
+                    "No cash entries found for transaction with Id {}",
+                    transaction.getId().toString()
+                )
+            };
+
+            LOG_ERROR(error.toString());
+
+            return error;
         }
 
         auto amountEntries = entries.filter(TransactionEntryType::General);
@@ -153,16 +167,24 @@ namespace finance
 
         if (amountEntries.size() != 2)
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid number of amount entries"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid number of amount entries for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         if (feeEntries.size() != 2 && !feeEntries.empty())
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid number of fee entries"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid number of fee entries for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         const auto internalAccounts = accounts.filterExternal(false);
@@ -176,9 +198,13 @@ namespace finance
             internalIndex = 1;
         else
         {
-            return std::unexpected(
-                TransactionConversionError{"No internal account found"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "No internal account found for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         const auto internalAccountId =
@@ -189,9 +215,13 @@ namespace finance
 
         if (!externalAccounts.contains(externalAccountId))
         {
-            return std::unexpected(
-                TransactionConversionError{"No external account found"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "No external account found for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         Cash fees{amountEntries[0].getCurrency(), 0};
@@ -201,17 +231,25 @@ namespace finance
             if (internalAccountId != feeEntries[0].getAccountId() &&
                 internalAccountId != feeEntries[1].getAccountId())
             {
-                return std::unexpected(
-                    TransactionConversionError{"Invalid fee entry accounts"}
-                );
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    "Invalid fee entry accounts for transaction with Id " +
+                        transaction.getId().toString()
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             if (externalAccountId != feeEntries[0].getAccountId() &&
                 externalAccountId != feeEntries[1].getAccountId())
             {
-                return std::unexpected(
-                    TransactionConversionError{"Invalid fee entry accounts"}
-                );
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    "Invalid fee entry accounts for transaction with Id " +
+                        transaction.getId().toString()
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             if (internalAccountId == feeEntries[0].getAccountId())
@@ -239,17 +277,22 @@ namespace finance
      * transaction entries for the stock trades associated with the transaction.
      *
      * @param transaction
-     * @return std::expected<StockTransaction, TransactionConversionError>
+     * @return FinanceResult<StockTransaction>
      */
-    std::expected<StockTransaction, TransactionConversionError> TransactionConverter::
-        toStock(const DomainTransaction& transaction)
+    FinanceResult<StockTransaction> TransactionConverter::toStock(
+        const DomainTransaction& transaction
+    )
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
         {
-            return std::unexpected(
-                TransactionConversionError{"No cash entries found"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "No cash entries found for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         auto amountEntries = entries.filter(TransactionEntryType::General);
@@ -257,18 +300,26 @@ namespace finance
 
         if (amountEntries.size() != 1)
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid number of amount entries"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid number of amount entries for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         const auto cashAccountId = amountEntries[0].getAccountId();
 
         if (feeEntries.size() != 2 && !feeEntries.empty())
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid number of fee entries"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid number of fee entries for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         Cash fees{amountEntries[0].getCurrency(), 0};
@@ -279,17 +330,25 @@ namespace finance
             if (cashAccountId != feeEntries[0].getAccountId() &&
                 cashAccountId != feeEntries[1].getAccountId())
             {
-                return std::unexpected(
-                    TransactionConversionError{"Invalid fee entry accounts"}
-                );
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    "Invalid fee entry accounts for transaction with Id " +
+                        transaction.getId().toString()
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             if (cashAccountId != feeEntries[0].getAccountId() &&
                 cashAccountId != feeEntries[1].getAccountId())
             {
-                return std::unexpected(
-                    TransactionConversionError{"Invalid fee entry accounts"}
-                );
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    "Invalid fee entry accounts for transaction with Id " +
+                        transaction.getId().toString()
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             if (cashAccountId == feeEntries[0].getAccountId())
@@ -306,9 +365,13 @@ namespace finance
 
         if (!std::holds_alternative<StockData>(transaction.getData()))
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid transaction data"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid transaction data for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         const auto data = std::get<StockData>(transaction.getData());
@@ -316,9 +379,13 @@ namespace finance
         const auto& legs = data.getLegs();
         if (legs.size() != 1)
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid trade legs"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid trade legs for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         return StockTransaction{
@@ -337,34 +404,48 @@ namespace finance
         };
     }
 
-    std::expected<OptionTransactionTemporary, TransactionConversionError> TransactionConverter::
-        toOption(const DomainTransaction& transaction)
+    FinanceResult<OptionTransaction> TransactionConverter::toOption(
+        const DomainTransaction& transaction
+    )
     {
         const auto& entries = transaction.getEntries();
         if (entries.empty())
         {
-            return std::unexpected(
-                TransactionConversionError{"No cash entries found"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "No cash entries found for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         auto amountEntries = entries.filter(TransactionEntryType::General);
         auto feeEntries    = entries.filter(TransactionEntryType::Fees);
 
-        if (amountEntries.size() != 1)
+        if (amountEntries.size() != 2)
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid number of amount entries"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid number of amount entries for transaction with Id " +
+                    transaction.getId().toString() + " Expected 1, got " +
+                    std::to_string(amountEntries.size())
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         const auto cashAccountId = amountEntries[0].getAccountId();
 
         if (feeEntries.size() != 2 && !feeEntries.empty())
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid number of fee entries"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid number of fee entries for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         Cash fees{amountEntries[0].getCurrency(), 0};
@@ -375,17 +456,25 @@ namespace finance
             if (cashAccountId != feeEntries[0].getAccountId() &&
                 cashAccountId != feeEntries[1].getAccountId())
             {
-                return std::unexpected(
-                    TransactionConversionError{"Invalid fee entry accounts"}
-                );
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    "Invalid fee entry accounts for transaction with Id " +
+                        transaction.getId().toString()
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             if (cashAccountId != feeEntries[0].getAccountId() &&
                 cashAccountId != feeEntries[1].getAccountId())
             {
-                return std::unexpected(
-                    TransactionConversionError{"Invalid fee entry accounts"}
-                );
+                const auto error = FinanceError{
+                    FinanceErrorType::InvalidTransaction,
+                    "Invalid fee entry accounts for transaction with Id " +
+                        transaction.getId().toString()
+                };
+                LOG_ERROR(error.toString());
+                return error;
             }
 
             if (cashAccountId == feeEntries[0].getAccountId())
@@ -402,9 +491,13 @@ namespace finance
 
         if (!std::holds_alternative<OptionData>(transaction.getData()))
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid transaction data"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid transaction data for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         const auto data = std::get<OptionData>(transaction.getData());
@@ -412,12 +505,16 @@ namespace finance
         const auto& legs = data.getLegs();
         if (legs.size() != 1)
         {
-            return std::unexpected(
-                TransactionConversionError{"Invalid trade legs"}
-            );
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidTransaction,
+                "Invalid trade legs for transaction with Id " +
+                    transaction.getId().toString()
+            };
+            LOG_ERROR(error.toString());
+            return error;
         }
 
-        return OptionTransactionTemporary{
+        return OptionTransaction{
             transaction.getId(),
             transaction.getTimestamp(),
             transaction.getStatus(),

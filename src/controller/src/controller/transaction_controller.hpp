@@ -46,10 +46,8 @@ namespace controller
         /// Reference to the stock store
         std::shared_ptr<store::IStockStore> _stockStore;
 
-        /// Pointer to the central stacked widget
-        QStackedWidget* _stackedWidget;
-        /// Pointer to the transaction detail view
-        QPointer<ui::TransactionsOverview> _transactionDetailView;
+        struct UIElements;
+        std::unique_ptr<UIElements> _uiElements;
 
        public:
         TransactionController(
@@ -59,6 +57,7 @@ namespace controller
             const std::shared_ptr<store::IStockStore>&       stockStore,
             QStackedWidget*                                  stackedWidget
         );
+        ~TransactionController() override;
 
         void transactionOverviewSelected(bool focus);
         void transactionOverviewSelected();
