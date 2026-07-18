@@ -65,7 +65,7 @@ namespace repo
      */
     void RepoContainer::reopenDb()
     {
-        _database->open(Constants::getInstance().getDatabasePath());
+        _database->open(Constants::getInstance().getDatabasePath().string());
     }
 
     RepoContainer::~RepoContainer() = default;
