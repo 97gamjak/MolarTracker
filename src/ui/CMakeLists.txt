@@ -17,6 +17,7 @@ target_link_libraries(molartracker_ui
     Qt6::Widgets                # for QApplication
     Qt6::PrintSupport           # for QPrinter / PDF export
     molartracker_config         # for constants
+    molartracker_http           # for HttpClient::urlEncode
     molartracker_utils
     molartracker_logging
     molartracker_drafts
