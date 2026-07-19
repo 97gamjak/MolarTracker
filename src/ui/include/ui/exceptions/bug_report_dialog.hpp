@@ -17,8 +17,10 @@ namespace ui
         Q_OBJECT
 
        private:
-        QLineEdit*      _titleEdit = nullptr;
-        QPlainTextEdit* _bodyEdit  = nullptr;
+        /// The line edit for the bug report title
+        QLineEdit* _titleEdit = nullptr;
+        /// The plain text edit for the bug report body
+        QPlainTextEdit* _bodyEdit = nullptr;
 
         void _buildUI(const QString& details);
 

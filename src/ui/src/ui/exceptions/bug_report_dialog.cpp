@@ -21,12 +21,29 @@ namespace
     /// length
     constexpr qsizetype MAX_DETAILS_LENGTH = 3000;
 
+    /**
+     * @brief Generate the default title of the bug report, based on the first
+     * line of the exception details
+     *
+     * @param details The exception details (message and stack trace)
+     * @return QString The default title of the bug report
+     */
     QString defaultTitle(const QString& details)
     {
-        const auto firstLine = details.left(details.indexOf('\n'));
-        return "Bug: " + firstLine.left(75);
+        const auto     firstLine = details.left(details.indexOf('\n'));
+        constexpr auto maxLength = 75;
+        if (firstLine.length() > maxLength)
+            return "Bug: " + firstLine.left(maxLength) + "...";
+        return "Bug: " + firstLine.left(maxLength);
     }
 
+    /**
+     * @brief Generate the default body of the bug report, including the
+     * exception details and the path to the current log file
+     *
+     * @param details The exception details (message and stack trace)
+     * @return QString The default body of the bug report
+     */
     QString defaultBody(const QString& details)
     {
         auto truncatedDetails = details.left(MAX_DETAILS_LENGTH);
@@ -65,7 +82,8 @@ namespace ui
         : Dialog(parent)
     {
         setWindowTitle("Report Bug on GitHub");
-        resize(600, 500);
+        constexpr auto size = QSize(600, 500);
+        resize(size);
         _buildUI(details);
     }
 
@@ -105,16 +123,16 @@ namespace ui
             this,
             [this]()
             {
-                const auto encodedTitle = http::HttpClient::urlEncode(
-                    _titleEdit->text().toStdString()
-                );
+                const auto encodedTitle =
+                    http::HttpClient::urlEncode(_titleEdit->text().toStdString()
+                    );
                 const auto encodedBody = http::HttpClient::urlEncode(
                     _bodyEdit->toPlainText().toStdString()
                 );
 
                 const auto url = GithubConstants::getGithubIssuesUrl() +
-                                  "/new?title=" + encodedTitle +
-                                  "&body=" + encodedBody;
+                                 "/new?title=" + encodedTitle +
+                                 "&body=" + encodedBody;
 
                 QDesktopServices::openUrl(QUrl{url.c_str()});
             }
