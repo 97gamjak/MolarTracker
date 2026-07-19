@@ -34,6 +34,7 @@ All changes and updates, that are relevant for a user will be documented here
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs
+- Add Help page accessible from Help → Help menu item, with PDF export
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
 
