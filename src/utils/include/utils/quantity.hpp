@@ -1,7 +1,6 @@
 #ifndef __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
 #define __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
 
-#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -77,7 +76,7 @@ class Quantity
      ********************/
 
     template <typename T>
-    friend bool operator>(const Quantity& lhs, const T& rhs);
+    friend auto operator<=>(const Quantity& lhs, const T& rhs);
 
     friend Quantity operator-(const Quantity& quantity);
 };

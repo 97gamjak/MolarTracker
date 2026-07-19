@@ -6,7 +6,93 @@ All changes and updates, that are relevant for developers will be documented her
 
 REVERT CACHE changes but keep error handling
 
-### Features
+#### Finance
+
+- Add position store, service and repo
+- Add position creation when creating transactions
+- Add fees to creating stock and cash transactions
+- Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
+- Make stock store a fully cached store with possibility to switch to a dirty-only cache store
+- Implement first version of Option SQL model
+- Extend transaction row sql model with some option specific data
+- Extend domain transaction type to have now `OptionData`
+- Make it possible to open (create) option transactions
+
+#### UI
+
+- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
+
+#### ORM
+
+- Introduce `.in` for queries to make it easier to create where clauses for ranges
+
+#### Utils
+
+- Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+
+#### VCS
+
+- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
+  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
+    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+  - `vcs::UpdateCheckService` — `QObject` that fires an async
+    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
+    emits `updateAvailable(SemVer)` at most once per distinct version per
+    session
+- Add `SemVer::current()` static method that returns the compile-time
+  version from `MOLARTRACKER_VERSION`
+- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
+  comparison operators
+- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
+  version, a link button to the GitHub releases page, and a
+  "don't show again for this version" checkbox
+- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
+  persists the last dismissed update version to `settings.json`
+- Wire `UpdateCheckService` into `MainController::Impl`; on
+  `updateAvailable` the dismissed version is checked, the dialog is shown,
+  and if dismissed the version is written to settings and saved
+
+#### DB / Backup
+
+- Add `db::BackupManager` (`src/db/`) — static methods for:
+  - `createBackup(Database&, backupDir)` — timestamped SQLite backup via
+    `sqlite3_backup_*`, followed by tiered retention pruning
+  - `listBackups(backupDir)` — sorted-newest-first scan of backup files
+  - Retention: 5 most-recent, 4 weekly, unlimited monthly tiers
+- `RepoContainer` now calls `BackupManager::createBackup()` on every startup
+  (before migrations). The old `Database::makeBackup()` call inside
+  `MigrationRunner` has been removed.
+- `Constants::getBackupPath()` / `setBackupPath()` added; `MainController`
+  sets it from `BackupSettings` before opening the database.
+- `BackupSettings` section added to the settings system (enable toggle,
+  configurable directory, recentCount / weeklyCount)
+
+#### Store / Restore
+
+- `IStore::reload()` pure-virtual method added and implemented in all five
+  stores (Profile, Account, Stock, Transaction, Position) — discards the
+  in-memory cache and reloads from the database
+- `RepoContainer::closeDb()` / `reopenDb()` and
+  `ServiceContainer::closeDb()` / `reopenDb()` added
+- `StoreContainer::restoreFromBackup(path)` — closes the DB, copies the
+  backup file over the live database, reopens, then calls `reload()` on
+  every store
+
+#### UI / Controller
+
+- `ui::RestoreBackupDialog` — table view listing backups by date/time and
+  file size with a confirmation step
+- "Restore from Backup…" action added to `SettingsMenu`
+- `SettingsMenuController::setRestoreCallback` wired from
+  `MainController::Impl` so the controller can trigger an in-place restore
+
 
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 
@@ -105,61 +191,6 @@ REVERT CACHE changes but keep error handling
 - Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
   before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
   execution
-
-### Features
-
-#### Finance
-
-- Add position store, service and repo
-- Add position creation when creating transactions
-- Add fees to creating stock and cash transactions
-- Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
-- Make stock store a fully cached store with possibility to switch to a dirty-only cache store
-- Implement first version of Option SQL model
-- Extend transaction row sql model with some option specific data
-- Extend domain transaction type to have now `OptionData`
-- Make it possible to open (create) option transactions
-
-#### UI
-
-- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
-- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
-  `MainWindow::closeEvent()` override — window refuses to close when
-  the callback returns `false`
-- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
-  `MainWindow`: checks `StoreContainer::isDirty()` and
-  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
-  before allowing the close
-
-#### ORM
-
-- Introduce `.in` for queries to make it easier to create where clauses for ranges
-
-#### Utils
-
-- Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
-
-#### VCS
-
-- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
-  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
-    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
-  - `vcs::UpdateCheckService` — `QObject` that fires an async
-    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
-    emits `updateAvailable(SemVer)` at most once per distinct version per
-    session
-- Add `SemVer::current()` static method that returns the compile-time
-  version from `MOLARTRACKER_VERSION`
-- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
-  comparison operators
-- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
-  version, a link button to the GitHub releases page, and a
-  "don't show again for this version" checkbox
-- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
-  persists the last dismissed update version to `settings.json`
-- Wire `UpdateCheckService` into `MainController::Impl`; on
-  `updateAvailable` the dismissed version is checked, the dialog is shown,
-  and if dismissed the version is written to settings and saved
 
 ### Cleanup
 

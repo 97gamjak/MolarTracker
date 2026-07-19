@@ -55,12 +55,12 @@ namespace finance
             std::int64_t contractSize
         );
 
-        [[nodiscard]] OptionId     getId() const;
-        [[nodiscard]] InstrumentId getInstrumentId() const;
-        [[nodiscard]] OptionType   getOptionType() const;
-        [[nodiscard]] Cash         getStrikePrice() const;
-        [[nodiscard]] Timestamp    getExpirationDate() const;
-        [[nodiscard]] std::int64_t getContractSize() const;
+        [[nodiscard]] OptionId            getId() const;
+        [[nodiscard]] InstrumentId        getInstrumentId() const;
+        [[nodiscard]] OptionType          getOptionType() const;
+        [[nodiscard]] Cash                getStrikePrice() const;
+        [[nodiscard]] Timestamp           getExpirationDate() const;
+        [[nodiscard]] const std::int64_t& getContractSize() const;
 
         [[nodiscard]] std::string getName() const;
 

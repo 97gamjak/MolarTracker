@@ -76,6 +76,12 @@ auto Iterable<Container>::end() const
     return _items.end();
 }
 
+template <typename Container>
+void Iterable<Container>::reserve(size_t size)
+{
+    _items.reserve(size);
+}
+
 /**
  * @brief Checks if the container is empty.
  *

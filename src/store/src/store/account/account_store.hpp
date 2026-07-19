@@ -68,7 +68,7 @@ namespace store
         [[nodiscard]]
         IdSet<AccountId> getExternalAccountIds() const override;
 
-        void commit() override;
+        void commit();
 
         void updateActiveProfile(
             const std::optional<ProfileId>& profileIdOpt
@@ -79,6 +79,8 @@ namespace store
 
         [[nodiscard]]
         const IdIdMap<AccountId>& getIdRemap() const override;
+
+        void reload() override;
 
        private:
         void _refresh();

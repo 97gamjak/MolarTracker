@@ -62,7 +62,14 @@ namespace store
             const IdSet<InstrumentId>& instrumentIds
         ) const override;
 
-        void commit(const IdIdMap<InstrumentId>& reMap) override;
+        [[nodiscard]]
+        std::optional<finance::Option> getOption(
+            InstrumentId instrumentId
+        ) const override;
+
+        void commit(const IdIdMap<InstrumentId>& reMap);
+
+        void reload() override;
 
         [[nodiscard]]
         bool optionExists(const finance::Option& option) const;

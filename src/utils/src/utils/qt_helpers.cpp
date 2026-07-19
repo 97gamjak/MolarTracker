@@ -100,4 +100,11 @@ namespace utils
         dlg->move(center);
     }
 
+    QString toKBString(std::size_t bytes)
+    {
+        static constexpr auto byteConversion = 1024;
+        const auto kiloBytes = static_cast<double>(bytes) / byteConversion;
+        return QString{"%1 KB"}.arg(kiloBytes);
+    }
+
 }   // namespace utils

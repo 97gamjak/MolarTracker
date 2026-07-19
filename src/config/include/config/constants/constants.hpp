@@ -20,8 +20,11 @@ class ConstantsSchema
                               // ConstantsSchema
 
    private:
+    /// The prefix used for config and data files, this is used to construct the
+    /// names of config and data files used by the application
+    static constexpr const char* _filePrefix = "molar_tracker";
     /// The name of the database file
-    static constexpr const char* _databaseFile = "molar_tracker.db";
+    static constexpr const char* _databaseFileExtension = ".db";
     /// The application name
     static constexpr const char* _appName = "Molar Tracker";
     /// The directory prefix used for config and data directories
@@ -79,6 +82,9 @@ class Constants
    public:
     static Constants& getInstance();
 
+    [[nodiscard]] static std::string    getFilePrefix();
+    [[nodiscard]] static std::string    getDatabaseFileExtension();
+    [[nodiscard]] static std::string    getDatabaseFileName();
     [[nodiscard]] std::filesystem::path getConfigPath() const;
     [[nodiscard]] std::filesystem::path getDataPath() const;
     [[nodiscard]] std::filesystem::path getDatabasePath() const;

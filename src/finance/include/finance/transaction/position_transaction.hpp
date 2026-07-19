@@ -4,72 +4,56 @@
 #include <memory>
 
 #include "config/id_types.hpp"
-#include "error/finance_error.hpp"
-#include "finance/position.hpp"
-#include "pnl.hpp"
 #include "transactions.hpp"
 #include "utils/finance.hpp"
 
 namespace finance
 {
     class Positions;
+    class Option;
 
-    /**
-     * @brief Class representing a stock position transaction, containing all
-     * transactions related to a specific position, along with PnL information.
-     *
-     */
-    class PositionTransaction
+    struct PositionTransaction
     {
-        Position _position;
-        /// The base instrument associated with the position
-        InstrumentId _baseInstrument;
-        /// The security account associated with the position
-        AccountId _securityAccount;
+        PositionId     positionId;
+        InstrumentId   baseInstrument;
+        AccountId      securityAccount;
+        InstrumentType instrumentType;
+        Transactions   transactions;
+    };
 
-        InstrumentType _instrumentType;
+    class StockPositionTransaction : public PositionTransaction
+    {
+       public:
+        using PositionTransaction::PositionTransaction;
+    };
 
-        Transactions _transactions;
-
-        /// The PnL information for the position, this will be calculated based
-        /// on the transactions in the position and the current price of the
-        /// security
-        std::shared_ptr<PnL> _pnl;
-        /// Flag indicating whether the PnL information is up to date and ready
-        /// for display
-        bool _pnlReady = false;
+    class OptionPositionTransaction : public PositionTransaction
+    {
+       private:
+        std::shared_ptr<Option> _option;
 
        public:
-        explicit PositionTransaction(
-            const Position&     position,
-            InstrumentId        baseInstrument,
-            AccountId           securityAccount,
-            InstrumentType      instrumentType,
-            const Transactions& transactions
-        );
+        using PositionTransaction::PositionTransaction;
 
-        [[nodiscard]] const Transactions& getTransactions() const;
+        [[nodiscard]] std::shared_ptr<Option> getOption() const;
+    };
 
-        [[nodiscard]] PositionId      getId() const;
-        [[nodiscard]] InstrumentType  getInstrumentType() const;
-        [[nodiscard]] InstrumentId    getBaseInstrument() const;
-        [[nodiscard]] AccountId       getSecurityAccount() const;
-        [[nodiscard]] const Position& getPosition() const;
+    class StockPositionTransactions : public Vector<StockPositionTransaction>
+    {
+       public:
+        using Vector<StockPositionTransaction>::Vector;
+    };
 
-        [[nodiscard]] PnLResult<const std::shared_ptr<PnL>&> getPnL();
-
-        [[nodiscard]]
-        static PositionTransaction fromTransactions(
-            const Position&     position,
-            InstrumentType      instrumentType,
-            const Transactions& transactions
-        );
+    class OptionPositionTransactions : public Vector<OptionPositionTransaction>
+    {
+       public:
+        using Vector<OptionPositionTransaction>::Vector;
     };
 
     class PositionTransactions
     {
-        std::vector<PositionTransaction> _stockPositions;
-        std::vector<PositionTransaction> _optionPositions;
+        StockPositionTransactions  _stockPositions;
+        OptionPositionTransactions _optionPositions;
 
        public:
         [[nodiscard]]
@@ -78,12 +62,13 @@ namespace finance
             const Positions&    positions
         );
 
-        [[nodiscard]] std::vector<PositionTransaction> getStockPositions(
+        [[nodiscard]]
+        StockPositionTransactions getStockPositions() const;
+        [[nodiscard]]
+        OptionPositionTransactions getOptionPositions() const;
+        [[nodiscard]]
+        std::vector<std::shared_ptr<PositionTransaction>> getAllPositions(
         ) const;
-        [[nodiscard]]
-        std::vector<PositionTransaction> getOptionPositions() const;
-        [[nodiscard]]
-        std::vector<PositionTransaction> getAllPositions() const;
     };
 
 }   // namespace finance

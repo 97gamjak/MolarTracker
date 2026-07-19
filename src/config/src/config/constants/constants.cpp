@@ -59,13 +59,45 @@ std::filesystem::path Constants::getConfigPath() const { return _configPath; }
 std::filesystem::path Constants::getDataPath() const { return _dataPath; }
 
 /**
+ * @brief Get the database file extension, this is used to identify the
+ * database file used by the application
+ *
+ * @return const std::string
+ */
+std::string Constants::getDatabaseFileExtension()
+{
+    return ConstantsSchema::_databaseFileExtension;
+}
+
+/**
+ * @brief Get the file prefix used for config and data files
+ *
+ * @return const std::string
+ */
+std::string Constants::getFilePrefix() { return ConstantsSchema::_filePrefix; }
+
+/**
+ * @brief Get the database file name, this is the name of the database file
+ * used by the application, it is constructed from the file prefix and the
+ * database file extension
+ *
+ * @return std::string
+ */
+std::string Constants::getDatabaseFileName()
+{
+    const auto& prefix = getFilePrefix();
+    const auto& ext    = getDatabaseFileExtension();
+    return prefix + ext;
+}
+
+/**
  * @brief Get the database file path
  *
  * @return std::filesystem::path
  */
 std::filesystem::path Constants::getDatabasePath() const
 {
-    return _dataPath / ConstantsSchema::_databaseFile;
+    return _dataPath / getDatabaseFileName();
 }
 
 /**

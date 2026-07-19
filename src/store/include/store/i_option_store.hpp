@@ -72,22 +72,10 @@ namespace store
             const IdSet<InstrumentId>& instrumentIds
         ) const = 0;
 
-        /**
-         * @brief Commit the current changes to the store, this will apply any
-         * pending changes to the underlying data storage for options, and will
-         * update the ID remapping as needed based on the changes that were
-         * committed, allowing for a structured way to finalize changes to the
-         * option data and ensure that the store's state is consistent with the
-         * underlying data storage after changes have been made.
-         *
-         * @param reMap The mapping of original InstrumentIds to their remapped
-         * InstrumentIds that should be applied during the commit operation,
-         * this allows the commit process to update the ID remapping based on
-         * the changes being committed, ensuring that any new or modified
-         * options have their IDs correctly remapped as part of the commit
-         * process.
-         */
-        virtual void commit(const IdIdMap<InstrumentId>& reMap) = 0;
+        [[nodiscard]]
+        virtual std::optional<finance::Option> getOption(
+            InstrumentId instrumentId
+        ) const = 0;
     };
 }   // namespace store
 

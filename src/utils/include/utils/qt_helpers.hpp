@@ -36,6 +36,9 @@ namespace utils
 
     void moveDialogToParentScreenCenter(QDialog* dlg, QWidget* parent);
 
+    [[nodiscard]]
+    QString toKBString(std::size_t bytes);
+
     template <typename T, typename... Args>
     [[nodiscard]]
     T* makeQChild(Args&&... args);

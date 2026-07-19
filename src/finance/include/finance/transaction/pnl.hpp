@@ -7,42 +7,64 @@
 #include "utils/cash.hpp"
 #include "utils/container/vector.hpp"
 #include "utils/percentage.hpp"
+#include "utils/quantity.hpp"
 #include "utils/timestamp.hpp"
 
 namespace finance
 {
 
-    struct StockPnL
+    struct StockTrade
     {
-        Quantity  quantity;
-        Cash      unitPrice;
-        Cash      fees;
-        Timestamp timestamp;
+        Quantity quantity;
+        Cash     unitPrice;
+        Cash     fees;
     };
 
-    class StockPnLs : public Vector<StockPnL>
+    struct OptionTrade
     {
-       public:
-        void sort();
-    };
-
-    struct OptionPnL
-    {
-        Cash                    strike;
-        OptionBuySell           buySell;
         OptionType              type;
+        OptionBuySell           buySell;
         TransactionOptionAction action;
+        Cash                    strike;
         Quantity                quantity;
-        Quantity                contractSize;
+        std::int64_t            contractSize;
         Cash                    premium;
         Cash                    fees;
-        Timestamp               timestamp;
     };
 
-    class OptionPnLs : public Vector<OptionPnL>
+    struct PositionEvent
+    {
+        Timestamp                             timestamp;
+        std::variant<StockTrade, OptionTrade> data;
+    };
+
+    class PositionEvents : public Vector<PositionEvent>
     {
        public:
+        using Vector<PositionEvent>::Vector;
+
         void sort();
+    };
+
+    struct OpenOptionLeg
+    {
+        OptionType    type;
+        OptionBuySell buySell;
+        Cash          strikePrice;
+        Quantity      qty;
+    };
+
+    struct PositionState
+    {
+        Quantity openQuantity{0};
+        Cash     costBasis;
+        Cash     realizedPnL;
+        Cash     realizedCostBasis;
+        Cash     unrealizedOptionPnL;   // premium-based, mirrors your existing
+                                        // PnLOption field
+        Cash                       fees;
+        Quantity                   contractSize{0};
+        std::vector<OpenOptionLeg> openOptionLegs;
     };
 
     /**

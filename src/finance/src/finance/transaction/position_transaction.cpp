@@ -28,7 +28,7 @@ namespace finance
     {
     }
 
-    PnLResult<const std::shared_ptr<PnL>&> PositionTransaction::getPnL()
+    PnLResult<std::shared_ptr<PnL>> PositionTransaction::getPnL()
     {
         if (!_pnl)
         {
@@ -75,11 +75,11 @@ namespace finance
                     {
                         optionPnLs.add(
                             OptionPnL{
-                                .strike       = tx.getStrike(),
-                                .type         = tx.getOptionType(),
-                                .buySell      = tx.getBuySell(),
-                                .action       = tx.getAction(),
-                                .quantity     = tx.getQuantity(),
+                                .strike   = tx.getOption()->getStrikePrice(),
+                                .type     = tx.getOptionType(),
+                                .buySell  = tx.getBuySell(),
+                                .action   = tx.getAction(),
+                                .quantity = tx.getQuantity(),
                                 .contractSize = tx.getContractSize(),
                                 .premium      = tx.getPremium(),
                                 .fees         = tx.getFees(),
@@ -184,33 +184,47 @@ namespace finance
         return positionTransactions;
     }
 
-    std::vector<PositionTransaction> PositionTransactions::getStockPositions(
-    ) const
+    StockPositionTransactions PositionTransactions::getStockPositions() const
     {
         return _stockPositions;
     }
 
-    std::vector<PositionTransaction> PositionTransactions::getOptionPositions(
-    ) const
+    OptionPositionTransactions PositionTransactions::getOptionPositions() const
     {
         return _optionPositions;
     }
 
-    std::vector<PositionTransaction> PositionTransactions::getAllPositions(
-    ) const
+    std::vector<std::shared_ptr<PositionTransaction>> PositionTransactions::
+        getAllPositions() const
     {
-        std::vector<PositionTransaction> allPositions;
+        std::vector<std::shared_ptr<PositionTransaction>> allPositions;
         allPositions.reserve(_stockPositions.size() + _optionPositions.size());
 
         allPositions.insert(
             allPositions.end(),
-            _stockPositions.begin(),
-            _stockPositions.end()
+            reinterpret_cast<
+                const std::vector<std::shared_ptr<PositionTransaction>>&>(
+                _stockPositions
+            )
+                .begin(),
+            reinterpret_cast<
+                const std::vector<std::shared_ptr<PositionTransaction>>&>(
+                _stockPositions
+            )
+                .end()
         );
         allPositions.insert(
             allPositions.end(),
-            _optionPositions.begin(),
-            _optionPositions.end()
+            reinterpret_cast<
+                const std::vector<std::shared_ptr<PositionTransaction>>&>(
+                _optionPositions
+            )
+                .begin(),
+            reinterpret_cast<
+                const std::vector<std::shared_ptr<PositionTransaction>>&>(
+                _optionPositions
+            )
+                .end()
         );
 
         return allPositions;

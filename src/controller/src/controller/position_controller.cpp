@@ -144,7 +144,7 @@ namespace controller
         const auto ids = _positionStore->getOpenPositions().getIds();
 
         finance::TransactionFilter filter;
-        filter.setPositionIds(ids);
+        filter.positionIds = ids;
 
         const auto transactions = _transactionStore->getTransactions(filter);
         if (!transactions)

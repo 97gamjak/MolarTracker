@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "finance/transaction/position_transaction.hpp"
-#include "finance/transaction/transactions.hpp"
+#include "finance/transaction/pnl.hpp"
+#include "finance/transaction/transactions.hpp"   // for return value
 
 namespace store
 {
@@ -12,13 +12,6 @@ namespace store
     class IPositionStore;      // forward declaration
     class IOptionStore;        // forward declaration
 }   // namespace store
-
-namespace finance
-{
-    class TransactionFilter;   // forward declaration
-    class Options;             // forward declaration
-    class Positions;           // forward declaration
-}   // namespace finance
 
 namespace gateway
 {
@@ -37,19 +30,14 @@ namespace gateway
         );
 
         [[nodiscard]]
-        FinanceResult<finance::PositionTransactions> getOpenPositionTransactions(
+        FinanceResult<IdMap<PositionId, finance::Transactions>> getOpenPositionTransactions(
             const IdSet<AccountId>& accountIds
         ) const;
 
-       private:
         [[nodiscard]]
-        std::pair<
-            finance::Positions,
-            finance::TransactionFilter> _getOpenPositionsFilter() const;
-
-        [[nodiscard]]
-        finance::Options _getNeededOptions(
-            const finance::Transactions& txs
+        FinanceResult<finance::PositionEvents> getPositionEvents(
+            const finance::Transactions&                txs,
+            const std::shared_ptr<store::IOptionStore>& optionStore
         ) const;
     };
 }   // namespace gateway

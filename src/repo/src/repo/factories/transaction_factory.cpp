@@ -258,11 +258,11 @@ namespace repo
     {
         orm::WhereExpr where = orm::makeEmptyWhere();
 
-        if (!filter.getTransactionIds().empty())
+        if (!filter.transactionIds.empty())
         {
             orm::WhereExpr idWhere = orm::makeEmptyWhere();
 
-            for (const auto &transactionId : filter.getTransactionIds())
+            for (const auto &transactionId : filter.transactionIds)
             {
                 idWhere |= TransactionRow::hasTransactionId(transactionId);
             }
@@ -270,17 +270,20 @@ namespace repo
             where &= idWhere;
         }
 
-        if (!filter.getPositionIds().empty())
+        if (!filter.positionIds.empty())
         {
             orm::WhereExpr posIdWhere = orm::makeEmptyWhere();
 
-            for (const auto &positionId : filter.getPositionIds())
+            for (const auto &positionId : filter.positionIds)
             {
                 posIdWhere |= TradeLegRow::hasPosition(positionId);
             }
 
             where &= posIdWhere;
         }
+
+        // we do not add here account ids as they need to be handled
+        // differently! see general get function
 
         return where;
     }
@@ -301,7 +304,7 @@ namespace repo
     {
         orm::Joins join;
 
-        if (!filter.getPositionIds().empty())
+        if (!filter.positionIds.empty())
         {
             join = join.add(
                 orm::join<

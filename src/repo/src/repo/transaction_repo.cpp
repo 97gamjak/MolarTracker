@@ -6,6 +6,7 @@
 #include "db/transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
@@ -222,8 +223,6 @@ namespace repo
     /**
      * @brief get all transactions from the database
      *
-     * @param accountIds The IDs of the accounts to retrieve transactions
-     * for.
      * @param filter The filter to apply to the transactions, this will be
      * converted to a WhereExpr and applied to the query when fetching
      * transactions from the database, if no filter is provided all transactions
@@ -232,7 +231,6 @@ namespace repo
      * @return std::vector<finance::DomainTransaction>
      */
     std::vector<finance::DomainTransaction> TransactionRepo::getTransactions(
-        const IdSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
     {
@@ -246,6 +244,8 @@ namespace repo
 
         std::vector<finance::DomainTransaction> results;
         results.reserve(txRows.size());
+
+        const auto& accountIds = filter.accountIds;
 
         for (const auto& [txRow] : txRows)
         {

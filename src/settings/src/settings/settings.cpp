@@ -96,6 +96,23 @@ namespace settings
     }
 
     /**
+     * @brief Get the BackupSettings object
+     *
+     * @return BackupSettings&
+     */
+    BackupSettings& Settings::getBackupSettings() { return _backupSettings; }
+
+    /**
+     * @brief Get the BackupSettings object (const version)
+     *
+     * @return const BackupSettings&
+     */
+    const BackupSettings& Settings::getBackupSettings() const
+    {
+        return _backupSettings;
+    }
+
+    /**
      * @brief Serialize settings to JSON and save to file
      *
      */

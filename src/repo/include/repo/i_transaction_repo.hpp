@@ -8,8 +8,8 @@
 
 namespace finance
 {
-    class DomainTransaction;   // Forward declaration
-    class TransactionFilter;   // Forward declaration
+    class DomainTransaction;    // Forward declaration
+    struct TransactionFilter;   // Forward declaration
 }   // namespace finance
 
 namespace repo
@@ -30,15 +30,14 @@ namespace repo
          *
          * @return The added transaction.
          */
-        [[nodiscard]] virtual TransactionId addTransaction(
+        [[nodiscard]]
+        virtual TransactionId addTransaction(
             const finance::DomainTransaction& transaction
         ) = 0;
 
         /**
          * @brief Retrieves all transactions from the repository.
          *
-         * @param accountIds The IDs of the accounts to retrieve transactions
-         * for.
          * @param filter The filter to apply to the transactions, this will be
          * converted to a WhereExpr and applied to the query when fetching
          * transactions from the database, if no filter is provided all
@@ -46,8 +45,8 @@ namespace repo
          *
          * @return A vector of all transactions.
          */
-        [[nodiscard]] virtual std::vector<finance::DomainTransaction> getTransactions(
-            const IdSet<AccountId>&           accountIds,
+        [[nodiscard]]
+        virtual std::vector<finance::DomainTransaction> getTransactions(
             const finance::TransactionFilter& filter
         ) = 0;
     };

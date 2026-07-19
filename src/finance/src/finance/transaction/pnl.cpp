@@ -7,6 +7,170 @@
 namespace finance
 {
 
+    [[nodiscard]]
+    PositionState apply(PositionState state, const StockTrade& trade)
+    {
+        state.fees += trade.fees;
+
+        if (trade.quantity.isZero())
+            return state;
+
+        const bool isStateQtyPositive = state.openQuantity > 0;
+        const bool isTradeQtyPositive = trade.quantity > 0;
+        const bool sameDirection      = state.openQuantity.isZero() ||
+                                   (isStateQtyPositive == isTradeQtyPositive);
+
+        if (sameDirection)
+        {
+            // opening or adding to the position
+            state.costBasis    += trade.unitPrice * trade.quantity.abs();
+            state.openQuantity += trade.quantity;
+        }
+        else
+        {
+            // reducing or closing/flipping the position
+            const auto avgCost = state.costBasis / state.openQuantity.abs();
+            const auto closedQty =
+                std::min(trade.quantity.abs(), state.openQuantity.abs());
+
+            state.realizedPnL       += (trade.unitPrice - avgCost) * closedQty;
+            state.realizedCostBasis += avgCost * closedQty;
+            state.costBasis         -= avgCost * closedQty;
+            state.openQuantity -=
+                (state.openQuantity > 0 ? closedQty : -closedQty);
+
+            const auto remainder = trade.quantity.abs() - closedQty;
+            if (!remainder.isZero())
+            {
+                // trade flips through zero: remainder opens a new position
+                // in the opposite direction
+                state.costBasis = trade.unitPrice * remainder;
+                state.openQuantity =
+                    trade.quantity > 0 ? remainder : -remainder;
+            }
+        }
+
+        return state;
+    }
+
+    [[nodiscard]]
+    FinanceResult<PositionState> apply(
+        PositionState      state,
+        const OptionTrade& trade
+    )
+    {
+        using enum OptionType;
+        using enum OptionBuySell;
+        using enum TransactionOptionAction;
+
+        if (state.contractSize.isZero())
+            state.contractSize = trade.contractSize;
+        else if (state.contractSize != trade.contractSize)
+        {
+            return FinanceError{
+                FinanceErrorType::InconsistentContractSize,
+                "Inconsistent contract size in option transactions"
+            };
+        }
+
+        state.fees += trade.fees;
+
+        switch (trade.action)
+        {
+            case Open:
+            case RollOpen:
+            {
+                auto it = std::ranges::find_if(
+                    state.openOptionLegs,
+                    [&](const auto& leg)
+                    {
+                        return leg.type == trade.type &&
+                               leg.buySell == trade.buySell &&
+                               leg.strikePrice == trade.strike;
+                    }
+                );
+
+                if (it != state.openOptionLegs.end())
+                    it->qty += trade.quantity;
+                else
+                    state.openOptionLegs.push_back(
+                        {trade.type,
+                         trade.buySell,
+                         trade.strike,
+                         trade.quantity}
+                    );
+
+                if (trade.buySell == Buy)
+                {
+                    state.unrealizedOptionPnL -= trade.premium;
+                    state.costBasis           += trade.premium;
+                }
+                else
+                {
+                    state.unrealizedOptionPnL += trade.premium;
+                    state.costBasis +=
+                        trade.strike * (trade.quantity * state.contractSize);
+                }
+                break;
+            }
+
+            case Close:
+            case RollClose:
+            {
+                const auto openSide = (trade.buySell == Buy) ? Sell : Buy;
+                auto       it       = std::ranges::find_if(
+                    state.openOptionLegs,
+                    [&](const auto& leg)
+                    {
+                        return leg.type == trade.type &&
+                               leg.buySell == openSide &&
+                               leg.strikePrice == trade.strike;
+                    }
+                );
+
+                Cash realized, costReduction;
+                if (it != state.openOptionLegs.end() && !it->qty.isZero())
+                {
+                    realized =
+                        state.unrealizedOptionPnL / it->qty * trade.quantity;
+                    costReduction = state.costBasis / it->qty * trade.quantity;
+
+                    it->qty -= trade.quantity;
+                    if (it->qty.isZero())
+                        state.openOptionLegs.erase(it);
+                }
+
+                state.unrealizedOptionPnL -= realized;
+                state.costBasis           -= costReduction;
+                state.realizedCostBasis   += costReduction;
+                state.realizedPnL         += (trade.buySell == Buy)
+                                                 ? (realized - trade.premium)
+                                                 : (realized + trade.premium);
+                break;
+            }
+
+            case Exercised:
+            {
+                // TODO: needs your confirmation on exercise semantics
+                break;
+            }
+        }
+
+        return state;
+    }
+
+    [[nodiscard]]
+    PositionState foldStockEvents(std::span<const PositionEvent> events)
+    {
+        PositionState state;
+        for (const auto& event : events)
+        {
+            if (const auto* trade = std::get_if<StockTrade>(&event.data))
+                state = apply(state, *trade);
+        }
+        return state;
+    }
+
     /**
      * @brief Get the quantity of the security involved in the transactions
      *

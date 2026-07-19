@@ -6,15 +6,15 @@
 
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
-#include "finance/transaction/transaction_filter.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_transaction_store.hpp"
 #include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
-    class Account;    // Forward declaration
-    class Accounts;   // Forward declaration
+    class Account;              // Forward declaration
+    class Accounts;             // Forward declaration
+    struct TransactionFilter;   // Forward declaration
 }   // namespace finance
 
 namespace service
@@ -58,7 +58,8 @@ namespace store
             const IdIdMap<AccountId>&    accountIdRemap,
             const IdIdMap<InstrumentId>& instrumentIdRemap,
             const IdIdMap<PositionId>&   positionIdRemap
-        ) override;
+        );
+        void reload() override;
 
         [[nodiscard]]
         TransactionStoreResult addCashTransaction(
@@ -76,7 +77,7 @@ namespace store
 
         [[nodiscard]]
         FinanceResult<finance::Transactions> getTransactions(
-            const finance::TransactionFilter& filter
+            finance::TransactionFilter filter
         ) const override;
         [[nodiscard]]
         FinanceResult<finance::Transactions> getTransactions() const override;

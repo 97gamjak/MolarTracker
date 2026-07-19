@@ -61,6 +61,29 @@ namespace finance
         return result;
     }
 
+    bool DomainTransaction::isAccountInvolved(AccountId accountId) const
+    {
+        if (std::ranges::any_of(
+                _entries,
+                [&](const TransactionEntry& entry)
+                { return entry.getAccountId() == accountId; }
+            ))
+        {
+            return true;
+        }
+
+        if (std::ranges::any_of(
+                getLegs(),
+                [&](const TradeLeg& leg)
+                { return leg.getAccountId() == accountId; }
+            ))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * @brief Get the legs of the transaction, this is used to get the trade
      * legs associated with the transaction, which contain information about

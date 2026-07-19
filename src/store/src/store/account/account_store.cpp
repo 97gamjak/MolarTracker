@@ -485,4 +485,25 @@ namespace store
         return _getIdRemap();
     }
 
+    /**
+     * @brief Discard all cached accounts and reload from the database.
+     * Called after a database restore so the store reflects restored data.
+     */
+    void AccountStore::reload()
+    {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
+        _session.clear();
+        const auto savedProfileId = _activeProfileId;
+        _activeProfileId          = ProfileId::invalid();
+        _clearEntries();
+        if (savedProfileId.isValid())
+        {
+            _activeProfileId = savedProfileId;
+            _refresh();
+        }
+    }
+
 }   // namespace store

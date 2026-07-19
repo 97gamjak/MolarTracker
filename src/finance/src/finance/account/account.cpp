@@ -1,5 +1,6 @@
 #include "finance/account/account.hpp"
 
+#include <format>
 #include <utility>
 
 #include "utils/finance.hpp"
@@ -113,6 +114,23 @@ namespace finance
     bool Account::isExternal() const
     {
         return getKind() == AccountKind::External;
+    }
+
+    /**
+     * @brief Get a string representation of the account
+     *
+     * @return std::string
+     */
+    std::string Account::toString() const
+    {
+        return std::format(
+            "Account{{id={}, status={}, name={}, currency={}, kind={}}}",
+            _id.toString(),
+            AccountStatusMeta::toString(_status),
+            _name,
+            CurrencyMeta::toString(_currency),
+            AccountKindMeta::toString(getKind())
+        );
     }
 
     /**

@@ -17,7 +17,8 @@
     X(InvalidStock)                \
     X(CurrencyUnknown)             \
     X(InvalidPriceString)          \
-    X(PriceOverflow)
+    X(PriceOverflow)               \
+    X(UnknownOption)
 
 #define PNL_ERROR_TYPE_LIST(X)  \
     X(InconsistentContractSize) \

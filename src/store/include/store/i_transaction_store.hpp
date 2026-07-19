@@ -8,16 +8,15 @@
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for public return types
 #include "finance/transaction/transactions.hpp"   // needed for public return types
-#include "utils/container/id_id_map.hpp"
 #include "utils/container/id_map.hpp"
 
 namespace finance
 {
-    class Account;             // Forward declaration
-    class TransactionFilter;   // Forward declaration
-    class CashTransaction;     // Forward declaration
-    class StockTransaction;    // Forward declaration
-    class OptionTransaction;   // Forward declaration
+    class Account;              // Forward declaration
+    struct TransactionFilter;   // Forward declaration
+    class CashTransaction;      // Forward declaration
+    class StockTransaction;     // Forward declaration
+    class OptionTransaction;    // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -50,19 +49,6 @@ namespace store
     {
        public:
         virtual ~ITransactionStore() = default;
-
-        /**
-         * @brief Commit all changes to the database
-         *
-         * @param accountIdRemap Mapping of account IDs
-         * @param instrumentIdRemap Mapping of instrument IDs
-         * @param positionIdRemap Mapping of position IDs
-         */
-        virtual void commit(
-            const IdIdMap<AccountId>&    accountIdRemap,
-            const IdIdMap<InstrumentId>& instrumentIdRemap,
-            const IdIdMap<PositionId>&   positionIdRemap
-        ) = 0;
 
         /**
          * @brief Add a cash transaction to the store
@@ -107,7 +93,7 @@ namespace store
          */
         [[nodiscard]]
         virtual FinanceResult<finance::Transactions> getTransactions(
-            const finance::TransactionFilter& filter
+            finance::TransactionFilter filter
         ) const = 0;
 
         /**

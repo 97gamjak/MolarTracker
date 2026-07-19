@@ -24,8 +24,7 @@ namespace finance
     class OptionTransaction : public SecurityTransaction
     {
        private:
-        /// The amount of the option being traded in the transaction
-        Cash _amount;
+        Cash _premium;
 
         /// The action being performed in the option transaction (e.g., open,
         /// close, roll)
@@ -67,6 +66,15 @@ namespace finance
 
         [[nodiscard]]
         OptionData getOptionData() const;
+
+        [[nodiscard]]
+        const OptionBuySell& getBuySell() const;
+
+        [[nodiscard]]
+        const TransactionOptionAction& getAction() const;
+
+        [[nodiscard]]
+        const Cash& getPremium() const;
     };
 }   // namespace finance
 

@@ -233,13 +233,16 @@ namespace store
      * @return FinanceResult<finance::Transactions>
      */
     FinanceResult<finance::Transactions> TransactionStore::getTransactions(
-        const finance::TransactionFilter& filter
+        finance::TransactionFilter filter
     ) const
     {
         const auto accountIds = _session->accountSession.getIds();
 
         if (accountIds.empty())
             return {};
+
+        if (filter.accountIds.empty())
+            filter.accountIds = accountIds;
 
         const auto options = Options{
             .filter   = filter.getPredicate(),
@@ -254,8 +257,7 @@ namespace store
         );
         auto transactions = _getEntries(options);
 
-        auto dbTransactions =
-            _transactionService->getTransactions(accountIds, filter);
+        auto dbTransactions = _transactionService->getTransactions(filter);
 
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
@@ -527,6 +529,18 @@ namespace store
             },
             user
         );
+    }
+
+    /**
+     * @brief Discard all cached transactions. Transactions load lazily, so
+     * clearing the cache is sufficient — the next query will fetch from the
+     * restored database.
+     */
+    void TransactionStore::reload()
+    {
+        LOG_ENTRY;
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+        _clearEntries();
     }
 
 }   // namespace store
