@@ -1,10 +1,16 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__CASH_TRANSACTION_TABLE_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__CASH_TRANSACTION_TABLE_HPP__
 
+#include <qabstractitemmodel.h>
 #include <qtablewidget.h>
 
-#include "drafts/transaction_draft.hpp"
-#include "ui/transaction/transaction_table.hpp"
+#include "config/id_types.hpp"
+#include "utils/container/id_map.hpp"
+
+namespace drafts
+{
+    class CashTransactionOverview;   // Forward declaration
+}   // namespace drafts
 
 namespace ui
 {
@@ -19,36 +25,64 @@ namespace ui
      * methods for row and column count, data retrieval, header data, and item
      * flags to enable proper display and interaction with the transaction data.
      */
-    class CashTransactionTableModel : public TransactionTableModel
+    class CashTransactionTableModel : public QAbstractTableModel
     {
         Q_OBJECT
+       private:
+        /// The list of transactions to display in the table
+        std::vector<drafts::CashTransactionOverview> _transactions;
+
+        /// A map of account IDs to account names for display purposes
+        IdMap<AccountId, std::string> _accountIdToName;
 
        public:
-        using TransactionTableModel::TransactionTableModel;
+        explicit CashTransactionTableModel(QObject* parent = nullptr);
+        ~CashTransactionTableModel() override;
 
         [[nodiscard]] int columnCount(const QModelIndex& parent) const override;
 
-        [[nodiscard]] int getDescriptionIndex() const override;
-        [[nodiscard]] int getDateIndex() const override;
+        [[nodiscard]] static int getDescriptionIndex();
+        [[nodiscard]] static int getDateIndex();
+
+        void setTransactions(
+            std::vector<drafts::CashTransactionOverview> transactions,
+            IdMap<AccountId, std::string>                accountIdToName
+        );
+
+        [[nodiscard]]
+        int rowCount(const QModelIndex& parent) const override;
+
+        [[nodiscard]]
+        QVariant data(const QModelIndex& index, int role) const override;
+
+        [[nodiscard]]
+        QVariant headerData(
+            int             section,
+            Qt::Orientation orientation,
+            int             role
+        ) const override;
+
+        [[nodiscard]]
+        Qt::ItemFlags flags(const QModelIndex& index) const override;
 
        private:
         [[nodiscard]]
         QVariant _displayData(
-            const drafts::TransactionOverviewDraft& transaction,
-            int                                     col
-        ) const override;
+            const drafts::CashTransactionOverview& transaction,
+            int                                    col
+        ) const;
 
         [[nodiscard]]
-        QVariant _decorationData(
-            const drafts::TransactionOverviewDraft& transaction,
-            int                                     col
-        ) const override;
+        static QVariant _decorationData(
+            const drafts::CashTransactionOverview& transaction,
+            int                                    col
+        );
 
         [[nodiscard]]
-        QVariant _textAlignmentData(int col) const override;
+        static QVariant _textAlignmentData(int col);
 
         [[nodiscard]]
-        QString _getColLabel(int col) const override;
+        static QString _getColLabel(int col);
     };
 
 }   // namespace ui

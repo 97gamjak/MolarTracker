@@ -40,6 +40,8 @@ namespace domain
         void setId(ProfileId newId);
         void setName(const std::string& newName);
         void setEmail(const std::optional<std::string>& newEmail);
+
+        [[nodiscard]] std::string toString() const;
     };
 
     filter::Predicate<Profile> HasProfileId(ProfileId id);

@@ -21,9 +21,30 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Features
 
+- Add a "Report Bug" button to the fatal error dialog; it pre-fills a GitHub
+  issue with the exception details and app/OS info for you to review and
+  submit
+- Automatically check for new MolarTracker releases on startup and every
+  24 h; if a newer version is available, a dialog is shown with a link to
+  the releases page and a "don't show again for this version" option
+- Log files older than the configured maximum age (default: 30 days) are
+  automatically removed at startup, preventing unbounded accumulation of old
+  session log files. The limit is configurable via the new "Max Log Age (Days)"
+  setting (0 disables age-based cleanup).
+- Closing the main window while there are unsaved changes now shows a
+  "Discard changes?" confirmation dialog; the window only closes if the
+  user confirms
+- Automatic database backup on every startup with a tiered rolling-window
+  retention strategy: 5 most-recent backups, 1 per calendar week for 4 weeks,
+  then 1 per calendar month indefinitely
+- "Restore from Backup…" action in the Settings menu lets you select a backup,
+  preview its timestamp, and restore in-place without restarting
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs
+- Add Help page accessible from Help → Help menu item, with PDF export
+- show open positions in security accounts overview pages
+- Make it possible to open (create) option transactions
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

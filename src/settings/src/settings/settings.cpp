@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
 #include "settings/params/param_container.hpp"
@@ -93,6 +93,23 @@ namespace settings
     const LoggingSettings& Settings::getLoggingSettings() const
     {
         return _loggingSettings;
+    }
+
+    /**
+     * @brief Get the BackupSettings object
+     *
+     * @return BackupSettings&
+     */
+    BackupSettings& Settings::getBackupSettings() { return _backupSettings; }
+
+    /**
+     * @brief Get the BackupSettings object (const version)
+     *
+     * @return const BackupSettings&
+     */
+    const BackupSettings& Settings::getBackupSettings() const
+    {
+        return _backupSettings;
     }
 
     /**

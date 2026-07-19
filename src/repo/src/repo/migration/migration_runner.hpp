@@ -17,7 +17,7 @@ namespace repo
     {
        private:
         /// current db version
-        constexpr static std::size_t DB_VERSION = 11;
+        constexpr static std::size_t DB_VERSION = 14;
 
         /// The migration states for the application
         Migrations _migrations;

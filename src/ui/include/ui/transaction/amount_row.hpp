@@ -4,7 +4,7 @@
 
 #include <qwidget.h>
 
-#include "config/quantity.hpp"
+#include "utils/quantity.hpp"
 
 namespace ui
 {

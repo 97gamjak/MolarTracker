@@ -68,6 +68,8 @@ namespace controller
             cmd::UndoStack&        undoStack,
             settings::Settings&    settings
         );
+
+        [[nodiscard]] SettingsMenuController& getSettingsMenuController();
     };
 
 }   // namespace controller

@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
 #include "finance/account/accounts.hpp"
 #include "finance/position.hpp"

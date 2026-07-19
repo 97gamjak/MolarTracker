@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "config/signal_tags.hpp"
+#include "settings/backup_settings.hpp"
 #include "settings/general_settings.hpp"
 #include "settings/logging_settings.hpp"
 #include "settings/params/param_container.hpp"
@@ -61,6 +62,9 @@ namespace settings
         /// The logging settings parameters
         LoggingSettings _loggingSettings;
 
+        /// The backup settings parameters
+        BackupSettings _backupSettings;
+
        public:
         Settings() = delete;
         explicit Settings(const std::filesystem::path& configDir);
@@ -76,6 +80,9 @@ namespace settings
 
         [[nodiscard]] LoggingSettings&       getLoggingSettings();
         [[nodiscard]] const LoggingSettings& getLoggingSettings() const;
+
+        [[nodiscard]] BackupSettings&       getBackupSettings();
+        [[nodiscard]] const BackupSettings& getBackupSettings() const;
 
         template <typename Func>
         void forEachParam(Func&& func) const;

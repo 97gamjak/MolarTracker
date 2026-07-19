@@ -1,13 +1,15 @@
 #include "repo/repo_container.hpp"
 
 #include "account_repo.hpp"
-#include "config/constants.hpp"
+#include "config/constants/constants.hpp"
+#include "db/backup_manager.hpp"
 #include "instrument_repo.hpp"
 #include "logging/log_macros.hpp"
 #include "position_repo.hpp"
 #include "profile_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/repo_errors.hpp"
+#include "settings/backup_settings.hpp"
 #include "transaction_repo.hpp"
 
 REGISTER_LOG_CATEGORY("Repo.Container");
@@ -18,18 +20,32 @@ namespace repo
     /**
      * @brief Construct a new Repo Container object
      *
+     * @param backupSettings The backup settings to use for creating a backup on
+     *
      */
-    RepoContainer::RepoContainer()
+    RepoContainer::RepoContainer(const settings::BackupSettings& backupSettings)
         : _database{std::make_unique<db::Database>(
               Constants::getInstance().getDatabasePath()
-          )},
-          _migrationRunner{std::make_unique<MigrationRunner>(*_database)},
-          _profileRepo{std::make_shared<ProfileRepo>(*_database)},
-          _accountRepo{std::make_shared<AccountRepo>(*_database)},
-          _transactionRepo{std::make_shared<TransactionRepo>(*_database)},
-          _instrumentRepo{std::make_shared<InstrumentRepo>(*_database)},
-          _positionRepo{std::make_shared<PositionRepo>(*_database)}
+          )}
     {
+        try
+        {
+            db::BackupManager::createBackup(*_database, backupSettings);
+        }
+        catch (const std::exception& e)
+        {
+            LOG_WARNING(
+                std::string{"Startup backup failed (continuing): "} + e.what()
+            );
+        }
+
+        _migrationRunner = std::make_unique<MigrationRunner>(*_database);
+        _profileRepo     = std::make_shared<ProfileRepo>(*_database);
+        _accountRepo     = std::make_shared<AccountRepo>(*_database);
+        _transactionRepo = std::make_shared<TransactionRepo>(*_database);
+        _instrumentRepo  = std::make_shared<InstrumentRepo>(*_database);
+        _positionRepo    = std::make_shared<PositionRepo>(*_database);
+
         if (!_migrationRunner || !_profileRepo || !_accountRepo ||
             !_transactionRepo || !_instrumentRepo || !_positionRepo)
         {
@@ -37,6 +53,19 @@ namespace repo
             LOG_ERROR(msg);
             throw RepositoryException(msg);
         }
+    }
+
+    /**
+     * @brief Close the underlying database connection.
+     */
+    void RepoContainer::closeDb() { _database->close(); }
+
+    /**
+     * @brief Reopen the database connection at the original path.
+     */
+    void RepoContainer::reopenDb()
+    {
+        _database->open(Constants::getInstance().getDatabasePath().string());
     }
 
     RepoContainer::~RepoContainer() = default;

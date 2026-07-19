@@ -1,9 +1,7 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
@@ -11,6 +9,8 @@
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/position_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "utils/finance.hpp"
+#include "utils/quantity.hpp"
 
 /**
  * @brief ORM model for the trade_leg table, representing a single leg of a
@@ -33,14 +33,7 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// associate this trade leg with a specific transaction.
     ORM_FIELD(
         transactionId,
-        Field<
-            "transaction_id",
-            TransactionId,
-            orm::foreign_key_t<
-                orm::CascadeDelete,
-                TransactionRow,
-                decltype(TransactionRow::id)>,
-            orm::not_null_t>
+        TransactionRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The ID of the account associated with this trade leg, this is a foreign

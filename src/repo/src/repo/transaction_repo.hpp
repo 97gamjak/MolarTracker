@@ -18,12 +18,12 @@ namespace repo
 
         [[nodiscard]]
         TransactionId addTransaction(
-            const finance::Transaction& transaction
+            const finance::DomainTransaction& transaction
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Transaction> getTransactions(
-            const idSet<AccountId>&           accountIds,
+        std::vector<finance::DomainTransaction> getTransactions(
+            const IdSet<AccountId>&           accountIds,
             const finance::TransactionFilter& filter
         ) override;
     };

@@ -7,9 +7,10 @@
 
 namespace finance
 {
-    class Stock;                  // forward declaration
-    class StockInsertionResult;   // forward declaration
-
+    class Stock;                    // forward declaration
+    struct StockInsertionResult;    // forward declaration
+    class Option;                   // forward declaration
+    struct OptionInsertionResult;   // forward declaration
 }   // namespace finance
 
 namespace repo
@@ -39,8 +40,11 @@ namespace service
 
         [[nodiscard]]
         std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+            const IdSet<InstrumentId>& ids
         ) override;
+
+        [[nodiscard]]
+        std::vector<finance::Option> getOptions() override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(
@@ -52,7 +56,14 @@ namespace service
             const finance::Stock& stock
         ) override;
 
+        [[nodiscard]]
+        finance::OptionInsertionResult addOption(
+            const finance::Option& option
+        ) override;
+
         [[nodiscard]] bool stockExists(const std::string& ticker) override;
+
+        [[nodiscard]] bool optionExists(const finance::Option& option) override;
     };
 
 }   // namespace service

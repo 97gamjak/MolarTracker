@@ -20,6 +20,7 @@ namespace settings
         std::forward<Func>(func)(_logFileSuffix);
         std::forward<Func>(func)(_maxLogFiles);
         std::forward<Func>(func)(_maxLogFileSizeMB);
+        std::forward<Func>(func)(_maxLogAgeDays);
         std::forward<Func>(func)(_defaultLogLevel);
     }
 
@@ -38,6 +39,7 @@ namespace settings
         std::forward<Func>(func)(_logFileSuffix);
         std::forward<Func>(func)(_maxLogFiles);
         std::forward<Func>(func)(_maxLogFileSizeMB);
+        std::forward<Func>(func)(_maxLogAgeDays);
         std::forward<Func>(func)(_defaultLogLevel);
     }
 

@@ -1,0 +1,31 @@
+# getsentry/codecov-action configuration
+# https://github.com/getsentry/codecov-action
+
+# Post a PR comment summarising coverage changes
+comment: true
+
+config:
+  # Show only changed files in the PR comment
+  files: changed
+
+coverage:
+  status:
+    project:
+      # Track overall project coverage; allow a 1 % drop before failing
+      target: auto
+      threshold: 1
+      informational: false
+      enabled: true
+    patch:
+      # Require at least 70 % coverage on changed lines
+      target: 70
+      threshold: 5
+      informational: false
+      enabled: true
+
+  ignore:
+    - "**/moc_*.cpp"
+    - "**/test*"
+    - "**/_deps/**"
+    - "**/external/**"
+    - "**/build/**"

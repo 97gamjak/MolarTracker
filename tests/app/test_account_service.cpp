@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/account/account.hpp"
@@ -16,6 +15,7 @@
 #include "service/account_service.hpp"
 #include "sql_models/profile_row.hpp"
 #include "test_fixtures.hpp"
+#include "utils/finance.hpp"
 
 namespace
 {

@@ -1,6 +1,7 @@
 #include "logging/log_manager.hpp"
 
 #include <algorithm>
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -11,6 +12,7 @@
 #include "log_categories.gen.hpp"
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
+#include "logging/log_file_cleaner.hpp"
 #include "logging/log_object.hpp"
 #include "settings/logging_settings.hpp"
 #include "utils/ring_file.hpp"
@@ -44,6 +46,7 @@ namespace logging
     {
         _defaultLogLevel = loggingSettings.getDefaultLogLevelParam().get();
         _initializeCategories(directory);
+        _cleanupOldLogFiles(loggingSettings);
         _initializeRingFileLogger(loggingSettings);
     }
 
@@ -65,6 +68,27 @@ namespace logging
         _startupCategories = _categories;
 
         loadOverrides();
+    }
+
+    /**
+     * @brief Deletes log files in the log directory that are older than
+     * the configured maximum age
+     *
+     * @param settings Logging settings providing directory, prefix, suffix,
+     * and max age
+     */
+    void LogManager::_cleanupOldLogFiles(
+        const settings::LoggingSettings& settings
+    )
+    {
+        const auto dir =
+            std::filesystem::path(_logDirectory) / settings.getLogDirectory();
+        LogFileCleaner::cleanByAge(
+            dir,
+            settings.getLogFilePrefix(),
+            settings.getLogFileSuffix(),
+            settings.getMaxLogAgeDays()
+        );
     }
 
     /**
@@ -213,9 +237,11 @@ namespace logging
             return;
 
         std::string buffer;
+        std::string prefix;
 
-        buffer += _logLevelToString(logObject.level);
-        buffer += " [" + Timestamp().iso8601TimeMs() + "] ";
+        prefix += _logLevelToString(logObject.level);
+        prefix += " [" + Timestamp().iso8601TimeMs() + "] ";
+        buffer += prefix;
         buffer += logObject.message;
         if (logObject.level >= LogLevel::Debug ||
             logObject.level == LogLevel::Error)
@@ -227,10 +253,22 @@ namespace logging
             buffer += ")";
         }
 
+        // replace all new lines in buffer with a new line following by n
+        // whitespaces according to the length of the prefix
+        const auto             prefixLength = prefix.length();
+        std::string::size_type pos          = 0;
+        while ((pos = buffer.find('\n', pos)) != std::string::npos)
+        {
+            buffer.insert(pos + 1, prefixLength, ' ');
+            pos += prefixLength + 1;
+        }
+
         _ringFile->writeLine(buffer);
 
-        if (logObject.level == LogLevel::Error ||
-            logObject.level == LogLevel::Warning)
+        // Flush the log file if the log level is not Info
+        // 1) on warning or error we want always to log
+        // 2) if the user selected a debug logging we also want always to log
+        if (logObject.level != LogLevel::Info)
             flush();
     }
 

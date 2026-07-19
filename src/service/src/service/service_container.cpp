@@ -17,10 +17,14 @@ namespace service
     /**
      * @brief Construct a new Service Container object
      *
+     * @param backupSettings The backup settings to use for creating a backup on
+     *
      */
-    ServiceContainer::ServiceContainer()
+    ServiceContainer::ServiceContainer(
+        const settings::BackupSettings& backupSettings
+    )
     try
-        : _repoContainer{std::make_unique<repo::RepoContainer>()},
+        : _repoContainer{std::make_unique<repo::RepoContainer>(backupSettings)},
           _profileService{
               std::make_shared<ProfileService>(_repoContainer->getProfileRepo()
               )},
@@ -159,5 +163,15 @@ namespace service
     {
         return _positionService;
     }
+
+    /**
+     * @brief Close the underlying database connection.
+     */
+    void ServiceContainer::closeDb() { _repoContainer->closeDb(); }
+
+    /**
+     * @brief Reopen the database connection.
+     */
+    void ServiceContainer::reopenDb() { _repoContainer->reopenDb(); }
 
 }   // namespace service

@@ -1,6 +1,7 @@
 #include "finance/price_cache.hpp"
 
 #include <mutex>
+#include <unordered_set>
 
 #include "finance/yf_client.hpp"
 #include "logging/log_macros.hpp"
@@ -18,9 +19,25 @@ namespace finance
         const std::unordered_map<std::string, PriceQuote>& quotes
     )
     {
-        std::unique_lock lock{_mutex};
-        for (const auto& [symbol, quote] : quotes)
-            _quotes.insert_or_assign(symbol, quote);
+        {
+            std::unique_lock lock{_mutex};
+            for (const auto& [symbol, quote] : quotes)
+                _quotes.insert_or_assign(symbol, quote);
+        }
+
+        Observable<OnPriceUpdated>::template notify<OnPriceUpdated>();
+    }
+
+    /**
+     * @brief Adds a ticker to the cache with an empty quote if it doesn't
+     * already exist.
+     *
+     * @param yahooSymbol The Yahoo Finance symbol to add.
+     */
+    void PriceCache::addTicker(const std::string& yahooSymbol)
+    {
+        if (!_quotes.contains(yahooSymbol))
+            _tickersNotYetFetched.insert(yahooSymbol);
     }
 
     /**
@@ -86,7 +103,7 @@ namespace finance
      * @return A map of fetched price quotes, indexed by their symbols.
      */
     std::unordered_map<std::string, PriceQuote> PriceFeedService::fetchBatch(
-        const std::vector<std::string>& yahooSymbols
+        const std::unordered_set<std::string>& yahooSymbols
     )
     {
         std::unordered_map<std::string, PriceQuote> results;
@@ -99,6 +116,26 @@ namespace finance
         }
 
         return results;
+    }
+
+    /**
+     * @brief subscribe to price changes in the cache, the callback will be
+     * called whenever the price quotes in the cache are updated, allowing
+     * clients to react to price changes in real-time.
+     *
+     * @param callback
+     * @param user
+     * @return Connection
+     */
+    Connection PriceCache::subscribeToPriceChange(
+        OnPriceUpdated::func callback,
+        void*                user
+    )
+    {
+        return Observable<OnPriceUpdated>::template on<OnPriceUpdated>(
+            std::move(callback),
+            user
+        );
     }
 
 }   // namespace finance

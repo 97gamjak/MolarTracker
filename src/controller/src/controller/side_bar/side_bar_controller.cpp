@@ -58,6 +58,7 @@ namespace controller
               storeContainer.getAccountStore(),
               storeContainer.getTransactionStore(),
               storeContainer.getStockStore(),
+              storeContainer.getOptionStore(),
               storeContainer.getPositionStore(),
               transactionController,
               _securitiesSideBarController,

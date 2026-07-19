@@ -21,6 +21,8 @@ namespace ui
        signals:
         /// Signal emitted when the user requests to open the preferences dialog
         void requestPreferences();
+        /// Signal emitted when the user requests the restore-from-backup dialog
+        void requestRestoreFromBackup();
 
        private:
         /// Pointer to the settings menu widget
@@ -28,6 +30,8 @@ namespace ui
 
         /// The preferences action in the settings menu
         QAction* _preferencesAction = nullptr;
+        /// The restore-from-backup action in the settings menu
+        QAction* _restoreBackupAction = nullptr;
 
        public:
         explicit SettingsMenu(QMenuBar& menuBar);

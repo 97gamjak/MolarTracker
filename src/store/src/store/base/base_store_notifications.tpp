@@ -6,24 +6,6 @@
 namespace store
 {
     /**
-     * @brief Notifies subscribers of ID remapping events.
-     *
-     * @tparam T
-     * @tparam IdType
-     * @param checkAlreadyNotified
-     */
-    template <typename T, typename IdType>
-    void BaseStore<T, IdType>::_notifyIdRemap(bool checkAlreadyNotified)
-    {
-        if (_idRemap.empty())
-            return;
-
-        this->template notify<OnIdRemap<IdType>>(_idRemap);
-        _notifyStoreChanged(checkAlreadyNotified);
-        _idRemap.clear();
-    }
-
-    /**
      * @brief Notifies subscribers of updated entries.
      *
      * @tparam T
@@ -80,7 +62,6 @@ namespace store
         _notifyAdded(true);
         _notifyRemoved(true);
         _notifyUpdated(true);
-        _notifyIdRemap(true);
         _alreadyNotified = false;
     }
 

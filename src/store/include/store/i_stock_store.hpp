@@ -3,10 +3,11 @@
 
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
+#include "finance/instrument/stocks.hpp"
+#include "utils/container/id_id_map.hpp"
 
 class Connection;   // Forward declaration
 
@@ -50,31 +51,42 @@ namespace store
         virtual StockStoreResult addStock(finance::Stock stock) = 0;
 
         /**
+         * @brief Get the Stock based on the given instrument ID
+         *
+         * @param id
+         * @return std::optional<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Stock> getStock(
+            InstrumentId id
+        ) const = 0;
+
+        /**
          * @brief Get a list of stocks by their instrument IDs
          *
          * @param ids The set of instrument IDs to retrieve stocks for
-         * @return std::vector<finance::Stock>
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+        virtual finance::Stocks getStocks(
+            const IdSet<InstrumentId>& ids
         ) const = 0;
 
         /**
          * @brief Get a list of all stocks in the store
          *
-         * @return std::vector<finance::Stock>
+         * @return finance::Stocks
          */
         [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocks() const = 0;
+        virtual finance::Stocks getStocks() const = 0;
 
         /**
          * @brief Get all stock tickers in the store
          *
-         * @return std::vector<std::string>
+         * @return Set<std::string>
          */
         [[nodiscard]]
-        virtual std::vector<std::string> getAllTickers() const = 0;
+        virtual Set<std::string> getAllTickers() const = 0;
 
         /**
          * @brief Get a mapping of stock tickers to their instrument IDs
@@ -82,7 +94,8 @@ namespace store
          * @return std::unordered_map<std::string, InstrumentId>
          */
         [[nodiscard]]
-        virtual instrumentMap<std::string> getInstrumentIdToNameMap() const = 0;
+        virtual IdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        ) const = 0;
 
         /**
          * @brief Get the instrument ID for a given stock ticker
@@ -96,22 +109,12 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief commit changes to the store, this will save any new or
-         * modified stocks to the database, and will also handle any necessary
-         * cleanup or state updates in the store after committing changes.
-         *
-         */
-        virtual void commit() = 0;
-
-        /**
          * @brief Get the mapping of old instrument IDs to new instrument IDs
          *
-         * @return const unorderedIdMap<InstrumentId, InstrumentId>&
+         * @return const IdIdMap<InstrumentId>&
          */
         [[nodiscard]]
-        virtual const unorderedIdMap<
-            InstrumentId,
-            InstrumentId>& getInstrumentIdMap() const = 0;
+        virtual const IdIdMap<InstrumentId>& getInstrumentIdMap() const = 0;
 
         /**
          * @brief Subscribe to changes in the stock store, this allows observers

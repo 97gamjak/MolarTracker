@@ -373,4 +373,18 @@ namespace store
         return _activeProfile.on<OnProfileChanged>(func, user);
     }
 
+    /**
+     * @brief Discard all cached profiles and reload from the database.
+     */
+    void ProfileStore::reload()
+    {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
+        _clearEntries();
+        const auto profiles = _profileService->getAll();
+        _addCleanEntries(profiles);
+    }
+
 }   // namespace store

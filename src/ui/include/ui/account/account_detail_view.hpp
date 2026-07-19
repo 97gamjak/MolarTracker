@@ -6,9 +6,14 @@
 
 #include "drafts/account_draft.hpp"
 
+namespace drafts
+{
+    class PositionStockDetailDraft;   // Forward declaration
+    class AccountDraft;               // Forward declaration
+}   // namespace drafts
+
 namespace ui
 {
-
     /**
      * @brief View for displaying account details
      *
@@ -29,10 +34,14 @@ namespace ui
         explicit AccountDetailView(QWidget* parent);
         ~AccountDetailView() override;
 
-        void updateAccount(const drafts::AccountDraft& account);
+        void updateCashAccount(const drafts::AccountDraft& account);
+        void updateSecurityAccount(
+            const drafts::AccountDraft&                          account,
+            const std::vector<drafts::PositionStockDetailDraft>& positions
+        );
 
        private:
-        void _setupUi();
+        void _updateAccount(const drafts::AccountDraft& account);
     };
 
 }   // namespace ui

@@ -21,12 +21,13 @@ MolarTracker is a **C++23 desktop application** built with **Qt6** for dental (m
 5. AI-generated branches must follow the pattern: `claude/<short-description>-<session-id>`.
 6. Use `git push -u origin <branch-name>` when pushing a new branch.
 7. **Never amend or force-push** to shared branches.
-8. **Always fetch before branching** to ensure you start from an up-to-date base.
+8. **Always `git checkout dev` and `git pull` to update local `dev` before creating any new branch.** Do not branch directly off a stale local `dev` or off `origin/dev` without first syncing local `dev` — always update local `dev` itself first.
 
 ```bash
 # Correct workflow
-git fetch origin dev
-git checkout -b feature/MOLTRACK-XX-my-feature origin/dev
+git checkout dev
+git pull
+git checkout -b feature/MOLTRACK-XX-my-feature
 # ... make changes, commit ...
 git push -u origin feature/MOLTRACK-XX-my-feature
 # Then open a PR targeting dev
@@ -337,6 +338,27 @@ The Dockerfile is based on **Ubuntu 24.04** and installs all build dependencies.
 
 ---
 
+## Local CI Script
+
+**Always run `scripts/custom_cpp_checks.sh` before committing.** It runs the same
+checks as CI (cppcheck + clangd-tidy) and will catch issues before they fail the
+pipeline.
+
+The full local CI reference is `scripts/local_ci.sh` (builds, runs tests, then runs
+the same linters).
+
+### Key linter rules enforced by CI
+
+- **`cppcoreguidelines-owning-memory`** — Never write `new T(...)` directly in UI
+  code. Use `utils::makeQChild<T>(...)` instead; the suppression is centralized
+  there.
+- **`readability-convert-member-functions-to-static`** — If a method does not
+  access instance state, declare it `static`.
+- **Doxygen strict mode** — Every private class member needs a `///` doc comment.
+  The Doxygen build runs in strict mode and treats undocumented members as errors.
+
+---
+
 ## Summary Checklist for AI Assistants
 
 Before submitting any change:
@@ -345,6 +367,9 @@ Before submitting any change:
 - [ ] PR targets `dev` (not `main`)
 - [ ] Code formatted with `clang-format`
 - [ ] No new compiler warnings introduced
+- [ ] `scripts/custom_cpp_checks.sh` passes (cppcheck + clangd-tidy)
+- [ ] All private members have `///` doxygen doc comments
+- [ ] Qt widgets created with `utils::makeQChild<T>()`, not bare `new T()`
 - [ ] Tests added or updated for changed logic
 - [ ] One of `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
 - [ ] Git submodules not accidentally modified
