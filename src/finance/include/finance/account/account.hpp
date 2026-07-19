@@ -5,9 +5,9 @@
 #include <string>
 #include <variant>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
+#include "utils/finance.hpp"
 
 enum class Currency : std::uint8_t;        // Forward declaration
 enum class AccountStatus : std::uint8_t;   // Forward declaration
@@ -73,6 +73,8 @@ namespace finance
         [[nodiscard]] Currency      getCurrency() const;
         [[nodiscard]] AccountKind   getKind() const;
         [[nodiscard]] bool          isExternal() const;
+
+        [[nodiscard]] std::string toString() const;
     };
 
     filter::Predicate<Account> IsAccountType(AccountKind kind);

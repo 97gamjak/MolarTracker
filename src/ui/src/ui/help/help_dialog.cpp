@@ -22,7 +22,8 @@ namespace ui
     HelpDialog::HelpDialog(QWidget* parent) : Dialog(parent)
     {
         setWindowTitle("Help — MolarTracker");
-        resize(700, 500);
+        constexpr auto size = QSize(700, 500);
+        resize(size);
         _buildUI();
     }
 
@@ -33,10 +34,10 @@ namespace ui
     {
         auto* layout = makeQChild<QVBoxLayout>(this);
 
-        auto* titleLabel =
-            makeQChild<QLabel>("MolarTracker Help", this);
-        auto font = titleLabel->font();
-        font.setPointSize(16);
+        auto* titleLabel = makeQChild<QLabel>("MolarTracker Help", this);
+        auto  font       = titleLabel->font();
+        constexpr auto pointSize = 16;
+        font.setPointSize(pointSize);
         font.setBold(true);
         titleLabel->setFont(font);
 
@@ -47,7 +48,7 @@ namespace ui
             "Help content will be available here."
         );
 
-        _exportButton = makeQChild<QPushButton>("Export to PDF...", this);
+        _exportButton     = makeQChild<QPushButton>("Export to PDF...", this);
         auto* closeButton = makeQChild<QPushButton>("Close", this);
 
         auto* buttonRow = makeQChild<QHBoxLayout>();

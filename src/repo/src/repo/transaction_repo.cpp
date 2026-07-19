@@ -1,9 +1,11 @@
 #include "transaction_repo.hpp"
 
-#include "config/finance.hpp"
+#include <algorithm>
+
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
-#include "finance/transaction.hpp"
+#include "finance/transaction/domain_transaction.hpp"
+#include "finance/transaction/stock_data.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
@@ -11,10 +13,112 @@
 #include "repo_errors.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "utils/finance.hpp"
 
 namespace repo
 {
+    namespace
+    {
+        /**
+         * @brief add the legs of a trade transaction to the database
+         *
+         * @param legs
+         * @param txId
+         * @param dbTx
+         * @param crud
+         * @param db
+         */
+        void addLegs(
+            const finance::TradeLegs& legs,
+            TransactionId             txId,
+            const db::Transaction&    dbTx,
+            orm::Crud&                crud,
+            db::Database&             db
+        )
+        {
+            for (const auto& leg : legs)
+            {
+                const auto legRow = TransactionFactory::toLegRow(leg, txId);
+
+                const auto legResult = crud.insert(db, dbTx, legRow);
+
+                if (!legResult.has_value())
+                {
+                    const auto msg =
+                        getInsertError(legResult.error(), "trade leg");
+
+                    LOG_ERROR(msg);
+                    throw orm::CrudException(msg);
+                }
+            }
+        }
+
+        /**
+         * @brief Prepare a DomainTransaction object from a TransactionRow and
+         * an optional TransactionOptionRow, this method takes a TransactionRow
+         * and an optional TransactionOptionRow and constructs a
+         * DomainTransaction object based on the type of transaction, allowing
+         * for the creation of a complete DomainTransaction that includes all
+         * relevant data for the transaction, including option details if
+         * applicable.
+         *
+         * @param txRow The TransactionRow containing the basic transaction
+         * data.
+         * @param optionRow An optional TransactionOptionRow containing
+         * additional details for option transactions.
+         * @return finance::DomainTransaction The prepared DomainTransaction
+         * object.
+         */
+        finance::DomainTransaction prepareDomainTx(
+            const TransactionRow& txRow,
+            orm::Crud&            crud,
+            db::Database&         db
+        )
+        {
+            switch (txRow.type.value())
+            {
+                case TransactionDataType::Option:
+                {
+                    const auto optionRow = crud.getUnique<TransactionOptionRow>(
+                        db,
+                        orm::Query{}.where(
+                            TransactionOptionRow::hasTransactionId(
+                                txRow.id.value()
+                            )
+                        )
+                    );
+
+                    if (!optionRow.has_value())
+                    {
+                        LOG_ERROR(
+                            "Failed to retrieve option data for transaction "
+                            "with "
+                            "ID " +
+                            txRow.id.value().toString()
+                        );
+                        throw orm::CrudException(
+                            "Missing option data for option transaction with "
+                            "ID " +
+                            txRow.id.value().toString()
+                        );
+                    }
+
+                    return TransactionFactory::fromOptionRow(
+                        txRow,
+                        optionRow.value()
+                    );
+                }
+                case TransactionDataType::Stock:
+                    return TransactionFactory::fromStockRow(txRow);
+                case TransactionDataType::Cash:
+                    return TransactionFactory::fromCashRow(txRow);
+            }
+
+            std::unreachable();
+        }
+    }   // namespace
     /**
      * @brief add a transaction to the database
      *
@@ -22,7 +126,7 @@ namespace repo
      * @return TransactionId
      */
     TransactionId TransactionRepo::addTransaction(
-        const finance::Transaction& transaction
+        const finance::DomainTransaction& transaction
     )
     {
         db::Transaction dbTx{_getDb()};
@@ -61,28 +165,49 @@ namespace repo
 
         switch (txRow.type.value())
         {
-            case TransactionDataType::Trade:
+            case TransactionDataType::Stock:
             {
                 const auto data =
-                    std::get<finance::TradeData>(transaction.getData());
+                    std::get<finance::StockData>(transaction.getData());
 
-                for (const auto& leg : data.getLegs())
+                addLegs(
+                    data.getLegs(),
+                    TransactionId(transactionResult.value()),
+                    dbTx,
+                    _getCrud(),
+                    _getDb()
+                );
+                break;
+            }
+            case TransactionDataType::Option:
+            {
+                const auto data =
+                    std::get<finance::OptionData>(transaction.getData());
+
+                addLegs(
+                    data.getLegs(),
+                    TransactionId(transactionResult.value()),
+                    dbTx,
+                    _getCrud(),
+                    _getDb()
+                );
+
+                const auto optionResult = _getCrud().insert(
+                    _getDb(),
+                    dbTx,
+                    TransactionFactory::toOptionRow(data, txId)
+                );
+
+                if (!optionResult.has_value())
                 {
-                    const auto legRow = TransactionFactory::toLegRow(leg, txId);
+                    const auto msg = getInsertError(
+                        optionResult.error(),
+                        "transaction option"
+                    );
 
-                    const auto legResult =
-                        _getCrud().insert(_getDb(), dbTx, legRow);
-
-                    if (!legResult.has_value())
-                    {
-                        const auto msg =
-                            getInsertError(legResult.error(), "trade leg");
-
-                        LOG_ERROR(msg);
-                        throw orm::CrudException(msg);
-                    }
+                    LOG_ERROR(msg);
+                    throw orm::CrudException(msg);
                 }
-
                 break;
             }
             case TransactionDataType::Cash:
@@ -104,10 +229,10 @@ namespace repo
      * transactions from the database, if no filter is provided all transactions
      * will be returned
      *
-     * @return std::vector<finance::Transaction>
+     * @return std::vector<finance::DomainTransaction>
      */
-    std::vector<finance::Transaction> TransactionRepo::getTransactions(
-        const idSet<AccountId>&           accountIds,
+    std::vector<finance::DomainTransaction> TransactionRepo::getTransactions(
+        const IdSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
     {
@@ -119,7 +244,7 @@ namespace repo
         const auto txRows =
             _getCrud().getJoined<TransactionRow>(_getDb(), join, query);
 
-        std::vector<finance::Transaction> results;
+        std::vector<finance::DomainTransaction> results;
         results.reserve(txRows.size());
 
         for (const auto& [txRow] : txRows)
@@ -162,7 +287,7 @@ namespace repo
                 continue;
             }
 
-            auto transaction = TransactionFactory::fromRow(txRow);
+            auto transaction = prepareDomainTx(txRow, _getCrud(), _getDb());
 
             for (const auto& entryRow : entryRows)
                 transaction.addEntry(

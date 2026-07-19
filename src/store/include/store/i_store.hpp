@@ -52,6 +52,20 @@ namespace store
          * longer any dirty data that needs to be committed.
          */
         virtual void clearPotentiallyDirty() = 0;
+
+        /**
+         * @brief Discard all in-memory state and re-load fresh data from the
+         * database. Called after a database restore to synchronise the store
+         * with the restored file.
+         */
+        virtual void reload() = 0;
+
+        /**
+         * @brief Clear the ID remapping map for the store. This is used to
+         * reset the ID remapping state, typically after a commit or when the
+         * remapping is no longer needed.
+         */
+        virtual void clearIdRemap() = 0;
     };
 
 }   // namespace store

@@ -10,7 +10,7 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Core PrintSupport)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Concurrent PrintSupport)
 find_package(CURL REQUIRED)
 
 message(STATUS "CMAKE_SYSTEM_NAME       = ${CMAKE_SYSTEM_NAME}")

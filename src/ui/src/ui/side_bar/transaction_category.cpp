@@ -2,8 +2,8 @@
 
 #include <QMenu>
 
-#include "config/finance.hpp"
 #include "ui/side_bar/category.hpp"
+#include "utils/finance.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -16,7 +16,8 @@ namespace ui
         : Category("Transactions", SideBarItemType::TransactionCategory),
           _createDepositAction(nullptr),
           _createWithdrawalAction(nullptr),
-          _createStockTransactionAction(nullptr)
+          _createStockTransactionAction(nullptr),
+          _createOptionTransactionAction(nullptr)
     {
     }
 
@@ -54,6 +55,18 @@ namespace ui
     }
 
     /**
+     * @brief Get the create option transaction action for the transaction
+     * category
+     *
+     * @return QAction* The create option transaction action for the transaction
+     * category
+     */
+    QAction* TransactionCategory::getCreateOptionTransactionAction() const
+    {
+        return _createOptionTransactionAction;
+    }
+
+    /**
      * @brief Populate the context menu for the transaction category
      *
      * @param menu The context menu to populate
@@ -62,20 +75,27 @@ namespace ui
     {
         using enum TransactionType;
 
-        const auto depositName = "Create " + utils::toQString(Deposit);
+        auto createName = [&](TransactionType type)
+        { return "Create " + utils::toQString(type) + " Transaction"; };
+
+        const auto depositName = createName(Deposit);
         _createDepositAction   = menu.addAction(depositName);
         _createDepositAction->setData(QVariant::fromValue(Deposit));
 
-        const auto withdrawalName = "Create " + utils::toQString(Withdrawal);
+        const auto withdrawalName = createName(Withdrawal);
         _createWithdrawalAction   = menu.addAction(withdrawalName);
         _createWithdrawalAction->setData(QVariant::fromValue(Withdrawal));
 
-        const auto stockTransactionName =
-            "Create " + utils::toQString(TransactionType::Stock) +
-            " Transaction";
-        _createStockTransactionAction = menu.addAction(stockTransactionName);
+        const auto stockTransactionName = createName(TransactionType::Stock);
+        _createStockTransactionAction   = menu.addAction(stockTransactionName);
         _createStockTransactionAction->setData(
             QVariant::fromValue(TransactionType::Stock)
+        );
+
+        const auto optionTransactionName = createName(TransactionType::Option);
+        _createOptionTransactionAction = menu.addAction(optionTransactionName);
+        _createOptionTransactionAction->setData(
+            QVariant::fromValue(TransactionType::Option)
         );
     }
 

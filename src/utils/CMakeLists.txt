@@ -1,8 +1,13 @@
 add_library(molartracker_utils STATIC
-    src/utils/timestamp.cpp
+    src/utils/cash.cpp
+    src/utils/currency.cpp
+    src/utils/currency_exception.cpp
     src/utils/ring_file.cpp
     src/utils/paths.cpp
+    src/utils/percentage.cpp
     src/utils/qt_helpers.cpp
+    src/utils/quantity.cpp
+    src/utils/timestamp.cpp
     src/utils/version.cpp
 )
 
@@ -20,6 +25,8 @@ target_link_libraries(molartracker_utils
     Qt6::Core
     Qt6::Widgets
     json
+    molartracker_exceptions
+    molartracker_config
 )
 
 set_property(TARGET molartracker_utils APPEND PROPERTY

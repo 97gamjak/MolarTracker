@@ -1,17 +1,30 @@
 #ifndef __STORE__INCLUDE__STORE__I_POSITION_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_POSITION_STORE_HPP__
 
-#include <vector>
-
 #include "config/id_types.hpp"
+#include "finance/positions.hpp"   // to avoid incomplete return type outside
+#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {
     class Position;   // Forward declaration
 }   // namespace finance
 
+class Connection;   // Forward declaration
+
 namespace store
 {
+
+    /**
+     * @brief Structure representing a callback for when a position is closed.
+     *
+     */
+    struct PositionClosed
+    {
+        /// The callback function type for when a position is closed
+        using func = std::function<void(PositionId)>;
+    };
+
     /**
      * @brief Store for managing Positions
      *
@@ -35,33 +48,42 @@ namespace store
         /**
          * @brief Get all Positions
          *
-         * @return std::vector<finance::Position>
+         * @return finance::Positions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Position> getAllPositions() const = 0;
+        virtual finance::Positions getAllPositions() const = 0;
 
         /**
          * @brief Get all open Positions
          *
-         * @return std::vector<finance::Position>
+         * @return finance::Positions
          */
         [[nodiscard]]
-        virtual std::vector<finance::Position> getOpenPositions() const = 0;
-
-        /**
-         * @brief Commit the current session
-         *
-         */
-        virtual void commit() = 0;
+        virtual finance::Positions getOpenPositions() const = 0;
 
         /**
          * @brief Get the ID remapping for positions
          *
-         * @return const unorderedIdMap<PositionId, PositionId>&
+         * @return const IdIdMap<PositionId>&
          */
         [[nodiscard]]
-        virtual const unorderedIdMap<PositionId, PositionId>& getIdRemap(
-        ) const = 0;
+        virtual const IdIdMap<PositionId>& getIdRemap() const = 0;
+
+        /**
+         * @brief Subscribe to position closed events, this allows subscribers
+         * to be notified when a position is closed, which can be useful for
+         * updating the UI or performing other actions in response to a position
+         * being closed.
+         *
+         * @param func
+         * @param user
+         * @return Connection
+         */
+        [[nodiscard]]
+        virtual Connection subscribeToPositionClosed(
+            PositionClosed::func func,
+            void*                user
+        ) = 0;
     };
 
 }   // namespace store

@@ -111,6 +111,21 @@ namespace filter
     }
 
     /**
+     * @brief Create a disjunction (OR) filter expression.
+     *
+     * @tparam Leaf The type of the leaf nodes.
+     * @param left The left operand.
+     * @param right The right operand.
+     * @return A new disjunction (OR) filter expression.
+     */
+    template <typename Leaf>
+    Node<Leaf>& operator|=(Node<Leaf>& left, const Node<Leaf>& right)
+    {
+        left = makeOr(left, right);
+        return left;
+    }
+
+    /**
      * @brief Create a negation (NOT) filter expression.
      *
      * @tparam Leaf The type of the leaf nodes.

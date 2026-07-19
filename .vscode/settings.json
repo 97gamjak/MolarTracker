@@ -126,8 +126,11 @@
     },
     "cSpell.words": [
         "bugprone",
+        "DMOLARTRACKER",
         "googletest",
+        "hicpp",
         "insertable",
+        "LFIFO",
         "MOLTRACK",
         "MSTD",
         "NOMINMAX",

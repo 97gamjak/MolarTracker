@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/instrument/stock.hpp"
@@ -13,6 +12,7 @@
 #include "repo/migration/migration_runner.hpp"
 #include "service/instrument_service.hpp"
 #include "test_fixtures.hpp"
+#include "utils/finance.hpp"
 
 namespace
 {

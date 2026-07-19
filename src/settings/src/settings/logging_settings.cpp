@@ -27,6 +27,9 @@ namespace settings
         _maxLogFileSizeMB.setDefault(Schema::MAX_LOG_FILE_SIZE_MB_DEFAULT);
         _maxLogFileSizeMB.setMinValue(Schema::MAX_LOG_FILE_SIZE_MB_MIN);
 
+        _maxLogAgeDays.setDefault(Schema::MAX_LOG_AGE_DAYS_DEFAULT);
+        _maxLogAgeDays.setMinValue(Schema::MAX_LOG_AGE_DAYS_MIN);
+
         _defaultLogLevel.setDefault(Schema::DEFAULT_LOG_LEVEL_DEFAULT);
 
         _logDirectory.setRebootRequired(true);
@@ -34,6 +37,7 @@ namespace settings
         _logFileSuffix.setRebootRequired(true);
         _maxLogFiles.setRebootRequired(true);
         _maxLogFileSizeMB.setRebootRequired(true);
+        _maxLogAgeDays.setRebootRequired(true);
     }
 
     /**
@@ -84,6 +88,16 @@ namespace settings
     size_t LoggingSettings::getMaxLogFileSizeMB() const
     {
         return _maxLogFileSizeMB.get();
+    }
+
+    /**
+     * @brief Get the max log age in days setting
+     *
+     * @return size_t
+     */
+    size_t LoggingSettings::getMaxLogAgeDays() const
+    {
+        return _maxLogAgeDays.get();
     }
 
     /**

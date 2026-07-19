@@ -262,7 +262,7 @@ namespace
     void onNumericIntChanged(const int& value) { s_numericIntValue = value; }
 }   // namespace
 
-TEST(NumericParam, SubscribeCallbackFiredOnValidSet)
+TEST(NumericParam, SubscribeCallbackFiredOnValIdSet)
 {
     s_numericIntValue = -1;
     settings::NumericParam<int> param("k", "T", "D");

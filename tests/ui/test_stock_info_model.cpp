@@ -2,9 +2,9 @@
 
 #include <QVariant>
 
-#include "config/finance.hpp"
 #include "drafts/stock_draft.hpp"
 #include "ui/securities/stock_info_model.hpp"
+#include "utils/finance.hpp"
 
 namespace
 {

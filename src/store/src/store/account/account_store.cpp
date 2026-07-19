@@ -4,11 +4,11 @@
 #include <format>
 #include <ranges>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_account_service.hpp"
+#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
 
@@ -36,15 +36,17 @@ namespace store
     )
         : _accountService(accountService)
     {
+        // we use the unchecked versions as ids are unique due to store
+        // handling!
         _connections.add(subscribeToEntryAdded(
             [this](const std::vector<finance::Account>& accounts)
-            { _session.add(accounts); },
+            { _session.addUnchecked(accounts); },
             this
         ));
 
         _connections.add(subscribeToEntryRemoved(
             [this](const std::vector<AccountId>& accountIds)
-            { _session.remove(accountIds); },
+            { _session.removeUnchecked(accountIds); },
             this
         ));
 
@@ -201,8 +203,8 @@ namespace store
         _notifyOnCommit();
 
         // here now we set our ids because they are now clean!
-        auto values = _getValues();
-        _session.set({values.begin(), values.end()});
+        // we use the unchecked version as ids are unique due to store handling!
+        _session.setUnchecked(_getValues());
     }
 
     /**
@@ -286,8 +288,7 @@ namespace store
             LOG_DEBUG(std::format("Retrieved accounts: {}", accounts.size()));
 
             _addCleanEntries(accounts);
-            auto values = _getValues();
-            _session.set({values.begin(), values.end()});
+            _session.setUnchecked(_getValues());
         }
     }
 
@@ -372,26 +373,23 @@ namespace store
      * and provides a convenient way to access the account names without having
      * to retrieve the full account data for each account.
      *
-     * @return unorderedIdMap<AccountId, std::string> A
+     * @return IdMap<AccountId, std::string> A
      * map where the keys are account IDs and the values are the corresponding
      * account names for all active accounts in the store, this allows for
      * efficient lookups of account names based on their IDs and can be used in
      * various parts of the application where such mappings are needed.
      */
-    unorderedIdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap(
-    ) const
+    IdMap<AccountId, std::string> AccountStore::getAccountIdToNameMap() const
     {
         const auto options = Options{
             .filter   = IsAccountActive(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        unorderedIdMap<AccountId, std::string> accountIdToName;
+        IdMap<AccountId, std::string> accountIdToName;
 
         for (const auto& account : _getValues(options))
-        {
-            accountIdToName.emplace(account.getId(), account.getName());
-        }
+            accountIdToName.addUnchecked(account.getId(), account.getName());
 
         return accountIdToName;
     }
@@ -433,16 +431,16 @@ namespace store
     /**
      * @brief Get the IDs of all external accounts
      *
-     * @return idSet<AccountId>
+     * @return IdSet<AccountId>
      */
-    idSet<AccountId> AccountStore::getExternalAccountIds() const
+    IdSet<AccountId> AccountStore::getExternalAccountIds() const
     {
         const auto options = Options{
             .filter   = IsExternal(),
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        idSet<AccountId> externalAccountIds;
+        IdSet<AccountId> externalAccountIds;
 
         for (const auto& account : _getValues(options))
             externalAccountIds.insert(account.getId());
@@ -480,11 +478,32 @@ namespace store
     /**
      * @brief Get the ID remapping for accounts
      *
-     * @return const unorderedIdMap<AccountId, AccountId>& The ID remapping
+     * @return const IdIdMap<AccountId>& The ID remapping
      */
-    const unorderedIdMap<AccountId, AccountId>& AccountStore::getIdRemap() const
+    const IdIdMap<AccountId>& AccountStore::getIdRemap() const
     {
         return _getIdRemap();
+    }
+
+    /**
+     * @brief Discard all cached accounts and reload from the database.
+     * Called after a database restore so the store reflects restored data.
+     */
+    void AccountStore::reload()
+    {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
+        _session.clear();
+        const auto savedProfileId = _activeProfileId;
+        _activeProfileId          = ProfileId::invalid();
+        _clearEntries();
+        if (savedProfileId.isValid())
+        {
+            _activeProfileId = savedProfileId;
+            _refresh();
+        }
     }
 
 }   // namespace store

@@ -51,6 +51,20 @@ namespace utils
     }
 
     /**
+     * @brief Converts a span of strings to a set of QStrings
+     *
+     * @param vec The input span of strings
+     * @return Set<QString> The converted set of QStrings
+     */
+    Set<QString> toQStringSet(const Set<std::string>& vec)
+    {
+        Set<QString> set;
+        for (const auto& str : vec)
+            set.insert(QString::fromStdString(str));
+        return set;
+    }
+
+    /**
      * @brief Converts a span of const strings to a vector of QStrings
      *
      * @param vec The input span of const strings
@@ -84,6 +98,13 @@ namespace utils
         center.setX(center.x() - (dlg->width() / 2));
         center.setY(center.y() - (dlg->height() / 2));
         dlg->move(center);
+    }
+
+    QString toKBString(std::size_t bytes)
+    {
+        static constexpr auto byteConversion = 1024;
+        const auto kiloBytes = static_cast<double>(bytes) / byteConversion;
+        return QString{"%1 KB"}.arg(kiloBytes);
     }
 
 }   // namespace utils

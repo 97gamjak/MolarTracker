@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/instrument/stock.hpp"
@@ -13,6 +12,7 @@
 #include "repo/migration/migration_runner.hpp"
 #include "repo/repo_errors.hpp"
 #include "test_fixtures.hpp"
+#include "utils/finance.hpp"
 
 namespace
 {
@@ -245,7 +245,7 @@ TEST_F(InstrumentRepoTest, GetStocksSpecificIdReturnsOnlyMatchingStock)
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
     const auto [stockId, instrId] = _repo.addStock(makeStock("GOOG"));
 
-    const idSet<InstrumentId> ids{instrId};
+    const IdSet<InstrumentId> ids{instrId};
     const auto                stocks = _repo.getStocks(ids);
 
     ASSERT_EQ(stocks.size(), 1U);
@@ -258,7 +258,7 @@ TEST_F(InstrumentRepoTest, GetStocksMultipleIdsReturnsMatchingStocks)
     const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG"));
     static_cast<void>(_repo.addStock(makeStock("MSFT")));
 
-    const idSet<InstrumentId> ids{instrId1, instrId2};
+    const IdSet<InstrumentId> ids{instrId1, instrId2};
     const auto                stocks = _repo.getStocks(ids);
 
     ASSERT_EQ(stocks.size(), 2U);

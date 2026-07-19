@@ -16,8 +16,10 @@ namespace ui
         Q_OBJECT
 
        private:
-        QTextBrowser* _textBrowser  = nullptr;
-        QPushButton*  _exportButton = nullptr;
+        /// The text browser displaying the help page
+        QTextBrowser* _textBrowser = nullptr;
+        /// The button to export the help page to PDF
+        QPushButton* _exportButton = nullptr;
 
         void _buildUI();
 

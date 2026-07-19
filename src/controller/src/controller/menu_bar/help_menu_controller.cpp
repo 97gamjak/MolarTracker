@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QString>
 
-#include "config/constants.hpp"
+#include "config/constants/github_constants.hpp"
 #include "ui/help/help_dialog.hpp"
 #include "ui/menu_bar/help_menu.hpp"
 
@@ -54,9 +54,9 @@ namespace controller
      */
     void HelpMenuController::_onAboutRequested()
     {
-        const auto version = QString::fromStdString(Constants::getVersion());
+        const auto version = QString::fromStdString(GithubConstants::version);
         const auto githubRepoUrl =
-            QString::fromStdString(Constants::getGithubRepoUrl());
+            QString::fromStdString(GithubConstants::getGithubRepoUrl());
 
         const auto aboutText =
             QString(

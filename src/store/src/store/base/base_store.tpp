@@ -167,12 +167,12 @@ namespace store
      * @tparam T
      * @tparam IdType
      * @param options
-     * @return idSet<IdType>
+     * @return IdSet<IdType>
      */
     template <typename T, typename IdType>
-    idSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
+    IdSet<IdType> BaseStore<T, IdType>::_getIds(Options options) const
     {
-        idSet<IdType> ids;
+        IdSet<IdType> ids;
         for (const auto& entry : _entries)
             if (options.eval(entry))
                 ids.insert(getId(entry.value));
@@ -213,8 +213,9 @@ namespace store
     auto BaseStore<T, IdType>::_getValues(Options options) const
     {
         return _getEntries(options) |
-               std::views::transform([](const auto& entry)
-                                     { return entry.value; });
+               std::views::transform(
+                   [](const auto& entry) -> const T& { return entry.value; }
+               );
     }
 
     /**
@@ -493,16 +494,72 @@ namespace store
     }
 
     /**
+     * @brief logs the contents of the store's cache for debugging purposes.
+     * This method checks if logging is enabled for the specified category and
+     * log level, and if so, it logs the number of entries in the cache and the
+     * details of each entry, including its value and state. This can be useful
+     * for debugging and understanding the current state of the store's cache.
+     *
+     * @tparam T
+     * @tparam IdType
+     * @param category The logging category to use for the log messages.
+     * @param level The log level to use for the log messages.
+     */
+
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::_logCache(
+        const std::string& category,
+        LogLevel           level
+    )
+    {
+        if (logging::LogManager::getInstance().isEnabled(category, level))
+        {
+            EXPLICIT_LOG(
+                level,
+                category,
+                std::format("Cache contents ({}):", _entries.size())
+            );
+
+            for (const auto& entry : _entries)
+            {
+                EXPLICIT_LOG(
+                    level,
+                    category,
+                    std::format(
+                        "Cache: {{value: {}, state: {}}}",
+                        entry.value.toString(),
+                        StoreStateMeta::toString(entry.state)
+                    )
+                );
+            }
+        }
+    }
+
+    /**
      * @brief Gets the ID remapping map for the store.
      *
      * @tparam T
      * @tparam IdType
-     * @return const IdMap&
+     * @return const IdIdMap<IdType>&
      */
     template <typename T, typename IdType>
-    auto BaseStore<T, IdType>::_getIdRemap() const -> const IdMap&
+    const IdIdMap<IdType>& BaseStore<T, IdType>::_getIdRemap() const
     {
         return _idRemap;
+    }
+
+    /**
+     * @brief Clears the ID remapping map for the store. This is used to reset
+     * the ID remapping state, typically after a commit or when the remapping is
+     * no longer needed.
+     *
+     * @tparam T
+     * @tparam IdType
+     */
+    template <typename T, typename IdType>
+    void BaseStore<T, IdType>::clearIdRemap()
+    {
+        _idRemap.clear();
     }
 
 }   // namespace store

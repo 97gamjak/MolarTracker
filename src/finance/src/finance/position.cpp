@@ -1,5 +1,7 @@
 #include "finance/position.hpp"
 
+#include <format>
+
 namespace finance
 {
     /**
@@ -47,12 +49,27 @@ namespace finance
      *
      * @return filter::Predicate<Position>
      */
-    filter::Predicate<Position> IsPositionOpen()
+    filter::Predicate<Position> IsPositionOpen(bool isOpen)
     {
         return filter::Predicate<Position>{
-            [](const Position& position)
-            { return !position.getClosedAt().has_value(); }
+            [isOpen](const Position& position)
+            { return isOpen == !position.getClosedAt().has_value(); }
         };
+    }
+
+    /**
+     * @brief Get a string representation of the position.
+     *
+     * @return std::string
+     */
+    std::string Position::toString() const
+    {
+        return std::format(
+            "Position(id={}, createdAt={}, closedAt={})",
+            _id.toString(),
+            _createdAt.humanReadable(),
+            _closedAt.has_value() ? _closedAt->humanReadable() : "null"
+        );
     }
 
 }   // namespace finance

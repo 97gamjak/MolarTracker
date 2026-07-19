@@ -6,15 +6,17 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 
+#include <QPointer>
 #include <stdexcept>
 
-#include "config/finance.hpp"
-#include "finance/currency.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
+#include "utils/currency.hpp"
+#include "utils/finance.hpp"
 #include "utils/qt_helpers.hpp"
 
 using utils::makeQChild;
@@ -30,25 +32,25 @@ namespace ui
     {
         /// The combo box for selecting the account to deposit to or withdraw
         /// from
-        AccountCombo* accountCombo;
+        QPointer<AccountCombo> accountCombo = nullptr;
 
         /// The field for selecting the transaction timestamp
-        TimestampField* timestampField;
+        QPointer<TimestampField> timestampField = nullptr;
 
         /// The row for entering the amount to deposit or withdraw
-        AmountRow* amountRow;
+        QPointer<AmountRow> amountRow = nullptr;
 
         /// The label for displaying the currency of the selected account
-        QLabel* currencyLabel;
+        QPointer<QLabel> currencyLabel = nullptr;
 
         /// The field for entering an optional comment
-        CommentField* commentField;
+        QPointer<CommentField> commentField = nullptr;
 
         /// The row for entering the fees for the transaction
-        AmountRow* feesRow;
+        QPointer<AmountRow> feesRow = nullptr;
 
         /// The label for displaying the currency of the fees
-        QLabel* currencyFees;
+        QPointer<QLabel> currencyFees = nullptr;
 
         Fields(
             const std::vector<drafts::AccountDraft>& accounts,
@@ -73,13 +75,13 @@ namespace ui
         const std::vector<drafts::AccountDraft>& accounts,
         QWidget*                                 parent
     )
-        : accountCombo(makeQChild<AccountCombo>(accounts, parent)),
-          timestampField(makeQChild<TimestampField>(parent)),
-          amountRow(makeQChild<AmountRow>(parent)),
-          currencyLabel(makeQChild<QLabel>(parent)),
-          commentField(makeQChild<CommentField>(parent)),
-          feesRow(makeQChild<AmountRow>(parent)),
-          currencyFees(makeQChild<QLabel>(parent))
+        : accountCombo(new AccountCombo(accounts, parent)),
+          timestampField(new TimestampField(false, parent)),
+          amountRow(new AmountRow(parent)),
+          currencyLabel(new QLabel(parent)),
+          commentField(new CommentField(parent)),
+          feesRow(new AmountRow(parent)),
+          currencyFees(new QLabel(parent))
     {
     }
 
@@ -107,9 +109,6 @@ namespace ui
         Currency currency
     ) const
     {
-        using finance::getMicroUnit;
-        using finance::getSymbol;
-
         amountRow->setNDecimalPlaces(getMicroUnit(currency));
         feesRow->setNDecimalPlaces(getMicroUnit(currency));
         currencyLabel->setText(getSymbol(currency).c_str());
@@ -167,33 +166,19 @@ namespace ui
             throw std::runtime_error("No account selected");
 
         const auto currency   = account->getCurrency();
-        const auto microUnits = finance::getMicroUnit(currency);
+        const auto microUnits = getMicroUnit(currency);
         const auto cash_      = amountRow->getAmount(microUnits);
 
-        auto cash = finance::Cash(currency, cash_);
+        auto cash = Cash(currency, cash_);
         cash      = type == TransactionType::Deposit ? cash : -cash;
 
-        auto fees = finance::Cash(currency, feesRow->getAmount(microUnits));
+        auto fees = Cash(currency, feesRow->getAmount(microUnits));
 
-        auto entry = drafts::TransactionEntryDraft{
-            account->getId(),
-            cash,
-            TransactionEntryType::General,
-            false
-        };
-        entry.setNeedsExternal(true);
-
-        auto feesEntry = drafts::TransactionEntryDraft{
-            account->getId(),
-            fees,
-            TransactionEntryType::Fees,
-            false
-        };
-        feesEntry.setNeedsExternal(true);
-
-        return {
+        return drafts::CreateCashTransactionDraft{
             timestampField->getTimestamp(),
-            {entry, feesEntry},
+            cash,
+            fees,
+            account->getId(),
             commentField->getComment()
         };
     }

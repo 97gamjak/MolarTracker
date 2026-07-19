@@ -6,11 +6,11 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
-#include "config/strong_id.hpp"
 #include "finance/instrument/stock.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
+#include "utils/container/id_id_map.hpp"
 
 namespace store
 {
@@ -33,7 +33,7 @@ namespace store
         InstrumentIdSeq& _instrumentIdSeq;
 
         /// The observable for instrument ID remapping events
-        unorderedIdMap<InstrumentId, InstrumentId> _instrumentIdMap;
+        IdIdMap<InstrumentId> _instrumentIdMap;
 
        public:
         explicit StockStore(
@@ -51,24 +51,25 @@ namespace store
         StockStoreResult addStock(finance::Stock stock) override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks(
-            const idSet<InstrumentId>& ids
+        finance::Stocks getStocks(
+            const IdSet<InstrumentId>& ids
         ) const override;
 
         [[nodiscard]]
-        std::vector<finance::Stock> getStocks() const override;
+        finance::Stocks getStocks() const override;
 
         [[nodiscard]]
-        std::optional<finance::Stock> getStock(InstrumentId id) const;
+        std::optional<finance::Stock> getStock(InstrumentId id) const override;
 
         [[nodiscard]]
-        std::vector<std::string> getAllTickers() const override;
+        Set<std::string> getAllTickers() const override;
 
         [[nodiscard]]
         std::unordered_map<std::string, InstrumentId> getTickerMap() const;
 
         [[nodiscard]]
-        instrumentMap<std::string> getInstrumentIdToNameMap() const override;
+        IdMap<InstrumentId, std::string> getInstrumentIdToNameMap(
+        ) const override;
 
         [[nodiscard]]
         bool stockExists(const std::string& ticker, bool checkDeleted) const;
@@ -78,11 +79,11 @@ namespace store
             const std::string& ticker
         ) const override;
 
-        void commit() override;
+        void commit();
+        void reload() override;
 
         [[nodiscard]]
-        const unorderedIdMap<InstrumentId, InstrumentId>& getInstrumentIdMap(
-        ) const override;
+        const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
 
         [[nodiscard]]
         Connection subscribeToStoreChange(

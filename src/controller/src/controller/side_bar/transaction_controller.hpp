@@ -6,16 +6,18 @@
 
 #include <QObject>
 #include <QPointer>
+#include <cstdint>
 
-#include "connections/connection.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace store
 {
-    class IAccountStore;       // Forward declaration
-    class ITransactionStore;   // Forward declaration
-    class IStockStore;         // Forward declaration
-    class IPositionStore;      // Forward declaration
+    class IAccountStore;                                // Forward declaration
+    class ITransactionStore;                            // Forward declaration
+    class IStockStore;                                  // Forward declaration
+    class IOptionStore;                                 // Forward declaration
+    class IPositionStore;                               // Forward declaration
+    enum class TransactionStoreResult : std::uint8_t;   // Forward declaration
 }   // namespace store
 
 namespace cmd
@@ -28,20 +30,23 @@ namespace ui
     class TransactionCategory;       // Forward declaration
     class DepositWithdrawalWidget;   // Forward declaration
     class StockWidget;               // Forward declaration
+    class OptionWidget;              // Forward declaration
 }   // namespace ui
 
 namespace drafts
 {
-    class CreateCashTransactionDraft;    // Forward declaration
-    class CreateStockTransactionDraft;   // Forward declaration
+    class CreateCashTransactionDraft;     // Forward declaration
+    class CreateStockTransactionDraft;    // Forward declaration
+    class CreateOptionTransactionDraft;   // Forward declaration
 }   // namespace drafts
 
 namespace finance
 {
-    class Transaction;   // Forward declaration
+    class DomainTransaction;   // Forward declaration
 }   // namespace finance
 
 class QMainWindow;   // Forward declaration
+class Connections;   // Forward declaration
 
 namespace controller
 {
@@ -67,21 +72,20 @@ namespace controller
         std::shared_ptr<store::IPositionStore> _positionStore;
         /// The stock store for the application
         std::shared_ptr<store::IStockStore> _stockStore;
+        /// The option store for the application
+        std::shared_ptr<store::IOptionStore> _optionStore;
 
-        /// Pointer to the create transaction dialog
-        QPointer<ui::DepositWithdrawalWidget> _createCashTransactionDlg;
-        /// Pointer to the stock widget
-        QPointer<ui::StockWidget> _createStockTransactionDlg;
+        struct Dialogs;
+        /// Pointer to the dialogs struct
+        std::unique_ptr<Dialogs> _dialogs;
+
         /// Reference to the transaction controller
         TransactionController& _transactionController;
         /// Reference to the stock controller
         SecuritiesSideBarController& _stockController;
 
-        /// Pointer to the main window
-        QMainWindow* _mainWindow;
-
         /// Connections for the transaction side bar controller
-        Connections _connections;
+        std::unique_ptr<Connections> _connections;
 
        public:
         TransactionSideBarController(
@@ -89,11 +93,13 @@ namespace controller
             const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
             const std::shared_ptr<store::IStockStore>&       stockStore,
+            const std::shared_ptr<store::IOptionStore>&      optionStore,
             const std::shared_ptr<store::IPositionStore>&    positionStore,
             TransactionController&       transactionController,
             SecuritiesSideBarController& stockController,
             QMainWindow*                 mainWindow
         );
+        ~TransactionSideBarController() override;
 
         void refresh() override;
 
@@ -106,16 +112,20 @@ namespace controller
 
        private:
         void _onCreateCashTransactionRequested(
-            drafts::CreateCashTransactionDraft draft
+            const drafts::CreateCashTransactionDraft& draft
         );
 
         void _onCreateStockTransactionRequested(
             drafts::CreateStockTransactionDraft draft
         );
 
+        void _onCreateOptionTransactionRequested(
+            drafts::CreateOptionTransactionDraft draft
+        );
+
         void _onCreateTickerRequested(const std::string& ticker);
 
-        bool _checkAddTransaction(const finance::Transaction& transaction);
+        static bool _checkAddTransaction(store::TransactionStoreResult result);
     };
 }   // namespace controller
 

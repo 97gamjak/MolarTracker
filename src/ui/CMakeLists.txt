@@ -20,7 +20,6 @@ target_link_libraries(molartracker_ui
     molartracker_utils
     molartracker_logging
     molartracker_drafts
-    molartracker_finance # TODO(97gamjak): should probably be removed
     molartracker_settings
 )
 

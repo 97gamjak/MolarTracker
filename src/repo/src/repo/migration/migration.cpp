@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 
-#include "config/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "multi_migration.hpp"
@@ -13,12 +12,15 @@
 #include "single_migration.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/option_row.hpp"
 #include "sql_models/position_row.hpp"
 #include "sql_models/profile_row.hpp"
 #include "sql_models/stock_row.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
+#include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "utils/finance.hpp"
 #include "utils/version.hpp"
 
 namespace repo
@@ -427,6 +429,9 @@ namespace repo
         _lastReleaseVersion = utils::SemVer(0, 2, 3);
 
         _migrateV11();
+        _migrateV12();
+        _migrateV13();
+        _migrateV14();
     }
 
     /**
@@ -447,4 +452,80 @@ namespace repo
         _migrations.push_back(std::move(migration));
     }
 
+    /**
+     * @brief Migrate to version 12
+     *
+     */
+    void Migrations::_migrateV12()
+    {
+        // change TransactionDataType of Trade to TransactionDataType of Stock
+        constexpr std::size_t currentVersion = 11;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        std::string sql = std::format(
+            R"(
+                UPDATE {0}
+                SET {1} = '{2}' WHERE {1} = 'Trade'
+            )",
+            TransactionRow::tableName,
+            TransactionRow::typeField::name,
+            TransactionDataTypeMeta::toString(TransactionDataType::Stock)
+        );
+
+        migration.addMigration(
+            std::make_unique<CustomMigration>(std::move(sql))
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 13
+     *
+     * @details This handles the migration from v12 to v13. It creates a new
+     * option table for representing option instruments, which has a one-to-one
+     * relationship with the instrument table. This allows for more specific
+     * fields related to options (e.g., option type, strike price, expiration
+     * date) while still maintaining a common base for all instruments.
+     * Additionally, it introduces a unique constraint on the combination of
+     * underlying instrument, option type, strike price, and expiration date to
+     * ensure data integrity and prevent duplicate entries for the same option.
+     */
+    void Migrations::_migrateV13()
+    {
+        constexpr std::size_t currentVersion = 12;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<OptionRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 14
+     *
+     * @details This handles the migration from v13 to v14. It creates a new
+     * transaction_option table for representing options associated with
+     * financial transactions, allowing for detailed tracking and management of
+     * option positions within transactions, including whether the option is a
+     * buy or sell, the action taken on the option (e.g., open, close, roll),
+     * and any rolled options if applicable. This structured representation
+     * enables accurate reporting and analysis of option-related activities
+     * within the application.
+     */
+    void Migrations::_migrateV14()
+    {
+        constexpr std::size_t currentVersion = 13;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        // here we can safely migrate with invalid as we did not yet add any
+        // transaction options to the db
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<TransactionOptionRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
 }   // namespace repo

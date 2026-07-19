@@ -4,15 +4,17 @@
 #include <cstdint>
 #include <mstd/enum.hpp>
 #include <optional>
-#include <unordered_map>
 #include <vector>
 
+#include "config/logging_base.hpp"
 #include "config/signal_tags.hpp"
 #include "config/strong_id.hpp"
 #include "connections/observable.hpp"
 #include "filter/predicate.hpp"
 #include "store/i_store.hpp"
 #include "store_state.hpp"
+#include "utils/container/id_id_map.hpp"
+#include "utils/container/set.hpp"
 
 namespace store
 {
@@ -120,9 +122,6 @@ namespace store
         /// its state.
         struct Entry;
 
-        /// Type alias for the ID map used to track ID remappings.
-        using IdMap = std::unordered_map<IdType, IdType, typename IdType::Hash>;
-
        private:
         /// The collection of entries in the store.
         std::vector<Entry> _entries;
@@ -132,7 +131,7 @@ namespace store
         bool _isPotentiallyDirty = false;
 
         /// Map for remapping IDs
-        IdMap _idRemap;
+        IdIdMap<IdType> _idRemap;
         /// Vector for tracking updated entries
         std::vector<T> _updated;
         /// Vector for tracking added entries
@@ -196,6 +195,8 @@ namespace store
         [[nodiscard]]
         bool isFullCache() const;
 
+        void clearIdRemap() override;
+
        protected:
         [[nodiscard]] bool _isDeleted(IdType id) const;
         [[nodiscard]] bool _hasNonDeletedEntries() const;
@@ -209,7 +210,7 @@ namespace store
         [[nodiscard]]
         auto _getEntry(Options options = Options()) const;
         [[nodiscard]]
-        idSet<IdType> _getIds(Options options = Options()) const;
+        IdSet<IdType> _getIds(Options options = Options()) const;
 
         IdType      _addEntry(T value);
         void        _addCleanEntries(const std::vector<T>& value);
@@ -222,7 +223,9 @@ namespace store
 
         void _notifyOnCommit();
 
-        [[nodiscard]] const IdMap& _getIdRemap() const;
+        void _logCache(const std::string& category, LogLevel level);
+
+        [[nodiscard]] const IdIdMap<IdType>& _getIdRemap() const;
 
        private:
         static bool _evalDeletionPolicy(
@@ -236,7 +239,6 @@ namespace store
         void                 _markPotentiallyDirty();
         [[nodiscard]] IdType _generateNewId();
 
-        void _notifyIdRemap(bool checkAlreadyNotified);
         void _notifyUpdated(bool checkAlreadyNotified);
         void _notifyAdded(bool checkAlreadyNotified);
         void _notifyRemoved(bool checkAlreadyNotified);
