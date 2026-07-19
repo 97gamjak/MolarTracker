@@ -197,6 +197,25 @@ namespace store
     }
 
     /**
+     * @brief Discard all cached positions and reload from the database.
+     */
+    void PositionStore::reload()
+    {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
+        _clearEntries();
+        const auto accountIds = _session->accountSession.getIds();
+        if (!accountIds.empty())
+        {
+            const auto positions =
+                _positionService->getAllOpenPositions(accountIds);
+            _addCleanEntries(positions);
+        }
+    }
+
+    /**
      * @brief Subscribe to position closed events, this allows subscribers to be
      * notified when a position is closed, which can be useful for updating
      *

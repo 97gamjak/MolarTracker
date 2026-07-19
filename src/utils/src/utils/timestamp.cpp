@@ -96,7 +96,7 @@ std::string Timestamp::iso8601TimeMs() const
 std::string Timestamp::humanReadable() const
 {
     return std::format(
-        "{:%Y-%m-%d %H:%M:%S}",
+        _humanReadableFmt,
         floor<seconds>(toTimePoint(_toLocalTime()))
     );
 }
@@ -111,7 +111,7 @@ std::string Timestamp::humanReadable() const
 std::string Timestamp::fileSafe() const
 {
     return std::format(
-        "{:%Y%m%d_%H%M%S}",
+        _fileSafeFmt,
         floor<seconds>(toTimePoint(_toLocalTime()))
     );
 }
@@ -153,6 +153,13 @@ Timestamp::Timestamp(int64_t timePoint) : _timePoint(timePoint) {}
  */
 Timestamp Timestamp::fromInt64(int64_t value) { return Timestamp(value); }
 
+/**
+ * @brief Returns a Timestamp object representing a null timestamp.
+ *
+ * @return Timestamp
+ */
+Timestamp Timestamp::Null() { return Timestamp(0); }
+
 #ifdef __QT_ENABLED__
 /**
  * @brief Constructs a Timestamp object from a QDateTime object.
@@ -189,3 +196,101 @@ std::strong_ordering Timestamp::operator<=>(const Timestamp& other) const
 }
 
 #endif
+
+/**
+ * @brief parses a filename-safe timestamp string and returns an optional
+ * Timestamp, if the parsing fails, returns std::nullopt
+ *
+ * @param value
+ * @param prefix
+ * @param postfix
+ * @return std::optional<Timestamp>
+ */
+std::optional<Timestamp> Timestamp::fromFileSafe(
+    const std::string& value,
+    const std::string& prefix,
+    const std::string& postfix
+)
+{
+    auto valueWithoutPrefix =
+        value.starts_with(prefix) ? value.substr(prefix.size()) : value;
+
+    valueWithoutPrefix = valueWithoutPrefix.starts_with("_")
+                             ? valueWithoutPrefix.substr(1)
+                             : valueWithoutPrefix;
+
+    if (valueWithoutPrefix.ends_with(postfix))
+    {
+        valueWithoutPrefix = valueWithoutPrefix.substr(
+            0,
+            valueWithoutPrefix.size() - postfix.size()
+        );
+    }
+
+    valueWithoutPrefix =
+        valueWithoutPrefix.ends_with(".")
+            ? valueWithoutPrefix.substr(0, valueWithoutPrefix.size() - 1)
+            : valueWithoutPrefix;
+
+    std::istringstream stream{valueWithoutPrefix};
+    std::tm            time{};
+    stream >> std::get_time(&time, _fileSafeParseFmt);
+
+    if (stream.fail())
+        return std::nullopt;
+
+    const auto clock =
+        std::chrono::system_clock::from_time_t(std::mktime(&time));
+
+    return Timestamp(
+        duration_cast<milliseconds>(clock.time_since_epoch()).count()
+    );
+}
+
+/**
+ * @brief Returns the year component of the timestamp.
+ *
+ * @return int The year component.
+ */
+int Timestamp::year() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const std::chrono::year_month_day ymd{days};
+    return static_cast<int>(ymd.year());
+}
+
+/**
+ * @brief Returns the month component of the timestamp.
+ *
+ * @return unsigned int The month component (1-12).
+ */
+unsigned int Timestamp::month() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const std::chrono::year_month_day ymd{days};
+    return static_cast<unsigned int>(ymd.month());
+}
+
+/**
+ * @brief Returns the day component of the timestamp.
+ *
+ * @return unsigned int The day component (1-31).
+ */
+unsigned int Timestamp::day() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const std::chrono::year_month_day ymd{days};
+    return static_cast<unsigned int>(ymd.day());
+}
+
+/**
+ * @brief Returns the week number of the timestamp.
+ *
+ * @return unsigned int The week number (1-53).
+ */
+unsigned int Timestamp::week() const
+{
+    const auto days = floor<std::chrono::days>(toTimePoint(_toLocalTime()));
+    const auto week = days.time_since_epoch().count() / _weekDayCount;
+    return static_cast<unsigned int>(week);
+}

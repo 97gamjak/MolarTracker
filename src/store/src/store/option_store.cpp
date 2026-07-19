@@ -5,6 +5,9 @@
 #include "config/id_types.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("Store.OptionStore");
 
 namespace store
 {
@@ -234,6 +237,17 @@ namespace store
                 }
             }
         }
+    }
+
+    void OptionStore::reload()
+    {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
+        _clearEntries();
+        const auto options = _instrumentService->getOptions();
+        _addCleanEntries(options);
     }
 
 }   // namespace store

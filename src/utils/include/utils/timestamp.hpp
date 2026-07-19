@@ -2,6 +2,7 @@
 #define __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
 
 #include <compare>
+#include <optional>
 #include <string>
 
 // TODO(97gamjak): migrate to mstd later on
@@ -25,9 +26,32 @@ class Timestamp
     /// Indicates whether the return timestamp should be converted to local time
     bool _localTime = true;
 
+    /// The format string for human-readable timestamps, used with std::format.
+    static constexpr auto _humanReadableFmt = "{:%Y-%m-%d %H:%M:%S}";
+    /// The format string for filename-safe timestamps, used with std::format.
+    static constexpr auto _fileSafeFmt = "{:%Y%m%d_%H%M%S}";
+
+    /// The format string for parsing filename-safe timestamps, used with
+    /// std::chrono::parse.
+    static constexpr auto _fileSafeParseFmt = "%Y%m%d_%H%M%S";
+
+    /// The number of days in a week, this is used to calculate the week number
+    static constexpr auto _weekDayCount = 7;
+
    public:
     Timestamp();
     explicit Timestamp(const QDateTime& dateTime);
+
+    [[nodiscard]]
+    static Timestamp Null();
+    [[nodiscard]]
+    static Timestamp fromInt64(int64_t value);
+    [[nodiscard]]
+    static std::optional<Timestamp> fromFileSafe(
+        const std::string& value,
+        const std::string& prefix  = "",
+        const std::string& postfix = ""
+    );
 
     // ISO-8601 2026-01-20T11:34:05
     [[nodiscard]] std::string iso8601() const;
@@ -46,9 +70,12 @@ class Timestamp
 
     [[nodiscard]] int64_t toInt64() const;
 
-    [[nodiscard]] static Timestamp fromInt64(int64_t value);
-
     [[nodiscard]] QDateTime toQDateTime() const;
+
+    [[nodiscard]] int          year() const;
+    [[nodiscard]] unsigned int month() const;
+    [[nodiscard]] unsigned int day() const;
+    [[nodiscard]] unsigned int week() const;
 
     std::strong_ordering operator<=>(const Timestamp& other) const;
 

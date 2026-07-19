@@ -352,4 +352,18 @@ namespace store
         );
     }
 
+    /**
+     * @brief Discard all cached stocks and reload from the database.
+     */
+    void StockStore::reload()
+    {
+        LOG_ENTRY;
+
+        _logCache(LOG_CATEGORY, LogLevel::Debug);
+
+        _clearEntries();
+        const auto stocks = _instrumentService->getStocks({});
+        _addCleanEntries(stocks);
+    }
+
 }   // namespace store
