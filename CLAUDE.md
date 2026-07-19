@@ -21,12 +21,13 @@ MolarTracker is a **C++23 desktop application** built with **Qt6** for dental (m
 5. AI-generated branches must follow the pattern: `claude/<short-description>-<session-id>`.
 6. Use `git push -u origin <branch-name>` when pushing a new branch.
 7. **Never amend or force-push** to shared branches.
-8. **Always fetch before branching** to ensure you start from an up-to-date base.
+8. **Always `git checkout dev` and `git pull` to update local `dev` before creating any new branch.** Do not branch directly off a stale local `dev` or off `origin/dev` without first syncing local `dev` — always update local `dev` itself first.
 
 ```bash
 # Correct workflow
-git fetch origin dev
-git checkout -b feature/MOLTRACK-XX-my-feature origin/dev
+git checkout dev
+git pull
+git checkout -b feature/MOLTRACK-XX-my-feature
 # ... make changes, commit ...
 git push -u origin feature/MOLTRACK-XX-my-feature
 # Then open a PR targeting dev
