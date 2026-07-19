@@ -234,6 +234,14 @@ REVERT CACHE changes but keep error handling
   label, `QTextBrowser` content area, and "Export to PDF…" button backed by
   `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
   signal and `HelpMenuController`
+- `ui::HelpDialog` (MOLTRACK-313): add a "Settings" section to the help
+  content documenting the Settings dialog (how to open it, its sidebar
+  sections, and Save/Close semantics), with two screenshots. Add
+  `src/ui/resources/help.qrc` (Qt resource collection, auto-compiled via
+  `CMAKE_AUTORCC`) bundling `src/ui/resources/help/*.png` into the binary at
+  `:/help/...`; `molartracker_ui`'s `CMakeLists.txt` now globs `resources/*.qrc`
+  into its sources. The two screenshot files are placeholders — see PR
+  description for what to capture and where to save them.
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

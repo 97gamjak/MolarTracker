@@ -12,6 +12,47 @@
 
 using utils::makeQChild;
 
+namespace
+{
+    /**
+     * @brief Build the HTML content shown in the help dialog's text browser
+     *
+     * @return QString
+     */
+    QString buildHelpHtml()
+    {
+        return QStringLiteral(R"html(
+<p>This page collects usage documentation for MolarTracker's dialogs and
+features.</p>
+
+<h3>Settings</h3>
+<p>Open the settings dialog via <b>Settings &rarr; Preferences</b> in the menu
+bar. It lets you configure general, UI, and logging preferences.</p>
+
+<p align="center"><img src=":/help/settings_dialog_general.png" width="600"></p>
+
+<p>The sidebar on the left lists the top-level sections:</p>
+<ul>
+  <li><b>General Settings</b> &mdash; app version, default profile, dismissed
+      update notices</li>
+  <li><b>UI Settings</b> &mdash; grouped into <i>Profile UI Settings</i> and
+      <i>Log Viewer Settings</i>, shown as an overview page with cards linking
+      to each sub-section</li>
+  <li><b>Logging Settings</b> &mdash; log file rotation, retention, and
+      default log level</li>
+</ul>
+
+<p align="center"><img src=":/help/settings_dialog_ui_overview.png" width="600"></p>
+
+<p>Editing a value updates it immediately in memory &mdash; a dot appears next
+to the affected section in the sidebar, and an "unsaved changes" label
+appears at the bottom. Click <b>Save</b> to persist your changes to disk, or
+<b>Close</b> to discard them and revert to how they were before you opened
+the dialog.</p>
+)html");
+    }
+}   // namespace
+
 namespace ui
 {
     /**
@@ -44,9 +85,7 @@ namespace ui
         _textBrowser = makeQChild<QTextBrowser>(this);
         _textBrowser->setReadOnly(true);
         _textBrowser->setOpenExternalLinks(true);
-        _textBrowser->setPlaceholderText(
-            "Help content will be available here."
-        );
+        _textBrowser->setHtml(buildHelpHtml());
 
         _exportButton     = makeQChild<QPushButton>("Export to PDF...", this);
         auto* closeButton = makeQChild<QPushButton>("Close", this);

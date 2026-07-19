@@ -7,9 +7,15 @@ file(GLOB_RECURSE HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
 )
 
+# Qt resource collections (e.g. help screenshots), auto-compiled by AUTORCC
+file(GLOB_RECURSE RESOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/*.qrc
+)
+
 qt_add_library(molartracker_ui STATIC
     ${SOURCE_FILES}
     ${HEADER_FILES}
+    ${RESOURCE_FILES}
 )
 
 target_link_libraries(molartracker_ui
