@@ -91,8 +91,9 @@ TEST(ParamCore, ResetToDefaultClearsValueWhenDefaultConfigured)
     const auto               defaultValue = 7;
     settings::ParamCore<int> param("k", "T", "D");
     param.setDefault(defaultValue);
-    param.set(42);
-    EXPECT_EQ(param.get(), 42);
+    constexpr auto paramValue = 42;
+    param.set(paramValue);
+    EXPECT_EQ(param.get(), paramValue);
 
     param.resetToDefault();
     EXPECT_EQ(param.get(), defaultValue);

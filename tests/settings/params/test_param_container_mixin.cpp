@@ -120,7 +120,8 @@ TEST(ParamContainerMixin, ResetToDefaultRestoresParamsWithDefaultConfigured)
 {
     TestContainer testContainer;
     testContainer._intParam.setDefault(1);
-    testContainer._intParam.set(42);
+    constexpr auto paramValue = 42;
+    testContainer._intParam.set(paramValue);
     testContainer._strParam.set(std::string("changed"));   // no default set
 
     testContainer.resetToDefault();
