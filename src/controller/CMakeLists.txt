@@ -6,16 +6,6 @@ qt_add_library(molartracker_controller STATIC
     src/controller/position_controller.cpp
     src/controller/vcs_controller.cpp
 
-    # mappers
-    src/controller/mapper/account_mapper.cpp
-    src/controller/mapper/profile_mapper.cpp
-    src/controller/mapper/stock_mapper.cpp
-    src/controller/mapper/option_mapper.cpp
-
-    src/controller/mapper/transaction/transaction_mapper.cpp
-    src/controller/mapper/transaction/transaction_overview_mapper.cpp
-    src/controller/mapper/transaction/transaction_create_mapper.cpp
-
     # menu bar
     src/controller/menu_bar/menu_bar_controller.cpp
     src/controller/menu_bar/file_menu_controller.cpp
@@ -63,6 +53,7 @@ target_link_libraries(molartracker_controller
     molartracker_gateway
     molartracker_http
     molartracker_logging
+    molartracker_mapper
     molartracker_settings
     molartracker_store
     molartracker_ui

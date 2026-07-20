@@ -15,14 +15,18 @@
     X(InvalidTransaction)          \
     X(InvalidAccount)              \
     X(InvalidStock)                \
+    X(InvalidOption)               \
+    X(InvalidPosition)             \
     X(CurrencyUnknown)             \
     X(InvalidPriceString)          \
     X(PriceOverflow)               \
-    X(UnknownOption)
+    X(UnknownOption)               \
+    X(PnlError)
 
 #define PNL_ERROR_TYPE_LIST(X)  \
     X(InconsistentContractSize) \
-    X(NotYetImplemented)
+    X(NotYetImplemented)        \
+    X(UnknownOption)
 
 MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_TYPE_LIST);
 MSTD_ENUM(YFinanceErrorType, std::uint8_t, YFINANCE_ERROR_TYPE_LIST);

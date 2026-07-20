@@ -1,4 +1,4 @@
-#include "transaction_mapper.hpp"
+#include "mapper/transaction/transaction_mapper.hpp"
 
 #include <string>
 
@@ -10,7 +10,7 @@
 
 REGISTER_LOG_CATEGORY("Controller.Mapper.TransactionMapper");
 
-namespace controller
+namespace mapper
 {
 
     /**
@@ -150,4 +150,4 @@ namespace controller
         return drafts;
     }
 
-}   // namespace controller
+}   // namespace mapper

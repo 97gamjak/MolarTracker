@@ -24,7 +24,7 @@ namespace drafts
     class TradeLegDraft;              // forward declaration
 }   // namespace drafts
 
-namespace controller
+namespace mapper
 {
 
     /**
@@ -74,6 +74,6 @@ namespace controller
         );
     };
 
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_MAPPER_HPP__

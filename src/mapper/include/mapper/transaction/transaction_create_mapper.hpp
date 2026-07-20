@@ -12,7 +12,7 @@ namespace drafts
     class CreateOptionTransactionDraft;
 }   // namespace drafts
 
-namespace controller
+namespace mapper
 {
 
     /**
@@ -38,6 +38,6 @@ namespace controller
         );
     };
 
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_CREATE_MAPPER_HPP__

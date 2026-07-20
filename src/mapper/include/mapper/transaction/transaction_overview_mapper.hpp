@@ -12,7 +12,7 @@ namespace finance
     class Transactions;   // Forward declaration
 }   // namespace finance
 
-namespace controller
+namespace mapper
 {
 
     /**
@@ -33,6 +33,6 @@ namespace controller
         );
     };
 
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__TRANSACTION__TRANSACTION_OVERVIEW_MAPPER_HPP__

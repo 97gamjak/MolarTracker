@@ -1,10 +1,10 @@
-#include "stock_mapper.hpp"
+#include "mapper/stock_mapper.hpp"
 
 #include "drafts/stock_draft.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/instrument/stocks.hpp"
 
-namespace controller
+namespace mapper
 {
 
     /**
@@ -49,4 +49,4 @@ namespace controller
         return drafts;
     }
 
-}   // namespace controller
+}   // namespace mapper

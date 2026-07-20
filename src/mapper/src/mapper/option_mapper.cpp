@@ -1,6 +1,8 @@
-#include "option_mapper.hpp"
+#include "mapper/option_mapper.hpp"
 
-namespace controller
+#include "drafts/transaction/transaction_create_draft.hpp"
+
+namespace mapper
 {
     /**
      * @brief Convert a CreateOptionTransactionDraft to an Option instrument.
@@ -24,4 +26,4 @@ namespace controller
             draft.getContractSize()
         };
     }
-}   // namespace controller
+}   // namespace mapper

@@ -16,9 +16,11 @@ target_include_directories(molartracker_gateway
 target_link_libraries(molartracker_gateway
     PUBLIC
     PRIVATE
-    molartracker_finance
-    molartracker_store
     molartracker_config
-    molartracker_utils
+    molartracker_drafts
+    molartracker_finance
     molartracker_logging
+    molartracker_mapper
+    molartracker_store
+    molartracker_utils
 )

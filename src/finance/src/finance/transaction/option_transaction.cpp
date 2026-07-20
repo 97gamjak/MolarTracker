@@ -59,7 +59,7 @@ namespace finance
               positionId,
               std::move(comment)
           ),
-          _amount(amount),
+          _premium(amount),
           _action(action),
           _buySell(buySell),
           _rolledOption(rolledOption)
@@ -85,7 +85,7 @@ namespace finance
             TransactionEntry{
                 TransactionEntryId::invalid(),
                 getCashAccountId(),
-                _amount,
+                _premium,
                 TransactionEntryType::General
             }
         );
@@ -93,7 +93,7 @@ namespace finance
             TransactionEntry{
                 TransactionEntryId::invalid(),
                 externalAccount,
-                -_amount,
+                -_premium,
                 TransactionEntryType::General
             }
         );
@@ -124,11 +124,23 @@ namespace finance
                 getSecurityAccountId(),
                 getInstrumentId(),
                 getQuantity(),
-                _amount,
+                _premium,
                 getPositionId()
             }
         );
         return optionData;
     }
+
+    const OptionBuySell& OptionTransaction::getBuySell() const
+    {
+        return _buySell;
+    }
+
+    const TransactionOptionAction& OptionTransaction::getAction() const
+    {
+        return _action;
+    }
+
+    const Cash& OptionTransaction::getPremium() const { return _premium; }
 
 }   // namespace finance

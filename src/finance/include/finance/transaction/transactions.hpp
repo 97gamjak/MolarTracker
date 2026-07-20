@@ -155,6 +155,12 @@ namespace finance
 
         [[nodiscard]]
         Transactions filter(const IdSet<AccountId>& accountIds) const;
+
+        [[nodiscard]]
+        IdSet<InstrumentId> getStockInstrumentIds() const;
+
+        [[nodiscard]]
+        IdSet<InstrumentId> getOptionInstrumentIds() const;
     };
 }   // namespace finance
 

@@ -472,4 +472,14 @@ namespace finance
         return {cashTx, stockTx, optionTx};
     }
 
+    IdSet<InstrumentId> Transactions::getStockInstrumentIds() const
+    {
+        return stocks().getBaseInstrumentIds();
+    }
+
+    IdSet<InstrumentId> Transactions::getOptionInstrumentIds() const
+    {
+        return options().getBaseInstrumentIds();
+    }
+
 }   // namespace finance

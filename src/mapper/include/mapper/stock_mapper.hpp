@@ -11,7 +11,7 @@ namespace finance
     class Stocks;   // Forward declaration
 }   // namespace finance
 
-namespace controller
+namespace mapper
 {
     /**
      * @brief Mapper class for converting between Stock and Stock drafts for UI.
@@ -30,6 +30,6 @@ namespace controller
         );
     };
 
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__STOCK_MAPPER_HPP__

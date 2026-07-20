@@ -4,7 +4,7 @@
 #include "domain/profile.hpp"
 #include "drafts/profile_draft.hpp"
 
-namespace controller
+namespace mapper
 {
     /**
      * @brief Mapper class for converting between Profile and ProfileDraft
@@ -19,6 +19,6 @@ namespace controller
         [[nodiscard]]
         static domain::Profile toProfile(const drafts::ProfileDraft& draft);
     };
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__PROFILE_MAPPER_HPP__

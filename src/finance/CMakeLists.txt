@@ -5,7 +5,10 @@ set(SOURCE_DIR
 add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/ticker_info.cpp
     ${SOURCE_DIR}/yf_client.cpp
+
     ${SOURCE_DIR}/position.cpp
+    ${SOURCE_DIR}/positions.cpp
+
     ${SOURCE_DIR}/price_quote.cpp
     ${SOURCE_DIR}/price_cache.cpp
 
@@ -14,7 +17,6 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/transaction/option_data.cpp
     ${SOURCE_DIR}/transaction/pnl.cpp
     ${SOURCE_DIR}/transaction/option_transaction.cpp
-    ${SOURCE_DIR}/transaction/position_transaction.cpp
     ${SOURCE_DIR}/transaction/security_transaction.cpp
     ${SOURCE_DIR}/transaction/stock_data.cpp
     ${SOURCE_DIR}/transaction/stock_transaction.cpp
@@ -50,8 +52,8 @@ target_link_libraries(molartracker_finance
     molartracker_http   # TODO(97gamjak): try to move this dependency to private
     molartracker_connections
     molartracker_error
-    PRIVATE
     molartracker_config
+    PRIVATE
     molartracker_exceptions
     molartracker_utils
     molartracker_logging

@@ -56,135 +56,67 @@ namespace finance
 
     struct PositionState
     {
-        Quantity openQuantity{0};
-        Cash     costBasis;
-        Cash     realizedPnL;
-        Cash     realizedCostBasis;
-        Cash     unrealizedOptionPnL;   // premium-based, mirrors your existing
-                                        // PnLOption field
+        Quantity                   openQuantity{0};
+        Cash                       costBasis;
+        Cash                       realizedPnL;
+        Cash                       realizedCostBasis;
+        Cash                       unrealizedOptionPnL;
         Cash                       fees;
-        Quantity                   contractSize{0};
+        std::int64_t               contractSize{0};
         std::vector<OpenOptionLeg> openOptionLegs;
     };
 
-    /**
-     * @brief Base class for calculating profit and loss (PnL) for financial
-     * transactions.
-     */
-    class PnL
+    struct PositionPnl
     {
-       private:
-        /// The current price of the security, if available
-        std::optional<Cash> _currentPrice = std::nullopt;
-        /// The currency of the PnL calculations
-        Currency _currency = Currency::Unknown;
-        /// The quantity of the security involved in the transactions
-        Quantity _quantity{0};
-        /// The total cost of the security, calculated based on the transactions
-        Cash _totalCost;
-        /// The realized PnL of the security, calculated based on the
-        /// transactions
-        Cash _realizedPnL;
-        /// The realized cost basis of the security, calculated based on the
-        /// transactions
-        Cash _realizedCostBasis;
-        /// The total fees associated with the transactions
-        Cash _fees;
+        Quantity quantity;
+        Cash     costBasis;
+        Cash     realizedPnL;
+        Cash     realizedCostBasis;
+        Cash     unrealizedPnL;
+        Cash     fees;
 
-       protected:
-        void setCurrency(Currency currency);
-        void setQuantity(Quantity quantity);
-        void setTotalCost(const Cash& totalCost);
-        void setRealizedPnL(const Cash& realizedPnL);
-        void setRealizedCostBasis(const Cash& realizedCostBasis);
-        void setFees(const Cash& fees);
-
-        [[nodiscard]] Currency            getCurrency() const;
-        [[nodiscard]] std::optional<Cash> getCurrentPrice() const;
-
-       public:
-        PnL()          = default;
-        virtual ~PnL() = default;
-
-        virtual PnLResult<void> calculatePnL(StockPnLs transactions)  = 0;
-        virtual PnLResult<void> calculatePnL(OptionPnLs transactions) = 0;
-
-        [[nodiscard]] Quantity     getQuantity() const;
-        [[nodiscard]] virtual Cash getAverageCost() const;
-        [[nodiscard]] Cash         getCostBasis() const;
-        [[nodiscard]] Cash         getMarketValue() const;
-        [[nodiscard]] Cash         getTotalPnL() const;
-        [[nodiscard]] Cash         getRealizedPnL() const;
-        [[nodiscard]] virtual Cash getUnrealizedPnL() const;
-        [[nodiscard]] Percentage   getUnrealizedPnLPercentage() const;
-        [[nodiscard]] Percentage   getRealizedPnLPercentage() const;
-
-        void setCurrentPrice(const Cash& price);
-    };
-
-    /**
-     * @brief Class for calculating PnL using the average cost method for
-     * stocks.
-     */
-    class PnLAvg : public PnL
-    {
-       public:
-        using PnL::PnL;
-        PnLResult<void> calculatePnL(StockPnLs transactions) override;
-        PnLResult<void> calculatePnL(OptionPnLs /*transactions*/) override
+        [[nodiscard]] Cash getAverageCost() const
         {
-            // TODO: remove this overload
-            return PnLError::NotYetImplemented();
+            return quantity.isZero() ? Cash{costBasis.getCurrency(), 0}
+                                     : costBasis / quantity;
+        }
+
+        [[nodiscard]] Percentage getRealizedPnLPercentage() const
+        {
+            if (realizedCostBasis.isZero())
+                return Percentage(0);
+            return Percentage(realizedPnL / realizedCostBasis);
+        }
+
+        [[nodiscard]] Cash totalPnL() const
+        {
+            return realizedPnL + unrealizedPnL;
+        }
+
+        [[nodiscard]] Cash getMarketValue() const
+        {
+            return costBasis + totalPnL();
+        }
+
+        [[nodiscard]] Percentage getUnrealizedPnLPercentage() const
+        {
+            if (costBasis.isZero())
+                return Percentage(0);
+            return Percentage(unrealizedPnL / costBasis);
         }
     };
 
-    /**
-     * @brief Base class for option PnL calculations, extends PnL with
-     * option-specific fields and overrides.
-     */
-    class PnLOption : public PnL
-    {
-       public:
-        /// Represents a single open option leg
-        struct OpenLeg
-        {
-            OptionType    optionType;
-            OptionBuySell buySell;
-            Cash          strikePrice;
-            Quantity      qty;
-        };
+    [[nodiscard]]
+    PnLResult<PositionState> foldEvents(
+        PositionState                  state,
+        std::span<const PositionEvent> events
+    );
 
-       private:
-        Cash                 _unrealizedPnL;
-        std::optional<Cash>  _currentUnderlyingPrice;
-        Quantity             _contractSize;
-        std::vector<OpenLeg> _openLegs;
-
-        [[nodiscard]] Cash getUnrealizedPnL() const override;
-
-        void setCurrentUnderlyingPrice(const Cash& price);
-
-       protected:
-        void setUnrealizedPnL(const Cash& unrealizedPnL);
-        void setContractSize(const Quantity& contractSize);
-        void setOpenLegs(std::vector<OpenLeg> legs);
-
-        [[nodiscard]] Quantity getContractSize() const;
-    };
-
-    /**
-     * @brief Class for calculating option PnL using the average cost method.
-     */
-    class PnLAvgOption : public PnLOption
-    {
-       public:
-        PnLResult<void> calculatePnL(StockPnLs /*transactions*/) override
-        {
-            // TODO: remove this overload
-            return PnLError::NotYetImplemented();
-        }
-        PnLResult<void> calculatePnL(OptionPnLs transactions) override;
-    };
+    [[nodiscard]]
+    PositionPnl snapshot(
+        const PositionState& state,
+        std::optional<Cash>  markPrice
+    );
 
 }   // namespace finance
 

@@ -8,6 +8,9 @@ namespace finance
 {
     class Positions : public IdObjectMap<Position>
     {
+       public:
+        [[nodiscard]]
+        Positions getOpenPositions() const;
     };
 }   // namespace finance
 

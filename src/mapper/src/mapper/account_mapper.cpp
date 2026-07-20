@@ -1,9 +1,9 @@
-#include "account_mapper.hpp"
+#include "mapper/account_mapper.hpp"
 
 #include "drafts/account_draft.hpp"
 #include "finance/account/account.hpp"
 
-namespace controller
+namespace mapper
 {
 
     /**
@@ -77,4 +77,4 @@ namespace controller
         return account;
     }
 
-}   // namespace controller
+}   // namespace mapper

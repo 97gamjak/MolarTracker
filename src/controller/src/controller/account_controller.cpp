@@ -10,13 +10,13 @@
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/helpers.hpp"
-#include "controller/mapper/account_mapper.hpp"
 #include "drafts/position/position_option_draft.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "finance/price_cache.hpp"
 #include "gateway/position_gateway.hpp"
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
 #include "side_bar/account_controller.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_option_store.hpp"
@@ -67,9 +67,9 @@ namespace controller
 
         /// A mapping of account IDs to their corresponding open stock position
         /// details, used for displaying the account details in the UI
-        IdMap<AccountId, std::vector<OpenStockPositionDetail>>
+        IdMap<AccountId, std::vector<gateway::OpenStockPositionDetail>>
             openStockPositions;
-        IdMap<AccountId, std::vector<OpenOptionPositionDetail>>
+        IdMap<AccountId, std::vector<gateway::OpenOptionPositionDetail>>
             openOptionPositions;
 
         Details(
@@ -183,12 +183,16 @@ namespace controller
                     const auto quote = _details->priceCache->get(detail.ticker);
                     if (quote.has_value())
                     {
-                        detail.pnl->setCurrentPrice(quote.value().getPrice());
+                        const auto pnl = finance::snapshot(
+                            detail.state,
+                            quote.value().getPrice()
+                        );
+
                         detail.positionDraft.updateUnrealizedPnL(
                             quote.value().getPrice(),
-                            detail.pnl->getMarketValue(),
-                            detail.pnl->getUnrealizedPnL(),
-                            detail.pnl->getUnrealizedPnLPercentage()
+                            pnl.getMarketValue(),
+                            pnl.unrealizedPnL,
+                            pnl.getUnrealizedPnLPercentage()
                         );
                     }
                     drafts.push_back(detail.positionDraft);
@@ -225,7 +229,8 @@ namespace controller
             return;
         }
 
-        const auto accountDraft = AccountMapper::toDraft(account.value());
+        const auto accountDraft =
+            mapper::AccountMapper::toDraft(account.value());
 
         switch (account->getKind())
         {
@@ -234,16 +239,14 @@ namespace controller
                 break;
             case AccountKind::Security:
             {
-                const auto stocksResult = getOpenStockPositionDetails(
-                    account->getId(),
-                    _details->positionGateway,
-                    _details->stockStore
-                );
-                const auto optionsResult = getOpenOptionPositionDetails(
-                    account->getId(),
-                    _details->positionGateway,
-                    _details->optionStore
-                );
+                const auto stocksResult =
+                    _details->positionGateway->getOpenStockPositionDetails(
+                        account->getId()
+                    );
+                const auto optionsResult =
+                    _details->positionGateway->getOpenOptionPositionDetails(
+                        account->getId()
+                    );
 
                 if (!stocksResult)
                 {

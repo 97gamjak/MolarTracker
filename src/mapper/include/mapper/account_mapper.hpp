@@ -10,7 +10,7 @@ namespace finance
     class Account;   // Forward declaration
 }   // namespace finance
 
-namespace controller
+namespace mapper
 {
     /**
      * @brief Mapper class for converting between Account and AccountDraft
@@ -36,6 +36,6 @@ namespace controller
         static finance::Account toAccount(const drafts::AccountDraft& draft);
     };
 
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__ACCOUNT_MAPPER_HPP__

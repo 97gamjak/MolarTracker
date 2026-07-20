@@ -1,4 +1,4 @@
-#include "controller/mapper/transaction/transaction_overview_mapper.hpp"
+#include "mapper/transaction/transaction_overview_mapper.hpp"
 
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "finance/transaction/cash_transaction.hpp"
@@ -6,7 +6,7 @@
 #include "finance/transaction/transactions.hpp"
 #include "utils/container/id_map.hpp"
 
-namespace controller
+namespace mapper
 {
     using drafts::StockTransactionOverview;
 
@@ -28,7 +28,7 @@ namespace controller
             const IdMap<InstrumentId, std::string>& instrumentNames
         )
         {
-            const auto  instrumentId = transaction.getBaseInstrumentId();
+            const auto  instrumentId = transaction.getInstrumentId();
             std::string ticker       = "UNKNOWN";
 
             if (instrumentNames.contains(instrumentId))
@@ -119,4 +119,4 @@ namespace controller
         return result;
     }
 
-}   // namespace controller
+}   // namespace mapper

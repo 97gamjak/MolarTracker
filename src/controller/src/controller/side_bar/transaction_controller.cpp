@@ -6,16 +6,17 @@
 #include "config/constants/github_constants.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
-#include "controller/mapper/account_mapper.hpp"
-#include "controller/mapper/option_mapper.hpp"
-#include "controller/mapper/transaction/transaction_create_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
+#include "gateway/position_gateway.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
+#include "mapper/option_mapper.hpp"
+#include "mapper/transaction/transaction_create_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_option_store.hpp"
 #include "store/i_position_store.hpp"
@@ -149,10 +150,11 @@ namespace controller
           _connections(std::make_unique<Connections>())
     {
         const auto cashAccounts =
-            AccountMapper::toDrafts(_accountStore->getCashAccounts());
+            mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts());
 
         const auto securityAccounts =
-            AccountMapper::toDrafts(_accountStore->getSecurityAccounts());
+            mapper::AccountMapper::toDrafts(_accountStore->getSecurityAccounts()
+            );
 
         _dialogs = std::make_unique<Dialogs>(
             cashAccounts,
@@ -245,7 +247,8 @@ namespace controller
 
             _dialogs->cash->setTransactionType(type);
             _dialogs->cash->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _dialogs->cash->refresh();
 
@@ -254,10 +257,13 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _dialogs->stock->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                mapper::AccountMapper::toDrafts(
+                    _accountStore->getSecurityAccounts()
+                )
             );
             _dialogs->stock->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _dialogs->stock->updateTickers(_stockStore->getAllTickers());
             _dialogs->stock->refresh();
@@ -267,10 +273,13 @@ namespace controller
         else if (action == item->getCreateOptionTransactionAction())
         {
             _dialogs->option->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                mapper::AccountMapper::toDrafts(
+                    _accountStore->getSecurityAccounts()
+                )
             );
             _dialogs->option->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _dialogs->option->updateTickers(_stockStore->getAllTickers());
             _dialogs->option->refresh();
@@ -307,7 +316,7 @@ namespace controller
         LOG_ENTRY;
 
         const auto transaction =
-            TransactionCreateMapper::fromCreateCashDraft(draft);
+            mapper::TransactionCreateMapper::fromCreateCashDraft(draft);
 
         const auto result = _transactionStore->addCashTransaction(transaction);
 
@@ -346,11 +355,8 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        auto draftsResult = getOpenStockPositions(
-            draft.getSecurityAccount(),
-            _positionGateway,
-            _stockStore
-        );
+        auto draftsResult =
+            _positionGateway->getOpenStockPosition(draft.getSecurityAccount());
 
         if (!draftsResult)
         {
@@ -403,7 +409,7 @@ namespace controller
         draft.setPositionId(positionId);
 
         const auto transaction =
-            TransactionCreateMapper::fromCreateStockDraft(draft);
+            mapper::TransactionCreateMapper::fromCreateStockDraft(draft);
 
         const auto txAddResult =
             _transactionStore->addStockTransaction(transaction);
@@ -455,7 +461,8 @@ namespace controller
             throw std::logic_error(msg);
         }
 
-        const auto option = OptionMapper::toOption(draft, stock.value());
+        const auto option =
+            mapper::OptionMapper::toOption(draft, stock.value());
 
         const auto optionResult = _optionStore->addOption(option);
 
@@ -478,7 +485,7 @@ namespace controller
         draft.setPositionId(positionId);
 
         const auto transaction =
-            TransactionCreateMapper::fromCreateOptionDraft(draft);
+            mapper::TransactionCreateMapper::fromCreateOptionDraft(draft);
 
         const auto txAddResult =
             _transactionStore->addOptionTransaction(transaction);

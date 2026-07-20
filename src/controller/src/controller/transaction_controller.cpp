@@ -2,8 +2,8 @@
 
 #include <qstackedwidget.h>
 
-#include "controller/mapper/transaction/transaction_overview_mapper.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/transaction/transaction_overview_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
@@ -108,8 +108,9 @@ namespace controller
             );
         }
 
-        const auto cashDrafts  = TransactionOverviewMapper::toCash(txs.value());
-        const auto stockDrafts = TransactionOverviewMapper::toStock(
+        const auto cashDrafts =
+            mapper::TransactionOverviewMapper::toCash(txs.value());
+        const auto stockDrafts = mapper::TransactionOverviewMapper::toStock(
             txs.value(),
             _stockStore->getInstrumentIdToNameMap()
         );

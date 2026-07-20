@@ -83,7 +83,8 @@ namespace controller
               _positionGateway(
                   _storeContainer.getTransactionStore(),
                   _storeContainer.getPositionStore(),
-                  _storeContainer.getOptionStore()
+                  _storeContainer.getOptionStore(),
+                  _storeContainer.getStockStore()
               ),
               _centralController(_mainWindow->getCentralWidget()),
               _accountController(

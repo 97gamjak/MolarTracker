@@ -1,10 +1,14 @@
 #ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__OPTION_MAPPER_HPP__
 #define __CONTROLLER__SRC__CONTROLLER__MAPPER__OPTION_MAPPER_HPP__
 
-#include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/instrument/option.hpp"
 
-namespace controller
+namespace drafts
+{
+    class CreateOptionTransactionDraft;
+}   // namespace drafts
+
+namespace mapper
 {
     /**
      * @brief Mapper for converting option transaction drafts to option
@@ -20,6 +24,6 @@ namespace controller
             const finance::Stock&                       underlying
         );
     };
-}   // namespace controller
+}   // namespace mapper
 
 #endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__OPTION_MAPPER_HPP__

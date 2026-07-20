@@ -1,10 +1,10 @@
-#include "transaction_create_mapper.hpp"
+#include "mapper/transaction/transaction_create_mapper.hpp"
 
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "utils/finance.hpp"
 
-namespace controller
+namespace mapper
 {
     /**
      * @brief Maps a CreateCashTransactionDraft to a CashTransaction.
@@ -69,21 +69,17 @@ namespace controller
             draft.getTimestamp(),
             TransactionStatus::Completed,
             draft.getInstrumentId(),
-            draft.getUnderlyingInstrumentId(),
             draft.getSecurityAccount(),
             draft.getCashAccount(),
             AccountId::invalid(),
             draft.getQuantity(),
-            draft.getStrikePrice(),
             draft.getAmount(),
             draft.getFees(),
-            draft.getContractSize(),
             draft.getPositionId(),
             TransactionOptionAction::Open,
             draft.getBuySell(),
-            draft.getOptionType(),
             std::nullopt,   // rolled option will be set when rolling
             draft.getComment()
         };
     }
-}   // namespace controller
+}   // namespace mapper

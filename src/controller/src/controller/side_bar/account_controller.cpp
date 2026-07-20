@@ -5,9 +5,9 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "controller/mapper/account_mapper.hpp"
 #include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
@@ -151,7 +151,7 @@ namespace controller
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
             _accountStore,
-            AccountMapper::toAccount(account)
+            mapper::AccountMapper::toAccount(account)
         );
 
         if (!result)
