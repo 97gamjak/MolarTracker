@@ -77,7 +77,8 @@ namespace controller
         {
             category->addAccount(
                 account.getId(),
-                QString::fromStdString(account.getName())
+                QString::fromStdString(account.getName()),
+                account.getKind()
             );
         }
     }

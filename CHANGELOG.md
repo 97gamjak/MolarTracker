@@ -4,6 +4,11 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Features
+
+- Show a symbol before each account name in the sidebar: `●` for cash
+  accounts and `▲` for security accounts
+
 ### Bug Fix
 
 - Fix silent failure when creating a duplicate account — the operation now

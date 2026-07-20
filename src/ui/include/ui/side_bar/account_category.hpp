@@ -3,6 +3,7 @@
 
 #include "category.hpp"
 #include "config/id_types.hpp"
+#include "utils/finance.hpp"
 
 class QString;   // Forward declaration
 class QMenu;     // Forward declaration
@@ -25,7 +26,7 @@ namespace ui
        public:
         explicit AccountCategory();
 
-        void addAccount(AccountId id, const QString& name);
+        void addAccount(AccountId id, const QString& name, AccountKind kind);
         void clearAccounts();
 
         [[nodiscard]] QAction* getCreateAction() const;
