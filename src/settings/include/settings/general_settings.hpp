@@ -74,6 +74,7 @@ namespace settings
         static constexpr const char* DISMISSED_UPDATE_VERSION_DESCRIPTION =
             "The version of the update that the user has chosen not to be "
             "reminded about.";
+        static constexpr const char* DISMISSED_UPDATE_VERSION_DEFAULT = "";
     };
 
     /**

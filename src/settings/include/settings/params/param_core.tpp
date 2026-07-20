@@ -81,7 +81,11 @@ namespace settings
             return _defaultValue.value();
 
         throw ParamException(
-            "Parameter value is not set and no default value is provided"
+            std::format(
+                "For Parameter {}: value is not set and no default value is "
+                "provided",
+                _key
+            )
         );
     }
 
