@@ -1,8 +1,10 @@
 #include "store/store_container.hpp"
 
 #include <algorithm>
+#include <filesystem>
 #include <memory>
 
+#include "config/constants/constants.hpp"
 #include "connections/connection.hpp"
 #include "logging/log_macros.hpp"
 #include "service/service_container.hpp"
@@ -35,34 +37,17 @@ namespace store
         std::vector<IStore*> allStores;
 
         /// The Profile store
-        std::shared_ptr<ProfileStore> profileStoreImpl;
-        /// The IProfileStore interface for the profile store
-        std::shared_ptr<IProfileStore> profileStore;
-
+        std::shared_ptr<ProfileStore> profileStore;
         /// The Account store
-        std::shared_ptr<AccountStore> accountStoreImpl;
-        /// The IAccountStore interface for the account store
-        std::shared_ptr<IAccountStore> accountStore;
-
+        std::shared_ptr<AccountStore> accountStore;
         /// The stock store
-        std::shared_ptr<StockStore> stockStoreImpl;
-        /// The IStockStore interface for the stock store
-        std::shared_ptr<IStockStore> stockStore;
-
+        std::shared_ptr<StockStore> stockStore;
         /// The option store
-        std::shared_ptr<OptionStore> optionStoreImpl;
-        /// The IOptionStore interface for the option store
-        std::shared_ptr<IOptionStore> optionStore;
-
+        std::shared_ptr<OptionStore> optionStore;
         /// The Position store
-        std::shared_ptr<PositionStore> positionStoreImpl;
-        /// The IPositionStore interface for the position store
-        std::shared_ptr<IPositionStore> positionStore;
-
+        std::shared_ptr<PositionStore> positionStore;
         /// The Transaction store
-        std::shared_ptr<TransactionStore> transactionStoreImpl;
-        /// The ITransactionStore interface for the transaction store
-        std::shared_ptr<ITransactionStore> transactionStore;
+        std::shared_ptr<TransactionStore> transactionStore;
 
         StoreImpl(
             service::ServiceContainer& serviceContainer,
@@ -80,59 +65,59 @@ namespace store
         service::ServiceContainer& serviceContainer,
         InstrumentIdSeq&           instrumentIdSeq
     )
-        : profileStoreImpl(
+        : profileStore(
               std::make_shared<ProfileStore>(serviceContainer.getProfileService(
               ))
           ),
-          profileStore(profileStoreImpl),
-          accountStoreImpl(
+          accountStore(
               std::make_shared<AccountStore>(serviceContainer.getAccountService(
               ))
           ),
-          accountStore(accountStoreImpl),
-          stockStoreImpl(
+          stockStore(
               std::make_shared<StockStore>(
                   serviceContainer.getInstrumentService(),
                   instrumentIdSeq
               )
           ),
-          stockStore(stockStoreImpl),
-          optionStoreImpl(
+          optionStore(
               std::make_shared<OptionStore>(
                   serviceContainer.getInstrumentService(),
                   instrumentIdSeq
               )
           ),
-          optionStore(optionStoreImpl),
-          positionStoreImpl(
+          positionStore(
               std::make_shared<PositionStore>(
                   serviceContainer.getPositionService(),
                   accountStore->getAccountSession()
               )
           ),
-          positionStore(positionStoreImpl),
-          transactionStoreImpl(
+          transactionStore(
               std::make_shared<TransactionStore>(
                   serviceContainer.getTransactionService(),
                   accountStore->getAccountSession()
               )
-          ),
-          transactionStore(transactionStoreImpl)
+          )
     {
-        allStores.push_back(profileStoreImpl.get());
-        allStores.push_back(accountStoreImpl.get());
-        allStores.push_back(stockStoreImpl.get());
-        allStores.push_back(optionStoreImpl.get());
-        allStores.push_back(positionStoreImpl.get());
-        allStores.push_back(transactionStoreImpl.get());
+        allStores.push_back(profileStore.get());
+        allStores.push_back(accountStore.get());
+        allStores.push_back(stockStore.get());
+        allStores.push_back(optionStore.get());
+        allStores.push_back(positionStore.get());
+        allStores.push_back(transactionStore.get());
     }
 
     /**
      * @brief Construct a new Store Container object
      *
+     * @param backupSettings The backup settings to use for creating a backup on
+     *
      */
-    StoreContainer::StoreContainer()
-        : _serviceContainer{std::make_unique<service::ServiceContainer>()},
+    StoreContainer::StoreContainer(
+        const settings::BackupSettings& backupSettings
+    )
+        : _serviceContainer{std::make_unique<service::ServiceContainer>(
+              backupSettings
+          )},
           _stores{
               std::make_unique<StoreImpl>(*_serviceContainer, _instrumentIdSeq)
           },
@@ -266,67 +251,101 @@ namespace store
     }
 
     /**
-     * @brief Get the ProfileStore (const version)
+     * @brief Get the ProfileStore
      *
-     * @return const ProfileStore&
+     * @return std::shared_ptr<IProfileStore>
      */
-    const std::shared_ptr<IProfileStore>& StoreContainer::getProfileStore(
-    ) const
+    std::shared_ptr<IProfileStore> StoreContainer::getProfileStore() const
     {
         return _stores->profileStore;
     }
 
     /**
-     * @brief Get the AccountStore (const version)
+     * @brief Get the AccountStore
      *
-     * @return const std::shared_ptr<IAccountStore>&
+     * @return std::shared_ptr<IAccountStore>
      */
-    const std::shared_ptr<IAccountStore>& StoreContainer::getAccountStore(
-    ) const
+    std::shared_ptr<IAccountStore> StoreContainer::getAccountStore() const
     {
         return _stores->accountStore;
     }
 
     /**
-     * @brief Get the TransactionStore (const version)
+     * @brief Get the TransactionStore
      *
-     * @return const std::shared_ptr<ITransactionStore>&
+     * @return std::shared_ptr<ITransactionStore>
      */
-    const std::shared_ptr<ITransactionStore>& StoreContainer::
-        getTransactionStore() const
+    std::shared_ptr<ITransactionStore> StoreContainer::getTransactionStore(
+    ) const
     {
         return _stores->transactionStore;
     }
 
     /**
-     * @brief Get the StockStore (const version)
+     * @brief Get the StockStore
      *
-     * @return const std::shared_ptr<IStockStore>&
+     * @return std::shared_ptr<IStockStore>
      */
-    const std::shared_ptr<IStockStore>& StoreContainer::getStockStore() const
+    std::shared_ptr<IStockStore> StoreContainer::getStockStore() const
     {
         return _stores->stockStore;
     }
 
     /**
-     * @brief Get the OptionStore (const version)
+     * @brief Get the OptionStore
      *
-     * @return const std::shared_ptr<IOptionStore>&
+     * @return std::shared_ptr<IOptionStore>
      */
-    const std::shared_ptr<IOptionStore>& StoreContainer::getOptionStore() const
+    std::shared_ptr<IOptionStore> StoreContainer::getOptionStore() const
     {
         return _stores->optionStore;
     }
 
     /**
-     * @brief Get the PositionStore (const version)
+     * @brief Get the PositionStore
      *
-     * @return const std::shared_ptr<IPositionStore>&
+     * @return std::shared_ptr<IPositionStore>
      */
-    const std::shared_ptr<IPositionStore>& StoreContainer::getPositionStore(
-    ) const
+    std::shared_ptr<IPositionStore> StoreContainer::getPositionStore() const
     {
         return _stores->positionStore;
+    }
+
+    /**
+     * @brief Replace the live database with a backup file and reload all
+     * stores so they reflect the restored data.
+     *
+     * 1. Close the SQLite connection via ServiceContainer.
+     * 2. Overwrite the database file with the selected backup.
+     * 3. Reopen the connection.
+     * 4. Call reload() on every store so they clear their caches and
+     *    re-fetch from the restored database.
+     *
+     * @param backupFile Path to the backup file to restore from
+     */
+    void StoreContainer::restoreFromBackup(
+        const std::filesystem::path& backupFile
+    )
+    {
+        LOG_INFO("Restoring database from backup: " + backupFile.string());
+
+        _serviceContainer->closeDb();
+
+        std::filesystem::copy(
+            backupFile,
+            Constants::getInstance().getDatabasePath(),
+            std::filesystem::copy_options::overwrite_existing
+        );
+
+        _serviceContainer->reopenDb();
+
+        for (auto* store : _stores->allStores)
+        {
+            if (store != nullptr)
+                store->reload();
+        }
+
+        LOG_INFO("Database restore complete");
     }
 
 }   // namespace store

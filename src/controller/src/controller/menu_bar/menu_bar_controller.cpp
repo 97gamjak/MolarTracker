@@ -81,13 +81,25 @@ namespace controller
         _settingsMenuController = std::make_unique<SettingsMenuController>(
             *mainWindow,
             menuBar.getSettingsMenu(),
-            settings
+            settings,
+            storeContainer
         );
 
         _helpMenuController = std::make_unique<HelpMenuController>(
             *mainWindow,
             menuBar.getHelpMenu()
         );
+    }
+
+    /**
+     * @brief Return a reference to the settings menu controller so callers
+     * can configure callbacks (e.g., the restore-from-backup callback).
+     *
+     * @return SettingsMenuController&
+     */
+    SettingsMenuController& MenuBarController::getSettingsMenuController()
+    {
+        return *_settingsMenuController;
     }
 
 }   // namespace controller

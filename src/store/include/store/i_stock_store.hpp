@@ -109,14 +109,6 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief commit changes to the store, this will save any new or
-         * modified stocks to the database, and will also handle any necessary
-         * cleanup or state updates in the store after committing changes.
-         *
-         */
-        virtual void commit() = 0;
-
-        /**
          * @brief Get the mapping of old instrument IDs to new instrument IDs
          *
          * @return const IdIdMap<InstrumentId>&

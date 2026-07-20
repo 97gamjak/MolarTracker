@@ -10,6 +10,7 @@
 #include "config/logging_base.hpp"
 #include "logging/log_manager.hpp"
 #include "logging/log_object.hpp"
+#include "ui/exceptions/bug_report_dialog.hpp"
 #include "utils/qt_helpers.hpp"
 
 namespace ui
@@ -43,10 +44,9 @@ namespace ui
         detailBox->setVisible(false);
 
         auto* toggleButton = new QPushButton("Show details");
-        // TODO(97gamjak): make this a bug report button for GitHub later on
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-53
-        auto* copyButton  = new QPushButton("Copy");
-        auto* closeButton = new QPushButton("Close");
+        auto* copyButton   = new QPushButton("Copy");
+        auto* reportButton = new QPushButton("Report Bug");
+        auto* closeButton  = new QPushButton("Close");
 
         connect(
             toggleButton,
@@ -70,12 +70,24 @@ namespace ui
             [details]() { QApplication::clipboard()->setText(details); }
         );
 
+        connect(
+            reportButton,
+            &QPushButton::clicked,
+            this,
+            [this, details]()
+            {
+                BugReportDialog dlg(details, this);
+                dlg.exec();
+            }
+        );
+
         connect(closeButton, &QPushButton::clicked, this, &QDialog::accept);
 
         layout->addWidget(summary);
         layout->addWidget(toggleButton);
         layout->addWidget(detailBox);
         layout->addWidget(copyButton);
+        layout->addWidget(reportButton);
         layout->addWidget(closeButton);
     }
 

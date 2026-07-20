@@ -27,6 +27,7 @@ namespace controller
         ui::HelpMenu& _helpMenu;
 
        private slots:
+        void _onHelpPageRequested();
         void _onAboutRequested();
 
        public:

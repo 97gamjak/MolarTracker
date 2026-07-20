@@ -73,6 +73,8 @@ namespace finance
         [[nodiscard]] Currency      getCurrency() const;
         [[nodiscard]] AccountKind   getKind() const;
         [[nodiscard]] bool          isExternal() const;
+
+        [[nodiscard]] std::string toString() const;
     };
 
     filter::Predicate<Account> IsAccountType(AccountKind kind);

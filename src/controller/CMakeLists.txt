@@ -65,5 +65,6 @@ target_link_libraries(molartracker_controller
     molartracker_drafts
     molartracker_commands
     molartracker_http
+    molartracker_db
     molartracker_vcs
 )
