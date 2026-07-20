@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <concepts>
+#include <format>
 #include <limits>
 #include <optional>
 #include <string>
