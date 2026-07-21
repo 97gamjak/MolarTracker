@@ -13,6 +13,9 @@ All changes and updates, that are relevant for a user will be documented here
 - Fix profile deletion crashing with a SQL syntax error
 - Fix three ORM bugs exposed by unit tests: duplicate `WHERE` in `deleteByPk` SQL, wrong bind-parameter index in `update` WHERE clause, and `LIMIT` being silently ignored when no `ORDER BY` was set
 - Fix default log level of settings is now also applied at startup
+- Fix numeric settings (e.g. max log files, log age, window sizes) not being
+  saved in the Settings dialog — only toggle/checkbox settings persisted
+  before this fix
 
 ### Features
 
