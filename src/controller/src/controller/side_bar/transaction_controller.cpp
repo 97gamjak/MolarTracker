@@ -452,13 +452,20 @@ namespace controller
 
         if (!stock)
         {
-            const auto msg =
-                "Failed to retrieve stock data for underlying "
-                "instrument with ID " +
-                draft.getUnderlyingInstrumentId().toString();
-
-            LOG_ERROR(msg);
-            throw std::logic_error(msg);
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidStock,
+                std::format(
+                    "No stock found for underlying instrument id: {}",
+                    draft.getUnderlyingInstrumentId().toString()
+                )
+            };
+            LOG_ERROR(error.toString());
+            ui::ErrorDialog::show(
+                error,
+                "Failed to create option transaction",
+                _dialogs->option
+            );
+            return;
         }
 
         const auto option =

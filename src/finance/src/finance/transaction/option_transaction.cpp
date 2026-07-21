@@ -113,8 +113,7 @@ namespace finance
     {
         auto optionData = OptionData{
             TransactionOptionId::invalid(),   // populated with commit
-            getQuantity() > Quantity{0} ? OptionBuySell::Buy
-                                        : OptionBuySell::Sell,
+            _buySell,
             _action,
             _rolledOption
         };
