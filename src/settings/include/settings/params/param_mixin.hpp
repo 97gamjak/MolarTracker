@@ -72,6 +72,7 @@ namespace settings
         void               setRebootRequired(bool required);
 
         void commit();
+        void resetToDefault();
 
         [[nodiscard]] bool isDirty() const;
 

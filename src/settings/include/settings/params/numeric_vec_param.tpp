@@ -257,6 +257,22 @@ namespace settings
     }
 
     /**
+     * @brief Reset each individual numeric parameter in the vector to its
+     * default value, this is a no-op for any individual parameter that has no
+     * default value configured
+     *
+     * @tparam T
+     * @tparam N
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    void NumericVecParam<T, N>::resetToDefault()
+    {
+        for (auto& param : _params)
+            param.resetToDefault();
+    }
+
+    /**
      * @brief Deserialize a numeric vector parameter from JSON, this function
      * reads the key, title, description, and an array of values for each
      * individual numeric parameter in the vector from the provided JSON data,

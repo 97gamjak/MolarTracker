@@ -238,6 +238,19 @@ TEST(NumericVecParam, CommitClearsDirtyForAllElements)
     EXPECT_FALSE(vec.isDirty());
 }
 
+TEST(NumericVecParam, ResetToDefaultRestoresAllElements)
+{
+    settings::NumericVecParam<int, 2> vec("v", "V", "D");
+    vec.setDefaults(std::vector<int>{1, 2});
+    ASSERT_TRUE(vec.set(0, 10).has_value());
+    ASSERT_TRUE(vec.set(1, 20).has_value());
+
+    vec.resetToDefault();
+
+    EXPECT_EQ(vec.get(0), 1);
+    EXPECT_EQ(vec.get(1), 2);
+}
+
 // ============================================================================
 // toString
 // ============================================================================
