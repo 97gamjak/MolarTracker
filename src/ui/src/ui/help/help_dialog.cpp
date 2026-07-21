@@ -29,6 +29,10 @@ features.</p>
 <p>Open the settings dialog via <b>Settings &rarr; Preferences</b> in the menu
 bar. It lets you configure general, UI, and logging preferences.</p>
 
+<p align="center"><img src=":/help/settings_menu_location.png" width="500"></p>
+
+<p>The dialog opens on the <b>General Settings</b> section by default:</p>
+
 <p align="center"><img src=":/help/settings_dialog_general.png" width="600"></p>
 
 <p>The sidebar on the left lists the top-level sections:</p>

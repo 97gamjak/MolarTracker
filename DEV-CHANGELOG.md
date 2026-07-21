@@ -235,12 +235,13 @@ REVERT CACHE changes but keep error handling
   `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
   signal and `HelpMenuController`
 - `ui::HelpDialog` (MOLTRACK-313): add a "Settings" section to the help
-  content documenting the Settings dialog (how to open it, its sidebar
-  sections, and Save/Close semantics), with two screenshots. Add
+  content documenting the Settings dialog (where to open it from the menu
+  bar, its default General Settings view, its sidebar sections, and
+  Save/Close semantics), with three screenshots. Add
   `src/ui/resources/help.qrc` (Qt resource collection, auto-compiled via
   `CMAKE_AUTORCC`) bundling `src/ui/resources/help/*.png` into the binary at
   `:/help/...`; `molartracker_ui`'s `CMakeLists.txt` now globs `resources/*.qrc`
-  into its sources. The two screenshot files are placeholders — see PR
+  into its sources. The three screenshot files are placeholders — see PR
   description for what to capture and where to save them.
 
 <!-- insertion marker -->
