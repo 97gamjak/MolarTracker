@@ -18,6 +18,8 @@
 #include "sql_models/transaction_row.hpp"
 #include "utils/finance.hpp"
 
+REGISTER_LOG_CATEGORY("Repo.TransactionRepo");
+
 namespace repo
 {
     namespace
@@ -264,26 +266,14 @@ namespace repo
             const auto inSet = [&](const auto& row)
             { return accountIds.contains(row.accountId.value()); };
 
-            if (!std::ranges::all_of(entryRows, inSet) ||
-                !std::ranges::all_of(legRows, inSet))
+            if (!std::ranges::any_of(entryRows, inSet) &&
+                !std::ranges::any_of(legRows, inSet))
             {
-                if (std::ranges::any_of(entryRows, inSet) ||
-                    std::ranges::any_of(legRows, inSet))
-                {
-                    LOG_WARNING(
-                        "Skipping transaction with ID " +
-                        txRow.id.value().toString() +
-                        " because not all entries/legs match the account filter"
-                    );
-                }
-                else
-                {
-                    LOG_TRACE(
-                        "Skipping transaction with ID " +
-                        txRow.id.value().toString() +
-                        " because no entries/legs match the account filter"
-                    );
-                }
+                LOG_WARNING(
+                    "Skipping transaction with ID " +
+                    txRow.id.value().toString() +
+                    " because not all entries/legs match the account filter"
+                );
                 continue;
             }
 
@@ -299,6 +289,13 @@ namespace repo
 
             results.push_back(std::move(transaction));
         }
+
+        LOG_DEBUG(
+            std::format(
+                "Retrieved {} transactions from the database",
+                results.size()
+            )
+        );
 
         return results;
     }

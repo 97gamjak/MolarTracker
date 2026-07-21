@@ -257,20 +257,38 @@ namespace store
         );
         auto transactions = _getEntries(options);
 
-        auto dbTransactions = _transactionService->getTransactions(filter);
-
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
         IdSet<TransactionId> transactionIds;
 
         std::vector<finance::DomainTransaction> results;
-
         for (const auto& transaction : transactions)
         {
             transactionIds.insert(transaction.value.getId());
             results.push_back(transaction.value);
         }
+
+        LOG_DEBUG(
+            std::format(
+                "Transactions retrieved from store: {}, with ids: {}",
+                results.size(),
+                transactionIds.toString()
+            )
+        );
+
+        auto dbTransactions = _transactionService->getTransactions(filter);
+
+        LOG_DEBUG(
+            std::format(
+                "Transactions retrieved from database: {} with ids: {}",
+                dbTransactions.size(),
+                IdSet<TransactionId>::fromRange(
+                    dbTransactions,
+                    [](const auto& tx) { return tx.getId(); }
+                ).toString()
+            )
+        );
 
         for (const auto& transaction : dbTransactions)
             if (!transactionIds.contains(transaction.getId()))

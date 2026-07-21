@@ -174,11 +174,11 @@ namespace controller
                     _details->currentAccount == nullptr)
                     return;
 
-                auto& details =
+                auto& stockDetails =
                     _details
                         ->openStockPositions[_details->currentAccount->getId()];
                 std::vector<drafts::PositionStockDetailDraft> drafts;
-                for (auto& detail : details)
+                for (auto& detail : stockDetails)
                 {
                     const auto quote = _details->priceCache->get(detail.ticker);
                     if (quote.has_value())
@@ -198,10 +198,35 @@ namespace controller
                     drafts.push_back(detail.positionDraft);
                 }
 
+                auto& optionDetails =
+                    _details->openOptionPositions[_details->currentAccount
+                                                      ->getId()];
+
+                std::vector<drafts::PositionOptionDetailDraft> optionDrafts;
+                for (auto& detail : optionDetails)
+                {
+                    const auto quote = _details->priceCache->get(detail.ticker);
+                    if (quote.has_value())
+                    {
+                        const auto pnl = finance::snapshot(
+                            detail.state,
+                            quote.value().getPrice()
+                        );
+
+                        detail.positionDraft.updateUnrealizedPnL(
+                            quote.value().getPrice(),
+                            pnl.getMarketValue(),
+                            pnl.unrealizedPnL,
+                            pnl.getUnrealizedPnLPercentage()
+                        );
+                    }
+                    optionDrafts.push_back(detail.positionDraft);
+                }
+
                 _details->accountDetailView->updateSecurityAccount(
                     *_details->currentAccount,
                     drafts,
-                    {}
+                    optionDrafts
                 );
             },
             this

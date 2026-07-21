@@ -156,4 +156,35 @@ const T& Set<T, Hash>::front() const
     return *(IterableBase::_items.begin());
 }
 
+template <typename T, typename Hash>
+std::string Set<T, Hash>::toString() const
+{
+    std::string result = "{";
+    for (const auto& value : IterableBase::_items)
+    {
+        // check if toString is available for the type T, if it is, use it,
+        // otherwise use std::to_string
+        if constexpr (std::is_invocable_v<decltype(&T::toString), T>)
+            result += value.toString() + ", ";
+        else
+            result += std::to_string(value) + ", ";
+    }
+    if (!IterableBase::_items.empty())
+        result.pop_back(),
+            result.pop_back();   // Remove trailing comma and space
+    result += "}";
+    return result;
+}
+
+template <typename T, typename Hash>
+template <std::ranges::range R, typename F>
+Set<T, Hash> Set<T, Hash>::fromRange(const R& range, F&& func)
+{
+    Set<T, Hash> result;
+    for (const auto& item : range)
+        result.insert(std::forward<F>(func)(item));
+
+    return result;
+}
+
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
