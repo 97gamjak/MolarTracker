@@ -8,6 +8,7 @@
 #include "repo/exceptions.hpp"
 #include "repo/repo_container.hpp"
 #include "transaction_service.hpp"
+#include "watchlist_service.hpp"
 
 REGISTER_LOG_CATEGORY("Service.ServiceContainer");
 
@@ -39,6 +40,9 @@ namespace service
           )},
           _positionService{std::make_shared<PositionService>(
               _repoContainer->getPositionRepo()
+          )},
+          _watchlistService{std::make_shared<WatchlistService>(
+              _repoContainer->getWatchlistRepo()
           )}
 
     {
@@ -162,6 +166,27 @@ namespace service
         getPositionService() const
     {
         return _positionService;
+    }
+
+    /**
+     * @brief Get the Watchlist Service
+     *
+     * @return std::shared_ptr<IWatchlistService>
+     */
+    std::shared_ptr<IWatchlistService> ServiceContainer::getWatchlistService()
+    {
+        return _watchlistService;
+    }
+
+    /**
+     * @brief Get the Watchlist Service (const version)
+     *
+     * @return std::shared_ptr<const IWatchlistService>
+     */
+    std::shared_ptr<const IWatchlistService> ServiceContainer::
+        getWatchlistService() const
+    {
+        return _watchlistService;
     }
 
     /**

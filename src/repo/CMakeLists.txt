@@ -10,12 +10,14 @@ add_library(molartracker_repo STATIC
     src/repo/profile_repo.cpp
     src/repo/repo_errors.cpp
     src/repo/transaction_repo.cpp
+    src/repo/watchlist_repo.cpp
 
     src/repo/factories/account_factory.cpp
     src/repo/factories/profile_factory.cpp
     src/repo/factories/transaction_factory.cpp
     src/repo/factories/instrument_factory.cpp
     src/repo/factories/position_factory.cpp
+    src/repo/factories/watchlist_factory.cpp
 
     src/repo/migration/migration_runner.cpp
     src/repo/migration/migration.cpp

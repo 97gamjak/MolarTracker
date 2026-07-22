@@ -11,6 +11,8 @@ add_library(molartracker_sql_models STATIC
     ${SRC}/transaction_entry_row.cpp
     ${SRC}/transaction_option_row.cpp
     ${SRC}/transaction_row.cpp
+    ${SRC}/watchlist_row.cpp
+    ${SRC}/watchlist_instrument_row.cpp
 )
 
 target_include_directories(molartracker_sql_models

@@ -21,6 +21,7 @@ namespace service
     class ITransactionService;   // Forward declaration
     class IInstrumentService;    // Forward declaration
     class IPositionService;      // Forward declaration
+    class IWatchlistService;     // Forward declaration
 
     /**
      * @brief Container for all services
@@ -41,6 +42,8 @@ namespace service
         std::shared_ptr<IInstrumentService> _instrumentService;
         /// The Position service
         std::shared_ptr<IPositionService> _positionService;
+        /// The Watchlist service
+        std::shared_ptr<IWatchlistService> _watchlistService;
 
        public:
         explicit ServiceContainer(
@@ -68,6 +71,10 @@ namespace service
 
         [[nodiscard]] std::shared_ptr<IPositionService> getPositionService();
         [[nodiscard]] std::shared_ptr<const IPositionService> getPositionService(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<IWatchlistService> getWatchlistService();
+        [[nodiscard]] std::shared_ptr<const IWatchlistService> getWatchlistService(
         ) const;
 
         void closeDb();

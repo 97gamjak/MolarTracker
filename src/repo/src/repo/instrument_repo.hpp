@@ -27,6 +27,11 @@ namespace repo
         ) override;
 
         [[nodiscard]]
+        std::vector<finance::Stock> getStocksBySymbols(
+            const std::vector<std::string>& symbols
+        ) override;
+
+        [[nodiscard]]
         std::vector<finance::Option> getOptions() override;
 
         [[nodiscard]]

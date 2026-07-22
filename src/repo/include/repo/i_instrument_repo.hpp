@@ -47,6 +47,18 @@ namespace repo
         ) = 0;
 
         /**
+         * @brief Get a list of stocks whose ticker symbol is in the given
+         * allowlist (e.g. the symbols contained in a watchlist)
+         *
+         * @param symbols The ticker symbols to filter by
+         * @return std::vector<finance::Stock>
+         */
+        [[nodiscard]]
+        virtual std::vector<finance::Stock> getStocksBySymbols(
+            const std::vector<std::string>& symbols
+        ) = 0;
+
+        /**
          * @brief get a list of all options in the database
          *
          * @return std::vector<finance::Option>
