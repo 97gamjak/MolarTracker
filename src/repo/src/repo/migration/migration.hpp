@@ -6,8 +6,8 @@
 #include <mstd/enum.hpp>
 #include <vector>
 
+#include "common/version.hpp"
 #include "multi_migration.hpp"
-#include "utils/version.hpp"
 
 namespace db
 {
@@ -29,12 +29,12 @@ namespace repo
         std::vector<std::unique_ptr<MultiMigration>> _migrations;
 
         /// The release version this migration is targeting
-        utils::SemVer _version;
+        common::SemVer _version;
 
        public:
         explicit Migration(
-            std::size_t          fromVersion,
-            const utils::SemVer& version
+            std::size_t           fromVersion,
+            const common::SemVer& version
         );
 
         void migrate(db::Database& db) const;
@@ -57,7 +57,8 @@ namespace repo
         std::vector<Migration> _migrations;
 
         /// The last release version
-        utils::SemVer _lastReleaseVersion = utils::SemVer::getInvalidVersion();
+        common::SemVer _lastReleaseVersion =
+            common::SemVer::getInvalidVersion();
 
        public:
         Migrations(std::size_t fromVersion, std::size_t toVersion);

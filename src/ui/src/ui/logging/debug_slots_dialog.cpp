@@ -11,11 +11,11 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "ui/logging/debug_slots_log_level_delegate.hpp"
 #include "ui/logging/debug_slots_model.hpp"
 #include "ui/utils/discard_changes.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Logging.DebugSlotsDialog");
 
@@ -81,7 +81,7 @@ namespace ui
         setWindowTitle("Logging Debug Flags");
         resize(_settings->windowSize.first, _settings->windowSize.second);
 
-        _tree = utils::makeQChild<QTreeView>(this);
+        _tree = common::makeQChild<QTreeView>(this);
         _tree->setRootIsDecorated(true);
         _tree->setUniformRowHeights(true);
         _tree->setEditTriggers(
@@ -92,16 +92,17 @@ namespace ui
         header->setSectionResizeMode(QHeaderView::Stretch);
         _tree->setAlternatingRowColors(true);
 
-        _model = utils::makeQChild<LogCategoryModel>(_currentCategories, _tree);
+        _model =
+            common::makeQChild<LogCategoryModel>(_currentCategories, _tree);
         _tree->setModel(_model);
 
         _tree->setItemDelegateForColumn(
             LogCategoryModel::getLogLevelColumn(),
-            utils::makeQChild<DebugSlotsLogLevelDelegate>(this)
+            common::makeQChild<DebugSlotsLogLevelDelegate>(this)
         );
 
         auto* applyToChildrenDelegate =
-            utils::makeQChild<DebugSlotsApplyToChildrenDelegate>(this);
+            common::makeQChild<DebugSlotsApplyToChildrenDelegate>(this);
         _tree->setItemDelegateForColumn(
             LogCategoryModel::getApplyToChildrenColumn(),
             applyToChildrenDelegate
@@ -115,36 +116,36 @@ namespace ui
         );
 
         _defaultsButton =
-            utils::makeQChild<QPushButton>("Use default flags", this);
+            common::makeQChild<QPushButton>("Use default flags", this);
         _discardChangesButton =
-            utils::makeQChild<QPushButton>("Discard Changes", this);
+            common::makeQChild<QPushButton>("Discard Changes", this);
 
         _showOnlyModifiedCheckBox =
-            utils::makeQChild<QCheckBox>("Show only modified", this);
+            common::makeQChild<QCheckBox>("Show only modified", this);
         _showOnlyModifiedCheckBox->setChecked(false);
 
         _persistChangesCheckBox =
-            utils::makeQChild<QCheckBox>("Persist changes", this);
+            common::makeQChild<QCheckBox>("Persist changes", this);
         _persistChangesCheckBox->setChecked(false);
 
-        _buttonBox = utils::makeQChild<QDialogButtonBox>(
+        _buttonBox = common::makeQChild<QDialogButtonBox>(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
                 QDialogButtonBox::Apply,
             this
         );
 
-        auto* upperBottomRow = utils::makeQChild<QHBoxLayout>();
+        auto* upperBottomRow = common::makeQChild<QHBoxLayout>();
         upperBottomRow->addWidget(_showOnlyModifiedCheckBox);
         upperBottomRow->addWidget(_persistChangesCheckBox);
         upperBottomRow->addStretch(1);
 
-        auto* bottomRow = utils::makeQChild<QHBoxLayout>();
+        auto* bottomRow = common::makeQChild<QHBoxLayout>();
         bottomRow->addWidget(_defaultsButton);
         bottomRow->addWidget(_discardChangesButton);
         bottomRow->addStretch(1);
         bottomRow->addWidget(_buttonBox);
 
-        auto* root = utils::makeQChild<QVBoxLayout>();
+        auto* root = common::makeQChild<QVBoxLayout>();
         root->addWidget(_tree, 1);
         root->addLayout(upperBottomRow);
         root->addLayout(bottomRow);

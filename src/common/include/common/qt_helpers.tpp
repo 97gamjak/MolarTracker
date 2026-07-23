@@ -6,7 +6,7 @@
 
 #include "qt_helpers.hpp"
 
-namespace utils
+namespace common
 {
     /**
      * @brief Convert an enum value to a QString.
@@ -54,6 +54,6 @@ namespace utils
         return new T(std::forward<Args>(args)...);
     }
 
-}   // namespace utils
+}   // namespace common
 
 #endif   // __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__

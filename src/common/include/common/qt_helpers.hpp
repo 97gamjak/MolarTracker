@@ -9,12 +9,12 @@
 #include <string_view>
 #include <vector>
 
-#include "utils/container/set.hpp"
+#include "common/container/set.hpp"
 
 class QDialog;   // Forward declaration
 class QWidget;   // Forward declaration
 
-namespace utils
+namespace common
 {
     [[nodiscard]]
     QStringList toQStringList(const std::span<const std::string_view>& vec);
@@ -43,7 +43,7 @@ namespace utils
     [[nodiscard]]
     T* makeQChild(Args&&... args);
 
-}   // namespace utils
+}   // namespace common
 
 #ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
 #include "qt_helpers.tpp"   // IWYU pragma: export

@@ -9,10 +9,10 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "config/constants/github_constants.hpp"
 #include "http/http_client.hpp"
 #include "logging/log_manager.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace
 {
@@ -94,22 +94,22 @@ namespace ui
      */
     void BugReportDialog::_buildUI(const QString& details)
     {
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
 
-        auto* infoLabel = utils::makeQChild<QLabel>(
+        auto* infoLabel = common::makeQChild<QLabel>(
             "Review and edit the report below, then open it on GitHub to "
             "submit it.",
             this
         );
         infoLabel->setWordWrap(true);
 
-        _titleEdit = utils::makeQChild<QLineEdit>(defaultTitle(details), this);
+        _titleEdit = common::makeQChild<QLineEdit>(defaultTitle(details), this);
         _bodyEdit =
-            utils::makeQChild<QPlainTextEdit>(defaultBody(details), this);
+            common::makeQChild<QPlainTextEdit>(defaultBody(details), this);
 
         auto* openButton =
-            utils::makeQChild<QPushButton>("Open in Browser", this);
-        auto* cancelButton = utils::makeQChild<QPushButton>("Cancel", this);
+            common::makeQChild<QPushButton>("Open in Browser", this);
+        auto* cancelButton = common::makeQChild<QPushButton>("Cancel", this);
 
         layout->addWidget(infoLabel);
         layout->addWidget(_titleEdit);

@@ -4,8 +4,8 @@
 #include <optional>
 #include <string>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
-#include "utils/finance.hpp"
 
 namespace drafts
 {

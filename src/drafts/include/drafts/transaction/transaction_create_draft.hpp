@@ -3,10 +3,10 @@
 
 #include <optional>
 
+#include "common/cash.hpp"
+#include "common/quantity.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
-#include "utils/cash.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace drafts
 {

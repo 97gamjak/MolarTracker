@@ -3,8 +3,8 @@
 
 #include <expected>
 
+#include "common/version.hpp"
 #include "http/http_error.hpp"
-#include "utils/version.hpp"
 
 namespace vcs
 {
@@ -21,8 +21,8 @@ namespace vcs
 
        public:
         [[nodiscard]]
-        static std::expected<utils::SemVer, http::HttpError> fetchLatestVersion(
-        );
+        static std::
+            expected<common::SemVer, http::HttpError> fetchLatestVersion();
 
        private:
         [[nodiscard]]

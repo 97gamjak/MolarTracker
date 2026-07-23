@@ -13,9 +13,9 @@
 
 #include <QGroupBox>
 
+#include "common/qt_helpers.hpp"
 #include "param_editor.hpp"
 #include "settings/params/param_utils.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -70,7 +70,7 @@ namespace ui
 
         if constexpr (std::floating_point<ValueType>)
         {
-            auto* spinBox = utils::makeQChild<QDoubleSpinBox>();
+            auto* spinBox = common::makeQChild<QDoubleSpinBox>();
             spinBox->setDecimals(
                 static_cast<int>(param.getPrecision().value_or(4))
             );
@@ -87,7 +87,7 @@ namespace ui
         }
         else
         {
-            auto* spinBox = utils::makeQChild<QSpinBox>();
+            auto* spinBox = common::makeQChild<QSpinBox>();
             makeNumericEditorHelper(spinBox, param);
 
             QObject::connect(
@@ -107,8 +107,8 @@ namespace ui
         constexpr std::size_t spacing         = 6;
         constexpr std::size_t numberOfEntries = T::size;
 
-        auto* container = utils::makeQChild<QWidget>();
-        auto* layout    = utils::makeQChild<QHBoxLayout>(container);
+        auto* container = common::makeQChild<QWidget>();
+        auto* layout    = common::makeQChild<QHBoxLayout>(container);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(spacing);
 
@@ -142,7 +142,7 @@ namespace ui
     template <typename T>
     QWidget* makeEnumEditor(T& param)
     {
-        auto* comboBox = utils::makeQChild<QComboBox>();
+        auto* comboBox = common::makeQChild<QComboBox>();
 
         const auto& entries = T::EnumMeta::values;
 
@@ -208,7 +208,7 @@ namespace ui
         }
         else if constexpr (settings::is_version_param<P>)
         {
-            auto* lbl = utils::makeQChild<QLabel>(
+            auto* lbl = common::makeQChild<QLabel>(
                 QString::fromStdString(param.get().toString())
             );
 
@@ -239,10 +239,10 @@ namespace ui
         if constexpr (settings::IsParamContainer<TParam>)
         {
             // Sub-container → group box with its own form layout
-            auto* group = utils::makeQChild<QGroupBox>(
+            auto* group = common::makeQChild<QGroupBox>(
                 QString::fromStdString(param.getTitle())
             );
-            auto* groupLayout = utils::makeQChild<QFormLayout>(group);
+            auto* groupLayout = common::makeQChild<QFormLayout>(group);
 
             constexpr std::array<int, 4> margins = {12, 8, 12, 8};
 
@@ -269,9 +269,9 @@ namespace ui
                 return;   // Skip leaf params
 
             // Leaf param → normal editor row
-            auto* rowWidget = utils::makeQChild<QWidget>();
+            auto* rowWidget = common::makeQChild<QWidget>();
             rowWidget->setObjectName("paramRow");
-            auto* rowLayout = utils::makeQChild<QHBoxLayout>(rowWidget);
+            auto* rowLayout = common::makeQChild<QHBoxLayout>(rowWidget);
 
             constexpr std::array<int, 4> margins = {0, 6, 0, 6};
             constexpr std::size_t        spacing = 8;
@@ -283,7 +283,7 @@ namespace ui
             );
             rowLayout->setSpacing(spacing);
 
-            auto* dirtyStripe = utils::makeQChild<QWidget>();
+            auto* dirtyStripe = common::makeQChild<QWidget>();
 
             constexpr std::pair<int, int> dirtyStripeSize = {3, 20};
             dirtyStripe->setFixedSize(
@@ -309,7 +309,7 @@ namespace ui
 
             rowLayout->addStretch();
 
-            auto* label = utils::makeQChild<QLabel>(
+            auto* label = common::makeQChild<QLabel>(
                 QString::fromStdString(param.getTitle())
             );
             label->setObjectName("paramLabel");

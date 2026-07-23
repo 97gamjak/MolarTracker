@@ -7,7 +7,7 @@
 #include <fstream>
 #include <string>
 
-#include "utils/ring_file_config.hpp"
+#include "common/ring_file_config.hpp"
 
 // TODO(97gamjak): migrate this RingFile to mstd
 // https://97gamjak.atlassian.net/browse/MSTD-90

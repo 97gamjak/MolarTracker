@@ -1,4 +1,4 @@
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 
 #include <QDialog>
 #include <QList>
@@ -9,7 +9,7 @@
 #include <QWidget>
 #include <string>
 
-namespace utils
+namespace common
 {
     /**
      * @brief Converts a span of string_views to a QStringList
@@ -107,4 +107,4 @@ namespace utils
         return QString{"%1 KB"}.arg(kiloBytes);
     }
 
-}   // namespace utils
+}   // namespace common

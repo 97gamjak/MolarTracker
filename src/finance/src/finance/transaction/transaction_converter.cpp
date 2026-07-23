@@ -3,13 +3,13 @@
 #include <expected>
 #include <variant>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {

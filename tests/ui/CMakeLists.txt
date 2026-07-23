@@ -14,7 +14,7 @@ target_link_libraries(tests_ui
     molartracker_drafts
     molartracker_config
     molartracker_finance
-    molartracker_utils
+    molartracker_common
     Qt6::Widgets
     GTest::gtest
 )

@@ -4,7 +4,7 @@ namespace ui
 {
     QWidget* makeBoolEditor(settings::BoolParam& param)
     {
-        auto* checkBox = utils::makeQChild<QCheckBox>();
+        auto* checkBox = common::makeQChild<QCheckBox>();
         checkBox->setChecked(param.get());
         checkBox->setTristate(false);
 
@@ -21,7 +21,7 @@ namespace ui
     {
         constexpr size_t minimumWidth = 200;
 
-        auto* lineEdit = utils::makeQChild<QLineEdit>();
+        auto* lineEdit = common::makeQChild<QLineEdit>();
         lineEdit->setText(QString::fromStdString(param.get()));
         lineEdit->setMinimumWidth(minimumWidth);
 

@@ -22,7 +22,7 @@ target_link_libraries(molartracker_logging
     molartracker_settings
     mstd
     PUBLIC
-    molartracker_utils # value storing ring file
+    molartracker_common # value storing ring file
     molartracker_config
 )
 

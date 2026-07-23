@@ -8,7 +8,7 @@
 
 class QString;   // Forward declaration
 
-namespace utils
+namespace common
 {
 
     /**
@@ -58,6 +58,6 @@ namespace utils
         static std::optional<SemVer> _parse(const std::string& versionStr);
     };
 
-}   // namespace utils
+}   // namespace common
 
 #endif   // __UTILS__INCLUDE__UTILS__VERSION_HPP__

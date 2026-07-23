@@ -5,8 +5,8 @@
 #include <QVBoxLayout>
 #include <utility>
 
+#include "common/qt_helpers.hpp"
 #include "ui/validators/line_validator.hpp"
-#include "utils/qt_helpers.hpp"
 
 class QWidget;   // Forward declaration
 

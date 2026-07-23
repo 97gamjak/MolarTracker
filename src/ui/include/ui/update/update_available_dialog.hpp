@@ -6,10 +6,10 @@
 class QCheckBox;   // Forward declaration
 class QWidget;     // Forward declaration
 
-namespace utils
+namespace common
 {
     class SemVer;   // Forward declaration
-}   // namespace utils
+}   // namespace common
 
 namespace ui
 {
@@ -32,8 +32,8 @@ namespace ui
 
        public:
         explicit UpdateAvailableDialog(
-            const utils::SemVer& latestVersion,
-            QWidget*             parent = nullptr
+            const common::SemVer& latestVersion,
+            QWidget*              parent = nullptr
         );
 
         [[nodiscard]] bool isDismissedForVersion() const;

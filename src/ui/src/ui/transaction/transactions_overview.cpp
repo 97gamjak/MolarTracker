@@ -7,10 +7,10 @@
 #include <qsortfilterproxymodel.h>
 #include <qtableview.h>
 
+#include "common/qt_helpers.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -23,12 +23,12 @@ namespace ui
      */
     TransactionsOverview::TransactionsOverview(QWidget* parent)
         : QWidget(parent),
-          _cashModel(utils::makeQChild<CashTransactionTableModel>(this)),
-          _stockModel(utils::makeQChild<StockTransactionTableModel>(this)),
-          _cashProxy(utils::makeQChild<QSortFilterProxyModel>(this)),
-          _stockProxy(utils::makeQChild<QSortFilterProxyModel>(this)),
-          _cashTable(utils::makeQChild<QTableView>(this)),
-          _stockTable(utils::makeQChild<QTableView>(this))
+          _cashModel(common::makeQChild<CashTransactionTableModel>(this)),
+          _stockModel(common::makeQChild<StockTransactionTableModel>(this)),
+          _cashProxy(common::makeQChild<QSortFilterProxyModel>(this)),
+          _stockProxy(common::makeQChild<QSortFilterProxyModel>(this)),
+          _cashTable(common::makeQChild<QTableView>(this)),
+          _stockTable(common::makeQChild<QTableView>(this))
     {
         _cashProxy->setSourceModel(_cashModel);
         _cashProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -38,7 +38,7 @@ namespace ui
         _stockProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
         _stockProxy->setFilterKeyColumn(-1);   // search all columns
 
-        auto* search = utils::makeQChild<QLineEdit>(this);
+        auto* search = common::makeQChild<QLineEdit>(this);
         search->setPlaceholderText("Search transactions…");
 
         connect(
@@ -74,7 +74,7 @@ namespace ui
             QHeaderView::Stretch
         );
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->addWidget(search);
         layout->addWidget(_cashTable);
         layout->addWidget(_stockTable);

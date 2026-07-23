@@ -2,8 +2,8 @@
 #define __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_CATEGORY_HPP__
 
 #include "category.hpp"
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
-#include "utils/finance.hpp"
 
 class QString;   // Forward declaration
 class QMenu;     // Forward declaration

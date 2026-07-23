@@ -1,11 +1,11 @@
 #ifndef __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_ACCOUNT_STORE_HPP__
 
+#include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
-#include "utils/container/id_id_map.hpp"
 
 namespace store
 {

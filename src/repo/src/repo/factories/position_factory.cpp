@@ -2,9 +2,9 @@
 
 #include <optional>
 
+#include "common/timestamp.hpp"
 #include "finance/position.hpp"
 #include "sql_models/position_row.hpp"
-#include "utils/timestamp.hpp"
 
 namespace repo
 {

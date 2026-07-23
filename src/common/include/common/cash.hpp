@@ -3,8 +3,8 @@
 
 #include <compare>
 
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
 
 /**
  * @brief A class representing a cash amount in a specific currency.

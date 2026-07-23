@@ -9,6 +9,9 @@
 #include <QComboBox>
 #include <QPointer>
 
+#include "common/cash.hpp"
+#include "common/currency.hpp"
+#include "common/qt_helpers.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/transaction/account_combo.hpp"
@@ -17,11 +20,8 @@
 #include "ui/transaction/ticker_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
-#include "utils/cash.hpp"
-#include "utils/currency.hpp"
-#include "utils/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {
@@ -482,7 +482,7 @@ namespace ui
      */
     void OptionWidget::updateTickers(const Set<std::string>& tickers)
     {
-        _fields->tickerField->updateTickers(utils::toQStringSet(tickers));
+        _fields->tickerField->updateTickers(common::toQStringSet(tickers));
     }
 
     /**

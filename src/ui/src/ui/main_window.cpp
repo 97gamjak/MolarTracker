@@ -9,11 +9,11 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "config/constants/constants.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -42,10 +42,10 @@ namespace ui
     {
         setMenuBar(_menuBar);
 
-        auto* root = utils::makeQChild<QWidget>(this);
+        auto* root = common::makeQChild<QWidget>(this);
         setCentralWidget(root);
 
-        auto* layout = utils::makeQChild<QHBoxLayout>(root);
+        auto* layout = common::makeQChild<QHBoxLayout>(root);
 
         const auto& margins = Constants::getCoreWindowMargins();
         layout->setContentsMargins(

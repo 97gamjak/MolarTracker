@@ -3,9 +3,9 @@
 
 #include <string>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
 
 namespace drafts
 {

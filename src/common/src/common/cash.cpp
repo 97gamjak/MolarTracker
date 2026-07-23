@@ -1,12 +1,12 @@
-#include "utils/cash.hpp"
+#include "common/cash.hpp"
 
 #include <cmath>
 #include <format>
 #include <string>
 
+#include "common/currency.hpp"
+#include "common/quantity.hpp"
 #include "currency_exception.hpp"
-#include "utils/currency.hpp"
-#include "utils/quantity.hpp"
 
 /**
  * @brief Construct a new Cash:: Cash object with a specified amount

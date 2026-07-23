@@ -6,12 +6,12 @@
 #include <string>
 #include <utility>
 
+#include "common/version_json.hpp"   // IWYU pragma: keep -- needed for version param serialization
 #include "config/constants/constants.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
 #include "settings/params/param_container.hpp"
 #include "settings/params/params.hpp"
-#include "utils/version_json.hpp"   // IWYU pragma: keep -- needed for version param serialization
 
 namespace settings
 {

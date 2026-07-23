@@ -26,6 +26,6 @@ target_link_libraries(molartracker_settings
     molartracker_connections
     molartracker_config
     PRIVATE
-    molartracker_utils
+    molartracker_common
     molartracker_exceptions
 )

@@ -15,8 +15,8 @@
 #include <optional>
 #include <string>
 
+#include "common/version_json.hpp"   // IWYU pragma: keep
 #include "settings/general_settings.hpp"
-#include "utils/version_json.hpp"   // IWYU pragma: keep
 
 TEST(GeneralSettings, DefaultConstructedHasNoDefaultProfile)
 {

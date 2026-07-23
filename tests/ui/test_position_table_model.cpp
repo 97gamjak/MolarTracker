@@ -3,12 +3,12 @@
 #include <QVariant>
 #include <string>
 
+#include "common/finance.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
-#include "utils/finance.hpp"
-#include "utils/timestamp.hpp"
 
 namespace
 {

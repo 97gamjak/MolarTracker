@@ -1,13 +1,13 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__SECURITY_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__SECURITY_TRANSACTION_HPP__
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/i_security_transaction.hpp"
 #include "finance/transaction/transaction.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {

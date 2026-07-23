@@ -7,13 +7,13 @@
 
 #include "commands/undo_stack.hpp"
 #include "commands/update_debug_flags_command.hpp"
+#include "common/qt_helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "ui/logging/debug_slots_dialog.hpp"
 #include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.DebugMenuController");
 
@@ -144,7 +144,7 @@ namespace controller
                 )
             );
 
-        _debugSlotsDialog = utils::makeQChild<ui::DebugSlotsDialog>(
+        _debugSlotsDialog = common::makeQChild<ui::DebugSlotsDialog>(
             debugSlotsSettings,
             &_mainWindow
         );
@@ -170,7 +170,7 @@ namespace controller
 
         _applyLogViewerSettings();
 
-        _logViewerDialog = utils::makeQChild<ui::LogViewerDialog>(
+        _logViewerDialog = common::makeQChild<ui::LogViewerDialog>(
             _logViewerSettings,
             &_mainWindow
         );

@@ -1,8 +1,8 @@
 #include "config/constants/constants.hpp"
 
+#include "common/paths.hpp"
 #include "config/constants/github_constants.hpp"
 #include "exceptions/file_exceptions.hpp"
-#include "utils/paths.hpp"
 
 /**
  * @brief Get the singleton instance of Constants
@@ -21,7 +21,7 @@ Constants& Constants::getInstance()
  */
 Constants::Constants()
 {
-    const auto& configDir = utils::configDir(Constants::getDirPrefix());
+    const auto& configDir = common::configDir(Constants::getDirPrefix());
 
     if (configDir)
         _configPath = std::filesystem::absolute(configDir.value());
@@ -32,7 +32,7 @@ Constants::Constants()
         throw DirException("Failed to resolve config directory");
     }
 
-    const auto& dataDir = utils::dataDir(Constants::getDirPrefix());
+    const auto& dataDir = common::dataDir(Constants::getDirPrefix());
 
     if (dataDir)
         _dataPath = std::filesystem::absolute(dataDir.value());

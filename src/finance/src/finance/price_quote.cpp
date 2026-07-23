@@ -3,11 +3,11 @@
 #include <expected>
 #include <stdexcept>
 
+#include "common/currency.hpp"
+#include "common/finance.hpp"
 #include "finance/finance_error.hpp"
 #include "json/json.hpp"
 #include "logging/log_macros.hpp"
-#include "utils/currency.hpp"
-#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Finance.PriceQuote");
 

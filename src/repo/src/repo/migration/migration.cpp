@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+#include "common/finance.hpp"
+#include "common/version.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "multi_migration.hpp"
@@ -20,8 +22,6 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
-#include "utils/finance.hpp"
-#include "utils/version.hpp"
 
 namespace repo
 {
@@ -32,7 +32,7 @@ namespace repo
      * @param fromVersion The version the migration is being applied from
      * @param version The release version this migration is targeting
      */
-    Migration::Migration(std::size_t fromVersion, const utils::SemVer& version)
+    Migration::Migration(std::size_t fromVersion, const common::SemVer& version)
         : _fromVersion(fromVersion), _version(version)
     {
     }
@@ -106,7 +106,7 @@ namespace repo
      */
     void Migrations::_migrate_0_0_3()
     {
-        _lastReleaseVersion = utils::SemVer(0, 0, 3);
+        _lastReleaseVersion = common::SemVer(0, 0, 3);
 
         _migrateV1();
         _migrateV2();
@@ -256,7 +256,7 @@ namespace repo
      */
     void Migrations::_migrate_0_1_0()
     {
-        _lastReleaseVersion = utils::SemVer(0, 1, 0);
+        _lastReleaseVersion = common::SemVer(0, 1, 0);
 
         _migrateV6();
         _migrateV7();
@@ -426,7 +426,7 @@ namespace repo
      */
     void Migrations::_migrate_0_2_3()
     {
-        _lastReleaseVersion = utils::SemVer(0, 2, 3);
+        _lastReleaseVersion = common::SemVer(0, 2, 3);
 
         _migrateV11();
         _migrateV12();

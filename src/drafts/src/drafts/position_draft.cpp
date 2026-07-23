@@ -1,7 +1,7 @@
 #include "drafts/position_draft.hpp"
 
+#include "common/quantity.hpp"
 #include "drafts/stock_draft.hpp"
-#include "utils/quantity.hpp"
 
 namespace drafts
 {

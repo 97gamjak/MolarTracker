@@ -1,9 +1,9 @@
 #include "vcs_controller.hpp"
 
+#include "common/qt_helpers.hpp"
 #include "settings/settings.hpp"
 #include "ui/main_window.hpp"
 #include "ui/update/update_available_dialog.hpp"
-#include "utils/qt_helpers.hpp"
 #include "vcs/update_check_service.hpp"
 
 namespace controller
@@ -26,7 +26,7 @@ namespace controller
             _updateCheckService.get(),
             &vcs::UpdateCheckService::updateAvailable,
             _mainWindow.get(),
-            [this](utils::SemVer latest)
+            [this](common::SemVer latest)
             {
                 auto&       generalSettings = _settings->getGeneralSettings();
                 const auto& dismissed =
@@ -35,7 +35,7 @@ namespace controller
                 if (dismissed.has_value() && *dismissed == latest.toString())
                     return;
 
-                auto* dialog = utils::makeQChild<ui::UpdateAvailableDialog>(
+                auto* dialog = common::makeQChild<ui::UpdateAvailableDialog>(
                     latest,
                     _mainWindow.get()
                 );

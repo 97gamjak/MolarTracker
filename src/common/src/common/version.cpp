@@ -1,4 +1,4 @@
-#include "utils/version.hpp"
+#include "common/version.hpp"
 
 #include <cctype>
 #include <compare>
@@ -9,7 +9,7 @@
 #include <QString>
 #endif
 
-namespace utils
+namespace common
 {
     /**
      * @brief Construct a new Sem Ver:: Sem Ver object
@@ -215,4 +215,4 @@ namespace utils
         return lhs._major == rhs._major && lhs._minor == rhs._minor &&
                lhs._patch == rhs._patch;
     }
-}   // namespace utils
+}   // namespace common

@@ -52,7 +52,7 @@ target_link_libraries(molartracker_finance
     PRIVATE
     molartracker_config
     molartracker_exceptions
-    molartracker_utils
+    molartracker_common
     molartracker_logging
     molartracker_json
     mstd

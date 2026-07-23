@@ -6,11 +6,11 @@
 #include <mstd/type_traits.hpp>
 #include <string>
 
+#include "common/timestamp.hpp"
 #include "concepts.hpp"
 #include "db/statement.hpp"
 #include "index.hpp"
 #include "orm_exception.hpp"
-#include "utils/timestamp.hpp"
 
 namespace orm
 {

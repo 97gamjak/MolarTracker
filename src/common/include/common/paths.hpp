@@ -14,7 +14,7 @@
 #include <Windows.h>
 #endif
 
-namespace utils
+namespace common
 {
 
     /**
@@ -47,6 +47,6 @@ namespace utils
     PathErrorResult configDir(std::string_view app_name);
     PathErrorResult dataDir(std::string_view app_name);
 
-}   // namespace utils
+}   // namespace common
 
 #endif   // __UTILS__INCLUDE__UTILS__PATHS_HPP__

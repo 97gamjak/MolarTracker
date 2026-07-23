@@ -3,7 +3,7 @@
 #include <format>
 #include <utility>
 
-#include "utils/finance.hpp"
+#include "common/finance.hpp"
 
 namespace finance
 {

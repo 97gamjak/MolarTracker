@@ -41,7 +41,7 @@ REVERT CACHE changes but keep error handling
 
 - Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
   - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
-    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+    and returns a `common::SemVer`; strips the `v` prefix from GitHub tags
   - `vcs::UpdateCheckService` — `QObject` that fires an async
     `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
     emits `updateAvailable(SemVer)` at most once per distinct version per

@@ -1,10 +1,10 @@
 #include "sql_models/option_row.hpp"
 
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
 #include "config/id_types.hpp"
 #include "filter/operators.hpp"
 #include "orm/where_expr.hpp"
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
 
 /**
  * @brief Creates a where expression to find an option by its underlying

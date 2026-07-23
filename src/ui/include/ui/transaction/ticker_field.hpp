@@ -7,7 +7,7 @@
 
 #include <optional>
 
-#include "utils/container/set.hpp"
+#include "common/container/set.hpp"
 
 class QLineEdit;     // Forward declaration
 class QPushButton;   // Forward declaration

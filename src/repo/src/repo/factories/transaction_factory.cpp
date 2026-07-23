@@ -1,5 +1,6 @@
 #include "transaction_factory.hpp"
 
+#include "common/cash.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
@@ -11,7 +12,6 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
-#include "utils/cash.hpp"
 
 namespace repo
 {

@@ -1,4 +1,4 @@
-#include "utils/ring_file.hpp"
+#include "common/ring_file.hpp"
 
 #include <cstddef>
 #include <cstdint>

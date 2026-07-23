@@ -3,16 +3,16 @@
 
 #include <nlohmann/json.hpp>
 
-#include "utils/version.hpp"
+#include "common/version.hpp"
 
 // cppcheck-suppress unknownMacro -- false positive
 NLOHMANN_JSON_NAMESPACE_BEGIN
 /**
- * @brief Serializer for utils::SemVer
+ * @brief Serializer for common::SemVer
  *
  */
 template <>
-struct adl_serializer<utils::SemVer>
+struct adl_serializer<common::SemVer>
 {
     /**
      * @brief Serialize SemVer to JSON
@@ -20,7 +20,7 @@ struct adl_serializer<utils::SemVer>
      * @param jsonData
      * @param version
      */
-    static void to_json(nlohmann::json& jsonData, const utils::SemVer& version)
+    static void to_json(nlohmann::json& jsonData, const common::SemVer& version)
     {
         jsonData = version.toString();
     }
@@ -29,11 +29,11 @@ struct adl_serializer<utils::SemVer>
      * @brief Deserialize SemVer from JSON
      *
      * @param jsonData
-     * @return utils::SemVer
+     * @return common::SemVer
      */
-    static utils::SemVer from_json(const nlohmann::json& jsonData)
+    static common::SemVer from_json(const nlohmann::json& jsonData)
     {
-        return utils::SemVer(jsonData.get<std::string>());
+        return common::SemVer(jsonData.get<std::string>());
     }
 };
 NLOHMANN_JSON_NAMESPACE_END

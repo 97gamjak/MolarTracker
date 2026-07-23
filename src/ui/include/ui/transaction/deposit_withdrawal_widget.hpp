@@ -6,9 +6,9 @@
 
 #include <vector>
 
+#include "common/finance.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/base/dialog.hpp"
-#include "utils/finance.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration

@@ -1,4 +1,4 @@
-#include "utils/paths.hpp"
+#include "common/paths.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -11,7 +11,7 @@
 #include <string>
 #endif
 
-namespace utils
+namespace common
 {
 
     // TODO(97gamjak): migrate this to mstd later on
@@ -415,4 +415,4 @@ namespace utils
         return ensureDir(dir.value());
     }
 
-}   // namespace utils
+}   // namespace common

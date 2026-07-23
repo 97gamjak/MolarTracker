@@ -1,4 +1,4 @@
-#include "utils/percentage.hpp"
+#include "common/percentage.hpp"
 
 #include <cmath>
 #include <format>

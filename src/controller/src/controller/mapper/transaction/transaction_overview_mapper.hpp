@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include "common/container/id_map.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
-#include "utils/container/id_map.hpp"
 
 namespace finance
 {

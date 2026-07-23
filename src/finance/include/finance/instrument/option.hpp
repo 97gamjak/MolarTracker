@@ -1,11 +1,11 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__OPTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__OPTION_HPP__
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {
