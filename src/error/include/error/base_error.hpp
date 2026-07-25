@@ -34,16 +34,21 @@ struct ErrorWrapper
     const std::string& getMessage() const;
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define GENERIC_ERRORS(X) X(AssertionFailed) X(NotYetImplemented)
+
 template <typename E>
-concept HasNotYetImplementedValue = requires { E::NotYetImplemented; };
+concept ErrorType = std::is_enum_v<E> && mstd::has_enum_meta<E> && requires {
+    { E::AssertionFailed } -> std::convertible_to<E>;
+    { E::NotYetImplemented } -> std::convertible_to<E>;
+};
 
 /**
  * @brief An error object
  *
  * @tparam EnumType
  */
-template <typename EnumType>
-requires mstd::has_enum_meta<EnumType>
+template <ErrorType EnumType>
 class Error
 {
    public:
@@ -101,13 +106,11 @@ class Error
     ) const;
 
     [[nodiscard]]
-    static Error NotYetImplemented()
-    requires HasNotYetImplementedValue<EnumType>;
+    static Error NotYetImplemented();
 
    protected:
     /// @cond DOXYGEN_IGNORE
-    [[nodiscard]]
-    const std::string& getMessage() const;
+    [[nodiscard]] const std::string& getMessage() const;
     /// @endcond
 
    private:
@@ -196,6 +199,49 @@ class Result : public std::expected<T, E>
         return {};
     }
 };
+
+template <typename R>
+concept ResultLike = requires(const R& result) {
+    { static_cast<bool>(result) } -> std::same_as<bool>;
+    { result.error() };
+};
+
+// bool + explicit error — unchanged
+template <IsError E>
+[[nodiscard]]
+std::optional<E> mt_assert_check(bool cond, E err)
+{
+    if (!cond)
+        return err;
+    return std::nullopt;
+}
+
+// any Result-like type — works for MTResult, FinanceResult, future ones
+template <ResultLike R>
+[[nodiscard]]
+auto mt_assert_check(const R& result)
+    -> std::optional<std::decay_t<decltype(result.error())>>
+{
+    if (!result)
+        return result.error();
+    return std::nullopt;
+}
+
+template <typename EnumType>
+requires ErrorType<EnumType>
+[[nodiscard]]
+auto mt_assert_check(bool cond, const EnumType& errorType)
+    -> std::optional<Error<EnumType>>
+{
+    if (!cond)
+        return Error<EnumType>{errorType, "Assertion failed"};
+    return std::nullopt;
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define MT_ASSERT(...)                               \
+    if (auto _mt_err = mt_assert_check(__VA_ARGS__)) \
+        return *_mt_err;
 
 #ifndef __ERROR__INCLUDE__ERROR__BASE_ERROR_TPP__
 #include "base_error.tpp"

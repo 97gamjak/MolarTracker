@@ -2,12 +2,10 @@
 
 #include <algorithm>
 #include <cmath>
-#include <expected>
 #include <vector>
 
 #include "error/finance_error.hpp"
 #include "finance/account/accounts.hpp"
-#include "finance/instrument/options.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"

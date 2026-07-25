@@ -1,8 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__I_SECURITY_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__I_SECURITY_TRANSACTION_HPP__
 
-#include "config/id_types.hpp"
-
 namespace finance
 {
     /**
@@ -15,7 +13,6 @@ namespace finance
     {
        public:
         virtual ~ISecurityTransaction() = default;
-
     };
 }   // namespace finance
 

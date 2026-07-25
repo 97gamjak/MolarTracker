@@ -105,11 +105,11 @@ namespace finance
                     it->qty += trade.quantity;
                 else
                 {
-                    state.openOptionLegs.push_back(
-                        {trade.type,
-                         trade.buySell,
-                         trade.strike,
-                         trade.quantity}
+                    state.openOptionLegs.emplace_back(
+                        trade.type,
+                        trade.buySell,
+                        trade.strike,
+                        trade.quantity
                     );
                 }
 

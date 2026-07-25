@@ -20,7 +20,7 @@ namespace finance
 }   // namespace finance
 
 #ifndef __FINANCE__INCLUDE__FINANCE__PREDICATES__PREDICATES_TPP__
-#include "predicates.tpp"
+#include "predicates.tpp"   // IWYU pragma: export
 #endif   // __FINANCE__INCLUDE__FINANCE__PREDICATES__PREDICATES_TPP__
 
 #endif   // __FINANCE__INCLUDE__FINANCE__PREDICATES__PREDICATES_HPP__

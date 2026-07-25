@@ -52,6 +52,13 @@ namespace finance
         OptionBuySell buySell;
         Cash          strikePrice;
         Quantity      qty;
+
+        OpenOptionLeg(
+            OptionType    type,
+            OptionBuySell buySell,
+            Cash          strikePrice,
+            Quantity      qty
+        );
     };
 
     struct PositionState

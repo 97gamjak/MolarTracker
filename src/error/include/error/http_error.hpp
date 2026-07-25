@@ -11,7 +11,8 @@
     X(CurlPerform)              \
     X(BadStatus)                \
     X(ParseError)               \
-    X(AuthError)
+    X(AuthError)                \
+    GENERIC_ERRORS(X)
 
 MSTD_ENUM(HttpErrorType, std::uint8_t, HTTP_ERROR_TYPE_LIST);
 

@@ -1,13 +1,16 @@
 #ifndef __ERROR__INCLUDE__ERROR__FINANCE_ERROR_HPP__
 #define __ERROR__INCLUDE__ERROR__FINANCE_ERROR_HPP__
 
+#include <mstd/enum.hpp>
+
 #include "error/base_error.hpp"
 #include "error/http_error.hpp"
 
 #define YFINANCE_ERROR_TYPE_LIST(X) \
     X(HttpError)                    \
     X(InvalidTicker)                \
-    X(InvalidPriceQuote)
+    X(InvalidPriceQuote)            \
+    GENERIC_ERRORS(X)
 
 #define FINANCE_ERROR_TYPE_LIST(X) \
     X(StockNotFound)               \
@@ -21,12 +24,13 @@
     X(InvalidPriceString)          \
     X(PriceOverflow)               \
     X(UnknownOption)               \
-    X(PnlError)
+    X(PnlError)                    \
+    GENERIC_ERRORS(X)
 
 #define PNL_ERROR_TYPE_LIST(X)  \
     X(InconsistentContractSize) \
-    X(NotYetImplemented)        \
-    X(UnknownOption)
+    X(UnknownOption)            \
+    GENERIC_ERRORS(X)
 
 MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_TYPE_LIST);
 MSTD_ENUM(YFinanceErrorType, std::uint8_t, YFINANCE_ERROR_TYPE_LIST);

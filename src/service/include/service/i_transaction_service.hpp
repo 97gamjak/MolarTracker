@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {

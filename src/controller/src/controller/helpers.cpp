@@ -3,16 +3,10 @@
 #include <expected>
 
 #include "config/id_types.hpp"
-#include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "finance/transaction/transaction_filter.hpp"
 #include "gateway/position_gateway.hpp"
 #include "logging/log_macros.hpp"
-#include "mapper/stock_mapper.hpp"
-#include "store/i_option_store.hpp"
-#include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
-#include "store/i_transaction_store.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.Helpers");
 

@@ -1,8 +1,6 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_CONVERTER_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_CONVERTER_HPP__
 
-#include <expected>
-
 #include "error/finance_error.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
