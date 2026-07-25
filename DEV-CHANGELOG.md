@@ -6,6 +6,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 REVERT CACHE changes but keep error handling
 
+### Features
+
 #### Finance
 
 - Add position store, service and repo
@@ -137,6 +139,10 @@ REVERT CACHE changes but keep error handling
 - `LogManager::initialize()` now calls `_cleanupOldLogFiles()` before
   constructing the `RingFile`, ensuring stale session logs are pruned at every
   startup
+
+#### Error Handling
+
+- centralize and generalize error handling approach
 
 ### CI
 
