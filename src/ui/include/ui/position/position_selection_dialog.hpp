@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 class QTableView;

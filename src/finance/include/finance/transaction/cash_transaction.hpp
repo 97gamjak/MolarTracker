@@ -37,6 +37,9 @@ namespace finance
         [[nodiscard]]
         TransactionEntries getEntries(AccountId externalAccount) const override;
 
+        [[nodiscard]]
+        IdSet<AccountId> getInvolvedAccounts() const override;
+
        private:
         [[nodiscard]] TransactionEntry _getAmountEntry(
             std::optional<AccountId> external = std::nullopt

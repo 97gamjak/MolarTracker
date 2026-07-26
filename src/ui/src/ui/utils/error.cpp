@@ -52,6 +52,12 @@ namespace ui
         auto* msgLabel = makeQChild<QLabel>(message, this);
         msgLabel->setWordWrap(true);
         msgLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        msgLabel->setTextInteractionFlags(
+            Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard
+        );
+        msgLabel->setCursor(
+            Qt::IBeamCursor
+        );   // optional, hints that text is selectable
 
         topRow->addWidget(icon, 0, Qt::AlignTop);
         constexpr auto topRowSpacing = 12;
@@ -64,6 +70,12 @@ namespace ui
             auto* detailsLabel = makeQChild<QLabel>(*details, this);
             detailsLabel->setWordWrap(true);
             detailsLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+            detailsLabel->setTextInteractionFlags(
+                Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard
+            );
+            detailsLabel->setCursor(
+                Qt::IBeamCursor
+            );   // optional, hints that text is selectable
             layout->addWidget(detailsLabel);
         }
 

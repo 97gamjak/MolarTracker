@@ -92,9 +92,11 @@ add_subdirectory(drafts)
 add_subdirectory(exceptions)
 add_subdirectory(filter)
 add_subdirectory(finance)
+add_subdirectory(gateway)
 add_subdirectory(http)
 add_subdirectory(json)
 add_subdirectory(logging)
+add_subdirectory(mapper)
 add_subdirectory(orm)
 add_subdirectory(repo)
 add_subdirectory(service)
@@ -113,6 +115,9 @@ target_link_libraries(MolarTracker
     molartracker_logging
     molartracker_exceptions
 )
+
+set(CMAKE_AUTORCC ON)
+target_sources(MolarTracker PRIVATE ${CMAKE_SOURCE_DIR}/resources/resources.qrc)
 
 set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY

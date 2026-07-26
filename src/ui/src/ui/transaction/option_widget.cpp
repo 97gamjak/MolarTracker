@@ -38,6 +38,8 @@ namespace ui
         QPointer<AccountCombo> referenceAccountCombo = nullptr;
         /// The combo box for selecting the option type (call or put)
         QPointer<QComboBox> optionTypeCombo = nullptr;
+        /// The combo box for selecting the action (open, close, roll)
+        QPointer<QComboBox> buySellCombo = nullptr;
 
         /// The row for entering the quantity of the option
         QPointer<AmountRow> quantityRow = nullptr;
@@ -101,6 +103,7 @@ namespace ui
         : accountCombo(new AccountCombo(accounts, parent)),
           referenceAccountCombo(new AccountCombo(referenceAccounts, parent)),
           optionTypeCombo(new QComboBox(parent)),
+          buySellCombo(new QComboBox(parent)),
           quantityRow(new AmountRow(parent)),
           strikeRow(new AmountRow(parent)),
           amountRow(new AmountRow(parent)),
@@ -123,6 +126,9 @@ namespace ui
             optionTypeCombo->addItem(
                 OptionTypeMeta::toString(optionType).c_str()
             );
+
+        for (const auto& buySell : OptionBuySellMeta::values)
+            buySellCombo->addItem(OptionBuySellMeta::toString(buySell).c_str());
     }
 
     /**
@@ -136,6 +142,7 @@ namespace ui
         layout->addRow("Reference Account:", referenceAccountCombo);
         layout->addRow("Underlying:", tickerField);
         layout->addRow("Option Type:", optionTypeCombo);
+        layout->addRow("Buy/Sell:", buySellCombo);
         layout->addRow("Expiration:", expirationField);
         layout->addRow("Timestamp:", timestampField);
 
@@ -265,6 +272,7 @@ namespace ui
             ticker.value(),
             expirationField->getTimestamp(),
             static_cast<OptionType>(optionTypeCombo->currentIndex()),
+            static_cast<OptionBuySell>(buySellCombo->currentIndex()),
             quantity,
             amount,
             strikePrice,

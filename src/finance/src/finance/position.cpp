@@ -72,4 +72,11 @@ namespace finance
         );
     }
 
+    /**
+     * @brief Check if the position is open (i.e., has no closing timestamp).
+     *
+     * @return true if the position is open, false otherwise.
+     */
+    bool Position::isOpen() const { return !_closedAt.has_value(); }
+
 }   // namespace finance

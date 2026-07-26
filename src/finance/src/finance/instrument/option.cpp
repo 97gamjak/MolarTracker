@@ -80,9 +80,12 @@ namespace finance
     /**
      * @brief Get the contract size of the option.
      *
-     * @return std::int64_t
+     * @return const std::int64_t&
      */
-    std::int64_t Option::getContractSize() const { return _contractSize; }
+    const std::int64_t& Option::getContractSize() const
+    {
+        return _contractSize;
+    }
 
     /**
      * @brief Get the name of the option, which is typically a combination of

@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <string>
 #include <unordered_set>
 
 #include "iterable.hpp"
@@ -44,6 +45,12 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
     bool operator==(const Set<T, Hash>& other) const;
 
     bool intersects(const Set<T, Hash>& other) const;
+
+    // cppcheck-suppress functionStatic -- false positive
+    [[nodiscard]] std::string toString() const;
+
+    template <std::ranges::range R, typename F>
+    static Set<T, Hash> fromRange(const R& range, F&& func);
 };
 
 template <typename T>

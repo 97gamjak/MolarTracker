@@ -90,6 +90,7 @@ void IdObjectMap<Value>::addUnchecked(const Value& value)
  * keys and returns them as an unordered_set.
  *
  * @tparam Key
+ * @tparam Key
  * @tparam Value
  * @return A set of all the IDs currently in the map.
  */
@@ -109,7 +110,7 @@ auto IdMap<Key, Value>::getIds() const
  * used with caution.
  *
  * @tparam Value
- * @tparam R The type of the range of values.
+ * @tparam R A range of values that have IDs.
  * @param values The range of values to add to the map.
  */
 template <typename Value>
@@ -117,19 +118,7 @@ requires HasId<Value>
 template <std::ranges::range R>
 IdObjectMap<Value>::IdObjectMap(R&& values)
 {
-    for (const auto& elem : std::forward<R>(values))
-    {
-        if constexpr (requires { elem.second; })
-        {
-            // Range of pairs (from iterating IdObjectMap)
-            Base::addUnchecked(extractId(elem.second), elem.second);
-        }
-        else
-        {
-            // Range of values
-            Base::addUnchecked(extractId(elem), elem);
-        }
-    }
+    addUnchecked(std::forward<R>(values));
 }
 
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_TPP__

@@ -32,7 +32,7 @@ const std::string& ErrorWrapper<Error>::getMessage() const
  * @param subErrors
  * @param location (only used for debugging, not in release builds)
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 Error<EnumType>::Error(
     EnumType                   type,
     std::optional<std::string> message,
@@ -57,7 +57,7 @@ Error<EnumType>::Error(
  *
  * @return EnumType
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 EnumType Error<EnumType>::getType() const
 {
     return _type;
@@ -68,7 +68,7 @@ EnumType Error<EnumType>::getType() const
  *
  * @return std::string
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 std::string Error<EnumType>::getTypeStr() const
 {
     return ErrorTypeMeta::toString(_type);
@@ -82,7 +82,7 @@ std::string Error<EnumType>::getTypeStr() const
  * @return const std::vector<Error>& A const reference to the vector of
  * sub-errors associated with the error.
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 const std::vector<Error<EnumType>>& Error<EnumType>::getSubErrors() const
 {
     return _subErrors;
@@ -96,7 +96,7 @@ const std::vector<Error<EnumType>>& Error<EnumType>::getSubErrors() const
  * @return const std::string& A const reference to the error message
  * associated with the error.
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 const std::string& Error<EnumType>::getMessage() const
 {
     return _message;
@@ -110,7 +110,7 @@ const std::string& Error<EnumType>::getMessage() const
  * @param other The other Error object to compare with.
  * @return true if the two Error objects are equal, false otherwise.
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 bool Error<EnumType>::operator==(const Error& other) const
 {
     return _type == other._type && _message == other._message;
@@ -131,7 +131,7 @@ bool Error<EnumType>::operator==(const Error& other) const
  * @return Error<EnumType> A new Error object of the specified newType, with
  * the same error message and sub-errors as the original error.
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 Error<EnumType> Error<EnumType>::convert(
     const EnumType&                   newType,
     const std::optional<std::string>& newMessage,
@@ -181,7 +181,7 @@ Error<EnumType> Error<EnumType>::convert(
  *
  * @return std::string
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 std::string Error<EnumType>::toString() const
 {
     auto msg = std::format(

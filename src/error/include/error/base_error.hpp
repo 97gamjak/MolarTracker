@@ -38,17 +38,18 @@ struct ErrorWrapper
 #define GENERIC_ERRORS(X) X(AssertionFailed) X(NotYetImplemented)
 
 template <typename E>
-concept ErrorType = std::is_enum_v<E> && mstd::has_enum_meta<E> && requires {
-    { E::AssertionFailed } -> std::convertible_to<E>;
-    { E::NotYetImplemented } -> std::convertible_to<E>;
-};
+concept ErrorTypeEnum =
+    std::is_enum_v<E> && mstd::has_enum_meta<E> && requires {
+        { E::AssertionFailed } -> std::convertible_to<E>;
+        { E::NotYetImplemented } -> std::convertible_to<E>;
+    };
 
 /**
  * @brief An error object
  *
  * @tparam EnumType
  */
-template <ErrorType EnumType>
+template <ErrorTypeEnum EnumType>
 class Error
 {
    public:
@@ -89,13 +90,9 @@ class Error
 
     virtual ~Error() = default;
 
-    /// @cond DOXYGEN_IGNORE
-    [[nodiscard]] EnumType getType() const;
-    /// @endcond
-    [[nodiscard]] std::string getTypeStr() const;
-    /// @cond DOXYGEN_IGNORE
+    [[nodiscard]] EnumType            getType() const;
+    [[nodiscard]] std::string         getTypeStr() const;
     [[nodiscard]] virtual std::string toString() const;
-    /// @endcond
 
     [[nodiscard]]
     const std::vector<Error>& getSubErrors() const;
@@ -107,9 +104,7 @@ class Error
     ) const;
 
    protected:
-    /// @cond DOXYGEN_IGNORE
     [[nodiscard]] const std::string& getMessage() const;
-    /// @endcond
 
    private:
     bool operator==(const Error& other) const;
@@ -225,8 +220,7 @@ auto mt_assert_check(const R& result)
     return std::nullopt;
 }
 
-template <typename EnumType>
-requires ErrorType<EnumType>
+template <ErrorTypeEnum EnumType>
 [[nodiscard]]
 auto mt_assert_check(bool cond, const EnumType& errorType)
     -> std::optional<Error<EnumType>>

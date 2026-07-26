@@ -8,40 +8,66 @@
 
 namespace finance
 {
-    /**
-     * @brief Set the position IDs used to filter transactions, this will set
-     * the position IDs that will be used to filter transactions when querying
-     * the transaction store. Transactions that are associated with any of the
-     * specified position IDs will be included in the results, while
-     * transactions that are not associated with any of the specified position
-     * IDs will be excluded from the results.
-     *
-     * @param positionIds The set of position IDs to filter transactions by
-     */
-    void TransactionFilter::setPositionIds(const IdSet<PositionId>& positionIds)
+    namespace
     {
-        _positionIds = positionIds;
-    }
+        /**
+         * @brief Get a predicate function that can be used to filter
+         * transactions based on the specified position IDs.
+         *
+         * @param positionIds The set of position IDs to filter by
+         * @return filter::Predicate<DomainTransaction> A predicate function
+         * that can be used to filter transactions based on the specified
+         * position IDs
+         */
+        filter::Predicate<DomainTransaction> HasPositionId(
+            const IdSet<PositionId>& positionIds
+        )
+        {
+            return filter::makePredicate<DomainTransaction>(
+                [positionIds](const DomainTransaction& transaction)
+                {
+                    return std::ranges::any_of(
+                        positionIds,
+                        [&](const auto& positionId)
+                        { return transaction.hasPositionId(positionId); }
+                    );
+                }
+            );
+        }
 
-    /**
-     * @brief Get the position IDs used to filter transactions
-     *
-     * @return IdSet<PositionId> The set of position IDs used for filtering
-     */
-    IdSet<PositionId> TransactionFilter::getPositionIds() const
-    {
-        return _positionIds;
-    }
+        /**
+         * @brief Get a predicate function that can be used to filter
+         * transactions based on the specified transaction IDs.
+         *
+         * @param transactionIds
+         * @return filter::Predicate<DomainTransaction>
+         */
+        filter::Predicate<DomainTransaction> HasTransactionId(
+            const IdSet<TransactionId>& transactionIds
+        )
+        {
+            return filter::makePredicate<DomainTransaction>(
+                [transactionIds](const DomainTransaction& transaction)
+                { return transactionIds.contains(transaction.getId()); }
+            );
+        }
 
-    /**
-     * @brief get the transaction IDs used to filter transactions
-     *
-     * @return IdSet<TransactionId>
-     */
-    IdSet<TransactionId> TransactionFilter::getTransactionIds() const
-    {
-        return _transactionIds;
-    }
+        filter::Predicate<DomainTransaction> HasAccountId(
+            const IdSet<AccountId>& accountIds
+        )
+        {
+            return filter::makePredicate<DomainTransaction>(
+                [accountIds](const DomainTransaction& transaction)
+                {
+                    return std::ranges::any_of(
+                        accountIds,
+                        [&](const auto& accountId)
+                        { return transaction.isAccountInvolved(accountId); }
+                    );
+                }
+            );
+        }
+    }   // namespace
 
     /**
      * @brief Get a predicate function that can be used to filter transactions
@@ -57,54 +83,23 @@ namespace finance
      */
     filter::Predicate<DomainTransaction> TransactionFilter::getPredicate() const
     {
-        if (!_positionIds.empty())
-            return HasPositionId(_positionIds);
+        if (accountIds.empty())
+        {
+            throw std::logic_error(
+                "TransactionFilter must have at least one account ID set"
+            );
+        }
 
-        if (!_transactionIds.empty())
-            return HasTransactionId(_transactionIds);
+        filter::Predicate<DomainTransaction> predicate =
+            HasAccountId(accountIds);
 
-        return {};
-    }
+        if (!positionIds.empty())
+            predicate &= HasPositionId(positionIds);
 
-    /**
-     * @brief Get a predicate function that can be used to filter transactions
-     * based on the specified position IDs.
-     *
-     * @param positionIds The set of position IDs to filter by
-     * @return filter::Predicate<DomainTransaction> A predicate function that
-     * can be used to filter transactions based on the specified position IDs
-     */
-    filter::Predicate<DomainTransaction> HasPositionId(
-        const IdSet<PositionId>& positionIds
-    )
-    {
-        return filter::makePredicate<DomainTransaction>(
-            [positionIds](const DomainTransaction& transaction)
-            {
-                return std::ranges::any_of(
-                    positionIds,
-                    [&](const auto& positionId)
-                    { return transaction.hasPositionId(positionId); }
-                );
-            }
-        );
-    }
+        if (!transactionIds.empty())
+            predicate &= HasTransactionId(transactionIds);
 
-    /**
-     * @brief Get a predicate function that can be used to filter transactions
-     * based on the specified transaction IDs.
-     *
-     * @param transactionIds
-     * @return filter::Predicate<DomainTransaction>
-     */
-    filter::Predicate<DomainTransaction> HasTransactionId(
-        const IdSet<TransactionId>& transactionIds
-    )
-    {
-        return filter::makePredicate<DomainTransaction>(
-            [transactionIds](const DomainTransaction& transaction)
-            { return transactionIds.contains(transaction.getId()); }
-        );
+        return predicate;
     }
 
     /**
@@ -117,8 +112,12 @@ namespace finance
     {
         std::ostringstream oss;
         oss << "TransactionFilter: [";
-        for (const auto& positionId : _positionIds)
+        for (const auto& positionId : positionIds)
             oss << positionId << ", ";
+        for (const auto& transactionId : transactionIds)
+            oss << transactionId << ", ";
+        for (const auto& accountId : accountIds)
+            oss << accountId << ", ";
 
         oss << "]";
         return oss.str();

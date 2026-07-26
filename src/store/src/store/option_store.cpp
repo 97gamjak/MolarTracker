@@ -5,6 +5,7 @@
 #include "config/id_types.hpp"
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
+#include "finance/predicates/predicates.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("Store.OptionStore");
@@ -21,13 +22,12 @@ namespace store
         InstrumentServicePtr instrumentService,
         InstrumentIdSeq&     instrumentIdSeq
     )
-        : BaseStore<finance::Option, OptionId>(true),
-          _instrumentService(std::move(instrumentService)),
+        : _instrumentService(std::move(instrumentService)),
           _instrumentIdSeq(instrumentIdSeq)
     {
         const auto options = _instrumentService->getOptions();
 
-        _addCleanEntries(options);
+        _addCleanEntries(options.getValues());
     }
 
     /**
@@ -63,6 +63,72 @@ namespace store
         _addEntry(std::move(option));
 
         return instrumentId;
+    }
+
+    /**
+     * @brief Get the options for the given instrument IDs, this method
+     * retrieves the options from the store that match the provided instrument
+     * IDs, allowing callers to access specific options based on their
+     * associated instrument IDs.
+     *
+     * @param instrumentIds The set of instrument IDs for which to retrieve
+     * options.
+     * @return finance::Options The options corresponding to the provided
+     * instrument IDs.
+     */
+    finance::Options OptionStore::getOptions(
+        const IdSet<InstrumentId>& instrumentIds
+    ) const
+    {
+        const auto options = Options{
+            .filter = finance::HasInstrumentIds<finance::Option>(instrumentIds),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        finance::Options result{_getValues(options)};
+
+        if (!isFullCache())
+        {
+            const auto dbOptions =
+                _instrumentService->getOptions(instrumentIds);
+
+            for (const auto& option : dbOptions.getValues())
+            {
+                if (!result.contains(option.getId()))
+                    result.addUnchecked(option);
+            }
+        }
+
+        return result;
+    }
+
+    std::optional<finance::Option> OptionStore::getOption(
+        InstrumentId instrumentId
+    ) const
+    {
+        const auto& options = getOptions({instrumentId});
+
+        if (options.empty())
+            return std::nullopt;
+
+        if (options.size() > 1)
+        {
+            LOG_ERROR(
+                std::format(
+                    "Multiple options found for instrument ID {}",
+                    instrumentId.toString()
+                )
+            );
+            // here we throw an exception because this should never happen, as
+            // the instrument ID should be unique for each option, and if we
+            // find multiple options with the same instrument ID
+            throw std::runtime_error(
+                "Multiple options found for instrument ID " +
+                instrumentId.toString()
+            );
+        }
+
+        return options.getValues().front();
     }
 
     /**
@@ -247,7 +313,7 @@ namespace store
 
         _clearEntries();
         const auto options = _instrumentService->getOptions();
-        _addCleanEntries(options);
+        _addCleanEntries(options.getValues());
     }
 
 }   // namespace store

@@ -7,7 +7,7 @@
 #include <optional>
 #include <vector>
 
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 
 class Timestamp;   // Forward declaration
 

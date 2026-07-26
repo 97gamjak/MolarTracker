@@ -11,7 +11,7 @@ namespace finance
      * @param accountId The ID of the account associated with this trade leg
      * @param instrumentId The ID of the instrument being traded in this leg
      * @param quantity The quantity of the instrument being traded in this leg
-     * @param unitPrice The unit price of the instrument being traded in this
+     * @param amount The cash amount of the instrument being traded in this
      * leg
      * @param positionId The ID of the position associated with this trade leg
      */
@@ -19,13 +19,13 @@ namespace finance
         AccountId       accountId,
         InstrumentId    instrumentId,
         const Quantity& quantity,
-        const Cash&     unitPrice,
+        const Cash&     amount,
         PositionId      positionId
     )
         : _accountId(accountId),
           _instrumentId(instrumentId),
           _quantity(quantity),
-          _unitPrice(unitPrice),
+          _amount(amount),
           _positionId(positionId)
     {
     }
@@ -45,7 +45,7 @@ namespace finance
             _instrumentId.toString(),
             _positionId.toString(),
             _quantity.toString(),
-            _unitPrice.toString()
+            _amount.toString()
         );
     }
 
@@ -54,7 +54,7 @@ namespace finance
      *
      * @return Cash The cash value of the trade leg.
      */
-    Cash TradeLeg::getCash() const { return _unitPrice * _quantity; }
+    Cash TradeLeg::getCash() const { return _amount * _quantity; }
 
     /**
      * @brief Gets the instrument ID of the trade leg.
@@ -78,11 +78,11 @@ namespace finance
     Quantity TradeLeg::getQuantity() const { return _quantity; }
 
     /**
-     * @brief Gets the unit price of the trade leg.
+     * @brief Gets the cash amount of the trade leg.
      *
-     * @return Cash The unit price of the trade leg.
+     * @return Cash The cash amount of the trade leg.
      */
-    Cash TradeLeg::getUnitPrice() const { return _unitPrice; }
+    Cash TradeLeg::getAmount() const { return _amount; }
 
     /**
      * @brief Gets the position ID of the trade leg.
