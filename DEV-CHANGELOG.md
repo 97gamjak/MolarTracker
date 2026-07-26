@@ -6,6 +6,8 @@ All changes and updates, that are relevant for developers will be documented her
 
 REVERT CACHE changes but keep error handling
 
+### Features
+
 #### Finance
 
 - Add position store, service and repo
@@ -94,6 +96,38 @@ REVERT CACHE changes but keep error handling
   `MainController::Impl` so the controller can trigger an in-place restore
 
 
+#### UI — GitHub bug report from fatal error dialog (MOLTRACK-36)
+
+- Add `ui::BugReportDialog` (`src/ui/exceptions/`) — pre-fills a title and
+  Markdown body (app version, OS via `QSysInfo::prettyProductName`, truncated
+  exception details, log file path) from the exception details, lets the user
+  edit them, then opens GitHub's pre-filled `/issues/new` page via
+  `QDesktopServices::openUrl`; no GitHub token or POST support required since
+  the user submits manually in the browser
+- `ExceptionDialog` gains a "Report Bug" button wired to `BugReportDialog`,
+  replacing the `TODO(97gamjak)` marker for MOLTRACK-53
+- `molartracker_ui` now links `molartracker_http` for
+  `http::HttpClient::urlEncode`
+
+#### Settings — reset to default values (MOLTRACK-133)
+
+- Add `resetToDefault()` to `settings::ParamCore<T>` — clears `_value` (falling
+  back to `_defaultValue` via `get()`) but only if a default has been
+  configured, otherwise a no-op
+- Add `resetToDefault()` forwarding to `settings::ParamMixin<Derived, T>`,
+  `settings::NumericVecParam<T, N>` (loops its internal `NumericParam<T>`
+  elements), and `settings::ParamContainerMixin<Derived>` (loops
+  `forEachParam`, recursing into nested containers) — this gives every
+  settings container, including `Settings` itself, a working
+  `resetToDefault()` for free
+- `ui::SettingsDialog` gains a "Reset to Defaults" button in the bottom bar;
+  after a `QMessageBox` confirmation it calls `_settings.resetToDefault()`
+  then reuses the existing `saveRequested()`/`accept()` flow (same as Save),
+  since `SettingsDialog`'s param-editor widgets don't live-refresh on
+  external value changes
+- Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
+  `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 
 - Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,
@@ -105,6 +139,10 @@ REVERT CACHE changes but keep error handling
 - `LogManager::initialize()` now calls `_cleanupOldLogFiles()` before
   constructing the `RingFile`, ensuring stale session logs are pruned at every
   startup
+
+#### Error Handling
+
+- centralize and generalize error handling approach
 
 ### CI
 
@@ -212,6 +250,15 @@ REVERT CACHE changes but keep error handling
 ### Claude
 
 - add rules for allowing and denying commands
+
+### Features
+
+#### UI
+
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

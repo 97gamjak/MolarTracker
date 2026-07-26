@@ -228,6 +228,19 @@ namespace settings
     }
 
     /**
+     * @brief Reset the parameter to its default value, this is a no-op if no
+     * default value has been configured for the parameter
+     *
+     * @tparam Derived
+     * @tparam T
+     */
+    template <typename Derived, typename T>
+    void ParamMixin<Derived, T>::resetToDefault()
+    {
+        _self()._core.resetToDefault();
+    }
+
+    /**
      * @brief Get the derived object
      *
      * @tparam Derived

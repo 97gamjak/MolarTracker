@@ -87,6 +87,19 @@ TEST(NumericParam, SetDefaultAndGetDefault)
     EXPECT_EQ(param.getDefault().value(), value);
 }
 
+TEST(NumericParam, ResetToDefaultRestoresDefaultValue)
+{
+    settings::NumericParam<int> param("k", "T", "D");
+    const auto                  defaultValue = 100;
+    param.setDefault(std::optional<int>(defaultValue));
+    ASSERT_TRUE(param.set(5).has_value());
+
+    param.resetToDefault();
+
+    EXPECT_EQ(param.get(), defaultValue);
+    EXPECT_FALSE(param.isDirty());
+}
+
 // ============================================================================
 // Range limits
 // ============================================================================

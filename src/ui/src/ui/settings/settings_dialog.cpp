@@ -4,6 +4,7 @@
 #include <qlabel.h>
 #include <qstackedwidget.h>
 
+#include <QMessageBox>
 #include <QPushButton>
 
 #include "settings/params/param_utils.hpp"
@@ -88,6 +89,11 @@ namespace ui
         );
         bottomLayout->setSpacing(spacing);
 
+        auto* resetBtn = utils::makeQChild<QPushButton>(bottomBar);
+        resetBtn->setText("Reset to Defaults");
+        resetBtn->setObjectName("resetToDefaultsButton");
+        bottomLayout->addWidget(resetBtn);
+
         _unsavedLabel = utils::makeQChild<QLabel>(bottomBar);
         _unsavedLabel->setObjectName("unsavedLabel");
         _unsavedLabel->setText("● unsaved changes");
@@ -124,6 +130,13 @@ namespace ui
         );
 
         connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
+
+        connect(
+            resetBtn,
+            &QPushButton::clicked,
+            this,
+            &SettingsDialog::_onResetToDefaultsClicked
+        );
 
         // ── Build sections
         auto addPage = [&](auto& section, SectionMode mode)
@@ -251,6 +264,34 @@ namespace ui
         const bool anyDirty = _settings.isDirty();
 
         _unsavedLabel->setVisible(anyDirty);
+    }
+
+    /**
+     * @brief Handle a click on the "Reset to Defaults" button, after user
+     * confirmation this resets every parameter with a configured default value
+     * back to it and immediately saves, mirroring the Save button's behavior
+     *
+     */
+    void SettingsDialog::_onResetToDefaultsClicked()
+    {
+        using enum QMessageBox::StandardButton;
+
+        const auto choice = QMessageBox::question(
+            this,
+            "Reset to Defaults",
+            "This will reset all settings to their default values. This "
+            "cannot be undone. Continue?",
+            Yes | No,
+            No
+        );
+
+        if (choice != Yes)
+            return;
+
+        _settings.resetToDefault();
+        _updateUnsavedLabel();
+        emit saveRequested();
+        accept();
     }
 
     /**

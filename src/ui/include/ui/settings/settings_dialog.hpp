@@ -26,10 +26,11 @@ namespace ui
      *          │  Sidebar    │  SettingsSectionWidget<T>     │
      *          │             │  (swapped via QStackedWidget) │
      *          ├─────────────┴───────────────────────────────┤
-     *          │  [unsaved indicator]          [Save] [Close]│
+     *          │ [Reset] [unsaved indicator]   [Save] [Close]│
      *          └─────────────────────────────────────────────┘
      *
      *        Auto-commits param values on edit. Save writes to disk.
+     *        Reset restores all defaulted params, then saves and closes.
      *        Dirty dots in the sidebar update live via subscribeToDirty.
      */
     class SettingsDialog : public QDialog
@@ -74,6 +75,7 @@ namespace ui
         void _build();
         void _applyStyleSheet();
         void _updateUnsavedLabel();
+        void _onResetToDefaultsClicked();
     };
 
     /**

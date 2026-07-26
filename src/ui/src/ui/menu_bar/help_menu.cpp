@@ -16,6 +16,16 @@ namespace ui
     {
         _helpMenu = menuBar.addMenu("&Help");
 
+        _helpPageAction = _helpMenu->addAction("&Help");
+        connect(
+            _helpPageAction,
+            &QAction::triggered,
+            this,
+            &HelpMenu::requestHelpPage
+        );
+
+        _helpMenu->addSeparator();
+
         _aboutAction = _helpMenu->addAction("&About");
         connect(
             _aboutAction,

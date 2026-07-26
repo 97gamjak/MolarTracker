@@ -106,23 +106,23 @@ namespace
     TEST_F(AccountCategoryTest, AddAccountIncrementsRowCount)
     {
         ui::AccountCategory cat;
-        cat.addAccount(AccountId{1}, "Savings");
+        cat.addAccount(AccountId{1}, "Savings", AccountKind::Cash);
         EXPECT_EQ(cat.rowCount(), 1);
     }
 
     TEST_F(AccountCategoryTest, AddMultipleAccountsIncrementRowCount)
     {
         ui::AccountCategory cat;
-        cat.addAccount(AccountId{1}, "Savings");
-        cat.addAccount(AccountId{2}, "Checking");
+        cat.addAccount(AccountId{1}, "Savings", AccountKind::Cash);
+        cat.addAccount(AccountId{2}, "Checking", AccountKind::Cash);
         EXPECT_EQ(cat.rowCount(), 2);
     }
 
     TEST_F(AccountCategoryTest, ClearAccountsResetsRowCount)
     {
         ui::AccountCategory cat;
-        cat.addAccount(AccountId{1}, "Savings");
-        cat.addAccount(AccountId{2}, "Checking");
+        cat.addAccount(AccountId{1}, "Savings", AccountKind::Cash);
+        cat.addAccount(AccountId{2}, "Checking", AccountKind::Cash);
         cat.clearAccounts();
         EXPECT_EQ(cat.rowCount(), 0);
     }

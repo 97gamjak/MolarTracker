@@ -4,6 +4,11 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
+### Features
+
+- Show a symbol before each account name in the sidebar: `●` for cash
+  accounts and `▲` for security accounts
+
 ### Bug Fix
 
 - Fix silent failure when creating a duplicate account — the operation now
@@ -16,6 +21,11 @@ All changes and updates, that are relevant for a user will be documented here
 
 ### Features
 
+- Add a "Report Bug" button to the fatal error dialog; it pre-fills a GitHub
+  issue with the exception details and app/OS info for you to review and
+  submit
+- Add a "Reset to Defaults" button to the Settings dialog to restore all
+  settings back to their default values
 - Automatically check for new MolarTracker releases on startup and every
   24 h; if a newer version is available, a dialog is shown with a link to
   the releases page and a "don't show again for this version" option
@@ -34,6 +44,7 @@ All changes and updates, that are relevant for a user will be documented here
 - Add possibility to add fees when creating new stock or cash (deposit/withdrawal) transactions
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs
+- Add Help page accessible from Help → Help menu item, with PDF export
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
 

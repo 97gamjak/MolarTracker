@@ -158,6 +158,21 @@ namespace settings
     }
 
     /**
+     * @brief Reset all parameters in the container to their default values,
+     * this recurses into nested parameter containers; parameters without a
+     * configured default value are left untouched
+     *
+     * @tparam Derived
+     */
+    template <typename Derived>
+    void ParamContainerMixin<Derived>::resetToDefault()
+    {
+        auto resetParam = [&](auto& param) { param.resetToDefault(); };
+
+        _self().forEachParam(resetParam);
+    }
+
+    /**
      * @brief Get a reference to the derived class, this is used for CRTP to
      * call functions of the derived class from the mixin
      *

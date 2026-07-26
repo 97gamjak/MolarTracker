@@ -30,6 +30,7 @@ const std::string& ErrorWrapper<Error>::getMessage() const
  * @param type
  * @param message
  * @param subErrors
+ * @param location (only used for debugging, not in release builds)
  */
 template <ErrorTypeEnum EnumType>
 Error<EnumType>::Error(
@@ -101,12 +102,14 @@ const std::string& Error<EnumType>::getMessage() const
     return _message;
 }
 
-template <ErrorTypeEnum EnumType>
-Error<EnumType> Error<EnumType>::NotYetImplemented()
-{
-    return Error(EnumType::NotYetImplemented, "Not yet implemented");
-}
-
+/**
+ * @brief compares two Error objects for equality, this function compares the
+ * error type and error message of the two Error objects, returning true if they
+ * are equal and false otherwise.
+ *
+ * @param other The other Error object to compare with.
+ * @return true if the two Error objects are equal, false otherwise.
+ */
 template <ErrorTypeEnum EnumType>
 bool Error<EnumType>::operator==(const Error& other) const
 {
@@ -122,6 +125,9 @@ bool Error<EnumType>::operator==(const Error& other) const
  * @param newType The new error type to convert to.
  * @param newMessage An optional new error message to use for the converted
  * error. If not provided, the original error message will be used.
+ * @param addSubError A boolean flag indicating whether to add the original
+ * error as a sub-error to the new error. If true, the original error will be
+ * added as a sub-error to the new error.
  * @return Error<EnumType> A new Error object of the specified newType, with
  * the same error message and sub-errors as the original error.
  */

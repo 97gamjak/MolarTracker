@@ -145,6 +145,7 @@ namespace settings
         [[nodiscard]] const T&                get() const;
         void                                  set(const T& value);
         void                                  unset();
+        void                                  resetToDefault();
 
         Connection subscribe(ChangedFn func, void* user);
         Connection subscribeToOptional(ChangedFnOptional func, void* user);
