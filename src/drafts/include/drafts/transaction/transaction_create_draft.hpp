@@ -143,6 +143,8 @@ namespace drafts
 
         /// The option type (call or put) of the option being transacted
         OptionType _optionType;
+        /// The buy/sell direction of the option being transacted
+        OptionBuySell _buySell;
 
         /// The quantity of the option being transacted
         Quantity _quantity;
@@ -174,6 +176,7 @@ namespace drafts
             std::string                ticker,
             Timestamp                  expiration,
             OptionType                 optionType,
+            OptionBuySell              buySell,
             Quantity                   quantity,
             Cash                       amount,
             Cash                       strikePrice,
@@ -200,6 +203,7 @@ namespace drafts
         [[nodiscard]] const std::string& getUnderlyingTicker() const;
         [[nodiscard]] Timestamp          getExpiration() const;
         [[nodiscard]] OptionType         getOptionType() const;
+        [[nodiscard]] OptionBuySell      getBuySell() const;
         [[nodiscard]] std::int64_t       getContractSize() const;
     };
 

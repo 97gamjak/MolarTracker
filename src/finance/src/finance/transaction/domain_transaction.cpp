@@ -62,6 +62,39 @@ namespace finance
     }
 
     /**
+     * @brief Checks if the given account ID is involved in the transaction,
+     * this will check both the entries and the trade legs of the transaction to
+     * determine if the account is involved in any way.
+     *
+     * @param accountId The account ID to check for involvement in the
+     * transaction.
+     * @return true If the account ID is involved in the transaction.
+     * @return false If the account ID is not involved in the transaction.
+     */
+    bool DomainTransaction::isAccountInvolved(AccountId accountId) const
+    {
+        if (std::ranges::any_of(
+                _entries,
+                [&](const TransactionEntry& entry)
+                { return entry.getAccountId() == accountId; }
+            ))
+        {
+            return true;
+        }
+
+        if (std::ranges::any_of(
+                getLegs(),
+                [&](const TradeLeg& leg)
+                { return leg.getAccountId() == accountId; }
+            ))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @brief Get the legs of the transaction, this is used to get the trade
      * legs associated with the transaction, which contain information about
      * the instruments being traded, the quantities, and the unit prices.

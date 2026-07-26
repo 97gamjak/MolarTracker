@@ -13,23 +13,12 @@
 HttpError::HttpError(
     HttpErrorType                      type,
     const std::string&                 message,
-    int                                statusCode,
-    std::map<std::string, std::string> responseHeaders
+    std::map<std::string, std::string> responseHeaders,
+    int                                statusCode
 )
     : Error<HttpErrorType>(type, message),
       _statusCode{statusCode},
       _responseHeaders{std::move(responseHeaders)}
-{
-}
-
-/**
- * @brief Constructs an HttpError object with the specified type and message.
- *
- * @param type The type of the HTTP error.
- * @param message A descriptive message for the error.
- */
-HttpError::HttpError(HttpErrorType type, const std::string& message)
-    : Error<HttpErrorType>(type, message), _statusCode{0}
 {
 }
 

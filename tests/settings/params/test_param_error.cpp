@@ -4,18 +4,6 @@
 
 #include "settings/params/param_error.hpp"
 
-TEST(ParamError, StoresAndReturnsMessage)
-{
-    settings::ParamError err("some error message");
-    EXPECT_EQ(err.getMessage(), "some error message");
-}
-
-TEST(ParamError, EmptyMessageAllowed)
-{
-    settings::ParamError err("");
-    EXPECT_EQ(err.getMessage(), "");
-}
-
 TEST(ParamException, WhatContainsMessage)
 {
     settings::ParamException exception("param went wrong");

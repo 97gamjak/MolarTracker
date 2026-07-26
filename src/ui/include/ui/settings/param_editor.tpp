@@ -76,13 +76,7 @@ namespace ui
                 static_cast<int>(param.getPrecision().value_or(4))
             );
             makeNumericEditorHelper(spinBox, param);
-
-            QObject::connect(
-                spinBox,
-                &QDoubleSpinBox::editingFinished,
-                [spinBox, &param]()
-                { makeNumericEditorEditing(spinBox, param); }
-            );
+            makeNumericEditorEditing(spinBox, param);
 
             return spinBox;
         }
@@ -90,13 +84,7 @@ namespace ui
         {
             auto* spinBox = common::makeQChild<QSpinBox>();
             makeNumericEditorHelper(spinBox, param);
-
-            QObject::connect(
-                spinBox,
-                &QSpinBox::editingFinished,
-                [spinBox, &param]()
-                { makeNumericEditorEditing(spinBox, param); }
-            );
+            makeNumericEditorEditing(spinBox, param);
 
             return spinBox;
         }

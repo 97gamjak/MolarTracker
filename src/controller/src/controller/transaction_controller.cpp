@@ -2,14 +2,49 @@
 
 #include <qstackedwidget.h>
 
-#include "controller/mapper/transaction/transaction_overview_mapper.hpp"
+#include "logging/log_macros.hpp"
+#include "mapper/transaction/transaction_overview_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
+#include "ui/utils/error.hpp"
+
+REGISTER_LOG_CATEGORY("Controller.TransactionController");
 
 namespace controller
 {
+    /**
+     * @brief A struct to hold the UI elements for the TransactionController,
+     * this struct encapsulates the UI elements used by the
+     * TransactionController, including the stacked widget and the transaction
+     * detail view, providing a convenient way to manage and access these UI
+     * elements within the controller.
+     *
+     */
+    struct TransactionController::UIElements
+    {
+        /// Pointer to the central stacked widget
+        QStackedWidget* stackedWidget;
+        /// Pointer to the transaction detail view
+        QPointer<ui::TransactionsOverview> transactionDetailView;
+
+        explicit UIElements(QStackedWidget* stackedWidget_);
+    };
+
+    /**
+     * @brief Construct a new UIElements object
+     *
+     * @param stackedWidget_ Pointer to the central stacked widget
+     */
+    TransactionController::UIElements::UIElements(
+        QStackedWidget* stackedWidget_
+    )
+        : stackedWidget(stackedWidget_),
+          transactionDetailView(new ui::TransactionsOverview(stackedWidget))
+    {
+        stackedWidget->addWidget(transactionDetailView);
+    }
 
     /**
      * @brief Construct a new Transaction Controller:: Transaction Controller
@@ -32,11 +67,11 @@ namespace controller
           _transactionStore(transactionStore),
           _accountStore(accountStore),
           _stockStore(stockStore),
-          _stackedWidget(stackedWidget),
-          _transactionDetailView(new ui::TransactionsOverview(_stackedWidget))
+          _uiElements(std::make_unique<UIElements>(stackedWidget))
     {
-        _stackedWidget->addWidget(_transactionDetailView);
     }
+
+    TransactionController::~TransactionController() = default;
 
     /**
      * @brief Handle the selection of the transaction overview, this will be
@@ -74,17 +109,30 @@ namespace controller
     void TransactionController::transactionOverviewSelected(bool focus)
     {
         if (focus)
-            _stackedWidget->setCurrentWidget(_transactionDetailView);
+            _uiElements->stackedWidget->setCurrentWidget(
+                _uiElements->transactionDetailView
+            );
 
-        const auto transactions = _transactionStore->getTransactions();
+        const auto txs = _transactionStore->getTransactions();
 
-        const auto cashDrafts = TransactionOverviewMapper::toCash(transactions);
-        const auto stockDrafts = TransactionOverviewMapper::toStock(
-            transactions,
+        if (!txs)
+        {
+            LOG_ERROR(txs.error().toString());
+            ui::ErrorDialog::show(
+                txs.error(),
+                "Failed to retrieve transactions for overview",
+                _uiElements->stackedWidget
+            );
+        }
+
+        const auto cashDrafts =
+            mapper::TransactionOverviewMapper::toCash(txs.value());
+        const auto stockDrafts = mapper::TransactionOverviewMapper::toStock(
+            txs.value(),
             _stockStore->getInstrumentIdToNameMap()
         );
 
-        _transactionDetailView->refresh(
+        _uiElements->transactionDetailView->refresh(
             cashDrafts,
             stockDrafts,
             _accountStore->getAccountIdToNameMap()

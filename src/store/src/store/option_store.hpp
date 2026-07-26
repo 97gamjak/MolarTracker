@@ -57,6 +57,16 @@ namespace store
         [[nodiscard]]
         const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
 
+        [[nodiscard]]
+        finance::Options getOptions(
+            const IdSet<InstrumentId>& instrumentIds
+        ) const override;
+
+        [[nodiscard]]
+        std::optional<finance::Option> getOption(
+            InstrumentId instrumentId
+        ) const override;
+
         void commit(const IdIdMap<InstrumentId>& reMap);
 
         void reload() override;

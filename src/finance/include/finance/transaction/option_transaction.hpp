@@ -24,18 +24,20 @@ namespace finance
     class OptionTransaction : public SecurityTransaction
     {
        private:
-        /// The underlying instrument ID of the option being traded in the
-        /// transaction
-        InstrumentId _underlyingInstrumentId;
-
-        /// The strike price of the option being traded in the transaction
-        Cash _strikePrice;
-        /// The amount of the option being traded in the transaction
-        Cash _amount;
+        /// The premium amount of the option transaction, which represents the
+        /// cash flow associated with the option trade, either paid or received,
+        /// and is  used to calculate the overall cost or proceeds of the option
+        /// trade, and is an important factor in determining the profitability
+        /// of the option position.
+        Cash _premium;
 
         /// The action being performed in the option transaction (e.g., open,
         /// close, roll)
         TransactionOptionAction _action;
+
+        /// The buy/sell direction of the option transaction (e.g., buy, sell)
+        OptionBuySell _buySell;
+
         /// The ID of the rolled option transaction, if this transaction is a
         /// roll of an existing option position, this allows the transaction to
         /// reference the original option transaction that is being rolled,
@@ -52,26 +54,33 @@ namespace finance
             Timestamp                    timestamp,
             TransactionStatus            status,
             InstrumentId                 instrumentId,
-            InstrumentId                 underlyingInstrumentId,
             AccountId                    securityAccount,
             AccountId                    cashAccount,
             AccountId                    externalAccount,
             Quantity                     quantity,
-            Cash                         strikePrice,
             Cash                         amount,
             Cash                         fees,
             PositionId                   positionId,
             TransactionOptionAction      action,
+            OptionBuySell                buySell,
             std::optional<TransactionId> rolledOption = std::nullopt,
             std::optional<std::string>   comment      = std::nullopt
         );
 
-        [[nodiscard]] InstrumentId getBaseInstrumentId() const override;
-
         [[nodiscard]]
         TransactionEntries getEntries(AccountId externalAccount) const override;
 
-        [[nodiscard]] OptionData getOptionData() const;
+        [[nodiscard]]
+        OptionData getOptionData() const;
+
+        [[nodiscard]]
+        const OptionBuySell& getBuySell() const;
+
+        [[nodiscard]]
+        const TransactionOptionAction& getAction() const;
+
+        [[nodiscard]]
+        const Cash& getPremium() const;
     };
 }   // namespace finance
 

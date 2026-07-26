@@ -4,7 +4,7 @@
 #include <QDateTime>
 #include <optional>
 
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 
 namespace ui
 {

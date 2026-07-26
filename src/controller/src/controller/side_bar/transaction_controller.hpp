@@ -25,6 +25,11 @@ namespace cmd
     class UndoStack;   // Forward declaration
 }   // namespace cmd
 
+namespace gateway
+{
+    class PositionGateway;   // Forward declaration
+}   // namespace gateway
+
 namespace ui
 {
     class TransactionCategory;       // Forward declaration
@@ -64,6 +69,8 @@ namespace controller
        private:
         /// The undo stack for the application
         cmd::UndoStack& _undoStack;
+        /// The position gateway for fetching position-related data
+        std::shared_ptr<gateway::PositionGateway> _positionGateway;
         /// The account store for the application
         std::shared_ptr<store::IAccountStore> _accountStore;
         /// The transaction store for the application
@@ -90,6 +97,7 @@ namespace controller
        public:
         TransactionSideBarController(
             cmd::UndoStack&                                  undoStack,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway,
             const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
             const std::shared_ptr<store::IStockStore>&       stockStore,

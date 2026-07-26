@@ -13,6 +13,7 @@ target_include_directories(molartracker_http
 target_link_libraries(molartracker_http
     PUBLIC
     CURL::libcurl
+    molartracker_error
     PRIVATE
     mstd
 )

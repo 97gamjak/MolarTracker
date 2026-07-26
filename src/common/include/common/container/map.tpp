@@ -44,7 +44,8 @@ const Value& Map<Key, Value, Hash>::at(const Key& key) const
 }
 
 /**
- * @brief Returns a reference to the value associated with the specified key.
+ * @brief Returns a reference to the value associated with the specified
+ * key.
  *
  * @param key The key of the value to retrieve.
  * @return A reference to the value associated with the specified key.

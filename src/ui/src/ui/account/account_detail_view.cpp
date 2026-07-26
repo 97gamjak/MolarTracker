@@ -9,8 +9,10 @@
 #include "common/finance.hpp"
 #include "common/qt_helpers.hpp"
 #include "drafts/account_draft.hpp"
-#include "ui/position/position_table_model.hpp"
-#include "ui/position/position_table_view.hpp"
+#include "ui/position/option_position_table_model.hpp"
+#include "ui/position/option_position_table_view.hpp"
+#include "ui/position/stock_position_table_model.hpp"
+#include "ui/position/stock_position_table_view.hpp"
 #include "ui/utils/error.hpp"
 
 namespace ui
@@ -30,10 +32,18 @@ namespace ui
         /// The balance label
         QLabel* balanceLabel;
 
-        /// The position table view
-        PositionTableView* positionTableView;
-        /// The position table model
-        StockPositionTableModel* positionTableModel;
+        /// The stock position table view
+        StockPositionTableView* stockTableView;
+        /// The option position table view
+        OptionPositionTableView* optionTableView;
+        /// The stock position table model
+        StockPositionTableModel* stockTable;
+        /// The option position table model
+        OptionPositionTableModel* optionTable;
+        /// The stock positions section title
+        QLabel* stockTableTitle;
+        /// The option positions section title
+        QLabel* optionTableTitle;
 
         /// The stacked widget
         QStackedWidget* stackedWidget;
@@ -68,8 +78,12 @@ namespace ui
         : titleLabel(new QLabel("Account Details")),
           nameLabel(new QLabel()),
           balanceLabel(new QLabel()),
-          positionTableView(new PositionTableView()),
-          positionTableModel(new StockPositionTableModel()),
+          stockTableView(new StockPositionTableView()),
+          optionTableView(new OptionPositionTableView()),
+          stockTable(new StockPositionTableModel()),
+          optionTable(new OptionPositionTableModel()),
+          stockTableTitle(new QLabel("Stock Positions")),
+          optionTableTitle(new QLabel("Option Positions")),
           stackedWidget(new QStackedWidget()),
           cashAccountWidget(new QWidget()),
           securityAccountWidget(new QWidget()),
@@ -89,8 +103,12 @@ namespace ui
         titleLabel->setObjectName("titleLabel");
         nameLabel->setObjectName("nameLabel");
         balanceLabel->setObjectName("balanceLabel");
-        positionTableView->setObjectName("positionTableView");
-        positionTableModel->setObjectName("positionTableModel");
+        stockTableView->setObjectName("stockTableView");
+        stockTable->setObjectName("stockTable");
+        optionTableView->setObjectName("optionTableView");
+        optionTable->setObjectName("optionTable");
+        stockTableTitle->setObjectName("stockTableTitle");
+        optionTableTitle->setObjectName("optionTableTitle");
         stackedWidget->setObjectName("stackedWidget");
         cashAccountWidget->setObjectName("cashAccountWidget");
         securityAccountWidget->setObjectName("securityAccountWidget");
@@ -106,8 +124,15 @@ namespace ui
         cashAccountWidget->setLayout(cashAccountLayout);
         stackedWidget->addWidget(cashAccountWidget);
 
-        securityAccountLayout->addWidget(positionTableView);
-        positionTableView->setModel(positionTableModel);
+        stockTableTitle->setProperty("class", "sectionTitle");
+        optionTableTitle->setProperty("class", "sectionTitle");
+
+        securityAccountLayout->addWidget(stockTableTitle);
+        securityAccountLayout->addWidget(stockTableView);
+        securityAccountLayout->addWidget(optionTableTitle);
+        securityAccountLayout->addWidget(optionTableView);
+        stockTableView->setModel(stockTable);
+        optionTableView->setModel(optionTable);
         securityAccountWidget->setLayout(securityAccountLayout);
         stackedWidget->addWidget(securityAccountWidget);
 
@@ -183,11 +208,13 @@ namespace ui
      * @brief Update the security account details displayed in the view
      *
      * @param account The account data to display
-     * @param positions The positions associated with the account
+     * @param stocks The stock positions associated with the account
+     * @param options The option positions associated with the account
      */
     void AccountDetailView::updateSecurityAccount(
-        const AccountDraft&                                  account,
-        const std::vector<drafts::PositionStockDetailDraft>& positions
+        const AccountDraft&                                   account,
+        const std::vector<drafts::PositionStockDetailDraft>&  stocks,
+        const std::vector<drafts::PositionOptionDetailDraft>& options
     )
     {
         if (account.getKind() != AccountKind::Security)
@@ -204,7 +231,8 @@ namespace ui
 
         _updateAccount(account);
 
-        _uiElements->positionTableModel->setPositions(positions);
+        _uiElements->stockTable->setPositions(stocks);
+        _uiElements->optionTable->setPositions(options);
 
         _uiElements->stackedWidget->setCurrentWidget(
             _uiElements->securityAccountWidget

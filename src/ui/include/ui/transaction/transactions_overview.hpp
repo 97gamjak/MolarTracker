@@ -1,6 +1,7 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__TRANSACTIONS_OVERVIEW_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__TRANSACTIONS_OVERVIEW_HPP__
 
+#include <qlabel.h>
 #include <qsortfilterproxymodel.h>
 #include <qwidget.h>
 
@@ -37,6 +38,10 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// The title label for the cash transactions section
+        QLabel* _cashTitle;
+        /// The title label for the stock transactions section
+        QLabel* _stockTitle;
         /// The model for the transaction table
         CashTransactionTableModel* _cashModel;
         /// The model for the stock transaction table

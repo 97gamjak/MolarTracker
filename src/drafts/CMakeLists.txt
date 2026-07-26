@@ -1,11 +1,12 @@
 add_library(molartracker_drafts STATIC
-    src/drafts/account_draft.cpp
 
+    src/drafts/account_draft.cpp
+    src/drafts/profile_draft.cpp
     src/drafts/stock_draft.cpp
     
-    src/drafts/position_draft.cpp
-    
-    src/drafts/profile_draft.cpp
+    src/drafts/position/position_draft.cpp
+    src/drafts/position/position_option_draft.cpp
+    src/drafts/position/position_stock_draft.cpp
 
     src/drafts/transaction/transaction_draft.cpp
     src/drafts/transaction/transaction_overview_draft.cpp

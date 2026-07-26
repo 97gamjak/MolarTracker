@@ -10,7 +10,7 @@
 #include <QVBoxLayout>
 
 #include "common/qt_helpers.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
 
 using common::makeQChild;

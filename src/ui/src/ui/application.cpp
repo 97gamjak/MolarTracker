@@ -1,5 +1,7 @@
 #include "ui/application.hpp"
 
+#include <qdir.h>
+
 #include "config/constants/constants.hpp"
 #include "config/constants/github_constants.hpp"
 #include "logging/log_macros.hpp"
@@ -30,6 +32,13 @@ namespace ui
         setApplicationVersion(version);
 
         setDesktopFileName(desktopAppName);
+
+        QFile styleFile(":/styles/app.qss");
+        if (styleFile.open(QFile::ReadOnly | QFile::Text))
+        {
+            QTextStream stream(&styleFile);
+            setStyleSheet(stream.readAll());
+        }
     }
 
     /**

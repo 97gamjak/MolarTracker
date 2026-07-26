@@ -26,7 +26,7 @@ class Cash
     Cash(Currency currency, micro_units amount);
     Cash();
 
-    friend constexpr bool                 operator==(Cash lhs, const Cash& rhs);
+    friend bool                           operator==(Cash lhs, const Cash& rhs);
     friend constexpr std::strong_ordering operator<=>(
         const Cash& lhs,
         const Cash& rhs
@@ -46,6 +46,9 @@ class Cash
     [[nodiscard]] bool isZero() const;
     [[nodiscard]] bool isPositive() const;
     [[nodiscard]] bool isNegative() const;
+
+    [[nodiscard]] static Cash max(const Cash& lhs, const Cash& rhs);
+    [[nodiscard]] static Cash min(const Cash& lhs, const Cash& rhs);
 
     [[nodiscard]] micro_units getAmount() const;
     [[nodiscard]] Currency    getCurrency() const;

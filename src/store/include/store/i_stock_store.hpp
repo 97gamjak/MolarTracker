@@ -8,6 +8,7 @@
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
+#include "utils/container/set.hpp"
 
 class Connection;   // Forward declaration
 

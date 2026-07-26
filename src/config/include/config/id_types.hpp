@@ -7,9 +7,6 @@
 struct ProfileTag {};
 using ProfileId = StrongId<ProfileTag>;
 
-struct SecurityTag {};
-using SecurityId = StrongId<SecurityTag>;
-
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
 

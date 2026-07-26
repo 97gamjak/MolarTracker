@@ -1,6 +1,8 @@
 #ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__
 #define __UTILS__INCLUDE__UTILS__CONTAINER__ITERABLE_HPP__
 
+#include <cstddef>
+
 /**
  * @brief A container that provides iterable functionality.
  *
@@ -39,6 +41,8 @@ class Iterable
     auto end();
     auto begin() const;
     auto end() const;
+
+    void reserve(size_t size);
 
     [[nodiscard]] bool empty() const;
     [[nodiscard]] auto size() const;

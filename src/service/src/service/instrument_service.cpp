@@ -1,6 +1,7 @@
 #include "instrument_service.hpp"
 
 #include "finance/instrument/option.hpp"
+#include "finance/instrument/options.hpp"
 #include "finance/instrument/stock.hpp"
 #include "repo/i_instrument_repo.hpp"
 
@@ -41,9 +42,16 @@ namespace service
         return _instrumentRepo->getStocks(ids);
     }
 
-    std::vector<finance::Option> InstrumentService::getOptions()
+    finance::Options InstrumentService::getOptions()
     {
         return _instrumentRepo->getOptions();
+    }
+
+    finance::Options InstrumentService::getOptions(
+        const IdSet<InstrumentId>& ids
+    )
+    {
+        return _instrumentRepo->getOptions(ids);
     }
 
     std::optional<finance::Stock> InstrumentService::getStock(

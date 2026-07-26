@@ -45,9 +45,10 @@ class Quantity
 
    private:
     /// The value of the quantity, stored in micro_units.
-    micro_units _value;
+    micro_units _value{0};
 
    public:
+    Quantity() = default;
     explicit Quantity(micro_units value);
 
     [[nodiscard]] double getValue() const;
@@ -67,13 +68,15 @@ class Quantity
 
     friend Quantity operator+(const Quantity& lhs, const Quantity& rhs);
     friend Quantity operator-(const Quantity& lhs, const Quantity& rhs);
+    friend Quantity operator*(const Quantity& lhs, const Quantity& rhs);
+    friend Quantity operator*(const Quantity& lhs, micro_units rhs);
 
     /********************
      * friend operators *
      ********************/
 
     template <typename T>
-    friend bool operator>(const Quantity& lhs, const T& rhs);
+    friend auto operator<=>(const Quantity& lhs, const T& rhs);
 
     friend Quantity operator-(const Quantity& quantity);
 };

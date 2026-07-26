@@ -122,6 +122,7 @@ namespace finance
      * @param status
      * @param cashAccount
      * @param externalAccount
+     * @param type
      * @param fees
      * @param comment
      */
@@ -131,12 +132,14 @@ namespace finance
         TransactionStatus          status,
         AccountId                  cashAccount,
         AccountId                  externalAccount,
+        TransactionDataType        type,
         Cash                       fees,
         std::optional<std::string> comment
     )
         : BaseTransaction(id, timestamp, status, std::move(comment)),
           _cashAccount(cashAccount),
           _externalAccount(externalAccount),
+          _type(type),
           _fees(fees)
     {
     }
@@ -165,6 +168,18 @@ namespace finance
             amount,
             TransactionEntryType::Fees
         };
+    }
+
+    /**
+     * @brief Get the transaction type of the transaction, this will return the
+     * type of the transaction, which can be used to determine the specific
+     * subclass of the transaction.
+     *
+     * @return TransactionDataType The type of the transaction.
+     */
+    TransactionDataType Transaction::getTransactionType() const
+    {
+        return _type;
     }
 
 }   // namespace finance

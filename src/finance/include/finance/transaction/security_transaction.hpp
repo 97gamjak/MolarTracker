@@ -41,6 +41,7 @@ namespace finance
             Timestamp                  timestamp,
             TransactionStatus          status,
             InstrumentId               instrumentId,
+            TransactionDataType        type,
             AccountId                  securityAccount,
             AccountId                  cashAccount,
             AccountId                  externalAccount,
@@ -55,6 +56,8 @@ namespace finance
         [[nodiscard]] AccountId       getSecurityAccountId() const;
         [[nodiscard]] const Quantity& getQuantity() const;
         [[nodiscard]] PositionId      getPositionId() const;
+
+        [[nodiscard]] IdSet<AccountId> getInvolvedAccounts() const override;
     };
 
 }   // namespace finance

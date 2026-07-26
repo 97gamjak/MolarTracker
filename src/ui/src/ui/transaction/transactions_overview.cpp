@@ -23,12 +23,14 @@ namespace ui
      */
     TransactionsOverview::TransactionsOverview(QWidget* parent)
         : QWidget(parent),
-          _cashModel(common::makeQChild<CashTransactionTableModel>(this)),
-          _stockModel(common::makeQChild<StockTransactionTableModel>(this)),
-          _cashProxy(common::makeQChild<QSortFilterProxyModel>(this)),
-          _stockProxy(common::makeQChild<QSortFilterProxyModel>(this)),
-          _cashTable(common::makeQChild<QTableView>(this)),
-          _stockTable(common::makeQChild<QTableView>(this))
+          _cashTitle(new QLabel("Cash Transactions")),
+          _stockTitle(new QLabel("Stock Transactions")),
+          _cashModel(new CashTransactionTableModel(this)),
+          _stockModel(new StockTransactionTableModel(this)),
+          _cashProxy(new QSortFilterProxyModel(this)),
+          _stockProxy(new QSortFilterProxyModel(this)),
+          _cashTable(new QTableView(this)),
+          _stockTable(new QTableView(this))
     {
         _cashProxy->setSourceModel(_cashModel);
         _cashProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -37,6 +39,12 @@ namespace ui
         _stockProxy->setSourceModel(_stockModel);
         _stockProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
         _stockProxy->setFilterKeyColumn(-1);   // search all columns
+
+        _cashTitle->setProperty("class", "sectionTitle");
+        _stockTitle->setProperty("class", "sectionTitle");
+
+        _cashTitle->setProperty("class", "sectionTitle");
+        _stockTitle->setProperty("class", "sectionTitle");
 
         auto* search = common::makeQChild<QLineEdit>(this);
         search->setPlaceholderText("Search transactions…");
@@ -76,7 +84,9 @@ namespace ui
 
         auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->addWidget(search);
+        layout->addWidget(_cashTitle);
         layout->addWidget(_cashTable);
+        layout->addWidget(_stockTitle);
         layout->addWidget(_stockTable);
     }
 

@@ -4,11 +4,6 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
-### Features
-
-- Show a symbol before each account name in the sidebar: `●` for cash
-  accounts and `▲` for security accounts
-
 ### Bug Fix
 
 - Fix silent failure when creating a duplicate account — the operation now
@@ -18,9 +13,14 @@ All changes and updates, that are relevant for a user will be documented here
 - Fix profile deletion crashing with a SQL syntax error
 - Fix three ORM bugs exposed by unit tests: duplicate `WHERE` in `deleteByPk` SQL, wrong bind-parameter index in `update` WHERE clause, and `LIMIT` being silently ignored when no `ORDER BY` was set
 - Fix default log level of settings is now also applied at startup
+- Fix numeric settings (e.g. max log files, log age, window sizes) not being
+  saved in the Settings dialog — only toggle/checkbox settings persisted
+  before this fix
 
 ### Features
 
+- Show a symbol before each account name in the sidebar: `●` for cash
+  accounts and `▲` for security accounts
 - Add a "Report Bug" button to the fatal error dialog; it pre-fills a GitHub
   issue with the exception details and app/OS info for you to review and
   submit
@@ -47,6 +47,7 @@ All changes and updates, that are relevant for a user will be documented here
 - Add Help page accessible from Help → Help menu item, with PDF export
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
+- Show option positions in account overview
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

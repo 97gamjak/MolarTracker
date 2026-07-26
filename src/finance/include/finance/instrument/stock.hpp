@@ -1,11 +1,11 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
 #define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__STOCK_HPP__
 
-#include <expected>
 #include <string>
 
 #include "common/finance.hpp"
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 
 namespace finance
 {
@@ -64,7 +64,7 @@ namespace finance
         );
 
         [[nodiscard]]
-        static std::expected<Stock, YahooFinanceError> retrieveTickerInfo(
+        static YFinanceResult<Stock> retrieveTickerInfo(
             const std::string& ticker
         );
 

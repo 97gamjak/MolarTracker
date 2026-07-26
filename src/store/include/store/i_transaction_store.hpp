@@ -8,13 +8,15 @@
 #include "common/container/id_map.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/position_transaction.hpp"   // needed for vector
+#include "finance/transaction/transactions.hpp"   // needed for public return types
 
 namespace finance
 {
-    class Account;             // Forward declaration
-    class TransactionFilter;   // Forward declaration
-    class Transactions;        // Forward declaration
-    class OptionTransaction;   // Forward declaration
+    class Account;              // Forward declaration
+    struct TransactionFilter;   // Forward declaration
+    class CashTransaction;      // Forward declaration
+    class StockTransaction;     // Forward declaration
+    class OptionTransaction;    // Forward declaration
 }   // namespace finance
 
 class Connection;   // Forward declaration
@@ -86,32 +88,22 @@ namespace store
          *
          * @param filter The filter to apply
          *
-         * @return finance::Transactions The list of
+         * @return FinanceResult<finance::Transactions> The list of
          * transactions
          */
         [[nodiscard]]
-        virtual finance::Transactions getTransactions(
-            const finance::TransactionFilter& filter
+        virtual FinanceResult<finance::Transactions> getTransactions(
+            finance::TransactionFilter filter
         ) const = 0;
 
         /**
          * @brief Get all transactions in the store
          *
-         * @return finance::Transactions The list of
+         * @return FinanceResult<finance::Transactions> The list of
          * transactions
          */
         [[nodiscard]]
-        virtual finance::Transactions getTransactions() const = 0;
-
-        /**
-         * @brief Get the Stock Positions
-         *
-         * @param filter
-         * @return IdMap<PositionId, finance::StockPositionTransaction>
-         */
-        [[nodiscard]]
-        virtual IdMap<PositionId, finance::StockPositionTransaction> getStockPositions(
-            const finance::TransactionFilter& filter
+        virtual FinanceResult<finance::Transactions> getTransactions(
         ) const = 0;
 
         /**

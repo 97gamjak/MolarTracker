@@ -5,14 +5,6 @@
 
 #include "service/i_instrument_service.hpp"
 
-namespace finance
-{
-    class Stock;                    // forward declaration
-    struct StockInsertionResult;    // forward declaration
-    class Option;                   // forward declaration
-    struct OptionInsertionResult;   // forward declaration
-}   // namespace finance
-
 namespace repo
 {
     class IInstrumentRepo;   // forward declaration
@@ -44,7 +36,10 @@ namespace service
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Option> getOptions() override;
+        finance::Options getOptions() override;
+
+        [[nodiscard]]
+        finance::Options getOptions(const IdSet<InstrumentId>& ids) override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(

@@ -1,6 +1,7 @@
 add_executable(tests_ui
     main.cpp
     test_edit_menu.cpp
+    test_param_editor.cpp
     test_position_table_model.cpp
     test_side_bar_items.cpp
     test_stock_info_model.cpp
@@ -14,6 +15,7 @@ target_link_libraries(tests_ui
     molartracker_drafts
     molartracker_config
     molartracker_finance
+    molartracker_settings
     molartracker_common
     Qt6::Widgets
     GTest::gtest

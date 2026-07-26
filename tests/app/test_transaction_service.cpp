@@ -85,8 +85,7 @@ TEST_F(TransactionServiceTest, AddTransactionReturnsValidId)
 
 TEST_F(TransactionServiceTest, GetTransactionsEmptyForEmptyAccountSet)
 {
-    const auto txs =
-        _service->getTransactions({}, finance::TransactionFilter{});
+    const auto txs = _service->getTransactions(finance::TransactionFilter{});
 
     EXPECT_TRUE(txs.empty());
 }
@@ -95,8 +94,10 @@ TEST_F(TransactionServiceTest, GetTransactionsReturnsAddedTransaction)
 {
     static_cast<void>(_service->addTransaction(makeCashTx()));
 
-    const auto txs =
-        _service->getTransactions({_accountId}, finance::TransactionFilter{});
+    finance::TransactionFilter filter;
+    filter.accountIds.insert(_accountId);
+
+    const auto txs = _service->getTransactions(filter);
 
     EXPECT_EQ(txs.size(), 1U);
 }

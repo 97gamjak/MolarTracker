@@ -44,6 +44,7 @@ namespace finance
               timestamp,
               status,
               instrumentId,
+              TransactionDataType::Stock,
               securityAccount,
               cashAccount,
               externalAccount,
@@ -101,7 +102,7 @@ namespace finance
     {
         const TradeLeg leg{
             getSecurityAccountId(),
-            getBaseInstrumentId(),
+            getInstrumentId(),
             getQuantity(),
             getUnitPrice(),
             getPositionId()
@@ -119,19 +120,6 @@ namespace finance
     Cash StockTransaction::getAmount() const
     {
         return getQuantity() * getUnitPrice();
-    }
-
-    /**
-     * @brief Get the base instrument ID associated with the stock transaction,
-     * this will return the instrument ID of the stock that is being traded in
-     * the transaction, which is used for categorizing and displaying the
-     * transaction in the transaction overview.
-     *
-     * @return InstrumentId
-     */
-    InstrumentId StockTransaction::getBaseInstrumentId() const
-    {
-        return getInstrumentId();
     }
 
     /**

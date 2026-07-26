@@ -13,9 +13,9 @@
  * otherwise.
  */
 template <typename T>
-[[nodiscard]] bool operator>(const Quantity& lhs, const T& rhs)
+auto operator<=>(const Quantity& lhs, const T& rhs)
 {
-    return lhs.getValue() > rhs;
+    return lhs.getValue() <=> rhs;
 }
 
 #endif   // __UTILS__INCLUDE__UTILS__QUANTITY_TPP__

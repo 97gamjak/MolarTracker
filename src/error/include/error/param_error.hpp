@@ -3,23 +3,18 @@
 
 #include <mstd/enum.hpp>
 
-#include "base_error.hpp"
+#include "error/base_error.hpp"
 
-#define PARAM_ERROR_LIST(X) \
-    X(InvalidValue)         \
-    X(OutOfRange)           \
-    X(MissingValue)         \
-    X(InvalidType)          \
-    X(UnknownError)         \
-    X(DuplicateValue)
+#define PARAM_ERROR_TYPE_LIST(X) \
+    X(InvalidParamValue)         \
+    X(ParamNotFound)             \
+    GENERIC_ERRORS(X)
 
-MSTD_ENUM(ParamErrorType, std::uint8_t, PARAM_ERROR_LIST);
+MSTD_ENUM(ParamErrorType, std::uint8_t, PARAM_ERROR_TYPE_LIST);
 
 using ParamError = Error<ParamErrorType>;
 
 template <typename T>
 using ParamResult = Result<T, ParamError>;
-
-#define PARAM_ERROR_ENUM_NAME ParamErrorType
 
 #endif   // __ERROR__INCLUDE__ERROR__PARAM_ERROR_HPP__

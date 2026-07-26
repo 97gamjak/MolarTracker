@@ -6,7 +6,7 @@
 #include "common/finance.hpp"
 #include "common/timestamp.hpp"
 #include "config/id_types.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "drafts/stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
 

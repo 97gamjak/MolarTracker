@@ -37,6 +37,8 @@ namespace finance
         [[nodiscard]] Timestamp                getCreatedAt() const;
         [[nodiscard]] std::optional<Timestamp> getClosedAt() const;
 
+        [[nodiscard]] bool isOpen() const;
+
         [[nodiscard]] std::string toString() const;
     };
 
