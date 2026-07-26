@@ -1,6 +1,8 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__
 
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
@@ -9,8 +11,6 @@
 #include "sql_models/instrument_row.hpp"
 #include "sql_models/position_row.hpp"
 #include "sql_models/transaction_row.hpp"
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
 
 /**
  * @brief ORM model for the trade_leg table, representing a single leg of a

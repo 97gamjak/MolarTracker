@@ -4,13 +4,13 @@
 #include <cmath>
 #include <vector>
 
+#include "common/container/set.hpp"
 #include "error/finance_error.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "logging/log_macros.hpp"
-#include "utils/container/set.hpp"
 
 REGISTER_LOG_CATEGORY("Finance.Transactions");
 

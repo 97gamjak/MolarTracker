@@ -2,15 +2,15 @@
 
 #include <QVariant>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "drafts/transaction/transaction_draft.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace
 {

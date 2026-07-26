@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {

@@ -1,8 +1,8 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__OPTIONS_HPP__
 #define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__OPTIONS_HPP__
 
+#include "common/container/id_map.hpp"
 #include "option.hpp"
-#include "utils/container/id_map.hpp"
 
 namespace finance
 {

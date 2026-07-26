@@ -8,6 +8,7 @@
 #define PARAM_ERROR_TYPE_LIST(X) \
     X(InvalidParamValue)         \
     X(ParamNotFound)             \
+    X(DuplicateValue)            \
     GENERIC_ERRORS(X)
 
 MSTD_ENUM(ParamErrorType, std::uint8_t, PARAM_ERROR_TYPE_LIST);

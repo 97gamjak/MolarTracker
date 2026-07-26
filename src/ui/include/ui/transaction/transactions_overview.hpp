@@ -5,8 +5,8 @@
 #include <qsortfilterproxymodel.h>
 #include <qwidget.h>
 
+#include "common/container/id_map.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/id_map.hpp"
 
 namespace drafts
 {

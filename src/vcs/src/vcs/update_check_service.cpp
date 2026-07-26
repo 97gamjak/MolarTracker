@@ -25,7 +25,7 @@ namespace vcs
         );
         connect(
             &_watcher,
-            &QFutureWatcher<HttpResult<utils::SemVer>>::finished,
+            &QFutureWatcher<HttpResult<common::SemVer>>::finished,
             this,
             &UpdateCheckService::_onFetchFinished
         );
@@ -81,9 +81,9 @@ namespace vcs
             return;
         }
 
-        const utils::SemVer& latest = *result;
+        const common::SemVer& latest = *result;
 
-        if (latest <= utils::SemVer::current())
+        if (latest <= common::SemVer::current())
             return;
 
         if (_lastNotifiedVersion.has_value() && *_lastNotifiedVersion == latest)

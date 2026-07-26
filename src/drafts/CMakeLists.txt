@@ -23,7 +23,7 @@ target_include_directories(molartracker_drafts
 target_link_libraries(molartracker_drafts
     PUBLIC
     molartracker_config
-    molartracker_utils
+    molartracker_common
     PRIVATE
     molartracker_domain
     molartracker_finance

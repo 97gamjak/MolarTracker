@@ -22,5 +22,5 @@ target_link_libraries(molartracker_gateway
     molartracker_logging
     molartracker_mapper
     molartracker_store
-    molartracker_utils
+    molartracker_common
 )

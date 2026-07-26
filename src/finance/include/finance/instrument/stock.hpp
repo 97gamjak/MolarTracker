@@ -3,9 +3,9 @@
 
 #include <string>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "error/finance_error.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {

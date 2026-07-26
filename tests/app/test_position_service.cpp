@@ -4,13 +4,13 @@
 #include <memory>
 #include <vector>
 
+#include "common/timestamp.hpp"
 #include "db/database.hpp"
 #include "finance/position.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/position_repo.hpp"
 #include "service/position_service.hpp"
 #include "test_fixtures.hpp"
-#include "utils/timestamp.hpp"
 
 namespace
 {

@@ -9,9 +9,9 @@
 #include <QVBoxLayout>
 #include <filesystem>
 
+#include "common/qt_helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Logging.LogViewerDialog");
 
@@ -46,12 +46,12 @@ namespace ui
         _autoReloadCheckBox->setChecked(_settings->autoReload);
         _reloadTimer->setInterval(_settings->reloadIntervalMs);
 
-        auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
+        auto* buttonLayout = common::makeQChild<QHBoxLayout>();
         buttonLayout->addWidget(_reloadButton);
         buttonLayout->addStretch(1);
         buttonLayout->addWidget(_autoReloadCheckBox);
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->addWidget(_textEdit);
         layout->addLayout(buttonLayout);
 

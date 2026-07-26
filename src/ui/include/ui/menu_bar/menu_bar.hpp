@@ -12,6 +12,11 @@
 
 class QWidget;   // Forward declaration
 
+namespace settings
+{
+    class ShortcutSettings;   // Forward declaration
+}   // namespace settings
+
 namespace ui
 {
     /**
@@ -35,7 +40,10 @@ namespace ui
         HelpMenu _helpMenu;
 
        public:
-        explicit MenuBar(QWidget* parent);
+        explicit MenuBar(
+            QWidget*                          parent,
+            const settings::ShortcutSettings& shortcutSettings
+        );
 
         FileMenu&     getFileMenu();
         EditMenu&     getEditMenu();

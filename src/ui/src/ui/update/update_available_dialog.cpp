@@ -8,9 +8,9 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
+#include "common/version.hpp"
 #include "config/constants/github_constants.hpp"
-#include "utils/qt_helpers.hpp"
-#include "utils/version.hpp"
 
 namespace ui
 {
@@ -22,16 +22,16 @@ namespace ui
      * @param parent        Optional parent widget.
      */
     UpdateAvailableDialog::UpdateAvailableDialog(
-        const utils::SemVer& latestVersion,
-        QWidget*             parent
+        const common::SemVer& latestVersion,
+        QWidget*              parent
     )
         : Dialog{parent}
     {
         setWindowTitle("Update Available");
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
 
-        auto* versionLabel = utils::makeQChild<QLabel>(
+        auto* versionLabel = common::makeQChild<QLabel>(
             QString{"A new version of MolarTracker is available: <b>%1</b>"}
                 .arg(latestVersion.toQString()),
             this
@@ -40,7 +40,7 @@ namespace ui
         layout->addWidget(versionLabel);
 
         auto* releasesButton =
-            utils::makeQChild<QPushButton>("Open Releases Page", this);
+            common::makeQChild<QPushButton>("Open Releases Page", this);
 
         connect(
             releasesButton,
@@ -54,14 +54,14 @@ namespace ui
         );
         layout->addWidget(releasesButton);
 
-        _dismissCheckBox = utils::makeQChild<QCheckBox>(
+        _dismissCheckBox = common::makeQChild<QCheckBox>(
             "Don't show again for this version",
             this
         );
         layout->addWidget(_dismissCheckBox);
 
         auto* buttons =
-            utils::makeQChild<QDialogButtonBox>(QDialogButtonBox::Ok, this);
+            common::makeQChild<QDialogButtonBox>(QDialogButtonBox::Ok, this);
 
         connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
         layout->addWidget(buttons);

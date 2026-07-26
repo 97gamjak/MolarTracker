@@ -9,10 +9,10 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "config/id_types.hpp"
 #include "drafts/profile_draft.hpp"
 #include "ui/validators/validators.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -36,7 +36,7 @@ namespace ui
     {
         setWindowTitle("Add New Profile");
         resize(_settings->dialogSize.first, _settings->dialogSize.second);
-        utils::moveDialogToParentScreenCenter(this, parent);
+        common::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI();
     }
@@ -67,7 +67,7 @@ namespace ui
     {
         QDialog::setModal(true);
 
-        auto* mainLayout = utils::makeQChild<QVBoxLayout>(this);
+        auto* mainLayout = common::makeQChild<QVBoxLayout>(this);
 
         _buildFormSection(mainLayout);
 
@@ -83,28 +83,31 @@ namespace ui
      */
     void AddProfileDialog::_buildFormSection(QVBoxLayout* parent)
     {
-        auto* formLayout = utils::makeQChild<QFormLayout>();
+        auto* formLayout = common::makeQChild<QFormLayout>();
 
         auto [nameLineEdit, nameContainer] =
             createLineEditWithLabel<NameLineEdit>(this);
         nameLineEdit->setRequired(true);
 
         _nameLineEdit = nameLineEdit;
-        formLayout->addRow(utils::makeQChild<QLabel>("Name*:"), nameContainer);
+        formLayout->addRow(common::makeQChild<QLabel>("Name*:"), nameContainer);
 
-        auto* emailErrorLabel = utils::makeQChild<QLabel>();
+        auto* emailErrorLabel = common::makeQChild<QLabel>();
 
-        _emailLineEdit = utils::makeQChild<EmailLineEdit>(this);
+        _emailLineEdit = common::makeQChild<EmailLineEdit>(this);
         _emailLineEdit->attachErrorLabel(emailErrorLabel);
 
-        auto* emailContainer = utils::makeQChild<QWidget>();
-        auto* emailLayout    = utils::makeQChild<QVBoxLayout>(emailContainer);
+        auto* emailContainer = common::makeQChild<QWidget>();
+        auto* emailLayout    = common::makeQChild<QVBoxLayout>(emailContainer);
         emailLayout->setContentsMargins(0, 0, 0, 0);
         emailLayout->setSpacing(2);
         emailLayout->addWidget(_emailLineEdit);
         emailLayout->addWidget(emailErrorLabel);
 
-        formLayout->addRow(utils::makeQChild<QLabel>("Email:"), emailContainer);
+        formLayout->addRow(
+            common::makeQChild<QLabel>("Email:"),
+            emailContainer
+        );
 
         parent->addLayout(formLayout);
     }
@@ -116,14 +119,14 @@ namespace ui
      */
     void AddProfileDialog::_buildToggleSection(QVBoxLayout* parent)
     {
-        auto* toggleLayout = utils::makeQChild<QHBoxLayout>();
+        auto* toggleLayout = common::makeQChild<QHBoxLayout>();
 
         _setActiveCheckBox =
-            utils::makeQChild<QCheckBox>("Set as Active Profile");
+            common::makeQChild<QCheckBox>("Set as Active Profile");
         toggleLayout->addWidget(_setActiveCheckBox);
 
         _setAsDefaultCheckBox =
-            utils::makeQChild<QCheckBox>("Set as Default Profile");
+            common::makeQChild<QCheckBox>("Set as Default Profile");
         toggleLayout->addWidget(_setAsDefaultCheckBox);
 
         _setActiveCheckBox->setChecked(false);
@@ -141,9 +144,9 @@ namespace ui
      */
     void AddProfileDialog::_buildButtonSection(QVBoxLayout* parent)
     {
-        auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
+        auto* buttonLayout = common::makeQChild<QHBoxLayout>();
 
-        _addButton = utils::makeQChild<QPushButton>("Add Profile");
+        _addButton = common::makeQChild<QPushButton>("Add Profile");
 
         // check the validity of the input to enable or disable the add button
         _addButton->setEnabled(false);
@@ -166,7 +169,7 @@ namespace ui
 
         if (_canBeClosed)
         {
-            _cancelButton = utils::makeQChild<QPushButton>("Cancel");
+            _cancelButton = common::makeQChild<QPushButton>("Cancel");
             buttonLayout->addWidget(_cancelButton);
             connect(
                 _cancelButton,

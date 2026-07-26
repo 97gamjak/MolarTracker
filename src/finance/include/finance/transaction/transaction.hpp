@@ -4,11 +4,11 @@
 #include <optional>
 #include <string>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {

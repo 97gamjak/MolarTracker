@@ -3,11 +3,11 @@
 
 #include <string>
 
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/where_expr.hpp"
-#include "utils/timestamp.hpp"
 
 /**
  * @brief Represents a row in the "watchlists" database table

@@ -2,7 +2,7 @@
 
 #include <QTreeWidget>
 
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 
 namespace ui
 {
@@ -14,11 +14,11 @@ namespace ui
      */
     SettingsSidebar::SettingsSidebar(QWidget* parent) : QWidget(parent)
     {
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
-        _tree = utils::makeQChild<QTreeWidget>(this);
+        _tree = common::makeQChild<QTreeWidget>(this);
         _tree->setObjectName("settingsSidebar");
         _tree->setHeaderHidden(true);
         _tree->setFrameShape(QFrame::NoFrame);
@@ -49,7 +49,7 @@ namespace ui
      */
     void SettingsSidebar::addTopLevel(const QString& title, int stackIndex)
     {
-        auto* item = utils::makeQChild<QTreeWidgetItem>(_tree);
+        auto* item = common::makeQChild<QTreeWidgetItem>(_tree);
         item->setText(0, title);
         item->setData(0, kStackIndexRole, stackIndex);
         item->setData(0, kBaseTitleRole, title);
@@ -76,7 +76,7 @@ namespace ui
         int            stackIndex
     )
     {
-        auto* item = utils::makeQChild<QTreeWidgetItem>(_tree);
+        auto* item = common::makeQChild<QTreeWidgetItem>(_tree);
         item->setText(0, title);
         item->setData(0, kStackIndexRole, stackIndex);
         item->setData(0, kBaseTitleRole, title);
@@ -104,7 +104,7 @@ namespace ui
         int              stackIndex
     )
     {
-        auto* item = utils::makeQChild<QTreeWidgetItem>(parent);
+        auto* item = common::makeQChild<QTreeWidgetItem>(parent);
         item->setText(0, title);
         item->setData(0, kStackIndexRole, stackIndex);
         item->setData(0, kBaseTitleRole, title);

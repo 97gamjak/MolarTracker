@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "utils/version.hpp"
+#include "common/version.hpp"
 
 /**
  * @brief Class containing compile-time constants related to GitHub for the
@@ -37,7 +37,7 @@ class GithubConstants
     [[nodiscard]] static std::string getGithubIssuesUrl();
     [[nodiscard]] static std::string getCreateIssueError();
 
-    [[nodiscard]] static utils::SemVer getSemVer();
+    [[nodiscard]] static common::SemVer getSemVer();
 };
 
 #endif   // __CONFIG__INCLUDE__CONFIG__CONSTANTS__GITHUB_CONSTANTS_HPP__

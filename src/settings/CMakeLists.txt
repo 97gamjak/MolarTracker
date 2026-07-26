@@ -1,12 +1,14 @@
 add_library(molartracker_settings STATIC
-    src/settings/backup_settings.cpp
     src/settings/settings.cpp
-    src/settings/ui_settings.cpp
-    src/settings/log_viewer_settings.cpp
+
+    src/settings/backup_settings.cpp
     src/settings/debug_slots_settings.cpp
-    src/settings/profile_ui_settings.cpp
     src/settings/general_settings.cpp
     src/settings/logging_settings.cpp
+    src/settings/log_viewer_settings.cpp
+    src/settings/profile_ui_settings.cpp
+    src/settings/shortcut_settings.cpp
+    src/settings/ui_settings.cpp
 
     src/settings/params/param_container.cpp
     src/settings/params/param_error.cpp
@@ -27,6 +29,6 @@ target_link_libraries(molartracker_settings
     molartracker_config
     molartracker_error
     PRIVATE
-    molartracker_utils
+    molartracker_common
     molartracker_exceptions
 )

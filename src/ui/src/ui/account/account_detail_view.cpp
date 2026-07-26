@@ -6,14 +6,14 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
+#include "common/finance.hpp"
+#include "common/qt_helpers.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/position/option_position_table_model.hpp"
 #include "ui/position/option_position_table_view.hpp"
 #include "ui/position/stock_position_table_model.hpp"
 #include "ui/position/stock_position_table_view.hpp"
 #include "ui/utils/error.hpp"
-#include "utils/finance.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -115,7 +115,7 @@ namespace ui
         cashAccountLayout->setObjectName("cashAccountLayout");
         securityAccountLayout->setObjectName("securityAccountLayout");
 
-        auto* mainLayout = utils::makeQChild<QVBoxLayout>();
+        auto* mainLayout = common::makeQChild<QVBoxLayout>();
         mainLayout->addWidget(titleLabel);
         mainLayout->addWidget(nameLabel);
         mainLayout->addWidget(balanceLabel);

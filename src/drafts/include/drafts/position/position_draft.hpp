@@ -1,9 +1,9 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__POSITION__POSITION_DRAFT_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__POSITION__POSITION_DRAFT_HPP__
 
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "drafts/stock_draft.hpp"
-#include "utils/timestamp.hpp"
 
 namespace drafts
 {

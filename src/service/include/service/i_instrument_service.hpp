@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "common/container/set.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {

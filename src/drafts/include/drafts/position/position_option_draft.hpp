@@ -1,10 +1,10 @@
 #ifndef __DRAFTS__INCLUDE__DRAFTS__POSITION__POSITION_OPTION_DRAFT_HPP__
 #define __DRAFTS__INCLUDE__DRAFTS__POSITION__POSITION_OPTION_DRAFT_HPP__
 
+#include "common/cash.hpp"
+#include "common/percentage.hpp"
+#include "common/quantity.hpp"
 #include "position_draft.hpp"
-#include "utils/cash.hpp"
-#include "utils/percentage.hpp"
-#include "utils/quantity.hpp"
 
 namespace drafts
 {

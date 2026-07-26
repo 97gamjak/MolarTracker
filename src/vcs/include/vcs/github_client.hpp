@@ -1,8 +1,8 @@
 #ifndef __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 #define __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 
+#include "common/version.hpp"
 #include "error/http_error.hpp"
-#include "utils/version.hpp"
 
 namespace vcs
 {
@@ -19,7 +19,7 @@ namespace vcs
 
        public:
         [[nodiscard]]
-        static HttpResult<utils::SemVer> fetchLatestVersion();
+        static HttpResult<common::SemVer> fetchLatestVersion();
 
        private:
         [[nodiscard]]

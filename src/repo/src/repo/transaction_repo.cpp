@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -16,7 +17,6 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
-#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Repo.TransactionRepo");
 

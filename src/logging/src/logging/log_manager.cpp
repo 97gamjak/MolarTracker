@@ -8,6 +8,9 @@
 #include <optional>
 #include <string>
 
+#include "common/ring_file.hpp"
+#include "common/ring_file_config.hpp"
+#include "common/timestamp.hpp"
 #include "config/logging_base.hpp"
 #include "log_categories.gen.hpp"
 #include "logging/log_categories.hpp"
@@ -15,9 +18,6 @@
 #include "logging/log_file_cleaner.hpp"
 #include "logging/log_object.hpp"
 #include "settings/logging_settings.hpp"
-#include "utils/ring_file.hpp"
-#include "utils/ring_file_config.hpp"
-#include "utils/timestamp.hpp"
 
 namespace logging
 {

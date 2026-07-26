@@ -8,10 +8,10 @@
 
 class QCloseEvent;   // Forward declaration
 
-namespace app
+namespace settings
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class ShortcutSettings;   // Forward declaration
+}   // namespace settings
 
 class QStackedWidget;   // Forward declaration
 
@@ -46,7 +46,7 @@ namespace ui
         CanCloseCallback _canCloseCallback;
 
        public:
-        explicit MainWindow();
+        explicit MainWindow(const settings::ShortcutSettings& shortcutSettings);
 
         void setWindowTitle(const bool& isDirty);
         void setCanCloseCallback(CanCloseCallback callback);

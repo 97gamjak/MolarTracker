@@ -89,7 +89,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
   - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
-    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+    and returns a `common::SemVer`; strips the `v` prefix from GitHub tags
   - `vcs::UpdateCheckService` — `QObject` that fires an async
     `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
     emits `updateAvailable(SemVer)` at most once per distinct version per
@@ -173,6 +173,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
   external value changes
 - Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
   `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+- Add `MapParam` as a new parameter type and add `Shortcutsettings` with it
 
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 

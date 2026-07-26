@@ -88,6 +88,7 @@ class Constants
     [[nodiscard]] std::filesystem::path getConfigPath() const;
     [[nodiscard]] std::filesystem::path getDataPath() const;
     [[nodiscard]] std::filesystem::path getDatabasePath() const;
+    [[nodiscard]] std::filesystem::path getImagesPath() const;
 
     [[nodiscard]] static std::string getAppName();
     [[nodiscard]] static std::string getAppDisplayName();

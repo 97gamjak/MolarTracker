@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "utils/finance.hpp"
+#include "common/finance.hpp"
 
 namespace drafts
 {

@@ -5,9 +5,9 @@
 #include <string>
 #include <variant>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
-#include "utils/finance.hpp"
 
 enum class Currency : std::uint8_t;        // Forward declaration
 enum class AccountStatus : std::uint8_t;   // Forward declaration

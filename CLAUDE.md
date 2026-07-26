@@ -350,7 +350,7 @@ the same linters).
 ### Key linter rules enforced by CI
 
 - **`cppcoreguidelines-owning-memory`** — Never write `new T(...)` directly in UI
-  code. Use `utils::makeQChild<T>(...)` instead; the suppression is centralized
+  code. Use `common::makeQChild<T>(...)` instead; the suppression is centralized
   there.
 - **`readability-convert-member-functions-to-static`** — If a method does not
   access instance state, declare it `static`.
@@ -369,7 +369,7 @@ Before submitting any change:
 - [ ] No new compiler warnings introduced
 - [ ] `scripts/custom_cpp_checks.sh` passes (cppcheck + clangd-tidy)
 - [ ] All private members have `///` doxygen doc comments
-- [ ] Qt widgets created with `utils::makeQChild<T>()`, not bare `new T()`
+- [ ] Qt widgets created with `common::makeQChild<T>()`, not bare `new T()`
 - [ ] Tests added or updated for changed logic
 - [ ] One of `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
 - [ ] Git submodules not accidentally modified

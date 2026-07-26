@@ -3,7 +3,7 @@
 
 #include <qwidget.h>
 
-#include "utils/timestamp.hpp"
+#include "common/timestamp.hpp"
 
 class QDateEdit;     // Forward declaration
 class QTimeEdit;     // Forward declaration

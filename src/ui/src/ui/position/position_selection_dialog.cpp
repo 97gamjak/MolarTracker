@@ -9,11 +9,11 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "drafts/position/position_stock_draft.hpp"
 #include "ui/position/position_selection_table_model.hpp"
-#include "utils/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {

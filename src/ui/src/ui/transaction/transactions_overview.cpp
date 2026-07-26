@@ -7,10 +7,10 @@
 #include <qsortfilterproxymodel.h>
 #include <qtableview.h>
 
+#include "common/qt_helpers.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -43,7 +43,10 @@ namespace ui
         _cashTitle->setProperty("class", "sectionTitle");
         _stockTitle->setProperty("class", "sectionTitle");
 
-        auto* search = utils::makeQChild<QLineEdit>(this);
+        _cashTitle->setProperty("class", "sectionTitle");
+        _stockTitle->setProperty("class", "sectionTitle");
+
+        auto* search = common::makeQChild<QLineEdit>(this);
         search->setPlaceholderText("Search transactions…");
 
         connect(
@@ -79,7 +82,7 @@ namespace ui
             QHeaderView::Stretch
         );
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->addWidget(search);
         layout->addWidget(_cashTitle);
         layout->addWidget(_cashTable);

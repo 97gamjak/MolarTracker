@@ -4,6 +4,10 @@
 #include <memory>
 #include <vector>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -14,10 +18,6 @@
 #include "repo/transaction_repo.hpp"
 #include "service/transaction_service.hpp"
 #include "test_fixtures.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace
 {

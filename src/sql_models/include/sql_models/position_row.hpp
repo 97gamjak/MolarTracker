@@ -1,12 +1,12 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__POSITION_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__POSITION_ROW_HPP__
 
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
 #include "orm/where_expr.hpp"
-#include "utils/timestamp.hpp"
 
 /**
  * @brief Represents a position in the trading system.

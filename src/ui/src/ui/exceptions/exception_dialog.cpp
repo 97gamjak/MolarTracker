@@ -7,11 +7,11 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "config/logging_base.hpp"
 #include "logging/log_manager.hpp"
 #include "logging/log_object.hpp"
 #include "ui/exceptions/bug_report_dialog.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -32,14 +32,14 @@ namespace ui
         setWindowTitle(title);
         setModal(true);
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
 
         auto* summary = new QLabel(
             "The application encountered a fatal error and must close."
         );
         summary->setWordWrap(true);
 
-        auto* detailBox = utils::makeQChild<QPlainTextEdit>(details);
+        auto* detailBox = common::makeQChild<QPlainTextEdit>(details);
         detailBox->setReadOnly(true);
         detailBox->setVisible(false);
 

@@ -77,7 +77,11 @@ namespace controller
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
               _storeContainer{_settings.getBackupSettings()},
-              _mainWindow(std::make_shared<ui::MainWindow>()),
+              _mainWindow(
+                  std::make_shared<ui::MainWindow>(
+                      _settings.getShortcutSettings()
+                  )
+              ),
               _handlers(_settings),
               _priceCache(std::make_shared<finance::PriceCache>()),
               _positionGateway(

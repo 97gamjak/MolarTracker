@@ -4,8 +4,8 @@
 #include <QMenu>
 #include <QString>
 
+#include "common/qt_helpers.hpp"
 #include "ui/side_bar/account_item.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -42,7 +42,7 @@ namespace ui
                                    ? QString::fromUtf8(securitySymbol)
                                    : QString::fromUtf8(cashSymbol);
 
-        auto* accountItem = utils::makeQChild<AccountItem>(id, prefix + name);
+        auto* accountItem = common::makeQChild<AccountItem>(id, prefix + name);
         appendRow(accountItem);
     }
 

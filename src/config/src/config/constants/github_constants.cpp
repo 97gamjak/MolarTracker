@@ -55,6 +55,6 @@ std::string GithubConstants::getCreateIssueError()
 /**
  * @brief Get the semantic version of the application
  *
- * @return utils::SemVer
+ * @return common::SemVer
  */
-utils::SemVer GithubConstants::getSemVer() { return utils::SemVer(version); }
+common::SemVer GithubConstants::getSemVer() { return common::SemVer(version); }
