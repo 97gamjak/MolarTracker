@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__MAP_TPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__MAP_TPP__
 
 #include <vector>
 
@@ -185,4 +185,4 @@ void Map<Key, Value, Hash>::clear()
     _items.clear();
 }
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__MAP_TPP__

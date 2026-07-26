@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include "common/shortcut_json.hpp"   // IWYU pragma: keep -- needed for shortcut param serialization
 #include "common/version_json.hpp"   // IWYU pragma: keep -- needed for version param serialization
 #include "config/constants/constants.hpp"
 #include "config/signal_tags.hpp"
@@ -110,6 +111,26 @@ namespace settings
     const BackupSettings& Settings::getBackupSettings() const
     {
         return _backupSettings;
+    }
+
+    /**
+     * @brief Get the ShortcutSettings object
+     *
+     * @return ShortcutSettings&
+     */
+    ShortcutSettings& Settings::getShortcutSettings()
+    {
+        return _shortcutSettings;
+    }
+
+    /**
+     * @brief Get the ShortcutSettings object (const version)
+     *
+     * @return const ShortcutSettings&
+     */
+    const ShortcutSettings& Settings::getShortcutSettings() const
+    {
+        return _shortcutSettings;
     }
 
     /**

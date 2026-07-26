@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
-#define __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__TIMESTAMP_HPP__
+#define __COMMON__INCLUDE__COMMON__TIMESTAMP_HPP__
 
 #include <compare>
 #include <optional>
@@ -85,4 +85,4 @@ class Timestamp
     [[nodiscard]] int64_t _toLocalTime() const;
 };
 
-#endif   // __UTILS__INCLUDE__UTILS__TIMESTAMP_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__TIMESTAMP_HPP__

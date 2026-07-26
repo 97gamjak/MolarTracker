@@ -12,6 +12,8 @@
 #include <qwidget.h>
 
 #include <QGroupBox>
+#include <QKeySequenceEdit>
+#include <utility>
 
 #include "common/qt_helpers.hpp"
 #include "param_editor.hpp"
@@ -20,6 +22,79 @@
 
 namespace ui
 {
+
+    /**
+     * @brief Builds a QGroupBox containing one row per shortcut entry in a
+     *        MapParam<Shortcut>. Each row has a label (from
+     * Shortcut::getWhat()) and a QKeySequenceEdit bound to that entry's
+     * modifiers/key. Edits are validated through MapParam::set (which runs
+     * registered conflict validators); on rejection, the edit reverts to
+     * the last committed value.
+     *
+     * @param param The MapParam<Shortcut> to build an editor for
+     * @return QWidget* Un-parented QGroupBox — caller must parent/add to
+     * layout
+     */
+    inline QWidget* makeShortcutWidget(settings::MapParam<Shortcut>& param)
+    {
+        auto* group = common::makeQChild<QGroupBox>(
+            QString::fromStdString(param.getTitle())
+        );
+        auto* layout = common::makeQChild<QFormLayout>(group);
+        layout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+        for (const auto& [key, entry] : param.getParams())
+        {
+            auto* rowWidget = common::makeQChild<QWidget>();
+            auto* rowLayout = common::makeQChild<QHBoxLayout>(rowWidget);
+            rowLayout->setContentsMargins(0, 4, 0, 4);
+            constexpr auto spacing = 8;
+            rowLayout->setSpacing(spacing);
+
+            auto*      dirtyStripe = common::makeQChild<QWidget>();
+            const auto size        = QSize(3, 20);
+            dirtyStripe->setFixedSize(size);
+            dirtyStripe->setObjectName("dirtyStripe");
+            dirtyStripe->setProperty("dirty", false);
+            rowLayout->addWidget(dirtyStripe);
+
+            auto* keyEdit = common::makeQChild<QKeySequenceEdit>();
+            keyEdit->setKeySequence(entry.get().toQKeySequence());
+            rowLayout->addWidget(keyEdit);
+            rowLayout->addStretch();
+
+            QObject::connect(
+                keyEdit,
+                &QKeySequenceEdit::editingFinished,
+                [keyEdit, &param, &entry, &key]()
+                {
+                    const auto forWhat  = entry.get().getWhat();
+                    const auto newValue = Shortcut::fromQKeySequence(
+                        forWhat,
+                        keyEdit->keySequence()
+                    );
+
+                    const auto result = param.setAt(key, newValue);
+
+                    if (!result.has_value())
+                    {
+                        // Reject — revert to last committed value
+                        keyEdit->setKeySequence(entry.get().toQKeySequence());
+                    }
+                }
+            );
+
+            auto* label = common::makeQChild<QLabel>(
+                QString::fromStdString(entry.get().getWhat())
+            );
+            label->setObjectName("paramLabel");
+
+            layout->addRow(label, rowWidget);
+        }
+
+        return group;
+    }
+
     template <typename TSpinBox, typename T>
     void makeNumericEditorHelper(TSpinBox* spinBox, const T& param)
     {
@@ -164,15 +239,16 @@ namespace ui
 
     /**
      * @brief Creates an editor QWidget for any param type.
-     *        The returned widget is un-parented — caller must parent it or add
-     *        it to a layout (which takes ownership).
+     *        The returned widget is un-parented — caller must parent it or
+     * add it to a layout (which takes ownership).
      *
      *        Supported param types:
      *          BoolParam       → QCheckBox
      *          StringParam     → QLineEdit
      *          NumericParam    → QSpinBox / QDoubleSpinBox
      *          NumericVecParam → N inline QSpinBox / QDoubleSpinBox (x/y/z
-     * labels) EnumParam       → QComboBox VersionParam    → QLabel (read-only)
+     * labels) EnumParam       → QComboBox VersionParam    → QLabel
+     * (read-only)
      */
     template <typename TParam>
     QWidget* makeParamEditor(TParam& param)
@@ -206,6 +282,10 @@ namespace ui
             );
             return lbl;
         }
+        else if constexpr (settings::is_shortcut_param<P>)
+        {
+            return makeShortcutWidget(param);
+        }
 
         else
         {
@@ -213,7 +293,7 @@ namespace ui
                 std::is_same_v<P, void>,
                 "Unsupported param type in makeParamEditor"
             );
-            return nullptr;   // Unreachable, but silences compiler warning
+            std::unreachable();
         }
     }
 

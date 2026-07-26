@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_HPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__VECTOR_HPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__VECTOR_HPP__
 
 #include <vector>
 
@@ -39,4 +39,4 @@ class Vector : public Iterable<std::vector<T>>
 #include "vector.tpp"
 #endif
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__VECTOR_HPP__

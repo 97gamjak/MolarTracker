@@ -20,9 +20,11 @@ namespace ui
 
     /**
      * @brief Construct a new Main Window:: Main Window object
+     *
+     * @param shortcutSettings The shortcut settings to use for the menu bar
      */
-    MainWindow::MainWindow()
-        : _menuBar(new MenuBar(this)),
+    MainWindow::MainWindow(const settings::ShortcutSettings& shortcutSettings)
+        : _menuBar(new MenuBar(this, shortcutSettings)),
           _sideBar(new SideBar(this)),
           _centralWidget(new CentralWidget(this))
     {

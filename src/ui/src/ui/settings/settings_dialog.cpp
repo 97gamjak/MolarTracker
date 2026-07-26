@@ -8,7 +8,6 @@
 #include <QPushButton>
 
 #include "common/qt_helpers.hpp"
-#include "settings/params/param_utils.hpp"
 #include "settings/settings.hpp"
 #include "ui/settings/param_editor.hpp"
 #include "ui/settings/settings_overview.hpp"

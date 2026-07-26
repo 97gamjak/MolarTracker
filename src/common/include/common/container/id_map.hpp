@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_HPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__ID_MAP_HPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__ID_MAP_HPP__
 
 #include "config/strong_id.hpp"
 #include "map.hpp"
@@ -60,4 +60,4 @@ class IdObjectMap : public IdMap<IdOf<Value>, Value>
 #include "id_map.tpp"
 #endif
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__ID_MAP_HPP__

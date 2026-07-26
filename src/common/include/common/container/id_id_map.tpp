@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_TPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__ID_ID_MAP_TPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__ID_ID_MAP_TPP__
 
 #include "id_id_map.hpp"
 
@@ -54,4 +54,4 @@ std::string IdIdMap<IdType, SecondIdType>::toString() const
     return result;
 }
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__ID_ID_MAP_TPP__

@@ -98,6 +98,31 @@ namespace repo
     }
 
     /**
+     * @brief get a list of stocks whose ticker symbol is in the given
+     * allowlist (e.g. the symbols contained in a watchlist)
+     *
+     * @param symbols The ticker symbols to filter by
+     * @return std::vector<finance::Stock>
+     */
+    std::vector<finance::Stock> InstrumentRepo::getStocksBySymbols(
+        const std::vector<std::string>& symbols
+    )
+    {
+        if (symbols.empty())
+            return {};
+
+        const auto query =
+            orm::Query{}.in<StockRow::tickerField>(symbols);
+
+        auto results =
+            _getCrud().get<StockRow>(_getDb(), query) |
+            std::views::transform([](const StockRow& row)
+                                  { return InstrumentFactory::toStock(row); });
+
+        return {results.begin(), results.end()};
+    }
+
+    /**
      * @brief get a list of all options in the database, this will return all
      * options that are not marked as deleted, and will include options that
      * are new or modified but not yet saved to the database.

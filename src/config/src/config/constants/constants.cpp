@@ -100,6 +100,12 @@ std::filesystem::path Constants::getDatabasePath() const
     return _dataPath / getDatabaseFileName();
 }
 
+/**
+ * @brief Get the images directory path, this is the directory where images
+ * used by the application are stored
+ *
+ * @return std::filesystem::path
+ */
 std::filesystem::path Constants::getImagesPath() const
 {
     return _dataPath / "pictures";

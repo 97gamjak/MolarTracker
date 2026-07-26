@@ -8,6 +8,52 @@ REVERT CACHE changes but keep error handling
 
 ### Features
 
+#### Finance / Watchlist backend (MOLTRACK-285)
+
+Backend-only scaffolding for the Watchlist feature — DB migration, ORM
+rows, repo, service, and store. Sidebar UI, context menu, and
+create/rename/delete dialogs are deferred to a follow-up PR (depends on
+the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
+
+- New `watchlists` / `watchlist_instruments` tables added via
+  `_migrateV15()` (`DB_VERSION` bumped 14 → 15).
+  `watchlist_instruments` uses a surrogate `IdField<WatchlistInstrumentId>`
+  primary key plus a `getUniqueGroups()` unique constraint on
+  `(watchlistId, symbol)`, since this ORM only supports single-column
+  primary keys (no composite PK support) — functionally equivalent to
+  the ticket's literal composite-PK schema. `symbol` is a plain string,
+  not a foreign key to `instrument`, so a watchlist can reference a
+  symbol that isn't (yet) a tracked instrument.
+- Add `WatchlistId` / `WatchlistInstrumentId` strong IDs
+  (`config/id_types.hpp`), `finance::Watchlist` domain type
+  (`src/finance/include/finance/watchlist.hpp`, mirrors `finance::Position`),
+  `WatchlistRow` / `WatchlistInstrumentRow` ORM rows (`src/sql_models/`),
+  `IWatchlistRepo` / `WatchlistRepo` (create/getAll/rename/delete/
+  addSymbol/removeSymbol, mirrors `AccountRepo`), `IWatchlistService` /
+  `WatchlistService` (thin wrapper, mirrors `AccountService`), and
+  `IWatchlistStore` / `WatchlistStore` (extends
+  `BaseStore<finance::Watchlist, WatchlistId>`, mirrors `AccountStore`).
+  Like `AccountStore`, `WatchlistStore::commit()` only supports the
+  `New`/`Clean` states so far (`Modified`/`Deleted` throw
+  "not supported yet") — rename/delete/add-symbol/remove-symbol are
+  available at the repo/service layer already, to be wired into the
+  store's dirty-tracking once the UI needs them.
+- Add `finance::TradeFilterParams` (`src/finance/include/finance/instrument/`)
+  holding `std::optional<std::vector<std::string>> symbolAllowlist`.
+- Add `IInstrumentRepo::getStocksBySymbols(symbols)` /
+  `InstrumentRepo::getStocksBySymbols(symbols)` — additive method using
+  `orm::Query{}.in<StockRow::tickerField>(symbols)` (existing `.in<Field>()`
+  query-builder mechanism) to generate a `ticker IN (...)` clause; no
+  existing method signatures changed. Not yet wired into the live
+  `StockStore` → `SecuritiesController` flow.
+- Register the new repo/service/store trio in `RepoContainer`,
+  `ServiceContainer`, and `StoreContainer` (including `allStores`/`commit()`
+  wiring), so they're ready for the UI PR to consume.
+- Add `tests/app/test_watchlist_repo.cpp`, `test_watchlist_service.cpp`,
+  `tests/app/store/test_watchlist_store.cpp` (+ `MockWatchlistService` in
+  `mock_services.hpp`), and `getStocksBySymbols` coverage in
+  `test_instrument_repo.cpp`.
+
 #### Finance
 
 - Add position store, service and repo
@@ -127,6 +173,7 @@ REVERT CACHE changes but keep error handling
   external value changes
 - Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
   `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+- Add `MapParam` as a new parameter type and add `Shortcutsettings` with it
 
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 

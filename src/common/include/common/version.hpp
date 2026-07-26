@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__VERSION_HPP__
-#define __UTILS__INCLUDE__UTILS__VERSION_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__VERSION_HPP__
+#define __COMMON__INCLUDE__COMMON__VERSION_HPP__
 
 #include <compare>
 #include <cstddef>
@@ -60,4 +60,4 @@ namespace common
 
 }   // namespace common
 
-#endif   // __UTILS__INCLUDE__UTILS__VERSION_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__VERSION_HPP__

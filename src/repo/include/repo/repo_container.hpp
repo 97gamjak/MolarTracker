@@ -21,6 +21,7 @@ namespace repo
     class ITransactionRepo;   // Forward declaration
     class IInstrumentRepo;    // Forward declaration
     class IPositionRepo;      // Forward declaration
+    class IWatchlistRepo;     // Forward declaration
     class MigrationRunner;    // Forward declaration
 
     /**
@@ -46,6 +47,8 @@ namespace repo
         std::shared_ptr<IInstrumentRepo> _instrumentRepo;
         /// The Position repository
         std::shared_ptr<IPositionRepo> _positionRepo;
+        /// The Watchlist repository
+        std::shared_ptr<IWatchlistRepo> _watchlistRepo;
 
        public:
         explicit RepoContainer(const settings::BackupSettings& backupSettings);
@@ -69,6 +72,10 @@ namespace repo
 
         [[nodiscard]] std::shared_ptr<IPositionRepo>       getPositionRepo();
         [[nodiscard]] std::shared_ptr<const IPositionRepo> getPositionRepo(
+        ) const;
+
+        [[nodiscard]] std::shared_ptr<IWatchlistRepo> getWatchlistRepo();
+        [[nodiscard]] std::shared_ptr<const IWatchlistRepo> getWatchlistRepo(
         ) const;
 
         void closeDb();

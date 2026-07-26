@@ -21,13 +21,12 @@ namespace settings
           )
     {
         _shortcuts.addValidator(
-            [](const ParamCore<Shortcut>&              shortcut,
-               const std::vector<ParamCore<Shortcut>>& params
-            ) -> ParamResult<void>
+            [](const ParamCore<Shortcut>& shortcut,
+               const ParamMap<Shortcut>&  params) -> ParamResult<void>
             {
-                for (const auto& storedShortcut : params)
+                for (const auto& [key, storedShortcut] : params)
                 {
-                    if (storedShortcut == shortcut)
+                    if (storedShortcut.get().isKeyStrokeEqual(shortcut.get()))
                     {
                         return ParamError{
                             ParamErrorType::DuplicateValue,
@@ -55,6 +54,42 @@ namespace settings
         );
 
         _shortcuts.addParam(saveShortcut);
+
+        ParamCore<Shortcut> quitShortcut{
+            ShortcutSettingsSchema::QUIT_SHORTCUT_KEY,
+            ShortcutSettingsSchema::QUIT_SHORTCUT_TITLE,
+            ShortcutSettingsSchema::QUIT_SHORTCUT_DESCRIPTION
+        };
+
+        quitShortcut.setDefault(
+            Shortcut{
+                std::get<0>(ShortcutSettingsSchema::QUIT_SHORTCUT_DEFAULT),
+                std::get<1>(ShortcutSettingsSchema::QUIT_SHORTCUT_DEFAULT),
+                std::get<2>(ShortcutSettingsSchema::QUIT_SHORTCUT_DEFAULT)
+            }
+        );
+
+        _shortcuts.addParam(quitShortcut);
+    }
+
+    /**
+     * @brief Returns the save shortcut from the shortcut settings.
+     *
+     * @return Shortcut The save shortcut.
+     */
+    Shortcut ShortcutSettings::getSaveShortcut() const
+    {
+        return _shortcuts.at(ShortcutSettingsSchema::SAVE_SHORTCUT_KEY).get();
+    }
+
+    /**
+     * @brief Returns the quit shortcut from the shortcut settings.
+     *
+     * @return Shortcut The quit shortcut.
+     */
+    Shortcut ShortcutSettings::getQuitShortcut() const
+    {
+        return _shortcuts.at(ShortcutSettingsSchema::QUIT_SHORTCUT_KEY).get();
     }
 
 }   // namespace settings

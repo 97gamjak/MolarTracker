@@ -83,6 +83,7 @@ namespace repo
         void _migrateV12();
         void _migrateV13();
         void _migrateV14();
+        void _migrateV15();
     };
 
 }   // namespace repo

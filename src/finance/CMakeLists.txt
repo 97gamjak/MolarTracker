@@ -11,6 +11,7 @@ add_library(molartracker_finance STATIC
 
     ${SOURCE_DIR}/price_quote.cpp
     ${SOURCE_DIR}/price_cache.cpp
+    ${SOURCE_DIR}/watchlist.cpp
 
     ${SOURCE_DIR}/transaction/cash_transaction.cpp
     ${SOURCE_DIR}/transaction/domain_transaction.cpp
@@ -33,6 +34,7 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/instrument/options.cpp
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/stocks.cpp
+    ${SOURCE_DIR}/instrument/trade_filter_params.cpp
 
     ${SOURCE_DIR}/account/account.cpp
     ${SOURCE_DIR}/account/accounts.cpp

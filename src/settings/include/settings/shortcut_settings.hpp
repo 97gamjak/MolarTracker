@@ -47,13 +47,28 @@ namespace settings
          * Single Shortcut *
          *******************/
 
-        static constexpr const char* SAVE_SHORTCUT_KEY   = "saveShortcut";
+        /// save shortcut key
+        static constexpr const char* SAVE_SHORTCUT_KEY = "saveShortcut";
+        /// save shortcut title
         static constexpr const char* SAVE_SHORTCUT_TITLE = "Save Shortcut";
+        /// save shortcut description
         static constexpr const char* SAVE_SHORTCUT_DESCRIPTION =
             "The keyboard shortcut for saving the current state of the "
             "application.";
-        static constexpr std::tuple<ShortcutModifier, char, std::string>
-            SAVE_SHORTCUT_DEFAULT = {ShortcutModifier::Control, 'S', "Save"};
+        /// default save shortcut value
+        static constexpr std::tuple<std::string, ShortcutModifier, char>
+            SAVE_SHORTCUT_DEFAULT = {"Save", ShortcutModifier::Control, 'S'};
+
+        /// quit shortcut key
+        static constexpr const char* QUIT_SHORTCUT_KEY = "quitShortcut";
+        /// quit shortcut title
+        static constexpr const char* QUIT_SHORTCUT_TITLE = "Quit Shortcut";
+        /// quit shortcut description
+        static constexpr const char* QUIT_SHORTCUT_DESCRIPTION =
+            "The keyboard shortcut for quitting the application.";
+        /// default quit shortcut value
+        static constexpr std::tuple<std::string, ShortcutModifier, char>
+            QUIT_SHORTCUT_DEFAULT = {"Quit", ShortcutModifier::Control, 'Q'};
     };
 
     /**
@@ -76,7 +91,7 @@ namespace settings
         ParamContainer _core;
 
         /// The version of the application
-        VecParam<Shortcut> _shortcuts{
+        MapParam<Shortcut> _shortcuts{
             Schema::SHORTCUT_LIST_KEY,
             Schema::SHORTCUT_LIST_TITLE,
             Schema::SHORTCUT_LIST_DESCRIPTION
@@ -84,6 +99,9 @@ namespace settings
 
        public:
         ShortcutSettings();
+
+        [[nodiscard]] Shortcut getSaveShortcut() const;
+        [[nodiscard]] Shortcut getQuitShortcut() const;
 
         template <typename Func>
         void forEachParam(Func&& func) const;

@@ -2,6 +2,8 @@
 
 #include <QMenuBar>
 
+#include "settings/shortcut_settings.hpp"
+
 class QWidget;   // Forward declaration
 
 namespace ui
@@ -17,10 +19,18 @@ namespace ui
      * @brief Construct a new Menu Bar:: Menu Bar object
      *
      * @param parent
+     * @param shortcutSettings The shortcut settings to use for the menu bar
      */
-    MenuBar::MenuBar(QWidget* parent)
+    MenuBar::MenuBar(
+        QWidget*                          parent,
+        const settings::ShortcutSettings& shortcutSettings
+    )
         : QMenuBar{parent},
-          _fileMenu{*this},
+          _fileMenu{
+              *this,
+              shortcutSettings.getSaveShortcut(),
+              shortcutSettings.getQuitShortcut()
+          },
           _editMenu{*this},
           _debugMenu{*this},
           _settingsMenu{*this},

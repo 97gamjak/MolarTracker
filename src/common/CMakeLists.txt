@@ -7,6 +7,7 @@ add_library(molartracker_common STATIC
     src/common/percentage.cpp
     src/common/qt_helpers.cpp
     src/common/quantity.cpp
+    src/common/shortcut.cpp
     src/common/timestamp.cpp
     src/common/version.cpp
 )

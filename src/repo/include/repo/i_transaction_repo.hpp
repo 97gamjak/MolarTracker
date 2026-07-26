@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "common/container/set.hpp"
 #include "config/id_types.hpp"
 
 namespace finance

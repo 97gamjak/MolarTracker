@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__SET_TPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__SET_TPP__
 
 #include "exceptions/out_of_range.hpp"
 #include "set.hpp"
@@ -208,4 +208,4 @@ Set<T, Hash> Set<T, Hash>::fromRange(const R& range, F&& func)
     return result;
 }
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__SET_TPP__

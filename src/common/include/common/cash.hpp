@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CASH_HPP__
-#define __UTILS__INCLUDE__UTILS__CASH_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__CASH_HPP__
+#define __COMMON__INCLUDE__COMMON__CASH_HPP__
 
 #include <compare>
 
@@ -63,4 +63,4 @@ class Cash
     void _takeCurrency(const Cash& cash);
 };
 
-#endif   // __UTILS__INCLUDE__UTILS__CASH_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__CASH_HPP__

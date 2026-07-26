@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
-#define __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__QT_HELPERS_TPP__
+#define __COMMON__INCLUDE__COMMON__QT_HELPERS_TPP__
 
 #include <QString>
 #include <mstd/type_traits/enum_traits.hpp>
@@ -56,4 +56,4 @@ namespace common
 
 }   // namespace common
 
-#endif   // __UTILS__INCLUDE__UTILS__QT_HELPERS_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__QT_HELPERS_TPP__

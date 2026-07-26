@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
-#define __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__QUANTITY_HPP__
+#define __COMMON__INCLUDE__COMMON__QUANTITY_HPP__
 
 #include <cstdint>
 #include <string>
@@ -107,4 +107,4 @@ class Quantity
 #include "quantity.tpp"
 #endif
 
-#endif   // __UTILS__INCLUDE__UTILS__QUANTITY_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__QUANTITY_HPP__

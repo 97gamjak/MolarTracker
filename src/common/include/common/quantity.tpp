@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__QUANTITY_TPP__
-#define __UTILS__INCLUDE__UTILS__QUANTITY_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__QUANTITY_TPP__
+#define __COMMON__INCLUDE__COMMON__QUANTITY_TPP__
 
 #include "quantity.hpp"
 
@@ -18,4 +18,4 @@ auto operator<=>(const Quantity& lhs, const T& rhs)
     return lhs.getValue() <=> rhs;
 }
 
-#endif   // __UTILS__INCLUDE__UTILS__QUANTITY_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__QUANTITY_TPP__

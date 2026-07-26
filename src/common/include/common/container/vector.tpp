@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_TPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__VECTOR_TPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__VECTOR_TPP__
 
 #include "vector.hpp"
 
@@ -78,4 +78,4 @@ void Vector<T>::add(const std::vector<T>& items)
     _items.insert(_items.end(), items.begin(), items.end());
 }
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__VECTOR_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__VECTOR_TPP__

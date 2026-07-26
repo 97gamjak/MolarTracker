@@ -1,6 +1,6 @@
 
-#ifndef __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
-#define __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__QT_HELPERS_HPP__
+#define __COMMON__INCLUDE__COMMON__QT_HELPERS_HPP__
 
 #include <QtContainerFwd>
 #include <mstd/type_traits/enum_traits.hpp>
@@ -49,4 +49,4 @@ namespace common
 #include "qt_helpers.tpp"   // IWYU pragma: export
 #endif
 
-#endif   // __UTILS__INCLUDE__UTILS__QT_HELPERS_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__QT_HELPERS_HPP__

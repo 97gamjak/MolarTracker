@@ -6,6 +6,7 @@
 #include "connections/connection.hpp"
 #include "connections/observable.hpp"
 #include "numeric_param.hpp"
+#include "settings/params/i_param.hpp"
 
 namespace settings
 {
@@ -38,7 +39,7 @@ namespace settings
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    class NumericVecParam : public Observable<OnDirtyChanged>
+    class NumericVecParam : public Observable<OnDirtyChanged>, public IParam
     {
        public:
         /// The size of the vector
@@ -86,24 +87,28 @@ namespace settings
         NumericParam<T>&                getParam(std::size_t index);
         [[nodiscard]] ParamResult<void> set(std::size_t index, const T& value);
 
-        void commit();
-        void resetToDefault();
+        void commit() override;
+        void resetToDefault() override;
+
+        [[nodiscard]]
+        Connections subscribeToDirty(
+            OnDirtyChanged::func func,
+            void*                user
+        ) override;
+
+        [[nodiscard]] bool isDirty() const override;
+
+        [[nodiscard]] const std::string& getKey() const override;
+        [[nodiscard]] const std::string& getDescription() const override;
+        [[nodiscard]] const std::string& getTitle() const override;
+
+        [[nodiscard]] std::string toString() const override;
 
         static void fromJson(
             const nlohmann::json&  jsonData,
             NumericVecParam<T, N>& param
         );
-        [[nodiscard]] nlohmann::json toJson() const;
-
-        [[nodiscard]] const std::string& getKey() const;
-
-        Connections subscribeToDirty(OnDirtyChanged::func func, void* user);
-
-        [[nodiscard]] bool isDirty() const;
-
-        [[nodiscard]] std::string toString() const;
-        [[nodiscard]] std::string getDescription() const;
-        [[nodiscard]] std::string getTitle() const;
+        [[nodiscard]] nlohmann::json toJson() const override;
 
         const T& x() const
         requires(N <= 3);

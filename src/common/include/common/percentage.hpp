@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__PERCENTAGE_HPP__
-#define __UTILS__INCLUDE__UTILS__PERCENTAGE_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__PERCENTAGE_HPP__
+#define __COMMON__INCLUDE__COMMON__PERCENTAGE_HPP__
 
 #include <string>
 
@@ -25,4 +25,4 @@ class Percentage
     [[nodiscard]] std::string toString(size_t nDecimals = 2) const;
 };
 
-#endif   // __UTILS__INCLUDE__UTILS__PERCENTAGE_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__PERCENTAGE_HPP__

@@ -22,6 +22,8 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
+#include "sql_models/watchlist_instrument_row.hpp"
+#include "sql_models/watchlist_row.hpp"
 
 namespace repo
 {
@@ -432,6 +434,7 @@ namespace repo
         _migrateV12();
         _migrateV13();
         _migrateV14();
+        _migrateV15();
     }
 
     /**
@@ -524,6 +527,30 @@ namespace repo
         // transaction options to the db
         migration.addMigration(
             std::make_unique<CreateTableMigration<TransactionOptionRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 15
+     *
+     * @details This handles the migration from v14 to v15. It creates the
+     * watchlists table and the watchlist_instruments table, allowing users to
+     * group ticker symbols into named watchlists. The instrument table is
+     * created first since watchlist_instruments has a foreign key referencing
+     * it.
+     */
+    void Migrations::_migrateV15()
+    {
+        constexpr std::size_t currentVersion = 14;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<WatchlistRow>>()
+        );
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<WatchlistInstrumentRow>>()
         );
 
         _migrations.push_back(std::move(migration));

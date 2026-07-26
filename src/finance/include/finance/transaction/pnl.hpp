@@ -5,9 +5,10 @@
 #include <vector>
 
 #include "common/cash.hpp"
+#include "common/container/vector.hpp"
 #include "common/percentage.hpp"
+#include "common/timestamp.hpp"
 #include "error/finance_error.hpp"
-#include "finance/transaction/transactions.hpp"
 
 namespace finance
 {

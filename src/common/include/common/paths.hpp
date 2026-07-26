@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__PATHS_HPP__
-#define __UTILS__INCLUDE__UTILS__PATHS_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__PATHS_HPP__
+#define __COMMON__INCLUDE__COMMON__PATHS_HPP__
 
 #include <cstdint>
 #include <expected>
@@ -49,4 +49,4 @@ namespace common
 
 }   // namespace common
 
-#endif   // __UTILS__INCLUDE__UTILS__PATHS_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__PATHS_HPP__

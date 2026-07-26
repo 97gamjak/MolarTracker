@@ -5,7 +5,9 @@
 #include <utility>
 
 #include "bool_param.hpp"
+#include "common/shortcut.hpp"
 #include "enum_param.hpp"
+#include "map_param.hpp"
 #include "numeric_param.hpp"
 #include "numeric_vec_param.hpp"
 #include "string_param.hpp"
@@ -134,6 +136,12 @@ namespace settings
 
     template <typename T, std::size_t N>
     inline constexpr bool is_numeric_vec_param<NumericVecParam<T, N>> = true;
+
+    template <typename T>
+    inline constexpr bool is_shortcut_param = false;
+
+    template <>
+    inline constexpr bool is_shortcut_param<MapParam<Shortcut>> = true;
 
 }   // namespace settings
 

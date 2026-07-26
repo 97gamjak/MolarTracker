@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__SET_HPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__SET_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__SET_HPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__SET_HPP__
 
 #include <functional>
 #include <initializer_list>
@@ -60,4 +60,4 @@ using IdSet = Set<T, typename T::Hash>;
 #include "set.tpp"
 #endif
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__SET_HPP__

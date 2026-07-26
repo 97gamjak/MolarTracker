@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_TPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__ID_MAP_TPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__ID_MAP_TPP__
 
 #include "id_map.hpp"
 
@@ -121,4 +121,4 @@ IdObjectMap<Value>::IdObjectMap(R&& values)
     addUnchecked(std::forward<R>(values));
 }
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_MAP_TPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__ID_MAP_TPP__

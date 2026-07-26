@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_HPP__
-#define __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__ID_ID_MAP_HPP__
+#define __COMMON__INCLUDE__COMMON__CONTAINER__ID_ID_MAP_HPP__
 
 #include <string>
 
@@ -38,4 +38,4 @@ class IdIdMap : public Map<IdType, SecondIdType, typename IdType::Hash>
 #include "id_id_map.tpp"
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_TPP__
 
-#endif   // __UTILS__INCLUDE__UTILS__CONTAINER__ID_ID_MAP_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__CONTAINER__ID_ID_MAP_HPP__

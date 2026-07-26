@@ -1,5 +1,5 @@
-#ifndef __UTILS__INCLUDE__UTILS__CURRENCY_HPP__
-#define __UTILS__INCLUDE__UTILS__CURRENCY_HPP__
+#ifndef __COMMON__INCLUDE__COMMON__CURRENCY_HPP__
+#define __COMMON__INCLUDE__COMMON__CURRENCY_HPP__
 
 #include <mstd/error.hpp>
 
@@ -107,4 +107,4 @@ struct CurrencyTraits<Currency::CHF>
 [[nodiscard]] std::uint8_t getMicroUnit(Currency currency);
 [[nodiscard]] std::string  getSymbol(Currency currency);
 
-#endif   // __UTILS__INCLUDE__UTILS__CURRENCY_HPP__
+#endif   // __COMMON__INCLUDE__COMMON__CURRENCY_HPP__
