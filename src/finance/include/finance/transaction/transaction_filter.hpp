@@ -14,21 +14,14 @@ namespace finance
      * the transaction store
      *
      */
-    class TransactionFilter
+    struct TransactionFilter
     {
-       private:
         /// The set of position IDs to filter transactions by
-        IdSet<PositionId> _positionIds;
+        IdSet<PositionId> positionIds;
         /// The set of transaction IDs to filter transactions by
-        IdSet<TransactionId> _transactionIds;
-
-       public:
-        TransactionFilter() = default;
-
-        void setPositionIds(const IdSet<PositionId>& positionIds);
-        [[nodiscard]] IdSet<PositionId> getPositionIds() const;
-
-        [[nodiscard]] IdSet<TransactionId> getTransactionIds() const;
+        IdSet<TransactionId> transactionIds;
+        /// The set of account IDs to filter transactions by
+        IdSet<AccountId> accountIds;
 
         [[nodiscard]]
         filter::Predicate<DomainTransaction> getPredicate() const;
@@ -36,14 +29,6 @@ namespace finance
         [[nodiscard]]
         std::string toString() const;
     };
-
-    filter::Predicate<DomainTransaction> HasPositionId(
-        const IdSet<PositionId>& positionIds
-    );
-
-    filter::Predicate<DomainTransaction> HasTransactionId(
-        const IdSet<TransactionId>& transactionIds
-    );
 
 }   // namespace finance
 

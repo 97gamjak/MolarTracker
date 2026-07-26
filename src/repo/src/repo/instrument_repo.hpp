@@ -32,7 +32,10 @@ namespace repo
         ) override;
 
         [[nodiscard]]
-        std::vector<finance::Option> getOptions() override;
+        finance::Options getOptions() override;
+
+        [[nodiscard]]
+        finance::Options getOptions(const IdSet<InstrumentId>& ids) override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(
@@ -63,6 +66,9 @@ namespace repo
 
         [[nodiscard]]
         InstrumentId _addInstrument(const InstrumentRow& instrumentRow);
+
+        [[nodiscard]]
+        finance::Options _getOptions(const orm::Query& query);
     };
 }   // namespace repo
 

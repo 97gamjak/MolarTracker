@@ -1,6 +1,7 @@
 #include "finance/transaction/option_transaction.hpp"
 
 #include "config/id_types.hpp"
+#include "utils/finance.hpp"
 
 namespace finance
 {
@@ -12,16 +13,15 @@ namespace finance
      * @param timestamp
      * @param status
      * @param instrumentId
-     * @param underlyingInstrumentId
      * @param securityAccount
      * @param cashAccount
      * @param externalAccount
      * @param quantity
-     * @param strikePrice
      * @param amount
      * @param fees
      * @param positionId
      * @param action
+     * @param buySell
      * @param rolledOption
      * @param comment
      */
@@ -30,16 +30,15 @@ namespace finance
         Timestamp                    timestamp,
         TransactionStatus            status,
         InstrumentId                 instrumentId,
-        InstrumentId                 underlyingInstrumentId,
         AccountId                    securityAccount,
         AccountId                    cashAccount,
         AccountId                    externalAccount,
         Quantity                     quantity,
-        Cash                         strikePrice,
         Cash                         amount,
         Cash                         fees,
         PositionId                   positionId,
         TransactionOptionAction      action,
+        OptionBuySell                buySell,
         std::optional<TransactionId> rolledOption,
         std::optional<std::string>   comment
     )
@@ -48,6 +47,7 @@ namespace finance
               timestamp,
               status,
               instrumentId,
+              TransactionDataType::Option,
               securityAccount,
               cashAccount,
               externalAccount,
@@ -56,24 +56,11 @@ namespace finance
               positionId,
               std::move(comment)
           ),
-          _underlyingInstrumentId(underlyingInstrumentId),
-          _strikePrice(strikePrice),
-          _amount(amount),
+          _premium(amount),
           _action(action),
+          _buySell(buySell),
           _rolledOption(rolledOption)
     {
-    }
-
-    /**
-     * @brief Get the base instrument ID for the option transaction, which is
-     * the underlying instrument ID.
-     *
-     * @return InstrumentId The underlying instrument ID associated with the
-     * option transaction.
-     */
-    InstrumentId OptionTransaction::getBaseInstrumentId() const
-    {
-        return getInstrumentId();
     }
 
     /**
@@ -95,7 +82,7 @@ namespace finance
             TransactionEntry{
                 TransactionEntryId::invalid(),
                 getCashAccountId(),
-                _amount,
+                _premium,
                 TransactionEntryType::General
             }
         );
@@ -103,7 +90,7 @@ namespace finance
             TransactionEntry{
                 TransactionEntryId::invalid(),
                 externalAccount,
-                -_amount,
+                -_premium,
                 TransactionEntryType::General
             }
         );
@@ -123,8 +110,7 @@ namespace finance
     {
         auto optionData = OptionData{
             TransactionOptionId::invalid(),   // populated with commit
-            getQuantity() > Quantity{0} ? OptionBuySell::Buy
-                                        : OptionBuySell::Sell,
+            _buySell,
             _action,
             _rolledOption
         };
@@ -132,13 +118,45 @@ namespace finance
         optionData.addLeg(
             TradeLeg{
                 getSecurityAccountId(),
-                getBaseInstrumentId(),
+                getInstrumentId(),
                 getQuantity(),
-                _strikePrice,
+                _premium,
                 getPositionId()
             }
         );
         return optionData;
     }
+
+    /**
+     * @brief Get the buy/sell direction of the option transaction, which
+     * indicates whether the option is being bought or sold.
+     *
+     * @return const OptionBuySell& The buy/sell direction of the option
+     * transaction.
+     */
+    const OptionBuySell& OptionTransaction::getBuySell() const
+    {
+        return _buySell;
+    }
+
+    /**
+     * @brief Get the action being performed in the option transaction, which
+     * indicates whether the option is being opened, closed, or rolled.
+     *
+     * @return const TransactionOptionAction& The action of the option
+     * transaction.
+     */
+    const TransactionOptionAction& OptionTransaction::getAction() const
+    {
+        return _action;
+    }
+
+    /**
+     * @brief Get the premium amount of the option transaction, which represents
+     * the cash flow associated with the option trade, either paid or received.
+     *
+     * @return const Cash& The premium amount of the option transaction.
+     */
+    const Cash& OptionTransaction::getPremium() const { return _premium; }
 
 }   // namespace finance

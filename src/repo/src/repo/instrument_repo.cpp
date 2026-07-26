@@ -2,6 +2,7 @@
 
 #include "config/id_types.hpp"
 #include "finance/instrument/option.hpp"
+#include "finance/instrument/options.hpp"
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
@@ -126,12 +127,47 @@ namespace repo
      * options that are not marked as deleted, and will include options that
      * are new or modified but not yet saved to the database.
      *
-     * @return std::vector<finance::Option>
+     * @return finance::Options
      */
-    std::vector<finance::Option> InstrumentRepo::getOptions()
+    finance::Options InstrumentRepo::getOptions()
     {
         orm::Query query{};
 
+        return _getOptions(query);
+    }
+
+    /**
+     * @brief get a list of all options in the database for the given instrument
+     * IDs, this will return all options that are not marked as deleted, and
+     * will include options that are new or modified but not yet saved to the
+     * database.
+     *
+     * @param ids The set of instrument IDs to retrieve options for
+     * @return finance::Options
+     */
+    finance::Options InstrumentRepo::getOptions(const IdSet<InstrumentId>& ids)
+    {
+        orm::Query query{};
+
+        if (!ids.empty())
+            query = query.in<OptionRow::instrumentIdField>(ids);
+
+        return _getOptions(query);
+    }
+
+    /**
+     * @brief get a list of all options in the database for the given query,
+     * this is a helper method that retrieves option rows based on the provided
+     * query, and then constructs Option objects for use in the application,
+     * ensuring that the data from the database is correctly mapped to the
+     * properties of the Option objects.
+     *
+     * @param query The ORM query to filter the option rows
+     * @return finance::Options The resulting Options object containing the
+     * retrieved options
+     */
+    finance::Options InstrumentRepo::_getOptions(const orm::Query& query)
+    {
         auto join = orm::Joins{}.add(
             orm::join<
                 OptionRow::underlyingInstrumentIdField,
@@ -150,7 +186,7 @@ namespace repo
                 }
             );
 
-        return {options.begin(), options.end()};
+        return {options};
     }
 
     /**

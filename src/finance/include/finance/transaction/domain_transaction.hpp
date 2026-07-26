@@ -53,6 +53,8 @@ namespace finance
         void                           setLegs(const TradeLegs& legs);
 
         [[nodiscard]] std::string toString() const override;
+
+        [[nodiscard]] bool isAccountInvolved(AccountId accountId) const;
     };
 
     bool hasPositionId(const DomainTransaction& transaction, PositionId id);

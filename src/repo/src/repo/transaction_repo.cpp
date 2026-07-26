@@ -6,6 +6,7 @@
 #include "db/transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
+#include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
@@ -16,6 +17,8 @@
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
 #include "utils/finance.hpp"
+
+REGISTER_LOG_CATEGORY("Repo.TransactionRepo");
 
 namespace repo
 {
@@ -222,8 +225,6 @@ namespace repo
     /**
      * @brief get all transactions from the database
      *
-     * @param accountIds The IDs of the accounts to retrieve transactions
-     * for.
      * @param filter The filter to apply to the transactions, this will be
      * converted to a WhereExpr and applied to the query when fetching
      * transactions from the database, if no filter is provided all transactions
@@ -232,7 +233,6 @@ namespace repo
      * @return std::vector<finance::DomainTransaction>
      */
     std::vector<finance::DomainTransaction> TransactionRepo::getTransactions(
-        const IdSet<AccountId>&           accountIds,
         const finance::TransactionFilter& filter
     )
     {
@@ -246,6 +246,8 @@ namespace repo
 
         std::vector<finance::DomainTransaction> results;
         results.reserve(txRows.size());
+
+        const auto& accountIds = filter.accountIds;
 
         for (const auto& [txRow] : txRows)
         {
@@ -264,26 +266,14 @@ namespace repo
             const auto inSet = [&](const auto& row)
             { return accountIds.contains(row.accountId.value()); };
 
-            if (!std::ranges::all_of(entryRows, inSet) ||
-                !std::ranges::all_of(legRows, inSet))
+            if (!std::ranges::any_of(entryRows, inSet) &&
+                !std::ranges::any_of(legRows, inSet))
             {
-                if (std::ranges::any_of(entryRows, inSet) ||
-                    std::ranges::any_of(legRows, inSet))
-                {
-                    LOG_WARNING(
-                        "Skipping transaction with ID " +
-                        txRow.id.value().toString() +
-                        " because not all entries/legs match the account filter"
-                    );
-                }
-                else
-                {
-                    LOG_TRACE(
-                        "Skipping transaction with ID " +
-                        txRow.id.value().toString() +
-                        " because no entries/legs match the account filter"
-                    );
-                }
+                LOG_WARNING(
+                    "Skipping transaction with ID " +
+                    txRow.id.value().toString() +
+                    " because not all entries/legs match the account filter"
+                );
                 continue;
             }
 
@@ -299,6 +289,13 @@ namespace repo
 
             results.push_back(std::move(transaction));
         }
+
+        LOG_DEBUG(
+            std::format(
+                "Retrieved {} transactions from the database",
+                results.size()
+            )
+        );
 
         return results;
     }

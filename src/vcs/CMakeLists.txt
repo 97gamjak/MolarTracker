@@ -24,6 +24,7 @@ target_link_libraries(molartracker_vcs
     PUBLIC
     molartracker_http
     molartracker_utils
+    molartracker_error
     PRIVATE
     molartracker_logging
     Qt6::Core

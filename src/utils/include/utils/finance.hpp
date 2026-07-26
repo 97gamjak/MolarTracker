@@ -58,6 +58,12 @@ MSTD_ENUM(TransactionDataType, std::uint8_t, TRANSACTION_DATA_TYPE_LIST);
 
 constexpr int TxDataTypeNotImplError = 0;
 
+#define INSTRUMENT_TYPE(X) \
+    X(Stock)               \
+    X(Option)
+
+MSTD_ENUM(InstrumentType, std::uint8_t, INSTRUMENT_TYPE);
+
 #define ASSET_CLASS_LIST(X) \
     X(Stock)                \
     X(Etf)                  \

@@ -77,6 +77,18 @@ auto Iterable<Container>::end() const
 }
 
 /**
+ * @brief Reserves space in the underlying container for the specified number
+ * of elements.
+ *
+ * @param size The number of elements to reserve space for.
+ */
+template <typename Container>
+void Iterable<Container>::reserve(size_t size)
+{
+    _items.reserve(size);
+}
+
+/**
  * @brief Checks if the container is empty.
  *
  * @return true if the container is empty, false otherwise.

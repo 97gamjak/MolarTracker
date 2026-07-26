@@ -12,9 +12,9 @@
 #include "commands/profile/set_active_profile_command.hpp"
 #include "commands/profile/set_default_profile_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "controller/mapper/profile_mapper.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/profile_mapper.hpp"
 #include "settings/settings.hpp"
 #include "store/i_profile_store.hpp"   // IWYU pragma: keep
 #include "store/store_container.hpp"
@@ -373,7 +373,7 @@ namespace controller
             // default/active status is managed by separate commands below.
             auto result = cmd::Commands::makeAndDo<cmd::AddProfileCommand>(
                 _storeContainer.getProfileStore(),
-                ProfileMapper::toProfile(profileDraft)
+                mapper::ProfileMapper::toProfile(profileDraft)
             );
 
             if (!result)

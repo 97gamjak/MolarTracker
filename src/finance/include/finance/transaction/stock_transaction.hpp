@@ -47,8 +47,6 @@ namespace finance
 
         [[nodiscard]] Cash getAmount() const;
 
-        [[nodiscard]] InstrumentId getBaseInstrumentId() const override;
-
        private:
         [[nodiscard]] TransactionEntry _getAmountEntry() const;
     };

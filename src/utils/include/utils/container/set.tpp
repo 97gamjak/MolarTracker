@@ -156,4 +156,56 @@ const T& Set<T, Hash>::front() const
     return *(IterableBase::_items.begin());
 }
 
+/**
+ * @brief Returns a string representation of the set.
+ *
+ * @tparam T The type of elements in the set.
+ * @tparam Hash The hash function used for hashing the elements (default is
+ * std::hash<T>).
+ * @return A string representation of the set.
+ */
+template <typename T, typename Hash>
+std::string Set<T, Hash>::toString() const
+{
+    std::string result = "{";
+    for (const auto& value : IterableBase::_items)
+    {
+        // check if toString is available for the type T, if it is, use it,
+        // otherwise use std::to_string
+        if constexpr (std::is_invocable_v<decltype(&T::toString), T>)
+            result += value.toString() + ", ";
+        else
+            result += std::to_string(value) + ", ";
+    }
+    if (!IterableBase::_items.empty())
+        result.pop_back(),
+            result.pop_back();   // Remove trailing comma and space
+    result += "}";
+    return result;
+}
+
+/**
+ * @brief Creates a Set from a range of values, applying a transformation
+ * function to each value.
+ *
+ * @tparam T The type of elements in the set.
+ * @tparam Hash The hash function used for hashing the elements (default is
+ * std::hash<T>).
+ * @tparam R The type of the range of values.
+ * @tparam F The type of the transformation function.
+ * @param range The range of values to transform and add to the set.
+ * @param func The transformation function to apply to each value in the range.
+ * @return A new Set containing the transformed values.
+ */
+template <typename T, typename Hash>
+template <std::ranges::range R, typename F>
+Set<T, Hash> Set<T, Hash>::fromRange(const R& range, F&& func)
+{
+    Set<T, Hash> result;
+    for (const auto& item : range)
+        result.insert(std::forward<F>(func)(item));
+
+    return result;
+}
+
 #endif   // __UTILS__INCLUDE__UTILS__CONTAINER__SET_TPP__

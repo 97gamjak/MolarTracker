@@ -11,6 +11,7 @@
 #include "domain/profile.hpp"
 #include "finance/account/account.hpp"
 #include "finance/instrument/option.hpp"
+#include "finance/instrument/options.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/position.hpp"
 #include "finance/transaction/domain_transaction.hpp"
@@ -165,7 +166,11 @@ namespace tests
             return {};
         }
 
-        [[nodiscard]] std::vector<finance::Option> getOptions() override
+        [[nodiscard]] finance::Options getOptions() override { return {}; }
+
+        [[nodiscard]] finance::Options getOptions(
+            const IdSet<InstrumentId>& /*ids*/
+        ) override
         {
             return {};
         }
@@ -264,7 +269,6 @@ namespace tests
         }
 
         [[nodiscard]] std::vector<finance::DomainTransaction> getTransactions(
-            const IdSet<AccountId>& /*accountIds*/,
             const finance::TransactionFilter& /*filter*/
         ) override
         {

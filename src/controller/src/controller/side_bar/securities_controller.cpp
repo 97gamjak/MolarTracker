@@ -3,9 +3,8 @@
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 
-#include "controller/mapper/stock_mapper.hpp"
-#include "finance/finance_error.hpp"
 #include "finance/instrument/stock.hpp"
+#include "mapper/stock_mapper.hpp"
 #include "store/i_stock_store.hpp"
 #include "ui/securities/stock_info_model.hpp"
 #include "ui/securities/stock_overview.hpp"
@@ -63,7 +62,7 @@ namespace controller
     void SecuritiesSideBarController::onSecuritiesSelected()
     {
         const auto stocks =
-            StockMapper::toStockInfoDrafts(_stockStore->getStocks());
+            mapper::StockMapper::toStockInfoDrafts(_stockStore->getStocks());
 
         _stockOverviewWidget->getModel()->setRows(stocks);
         _stackedWidget->setCurrentWidget(_stockOverviewWidget);
@@ -109,7 +108,7 @@ namespace controller
 
         _acceptedQuote = result.value();
         _tickerLookupWidget->displayQuote(
-            StockMapper::toStockInfoDraft(result.value())
+            mapper::StockMapper::toStockInfoDraft(result.value())
         );
     }
 

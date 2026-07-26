@@ -16,6 +16,7 @@
 #include "controller/transaction_controller.hpp"
 #include "controller/vcs_controller.hpp"
 #include "finance/price_cache.hpp"
+#include "gateway/position_gateway.hpp"
 #include "logging/log_manager.hpp"
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
@@ -48,6 +49,8 @@ namespace controller
 
         /// price cache for managing stock prices
         std::shared_ptr<finance::PriceCache> _priceCache;
+        /// position gateway for managing positions
+        gateway::PositionGateway _positionGateway;
 
         /// controller for managing the account
         CentralController _centralController;
@@ -77,13 +80,21 @@ namespace controller
               _mainWindow(std::make_shared<ui::MainWindow>()),
               _handlers(_settings),
               _priceCache(std::make_shared<finance::PriceCache>()),
+              _positionGateway(
+                  _storeContainer.getTransactionStore(),
+                  _storeContainer.getPositionStore(),
+                  _storeContainer.getOptionStore(),
+                  _storeContainer.getStockStore()
+              ),
               _centralController(_mainWindow->getCentralWidget()),
               _accountController(
                   _undoStack,
+                  std::make_shared<gateway::PositionGateway>(_positionGateway),
                   _storeContainer.getAccountStore(),
                   _storeContainer.getPositionStore(),
                   _storeContainer.getStockStore(),
                   _storeContainer.getTransactionStore(),
+                  _storeContainer.getOptionStore(),
                   _priceCache,
                   _mainWindow->getCentralWidget()
               ),
@@ -118,7 +129,8 @@ namespace controller
                   &_mainWindow->getSideBar(),
                   _mainWindow->getCentralWidget(),
                   _accountController,
-                  _transactionController
+                  _transactionController,
+                  std::make_shared<gateway::PositionGateway>(_positionGateway)
               )
         {
             _handlers.getDirtyStateHandler()

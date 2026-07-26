@@ -28,6 +28,11 @@ namespace cmd
     class UndoStack;   // Forward declaration
 }   // namespace cmd
 
+namespace gateway
+{
+    class PositionGateway;   // Forward declaration
+}   // namespace gateway
+
 namespace controller
 {
 
@@ -66,7 +71,8 @@ namespace controller
             ui::SideBar*           sideBar,
             QStackedWidget*        centralStack,
             AccountController&     accountController,
-            TransactionController& transactionController
+            TransactionController& transactionController,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway
         );
 
         void refresh();
