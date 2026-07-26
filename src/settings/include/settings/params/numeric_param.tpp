@@ -8,7 +8,6 @@
 #include <string>
 
 #include "numeric_param.hpp"
-#include "param_error.hpp"
 
 namespace settings
 {
@@ -53,11 +52,11 @@ namespace settings
      * @tparam Derived
      * @tparam T
      * @param value
-     * @return std::expected<void, ParamError>
+     * @return ParamResult<void>
      */
     template <typename T>
     requires(std::integral<T> || std::floating_point<T>)
-    std::expected<void, ParamError> NumericParam<T>::set(const T& value)
+    ParamResult<void> NumericParam<T>::set(const T& value)
     {
         const auto valueToSet = _applyPrecision(value);
 
@@ -76,14 +75,12 @@ namespace settings
      * @tparam Derived
      * @tparam T
      * @param value
-     * @return std::expected<void, ParamError> if the value is out of range, an
+     * @return ParamResult<void> if the value is out of range, an
      * error is returned in the std::expected return type
      */
     template <typename T>
     requires(std::integral<T> || std::floating_point<T>)
-    std::expected<void, ParamError> NumericParam<T>::_isWithinRange(
-        const T& value
-    ) const
+    ParamResult<void> NumericParam<T>::_isWithinRange(const T& value) const
     {
         const auto minCheck =
             !_minValue.has_value() || value >= _minValue.value();
@@ -107,7 +104,7 @@ namespace settings
                 minStr,
                 maxStr
             );
-            return std::unexpected(ParamError(errorMessage));
+            return ParamError{ParamErrorType::InvalidParamValue, errorMessage};
         }
         return {};
     }
@@ -260,10 +257,12 @@ namespace settings
     requires(std::integral<T> || std::floating_point<T>)
     nlohmann::json NumericParam<T>::toJson() const
     {
-        auto jsonData                   = _core.toJson();
+        auto jsonData = _core.toJson();
+        // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         jsonData[Schema::MIN_VALUE_KEY] = _minValue;
         jsonData[Schema::MAX_VALUE_KEY] = _maxValue;
         jsonData[Schema::PRECISION_KEY] = _precision;
+        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return jsonData;
     }
 

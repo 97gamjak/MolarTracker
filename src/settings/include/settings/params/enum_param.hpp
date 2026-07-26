@@ -1,17 +1,15 @@
 #ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__ENUM_PARAM_HPP__
 #define __SETTINGS__INCLUDE__SETTINGS__PARAMS__ENUM_PARAM_HPP__
 
-#include <expected>
 #include <mstd/type_traits.hpp>
 #include <nlohmann/json.hpp>
 
+#include "error/param_error.hpp"
 #include "settings/params/param_core.hpp"
 #include "settings/params/param_mixin.hpp"
 
 namespace settings
 {
-    class ParamError;   // Forward declaration
-
     /**
      * @brief A setting parameter class for enum types, this class inherits from
      * ParamMixin to provide additional functionality for enum parameters
@@ -45,7 +43,7 @@ namespace settings
         );
         [[nodiscard]] nlohmann::json toJson() const;
 
-        std::expected<void, ParamError> set(const E& value);
+        ParamResult<void> set(const E& value);
     };
 
 }   // namespace settings
