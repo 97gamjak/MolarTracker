@@ -72,6 +72,7 @@ class Error
     std::vector<Error> _subErrors;
 
 #ifndef NDEBUG
+    /// The source location where the error was created, used for debugging
     std::source_location _location;
 #endif
 
@@ -104,9 +105,6 @@ class Error
         const std::optional<std::string>& newMessage  = std::nullopt,
         bool                              addSubError = true
     ) const;
-
-    [[nodiscard]]
-    static Error NotYetImplemented();
 
    protected:
     /// @cond DOXYGEN_IGNORE
