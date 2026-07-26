@@ -100,6 +100,11 @@ std::filesystem::path Constants::getDatabasePath() const
     return _dataPath / getDatabaseFileName();
 }
 
+std::filesystem::path Constants::getImagesPath() const
+{
+    return _dataPath / "pictures";
+}
+
 /**
  * @brief Get the application name
  *

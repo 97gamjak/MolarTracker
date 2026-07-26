@@ -15,6 +15,7 @@
 
 #include "common/qt_helpers.hpp"
 #include "param_editor.hpp"
+#include "settings/params/param_concepts.hpp"
 #include "settings/params/param_utils.hpp"
 
 namespace ui

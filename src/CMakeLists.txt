@@ -103,6 +103,7 @@ add_subdirectory(settings)
 add_subdirectory(sql_models)
 add_subdirectory(store)
 add_subdirectory(ui)
+# add_subdirectory(utilities)
 add_subdirectory(vcs)
 
 target_link_libraries(MolarTracker

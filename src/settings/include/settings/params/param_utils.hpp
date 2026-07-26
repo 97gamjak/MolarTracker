@@ -4,12 +4,12 @@
 #include <nlohmann/json.hpp>
 #include <utility>
 
-#include "settings/params/bool_param.hpp"
-#include "settings/params/enum_param.hpp"
-#include "settings/params/numeric_param.hpp"
-#include "settings/params/numeric_vec_param.hpp"
-#include "settings/params/string_param.hpp"
-#include "settings/params/version_param.hpp"
+#include "bool_param.hpp"
+#include "enum_param.hpp"
+#include "numeric_param.hpp"
+#include "numeric_vec_param.hpp"
+#include "string_param.hpp"
+#include "version_param.hpp"
 
 namespace settings
 {
@@ -52,28 +52,6 @@ namespace settings
             std::make_index_sequence<size>{}
         );
     }
-
-    /**
-     * @brief Concept for types that have a forEachParam function, this is used
-     * to constrain the types that can be used with the paramsToJson and
-     * paramsFromJson functions, this ensures that only types that have a
-     * forEachParam function can be serialized and deserialized using these
-     * functions
-     *
-     * @tparam T
-     */
-    template <class T>
-    concept HasForEachParam =
-        (requires(T& param) { param.forEachParam([](auto&&) {}); }) &&
-        requires(const T& param) { param.forEachParam([](auto&&) {}); };
-
-    /**
-     * @brief Concept for parameter containers
-     *
-     * @tparam T
-     */
-    template <typename T>
-    concept IsParamContainer = HasForEachParam<T>;
 
     /**
      * @brief Serialize a tuple of parameters to JSON

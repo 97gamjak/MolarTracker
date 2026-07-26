@@ -25,6 +25,7 @@ target_link_libraries(molartracker_settings
     molartracker_json
     molartracker_connections
     molartracker_config
+    molartracker_error
     PRIVATE
     molartracker_common
     molartracker_exceptions
