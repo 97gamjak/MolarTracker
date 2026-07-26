@@ -39,7 +39,7 @@ namespace controller
 
         /// Reference to the price cache
         std::shared_ptr<finance::PriceCache> priceCache;
-
+        /// Reference to the position gateway for managing positions
         std::shared_ptr<gateway::PositionGateway> positionGateway;
 
         /// Reference to the account store
@@ -50,7 +50,8 @@ namespace controller
         std::shared_ptr<store::IStockStore> stockStore;
         /// Reference to the transaction store
         std::shared_ptr<store::ITransactionStore> transactionStore;
-        std::shared_ptr<store::IOptionStore>      optionStore;
+        /// Reference to the option store
+        std::shared_ptr<store::IOptionStore> optionStore;
 
         /// Pointer to the stacked widget
         QStackedWidget* stackedWidget;
@@ -69,6 +70,8 @@ namespace controller
         /// details, used for displaying the account details in the UI
         IdMap<AccountId, std::vector<gateway::OpenStockPositionDetail>>
             openStockPositions;
+        /// A mapping of account IDs to their corresponding open option position
+        /// details, used for displaying the account details in the UI
         IdMap<AccountId, std::vector<gateway::OpenOptionPositionDetail>>
             openOptionPositions;
 
@@ -95,13 +98,15 @@ namespace controller
     /**
      * @brief Construct a new Account Controller:: Details:: Details object
      *
-     * @param accountStore_
-     * @param positionStore_
-     * @param stockStore_
-     * @param transactionStore_
-     * @param priceCache_
-     * @param undoStack_
-     * @param stackedWidget_
+     * @param accountStore_ The account store
+     * @param positionStore_ The position store
+     * @param stockStore_ The stock store
+     * @param transactionStore_ The transaction store
+     * @param optionStore_ The option store
+     * @param priceCache_ The price cache
+     * @param positionGateway_ The position gateway
+     * @param undoStack_ The undo stack
+     * @param stackedWidget_ The stacked widget
      */
     AccountController::Details::Details(
         const std::shared_ptr<store::IAccountStore>&     accountStore_,
@@ -133,10 +138,12 @@ namespace controller
      * @brief Controller for managing account-related actions
      *
      * @param undoStack
+     * @param positionGateway
      * @param accountStore
      * @param positionStore
      * @param stockStore
      * @param transactionStore
+     * @param optionStore
      * @param priceCache
      * @param stackedWidget
      */

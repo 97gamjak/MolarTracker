@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER__SRC__CONTROLLER__MAPPER__OPTION_MAPPER_HPP__
-#define __CONTROLLER__SRC__CONTROLLER__MAPPER__OPTION_MAPPER_HPP__
+#ifndef __MAPPER__INCLUDE__MAPPER__OPTION_MAPPER_HPP__
+#define __MAPPER__INCLUDE__MAPPER__OPTION_MAPPER_HPP__
 
 #include "finance/instrument/option.hpp"
 
@@ -26,4 +26,4 @@ namespace mapper
     };
 }   // namespace mapper
 
-#endif   // __CONTROLLER__SRC__CONTROLLER__MAPPER__OPTION_MAPPER_HPP__
+#endif   // __MAPPER__INCLUDE__MAPPER__OPTION_MAPPER_HPP__

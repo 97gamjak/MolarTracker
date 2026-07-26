@@ -145,6 +145,14 @@ Quantity operator*(const Quantity& lhs, micro_units rhs)
     return Quantity(lhs._value * rhs);
 }
 
+/**
+ * @brief Multiplies two quantities together.
+ *
+ * @param lhs The left-hand side quantity.
+ * @param rhs The right-hand side quantity.
+ * @return A new Quantity object representing the product of the two
+ * quantities.
+ */
 Quantity operator*(const Quantity& lhs, const Quantity& rhs)
 {
     return lhs * rhs._value;

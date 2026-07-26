@@ -111,6 +111,15 @@ namespace repo
         return _getOptions(query);
     }
 
+    /**
+     * @brief get a list of all options in the database for the given instrument
+     * IDs, this will return all options that are not marked as deleted, and
+     * will include options that are new or modified but not yet saved to the
+     * database.
+     *
+     * @param ids The set of instrument IDs to retrieve options for
+     * @return finance::Options
+     */
     finance::Options InstrumentRepo::getOptions(const IdSet<InstrumentId>& ids)
     {
         orm::Query query{};
@@ -121,6 +130,17 @@ namespace repo
         return _getOptions(query);
     }
 
+    /**
+     * @brief get a list of all options in the database for the given query,
+     * this is a helper method that retrieves option rows based on the provided
+     * query, and then constructs Option objects for use in the application,
+     * ensuring that the data from the database is correctly mapped to the
+     * properties of the Option objects.
+     *
+     * @param query The ORM query to filter the option rows
+     * @return finance::Options The resulting Options object containing the
+     * retrieved options
+     */
     finance::Options InstrumentRepo::_getOptions(const orm::Query& query)
     {
         auto join = orm::Joins{}.add(

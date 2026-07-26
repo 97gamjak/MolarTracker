@@ -101,6 +101,18 @@ auto IdMap<Key, Value>::getIds() const
     return Base::getKeys();
 }
 
+/**
+ * @brief Constructs an IdObjectMap from a range of values with IDs.
+ *
+ * @details This constructor takes a range of values that have IDs and adds
+ * them to the map, using the IDs as keys. It uses the addUnchecked method to
+ * add the values to the map without checking for duplicates, so it should be
+ * used with caution.
+ *
+ * @tparam Value
+ * @tparam R A range of values that have IDs.
+ * @param values The range of values to add to the map.
+ */
 template <typename Value>
 requires HasId<Value>
 template <std::ranges::range R>

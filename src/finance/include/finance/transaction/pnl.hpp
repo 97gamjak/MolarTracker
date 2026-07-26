@@ -123,10 +123,10 @@ namespace finance
         Quantity qty;
 
         OpenOptionLeg(
-            OptionType    type,
-            OptionBuySell buySell,
-            Cash          strikePrice,
-            Quantity      qty
+            OptionType    type_,
+            OptionBuySell buySell_,
+            Cash          strikePrice_,
+            Quantity      qty_
         );
     };
 

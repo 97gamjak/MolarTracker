@@ -425,6 +425,16 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Converts a DomainTransaction to a finance::OptionTransaction, this
+     * will take the relevant information from the DomainTransaction and format
+     * it into an OptionTransaction, including creating the appropriate
+     * transaction entries for the option trades associated with the
+     * transaction.
+     *
+     * @param transaction
+     * @return FinanceResult<OptionTransaction>
+     */
     FinanceResult<OptionTransaction> TransactionConverter::toOption(
         const DomainTransaction& transaction
     )

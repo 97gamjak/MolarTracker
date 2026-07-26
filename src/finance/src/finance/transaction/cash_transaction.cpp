@@ -100,6 +100,13 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Get the involved accounts for the cash transaction, this will
+     * return a set of account IDs that are involved in the cash transaction,
+     * including the cash account and the external account.
+     *
+     * @return IdSet<AccountId>
+     */
     IdSet<AccountId> CashTransaction::getInvolvedAccounts() const
     {
         IdSet<AccountId> accounts;

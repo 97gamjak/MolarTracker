@@ -67,10 +67,9 @@ namespace finance
         AccountId _cashAccount;
         /// The external account associated with the option transaction
         AccountId _externalAccount;
-
+        /// The type of the transaction (e.g., cash, security, option)
         TransactionDataType _type;
-
-        /// The fees associated with the option transaction
+        /// The fees associated with the transaction
         Cash _fees;
 
        public:
@@ -112,6 +111,18 @@ namespace finance
             AccountId externalAccount
         ) const = 0;
 
+        /**
+         * @brief Get the set of accounts involved in the transaction, this is
+         * used to retrieve all the accounts that are affected by the
+         * transaction, including both cash and external accounts, and can be
+         * useful for understanding the overall impact of the transaction on
+         * different accounts.
+         *
+         * @return IdSet<AccountId> The set of account IDs involved in the
+         * transaction, this is a collection of all unique account identifiers
+         * that are part of the transaction, and can be used to analyze the
+         * relationships between different accounts and transactions.
+         */
         [[nodiscard]]
         virtual IdSet<AccountId> getInvolvedAccounts() const = 0;
 

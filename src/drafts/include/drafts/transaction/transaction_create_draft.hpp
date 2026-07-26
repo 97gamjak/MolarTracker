@@ -143,7 +143,8 @@ namespace drafts
         Timestamp _expiration;
 
         /// The option type (call or put) of the option being transacted
-        OptionType    _optionType;
+        OptionType _optionType;
+        /// The buy/sell direction of the option being transacted
         OptionBuySell _buySell;
 
         /// The quantity of the option being transacted
@@ -191,21 +192,20 @@ namespace drafts
         void setUnderlyingInstrumentId(InstrumentId underlyingInstrumentId);
         void setPositionId(PositionId positionId);
 
-        [[nodiscard]] AccountId               getSecurityAccount() const;
-        [[nodiscard]] AccountId               getCashAccount() const;
-        [[nodiscard]] InstrumentId            getInstrumentId() const;
-        [[nodiscard]] InstrumentId            getUnderlyingInstrumentId() const;
-        [[nodiscard]] const Quantity&         getQuantity() const;
-        [[nodiscard]] const Cash&             getStrikePrice() const;
-        [[nodiscard]] const Cash&             getAmount() const;
-        [[nodiscard]] const Cash&             getFees() const;
-        [[nodiscard]] PositionId              getPositionId() const;
-        [[nodiscard]] const std::string&      getUnderlyingTicker() const;
-        [[nodiscard]] Timestamp               getExpiration() const;
-        [[nodiscard]] OptionType              getOptionType() const;
-        [[nodiscard]] OptionBuySell           getBuySell() const;
-        [[nodiscard]] std::int64_t            getContractSize() const;
-        [[nodiscard]] TransactionOptionAction getAction() const;
+        [[nodiscard]] AccountId          getSecurityAccount() const;
+        [[nodiscard]] AccountId          getCashAccount() const;
+        [[nodiscard]] InstrumentId       getInstrumentId() const;
+        [[nodiscard]] InstrumentId       getUnderlyingInstrumentId() const;
+        [[nodiscard]] const Quantity&    getQuantity() const;
+        [[nodiscard]] const Cash&        getStrikePrice() const;
+        [[nodiscard]] const Cash&        getAmount() const;
+        [[nodiscard]] const Cash&        getFees() const;
+        [[nodiscard]] PositionId         getPositionId() const;
+        [[nodiscard]] const std::string& getUnderlyingTicker() const;
+        [[nodiscard]] Timestamp          getExpiration() const;
+        [[nodiscard]] OptionType         getOptionType() const;
+        [[nodiscard]] OptionBuySell      getBuySell() const;
+        [[nodiscard]] std::int64_t       getContractSize() const;
     };
 
 }   // namespace drafts

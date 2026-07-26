@@ -90,6 +90,12 @@ namespace finance
         return _positionId;
     }
 
+    /**
+     * @brief Get the set of account IDs involved in the security transaction,
+     * this includes the cash account, external account, and security account.
+     *
+     * @return IdSet<AccountId>
+     */
     IdSet<AccountId> SecurityTransaction::getInvolvedAccounts() const
     {
         IdSet<AccountId> accounts;

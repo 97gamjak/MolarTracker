@@ -76,6 +76,12 @@ auto Iterable<Container>::end() const
     return _items.end();
 }
 
+/**
+ * @brief Reserves space in the underlying container for the specified number
+ * of elements.
+ *
+ * @param size The number of elements to reserve space for.
+ */
 template <typename Container>
 void Iterable<Container>::reserve(size_t size)
 {

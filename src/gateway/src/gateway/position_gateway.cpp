@@ -18,6 +18,16 @@ namespace gateway
 
     namespace
     {
+        /**
+         * @brief Create a transaction filter for open positions, this filter
+         * will be used to retrieve transactions associated with the open
+         * positions from the transaction store.
+         *
+         * @param positions The Positions object containing the open positions.
+         * @return finance::TransactionFilter The constructed transaction
+         * filter.
+         */
+        [[nodiscard]]
         finance::TransactionFilter _getOpenPositionsFilter(
             const finance::Positions& positions
         )
@@ -28,6 +38,17 @@ namespace gateway
             return filter;
         }
 
+        /**
+         * @brief Get the position events for the given transactions, this will
+         * convert the transactions into position events, including stock trades
+         * and option trades.
+         *
+         * @param txs The Transactions object containing the transactions.
+         * @param optionStore The option store used to retrieve option details.
+         * @return FinanceResult<finance::PositionEvents> The resulting position
+         * events or an error if any option is not found.
+         */
+        [[nodiscard]]
         FinanceResult<finance::PositionEvents> _getPositionEvents(
             const finance::Transactions&                txs,
             const std::shared_ptr<store::IOptionStore>& optionStore
@@ -89,6 +110,16 @@ namespace gateway
         }
     }   // namespace
 
+    /**
+     * @brief Construct a new Position Gateway object
+     *
+     * @param transactionStore The transaction store used to retrieve
+     * transactions associated with positions.
+     * @param positionStore The position store used to retrieve open
+     * positions.
+     * @param optionStore The option store used to retrieve option details.
+     * @param stockStore The stock store used to retrieve stock details.
+     */
     PositionGateway::PositionGateway(
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
@@ -102,6 +133,18 @@ namespace gateway
     {
     }
 
+    /**
+     * @brief Get open position transactions for the specified account IDs,
+     * this will retrieve all transactions associated with open positions for
+     * the given accounts, allowing for analysis of the positions and their
+     * associated trades.
+     *
+     * @param accountIds The set of account IDs to filter the open positions by.
+     * @return FinanceResult<std::vector<std::pair<finance::Position,
+     * finance::Transactions>>> The resulting vector of pairs containing the
+     * open positions and their associated transactions, or an error if any
+     * retrieval fails.
+     */
     FinanceResult<std::vector<std::pair<finance::Position, finance::Transactions>>> PositionGateway::
         getOpenPositionTransactions(const IdSet<AccountId>& accountIds) const
     {
@@ -126,6 +169,19 @@ namespace gateway
         return result;
     }
 
+    /**
+     * @brief Calculate the PnL for a given position's transactions, this will
+     * compute the realized and unrealized PnL based on the trades associated
+     * with the position, taking into account any fees and mark prices.
+     *
+     * @param positionTxs The Transactions object containing the position's
+     * transactions.
+     * @param markPrice An optional mark price to use for calculating unrealized
+     * PnL, if not provided, the calculation will be based on the last known
+     * trade price.
+     * @return PnLResult<finance::PositionPnl> The resulting PnL calculation or
+     * an error if any part of the calculation fails.
+     */
     PnLResult<finance::PositionPnl> PositionGateway::calculatePositionPnl(
         const finance::Transactions& positionTxs,
         std::optional<Cash>          markPrice
@@ -150,13 +206,14 @@ namespace gateway
     }
 
     /**
-     * @brief Get open position drafts for a specific account
+     * @brief Get open stock position details for a specific account, this will
+     * retrieve the open stock positions along with their associated PnL and
+     * other details for the given account, allowing for analysis of the stock
+     * positions.
      *
-     * @param account
-     * @param positionStore
-     * @param stockStore
-     * @param transactionStore
-     * @return FinanceResult<std::vector<OpenStockPositionDetail>>
+     * @param account The account ID to filter the open stock positions by.
+     * @return FinanceResult<std::vector<OpenStockPositionDetail>> The resulting
+     * vector of open stock position details or an error if any retrieval fails.
      */
     FinanceResult<std::vector<OpenStockPositionDetail>> PositionGateway::
         getOpenStockPositionDetails(AccountId account) const
@@ -253,6 +310,12 @@ namespace gateway
         return drafts;
     }
 
+    /**
+     * @brief Get open stock positions for a specific account
+     *
+     * @param account
+     * @return FinanceResult<std::vector<drafts::PositionStockDetailDraft>>
+     */
     FinanceResult<std::vector<drafts::PositionStockDetailDraft>> PositionGateway::
         getOpenStockPosition(AccountId account) const
     {
@@ -336,6 +399,12 @@ namespace gateway
         return drafts;
     }
 
+    /**
+     * @brief Get open option positions for a specific account
+     *
+     * @param account
+     * @return FinanceResult<std::vector<OpenOptionPositionDetail>>
+     */
     FinanceResult<std::vector<OpenOptionPositionDetail>> PositionGateway::
         getOpenOptionPositionDetails(AccountId account) const
     {

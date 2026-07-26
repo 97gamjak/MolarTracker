@@ -47,6 +47,10 @@ namespace controller
         std::shared_ptr<store::IStockStore> _stockStore;
 
         struct UIElements;
+        /// A unique pointer to the UI elements used by the controller,
+        /// encapsulating the stacked widget and the transaction detail view,
+        /// providing a convenient way to manage and access these UI elements
+        /// within the controller.
         std::unique_ptr<UIElements> _uiElements;
 
        public:

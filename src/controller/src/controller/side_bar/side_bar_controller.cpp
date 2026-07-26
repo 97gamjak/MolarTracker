@@ -28,6 +28,7 @@ namespace controller
      * @param centralStack
      * @param accountController
      * @param transactionController
+     * @param positionGateway
      */
     // TODO(97gamjak): would be probably best to remove dependency on central
     // stack here

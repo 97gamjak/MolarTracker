@@ -24,12 +24,18 @@ namespace finance
     class OptionTransaction : public SecurityTransaction
     {
        private:
+        /// The premium amount of the option transaction, which represents the
+        /// cash flow associated with the option trade, either paid or received,
+        /// and is  used to calculate the overall cost or proceeds of the option
+        /// trade, and is an important factor in determining the profitability
+        /// of the option position.
         Cash _premium;
 
         /// The action being performed in the option transaction (e.g., open,
         /// close, roll)
         TransactionOptionAction _action;
 
+        /// The buy/sell direction of the option transaction (e.g., buy, sell)
         OptionBuySell _buySell;
 
         /// The ID of the rolled option transaction, if this transaction is a

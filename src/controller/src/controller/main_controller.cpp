@@ -49,7 +49,7 @@ namespace controller
 
         /// price cache for managing stock prices
         std::shared_ptr<finance::PriceCache> _priceCache;
-
+        /// position gateway for managing positions
         gateway::PositionGateway _positionGateway;
 
         /// controller for managing the account

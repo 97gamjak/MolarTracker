@@ -114,6 +114,7 @@ namespace controller
      * Transaction Side Bar Controller object
      *
      * @param undoStack The undo stack for the application
+     * @param positionGateway The position gateway for the application
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
      * @param stockStore The stock store for the application

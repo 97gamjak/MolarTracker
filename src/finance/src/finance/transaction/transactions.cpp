@@ -29,6 +29,10 @@ namespace finance
         );
     }
 
+    /**
+     * @brief sort the option transactions by timestamp in ascending order
+     *
+     */
     void OptionTransactions::sort()
     {
         std::ranges::sort(
@@ -52,6 +56,11 @@ namespace finance
         return instrumentIds;
     }
 
+    /**
+     * @brief Get the Base Instrument Ids from the option transactions
+     *
+     * @return IdSet<InstrumentId>
+     */
     IdSet<InstrumentId> OptionTransactions::getBaseInstrumentIds() const
     {
         IdSet<InstrumentId> instrumentIds;
@@ -61,6 +70,13 @@ namespace finance
         return instrumentIds;
     }
 
+    /**
+     * @brief Get the IDs of the option transactions, this will return a vector
+     * of TransactionId objects representing the IDs of the option transactions
+     * managed by the OptionTransactions class.
+     *
+     * @return std::vector<TransactionId>
+     */
     std::vector<TransactionId> OptionTransactions::getIds() const
     {
         std::vector<TransactionId> ids;
@@ -254,6 +270,8 @@ namespace finance
      *
      * @param transactions
      * @param accounts
+     * @return FinanceResult<void> if all transactions were added successfully,
+     * or an error if any transaction failed to convert or add.
      */
     FinanceResult<void> Transactions::addTransactions(
         const std::vector<DomainTransaction>& transactions,
@@ -448,6 +466,13 @@ namespace finance
         return transactions;
     }
 
+    /**
+     * @brief Group the transactions by position ID, this will create a map of
+     * PositionId to Transactions, where each entry in the map contains all
+     * transactions associated with that position ID.
+     *
+     * @return IdMap<PositionId, Transactions>
+     */
     IdMap<PositionId, Transactions> Transactions::groupByPosition() const
     {
         IdMap<PositionId, Transactions> positionMap;
@@ -479,6 +504,14 @@ namespace finance
         return positionMap;
     }
 
+    /**
+     * @brief Filter the transactions by a set of account IDs, this will return
+     * a new Transactions object containing only the transactions that involve
+     * any of the specified account IDs.
+     *
+     * @param accountIds The set of account IDs to filter by.
+     * @return Transactions The filtered transactions.
+     */
     Transactions Transactions::filter(const IdSet<AccountId>& accountIds) const
     {
         CashTransactions   cashTx;
@@ -522,11 +555,25 @@ namespace finance
         return {cashTx, stockTx, optionTx};
     }
 
+    /**
+     * @brief Get the instrument IDs of the stock transactions, this will return
+     * a set of InstrumentId objects representing the unique instruments
+     * involved in the stock transactions managed by the Transactions object.
+     *
+     * @return IdSet<InstrumentId>
+     */
     IdSet<InstrumentId> Transactions::getStockInstrumentIds() const
     {
         return stocks().getBaseInstrumentIds();
     }
 
+    /**
+     * @brief Get the instrument IDs of the option transactions, this will
+     * return a set of InstrumentId objects representing the unique instruments
+     * involved in the option transactions managed by the Transactions object.
+     *
+     * @return IdSet<InstrumentId>
+     */
     IdSet<InstrumentId> Transactions::getOptionInstrumentIds() const
     {
         return options().getBaseInstrumentIds();

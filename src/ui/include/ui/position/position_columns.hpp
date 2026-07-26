@@ -1,5 +1,5 @@
-#ifndef __UI__SRC__UI__POSITION__POSITION_COLUMNS_HPP__
-#define __UI__SRC__UI__POSITION__POSITION_COLUMNS_HPP__
+#ifndef __UI__INCLUDE__UI__POSITION__POSITION_COLUMNS_HPP__
+#define __UI__INCLUDE__UI__POSITION__POSITION_COLUMNS_HPP__
 
 #include <cstdint>
 #include <mstd/enum.hpp>
@@ -53,4 +53,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__SRC__UI__POSITION__POSITION_COLUMNS_HPP__
+#endif   // __UI__INCLUDE__UI__POSITION__POSITION_COLUMNS_HPP__

@@ -38,7 +38,9 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// The title label for the cash transactions section
         QLabel* _cashTitle;
+        /// The title label for the stock transactions section
         QLabel* _stockTitle;
         /// The model for the transaction table
         CashTransactionTableModel* _cashModel;

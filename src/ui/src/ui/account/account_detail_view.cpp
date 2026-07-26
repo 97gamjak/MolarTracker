@@ -208,7 +208,8 @@ namespace ui
      * @brief Update the security account details displayed in the view
      *
      * @param account The account data to display
-     * @param positions The positions associated with the account
+     * @param stocks The stock positions associated with the account
+     * @param options The option positions associated with the account
      */
     void AccountDetailView::updateSecurityAccount(
         const AccountDraft&                                   account,

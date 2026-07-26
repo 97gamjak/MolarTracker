@@ -46,6 +46,7 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
 
     bool intersects(const Set<T, Hash>& other) const;
 
+    // cppcheck-suppress functionStatic -- false positive
     [[nodiscard]] std::string toString() const;
 
     template <std::ranges::range R, typename F>

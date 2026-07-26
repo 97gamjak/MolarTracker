@@ -226,18 +226,21 @@ namespace drafts
      * @brief Create a Option Transaction Draft:: Create Option Transaction
      * Draft object
      *
-     * @param timestamp
-     * @param ticker
-     * @param expiration
-     * @param optionType
-     * @param quantity
-     * @param amount
-     * @param strikePrice
-     * @param fees
-     * @param contractSize
-     * @param securityAccount
-     * @param cashAccount
-     * @param comment
+     * @param timestamp The timestamp of the option transaction draft.
+     * @param ticker The underlying ticker of the option.
+     * @param expiration The expiration date of the option.
+     * @param optionType The type of the option (call or put).
+     * @param buySell The buy/sell direction of the option.
+     * @param quantity The quantity of the option.
+     * @param amount The amount of the option.
+     * @param strikePrice The strike price of the option.
+     * @param fees The fees associated with the option transaction.
+     * @param contractSize The contract size of the option.
+     * @param securityAccount The security account ID associated with the option
+     * transaction.
+     * @param cashAccount The cash account ID associated with the option
+     * transaction.
+     * @param comment An optional comment for the transaction.
      */
     CreateOptionTransactionDraft::CreateOptionTransactionDraft(
         Timestamp                  timestamp,

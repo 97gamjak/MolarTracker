@@ -122,6 +122,7 @@ namespace finance
      * @param status
      * @param cashAccount
      * @param externalAccount
+     * @param type
      * @param fees
      * @param comment
      */
@@ -169,6 +170,13 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Get the transaction type of the transaction, this will return the
+     * type of the transaction, which can be used to determine the specific
+     * subclass of the transaction.
+     *
+     * @return TransactionDataType The type of the transaction.
+     */
     TransactionDataType Transaction::getTransactionType() const
     {
         return _type;

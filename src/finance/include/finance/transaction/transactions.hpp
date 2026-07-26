@@ -72,8 +72,6 @@ namespace finance
      */
     class CashTransactions : public Vector<CashTransaction>
     {
-       public:
-        void sort();
     };
 
     /**
@@ -114,6 +112,9 @@ namespace finance
     {
        private:
         class TransactionsImpl;
+        /// A shared pointer to the implementation of the Transactions class,
+        /// which encapsulates the details of managing different types of
+        /// financial transactions.
         std::shared_ptr<TransactionsImpl> _impl;
 
        public:

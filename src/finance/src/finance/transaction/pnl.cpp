@@ -9,6 +9,14 @@
 namespace finance
 {
 
+    /**
+     * @brief Construct a new Open Option Leg:: Open Option Leg object
+     *
+     * @param type_ The type of the option (call or put)
+     * @param buySell_ The buy/sell direction of the option
+     * @param strikePrice_ The strike price of the option
+     * @param qty_ The quantity of the option
+     */
     OpenOptionLeg::OpenOptionLeg(
         OptionType    type_,
         OptionBuySell buySell_,
@@ -19,6 +27,10 @@ namespace finance
     {
     }
 
+    /**
+     * @brief Sorts the position events in ascending order based on their
+     * timestamps, allowing for chronological analysis of the events.
+     */
     void PositionEvents::sort()
     {
         std::ranges::sort(
@@ -270,6 +282,15 @@ namespace finance
         }
     }   // namespace
 
+    /**
+     * @brief Folds a sequence of position events into a single position state,
+     * applying each event in order to update the state.
+     *
+     * @param state The initial position state to start folding from.
+     * @param events A span of position events to be applied to the state.
+     * @return PnLResult<PositionState> The final position state after
+     * applying all events, or an error if any event application fails.
+     */
     PnLResult<PositionState> foldEvents(
         PositionState                  state,
         std::span<const PositionEvent> events
@@ -293,6 +314,16 @@ namespace finance
         return state;
     }
 
+    /**
+     * @brief Takes a snapshot of the current position state, calculating the
+     * profit and loss (PnL) based on the state and an optional mark price.
+     *
+     * @param state The current position state to take a snapshot of.
+     * @param markPrice An optional mark price to use for calculating
+     * unrealized PnL.
+     * @return PositionPnl The calculated profit and loss (PnL) for the
+     * position.
+     */
     PositionPnl snapshot(
         const PositionState& state,
         std::optional<Cash>  markPrice
@@ -348,12 +379,27 @@ namespace finance
         };
     }
 
+    /**
+     * @brief Get the average cost of the position, which is calculated as the
+     * cost basis divided by the quantity of the position, representing the
+     * average price paid per share or contract in the position.
+     *
+     * @return Cash The average cost of the position.
+     */
     Cash PositionPnl::getAverageCost() const
     {
         return quantity.isZero() ? Cash{costBasis.getCurrency(), 0}
                                  : costBasis / quantity;
     }
 
+    /**
+     * @brief Get the realized profit and loss (PnL) percentage of the position,
+     * which is calculated as the realized PnL divided by the realized cost
+     * basis, representing the percentage gain or loss on closed trades in the
+     * position.
+     *
+     * @return Percentage The realized PnL percentage of the position.
+     */
     Percentage PositionPnl::getRealizedPnLPercentage() const
     {
         if (realizedCostBasis.isZero())
@@ -361,10 +407,33 @@ namespace finance
         return Percentage(realizedPnL / realizedCostBasis);
     }
 
+    /**
+     * @brief Get the total profit and loss (PnL) of the position, which is
+     * calculated as the sum of the realized PnL and unrealized PnL,
+     * representing the overall gain or loss on both closed and open trades in
+     * the position.
+     *
+     * @return Cash The total PnL of the position.
+     */
     Cash PositionPnl::totalPnL() const { return realizedPnL + unrealizedPnL; }
 
+    /**
+     * @brief Get the market value of the position, which is calculated as the
+     * cost basis plus the total PnL, representing the current value of the
+     * position based on both closed and open trades.
+     *
+     * @return Cash The market value of the position.
+     */
     Cash PositionPnl::getMarketValue() const { return costBasis + totalPnL(); }
 
+    /**
+     * @brief Get the unrealized profit and loss (PnL) percentage of the
+     * position, which is calculated as the unrealized PnL divided by the cost
+     * basis, representing the percentage gain or loss on open trades in the
+     * position.
+     *
+     * @return Percentage The unrealized PnL percentage of the position.
+     */
     Percentage PositionPnl::getUnrealizedPnLPercentage() const
     {
         if (costBasis.isZero())

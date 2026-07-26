@@ -13,19 +13,15 @@ namespace finance
      * @param timestamp
      * @param status
      * @param instrumentId
-     * @param underlyingInstrumentId
      * @param securityAccount
      * @param cashAccount
      * @param externalAccount
      * @param quantity
-     * @param strikePrice
      * @param amount
      * @param fees
-     * @param contractSize
      * @param positionId
      * @param action
      * @param buySell
-     * @param optionType
      * @param rolledOption
      * @param comment
      */
@@ -131,16 +127,36 @@ namespace finance
         return optionData;
     }
 
+    /**
+     * @brief Get the buy/sell direction of the option transaction, which
+     * indicates whether the option is being bought or sold.
+     *
+     * @return const OptionBuySell& The buy/sell direction of the option
+     * transaction.
+     */
     const OptionBuySell& OptionTransaction::getBuySell() const
     {
         return _buySell;
     }
 
+    /**
+     * @brief Get the action being performed in the option transaction, which
+     * indicates whether the option is being opened, closed, or rolled.
+     *
+     * @return const TransactionOptionAction& The action of the option
+     * transaction.
+     */
     const TransactionOptionAction& OptionTransaction::getAction() const
     {
         return _action;
     }
 
+    /**
+     * @brief Get the premium amount of the option transaction, which represents
+     * the cash flow associated with the option trade, either paid or received.
+     *
+     * @return const Cash& The premium amount of the option transaction.
+     */
     const Cash& OptionTransaction::getPremium() const { return _premium; }
 
 }   // namespace finance
