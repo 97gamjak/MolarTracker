@@ -1,11 +1,10 @@
 #ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
 #define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_PARAM_HPP__
 
-#include <expected>
 #include <optional>
 
+#include "error/param_error.hpp"
 #include "param_core.hpp"
-#include "param_error.hpp"
 #include "param_mixin.hpp"
 
 namespace settings
@@ -70,7 +69,7 @@ namespace settings
             std::string description
         );
 
-        [[nodiscard]] std::expected<void, ParamError> set(const T& value);
+        [[nodiscard]] ParamResult<void> set(const T& value);
         void setLimits(const T& minValue, const T& maxValue);
         void setMinValue(const T& minValue);
         void setMaxValue(const T& maxValue);
@@ -89,10 +88,8 @@ namespace settings
        private:
         explicit NumericParam(ParamCore<T> core);
 
-        [[nodiscard]] std::expected<void, ParamError> _isWithinRange(
-            const T& value
-        ) const;
-        [[nodiscard]] T _applyPrecision(const T& value) const;
+        [[nodiscard]] ParamResult<void> _isWithinRange(const T& value) const;
+        [[nodiscard]] T                 _applyPrecision(const T& value) const;
     };
 
 }   // namespace settings

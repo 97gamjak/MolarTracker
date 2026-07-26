@@ -81,13 +81,10 @@ namespace settings
         void setMinValues(const std::pair<T, T>& minValues)
         requires(N == 2);
 
-        const T&               get(std::size_t index) const;
-        const NumericParam<T>& getParam(std::size_t index) const;
-        NumericParam<T>&       getParam(std::size_t index);
-        [[nodiscard]] std::expected<void, ParamError> set(
-            std::size_t index,
-            const T&    value
-        );
+        const T&                        get(std::size_t index) const;
+        const NumericParam<T>&          getParam(std::size_t index) const;
+        NumericParam<T>&                getParam(std::size_t index);
+        [[nodiscard]] ParamResult<void> set(std::size_t index, const T& value);
 
         void commit();
         void resetToDefault();
