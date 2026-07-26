@@ -5,7 +5,6 @@
 
 #include "config/id_types.hpp"
 #include "db/database.hpp"
-#include "finance/watchlist.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_error.hpp"
 #include "orm/query_options.hpp"
@@ -80,7 +79,7 @@ TEST_F(WatchlistRepoTest, RenameWatchlistUpdatesName)
 
 TEST_F(WatchlistRepoTest, RenameWatchlistPreservesCreatedAt)
 {
-    const auto id = _repo.createWatchlist("Tech Stocks");
+    const auto id                = _repo.createWatchlist("Tech Stocks");
     const auto originalCreatedAt = _repo.getAllWatchlists()[0].getCreatedAt();
 
     _repo.renameWatchlist(id, "Big Tech");

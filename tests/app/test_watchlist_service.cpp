@@ -4,7 +4,6 @@
 #include <string>
 
 #include "db/database.hpp"
-#include "finance/watchlist.hpp"
 #include "repo/migration/migration_runner.hpp"
 #include "repo/watchlist_repo.hpp"
 #include "service/watchlist_service.hpp"
@@ -17,10 +16,10 @@ namespace
     {
        protected:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-        tests::TempDbFile                           _tempFile;
-        db::Database                                _db;
-        std::shared_ptr<repo::WatchlistRepo>         _repo;
-        std::shared_ptr<service::WatchlistService>   _service;
+        tests::TempDbFile                          _tempFile;
+        db::Database                               _db;
+        std::shared_ptr<repo::WatchlistRepo>       _repo;
+        std::shared_ptr<service::WatchlistService> _service;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
         WatchlistServiceTest()

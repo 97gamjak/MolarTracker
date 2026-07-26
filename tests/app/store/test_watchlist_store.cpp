@@ -95,9 +95,7 @@ TEST_F(WatchlistStoreTest, GetWatchlistReturnsNulloptForUnknownId)
 
 TEST_F(WatchlistStoreTest, ReloadLoadsWatchlistsFromService)
 {
-    _mockService->preloadedWatchlists.push_back(
-        finance::Watchlist{"Preloaded", Timestamp{}}
-    );
+    _mockService->preloadedWatchlists.emplace_back("Preloaded", Timestamp{});
 
     _store->reload();
 
