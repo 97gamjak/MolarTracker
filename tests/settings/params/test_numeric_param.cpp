@@ -7,7 +7,6 @@
 #include <string>
 
 #include "settings/params/numeric_param.hpp"
-#include "settings/params/param_error.hpp"
 
 // ============================================================================
 // Construction / metadata
@@ -142,7 +141,7 @@ TEST(NumericParam, SetBelowMinReturnsError)
     param.setLimits(limit1, limit2);
     auto result = param.set(value);
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(NumericParam, SetAboveMaxReturnsError)
@@ -154,7 +153,7 @@ TEST(NumericParam, SetAboveMaxReturnsError)
     param.setLimits(limit1, limit2);
     auto result = param.set(value);
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(NumericParam, SetAtMinBoundarySucceeds)

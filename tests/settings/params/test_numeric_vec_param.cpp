@@ -73,7 +73,7 @@ TEST(NumericVecParam, SetOutOfRangeIndexReturnsError)
 
     auto result = vec.set(2, paramValue);   // index == N
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(NumericVecParam, GetOutOfRangeIndexThrows)

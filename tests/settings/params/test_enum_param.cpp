@@ -51,7 +51,7 @@ TEST(EnumParam, SetInvalidEnumValueReturnsError)
     const auto invalid = static_cast<LogLevel>(static_cast<std::int8_t>(127));
     auto       result  = param.set(invalid);
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(EnumParam, GetThrowsWhenNoValueAndNoDefault)

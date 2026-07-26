@@ -246,6 +246,7 @@ REVERT CACHE changes but keep error handling
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
 - remove IdMap special type
+- replace `ParamError` with common `Error` type
 
 ### Claude
 
