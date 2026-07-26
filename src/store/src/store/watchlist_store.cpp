@@ -154,6 +154,100 @@ namespace store
     }
 
     /**
+     * @brief Rename an existing watchlist. Persisted immediately (not
+     * staged) since the repo/service API is a single atomic operation, not a
+     * value to diff against a previous state at commit time.
+     *
+     * @param id
+     * @param newName
+     */
+    void WatchlistStore::renameWatchlist(
+        WatchlistId         id,
+        const std::string& newName
+    )
+    {
+        auto watchlist = getWatchlist(id);
+        if (!watchlist)
+            throw WatchlistStoreException(
+                "Watchlist not found: " + id.toString()
+            );
+
+        _watchlistService->renameWatchlist(id, newName);
+        watchlist->setName(newName);
+
+        if (_updateEntry(*watchlist, StoreState::Clean) != StoreResult::Ok)
+            throw WatchlistStoreException(
+                "Failed to update cached watchlist after rename"
+            );
+    }
+
+    /**
+     * @brief Delete a watchlist and all of its symbol entries immediately.
+     *
+     * @param id
+     */
+    void WatchlistStore::deleteWatchlist(WatchlistId id)
+    {
+        _watchlistService->deleteWatchlist(id);
+        _removeEntry(id);
+    }
+
+    /**
+     * @brief Add a symbol to a watchlist immediately.
+     *
+     * @param id
+     * @param symbol
+     */
+    void WatchlistStore::addSymbol(WatchlistId id, const std::string& symbol)
+    {
+        auto watchlist = getWatchlist(id);
+        if (!watchlist)
+            throw WatchlistStoreException(
+                "Watchlist not found: " + id.toString()
+            );
+
+        _watchlistService->addSymbol(id, symbol);
+
+        auto symbols = watchlist->getSymbols();
+        symbols.push_back(symbol);
+        watchlist->setSymbols(symbols);
+
+        if (_updateEntry(*watchlist, StoreState::Clean) != StoreResult::Ok)
+            throw WatchlistStoreException(
+                "Failed to update cached watchlist after addSymbol"
+            );
+    }
+
+    /**
+     * @brief Remove a symbol from a watchlist immediately.
+     *
+     * @param id
+     * @param symbol
+     */
+    void WatchlistStore::removeSymbol(
+        WatchlistId         id,
+        const std::string& symbol
+    )
+    {
+        auto watchlist = getWatchlist(id);
+        if (!watchlist)
+            throw WatchlistStoreException(
+                "Watchlist not found: " + id.toString()
+            );
+
+        _watchlistService->removeSymbol(id, symbol);
+
+        auto symbols = watchlist->getSymbols();
+        std::erase(symbols, symbol);
+        watchlist->setSymbols(symbols);
+
+        if (_updateEntry(*watchlist, StoreState::Clean) != StoreResult::Ok)
+            throw WatchlistStoreException(
+                "Failed to update cached watchlist after removeSymbol"
+            );
+    }
+
+    /**
      * @brief Discard all cached watchlists and reload from the database
      *
      */

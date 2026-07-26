@@ -8,6 +8,63 @@ REVERT CACHE changes but keep error handling
 
 ### Features
 
+#### Securities sidebar sub-nodes + Watchlist UI (MOLTRACK-284, MOLTRACK-285)
+
+Implements the "All Securities" sidebar refactor (MOLTRACK-284) and the
+remaining UI-facing half of the Watchlist feature (MOLTRACK-285), on top
+of the backend scaffolding described below.
+
+- Add `SideBarItemType::AllSecuritiesItem` / `WatchlistItem`
+  (`ui/side_bar/side_bar_item.hpp`). `SecuritiesCategory` now owns a
+  permanent row-0 `AllSecuritiesItem` (created once in its constructor,
+  never rebuilt) plus dynamically-managed `WatchlistItem` child rows via
+  `addWatchlist()`/`clearWatchlists()` — note `clearWatchlists()`
+  deliberately does `removeRows(1, rowCount() - 1)`, not
+  `removeRows(0, rowCount())` like `AccountCategory::clearAccounts()`,
+  to preserve row 0. Both switches in `SideBarController` (`_onItemClicked`,
+  `_onContextMenuRequested`) were extended for the two new types.
+- `IStockStore`/`StockStore::getStocks(const finance::TradeFilterParams&)`
+  wires the previously-unused `symbolAllowlist` into the existing
+  cache-aware `getStocks(const IdSet<InstrumentId>&)` path by resolving
+  symbols via `getInstrumentId()` — no repo/service/ORM changes needed,
+  since `getStocksBySymbols`'s `IN` clause (added in the prior PR) already
+  covers the repo-level acceptance criteria. An allowlist resolving to zero
+  known symbols explicitly returns `{}` rather than falling through to
+  `getStocks({})`'s "no filter" semantics.
+- `IWatchlistStore`/`WatchlistStore` gains `renameWatchlist`/
+  `deleteWatchlist`/`addSymbol`/`removeSymbol`, implemented as immediate,
+  synchronous operations (call the service directly, then reconcile the
+  local cache to `StoreState::Clean`) rather than staged
+  `Modified`/`Deleted` entries. No store in this codebase has ever
+  implemented staged `Modified`/`Deleted` `commit()` handling, and the
+  repo/service API for watchlists is action-granular (one call = one
+  persisted operation), not a value to diff against a prior state at
+  commit time — staging would require snapshotting pre-edit values for no
+  concrete benefit. `createWatchlist` is unchanged (still staged/`New`).
+  These mutations are not undoable via `UndoStack` as a result.
+- `SecuritiesSideBarController` gains `onAllSecuritiesSelected`,
+  `onWatchlistSelected`, `onAddToWatchlist`, `onRemoveFromWatchlist`,
+  `onCreateWatchlist`, `onDeleteWatchlist`, `onRenameWatchlist`, and
+  `handleWatchlistContextMenuAction`; `onSecuritiesSelected` is removed
+  (its role is fully replaced by `onAllSecuritiesSelected`, triggered by
+  the new `AllSecuritiesItem`). Create/Rename use `QInputDialog::getText`;
+  Delete requires `QMessageBox::question` confirmation. "All Securities" is
+  selected by default on startup via a new `SideBar::selectItem()` and
+  `SideBarController::getSecuritiesSideBarController()` accessor, wired
+  from `MainController::start()`.
+- Add a right-click context menu on the securities table
+  (`StockOverviewWidget`, previously had none) — "Add to Watchlist ▶"
+  submenu and "Remove from current watchlist". The widget owns `QMenu`
+  construction/`exec()` (consistent with `SideBar` owning the tree's menu
+  mechanics) but never touches the watchlist store directly; it consumes
+  `setAvailableWatchlists()`/`setActiveWatchlist()` data pushed by the
+  controller in response to a new synchronous
+  `aboutToShowContextMenuForSymbol` signal, keeping the widget layer
+  store-agnostic.
+- Deferred (flagged during planning, not required by either ticket): no
+  `UndoStack` integration for watchlist mutations; no inline "create new
+  watchlist" shortcut from the Add-to-Watchlist submenu.
+
 #### Finance / Watchlist backend (MOLTRACK-285)
 
 Backend-only scaffolding for the Watchlist feature — DB migration, ORM

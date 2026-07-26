@@ -7,6 +7,7 @@
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stock.hpp"
+#include "finance/instrument/trade_filter_params.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
@@ -57,6 +58,10 @@ namespace store
 
         [[nodiscard]]
         finance::Stocks getStocks() const override;
+
+        [[nodiscard]]
+        finance::Stocks getStocks(const finance::TradeFilterParams& filter
+        ) const override;
 
         [[nodiscard]]
         std::optional<finance::Stock> getStock(InstrumentId id) const override;

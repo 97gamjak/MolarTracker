@@ -48,6 +48,10 @@ All changes and updates, that are relevant for a user will be documented here
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
 - Show option positions in account overview
+- Add watchlists: the Securities sidebar now expands into "All Securities"
+  (shown by default) plus your saved watchlists. Right-click Securities to
+  create a watchlist, right-click a security row to add/remove it to/from a
+  watchlist, and right-click a watchlist to rename or delete it
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

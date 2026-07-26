@@ -281,7 +281,11 @@ namespace tests
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Watchlist> preloadedWatchlists;
-        int                              createCallCount = 0;
+        int                              createCallCount     = 0;
+        int                              renameCallCount     = 0;
+        int                              deleteCallCount     = 0;
+        int                              addSymbolCallCount  = 0;
+        int                              removeSymbolCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
@@ -304,6 +308,7 @@ namespace tests
         void renameWatchlist(WatchlistId id, const std::string& newName)
             override
         {
+            renameCallCount++;
             for (auto& watchlist : preloadedWatchlists)
             {
                 if (watchlist.getId() == id)
@@ -313,6 +318,7 @@ namespace tests
 
         void deleteWatchlist(WatchlistId id) override
         {
+            deleteCallCount++;
             std::erase_if(
                 preloadedWatchlists,
                 [id](const auto& watchlist)
@@ -322,6 +328,7 @@ namespace tests
 
         void addSymbol(WatchlistId id, const std::string& symbol) override
         {
+            addSymbolCallCount++;
             for (auto& watchlist : preloadedWatchlists)
             {
                 if (watchlist.getId() != id)
@@ -335,6 +342,7 @@ namespace tests
 
         void removeSymbol(WatchlistId id, const std::string& symbol) override
         {
+            removeSymbolCallCount++;
             for (auto& watchlist : preloadedWatchlists)
             {
                 if (watchlist.getId() != id)

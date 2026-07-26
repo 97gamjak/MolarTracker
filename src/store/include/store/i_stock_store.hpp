@@ -14,7 +14,8 @@ class Connection;   // Forward declaration
 
 namespace finance
 {
-    class Stock;   // forward declaration
+    class Stock;              // forward declaration
+    class TradeFilterParams;  // forward declaration
 }   // namespace finance
 
 namespace store
@@ -80,6 +81,19 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Stocks getStocks() const = 0;
+
+        /**
+         * @brief Get a list of stocks restricted by the given filter
+         * parameters (e.g. a watchlist's symbol allowlist). A nullopt
+         * allowlist returns all stocks.
+         *
+         * @param filter
+         * @return finance::Stocks
+         */
+        [[nodiscard]]
+        virtual finance::Stocks getStocks(
+            const finance::TradeFilterParams& filter
+        ) const = 0;
 
         /**
          * @brief Get all stock tickers in the store

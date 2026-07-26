@@ -13,6 +13,7 @@
 #include "ui/side_bar/side_bar.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
 #include "ui/side_bar/transaction_category.hpp"
+#include "ui/side_bar/watchlist_item.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.SideBarController");
 
@@ -53,6 +54,7 @@ namespace controller
           _securitiesSideBarController(
               mainWindow,
               storeContainer.getStockStore(),
+              storeContainer.getWatchlistStore(),
               centralStack
           ),
           _transactionSideBarController(
@@ -102,6 +104,7 @@ namespace controller
     {
         _accountSideBarController.refresh();
         _transactionSideBarController.refresh();
+        _securitiesSideBarController.refresh();
     }
 
     /**
@@ -139,14 +142,30 @@ namespace controller
                 _transactionSideBarController.onTransactionsSelected();
                 break;
             }
-            case ui::SideBarItemType::SecuritiesCategory:
+            case ui::SideBarItemType::AllSecuritiesItem:
             {
-                _securitiesSideBarController.onSecuritiesSelected();
+                _securitiesSideBarController.onAllSecuritiesSelected();
+                break;
+            }
+            case ui::SideBarItemType::WatchlistItem:
+            {
+                const auto* watchlistItem =
+                    dynamic_cast<ui::WatchlistItem*>(item);
+
+                if (watchlistItem != nullptr)
+                    _securitiesSideBarController.onWatchlistSelected(
+                        watchlistItem->getId()
+                    );
+                else
+                    LOG_ERROR("Watchlist item clicked but not found");
+
                 break;
             }
             case ui::SideBarItemType::OverviewCategory:
             case ui::SideBarItemType::AccountCategory:
-                // Handle overview and account category clicks if needed
+            case ui::SideBarItemType::SecuritiesCategory:
+                // Handle overview, account and securities category clicks if
+                // needed (categories themselves are non-selectable)
                 break;
         }
     }
@@ -222,6 +241,19 @@ namespace controller
                 );
                 break;
             }
+            case ui::SideBarItemType::WatchlistItem:
+            {
+                const auto* watchlistItem =
+                    dynamic_cast<ui::WatchlistItem*>(item);
+                _securitiesSideBarController.handleWatchlistContextMenuAction(
+                    watchlistItem,
+                    action
+                );
+                break;
+            }
+            case ui::SideBarItemType::AllSecuritiesItem:
+                // permanent, immutable node — no context menu
+                break;
             case ui::SideBarItemType::OverviewCategory:
                 // Handle overview item click
                 break;
@@ -249,6 +281,18 @@ namespace controller
         getAccountSideBarController() const
     {
         return _accountSideBarController;
+    }
+
+    /**
+     * @brief Get the securities side bar controller
+     *
+     * @return SecuritiesSideBarController& Reference to the securities side
+     * bar controller
+     */
+    SecuritiesSideBarController&
+    SideBarController::getSecuritiesSideBarController()
+    {
+        return _securitiesSideBarController;
     }
 
 }   // namespace controller

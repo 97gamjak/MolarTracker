@@ -217,6 +217,36 @@ namespace store
     }
 
     /**
+     * @brief Get a list of stocks restricted by the given filter parameters
+     * (e.g. a watchlist's symbol allowlist). A nullopt allowlist returns all
+     * stocks.
+     *
+     * @param filter
+     * @return finance::Stocks
+     */
+    finance::Stocks StockStore::getStocks(
+        const finance::TradeFilterParams& filter
+    ) const
+    {
+        const auto& allowlist = filter.getSymbolAllowlist();
+
+        if (!allowlist)
+            return getStocks();
+
+        IdSet<InstrumentId> ids;
+        for (const auto& symbol : *allowlist)
+            if (const auto id = getInstrumentId(symbol))
+                ids.insert(*id);
+
+        // an allowlist that resolves to no known symbols must return
+        // nothing, not fall through to getStocks({})'s "no filter" case
+        if (ids.empty())
+            return {};
+
+        return getStocks(ids);
+    }
+
+    /**
      * @brief Get a stock by its instrument ID
      *
      * @param id The instrument ID

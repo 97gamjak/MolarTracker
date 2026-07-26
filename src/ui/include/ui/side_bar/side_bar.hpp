@@ -34,6 +34,7 @@ namespace ui
 
         void addCategory(Category* category);
         void removeCategory(SideBarItem* item);
+        void selectItem(SideBarItem* item);
 
        signals:
         /// Emitted when an item in the side bar is clicked

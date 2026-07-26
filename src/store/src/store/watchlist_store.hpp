@@ -44,6 +44,12 @@ namespace store
         [[nodiscard]]
         const IdIdMap<WatchlistId>& getIdRemap() const override;
 
+        void renameWatchlist(WatchlistId id, const std::string& newName)
+            override;
+        void deleteWatchlist(WatchlistId id) override;
+        void addSymbol(WatchlistId id, const std::string& symbol) override;
+        void removeSymbol(WatchlistId id, const std::string& symbol) override;
+
         void commit();
 
         void reload() override;

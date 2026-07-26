@@ -59,6 +59,20 @@ namespace ui
     }
 
     /**
+     * @brief Select an item in the side bar's tree view, highlighting it as
+     * the currently active item without emitting the itemClicked signal.
+     *
+     * @param item The item to select
+     */
+    void SideBar::selectItem(SideBarItem* item)
+    {
+        if (item == nullptr)
+            return;
+
+        _tree->setCurrentIndex(_model->indexFromItem(item));
+    }
+
+    /**
      * @brief Build the UI of the side bar, this will create the tree view and
      * set up the model for the side bar
      *

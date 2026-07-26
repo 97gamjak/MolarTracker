@@ -68,6 +68,46 @@ namespace store
          */
         [[nodiscard]]
         virtual const IdIdMap<WatchlistId>& getIdRemap() const = 0;
+
+        /**
+         * @brief Rename an existing watchlist. Unlike createWatchlist(), this
+         * is persisted immediately rather than staged, since the underlying
+         * repo/service API models it as a single atomic operation.
+         *
+         * @param id
+         * @param newName
+         */
+        virtual void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) = 0;
+
+        /**
+         * @brief Delete a watchlist and all of its symbol entries
+         * immediately.
+         *
+         * @param id
+         */
+        virtual void deleteWatchlist(WatchlistId id) = 0;
+
+        /**
+         * @brief Add a symbol to a watchlist immediately.
+         *
+         * @param id
+         * @param symbol
+         */
+        virtual void addSymbol(WatchlistId id, const std::string& symbol) = 0;
+
+        /**
+         * @brief Remove a symbol from a watchlist immediately.
+         *
+         * @param id
+         * @param symbol
+         */
+        virtual void removeSymbol(
+            WatchlistId        id,
+            const std::string& symbol
+        ) = 0;
     };
 
 }   // namespace store
