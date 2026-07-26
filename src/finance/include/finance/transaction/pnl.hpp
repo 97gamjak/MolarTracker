@@ -1,6 +1,7 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__PNL_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__PNL_HPP__
 
+#include <variant>
 #include <vector>
 
 #include "error/finance_error.hpp"
