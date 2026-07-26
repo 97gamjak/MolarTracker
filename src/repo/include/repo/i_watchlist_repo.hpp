@@ -5,11 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
-
-namespace finance
-{
-    class Watchlist;   // Forward declaration
-}   // namespace finance
+#include "finance/watchlist.hpp"
 
 namespace repo
 {
@@ -29,17 +25,16 @@ namespace repo
          * @param name The display name of the new watchlist
          * @return WatchlistId The ID of the newly created watchlist
          */
-        [[nodiscard]] virtual WatchlistId createWatchlist(
-            const std::string& name
-        ) = 0;
+        [[nodiscard]]
+        virtual WatchlistId createWatchlist(const std::string& name) = 0;
 
         /**
          * @brief Get all watchlists, including their symbols
          *
          * @return std::vector<finance::Watchlist>
          */
-        [[nodiscard]] virtual std::vector<finance::Watchlist>
-        getAllWatchlists() = 0;
+        [[nodiscard]]
+        virtual std::vector<finance::Watchlist> getAllWatchlists() = 0;
 
         /**
          * @brief Rename an existing watchlist
@@ -48,7 +43,7 @@ namespace repo
          * @param newName
          */
         virtual void renameWatchlist(
-            WatchlistId         id,
+            WatchlistId        id,
             const std::string& newName
         ) = 0;
 
@@ -75,7 +70,7 @@ namespace repo
          * @param symbol
          */
         virtual void removeSymbol(
-            WatchlistId         id,
+            WatchlistId        id,
             const std::string& symbol
         ) = 0;
     };

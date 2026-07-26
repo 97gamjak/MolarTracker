@@ -33,18 +33,19 @@ namespace finance
 
        public:
         explicit Watchlist(
-            std::string               name,
-            Timestamp                 createdAt,
-            std::vector<std::string>  symbols = {}
+            WatchlistId              id,
+            std::string              name,
+            Timestamp                createdAt,
+            std::vector<std::string> symbols = {}
         );
 
         void setId(WatchlistId id);
-        void setName(std::string name);
-        void setSymbols(std::vector<std::string> symbols);
+        void setName(const std::string& name);
+        void setSymbols(const std::vector<std::string>& symbols);
 
-        [[nodiscard]] WatchlistId                getId() const;
-        [[nodiscard]] const std::string&          getName() const;
-        [[nodiscard]] Timestamp                   getCreatedAt() const;
+        [[nodiscard]] WatchlistId                     getId() const;
+        [[nodiscard]] const std::string&              getName() const;
+        [[nodiscard]] Timestamp                       getCreatedAt() const;
         [[nodiscard]] const std::vector<std::string>& getSymbols() const;
 
         [[nodiscard]] std::string toString() const;

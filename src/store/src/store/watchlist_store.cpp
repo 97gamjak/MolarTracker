@@ -35,7 +35,7 @@ namespace store
     WatchlistId WatchlistStore::createWatchlist(const std::string& name)
     {
         const auto newWatchlist =
-            finance::Watchlist{name, Timestamp{}};
+            finance::Watchlist{WatchlistId::invalid(), name, Timestamp{}};
 
         return _addEntry(newWatchlist);
     }
@@ -57,10 +57,9 @@ namespace store
                 {
                     auto       newEntry = entry;
                     const auto oldId    = newEntry.value.getId();
-                    const auto id =
-                        _watchlistService->createWatchlist(
-                            newEntry.value.getName()
-                        );
+                    const auto id       = _watchlistService->createWatchlist(
+                        newEntry.value.getName()
+                    );
                     newEntry.value.setId(id);
 
                     const auto result = _commitEntry(oldId, newEntry);
@@ -137,9 +136,7 @@ namespace store
      */
     std::vector<finance::Watchlist> WatchlistStore::getAllWatchlists() const
     {
-        const auto options = Options{
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
+        const auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
 
         auto watchlists = _getValues(options);
 

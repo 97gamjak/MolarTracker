@@ -7,16 +7,19 @@ namespace finance
     /**
      * @brief Construct a new Watchlist:: Watchlist object
      *
+     * @param id
      * @param name
      * @param createdAt
      * @param symbols
      */
     Watchlist::Watchlist(
-        std::string               name,
-        Timestamp                 createdAt,
-        std::vector<std::string>  symbols
+        WatchlistId              id,
+        std::string              name,
+        Timestamp                createdAt,
+        std::vector<std::string> symbols
     )
-        : _name(std::move(name)),
+        : _id(id),
+          _name(std::move(name)),
           _createdAt(createdAt),
           _symbols(std::move(symbols))
     {
@@ -25,25 +28,25 @@ namespace finance
     /**
      * @brief Set the ID of the watchlist.
      *
-     * @param id The new ID.
+     * @param id
      */
     void Watchlist::setId(WatchlistId id) { _id = id; }
 
     /**
      * @brief Set the name of the watchlist.
      *
-     * @param name The new name.
+     * @param name
      */
-    void Watchlist::setName(std::string name) { _name = std::move(name); }
+    void Watchlist::setName(const std::string& name) { _name = name; }
 
     /**
      * @brief Set the symbols of the watchlist.
      *
-     * @param symbols The new symbols.
+     * @param symbols
      */
-    void Watchlist::setSymbols(std::vector<std::string> symbols)
+    void Watchlist::setSymbols(const std::vector<std::string>& symbols)
     {
-        _symbols = std::move(symbols);
+        _symbols = symbols;
     }
 
     /**
@@ -102,8 +105,7 @@ namespace finance
     filter::Predicate<Watchlist> HasWatchlistId(WatchlistId id)
     {
         return filter::makePredicate<Watchlist>(
-            [id](const Watchlist& watchlist)
-            { return watchlist.getId() == id; }
+            [id](const Watchlist& watchlist) { return watchlist.getId() == id; }
         );
     }
 

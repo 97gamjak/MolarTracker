@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "config/id_types.hpp"
 #include "mock_services.hpp"
 #include "store/watchlist_store.hpp"
 
@@ -95,7 +96,8 @@ TEST_F(WatchlistStoreTest, GetWatchlistReturnsNulloptForUnknownId)
 
 TEST_F(WatchlistStoreTest, ReloadLoadsWatchlistsFromService)
 {
-    _mockService->preloadedWatchlists.emplace_back("Preloaded", Timestamp{});
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId::invalid(), "Preloaded", Timestamp{});
 
     _store->reload();
 

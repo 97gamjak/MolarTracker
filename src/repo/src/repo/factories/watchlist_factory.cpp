@@ -20,12 +20,11 @@ namespace repo
     )
     {
         finance::Watchlist watchlist{
+            watchlistRow.id.value(),
             watchlistRow.name.value(),
             watchlistRow.createdAt.value(),
             symbols
         };
-
-        watchlist.setId(watchlistRow.id.value());
 
         return watchlist;
     }
