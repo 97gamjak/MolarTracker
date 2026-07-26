@@ -2,9 +2,9 @@
 
 #include <algorithm>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
 #include "error/finance_error.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {

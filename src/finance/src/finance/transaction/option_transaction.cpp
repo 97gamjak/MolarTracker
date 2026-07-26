@@ -1,7 +1,7 @@
 #include "finance/transaction/option_transaction.hpp"
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {

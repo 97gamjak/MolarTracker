@@ -1,5 +1,6 @@
+#include "drafts/position/position_stock_draft.hpp"
+
 #include "common/quantity.hpp"
-#include "drafts/position_draft.hpp"
 #include "drafts/stock_draft.hpp"
 
 namespace drafts
