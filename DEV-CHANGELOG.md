@@ -153,6 +153,26 @@ REVERT CACHE changes but keep error handling
 
 ### Bug Fix
 
+#### UI — numeric settings not persisting (MOLTRACK-314)
+
+- Fix `ui::makeNumericEditor` (`param_editor.tpp`) connecting
+  `editingFinished` to a lambda that called `makeNumericEditorEditing(...)`
+  — but that function's entire job is itself to establish the
+  `editingFinished → param.set(...)` connection. This meant the real
+  persist-on-edit connection was only registered the *first* time
+  `editingFinished` fired (without acting on that edit), and a duplicate
+  connection was added on every subsequent edit. `BoolParam` (`QCheckBox`),
+  `StringParam` (`QLineEdit`), and `EnumParam` (`QComboBox`) connect directly
+  and were unaffected — only `NumericParam`-backed spin boxes (and
+  `NumericVecParam` components, e.g. window/dialog sizes) were broken
+- Fix: call `makeNumericEditorEditing(spinBox, param)` directly once at
+  widget-creation time instead of wrapping it in another `editingFinished`
+  connection
+- Add `tests/ui/test_param_editor.cpp` — regression tests confirming
+  `QSpinBox`/`QDoubleSpinBox` editors persist to the underlying param on
+  `editingFinished`, including across repeated edits; `tests_ui` now links
+  `molartracker_settings`
+
 #### ORM
 
 - Fix `orm::Crud::insert` to catch `db::SqliteError` from
