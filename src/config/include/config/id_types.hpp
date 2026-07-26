@@ -39,6 +39,12 @@ using TradeLegId = StrongId<TradeLegTag>;
 struct PositionTag {};
 using PositionId = StrongId<PositionTag>;
 
+struct WatchlistTag {};
+using WatchlistId = StrongId<WatchlistTag>;
+
+struct WatchlistInstrumentTag {};
+using WatchlistInstrumentId = StrongId<WatchlistInstrumentTag>;
+
 // clang-format on
 
 template <typename T>

@@ -16,11 +16,13 @@
 #include "finance/position.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_filter.hpp"
+#include "finance/watchlist.hpp"
 #include "service/i_account_service.hpp"
 #include "service/i_instrument_service.hpp"
 #include "service/i_position_service.hpp"
 #include "service/i_profile_service.hpp"
 #include "service/i_transaction_service.hpp"
+#include "service/i_watchlist_service.hpp"
 
 namespace tests
 {
@@ -271,6 +273,77 @@ namespace tests
         ) override
         {
             return {};
+        }
+    };
+
+    class MockWatchlistService : public service::IWatchlistService
+    {
+       public:
+        // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+        std::vector<finance::Watchlist> preloadedWatchlists;
+        int                              createCallCount = 0;
+        // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+       private:
+        int _nextId = 1;
+
+       public:
+        [[nodiscard]] WatchlistId createWatchlist(const std::string& /*name*/
+        ) override
+        {
+            createCallCount++;
+            return WatchlistId{_nextId++};
+        }
+
+        [[nodiscard]] std::vector<finance::Watchlist> getAllWatchlists(
+        ) const override
+        {
+            return preloadedWatchlists;
+        }
+
+        void renameWatchlist(WatchlistId id, const std::string& newName)
+            override
+        {
+            for (auto& watchlist : preloadedWatchlists)
+            {
+                if (watchlist.getId() == id)
+                    watchlist.setName(newName);
+            }
+        }
+
+        void deleteWatchlist(WatchlistId id) override
+        {
+            std::erase_if(
+                preloadedWatchlists,
+                [id](const auto& watchlist)
+                { return watchlist.getId() == id; }
+            );
+        }
+
+        void addSymbol(WatchlistId id, const std::string& symbol) override
+        {
+            for (auto& watchlist : preloadedWatchlists)
+            {
+                if (watchlist.getId() != id)
+                    continue;
+
+                auto symbols = watchlist.getSymbols();
+                symbols.push_back(symbol);
+                watchlist.setSymbols(symbols);
+            }
+        }
+
+        void removeSymbol(WatchlistId id, const std::string& symbol) override
+        {
+            for (auto& watchlist : preloadedWatchlists)
+            {
+                if (watchlist.getId() != id)
+                    continue;
+
+                auto symbols = watchlist.getSymbols();
+                std::erase(symbols, symbol);
+                watchlist.setSymbols(symbols);
+            }
         }
     };
 

@@ -6,6 +6,7 @@ add_library(molartracker_service STATIC
     src/service/transaction_service.cpp
     src/service/instrument_service.cpp
     src/service/position_service.cpp
+    src/service/watchlist_service.cpp
 )
 
 target_include_directories(molartracker_service

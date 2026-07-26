@@ -8,6 +8,8 @@ add_executable(tests_app
     test_profile_service.cpp
     test_transaction_repo.cpp
     test_transaction_service.cpp
+    test_watchlist_repo.cpp
+    test_watchlist_service.cpp
 )
 
 target_include_directories(tests_app

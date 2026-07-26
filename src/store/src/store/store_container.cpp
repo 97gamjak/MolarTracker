@@ -15,6 +15,7 @@
 #include "store/profile/profile_store.hpp"
 #include "store/stock_store.hpp"
 #include "store/transaction_store.hpp"
+#include "store/watchlist_store.hpp"
 
 REGISTER_LOG_CATEGORY("Store.StoreContainer");
 
@@ -48,6 +49,8 @@ namespace store
         std::shared_ptr<PositionStore> positionStore;
         /// The Transaction store
         std::shared_ptr<TransactionStore> transactionStore;
+        /// The Watchlist store
+        std::shared_ptr<WatchlistStore> watchlistStore;
 
         StoreImpl(
             service::ServiceContainer& serviceContainer,
@@ -96,6 +99,11 @@ namespace store
                   serviceContainer.getTransactionService(),
                   accountStore->getAccountSession()
               )
+          ),
+          watchlistStore(
+              std::make_shared<WatchlistStore>(
+                  serviceContainer.getWatchlistService()
+              )
           )
     {
         allStores.push_back(profileStore.get());
@@ -104,6 +112,7 @@ namespace store
         allStores.push_back(optionStore.get());
         allStores.push_back(positionStore.get());
         allStores.push_back(transactionStore.get());
+        allStores.push_back(watchlistStore.get());
     }
 
     /**
@@ -171,6 +180,8 @@ namespace store
 
         _stores->transactionStore
             ->commit(accountIdRemap, instrumentIdRemap, positionIdRemap);
+
+        _stores->watchlistStore->commit();
 
         for (auto* store : _stores->allStores)
         {
@@ -346,6 +357,16 @@ namespace store
         }
 
         LOG_INFO("Database restore complete");
+    }
+
+    /**
+     * @brief Get the WatchlistStore
+     *
+     * @return std::shared_ptr<IWatchlistStore>
+     */
+    std::shared_ptr<IWatchlistStore> StoreContainer::getWatchlistStore() const
+    {
+        return _stores->watchlistStore;
     }
 
 }   // namespace store
