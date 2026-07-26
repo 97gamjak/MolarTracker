@@ -11,7 +11,8 @@
     X(CurlPerform)              \
     X(BadStatus)                \
     X(ParseError)               \
-    X(AuthError)
+    X(AuthError)                \
+    GENERIC_ERRORS(X)
 
 MSTD_ENUM(HttpErrorType, std::uint8_t, HTTP_ERROR_TYPE_LIST);
 
@@ -32,10 +33,9 @@ class HttpError : public Error<HttpErrorType>
     HttpError(
         HttpErrorType                      type,
         const std::string&                 message,
-        int                                statusCode,
-        std::map<std::string, std::string> responseHeaders
+        std::map<std::string, std::string> responseHeaders = {},
+        int                                statusCode      = 0
     );
-    HttpError(HttpErrorType type, const std::string& message);
     ~HttpError() override = default;
 
     [[nodiscard]]
