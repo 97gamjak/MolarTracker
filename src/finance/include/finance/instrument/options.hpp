@@ -6,14 +6,23 @@
 
 namespace finance
 {
+    /**
+     * @brief Represents a collection of option instruments, which are
+     * financial derivatives that give the holder the right, but not the
+     * obligation, to buy or sell an underlying asset at a specified price
+     * (strike price) on or before a specified date (expiration date). The
+     * Options class extends an IdObjectMap of Option and provides methods to
+     * access individual options by their instrument ID, allowing for efficient
+     * management and retrieval of option instruments in a financial context.
+     *
+     */
     class Options : public IdObjectMap<Option>
     {
        public:
         using IdObjectMap<Option>::IdObjectMap;
 
-        [[nodiscard]] std::optional<std::reference_wrapper<const Option>> getOption(
-            InstrumentId id
-        ) const;
+        [[nodiscard]]
+        std::optional<Option> getOption(InstrumentId id) const;
     };
 }   // namespace finance
 

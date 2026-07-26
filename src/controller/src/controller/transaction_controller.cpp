@@ -14,6 +14,14 @@ REGISTER_LOG_CATEGORY("Controller.TransactionController");
 
 namespace controller
 {
+    /**
+     * @brief A struct to hold the UI elements for the TransactionController,
+     * this struct encapsulates the UI elements used by the
+     * TransactionController, including the stacked widget and the transaction
+     * detail view, providing a convenient way to manage and access these UI
+     * elements within the controller.
+     *
+     */
     struct TransactionController::UIElements
     {
         /// Pointer to the central stacked widget
@@ -21,13 +29,22 @@ namespace controller
         /// Pointer to the transaction detail view
         QPointer<ui::TransactionsOverview> transactionDetailView;
 
-        explicit UIElements(QStackedWidget* stackedWidget_)
-            : stackedWidget(stackedWidget_),
-              transactionDetailView(new ui::TransactionsOverview(stackedWidget))
-        {
-            stackedWidget->addWidget(transactionDetailView);
-        }
+        explicit UIElements(QStackedWidget* stackedWidget_);
     };
+
+    /**
+     * @brief Construct a new UIElements object
+     *
+     * @param stackedWidget_ Pointer to the central stacked widget
+     */
+    TransactionController::UIElements::UIElements(
+        QStackedWidget* stackedWidget_
+    )
+        : stackedWidget(stackedWidget_),
+          transactionDetailView(new ui::TransactionsOverview(stackedWidget))
+    {
+        stackedWidget->addWidget(transactionDetailView);
+    }
 
     /**
      * @brief Construct a new Transaction Controller:: Transaction Controller

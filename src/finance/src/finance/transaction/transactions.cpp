@@ -101,6 +101,10 @@ namespace finance
         return instrumentIds;
     }
 
+    /**
+     * @brief Implementation class for Transactions, encapsulating the details
+     * of managing different types of financial transactions.
+     */
     class Transactions::TransactionsImpl
     {
        private:
@@ -124,36 +128,77 @@ namespace finance
         [[nodiscard]] std::vector<const Transaction*> getTransactions() const;
     };
 
+    /**
+     * @brief Get the security view of the transactions, this will return a
+     * SecurityView object that provides access to the stock transactions
+     * and their associated base instrument IDs for display in the
+     * transaction overview.
+     *
+     * @return SecurityView
+     */
     SecurityView Transactions::TransactionsImpl::securities() const
     {
         return SecurityView(_stockTransactions, _optionTransactions);
     }
 
+    /**
+     * @brief add an option transaction to the transactions implementation, this
+     * will add the provided option transaction to the list of option
+     * transactions managed by the implementation.
+     * @param tx The option transaction to add.
+     */
     void Transactions::TransactionsImpl::add(const OptionTransaction& tx)
     {
         _optionTransactions.add(tx);
     }
 
+    /**
+     * @brief add an option transaction to the transactions implementation, this
+     * will add the provided option transaction to the list of option
+     * transactions managed by the implementation.
+     * @param tx The option transaction to add.
+     */
     void Transactions::addTransaction(const OptionTransaction& tx)
     {
         _impl->add(tx);
     }
 
+    /**
+     * @brief add a stock transaction to the transactions implementation, this
+     * will add the provided stock transaction to the list of stock transactions
+     * managed by the implementation.
+     * @param tx The stock transaction to add.
+     */
     void Transactions::addTransaction(const StockTransaction& tx)
     {
         _impl->add(tx);
     }
 
+    /**
+     * @brief add a cash transaction to the transactions implementation, this
+     * will add the provided cash transaction to the list of cash transactions
+     * managed by the implementation.
+     * @param tx The cash transaction to add.
+     */
     void Transactions::TransactionsImpl::add(const CashTransaction& tx)
     {
         _cashTransactions.add(tx);
     }
 
+    /**
+     * @brief add a stock transaction to the transactions implementation, this
+     * will add the provided stock transaction to the list of stock transactions
+     * managed by the implementation.
+     * @param tx The stock transaction to add.
+     */
     void Transactions::TransactionsImpl::add(const StockTransaction& tx)
     {
         _stockTransactions.add(tx);
     }
 
+    /**
+     * @brief Construct a new Transactions:: Transactions object
+     */
     Transactions::Transactions() : _impl(std::make_shared<TransactionsImpl>())
     {
     }
@@ -176,6 +221,13 @@ namespace finance
             LOG_ERROR(error.error().toString());
     }
 
+    /**
+     * @brief Construct a new Transactions:: Transactions object
+     *
+     * @param cash
+     * @param stocks
+     * @param options
+     */
     Transactions::Transactions(
         const CashTransactions&   cash,
         const StockTransactions&  stocks,

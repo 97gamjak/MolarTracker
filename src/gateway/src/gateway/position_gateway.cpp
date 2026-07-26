@@ -302,7 +302,9 @@ namespace gateway
 
             auto pnlResult = calculatePositionPnl(
                 positionTransaction,
-                std::nullopt   // TODO: no mark price provided
+                std::nullopt   // starting point is without any mark price, will
+                               // be updated periodically with the latest mark
+                               // price
             );
             if (!pnlResult)
             {

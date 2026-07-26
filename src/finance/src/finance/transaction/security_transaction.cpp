@@ -9,6 +9,7 @@ namespace finance
      * @param timestamp
      * @param status
      * @param instrumentId
+     * @param type
      * @param securityAccount
      * @param cashAccount
      * @param externalAccount
@@ -22,6 +23,7 @@ namespace finance
         Timestamp                  timestamp,
         TransactionStatus          status,
         InstrumentId               instrumentId,
+        TransactionDataType        type,
         AccountId                  securityAccount,
         AccountId                  cashAccount,
         AccountId                  externalAccount,
@@ -36,7 +38,7 @@ namespace finance
               status,
               cashAccount,
               externalAccount,
-              TransactionDataType::Stock,   // TODO:
+              type,
               fees,
               std::move(comment)
           ),

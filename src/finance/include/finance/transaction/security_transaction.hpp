@@ -41,6 +41,7 @@ namespace finance
             Timestamp                  timestamp,
             TransactionStatus          status,
             InstrumentId               instrumentId,
+            TransactionDataType        type,
             AccountId                  securityAccount,
             AccountId                  cashAccount,
             AccountId                  externalAccount,

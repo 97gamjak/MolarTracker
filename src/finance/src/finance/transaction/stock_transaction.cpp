@@ -44,6 +44,7 @@ namespace finance
               timestamp,
               status,
               instrumentId,
+              TransactionDataType::Stock,
               securityAccount,
               cashAccount,
               externalAccount,
