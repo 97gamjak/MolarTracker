@@ -96,9 +96,14 @@ namespace settings
             tuple<std::string, ShortcutContext, ShortcutModifier, FKey>
                 SCREENSHOT_SHORTCUT_DEFAULT = {
                     "Screenshot",
-                    ShortcutContext::Default,
+                    ShortcutContext::Global,
                     ShortcutModifier::None,
                     FKey::F12
+        };
+        static constexpr std::tuple<ShortcutModifier, char>
+            SCREENSHOT_SHORTCUT_ALTERNATIVE = {
+                ShortcutModifier::ControlAlt,
+                'P'
         };
     };
 

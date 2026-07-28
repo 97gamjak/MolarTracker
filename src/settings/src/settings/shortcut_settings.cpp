@@ -98,17 +98,22 @@ namespace settings
             Schema::SCREENSHOT_SHORTCUT_TITLE,
             Schema::SCREENSHOT_SHORTCUT_DESCRIPTION
         };
-
-        screenshotShortcut.setDefault(
-            ShortcutSet{
-                std::get<0>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
-                std::get<1>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
-                Shortcut{
-                    std::get<2>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
-                    std::get<3>(Schema::SCREENSHOT_SHORTCUT_DEFAULT)
-                }
+        auto defaultScreenshotShortcut = ShortcutSet{
+            std::get<0>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
+            std::get<1>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
+            Shortcut{
+                std::get<2>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
+                std::get<3>(Schema::SCREENSHOT_SHORTCUT_DEFAULT)
+            }
+        };
+        defaultScreenshotShortcut.addAlternativeShortcut(
+            Shortcut{
+                std::get<0>(Schema::SCREENSHOT_SHORTCUT_ALTERNATIVE),
+                std::get<1>(Schema::SCREENSHOT_SHORTCUT_ALTERNATIVE)
             }
         );
+
+        screenshotShortcut.setDefault(defaultScreenshotShortcut);
 
         _shortcuts.addParam(screenshotShortcut);
     }
