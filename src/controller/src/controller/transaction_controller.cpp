@@ -5,6 +5,7 @@
 #include "logging/log_macros.hpp"
 #include "mapper/transaction/transaction_overview_mapper.hpp"
 #include "store/i_account_store.hpp"
+#include "store/i_option_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
 #include "ui/transaction/transactions_overview.hpp"
@@ -54,6 +55,7 @@ namespace controller
      * @param transactionStore
      * @param accountStore
      * @param stockStore
+     * @param optionStore
      * @param stackedWidget
      */
     TransactionController::TransactionController(
@@ -61,12 +63,14 @@ namespace controller
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
         const std::shared_ptr<store::IAccountStore>&     accountStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
+        const std::shared_ptr<store::IOptionStore>&      optionStore,
         QStackedWidget*                                  stackedWidget
     )
         : _undoStack(undoStack),
           _transactionStore(transactionStore),
           _accountStore(accountStore),
           _stockStore(stockStore),
+          _optionStore(optionStore),
           _uiElements(std::make_unique<UIElements>(stackedWidget))
     {
     }
@@ -131,10 +135,15 @@ namespace controller
             txs.value(),
             _stockStore->getInstrumentIdToNameMap()
         );
+        const auto optionDrafts = mapper::TransactionOverviewMapper::toOption(
+            txs.value(),
+            _optionStore->getOptions(txs.value().getOptionInstrumentIds())
+        );
 
         _uiElements->transactionDetailView->refresh(
             cashDrafts,
             stockDrafts,
+            optionDrafts,
             _accountStore->getAccountIdToNameMap()
         );
     }

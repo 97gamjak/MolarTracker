@@ -34,8 +34,8 @@ namespace drafts
      * @return const std::optional<std::string>& The comment of the transaction
      * overview draft.
      */
-    const std::optional<std::string>& TransactionOverviewDraft::getComment(
-    ) const
+    const std::optional<std::string>& TransactionOverviewDraft::
+        getComment() const
     {
         return _comment;
     }
@@ -198,5 +198,134 @@ namespace drafts
      * overview draft.
      */
     const Cash& StockTransactionOverview::getTotalFees() const { return _fees; }
+
+    /**
+     * @brief Construct a new Option Transaction Overview:: Option Transaction
+     * Overview object
+     *
+     * @param timestamp
+     * @param comment
+     * @param quantity
+     * @param premium
+     * @param fees
+     * @param optionName
+     * @param buySell
+     * @param action
+     * @param securityAccount
+     * @param cashAccount
+     */
+    OptionTransactionOverview::OptionTransactionOverview(
+        Timestamp                  timestamp,
+        std::optional<std::string> comment,
+        Quantity                   quantity,
+        Cash                       premium,
+        Cash                       fees,
+        std::string                optionName,
+        OptionBuySell              buySell,
+        TransactionOptionAction    action,
+        AccountId                  securityAccount,
+        AccountId                  cashAccount
+    )
+        : TransactionOverviewDraft(timestamp, std::move(comment)),
+          _quantity(quantity),
+          _premium(premium),
+          _fees(fees),
+          _optionName(std::move(optionName)),
+          _buySell(buySell),
+          _action(action),
+          _securityAccount(securityAccount),
+          _cashAccount(cashAccount)
+    {
+    }
+
+    /**
+     * @brief Gets the display name of the option transaction overview draft.
+     *
+     * @return std::string The display name of the option transaction overview
+     * draft.
+     */
+    std::string OptionTransactionOverview::getOptionName() const
+    {
+        return _optionName;
+    }
+
+    /**
+     * @brief Gets the security account ID of the option transaction overview
+     * draft.
+     *
+     * @return AccountId The security account ID of the option transaction
+     * overview draft.
+     */
+    AccountId OptionTransactionOverview::getSecurityAccount() const
+    {
+        return _securityAccount;
+    }
+
+    /**
+     * @brief Gets the cash account ID of the option transaction overview draft.
+     *
+     * @return AccountId The cash account ID of the option transaction overview
+     * draft.
+     */
+    AccountId OptionTransactionOverview::getCashAccount() const
+    {
+        return _cashAccount;
+    }
+
+    /**
+     * @brief Gets the quantity of the option transaction overview draft.
+     *
+     * @return const Quantity& The quantity of the option transaction overview
+     * draft.
+     */
+    const Quantity& OptionTransactionOverview::getQuantity() const
+    {
+        return _quantity;
+    }
+
+    /**
+     * @brief Gets the premium of the option transaction overview draft.
+     *
+     * @return const Cash& The premium of the option transaction overview
+     * draft.
+     */
+    const Cash& OptionTransactionOverview::getPremium() const
+    {
+        return _premium;
+    }
+
+    /**
+     * @brief Gets the total fees of the option transaction overview draft.
+     *
+     * @return const Cash& The total fees of the option transaction overview
+     * draft.
+     */
+    const Cash& OptionTransactionOverview::getTotalFees() const
+    {
+        return _fees;
+    }
+
+    /**
+     * @brief Gets the buy/sell direction of the option transaction overview
+     * draft.
+     *
+     * @return OptionBuySell The buy/sell direction of the option transaction
+     * overview draft.
+     */
+    OptionBuySell OptionTransactionOverview::getBuySell() const
+    {
+        return _buySell;
+    }
+
+    /**
+     * @brief Gets the action of the option transaction overview draft.
+     *
+     * @return TransactionOptionAction The action of the option transaction
+     * overview draft.
+     */
+    TransactionOptionAction OptionTransactionOverview::getAction() const
+    {
+        return _action;
+    }
 
 }   // namespace drafts

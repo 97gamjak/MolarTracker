@@ -10,6 +10,7 @@
 #include "common/qt_helpers.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
 #include "ui/transaction/cash_transaction_table.hpp"
+#include "ui/transaction/option_transaction_table.hpp"
 #include "ui/transaction/stock_transaction_table.hpp"
 
 namespace ui
@@ -25,12 +26,16 @@ namespace ui
         : QWidget(parent),
           _cashTitle(new QLabel("Cash Transactions")),
           _stockTitle(new QLabel("Stock Transactions")),
+          _optionTitle(new QLabel("Option Transactions")),
           _cashModel(new CashTransactionTableModel(this)),
           _stockModel(new StockTransactionTableModel(this)),
+          _optionModel(new OptionTransactionTableModel(this)),
           _cashProxy(new QSortFilterProxyModel(this)),
           _stockProxy(new QSortFilterProxyModel(this)),
+          _optionProxy(new QSortFilterProxyModel(this)),
           _cashTable(new QTableView(this)),
-          _stockTable(new QTableView(this))
+          _stockTable(new QTableView(this)),
+          _optionTable(new QTableView(this))
     {
         _cashProxy->setSourceModel(_cashModel);
         _cashProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -40,11 +45,13 @@ namespace ui
         _stockProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
         _stockProxy->setFilterKeyColumn(-1);   // search all columns
 
-        _cashTitle->setProperty("class", "sectionTitle");
-        _stockTitle->setProperty("class", "sectionTitle");
+        _optionProxy->setSourceModel(_optionModel);
+        _optionProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        _optionProxy->setFilterKeyColumn(-1);   // search all columns
 
         _cashTitle->setProperty("class", "sectionTitle");
         _stockTitle->setProperty("class", "sectionTitle");
+        _optionTitle->setProperty("class", "sectionTitle");
 
         auto* search = common::makeQChild<QLineEdit>(this);
         search->setPlaceholderText("Search transactions…");
@@ -63,14 +70,26 @@ namespace ui
             &QSortFilterProxyModel::setFilterFixedString
         );
 
-        auto* cashHeader  = _setupTable(_cashTable, _cashProxy);
-        auto* stockHeader = _setupTable(_stockTable, _stockProxy);
+        connect(
+            search,
+            &QLineEdit::textChanged,
+            _optionProxy,
+            &QSortFilterProxyModel::setFilterFixedString
+        );
+
+        auto* cashHeader   = _setupTable(_cashTable, _cashProxy);
+        auto* stockHeader  = _setupTable(_stockTable, _stockProxy);
+        auto* optionHeader = _setupTable(_optionTable, _optionProxy);
         _cashTable->sortByColumn(
             CashTransactionTableModel::getDateIndex(),
             Qt::DescendingOrder
         );
         _stockTable->sortByColumn(
             StockTransactionTableModel::getDateIndex(),
+            Qt::DescendingOrder
+        );
+        _optionTable->sortByColumn(
+            OptionTransactionTableModel::getDateIndex(),
             Qt::DescendingOrder
         );
         cashHeader->setSectionResizeMode(
@@ -81,6 +100,10 @@ namespace ui
             StockTransactionTableModel::getDescriptionIndex(),
             QHeaderView::Stretch
         );
+        optionHeader->setSectionResizeMode(
+            OptionTransactionTableModel::getDescriptionIndex(),
+            QHeaderView::Stretch
+        );
 
         auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->addWidget(search);
@@ -88,6 +111,8 @@ namespace ui
         layout->addWidget(_cashTable);
         layout->addWidget(_stockTitle);
         layout->addWidget(_stockTable);
+        layout->addWidget(_optionTitle);
+        layout->addWidget(_optionTable);
     }
 
     /**
@@ -95,17 +120,21 @@ namespace ui
      *
      * @param cashTransactions The list of cash transactions to display.
      * @param stockTransactions The list of stock transactions to display.
+     * @param optionTransactions The list of option transactions to display.
      * @param accountIdToName A mapping of account IDs to account names for
      * display purposes.
      */
     void TransactionsOverview::refresh(
         const std::vector<drafts::CashTransactionOverview>&  cashTransactions,
         const std::vector<drafts::StockTransactionOverview>& stockTransactions,
-        const IdMap<AccountId, std::string>&                 accountIdToName
+        const std::vector<drafts::OptionTransactionOverview>&
+                                             optionTransactions,
+        const IdMap<AccountId, std::string>& accountIdToName
     )
     {
         _cashModel->setTransactions(cashTransactions, accountIdToName);
         _stockModel->setTransactions(stockTransactions, accountIdToName);
+        _optionModel->setTransactions(optionTransactions, accountIdToName);
     }
 
     /**

@@ -48,6 +48,7 @@ All changes and updates, that are relevant for a user will be documented here
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
 - Show option positions in account overview
+- Show option transactions in the transaction overview
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17

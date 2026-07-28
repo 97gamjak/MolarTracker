@@ -2,7 +2,9 @@
 
 #include "common/container/id_map.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
+#include "finance/instrument/options.hpp"
 #include "finance/transaction/cash_transaction.hpp"
+#include "finance/transaction/option_transaction.hpp"
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transactions.hpp"
 
@@ -68,6 +70,43 @@ namespace mapper
                 transaction.getExternalAccountId()
             );
         }
+
+        /**
+         * @brief Converts a finance::OptionTransaction to an
+         * OptionTransactionOverview draft, this will extract the relevant
+         * information from the option transaction and format it for display in
+         * the transaction overview, including resolving the instrument ID to an
+         * option contract display name using the provided option lookup.
+         *
+         * @param transaction
+         * @param options
+         * @return drafts::OptionTransactionOverview
+         */
+        drafts::OptionTransactionOverview toOptionOverview(
+            const finance::OptionTransaction& transaction,
+            const finance::Options&           options
+        )
+        {
+            std::string optionName = "UNKNOWN";
+
+            if (const auto option =
+                    options.getOption(transaction.getInstrumentId());
+                option.has_value())
+                optionName = option->getName();
+
+            return drafts::OptionTransactionOverview(
+                transaction.getTimestamp(),
+                transaction.getComment(),
+                transaction.getQuantity(),
+                transaction.getPremium(),
+                transaction.getFees(),
+                optionName,
+                transaction.getBuySell(),
+                transaction.getAction(),
+                transaction.getSecurityAccountId(),
+                transaction.getCashAccountId()
+            );
+        }
     }   // namespace
 
     /**
@@ -114,6 +153,33 @@ namespace mapper
         for (const auto& transaction : transactions.cash())
         {
             result.push_back(toCashOverview(transaction));
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief Converts a vector of finance::OptionTransaction to a vector of
+     * OptionTransactionOverview drafts, this will iterate over the list of
+     * option transactions and convert each one to an OptionTransactionOverview
+     * draft using the toOptionOverview function, and return the resulting list
+     * of drafts for display in the transaction overview.
+     *
+     * @param transactions
+     * @param options
+     * @return std::vector<drafts::OptionTransactionOverview>
+     */
+    std::vector<drafts::OptionTransactionOverview> TransactionOverviewMapper::
+        toOption(
+            const finance::Transactions& transactions,
+            const finance::Options&      options
+        )
+    {
+        std::vector<drafts::OptionTransactionOverview> result;
+
+        for (const auto& transaction : transactions.options())
+        {
+            result.push_back(toOptionOverview(transaction, options));
         }
 
         return result;

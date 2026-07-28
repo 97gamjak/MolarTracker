@@ -107,6 +107,7 @@ namespace controller
                   _storeContainer.getTransactionStore(),
                   _storeContainer.getAccountStore(),
                   _storeContainer.getStockStore(),
+                  _storeContainer.getOptionStore(),
                   _mainWindow->getCentralWidget()
               ),
               _positionController(
