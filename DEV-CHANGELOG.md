@@ -76,6 +76,10 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
   `MainWindow`: checks `StoreContainer::isDirty()` and
   `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
   before allowing the close
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
 
 #### ORM
 
@@ -197,6 +201,8 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
   PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
   (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
   uploads to Codecov via `codecov/codecov-action@v5`
+- Fix drillian claude code review does not work anymore, hence, change it
+  to the official anthropic solution
 
 ### Bug Fix
 
@@ -319,14 +325,9 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - add rules for allowing and denying commands
 
-### Features
+### Building
 
-#### UI
-
-- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
-  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
-  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
-  signal and `HelpMenuController`
+- add log file for clangd-tidy checks
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
