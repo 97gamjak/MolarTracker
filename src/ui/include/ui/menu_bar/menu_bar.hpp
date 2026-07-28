@@ -9,6 +9,7 @@
 #include "file_menu.hpp"
 #include "help_menu.hpp"
 #include "settings_menu.hpp"
+#include "ui/menu_bar/utilities_menu.hpp"
 
 class QWidget;   // Forward declaration
 
@@ -38,18 +39,22 @@ namespace ui
         SettingsMenu _settingsMenu;
         /// Help menu
         HelpMenu _helpMenu;
+        /// Utilities menu
+        UtilitiesMenu _utilitiesMenu;
 
        public:
         explicit MenuBar(
             QWidget*                          parent,
+            QMainWindow*                      mainWindow,
             const settings::ShortcutSettings& shortcutSettings
         );
 
-        FileMenu&     getFileMenu();
-        EditMenu&     getEditMenu();
-        DebugMenu&    getDebugMenu();
-        SettingsMenu& getSettingsMenu();
-        HelpMenu&     getHelpMenu();
+        FileMenu&      getFileMenu();
+        EditMenu&      getEditMenu();
+        DebugMenu&     getDebugMenu();
+        SettingsMenu&  getSettingsMenu();
+        HelpMenu&      getHelpMenu();
+        UtilitiesMenu& getUtilitiesMenu();
     };
 
 }   // namespace ui

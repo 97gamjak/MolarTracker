@@ -10,86 +10,137 @@ namespace settings
      */
     ShortcutSettings::ShortcutSettings()
         : _core(
-              ShortcutSettingsSchema::SHORTCUT_SETTINGS_KEY,
-              ShortcutSettingsSchema::SHORTCUT_SETTINGS_TITLE,
-              ShortcutSettingsSchema::SHORTCUT_SETTINGS_DESCRIPTION
+              Schema::SHORTCUT_SETTINGS_KEY,
+              Schema::SHORTCUT_SETTINGS_TITLE,
+              Schema::SHORTCUT_SETTINGS_DESCRIPTION
           ),
           _shortcuts(
-              ShortcutSettingsSchema::SHORTCUT_LIST_KEY,
-              ShortcutSettingsSchema::SHORTCUT_LIST_TITLE,
-              ShortcutSettingsSchema::SHORTCUT_LIST_DESCRIPTION
+              Schema::SHORTCUT_LIST_KEY,
+              Schema::SHORTCUT_LIST_TITLE,
+              Schema::SHORTCUT_LIST_DESCRIPTION
           )
     {
         _shortcuts.addValidator(
-            [](const ParamCore<Shortcut>& shortcut,
-               const ParamMap<Shortcut>&  params) -> ParamResult<void>
+            [](const ParamCore<ShortcutSet>& shortcut,
+               const ParamMap<ShortcutSet>&  params) -> ParamResult<void>
             {
                 for (const auto& [key, storedShortcut] : params)
                 {
-                    if (storedShortcut.get().isKeyStrokeEqual(shortcut.get()))
+                    for (const auto& oldShortcut :
+                         storedShortcut.get().getShortcuts())
                     {
-                        return ParamError{
-                            ParamErrorType::DuplicateValue,
-                            "Duplicate shortcut found: " +
-                                shortcut.get().getWhat()
-                        };
+                        for (const auto& newShortcut :
+                             shortcut.get().getShortcuts())
+                        {
+                            if (oldShortcut == newShortcut)
+                            {
+                                return ParamError{
+                                    ParamErrorType::DuplicateValue,
+                                    "Duplicate shortcut found for new "
+                                    "shortcut: " +
+                                        newShortcut.toString() + " in " +
+                                        shortcut.get().getWhat() + " and " +
+                                        storedShortcut.get().getWhat()
+                                };
+                            }
+                        }
                     }
                 }
                 return {};
             }
         );
 
-        ParamCore<Shortcut> saveShortcut{
-            ShortcutSettingsSchema::SAVE_SHORTCUT_KEY,
-            ShortcutSettingsSchema::SAVE_SHORTCUT_TITLE,
-            ShortcutSettingsSchema::SAVE_SHORTCUT_DESCRIPTION
+        // save shortcut
+
+        ParamCore<ShortcutSet> saveShortcut{
+            Schema::SAVE_SHORTCUT_KEY,
+            Schema::SAVE_SHORTCUT_TITLE,
+            Schema::SAVE_SHORTCUT_DESCRIPTION
         };
 
         saveShortcut.setDefault(
-            Shortcut{
-                std::get<0>(ShortcutSettingsSchema::SAVE_SHORTCUT_DEFAULT),
-                std::get<1>(ShortcutSettingsSchema::SAVE_SHORTCUT_DEFAULT),
-                std::get<2>(ShortcutSettingsSchema::SAVE_SHORTCUT_DEFAULT)
+            ShortcutSet{
+                std::get<0>(Schema::SAVE_SHORTCUT_DEFAULT),
+                std::get<1>(Schema::SAVE_SHORTCUT_DEFAULT),
+                Shortcut{
+                    std::get<2>(Schema::SAVE_SHORTCUT_DEFAULT),
+                    std::get<3>(Schema::SAVE_SHORTCUT_DEFAULT)
+                }
             }
         );
 
         _shortcuts.addParam(saveShortcut);
 
-        ParamCore<Shortcut> quitShortcut{
-            ShortcutSettingsSchema::QUIT_SHORTCUT_KEY,
-            ShortcutSettingsSchema::QUIT_SHORTCUT_TITLE,
-            ShortcutSettingsSchema::QUIT_SHORTCUT_DESCRIPTION
+        // quit shortcut
+
+        ParamCore<ShortcutSet> quitShortcut{
+            Schema::QUIT_SHORTCUT_KEY,
+            Schema::QUIT_SHORTCUT_TITLE,
+            Schema::QUIT_SHORTCUT_DESCRIPTION
         };
 
         quitShortcut.setDefault(
-            Shortcut{
-                std::get<0>(ShortcutSettingsSchema::QUIT_SHORTCUT_DEFAULT),
-                std::get<1>(ShortcutSettingsSchema::QUIT_SHORTCUT_DEFAULT),
-                std::get<2>(ShortcutSettingsSchema::QUIT_SHORTCUT_DEFAULT)
+            ShortcutSet{
+                std::get<0>(Schema::QUIT_SHORTCUT_DEFAULT),
+                std::get<1>(Schema::QUIT_SHORTCUT_DEFAULT),
+                Shortcut{
+                    std::get<2>(Schema::QUIT_SHORTCUT_DEFAULT),
+                    std::get<3>(Schema::QUIT_SHORTCUT_DEFAULT)
+                }
             }
         );
 
         _shortcuts.addParam(quitShortcut);
+
+        // screenshot shortcut
+        ParamCore<ShortcutSet> screenshotShortcut{
+            Schema::SCREENSHOT_SHORTCUT_KEY,
+            Schema::SCREENSHOT_SHORTCUT_TITLE,
+            Schema::SCREENSHOT_SHORTCUT_DESCRIPTION
+        };
+
+        screenshotShortcut.setDefault(
+            ShortcutSet{
+                std::get<0>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
+                std::get<1>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
+                Shortcut{
+                    std::get<2>(Schema::SCREENSHOT_SHORTCUT_DEFAULT),
+                    std::get<3>(Schema::SCREENSHOT_SHORTCUT_DEFAULT)
+                }
+            }
+        );
+
+        _shortcuts.addParam(screenshotShortcut);
     }
 
     /**
      * @brief Returns the save shortcut from the shortcut settings.
      *
-     * @return Shortcut The save shortcut.
+     * @return ShortcutSet The save shortcut.
      */
-    Shortcut ShortcutSettings::getSaveShortcut() const
+    ShortcutSet ShortcutSettings::getSaveShortcut() const
     {
-        return _shortcuts.at(ShortcutSettingsSchema::SAVE_SHORTCUT_KEY).get();
+        return _shortcuts.at(Schema::SAVE_SHORTCUT_KEY).get();
     }
 
     /**
      * @brief Returns the quit shortcut from the shortcut settings.
      *
-     * @return Shortcut The quit shortcut.
+     * @return ShortcutSet The quit shortcut.
      */
-    Shortcut ShortcutSettings::getQuitShortcut() const
+    ShortcutSet ShortcutSettings::getQuitShortcut() const
     {
-        return _shortcuts.at(ShortcutSettingsSchema::QUIT_SHORTCUT_KEY).get();
+        return _shortcuts.at(Schema::QUIT_SHORTCUT_KEY).get();
+    }
+
+    /**
+     * @brief Returns the screenshot shortcut from the shortcut settings.
+     *
+     * @return ShortcutSet The screenshot shortcut.
+     */
+    ShortcutSet ShortcutSettings::getScreenshotShortcut() const
+    {
+        return _shortcuts.at(Schema::SCREENSHOT_SHORTCUT_KEY).get();
     }
 
 }   // namespace settings
