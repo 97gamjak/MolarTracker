@@ -201,6 +201,8 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
   PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
   (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
   uploads to Codecov via `codecov/codecov-action@v5`
+- Fix drillian claude code review does not work anymore, hence, change it
+  to the official anthropic solution
 
 ### Bug Fix
 
