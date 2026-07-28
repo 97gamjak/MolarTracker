@@ -100,6 +100,7 @@ namespace settings
                     ShortcutModifier::None,
                     FKey::F12
         };
+        /// alternative screenshot shortcut value
         static constexpr std::tuple<ShortcutModifier, char>
             SCREENSHOT_SHORTCUT_ALTERNATIVE = {
                 ShortcutModifier::ControlAlt,
