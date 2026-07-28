@@ -2,7 +2,7 @@ name: Claude PR Review
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
   workflow_dispatch:
 
 permissions:
@@ -14,31 +14,27 @@ permissions:
 jobs:
   review:
     if: |
-      ${{ github.head_ref != 'main' }} &&
-          github.head_ref != 'dev'
+      github.head_ref != 'main' &&
+      github.head_ref != 'dev'
     runs-on: ubuntu-latest
     steps:
-      - uses: drillan/claude-pr-reviewer@v1
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          anthropic_model: claude-haiku-4-5-20251001
-          allowed_tools: >-
-            Task,
-            Bash(gh pr comment:*),
-            Bash(gh pr review:*),
-            Bash(gh pr diff:*),
-            Bash(gh pr view:*),
-            Bash(git diff:*),
-            Bash(git log:*),
-            Bash(git show:*),
-            Read,
-            Grep,
-            Glob
-          custom_prompt: |
-            Do not check test coverage or if any unit tests were added.
-            This will usually be done in a separate PR. And only one of the two files: 
-            CHANGELOG.md or DEV-CHANGELOG.md has to be modified. 
-            Please make a todo task for every single point you find (I mean with `-[ ]` instead of `-` or something similar.
-            Only review lines that are explicitly part of the diff (added or removed lines).
-            Do not comment on unchanged context lines, even if they appear near a changed line.
-            If only a function signature was modified, do not comment on the function body.
+          claude_args: "--model claude-haiku-4-5-20251001"
+          prompt: |
+            Do not check test coverage or whether unit tests were added —
+            that is usually handled in a separate PR. Only one of
+            CHANGELOG.md or DEV-CHANGELOG.md needs to be modified, not both.
+
+            For every issue you find, create a task item using "- [ ]"
+            instead of a plain bullet "-".
+
+            Only review lines explicitly part of the diff (added or removed).
+            Do not comment on unchanged context lines, even if they appear
+            near a changed line. If only a function signature was modified,
+            do not comment on the function body.
