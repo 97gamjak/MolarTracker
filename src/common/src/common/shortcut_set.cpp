@@ -129,6 +129,9 @@ bool ShortcutSet::updateShortcutAt(
     if (!_shortcuts.contains(oldShortcut))
         return false;
 
+    if (_shortcuts.contains(newShortcut))
+        return false;
+
     _shortcuts.remove(oldShortcut);
     _shortcuts.insert(newShortcut);
     return true;
