@@ -78,8 +78,8 @@ namespace ui
      *
      * @return HelpMenu&
      */
-
     HelpMenu& MenuBar::getHelpMenu() { return _helpMenu; }
+
     /**
      * @brief Get the Utilities Menu object
      *
