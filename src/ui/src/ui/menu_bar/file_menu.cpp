@@ -6,7 +6,7 @@
 #include <QMenuBar>
 #include <QObject>
 
-#include "common/shortcut.hpp"
+#include "common/qt_helpers.hpp"
 
 namespace ui
 {
@@ -19,20 +19,20 @@ namespace ui
      * @param quitShortcut
      */
     FileMenu::FileMenu(
-        QMenuBar&       menuBar,
-        const Shortcut& saveShortcut,
-        const Shortcut& quitShortcut
+        QMenuBar&          menuBar,
+        const ShortcutSet& saveShortcut,
+        const ShortcutSet& quitShortcut
     )
         : QObject{&menuBar}
     {
         _fileMenu = menuBar.addMenu("&File");
 
         _saveAction = _fileMenu->addAction("&Save");
-        _saveAction->setShortcut(saveShortcut.toQKeySequence());
+        common::setShortcut(_saveAction, saveShortcut);
         connect(_saveAction, &QAction::triggered, this, &FileMenu::requestSave);
 
         _quitAction = _fileMenu->addAction("&Quit");
-        _quitAction->setShortcut(quitShortcut.toQKeySequence());
+        common::setShortcut(_quitAction, quitShortcut);
         connect(_quitAction, &QAction::triggered, this, &FileMenu::requestQuit);
     }
 

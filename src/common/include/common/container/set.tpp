@@ -208,4 +208,19 @@ Set<T, Hash> Set<T, Hash>::fromRange(const R& range, F&& func)
     return result;
 }
 
+/**
+ * @brief Removes a value from the set.
+ *
+ * @tparam T The type of elements in the set.
+ * @tparam Hash The hash function used for hashing the elements (default is
+ * std::hash<T>).
+ * @param value The value to remove from the set.
+ * @return true if the value was removed, false if it was not found in the set.
+ */
+template <typename T, typename Hash>
+bool Set<T, Hash>::remove(const T& value)
+{
+    return IterableBase::_items.erase(value) > 0;
+}
+
 #endif   // __COMMON__INCLUDE__COMMON__CONTAINER__SET_TPP__

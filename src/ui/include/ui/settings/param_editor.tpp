@@ -8,6 +8,7 @@
 #include <qformlayout.h>
 #include <qlabel.h>
 #include <qlineedit.h>
+#include <qpushbutton.h>
 #include <qspinbox.h>
 #include <qwidget.h>
 
@@ -35,7 +36,7 @@ namespace ui
      * @return QWidget* Un-parented QGroupBox — caller must parent/add to
      * layout
      */
-    inline QWidget* makeShortcutWidget(settings::MapParam<Shortcut>& param)
+    inline QWidget* makeShortcutWidget(settings::MapParam<ShortcutSet>& param)
     {
         auto* group = common::makeQChild<QGroupBox>(
             QString::fromStdString(param.getTitle())
@@ -58,35 +59,136 @@ namespace ui
             dirtyStripe->setProperty("dirty", false);
             rowLayout->addWidget(dirtyStripe);
 
-            auto* keyEdit = common::makeQChild<QKeySequenceEdit>();
-            keyEdit->setKeySequence(entry.get().toQKeySequence());
-            rowLayout->addWidget(keyEdit);
-            rowLayout->addStretch();
+            // Container for the variable-length list of keystroke edits.
+            auto* keysLayout = common::makeQChild<QHBoxLayout>();
+            keysLayout->setSpacing(spacing);
+            rowLayout->addLayout(keysLayout);
 
-            QObject::connect(
-                keyEdit,
-                &QKeySequenceEdit::editingFinished,
-                [keyEdit, &param, &entry, &key]()
+            // Copied by value — range-for loop variables must never be captured
+            // by reference in a lambda that outlives this iteration.
+            const auto paramKey = key;
+            const auto forWhat  = entry.get().getWhat();
+
+            // Rebuilds the entire row's edits from the current committed
+            // ShortcutSet. Declared as a std::function so it can recursively
+            // re-invoke itself after add/remove structurally changes the row.
+            auto rebuildRow = std::make_shared<std::function<void()>>();
+
+            *rebuildRow = [=, &param]()
+            {
+                // Clear any previously built sub-widgets/layout items.
+                QLayoutItem* item = nullptr;
+                while ((item = keysLayout->takeAt(0)) != nullptr)
                 {
-                    const auto forWhat  = entry.get().getWhat();
-                    const auto newValue = Shortcut::fromQKeySequence(
-                        forWhat,
-                        keyEdit->keySequence()
+                    if (auto* w = item->widget())
+                    {
+                        w->deleteLater();
+                    }
+                    delete item;
+                }
+
+                const auto currentSet = param.at(paramKey).get();
+
+                // currentSet.getShortcuts() is iterable but not indexable, so
+                // each entry is identified by its own value for update/remove,
+                // not by position.
+                for (const auto& shortcut : currentSet.getShortcuts())
+                {
+                    // Copy the loop variable — same reasoning as
+                    // paramKey/forWhat above, this lambda outlives the current
+                    // iteration.
+                    const auto originalShortcut = shortcut;
+
+                    auto* keyEdit = common::makeQChild<QKeySequenceEdit>();
+                    keyEdit->setKeySequence(originalShortcut.toQKeySequence());
+                    keysLayout->addWidget(keyEdit);
+
+                    QObject::connect(
+                        keyEdit,
+                        &QKeySequenceEdit::editingFinished,
+                        [keyEdit, &param, paramKey, originalShortcut]()
+                        {
+                            auto       updatedSet = param.at(paramKey).get();
+                            const auto newKeystroke =
+                                Shortcut::fromQKeySequence(keyEdit->keySequence(
+                                ));
+
+                            const auto result = updatedSet.updateShortcutAt(
+                                originalShortcut,
+                                newKeystroke
+                            );
+
+                            if (!result)
+                            {
+                                keyEdit->setKeySequence(
+                                    originalShortcut.toQKeySequence()
+                                );
+                                return;
+                            }
+
+                            const auto resultSet =
+                                param.setAt(paramKey, updatedSet);
+                            if (!resultSet)
+                            {
+                                keyEdit->setKeySequence(
+                                    originalShortcut.toQKeySequence()
+                                );
+                            }
+                        }
                     );
 
-                    const auto result = param.setAt(key, newValue);
+                    auto* removeButton =
+                        common::makeQChild<QPushButton>("\u2715");
+                    removeButton->setObjectName("removeShortcutButton");
+                    keysLayout->addWidget(removeButton);
 
-                    if (!result.has_value())
-                    {
-                        // Reject — revert to last committed value
-                        keyEdit->setKeySequence(entry.get().toQKeySequence());
-                    }
+                    QObject::connect(
+                        removeButton,
+                        &QPushButton::clicked,
+                        [&param, paramKey, originalShortcut, rebuildRow]()
+                        {
+                            auto updatedSet = param.at(paramKey).get();
+                            updatedSet.removeShortcut(originalShortcut);
+
+                            const auto resultSet =
+                                param.setAt(paramKey, updatedSet);
+                            if (resultSet)
+                            {
+                                (*rebuildRow)();
+                            }
+                        }
+                    );
                 }
-            );
 
-            auto* label = common::makeQChild<QLabel>(
-                QString::fromStdString(entry.get().getWhat())
-            );
+                auto* addButton = common::makeQChild<QPushButton>("+");
+                addButton->setObjectName("addShortcutButton");
+                keysLayout->addWidget(addButton);
+
+                QObject::connect(
+                    addButton,
+                    &QPushButton::clicked,
+                    [&param, paramKey, rebuildRow]()
+                    {
+                        auto updatedSet = param.at(paramKey).get();
+                        updatedSet.addAlternativeShortcut(
+                            Shortcut{ShortcutModifier::None, std::uint64_t{0}}
+                        );
+
+                        const auto resultSet =
+                            param.setAt(paramKey, updatedSet);
+                        if (resultSet)
+                        {
+                            (*rebuildRow)();
+                        }
+                    }
+                );
+            };
+
+            (*rebuildRow)();
+            rowLayout->addStretch();
+
+            auto* label =
+                common::makeQChild<QLabel>(QString::fromStdString(forWhat));
             label->setObjectName("paramLabel");
 
             layout->addRow(label, rowWidget);

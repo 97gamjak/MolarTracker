@@ -2,23 +2,30 @@
 
 #ifdef __QT_ENABLED__
 #include <qkeysequence.h>
+#include <qlist.h>
 #endif
 
 /**
  * @brief Constructs a Shortcut object.
  *
- * @param what Descriptive string identifying the action/command this shortcut
- * is for.
  * @param modifiers The modifiers (Shift, Control, Alt, Super) associated with
  * this shortcut.
  * @param key The key associated with this shortcut (e.g., 'A', 'Enter', etc.).
  */
-Shortcut::Shortcut(
-    std::string      what,
-    ShortcutModifier modifiers,
-    std::uint64_t    key
-)
-    : _forWhat{std::move(what)}, _modifiers{modifiers}, _key{key}
+Shortcut::Shortcut(ShortcutModifier modifiers, std::uint64_t key)
+    : _modifiers{modifiers}, _key{key}
+{
+}
+
+/**
+ * @brief Constructs a Shortcut object using an FKey.
+ *
+ * @param modifiers The modifiers (Shift, Control, Alt, Super) associated with
+ * this shortcut.
+ * @param key The FKey associated with this shortcut (e.g., F1, F2, etc.).
+ */
+Shortcut::Shortcut(ShortcutModifier modifiers, FKey key)
+    : _modifiers{modifiers}, _key{static_cast<std::uint64_t>(key)}
 {
 }
 
@@ -30,19 +37,6 @@ Shortcut::Shortcut(
  */
 bool Shortcut::operator==(const Shortcut& other) const
 {
-    return _forWhat == other._forWhat && _modifiers == other._modifiers &&
-           _key == other._key;
-}
-
-/**
- * @brief Checks if the key stroke (modifiers and key) of this Shortcut is equal
- *        to another Shortcut.
- *
- * @param other The other Shortcut object to compare with.
- * @return true if both Shortcuts have the same key stroke, false otherwise.
- */
-bool Shortcut::isKeyStrokeEqual(const Shortcut& other) const
-{
     return _modifiers == other._modifiers && _key == other._key;
 }
 
@@ -52,14 +46,6 @@ bool Shortcut::isKeyStrokeEqual(const Shortcut& other) const
  * @return const ShortcutModifier& The modifiers (Shift, Control, Alt, Super).
  */
 const ShortcutModifier& Shortcut::getModifiers() const { return _modifiers; }
-
-/**
- * @brief Returns the descriptive string identifying the action/command this
- *        Shortcut is for.
- *
- * @return const std::string& The descriptive string.
- */
-const std::string& Shortcut::getWhat() const { return _forWhat; }
 
 /**
  * @brief Returns the key associated with this Shortcut.
@@ -86,7 +72,24 @@ std::string Shortcut::toString() const
     if ((_modifiers & ShortcutModifier::Super) == ShortcutModifier::Super)
         result += "Super+";
 
-    result += std::to_string(_key);
+    if (_key >= static_cast<uint64_t>(FKey::F1) &&
+        _key <= static_cast<uint64_t>(FKey::F12))
+    {
+        result +=
+            "F" + std::to_string(_key - static_cast<uint64_t>(FKey::F1) + 1);
+    }
+    else
+    {
+#ifdef __QT_ENABLED__
+        // If Qt is enabled, we can use QKeySequence to get a more accurate
+        // string representation of the key.
+        QKeySequence seq  = toQKeySequence();
+        result           += seq.toString().toStdString();
+#else
+        // If Qt is not enabled, we will just append the key as a character.
+        result += static_cast<char>(_key);
+#endif
+    }
 
     return result;
 }
@@ -110,7 +113,17 @@ QKeySequence Shortcut::toQKeySequence() const
     if ((_modifiers & ShortcutModifier::Super) == ShortcutModifier::Super)
         mods |= Qt::MetaModifier;
 
-    return {QKeyCombination(mods, static_cast<Qt::Key>(_key))};
+    auto key = static_cast<Qt::Key>(_key);
+
+    if (_key >= static_cast<uint64_t>(FKey::F1) &&
+        _key <= static_cast<uint64_t>(FKey::F12))
+    {
+        key = static_cast<Qt::Key>(
+            Qt::Key_F1 + (_key - static_cast<int>(FKey::F1))
+        );
+    }
+
+    return {QKeyCombination(mods, key)};
 }
 
 /**
@@ -118,15 +131,10 @@ QKeySequence Shortcut::toQKeySequence() const
  *        converting user input from Qt's key sequence representation to the
  *        internal Shortcut representation.
  *
- * @param forWhat Descriptive string identifying the action/command this
- * Shortcut is for.
  * @param seq The QKeySequence to convert.
  * @return Shortcut The constructed Shortcut object.
  */
-Shortcut Shortcut::fromQKeySequence(
-    const std::string&  forWhat,
-    const QKeySequence& seq
-)
+Shortcut Shortcut::fromQKeySequence(const QKeySequence& seq)
 {
     const auto keyCombination = seq[0];
     const auto qtModifiers    = keyCombination.keyboardModifiers();
@@ -142,6 +150,14 @@ Shortcut Shortcut::fromQKeySequence(
     if ((qtModifiers & Qt::MetaModifier) == Qt::MetaModifier)
         modifiers |= ShortcutModifier::Super;
 
-    return Shortcut{forWhat, modifiers, static_cast<std::uint64_t>(qtKey)};
+    auto key = static_cast<std::uint64_t>(qtKey);
+
+    if (qtKey >= Qt::Key_F1 && qtKey <= Qt::Key_F12)
+    {
+        key = static_cast<std::uint64_t>(FKey::F1) +
+              static_cast<std::uint64_t>(qtKey - Qt::Key_F1);
+    }
+
+    return Shortcut{modifiers, key};
 }
 #endif   // __QT_ENABLED__
