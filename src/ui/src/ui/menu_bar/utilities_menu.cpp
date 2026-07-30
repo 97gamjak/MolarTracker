@@ -100,7 +100,7 @@ namespace ui
             Constants::getFilePrefix() + "_" + timestamp + ".png";
 
         const QString filePath = QFileDialog::getSaveFileName(
-            nullptr,
+            _captureRoot,
             "Save Screenshot",
             QString::fromStdString(path + "/" + filename),
             "PNG Files (*.png)"
