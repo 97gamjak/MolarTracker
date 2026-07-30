@@ -47,6 +47,9 @@ namespace settings
          * Single Shortcut *
          *******************/
 
+        static constexpr std::tuple<ShortcutModifier, std::int64_t>
+            SHORTCUT_DEFAULT = {ShortcutModifier::None, 0};
+
         /// save shortcut key
         static constexpr const char* SAVE_SHORTCUT_KEY = "saveShortcut";
         /// save shortcut title

@@ -20,9 +20,16 @@ namespace settings
               Schema::SHORTCUT_LIST_DESCRIPTION
           )
     {
+        const auto defaultShortcut = Shortcut{
+            std::get<0>(Schema::SHORTCUT_DEFAULT),
+            std::get<1>(Schema::SHORTCUT_DEFAULT)
+        };
+
         _shortcuts.addValidator(
-            [](const ParamCore<ShortcutSet>& shortcut,
-               const ParamMap<ShortcutSet>&  params) -> ParamResult<void>
+            [defaultShortcut](
+                const ParamCore<ShortcutSet>& shortcut,
+                const ParamMap<ShortcutSet>&  params
+            ) -> ParamResult<void>
             {
                 for (const auto& [key, storedShortcut] : params)
                 {
@@ -32,6 +39,12 @@ namespace settings
                         for (const auto& newShortcut :
                              shortcut.get().getShortcuts())
                         {
+                            // Ignore the default shortcut — it is always
+                            // allowed to be duplicated, since it is the "no
+                            // shortcut" value.
+                            if (newShortcut == defaultShortcut)
+                                continue;
+
                             if (oldShortcut == newShortcut)
                             {
                                 return ParamError{
