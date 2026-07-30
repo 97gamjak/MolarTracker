@@ -44,10 +44,10 @@ namespace finance
             switch (transactionType)
             {
                 case TransactionDataType::Cash:
+                case TransactionDataType::Option:
                     validNumberOfAmountEntries = 2;
                     break;
                 case TransactionDataType::Stock:
-                case TransactionDataType::Option:
                     validNumberOfAmountEntries = 1;
                     break;
             }
