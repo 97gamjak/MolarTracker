@@ -49,7 +49,7 @@ All changes and updates, that are relevant for a user will be documented here
 - Make it possible to open (create) option transactions
 - Show option positions in account overview
 - Add possibility to make screenshots via shortcuts and menu
-- Add possiblity to customize shortcuts
+- Add possibility to customize shortcuts
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
