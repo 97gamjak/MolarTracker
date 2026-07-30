@@ -135,6 +135,7 @@
         "MSTD",
         "NOMINMAX",
         "noquote",
+        "qresource",
         "remappings",
         "TSLA",
         "txrepo",

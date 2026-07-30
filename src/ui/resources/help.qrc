@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/help">
-        <file alias="settings_menu_location.png">help/settings_menu_location.png</file>
-        <file alias="settings_dialog_general.png">help/settings_dialog_general.png</file>
-        <file alias="settings_dialog_ui_overview.png">help/settings_dialog_ui_overview.png</file>
-    </qresource>
-</RCC>
