@@ -56,6 +56,88 @@ namespace orm
         ++index;
     }
 
+    /**
+     * @brief Construct a new In Clause< Field>:: In Clause object
+     *
+     * @tparam Field
+     * @param fields
+     */
+    template <typename Field>
+    InClause<Field>::InClause(std::vector<Field> fields)
+        : _fields(std::move(fields))
+    {
+    }
+
+    /**
+     * @brief Get the SQL operations for this IN clause, e.g. "table.field IN
+     * (?, ?)"
+     *
+     * @tparam Field
+     * @return std::string
+     */
+    template <typename Field>
+    std::string InClause<Field>::getDBOperations() const
+    {
+        std::string placeholders;
+        for (std::size_t i = 0; i < _fields.size(); ++i)
+        {
+            if (i > 0)
+                placeholders += ", ";
+            placeholders += "?";
+        }
+
+        return Field::getFullColumnName() + " IN (" + placeholders + ")";
+    }
+
+    /**
+     * @brief Bind the values for this IN clause to the specified statement,
+     * using the specified index for parameter binding
+     *
+     * @tparam Field
+     * @param statement
+     * @param index
+     */
+    template <typename Field>
+    void InClause<Field>::bind(db::Statement& statement, BindIndex& index) const
+    {
+        for (const auto& field : _fields)
+        {
+            // Rebind _field's value per iteration, then delegate
+            field.bind(statement, index);
+            ++index;
+        }
+    }
+
+    /**
+     * @brief Get the SQL operations for this NULL clause, e.g. "table.field IS
+     * NULL"
+     *
+     * @tparam Field
+     * @return std::string
+     */
+    template <typename Field>
+    [[nodiscard]] std::string NullClause<Field>::getDBOperations() const
+    {
+        return Field::getFullColumnName() + " IS NULL";
+    }
+
+    /**
+     * @brief Bind the values for this NULL clause to the specified statement,
+     * using the specified index for parameter binding
+     *
+     * @tparam Field
+     * @param statement
+     * @param index
+     */
+    template <typename Field>
+    void NullClause<Field>::bind(
+        db::Statement& /*statement*/,
+        BindIndex& /*index*/
+    ) const
+    {
+        // No binding necessary for NULL clauses
+    }
+
 }   // namespace orm
 
 #endif   // __ORM__INCLUDE__ORM__WHERE_CLAUSE_TPP__

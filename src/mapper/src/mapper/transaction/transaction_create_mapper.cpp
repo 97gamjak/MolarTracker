@@ -1,0 +1,85 @@
+#include "mapper/transaction/transaction_create_mapper.hpp"
+
+#include "common/finance.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
+#include "finance/transaction/option_transaction.hpp"
+
+namespace mapper
+{
+    /**
+     * @brief Maps a CreateCashTransactionDraft to a CashTransaction.
+     *
+     * @param draft
+     * @return CashTransaction
+     */
+    finance::CashTransaction TransactionCreateMapper::fromCreateCashDraft(
+        const drafts::CreateCashTransactionDraft& draft
+    )
+    {
+        return finance::CashTransaction{
+            TransactionId::invalid(),   // will be created
+            draft.getTimestamp(),
+            TransactionStatus::Completed,
+            draft.getAccountId(),
+            AccountId::invalid(),
+            draft.getAmount(),
+            draft.getFees(),
+            draft.getComment()
+        };
+    }
+
+    /**
+     * @brief Maps a CreateStockTransactionDraft to a StockTransaction.
+     *
+     * @param draft
+     * @return finance::StockTransaction
+     */
+    finance::StockTransaction TransactionCreateMapper::fromCreateStockDraft(
+        const drafts::CreateStockTransactionDraft& draft
+    )
+    {
+        return finance::StockTransaction{
+            TransactionId::invalid(),   // will be created
+            draft.getTimestamp(),
+            TransactionStatus::Completed,
+            draft.getInstrumentId(),
+            draft.getSecurityAccount(),
+            draft.getCashAccount(),
+            AccountId::invalid(),
+            draft.getQuantity(),
+            draft.getUnitPrice(),
+            draft.getFees(),
+            draft.getPositionId(),
+            draft.getComment()
+        };
+    }
+
+    /**
+     * @brief Maps a CreateOptionTransactionDraft to an OptionTransaction.
+     *
+     * @param draft
+     * @return finance::OptionTransaction
+     */
+    finance::OptionTransaction TransactionCreateMapper::fromCreateOptionDraft(
+        const drafts::CreateOptionTransactionDraft& draft
+    )
+    {
+        return finance::OptionTransaction{
+            TransactionId::invalid(),   // will be created
+            draft.getTimestamp(),
+            TransactionStatus::Completed,
+            draft.getInstrumentId(),
+            draft.getSecurityAccount(),
+            draft.getCashAccount(),
+            AccountId::invalid(),
+            draft.getQuantity(),
+            draft.getAmount(),
+            draft.getFees(),
+            draft.getPositionId(),
+            TransactionOptionAction::Open,
+            draft.getBuySell(),
+            std::nullopt,   // rolled option will be set when rolling
+            draft.getComment()
+        };
+    }
+}   // namespace mapper

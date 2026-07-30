@@ -8,6 +8,7 @@ target_link_libraries(tests_db
   PRIVATE
     molartracker_db
     molartracker_logging
+    molartracker_tests
     GTest::gtest_main
 )
 

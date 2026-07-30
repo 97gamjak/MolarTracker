@@ -2,13 +2,16 @@
 #define __UI__INCLUDE__UI__MAIN_WINDOW_HPP__
 
 #include <QMainWindow>
+#include <functional>
 
 #include "ui/central/central_widget.hpp"
 
-namespace app
+class QCloseEvent;   // Forward declaration
+
+namespace settings
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class ShortcutSettings;   // Forward declaration
+}   // namespace settings
 
 class QStackedWidget;   // Forward declaration
 
@@ -27,6 +30,10 @@ namespace ui
     {
         Q_OBJECT
 
+       public:
+        /// Callback type used to ask whether the window is allowed to close
+        using CanCloseCallback = std::function<bool()>;
+
        private:
         /// Pointer to the menu bar widget
         MenuBar* _menuBar;
@@ -34,17 +41,22 @@ namespace ui
         SideBar* _sideBar;
         /// Pointer to the central widget
         CentralWidget* _centralWidget;
-
-        /// Undo stack for managing undoable commands in the application
+        /// Optional callback invoked in closeEvent to guard against closing
+        /// with unsaved changes
+        CanCloseCallback _canCloseCallback;
 
        public:
-        explicit MainWindow();
+        explicit MainWindow(const settings::ShortcutSettings& shortcutSettings);
 
         void setWindowTitle(const bool& isDirty);
+        void setCanCloseCallback(CanCloseCallback callback);
 
         [[nodiscard]] MenuBar&       getMenuBar();
         [[nodiscard]] SideBar&       getSideBar();
         [[nodiscard]] CentralWidget* getCentralWidget();
+
+       protected:
+        void closeEvent(QCloseEvent* event) override;
 
        private:
         void _buildUI();

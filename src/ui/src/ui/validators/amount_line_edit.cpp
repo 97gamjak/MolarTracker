@@ -5,8 +5,9 @@
 #include <qlabel.h>
 #include <qregularexpression.h>
 
+#include "common/qt_helpers.hpp"
+#include "common/quantity.hpp"
 #include "logging/log_macros.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Validators.AmountLineEdit");
 
@@ -83,33 +84,38 @@ namespace ui
      * used in the application, ensuring that the amount is properly formatted
      * and can be processed correctly.
      *
+     * @param precision The number of decimal places to consider when converting
+     * the input to micro_units.
+     *
      * @return micro_units The amount entered in the line edit, converted to
      * micro_units for use in the application.
      */
-    micro_units AmountLineEdit::getAmount() const
+    micro_units AmountLineEdit::getAmount(std::size_t precision) const
     {
         const auto text = this->text().trimmed();
+
         if (text.isEmpty())
             return 0;
 
-        const auto sign  = text.startsWith('-') ? -1 : 1;
-        const auto parts = text.mid(sign < 0 ? 1 : 0).split('.');
+        return microUnitsFromString(
+            text.toStdString(),
+            static_cast<std::uint8_t>(precision)
+        );
+    }
 
-        const auto scale = static_cast<int64_t>(std::pow(10, _nDecimalPlaces));
-        const auto intPart = parts[0].toLongLong() * scale;
-
-        int64_t fracPart = 0;
-        if (parts.size() > 1)
-        {
-            // Truncate or pad to exactly decimalPlaces digits
-            const QString frac = parts[1]
-                                     .left(_nDecimalPlaces)
-                                     .leftJustified(_nDecimalPlaces, '0');
-
-            fracPart = frac.toLongLong();
-        }
-
-        return static_cast<micro_units>(sign * (intPart + fracPart));
+    /**
+     * @brief Check if the entered amount is zero, this will return true if the
+     * input in the amount field is zero according to the validation rules
+     * defined in the AmountLineEdit (e.g., required, only positive, etc.), and
+     * false otherwise, allowing the owning widget to easily check if the amount
+     * entered by the user is zero before proceeding with any actions that
+     * depend on a valid amount.
+     *
+     * @return true if the entered amount is zero, false otherwise
+     */
+    bool AmountLineEdit::isZero() const
+    {
+        return getAmount(_nDecimalPlaces) == 0;
     }
 
     /**

@@ -1,0 +1,96 @@
+#include "vcs/update_check_service.hpp"
+
+#include <QtConcurrent/QtConcurrent>
+
+#include "logging/log_macros.hpp"
+#include "vcs/github_client.hpp"
+
+REGISTER_LOG_CATEGORY("VCS.UpdateCheckService");
+
+namespace vcs
+{
+
+    /**
+     * @brief Construct a new UpdateCheckService.
+     *
+     * @param parent Qt parent object
+     */
+    UpdateCheckService::UpdateCheckService(QObject* parent) : QObject{parent}
+    {
+        connect(
+            &_timer,
+            &QTimer::timeout,
+            this,
+            &UpdateCheckService::_onTimerTick
+        );
+        connect(
+            &_watcher,
+            &QFutureWatcher<HttpResult<common::SemVer>>::finished,
+            this,
+            &UpdateCheckService::_onFetchFinished
+        );
+    }
+
+    /**
+     * @brief Start the update check service.
+     *
+     * Fires an immediate check and then starts the 24-hour periodic timer.
+     */
+    void UpdateCheckService::start()
+    {
+        LOG_INFO("Update check service started");
+        _onTimerTick();
+        _timer.start(_intervalMs);
+    }
+
+    /**
+     * @brief Slot called on each timer tick (and once on start).
+     *
+     * Skips the check if a previous fetch is still in flight.
+     */
+    void UpdateCheckService::_onTimerTick()
+    {
+        if (_watcher.isRunning())
+        {
+            LOG_DEBUG("Skipping update check — previous fetch still in flight");
+            return;
+        }
+
+        _watcher.setFuture(
+            QtConcurrent::run([]()
+                              { return GitHubClient::fetchLatestVersion(); })
+        );
+    }
+
+    /**
+     * @brief Slot called when the async fetch completes.
+     *
+     * Compares the fetched version against the running version and emits
+     * updateAvailable() if a newer release is found, deduplicating within the
+     * same session.
+     */
+    void UpdateCheckService::_onFetchFinished()
+    {
+        const auto result = _watcher.result();
+
+        if (!result)
+        {
+            LOG_WARNING(
+                "Update check failed: " + std::string{result.error().toString()}
+            );
+            return;
+        }
+
+        const common::SemVer& latest = *result;
+
+        if (latest <= common::SemVer::current())
+            return;
+
+        if (_lastNotifiedVersion.has_value() && *_lastNotifiedVersion == latest)
+            return;
+
+        _lastNotifiedVersion = latest;
+        emit updateAvailable(latest);
+    }
+
+}   // namespace vcs

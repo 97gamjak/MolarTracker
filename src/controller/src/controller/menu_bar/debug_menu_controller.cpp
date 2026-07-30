@@ -5,15 +5,15 @@
 #include <QObject>
 #include <QStatusBar>
 
-#include "app/app_context.hpp"
 #include "commands/undo_stack.hpp"
 #include "commands/update_debug_flags_command.hpp"
+#include "common/qt_helpers.hpp"
 #include "logging/log_macros.hpp"
 #include "logging/log_manager.hpp"
+#include "settings/settings.hpp"
 #include "ui/logging/debug_slots_dialog.hpp"
 #include "ui/logging/log_viewer_dialog.hpp"
 #include "ui/menu_bar/debug_menu.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.DebugMenuController");
 
@@ -25,20 +25,20 @@ namespace controller
      *
      * @param mainWindow
      * @param debugMenu
-     * @param appContext
      * @param undoStack
+     * @param settings
      */
     DebugMenuController::DebugMenuController(
-        QMainWindow&     mainWindow,
-        ui::DebugMenu&   debugMenu,
-        app::AppContext& appContext,
-        cmd::UndoStack&  undoStack
+        QMainWindow&        mainWindow,
+        ui::DebugMenu&      debugMenu,
+        cmd::UndoStack&     undoStack,
+        settings::Settings& settings
     )
         : QObject(&mainWindow),
           _mainWindow(mainWindow),
           _debugMenu(debugMenu),
-          _appContext(appContext),
-          _undoStack(undoStack)
+          _undoStack(undoStack),
+          _settings(settings)
     {
         connect(
             &debugMenu,
@@ -87,10 +87,12 @@ namespace controller
      *
      * @param action The action to perform (reset, apply, apply and close)
      * @param categories The new debug flag categories to set
+     * @param persistChanges Whether to persist changes
      */
     void DebugMenuController::_onDebugSlotsChangeRequested(
         const ui::DebugSlotsDialog::Action& action,
-        const logging::LogCategories&       categories
+        const logging::LogCategories&       categories,
+        bool                                persistChanges
     )
     {
         using enum ui::DebugSlotsDialog::Action;
@@ -101,10 +103,10 @@ namespace controller
                 _resetDefaultDebugFlags();
                 break;
             case Apply:
-                _applyDebugFlagChanges(categories);
+                _applyDebugFlagChanges(categories, persistChanges);
                 break;
             case ApplyAndClose:
-                _applyDebugFlagChangesAndClose(categories);
+                _applyDebugFlagChangesAndClose(categories, persistChanges);
                 break;
         }
     }
@@ -138,13 +140,11 @@ namespace controller
 
         auto debugSlotsSettings =
             std::make_shared<ui::DebugSlotsDialog::Settings>(
-                _appContext.getSettings()
-                    .getUISettings()
-                    .getDebugSlotsSettings()
-                    .getWindowSize()
+                _settings.getUISettings().getDebugSlotsSettings().getWindowSize(
+                )
             );
 
-        _debugSlotsDialog = utils::makeQChild<ui::DebugSlotsDialog>(
+        _debugSlotsDialog = common::makeQChild<ui::DebugSlotsDialog>(
             debugSlotsSettings,
             &_mainWindow
         );
@@ -170,7 +170,7 @@ namespace controller
 
         _applyLogViewerSettings();
 
-        _logViewerDialog = utils::makeQChild<ui::LogViewerDialog>(
+        _logViewerDialog = common::makeQChild<ui::LogViewerDialog>(
             _logViewerSettings,
             &_mainWindow
         );
@@ -193,33 +193,38 @@ namespace controller
     /**
      * @brief Discard debug flag changes and reset to current values
      *
-     * This is used when there was an error while applying the changes, to reset
-     * the dialog to the current values and avoid leaving it in an inconsistent
-     * state.
+     * This is used when there was an error while applying the changes, to
+     * reset the dialog to the current values and avoid leaving it in an
+     * inconsistent state.
      *
      * @param categories The current debug flag categories to reset to
+     * @param persistChanges Whether to persist the changes
      *
      */
     void DebugMenuController::_applyDebugFlagChanges(
-        const logging::LogCategories& categories
+        const logging::LogCategories& categories,
+        bool                          persistChanges
     )
     {
-        auto result =
-            cmd::Commands::makeAndDo<cmd::UpdateDebugFlagsCommand>(categories);
+        auto result = cmd::Commands::makeAndDo<cmd::UpdateDebugFlagsCommand>(
+            categories,
+            persistChanges
+        );
 
         if (!result)
         {
-            // TODO(97gamjak): create general exception message for unexpected
-            // errors
+            // TODO(97gamjak): create general exception message for
+            // unexpected errors
             // https://97gamjak.atlassian.net/browse/MOLTRACK-112
             LOG_ERROR(
-                "There happened an unexpected error while updating the debug "
+                "There happened an unexpected error while updating the "
+                "debug "
                 "flags! Please contact the developer!"
             );
 
-            // this should not happen, but if it does, we should not leave the
-            // dialog in an inconsistent state, so we will just reset the
-            // categories to the current values and repopulate the tree
+            // this should not happen, but if it does, we should not leave
+            // the dialog in an inconsistent state, so we will just reset
+            // the categories to the current values and repopulate the tree
             const auto& logManager        = logging::LogManager::getInstance();
             const auto  currentCategories = logManager.getCategories();
             _debugSlotsDialog->setCategories(currentCategories, false);
@@ -237,12 +242,14 @@ namespace controller
      * @brief Apply debug flag changes and close the dialog
      *
      * @param categories The new debug flag categories to set
+     * @param persistChanges Whether to persist the changes
      */
     void DebugMenuController::_applyDebugFlagChangesAndClose(
-        const logging::LogCategories& categories
+        const logging::LogCategories& categories,
+        bool                          persistChanges
     )
     {
-        _applyDebugFlagChanges(categories);
+        _applyDebugFlagChanges(categories, persistChanges);
         _debugSlotsDialog->accept();
     }
 
@@ -252,8 +259,7 @@ namespace controller
      */
     void DebugMenuController::_applyLogViewerSettings()
     {
-        const auto& settings =
-            _appContext.getSettings().getUISettings().getLogViewerSettings();
+        const auto& settings = _settings.getUISettings().getLogViewerSettings();
 
         _logViewerSettings = std::make_shared<ui::LogViewerDialog::Settings>(
             settings.getReloadIntervalMs(),

@@ -5,10 +5,20 @@
 /**
  * @brief Constructs a new Molar Tracker Exception object
  *
- * @param message The exception message
+ * @param msg The exception message
+ * @param trace The stack trace at the point the exception was thrown,
+ * defaulting to the current stack trace
  */
-MolarTrackerException::MolarTrackerException(std::string message)
-    : _message{std::move(message)}
+MolarTrackerException::MolarTrackerException(
+    const std::string& msg,
+    std::stacktrace    trace
+)
+    : std::runtime_error(msg),
+      _trace(std::move(trace)),
+      _what(
+          std::runtime_error::what() + std::string("\nStack trace:\n") +
+          std::to_string(_trace)
+      )
 {
 }
 
@@ -19,5 +29,15 @@ MolarTrackerException::MolarTrackerException(std::string message)
  */
 const char* MolarTrackerException::what() const noexcept
 {
-    return _message.c_str();
+    return _what.c_str();
+}
+
+/**
+ * @brief Returns the stack trace associated with the exception
+ *
+ * @return const std::stacktrace& The stack trace
+ */
+const std::stacktrace& MolarTrackerException::stacktrace() const noexcept
+{
+    return _trace;
 }

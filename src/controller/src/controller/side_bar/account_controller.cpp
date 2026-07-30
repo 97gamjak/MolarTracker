@@ -1,15 +1,18 @@
 #include "account_controller.hpp"
 
 #include <QMainWindow>
+#include <format>
 
-#include "app/app_context.hpp"
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
+#include "common/qt_helpers.hpp"
+#include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
+#include "store/i_account_store.hpp"
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.AccountSideBarController");
 
@@ -23,12 +26,10 @@ namespace controller
      * commands that are created as a result of actions in the account category
      * (e.g. creating a new account), this allows the user to undo and redo
      * actions related to accounts using the undo stack.
-     * @param appContext A reference to the application context, this is used to
-     * access the stores and services needed to perform operations related to
-     * accounts (e.g. creating a new account), this allows the controller to
-     * interact with the underlying data and business logic for accounts, and
-     * ensures that the controller can perform the necessary operations to
-     * manage accounts effectively.
+     * @param accountStore A reference to the account store, this is used to
+     * access the account data and perform operations on it (e.g. creating,
+     * deleting, or modifying accounts), this allows the account side bar
+     * controller to interact with the account data in a consistent way.
      * @param accountController A reference to the account controller, this is
      * used to delegate account-related actions (e.g. when an account is
      * selected in the side bar), this allows the account side bar controller to
@@ -44,14 +45,14 @@ namespace controller
      *
      */
     AccountSideBarController::AccountSideBarController(
-        cmd::UndoStack&    undoStack,
-        app::AppContext&   appContext,
-        AccountController& accountController,
-        QMainWindow*       mainWindow
+        cmd::UndoStack&                              undoStack,
+        const std::shared_ptr<store::IAccountStore>& accountStore,
+        AccountController&                           accountController,
+        QMainWindow*                                 mainWindow
     )
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
-          _appContext(appContext),
+          _accountStore(accountStore),
           _accountController(accountController)
     {
     }
@@ -70,14 +71,14 @@ namespace controller
             return;
 
         category->clearAccounts();
-        const auto accounts =
-            _appContext.getStore().getAccountStore().getAllAccounts();
+        const auto accounts = _accountStore->getAllAccounts();
 
         for (const auto& account : accounts)
         {
             category->addAccount(
-                account.id,
-                QString::fromStdString(account.name)
+                account.getId(),
+                QString::fromStdString(account.getName()),
+                account.getKind()
             );
         }
     }
@@ -112,7 +113,7 @@ namespace controller
             LOG_DEBUG("Create Account action triggered");
 
             _createAccountDialog =
-                utils::makeQChild<ui::CreateAccountDialog>(getMainWindow());
+                common::makeQChild<ui::CreateAccountDialog>(getMainWindow());
 
             connect(
                 _createAccountDialog,
@@ -145,13 +146,13 @@ namespace controller
         const drafts::AccountDraft& account
     )
     {
-        LOG_INFO("Create Account requested with name: " + account.name);
+        LOG_INFO("Create Account requested with name: " + account.getName());
 
         cmd::Commands command("Create Account");
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
-            _appContext.getStore().getAccountStore(),
-            account
+            _accountStore,
+            mapper::AccountMapper::toAccount(account)
         );
 
         if (!result)

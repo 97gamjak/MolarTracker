@@ -66,9 +66,7 @@ jobs:
           sudo apt-get install -y     \
               ninja-build             \
               pkg-config              \
-              libcurl4-openssl-dev    \
-              clangd-20
-          sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-20 100
+              libcurl4-openssl-dev
 
       # -------------------------
       # Install Qt
@@ -101,9 +99,11 @@ jobs:
           cmake --build build --verbose
 
       # -------------------------
-      # Run tests (on the built binaries)
+      # Run tests
       # -------------------------
       - name: Run tests (Ubuntu)
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
           ctest --test-dir build --output-on-failure
 
@@ -222,19 +222,27 @@ jobs:
             -DMOLARTRACKER_ENABLE_TESTING=ON
 
       # -------------------------
+      # Generate headers (required by linters; no C++ compiled)
+      # -------------------------
+      - name: Generate headers
+        run: cmake --build build --target generate_log_categories
+
+      # -------------------------
       # Run cppcheck
       # -------------------------
       - name: Run cppcheck
         run: |
+          jq '[.[] | select(.file | test("_autogen") | not)]' \
+            build/compile_commands.json > build/compile_commands_filtered.json
+
           cppcheck \
-              --project=build/compile_commands.json \
+              --project=build/compile_commands_filtered.json \
               --quiet \
               --file-filter=src/* \
               --suppress=useStlAlgorithm \
               --enable=all \
               --enable=performance \
               --enable=style \
-              --enable=information \
               --enable=portability \
               --error-exitcode=1 \
               --suppressions-list=.cppcheck \
@@ -249,4 +257,109 @@ jobs:
       # -------------------------
       - name: Run clangd-tidy
         run: |
-          clangd-tidy $(find src/) -p=build
+          clangd-tidy $(find src/ -name "*.cpp" ! -name "moc_*.cpp") -p=build
+
+  coverage:
+    runs-on: ubuntu-latest
+    # Skip on tag pushes — coverage is only useful on dev / PRs
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+      checks: write
+
+    env:
+      QT_VERSION: "6.8.3"
+      BUILD_TYPE: "Debug"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # -------------------------
+      # Build tools (same as build job + lcov)
+      # -------------------------
+      - name: Install build tools (Ubuntu)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y     \
+              ninja-build             \
+              pkg-config              \
+              libcurl4-openssl-dev    \
+              lcov
+
+      # -------------------------
+      # Install Qt
+      # -------------------------
+      - name: Install Qt (Ubuntu)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          target: desktop
+
+      # -------------------------
+      # Configure with coverage instrumentation
+      # -------------------------
+      - name: Configure (with coverage)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
+            -DMOLARTRACKER_IS_TAG=OFF \
+            -DMOLARTRACKER_GIT_TAG="${GITHUB_REF_NAME}" \
+            -DMOLARTRACKER_ENABLE_TESTING=ON
+
+      - name: Build
+        run: cmake --build build
+
+      # -------------------------
+      # Run tests
+      # -------------------------
+      - name: Run tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: ctest --test-dir build --output-on-failure
+
+      # -------------------------
+      # Generate LCOV report
+      # -------------------------
+      - name: Generate coverage report
+        run: |
+          lcov --capture \
+               --directory build \
+               --output-file coverage.info \
+               --gcov-tool gcov \
+               --ignore-errors mismatch,gcov,gcov \
+               --rc geninfo_unexecuted_blocks=1
+          lcov --remove coverage.info \
+               '/usr/*'         \
+               '*/Qt/*'         \
+               '*/vcpkg/*'      \
+               '*/_deps/*'      \
+               '*/external/*'   \
+               '*/test*'        \
+               '*/moc_*'        \
+               --output-file coverage.info \
+               --ignore-errors unused,unused
+          lcov --list coverage.info
+
+      # -------------------------
+      # Upload via getsentry/codecov-action (no external token needed)
+      # -------------------------
+      - name: Upload coverage
+        uses: getsentry/codecov-action@0.3.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: coverage.info
+          coverage-format: lcov
+          fail-ci-if-error: true
+          post-pr-comment: true

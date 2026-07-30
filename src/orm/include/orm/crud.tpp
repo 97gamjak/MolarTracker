@@ -10,9 +10,11 @@
 
 #include "crud/crud_error.hpp"
 #include "db/database.hpp"
+#include "db/db_exception.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
 #include "filter/expr_node.hpp"
+#include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/crud/crud_detail.hpp"
 #include "orm/fields.hpp"
@@ -21,6 +23,8 @@
 #include "orm/type_traits.hpp"
 #include "orm/where_expr.hpp"
 #include "where_clause.hpp"
+
+REGISTER_LOG_CATEGORY("Orm.Crud.Operations");
 
 namespace orm
 {
@@ -37,7 +41,7 @@ namespace orm
     template <db_model Model>
     void Crud::createTable(db::Database& database)
     {
-        createTable<Model>(database, Model::tableName);
+        createTable<Model>(database, std::string_view(Model::tableName));
     }
 
     /**
@@ -129,6 +133,8 @@ namespace orm
         const Model& row
     )
     {
+        LOG_DEBUG(std::format("Inserting {} into DB.", row.toString()));
+
         std::size_t nInsertableFields = 0;
         Model::forEachColumn(
             [&](const auto& field)
@@ -199,7 +205,16 @@ namespace orm
             }
         );
 
-        statement.executeToCompletion();
+        try
+        {
+            statement.executeToCompletion();
+        }
+        catch (const db::SqliteError& e)
+        {
+            return std::unexpected(
+                CrudError{CrudErrorType::InsertFailed, e.what()}
+            );
+        }
 
         const auto lastInsertId = database.getLastInsertRowid();
         if (lastInsertId.has_value())
@@ -276,6 +291,14 @@ namespace orm
         const Model&  row
     )
     {
+        LOG_DEBUG(
+            std::format(
+                "Updating table '{}' with SQL: {}",
+                Model::tableName,
+                row.toString()
+            )
+        );
+
         std::string sqlText;
         sqlText += "UPDATE ";
         sqlText += Model::tableName;
@@ -305,7 +328,7 @@ namespace orm
             ));
         }
 
-        sqlText += getDBOperations(where);
+        sqlText += Query{}.where(where).getDBOperations();
         sqlText += ";";
 
         LOG_DEBUG(
@@ -331,9 +354,19 @@ namespace orm
             }
         );
 
-        bind(where, statement);
+        auto whereIndex = bindIndex(index);
+        bind(where, statement, whereIndex);
 
-        statement.executeToCompletion();
+        try
+        {
+            statement.executeToCompletion();
+        }
+        catch (const db::SqliteError& e)
+        {
+            return std::unexpected(
+                CrudError{CrudErrorType::UpdateFailed, e.what()}
+            );
+        }
 
         const auto changes = database.getNumberOfLastChanges();
 
@@ -510,7 +543,7 @@ namespace orm
     )
     {
         std::string sql;
-        sql += getSelection<Models...>();
+        sql += getSelection<Models...>(joins.isDistinct());
         sql += joins.toSQL() + " ";
         sql += query.getDBOperations() + ";";
 
@@ -590,7 +623,7 @@ namespace orm
         std::string sqlText;
         sqlText += "DELETE FROM ";
         sqlText += Model::tableName;
-        sqlText += " WHERE ";
+        sqlText += " ";
 
         const auto where = getPkWhere(model);
 
@@ -606,7 +639,7 @@ namespace orm
             );
         }
 
-        sqlText += getDBOperations(where);
+        sqlText += Query{}.where(where).getDBOperations();
         sqlText += ";";
 
         LOG_DEBUG(

@@ -10,11 +10,10 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "drafts/stock_draft.hpp"
-#include "finance/ticker_info.hpp"
-#include "utils/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {
@@ -85,12 +84,12 @@ namespace ui
         _symbolLabel->setText(QString::fromStdString(quote.getTicker()));
         _shortNameLabel->setText(QString::fromStdString(quote.getShortName()));
         _longNameLabel->setText(QString::fromStdString(quote.getLongName()));
-        _currencyLabel->setText(utils::toQString(quote.getCurrency()));
+        _currencyLabel->setText(common::toQString(quote.getCurrency()));
         _exchangeLabel->setText(QString::fromStdString(quote.getExchange()));
         _industryLabel->setText(QString::fromStdString(quote.getIndustry()));
         _sectorLabel->setText(QString::fromStdString(quote.getSector()));
         _assetClassLabel->setText(
-            QString::fromStdString(finance::toString(quote.getAssetClass()))
+            QString::fromStdString(toString(quote.getAssetClass()))
         );
 
         _acceptButton->setEnabled(true);

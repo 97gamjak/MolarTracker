@@ -1,4 +1,3 @@
-// stock_widget.hpp
 #ifndef __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__STOCK_WIDGET_HPP__
 
@@ -6,7 +5,7 @@
 
 #include <vector>
 
-#include "drafts/account_draft.hpp"
+#include "common/container/set.hpp"
 #include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
@@ -16,6 +15,7 @@ class QPushButton;   // Forward declaration
 namespace drafts
 {
     class CreateStockTransactionDraft;   // Forward declaration
+    class AccountDraft;                  // Forward declaration
 }   // namespace drafts
 
 namespace ui
@@ -41,49 +41,31 @@ namespace ui
         /// The layout for this widget
         QFormLayout* _layout;
 
-        /// The combo box for selecting the primary account
-        AccountCombo* _accountCombo;
-
-        /// The combo box for selecting the reference account
-        AccountCombo* _referenceAccountCombo;
-
-        /// The row for entering the quantity of the stock
-        AmountRow* _quantityRow;
-
-        /// The row for entering the price of the stock
-        AmountRow* _priceRow;
-
-        /// The label for displaying the currency of the selected account
-        QLabel* _currencyLabel;
-
         /// The button for adding the transaction
         QPushButton* _addButton;
 
-        /// The field for entering the stock ticker
-        TickerField* _tickerField;
-
-        /// The field for entering the timestamp of the transaction
-        TimestampField* _timestampField;
-
-        /// The field for entering a comment about the transaction
-        CommentField* _commentField;
+        struct Fields;
+        /// Pointer to the fields struct
+        std::unique_ptr<Fields> _fields;
 
         /// The list of reference accounts
         std::vector<drafts::AccountDraft> _referenceAccounts;
 
        public:
         explicit StockWidget(
-            std::vector<drafts::AccountDraft>        accounts,
+            const std::vector<drafts::AccountDraft>& accounts,
             const std::vector<drafts::AccountDraft>& referenceAccounts,
-            std::vector<std::string>                 tickers,
+            const Set<std::string>&                  tickers,
             QWidget*                                 parent = nullptr
         );
+
+        ~StockWidget() override;
 
         void updateAccounts(std::vector<drafts::AccountDraft> accounts);
         void updateReferenceAccounts(
             std::vector<drafts::AccountDraft> referenceAccounts
         );
-        void updateTickers(const std::vector<std::string>& tickers);
+        void updateTickers(const Set<std::string>& tickers);
         void refresh();
 
        signals:

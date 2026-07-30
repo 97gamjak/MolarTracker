@@ -1,7 +1,8 @@
 #ifndef __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__
 #define __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__
 
-#include <exception>
+#include <stacktrace>
+#include <stdexcept>
 #include <string>
 
 /**
@@ -14,16 +15,26 @@
  * throughout the application.
  *
  */
-class MolarTrackerException : public std::exception
+class MolarTrackerException : public std::runtime_error
 {
    private:
-    /// The error message associated with the exception
-    std::string _message;
+    /// The stack trace captured at the point where the exception was thrown.
+    std::stacktrace _trace;
+    /// The full exception message, including the stack trace, returned by
+    /// what().
+    std::string _what;
 
    public:
-    explicit MolarTrackerException(std::string message);
+    explicit MolarTrackerException(
+        const std::string& msg,
+        std::stacktrace    trace = std::stacktrace::current()
+    );
 
-    [[nodiscard]] const char* what() const noexcept override;
+    [[nodiscard]]
+    const char* what() const noexcept override;
+
+    [[nodiscard]]
+    const std::stacktrace& stacktrace() const noexcept;
 };
 
 #endif   // __EXCEPTIONS__INCLUDE__EXCEPTIONS__BASE_HPP__

@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "common/timestamp.hpp"
 #include "config/strong_id.hpp"
 #include "orm/binder.hpp"
 #include "orm/concepts.hpp"
@@ -15,7 +16,6 @@
 #include "orm/fixed_string.hpp"
 #include "orm/index.hpp"
 #include "orm/sql_type.hpp"
-#include "utils/timestamp.hpp"
 
 namespace orm
 {

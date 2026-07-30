@@ -1,7 +1,7 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__STOCK_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__STOCK_ROW_HPP__
 
-#include "config/finance.hpp"
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
@@ -43,7 +43,7 @@ struct StockRow : public orm::ORMModel<"stock">
     /// instruments.
     ORM_FIELD(
         instrumentId,
-        InstrumentRow::template ForeignId<orm::CascadeDelete>
+        InstrumentRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The currency of the stock, this indicates the currency in which the

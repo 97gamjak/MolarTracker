@@ -1,7 +1,7 @@
 #ifndef __UI__INCLUDE__UI__VALIDATORS__AMOUNT_LINE_EDIT_HPP__
 #define __UI__INCLUDE__UI__VALIDATORS__AMOUNT_LINE_EDIT_HPP__
 
-#include "config/quantity.hpp"
+#include "common/quantity.hpp"
 #include "line_validator.hpp"
 
 namespace ui
@@ -33,7 +33,8 @@ namespace ui
         void setNDecimalPlaces(std::uint8_t numberOfDecimalPlaces);
         void setOnlyPositive(bool onlyPositive);
 
-        [[nodiscard]] micro_units getAmount() const;
+        [[nodiscard]] micro_units getAmount(std::size_t precision) const;
+        [[nodiscard]] bool        isZero() const;
 
        protected:
         [[nodiscard]] QString _getRequiredErrorMessage() const override;

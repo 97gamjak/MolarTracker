@@ -6,7 +6,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 
 namespace ui
 {
@@ -18,13 +18,13 @@ namespace ui
      */
     SettingsOverview::SettingsOverview(const QString& title)
     {
-        auto* root = utils::makeQChild<QVBoxLayout>(this);
+        auto* root = common::makeQChild<QVBoxLayout>(this);
         root->setContentsMargins(0, 0, 0, 0);
         root->setSpacing(0);
 
         // Header
-        auto* header       = utils::makeQChild<QWidget>(this);
-        auto* headerLayout = utils::makeQChild<QVBoxLayout>(header);
+        auto* header       = common::makeQChild<QWidget>(this);
+        auto* headerLayout = common::makeQChild<QVBoxLayout>(header);
 
         constexpr std::array<int, 4> margins = {20, 16, 20, 12};
         headerLayout->setContentsMargins(
@@ -36,26 +36,26 @@ namespace ui
         headerLayout->setSpacing(2);
         header->setObjectName("sectionHeader");
 
-        auto* titleLabel = utils::makeQChild<QLabel>(header);
+        auto* titleLabel = common::makeQChild<QLabel>(header);
         titleLabel->setText(title);
         titleLabel->setObjectName("sectionTitle");
         headerLayout->addWidget(titleLabel);
 
         root->addWidget(header);
 
-        auto* divider = utils::makeQChild<QFrame>(this);
+        auto* divider = common::makeQChild<QFrame>(this);
         divider->setFrameShape(QFrame::HLine);
         divider->setObjectName("sectionDivider");
         root->addWidget(divider);
 
         // Scrollable cards area
-        auto* scroll = utils::makeQChild<QScrollArea>(this);
+        auto* scroll = common::makeQChild<QScrollArea>(this);
         scroll->setWidgetResizable(true);
         scroll->setFrameShape(QFrame::NoFrame);
         scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-        auto* cardsContainer = utils::makeQChild<QWidget>(this);
-        _cardsLayout         = utils::makeQChild<QVBoxLayout>(cardsContainer);
+        auto* cardsContainer = common::makeQChild<QWidget>(this);
+        _cardsLayout         = common::makeQChild<QVBoxLayout>(cardsContainer);
 
         constexpr std::array<int, 4> cardMargins = {20, 16, 20, 16};
         constexpr std::size_t        spacing     = 8;
@@ -89,14 +89,14 @@ namespace ui
         int            stackIndex
     )
     {
-        auto* card = utils::makeQChild<QPushButton>(this);
+        auto* card = common::makeQChild<QPushButton>(this);
         card->setObjectName("overviewCard");
         card->setCursor(Qt::PointingHandCursor);
         card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         constexpr size_t cardHeight = 64;
         card->setFixedHeight(cardHeight);
 
-        auto* cardLayout = utils::makeQChild<QHBoxLayout>(card);
+        auto* cardLayout = common::makeQChild<QHBoxLayout>(card);
 
         constexpr std::array<int, 4> cardMargins = {16, 12, 16, 12};
         constexpr std::size_t        cardSpacing = 12;
@@ -108,15 +108,15 @@ namespace ui
         );
         cardLayout->setSpacing(cardSpacing);
 
-        auto* textLayout = utils::makeQChild<QVBoxLayout>(card);
+        auto* textLayout = common::makeQChild<QVBoxLayout>();
 
         constexpr std::size_t textSpacing = 2;
         textLayout->setSpacing(textSpacing);
 
-        auto* titleLabel = utils::makeQChild<QLabel>(title);
+        auto* titleLabel = common::makeQChild<QLabel>(title);
         titleLabel->setObjectName("cardTitle");
 
-        auto* descLabel = utils::makeQChild<QLabel>(description);
+        auto* descLabel = common::makeQChild<QLabel>(description);
         descLabel->setObjectName("cardDesc");
         descLabel->setWordWrap(true);
 

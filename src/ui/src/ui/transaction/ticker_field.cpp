@@ -9,9 +9,9 @@
 
 #include <algorithm>
 
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {
@@ -22,12 +22,9 @@ namespace ui
      * @param tickers A list of ticker symbols to initialize the field with
      * @param parent The parent widget for this field
      */
-    TickerField::TickerField(
-        const std::vector<std::string>& tickers,
-        QWidget*                        parent
-    )
+    TickerField::TickerField(const Set<std::string>& tickers, QWidget* parent)
         : QWidget(parent),
-          _tickers(utils::toQStringVector(tickers)),
+          _tickers(common::toQStringSet(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
           _addButton(makeQChild<QPushButton>("+", this)),
           _completer(new QCompleter(this))
@@ -99,9 +96,9 @@ namespace ui
      * @param ticker The ticker symbol to add to the field, this should be a
      * valid ticker symbol that can be used for creating stock transactions.
      */
-    void TickerField::addTicker(QString ticker)
+    void TickerField::addTicker(const QString& ticker)
     {
-        _tickers.push_back(std::move(ticker));
+        _tickers.insert(ticker);
         _rebuildCompleter();
     }
 
@@ -158,7 +155,7 @@ namespace ui
             list.append(ticker);
 
         _completer->setModel(
-            utils::makeQChild<QStringListModel>(list, _completer)
+            common::makeQChild<QStringListModel>(list, _completer)
         );
     }
 
@@ -168,9 +165,9 @@ namespace ui
      * @param tickers The new list of ticker symbols to populate the ticker
      * field
      */
-    void TickerField::updateTickers(std::vector<QString> tickers)
+    void TickerField::updateTickers(const Set<QString>& tickers)
     {
-        _tickers = std::move(tickers);
+        _tickers = tickers;
         _rebuildCompleter();
     }
 

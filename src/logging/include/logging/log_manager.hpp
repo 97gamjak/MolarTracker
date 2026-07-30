@@ -1,18 +1,20 @@
 #ifndef __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__
 #define __LOGGING__INCLUDE__LOGGING__LOG_MANAGER_HPP__
 
-#include <filesystem>
+#include <memory>
 #include <string>
+#include <string_view>
 
 #include "config/logging_base.hpp"
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
-#include "utils/ring_file.hpp"
 
 namespace settings
 {
     class LoggingSettings;   // forward declaration
 }   // namespace settings
+
+class RingFile;   // forward declaration
 
 namespace logging
 {
@@ -25,6 +27,9 @@ namespace logging
     class LogManager
     {
        private:
+        /// The name of the file where the persisted log levels are stored.
+        static constexpr auto _persistedLogLevelFile = "log_levels.json";
+
         /// The collection of log categories, organized in a hierarchical
         /// structure
         LogCategories _categories;
@@ -34,24 +39,29 @@ namespace logging
         LogCategories _startupCategories;
 
         /// The ring file logger instance used for logging to files.
-        RingFile _ringFile;
+        std::unique_ptr<RingFile> _ringFile;
 
         /// The directory where log files are stored.
-        std::filesystem::path _logDirectory;
+        std::string _logDirectory;
 
         /// The default log level for categories that are not explicitly set.
-        LogLevel _defaultLogLevel = LogLevel::Trace;
+        LogLevel _defaultLogLevel = LogLevel::Info;
 
        public:
         static LogManager& getInstance();
 
-        void initializeCategories();
-        void initializeRingFileLogger(
-            const settings::LoggingSettings& settings,
-            const std::filesystem::path&     directory
+        void initialize(
+            std::string_view                 directory,
+            const settings::LoggingSettings& loggingSettings
         );
 
-        void changeLogLevel(const LogCategory& category, const LogLevel& level);
+        void changeLogLevel(
+            const LogCategory& category,
+            const LogLevel&    level,
+            bool               withLogging = true
+        );
+
+        [[nodiscard]]
         bool isEnabled(
             const std::string& categoryName,
             const LogLevel&    level
@@ -62,7 +72,7 @@ namespace logging
         [[nodiscard]] LogCategories getCategories() const;
         [[nodiscard]] LogCategories getDefaultCategories() const;
 
-        std::filesystem::path getCurrentLogFilePath() const;
+        std::string getCurrentLogFilePath() const;
 
         void log(const LogObject& logObject);
 
@@ -73,12 +83,25 @@ namespace logging
 
         LogCategory getCategory(const std::string& name) const;
 
+        void saveOverrides() const;
+        void loadOverrides();
+
        private:
         LogManager() = default;
 
-        [[nodiscard]] static std::string _logLevelToString(
-            const LogLevel& level
+        [[nodiscard]]
+        std::optional<LogCategory> _getCategoryOpt(
+            const std::string& name
+        ) const;
+
+        [[nodiscard]]
+        static std::string _logLevelToString(const LogLevel& level);
+
+        void _initializeCategories(std::string_view directory);
+        void _initializeRingFileLogger(
+            const settings::LoggingSettings& settings
         );
+        void _cleanupOldLogFiles(const settings::LoggingSettings& settings);
     };
 
 }   // namespace logging

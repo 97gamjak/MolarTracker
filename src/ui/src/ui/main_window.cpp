@@ -1,6 +1,7 @@
 #include "ui/main_window.hpp"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QLabel>
 #include <QMessageBox>
 #include <QStackedWidget>
@@ -8,20 +9,22 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-#include "config/constants.hpp"
+#include "common/qt_helpers.hpp"
+#include "config/constants/constants.hpp"
 #include "ui/menu_bar/menu_bar.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
 
     /**
      * @brief Construct a new Main Window:: Main Window object
+     *
+     * @param shortcutSettings The shortcut settings to use for the menu bar
      */
-    MainWindow::MainWindow()
-        : _menuBar(new MenuBar(this)),
+    MainWindow::MainWindow(const settings::ShortcutSettings& shortcutSettings)
+        : _menuBar(new MenuBar(this, this, shortcutSettings)),
           _sideBar(new SideBar(this)),
           _centralWidget(new CentralWidget(this))
     {
@@ -41,10 +44,10 @@ namespace ui
     {
         setMenuBar(_menuBar);
 
-        auto* root = utils::makeQChild<QWidget>(this);
+        auto* root = common::makeQChild<QWidget>(this);
         setCentralWidget(root);
 
-        auto* layout = utils::makeQChild<QHBoxLayout>(root);
+        auto* layout = common::makeQChild<QHBoxLayout>(root);
 
         const auto& margins = Constants::getCoreWindowMargins();
         layout->setContentsMargins(
@@ -77,6 +80,34 @@ namespace ui
 
         const auto name = QString::fromStdString(baseTitle);
         QMainWindow::setWindowTitle(name);
+    }
+
+    /**
+     * @brief Set the callback used to decide whether the window is allowed to
+     * close. The callback is invoked inside closeEvent() and should return
+     * true to allow closing, false to keep the window open.
+     *
+     * @param callback A callable returning bool, or an empty function to
+     * disable the guard
+     */
+    void MainWindow::setCanCloseCallback(CanCloseCallback callback)
+    {
+        _canCloseCallback = std::move(callback);
+    }
+
+    /**
+     * @brief Override closeEvent to run the close guard before allowing the
+     * window to close. If a callback is set and it returns false the event
+     * is ignored; otherwise the default close behaviour proceeds.
+     *
+     * @param event The close event
+     */
+    void MainWindow::closeEvent(QCloseEvent* event)
+    {
+        if (_canCloseCallback && !_canCloseCallback())
+            event->ignore();
+        else
+            QMainWindow::closeEvent(event);
     }
 
     /**

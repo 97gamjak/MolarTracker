@@ -10,9 +10,9 @@
 #include <QStyledItemDelegate>
 #include <QWidget>
 
+#include "common/qt_helpers.hpp"
 #include "config/logging_base.hpp"
 #include "ui/logging/custom_roles.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -24,7 +24,7 @@ namespace ui
      */
     DebugSlotsLogLevelDelegate::DebugSlotsLogLevelDelegate(QObject* parent)
         : QStyledItemDelegate(parent),
-          _logLevelNames(utils::toQStringList(LogLevelMeta::names))
+          _logLevelNames(common::toQStringList(LogLevelMeta::names))
     {
     }
 
@@ -43,7 +43,7 @@ namespace ui
         const QModelIndex& /*index*/
     ) const
     {
-        auto* combo = utils::makeQChild<QComboBox>(parent);
+        auto* combo = common::makeQChild<QComboBox>(parent);
         combo->addItems(_logLevelNames);
         return combo;
     }

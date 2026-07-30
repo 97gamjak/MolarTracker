@@ -1,6 +1,6 @@
 #include "finance/ticker_info.hpp"
 
-#include <nlohmann/json.hpp>
+#include "json/json.hpp"
 
 namespace finance
 {
@@ -26,40 +26,8 @@ namespace finance
         return AssetClass::Unknown;
     }
 
-    /**
-     * @brief Convert an AssetClass to its string representation.
-     *
-     * @param assetClass The AssetClass to convert.
-     * @return std::string The string representation of the AssetClass.
-     */
-    std::string toString(AssetClass assetClass)
-    {
-        if (assetClass == AssetClass::MutualFund)
-            return "MutualFund";
-
-        return AssetClassMeta::toString(assetClass);
-    }
-
     namespace
     {
-        /**
-         * @brief Safely get a string value from a JSON object.
-         *
-         * @tparam T
-         * @param obj
-         * @param key
-         * @param fallback
-         * @return T
-         */
-        template <typename T>
-        T _safeGet(const nlohmann::json& obj, const char* key, T fallback = {})
-        {
-            if (const auto it = obj.find(key);
-                it != obj.end() && !it->is_null())
-                return it->get<T>();
-            return fallback;
-        }
-
         /**
          * @brief Safely get a double value from a JSON object.
          *
@@ -83,11 +51,9 @@ namespace finance
      * @brief Create a TickerInfo object from a JSON object.
      *
      * @param json The JSON object containing ticker information.
-     * @return std::expected<TickerInfo, FinanceError>
+     * @return FinanceResult<TickerInfo>
      */
-    std::expected<TickerInfo, FinanceError> TickerInfo::fromJson(
-        const nlohmann::json& json
-    )
+    FinanceResult<TickerInfo> TickerInfo::fromJson(const nlohmann::json& json)
     {
         // quoteSummary.result[0].price
         const auto& price =
@@ -101,29 +67,30 @@ namespace finance
             hasProfile ? result.at("assetProfile") : nlohmann::json::object();
 
         TickerInfo info;
-        info.symbol    = _safeGet<std::string>(price, "symbol");
-        info.shortName = _safeGet<std::string>(price, "shortName");
-        info.longName  = _safeGet<std::string>(price, "longName");
-        info.exchange  = _safeGet<std::string>(price, "exchangeName");
+        info.symbol    = json::safeGet<std::string>(price, "symbol");
+        info.shortName = json::safeGet<std::string>(price, "shortName");
+        info.longName  = json::safeGet<std::string>(price, "longName");
+        info.exchange  = json::safeGet<std::string>(price, "exchangeName");
 
-        const auto currencyStr = _safeGet<std::string>(price, "currency");
+        const auto currencyStr = json::safeGet<std::string>(price, "currency");
         const auto currencyOpt = CurrencyMeta::from_string(currencyStr);
 
         if (!currencyOpt)
         {
-            return std::unexpected(FinanceError(
+            return FinanceError(
                 FinanceErrorType::CurrencyUnknown,
                 "Unknown currency " + currencyStr
-            ));
+            );
         }
 
         info.currency = currencyOpt.value();
 
         info.regularMarketPrice = _rawValue(price, "regularMarketPrice");
         info.previousClose = _rawValue(price, "regularMarketPreviousClose");
-        info.assetClass = fromQuote(_safeGet<std::string>(price, "quoteType"));
-        info.industry   = _safeGet<std::string>(profile, "industry");
-        info.sector     = _safeGet<std::string>(profile, "sector");
+        info.assetClass =
+            fromQuote(json::safeGet<std::string>(price, "quoteType"));
+        info.industry = json::safeGet<std::string>(profile, "industry");
+        info.sector   = json::safeGet<std::string>(profile, "sector");
 
         return info;
     }

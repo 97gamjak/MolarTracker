@@ -4,6 +4,351 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+REVERT CACHE changes but keep error handling
+
+### Features
+
+#### Finance / Watchlist backend (MOLTRACK-285)
+
+Backend-only scaffolding for the Watchlist feature — DB migration, ORM
+rows, repo, service, and store. Sidebar UI, context menu, and
+create/rename/delete dialogs are deferred to a follow-up PR (depends on
+the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
+
+- New `watchlists` / `watchlist_instruments` tables added via
+  `_migrateV15()` (`DB_VERSION` bumped 14 → 15).
+  `watchlist_instruments` uses a surrogate `IdField<WatchlistInstrumentId>`
+  primary key plus a `getUniqueGroups()` unique constraint on
+  `(watchlistId, symbol)`, since this ORM only supports single-column
+  primary keys (no composite PK support) — functionally equivalent to
+  the ticket's literal composite-PK schema. `symbol` is a plain string,
+  not a foreign key to `instrument`, so a watchlist can reference a
+  symbol that isn't (yet) a tracked instrument.
+- Add `WatchlistId` / `WatchlistInstrumentId` strong IDs
+  (`config/id_types.hpp`), `finance::Watchlist` domain type
+  (`src/finance/include/finance/watchlist.hpp`, mirrors `finance::Position`),
+  `WatchlistRow` / `WatchlistInstrumentRow` ORM rows (`src/sql_models/`),
+  `IWatchlistRepo` / `WatchlistRepo` (create/getAll/rename/delete/
+  addSymbol/removeSymbol, mirrors `AccountRepo`), `IWatchlistService` /
+  `WatchlistService` (thin wrapper, mirrors `AccountService`), and
+  `IWatchlistStore` / `WatchlistStore` (extends
+  `BaseStore<finance::Watchlist, WatchlistId>`, mirrors `AccountStore`).
+  Like `AccountStore`, `WatchlistStore::commit()` only supports the
+  `New`/`Clean` states so far (`Modified`/`Deleted` throw
+  "not supported yet") — rename/delete/add-symbol/remove-symbol are
+  available at the repo/service layer already, to be wired into the
+  store's dirty-tracking once the UI needs them.
+- Add `finance::TradeFilterParams` (`src/finance/include/finance/instrument/`)
+  holding `std::optional<std::vector<std::string>> symbolAllowlist`.
+- Add `IInstrumentRepo::getStocksBySymbols(symbols)` /
+  `InstrumentRepo::getStocksBySymbols(symbols)` — additive method using
+  `orm::Query{}.in<StockRow::tickerField>(symbols)` (existing `.in<Field>()`
+  query-builder mechanism) to generate a `ticker IN (...)` clause; no
+  existing method signatures changed. Not yet wired into the live
+  `StockStore` → `SecuritiesController` flow.
+- Register the new repo/service/store trio in `RepoContainer`,
+  `ServiceContainer`, and `StoreContainer` (including `allStores`/`commit()`
+  wiring), so they're ready for the UI PR to consume.
+- Add `tests/app/test_watchlist_repo.cpp`, `test_watchlist_service.cpp`,
+  `tests/app/store/test_watchlist_store.cpp` (+ `MockWatchlistService` in
+  `mock_services.hpp`), and `getStocksBySymbols` coverage in
+  `test_instrument_repo.cpp`.
+
+#### Finance
+
+- Add position store, service and repo
+- Add position creation when creating transactions
+- Add fees to creating stock and cash transactions
+- Add `PriceCache` and `PriceQuote` for continuously fetching price quotes (actual `QFuture` fetching will follow later on)
+- Make stock store a fully cached store with possibility to switch to a dirty-only cache store
+- Implement first version of Option SQL model
+- Extend transaction row sql model with some option specific data
+- Extend domain transaction type to have now `OptionData`
+- Make it possible to open (create) option transactions
+
+#### UI
+
+- Add `ui/include/ui/include/utils/error.hpp` and `ui/src/ui/include/utils/error.cpp` for a generalized approach to display error messages
+- Add `MainWindow::setCanCloseCallback(CanCloseCallback)` and
+  `MainWindow::closeEvent()` override — window refuses to close when
+  the callback returns `false`
+- `DirtyStateHandler::subscribe()` now wires the close-guard callback on
+  `MainWindow`: checks `StoreContainer::isDirty()` and
+  `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
+  before allowing the close
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
+
+#### ORM
+
+- Introduce `.in` for queries to make it easier to create where clauses for ranges
+
+#### Utils
+
+- Introduce `Iterable` helper class for more easily iterating over containers and having a centralized base class approach
+
+#### VCS
+
+- Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
+  - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
+    and returns a `common::SemVer`; strips the `v` prefix from GitHub tags
+  - `vcs::UpdateCheckService` — `QObject` that fires an async
+    `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
+    emits `updateAvailable(SemVer)` at most once per distinct version per
+    session
+- Add `SemVer::current()` static method that returns the compile-time
+  version from `MOLARTRACKER_VERSION`
+- Add `std::strong_ordering operator<=>` to `SemVer` enabling all
+  comparison operators
+- Add `ui::UpdateAvailableDialog` — `QDialog` showing the available
+  version, a link button to the GitHub releases page, and a
+  "don't show again for this version" checkbox
+- Add `GeneralSettings::getDismissedUpdateVersion()` (`StringParam`) that
+  persists the last dismissed update version to `settings.json`
+- Wire `UpdateCheckService` into `MainController::Impl`; on
+  `updateAvailable` the dismissed version is checked, the dialog is shown,
+  and if dismissed the version is written to settings and saved
+
+#### DB / Backup
+
+- Add `db::BackupManager` (`src/db/`) — static methods for:
+  - `createBackup(Database&, backupDir)` — timestamped SQLite backup via
+    `sqlite3_backup_*`, followed by tiered retention pruning
+  - `listBackups(backupDir)` — sorted-newest-first scan of backup files
+  - Retention: 5 most-recent, 4 weekly, unlimited monthly tiers
+- `RepoContainer` now calls `BackupManager::createBackup()` on every startup
+  (before migrations). The old `Database::makeBackup()` call inside
+  `MigrationRunner` has been removed.
+- `Constants::getBackupPath()` / `setBackupPath()` added; `MainController`
+  sets it from `BackupSettings` before opening the database.
+- `BackupSettings` section added to the settings system (enable toggle,
+  configurable directory, recentCount / weeklyCount)
+
+#### Store / Restore
+
+- `IStore::reload()` pure-virtual method added and implemented in all five
+  stores (Profile, Account, Stock, Transaction, Position) — discards the
+  in-memory cache and reloads from the database
+- `RepoContainer::closeDb()` / `reopenDb()` and
+  `ServiceContainer::closeDb()` / `reopenDb()` added
+- `StoreContainer::restoreFromBackup(path)` — closes the DB, copies the
+  backup file over the live database, reopens, then calls `reload()` on
+  every store
+
+#### UI / Controller
+
+- `ui::RestoreBackupDialog` — table view listing backups by date/time and
+  file size with a confirmation step
+- "Restore from Backup…" action added to `SettingsMenu`
+- `SettingsMenuController::setRestoreCallback` wired from
+  `MainController::Impl` so the controller can trigger an in-place restore
+
+
+#### UI — GitHub bug report from fatal error dialog (MOLTRACK-36)
+
+- Add `ui::BugReportDialog` (`src/ui/exceptions/`) — pre-fills a title and
+  Markdown body (app version, OS via `QSysInfo::prettyProductName`, truncated
+  exception details, log file path) from the exception details, lets the user
+  edit them, then opens GitHub's pre-filled `/issues/new` page via
+  `QDesktopServices::openUrl`; no GitHub token or POST support required since
+  the user submits manually in the browser
+- `ExceptionDialog` gains a "Report Bug" button wired to `BugReportDialog`,
+  replacing the `TODO(97gamjak)` marker for MOLTRACK-53
+- `molartracker_ui` now links `molartracker_http` for
+  `http::HttpClient::urlEncode`
+
+#### Settings — reset to default values (MOLTRACK-133)
+
+- Add `resetToDefault()` to `settings::ParamCore<T>` — clears `_value` (falling
+  back to `_defaultValue` via `get()`) but only if a default has been
+  configured, otherwise a no-op
+- Add `resetToDefault()` forwarding to `settings::ParamMixin<Derived, T>`,
+  `settings::NumericVecParam<T, N>` (loops its internal `NumericParam<T>`
+  elements), and `settings::ParamContainerMixin<Derived>` (loops
+  `forEachParam`, recursing into nested containers) — this gives every
+  settings container, including `Settings` itself, a working
+  `resetToDefault()` for free
+- `ui::SettingsDialog` gains a "Reset to Defaults" button in the bottom bar;
+  after a `QMessageBox` confirmation it calls `_settings.resetToDefault()`
+  then reuses the existing `saveRequested()`/`accept()` flow (same as Save),
+  since `SettingsDialog`'s param-editor widgets don't live-refresh on
+  external value changes
+- Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
+  `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+- Add `MapParam` as a new parameter type and add `Shortcutsettings` with it
+
+#### Logging — age-based log file cleanup (MOLTRACK-60)
+
+- Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,
+  reboot-required); schema key `maxLogAgeDays`, min 0
+- Add `logging::LogFileCleaner::cleanByAge()` in `src/logging/` — scans a
+  directory for regular files matching a prefix/suffix and deletes those whose
+  `last_write_time` exceeds the configured age; no-op when `maxAgeDays == 0`;
+  best-effort (per-file errors suppressed via `std::error_code`)
+- `LogManager::initialize()` now calls `_cleanupOldLogFiles()` before
+  constructing the `RingFile`, ensuring stale session logs are pruned at every
+  startup
+
+#### Error Handling
+
+- centralize and generalize error handling approach
+
+#### Transaction overview — option transactions (MOLTRACK-316)
+
+- Add `drafts::OptionTransactionOverview` (`src/drafts/include/drafts/transaction/transaction_overview_draft.hpp`),
+  mirroring `StockTransactionOverview`, plus `mapper::TransactionOverviewMapper::toOption()`
+  resolving each option transaction's instrument ID to a display name via
+  `finance::Options::getOption()` (falls back to `"UNKNOWN"`, mirroring `toStock()`)
+- Add `ui::OptionTransactionTableModel` (`src/ui/include/ui/transaction/option_transaction_table.hpp`),
+  mirroring `StockTransactionTableModel`, with an additional `BuySell` /
+  `Action` column pair since options carry that data and stocks don't
+- `ui::TransactionsOverview` gains a third table/section for option
+  transactions; `refresh()` takes an additional
+  `std::vector<drafts::OptionTransactionOverview>` parameter
+- `TransactionController` now depends on `store::IOptionStore` and fetches
+  `_optionStore->getOptions(txs.value().getOptionInstrumentIds())` to feed
+  `TransactionOverviewMapper::toOption()`, alongside the existing cash/stock
+  mapping
+- Add `OptionTransactionTableModelTest` suite to
+  `tests/ui/test_transaction_table_models.cpp`, mirroring the existing
+  `StockTransactionTableModelTest` coverage
+
+### CI
+
+- Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
+  PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
+  (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
+  uploads to Codecov via `codecov/codecov-action@v5`
+- Fix drillian claude code review does not work anymore, hence, change it
+  to the official anthropic solution
+
+### Bug Fix
+
+#### UI — numeric settings not persisting (MOLTRACK-314)
+
+- Fix `ui::makeNumericEditor` (`param_editor.tpp`) connecting
+  `editingFinished` to a lambda that called `makeNumericEditorEditing(...)`
+  — but that function's entire job is itself to establish the
+  `editingFinished → param.set(...)` connection. This meant the real
+  persist-on-edit connection was only registered the *first* time
+  `editingFinished` fired (without acting on that edit), and a duplicate
+  connection was added on every subsequent edit. `BoolParam` (`QCheckBox`),
+  `StringParam` (`QLineEdit`), and `EnumParam` (`QComboBox`) connect directly
+  and were unaffected — only `NumericParam`-backed spin boxes (and
+  `NumericVecParam` components, e.g. window/dialog sizes) were broken
+- Fix: call `makeNumericEditorEditing(spinBox, param)` directly once at
+  widget-creation time instead of wrapping it in another `editingFinished`
+  connection
+- Add `tests/ui/test_param_editor.cpp` — regression tests confirming
+  `QSpinBox`/`QDoubleSpinBox` editors persist to the underlying param on
+  `editingFinished`, including across repeated edits; `tests_ui` now links
+  `molartracker_settings`
+
+#### ORM
+
+- Fix `orm::Crud::insert` to catch `db::SqliteError` from
+  `executeToCompletion()` and return `std::unexpected(CrudError{...})`
+  instead of propagating the exception, honouring the method's own
+  `std::expected` return-type contract
+- Fix `orm::Crud::update` binding the WHERE-clause parameters at index 0
+  instead of after the SET-clause parameters, causing the primary-key
+  predicate to always evaluate to NULL and update zero rows
+- Fix `orm::Crud::update` propagating `db::SqliteError` (e.g. from a UNIQUE
+  constraint violation) instead of returning
+  `std::unexpected(CrudError{UpdateFailed, …})` as its return-type contract
+  requires; add `CrudErrorType::UpdateFailed` to support this
+- Fix `orm::Crud::deleteByPk` emitting `DELETE FROM <t> WHERE WHERE …`
+  (double `WHERE`) by removing the manually appended `" WHERE "` that
+  duplicated the keyword already produced by `getDBOperations()`
+- Fix `orm::Crud::deleteByPk`: SQL contained duplicate `WHERE` keyword because `getDBOperations()` already prepends `WHERE` to the clause
+- Fix `orm::Crud::update`: WHERE-clause parameters were bound at index 1 (overwriting the first SET parameter) instead of after all SET parameters
+- Fix `orm::Query::getDBOperations`: `LIMIT` was silently ignored when no `ORDER BY` field was set due to an early return in the method
+- Fix `orm::Crud::createTable()` (no-arg overload): `fixed_string` tableName was passed where `std::string_view` was expected without an explicit conversion
+- Fix `orm::Query::orderBy()`: `fixed_string` field name was passed to `std::vector<pair<string,bool>>::push_back` without an explicit conversion
+
+#### Finance
+
+- Fix handling error if creating cash transaction fails
+- Fix silent continuing for stock transaction creation if position exists but has not suitable instrument
+- Improve error handling when creating a new position during stock transaction creation
+- Fix retrieving only transactions related to accounts that are loaded for the current profile
+- Fix retrieving only positions related to accounts that are loaded for the current profile
+- Fix account creation now handling duplicated account names already when adding to store instead of throwing exception when trying to commit to database
+
+#### UI
+
+- Fix: make `positionAt` in `PositionSelectionTableModel` more robust by returning `std::optional` with boundary checks
+
+### Tests
+
+- Add `tests/app/test_account_repo.cpp` with GoogleTest fixture covering
+  `AccountRepo::createAccount` (returns valid ID, persists data, enforces
+  unique constraint, allows differing kind/profile) and
+  `AccountRepo::getAllAccounts` (empty result, full set, profile isolation,
+  correct domain data mapping)
+- Add `tests/app/test_profile_repo.cpp` with GoogleTest fixture covering
+  `ProfileRepo::create` (valid ID, duplicate name throws, with/without email),
+  `ProfileRepo::get` by ID and name (hit and miss), `ProfileRepo::getAll`
+  (empty, full set, correct data), `ProfileRepo::update` (name/email change,
+  clear email, non-existent ID throws, duplicate name throws), and
+  `ProfileRepo::remove` (deletes target, preserves others)
+- Add `tests/app/test_transaction_repo.cpp` with 15 GoogleTest cases for
+  `repo::TransactionRepo::addTransaction` and `getTransactions`; covers Cash
+  and Trade transactions, entry/leg persistence, comment round-trips, ID
+  sequencing, and empty-database behavior
+- Add 48 GoogleTest unit tests for `orm::Crud` covering 
+  `createTable`, `insert`, `batchInsert`, `get`, `getUnique`, `update`, `deleteByPk`, `addColumn`, `dropColumn`, `getJoined`, 
+  WHERE/ORDER BY/LIMIT query options, FK constraints (CASCADE and RESTRICT), unique constraints, and SQL execution tracking
+- Add `tests/settings/params/` test suite (151 tests across 8 files) covering
+  `ParamError`, `ParamContainer`, `ParamCore<T>`, `NumericParam<T>`,
+  `EnumParam<E>`, `NumericVecParam<T,N>`, `ParamContainerMixin<Derived>`,
+  and the `param_utils.hpp` free functions and type traits
+- Unit tests for all five services (`ProfileService`, `AccountService`,
+  `InstrumentService`, `PositionService`, `TransactionService`) using
+  real repo + SQLite database integration fixtures
+- Unit tests for all five stores (`ProfileStore`, `AccountStore`,
+  `StockStore`, `PositionStore`, `TransactionStore`) using hand-rolled
+  mock service implementations
+- Shared `mock_services.hpp` test helper in `tests/app/store/` providing
+  lightweight fakes for all service interfaces
+- New `tests_stores` CMake test executable for store unit tests
+- Add unit test suite for the `src/ui/` layer covering validators
+  (`NameLineEdit`, `EmailLineEdit`, `AmountLineEdit`), table models
+  (`StockInfoTableModel`, `CashTransactionTableModel`,
+  `StockTransactionTableModel`, `PositionSelectionTableModel`), sidebar items
+  (`AccountItem`, `AccountCategory`), and `EditMenu`
+- Introduce `tests/ui/` with a custom `main.cpp` that creates `QApplication`
+  before GoogleTest runs; tests use `QT_QPA_PLATFORM=offscreen` for headless
+  execution
+
+### Cleanup
+
+- Speedup some compilation headers
+- split domain profile completely from controllers and introduce profile store interface
+- Move repository, factory, and migration implementations into separate
+  molartracker_repo CMake target (in src/repo/) for better modularity
+- Move service implementations into separate molartracker_service CMake target (in src/service/)
+- remove app namespace and introduce store namespace
+- make account store an interface
+- make stock store an interface
+- move account_session.hpp to src dir of store to disallow access from outside of stores
+- make transaction store an interface
+- make position store an interface and cleanup deps to remove drafts from store deps
+- move mappers from drafts into controller
+- remove `AccountSession` type and change it to `Accounts`
+- remove IdMap special type
+- replace `ParamError` with common `Error` type
+
+### Claude
+
+- add rules for allowing and denying commands
+
+### Building
+
+- add log file for clangd-tidy checks
+
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 

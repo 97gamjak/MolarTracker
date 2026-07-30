@@ -10,5 +10,5 @@
  */
 orm::WhereExpr StockRow::hasTicker(const std::string& ticker)
 {
-    return orm::makeWhere(tickerField{ticker}, filter::Operator::Equal);
+    return orm::makeWhere<tickerField>(ticker, filter::Operator::Equal);
 }

@@ -3,9 +3,9 @@
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 
-#include "app/store/stock_store.hpp"
-#include "drafts/stock_mapper.hpp"
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
+#include "mapper/stock_mapper.hpp"
+#include "store/i_stock_store.hpp"
 #include "ui/securities/stock_info_model.hpp"
 #include "ui/securities/stock_overview.hpp"
 #include "ui/securities/ticker_lookup.hpp"
@@ -22,9 +22,9 @@ namespace controller
      * @param stackedWidget
      */
     SecuritiesSideBarController::SecuritiesSideBarController(
-        QMainWindow*     mainWindow,
-        app::StockStore& stockStore,
-        QStackedWidget*  stackedWidget
+        QMainWindow*                               mainWindow,
+        const std::shared_ptr<store::IStockStore>& stockStore,
+        QStackedWidget*                            stackedWidget
     )
         : SideBarCategoryController(new ui::SecuritiesCategory(), mainWindow),
           _stockOverviewWidget(new ui::StockOverviewWidget()),
@@ -62,7 +62,7 @@ namespace controller
     void SecuritiesSideBarController::onSecuritiesSelected()
     {
         const auto stocks =
-            drafts::StockMapper::toStockInfoDrafts(_stockStore.getStocks());
+            mapper::StockMapper::toStockInfoDrafts(_stockStore->getStocks());
 
         _stockOverviewWidget->getModel()->setRows(stocks);
         _stackedWidget->setCurrentWidget(_stockOverviewWidget);
@@ -108,7 +108,7 @@ namespace controller
 
         _acceptedQuote = result.value();
         _tickerLookupWidget->displayQuote(
-            drafts::StockMapper::toStockInfoDraft(result.value())
+            mapper::StockMapper::toStockInfoDraft(result.value())
         );
     }
 
@@ -120,9 +120,9 @@ namespace controller
     {
         if (_acceptedQuote)
         {
-            const auto result = _stockStore.addStock(_acceptedQuote.value());
+            const auto result = _stockStore->addStock(_acceptedQuote.value());
 
-            if (result != app::StockStoreResult::Ok)
+            if (result != store::StockStoreResult::Ok)
                 _tickerLookupWidget->displayError("Failed to add stock");
         }
 

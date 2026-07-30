@@ -4,7 +4,6 @@
 #include <nlohmann/json.hpp>
 
 #include "enum_param.hpp"
-#include "settings/params/param_error.hpp"
 
 namespace settings
 {
@@ -65,11 +64,11 @@ namespace settings
      * @tparam Derived
      * @tparam T
      * @param value
-     * @return std::expected<void, ParamError>
+     * @return ParamResult<void>
      */
     template <typename E>
     requires std::is_enum_v<E>
-    std::expected<void, ParamError> EnumParam<E>::set(const E& value)
+    ParamResult<void> EnumParam<E>::set(const E& value)
     {
         for (const auto& validValue : EnumMeta::values_view())
         {
@@ -84,7 +83,7 @@ namespace settings
             "Invalid value for enum parameter: " +
             std::to_string(static_cast<std::underlying_type_t<E>>(value));
 
-        return std::unexpected(ParamError{errorMessage});
+        return ParamError{ParamErrorType::InvalidParamValue, errorMessage};
     }
 
 }   // namespace settings

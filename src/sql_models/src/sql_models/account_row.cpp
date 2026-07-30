@@ -8,5 +8,5 @@
  */
 orm::WhereExpr AccountRow::hasProfileId(const ProfileId& profileId)
 {
-    return orm::makeWhere(profileIdField{profileId}, filter::Operator::Equal);
+    return orm::makeWhere<profileIdField>(profileId, filter::Operator::Equal);
 }

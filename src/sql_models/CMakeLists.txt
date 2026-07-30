@@ -3,11 +3,16 @@ set(SRC src/sql_models/)
 add_library(molartracker_sql_models STATIC
     ${SRC}/account_row.cpp
     ${SRC}/instrument_row.cpp
+    ${SRC}/option_row.cpp
+    ${SRC}/position_row.cpp
     ${SRC}/profile_row.cpp
-    ${SRC}/transaction_entry_row.cpp
     ${SRC}/stock_row.cpp
-    ${SRC}/profile_row.cpp
     ${SRC}/trade_leg_row.cpp
+    ${SRC}/transaction_entry_row.cpp
+    ${SRC}/transaction_option_row.cpp
+    ${SRC}/transaction_row.cpp
+    ${SRC}/watchlist_row.cpp
+    ${SRC}/watchlist_instrument_row.cpp
 )
 
 target_include_directories(molartracker_sql_models

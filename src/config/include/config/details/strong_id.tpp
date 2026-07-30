@@ -167,4 +167,18 @@ Id IdSequence<Id>::next()
     return id;
 }
 
+/**
+ * @brief Compare two StrongId instances with the underlying representation
+ *
+ * @tparam Tag
+ * @tparam Rep
+ * @param value
+ * @return std::strong_ordering
+ */
+template <typename Tag, typename Rep>
+auto StrongId<Tag, Rep>::operator<=>(const Rep& value) const
+{
+    return _value <=> value;
+}
+
 #endif   // __CONFIG__INCLUDE__CONFIG__DETAILS__STRONG_ID_TPP__

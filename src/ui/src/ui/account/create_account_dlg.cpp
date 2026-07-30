@@ -6,12 +6,12 @@
 #include <QVBoxLayout>
 #include <string>
 
-#include "config/finance.hpp"
+#include "common/finance.hpp"
+#include "common/qt_helpers.hpp"
 #include "config/id_types.hpp"
 #include "drafts/account_draft.hpp"
 #include "ui/validators/name_line_edit.hpp"
 #include "ui/validators/validators.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -34,7 +34,7 @@ namespace ui
      */
     void CreateAccountDialog::_buildUI()
     {
-        auto* mainLayout = utils::makeQChild<QVBoxLayout>(this);
+        auto* mainLayout = common::makeQChild<QVBoxLayout>(this);
 
         _buildFormLayout(mainLayout);
         _buildButtonSection(mainLayout);
@@ -47,11 +47,11 @@ namespace ui
      */
     void CreateAccountDialog::_buildFormLayout(QVBoxLayout* parent)
     {
-        auto* formLayout = utils::makeQChild<QFormLayout>();
+        auto* formLayout = common::makeQChild<QFormLayout>();
 
         parent->addLayout(formLayout);
 
-        _accountType = utils::makeQChild<QComboBox>(this);
+        _accountType = common::makeQChild<QComboBox>(this);
         for (const auto& type : AccountKindMeta::values)
         {
             // we disallow creating accounts of kind External, since those are
@@ -75,7 +75,7 @@ namespace ui
 
         formLayout->addRow("Account Name:", nameContainer);
 
-        _currency = utils::makeQChild<QComboBox>(this);
+        _currency = common::makeQChild<QComboBox>(this);
         for (const auto& type : CurrencyMeta::names)
         {
             _currency->addItem(QString::fromStdString(std::string(type)));
@@ -90,9 +90,9 @@ namespace ui
      */
     void CreateAccountDialog::_buildButtonSection(QVBoxLayout* parent)
     {
-        auto* buttonLayout = utils::makeQChild<QHBoxLayout>();
+        auto* buttonLayout = common::makeQChild<QHBoxLayout>();
 
-        _addButton = utils::makeQChild<QPushButton>("Create Account", this);
+        _addButton = common::makeQChild<QPushButton>("Create Account", this);
 
         // check the validity of the input to enable or disable the add button
         _addButton->setEnabled(false);
@@ -113,7 +113,7 @@ namespace ui
 
         buttonLayout->addWidget(_addButton);
 
-        _cancelButton = utils::makeQChild<QPushButton>("Cancel", this);
+        _cancelButton = common::makeQChild<QPushButton>("Cancel", this);
         buttonLayout->addWidget(_cancelButton);
 
         parent->addLayout(buttonLayout);
@@ -152,10 +152,10 @@ namespace ui
 
         return drafts::AccountDraft{
             AccountId::invalid(),
+            AccountStatus::Active,
             _nameLineEdit->text().toStdString(),
-            type,
             currency,
-            AccountStatus::Active
+            type
         };
     }
 

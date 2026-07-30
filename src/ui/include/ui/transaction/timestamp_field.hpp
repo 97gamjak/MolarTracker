@@ -3,7 +3,7 @@
 
 #include <qwidget.h>
 
-#include "utils/timestamp.hpp"
+#include "common/timestamp.hpp"
 
 class QDateEdit;     // Forward declaration
 class QTimeEdit;     // Forward declaration
@@ -34,8 +34,11 @@ namespace ui
         /// The button for resetting the timestamp to the current date
         QPushButton* _todayButton;
 
+        /// Whether to only allow editing the date
+        bool _onlyDateEdit;
+
        public:
-        explicit TimestampField(QWidget* parent = nullptr);
+        explicit TimestampField(bool onlyDateEdit, QWidget* parent);
 
         [[nodiscard]] Timestamp getTimestamp() const;
 

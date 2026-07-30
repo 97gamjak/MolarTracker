@@ -37,7 +37,12 @@ namespace orm
      */
     std::string Query::getWhereDBOperations() const
     {
-        return orm::getDBOperations(_whereExpr);
+        const auto operations = orm::getDBOperations(_whereExpr);
+
+        if (!operations.empty())
+            return "WHERE " + operations;
+
+        return "";
     }
 
     /**
@@ -50,16 +55,16 @@ namespace orm
     {
         auto sql = getWhereDBOperations();
 
-        if (_orderFields.empty())
-            return sql;
+        if (!_orderFields.empty())
+        {
+            std::vector<std::string> operations;
+            operations.reserve(_orderFields.size());
 
-        std::vector<std::string> operations;
-        operations.reserve(_orderFields.size());
+            for (const auto& [field, ascending] : _orderFields)
+                operations.push_back(field + (ascending ? " ASC" : " DESC"));
 
-        for (const auto& [field, ascending] : _orderFields)
-            operations.push_back(field + (ascending ? " ASC" : " DESC"));
-
-        sql += "ORDER BY " + mstd::join(operations, ", ");
+            sql += "ORDER BY " + mstd::join(operations, ", ");
+        }
 
         if (_limit.has_value())
             sql += " LIMIT " + std::to_string(_limit.value());

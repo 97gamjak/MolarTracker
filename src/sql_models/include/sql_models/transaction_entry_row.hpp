@@ -2,9 +2,9 @@
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRANSACTION_ENTRY_ROW_HPP__
 
 #include "account_row.hpp"
-#include "config/finance.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
@@ -31,14 +31,7 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
     /// transaction entries will also be deleted
     ORM_FIELD(
         transactionId,
-        Field<
-            "transaction_id",
-            TransactionId,
-            orm::foreign_key_t<
-                orm::CascadeDelete,
-                TransactionRow,
-                decltype(TransactionRow::id)>,
-            orm::not_null_t>
+        TransactionRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The account_id field, this is a required field and is a foreign key
@@ -64,7 +57,13 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
     /// for USD) to avoid floating-point precision issues
     ORM_FIELD(amount, Field<"amount", micro_units, orm::not_null_t>)
 
+    /// The currency field, this is a required field that represents the
+    /// currency of the transaction, it is stored as an enum value
     ORM_FIELD(currency, Field<"currency", Currency, orm::not_null_t>)
+
+    /// The type field, this is a required field that represents the type of
+    /// the transaction entry, it is stored as an enum value
+    ORM_FIELD(type, Field<"type", TransactionEntryType, orm::not_null_t>)
 
     /// @cond DOXYGEN_IGNORE
     ORM_FIELDS(
@@ -73,7 +72,8 @@ struct TransactionEntryRow : public orm::ORMModel<"tx_entry">
         transactionId,
         accountId,
         amount,
-        currency
+        currency,
+        type
     )
     /// @endcond
 

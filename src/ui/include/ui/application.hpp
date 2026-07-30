@@ -22,6 +22,12 @@ namespace ui
          * @param argv Argument values
          */
         MolarTrackerApplication(int& argc, char** argv);
+
+       protected:
+        bool notify(QObject* receiver, QEvent* event) override;
+
+       private:
+        static void handleException(const char* what);
     };
 
 }   // namespace ui

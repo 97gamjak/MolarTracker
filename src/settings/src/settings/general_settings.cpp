@@ -1,6 +1,6 @@
 #include "settings/general_settings.hpp"
 
-#include "config/constants.hpp"
+#include "config/constants/github_constants.hpp"
 #include "connections/observable.hpp"   // IWYU pragma: keep
 #include "connections/signal.hpp"       // IWYU pragma: keep
 #include "settings/params/params.hpp"
@@ -13,9 +13,12 @@ namespace settings
      */
     GeneralSettings::GeneralSettings()
         : _core{Schema::GENERAL_SETTINGS_KEY, Schema::GENERAL_SETTINGS_TITLE, Schema::GENERAL_SETTINGS_DESCRIPTION},
-          _currentVersion(Constants::getSemVer())
+          _currentVersion(GithubConstants::getSemVer())
     {
-        _version.set(Constants::getSemVer());
+        _version.set(GithubConstants::getSemVer());
+        _dismissedUpdateVersion.setDefault(
+            Schema::DISMISSED_UPDATE_VERSION_DEFAULT
+        );
     }
 
     /**
@@ -52,6 +55,26 @@ namespace settings
     bool GeneralSettings::hasDefaultProfile() const
     {
         return _defaultProfile.getOptional().has_value();
+    }
+
+    /**
+     * @brief Get the dismissed update version parameter
+     *
+     * @return StringParam&
+     */
+    StringParam& GeneralSettings::getDismissedUpdateVersion()
+    {
+        return _dismissedUpdateVersion;
+    }
+
+    /**
+     * @brief Get the dismissed update version parameter (const version)
+     *
+     * @return const StringParam&
+     */
+    const StringParam& GeneralSettings::getDismissedUpdateVersion() const
+    {
+        return _dismissedUpdateVersion;
     }
 
 }   // namespace settings

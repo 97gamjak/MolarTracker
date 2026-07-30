@@ -4,7 +4,7 @@
 
 #include <qwidget.h>
 
-#include "config/quantity.hpp"
+#include "common/quantity.hpp"
 
 namespace ui
 {
@@ -30,9 +30,11 @@ namespace ui
         explicit AmountRow(QWidget* parent = nullptr);
 
         void setNDecimalPlaces(std::uint8_t places);
+        void setDefaultValue(int value);
 
         [[nodiscard]] bool        isValid() const;
-        [[nodiscard]] micro_units getAmount() const;
+        [[nodiscard]] bool        isZero() const;
+        [[nodiscard]] micro_units getAmount(std::size_t precision) const;
 
        signals:
         /**

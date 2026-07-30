@@ -7,19 +7,22 @@
 struct ProfileTag {};
 using ProfileId = StrongId<ProfileTag>;
 
-struct SecurityTag {};
-using SecurityId = StrongId<SecurityTag>;
-
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
 
 using InstrumentIdSeq = IdSequence<InstrumentId>;
 
 template <typename T>
-using instrumentMap = unorderedIdMap<InstrumentId, T>;
+concept HasInstrumentId = requires(T type) { type.getInstrumentId(); };
 
 struct StockTag {};
 using StockId = StrongId<StockTag>;
+
+struct OptionTag {};
+using OptionId = StrongId<OptionTag>;
+
+struct TransactionOptionTag {};
+using TransactionOptionId = StrongId<TransactionOptionTag>;
 
 struct AccountTag {};
 using AccountId = StrongId<AccountTag>;
@@ -35,6 +38,13 @@ using TradeLegId = StrongId<TradeLegTag>;
 
 struct PositionTag {};
 using PositionId = StrongId<PositionTag>;
+
+struct WatchlistTag {};
+using WatchlistId = StrongId<WatchlistTag>;
+
+struct WatchlistInstrumentTag {};
+using WatchlistInstrumentId = StrongId<WatchlistInstrumentTag>;
+
 // clang-format on
 
 template <typename T>

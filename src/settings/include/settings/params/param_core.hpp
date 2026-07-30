@@ -68,6 +68,18 @@ namespace settings
     };
 
     /**
+     * @brief Tag struct for indicating that the value of a parameter has been
+     * unset, this is used for notifying subscribers when the value of a
+     * parameter is unset, the TagType is the new value of the parameter
+     */
+    struct ParamUnsetWithoutDefault
+    {
+        /// Type alias for the change callback function for the invalid
+        /// parameter
+        using func = std::function<void()>;
+    };
+
+    /**
      * @brief Core class for a setting parameter, this is a template class that
      * can be used for any type of setting parameter
      *
@@ -77,14 +89,16 @@ namespace settings
     class ParamCore : Observable<
                           OnDirtyChanged,
                           ParamValueChanged<T>,
-                          ParamOptionalChanged<T>>
+                          ParamOptionalChanged<T>,
+                          ParamUnsetWithoutDefault>
     {
        private:
         /// Base class for the observable functionality
         using Base = Observable<
             OnDirtyChanged,
             ParamValueChanged<T>,
-            ParamOptionalChanged<T>>;
+            ParamOptionalChanged<T>,
+            ParamUnsetWithoutDefault>;
 
         /// Type alias for the change callback function for the parameter value,
         /// this is a function pointer that takes a pointer to the user data and
@@ -131,6 +145,7 @@ namespace settings
         [[nodiscard]] const T&                get() const;
         void                                  set(const T& value);
         void                                  unset();
+        void                                  resetToDefault();
 
         Connection subscribe(ChangedFn func, void* user);
         Connection subscribeToOptional(ChangedFnOptional func, void* user);

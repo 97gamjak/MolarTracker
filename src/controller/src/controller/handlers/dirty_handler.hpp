@@ -3,15 +3,20 @@
 
 #include "connections/connection.hpp"
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
 
 namespace ui
 {
     class MainWindow;   // Forward declaration
 }   // namespace ui
+
+namespace settings
+{
+    class Settings;   // Forward declaration
+}   // namespace settings
 
 namespace controller
 {
@@ -37,7 +42,11 @@ namespace controller
         Connection _settingsSavedConnection;
 
        public:
-        void subscribe(app::AppContext& appContext, ui::MainWindow* mainWindow);
+        void subscribe(
+            store::StoreContainer& storeContainer,
+            settings::Settings&    settings,
+            ui::MainWindow*        mainWindow
+        );
     };
 
 }   // namespace controller

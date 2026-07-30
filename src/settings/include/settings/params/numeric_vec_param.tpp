@@ -1,6 +1,7 @@
 #ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
 #define __SETTINGS__INCLUDE__SETTINGS__PARAMS__NUMERIC_VEC_PARAM_TPP__
 
+#include "error/param_error.hpp"
 #include "numeric_vec_param.hpp"
 #include "settings/params/numeric_param.hpp"
 
@@ -219,22 +220,23 @@ namespace settings
      * @param index The index of the numeric parameter to set the value of
      * @param value The value to set for the numeric parameter at the specified
      * index
-     * @return std::expected<void, ParamError> An object representing either a
+     * @return ParamResult<void> An object representing either a
      * successful operation or an error if the value is out of range or if the
      * index is invalid
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::expected<void, ParamError> NumericVecParam<T, N>::set(
+    ParamResult<void> NumericVecParam<T, N>::set(
         std::size_t index,
         const T&    value
     )
     {
         if (index >= N)
         {
-            return std::unexpected(
-                ParamError("Index out of range for NumericVecParam")
-            );
+            return ParamError{
+                ParamErrorType::InvalidParamValue,
+                "Index out of range for NumericVecParam"
+            };
         }
 
         return _params[index].set(value);
@@ -254,6 +256,22 @@ namespace settings
     {
         for (auto& param : _params)
             param.commit();
+    }
+
+    /**
+     * @brief Reset each individual numeric parameter in the vector to its
+     * default value, this is a no-op for any individual parameter that has no
+     * default value configured
+     *
+     * @tparam T
+     * @tparam N
+     */
+    template <typename T, std::size_t N>
+    requires(N > 1)
+    void NumericVecParam<T, N>::resetToDefault()
+    {
+        for (auto& param : _params)
+            param.resetToDefault();
     }
 
     /**
@@ -469,11 +487,11 @@ namespace settings
      *
      * @tparam T
      * @tparam N
-     * @return std::string The title of the numeric vector parameter
+     * @return const std::string& The title of the numeric vector parameter
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::string NumericVecParam<T, N>::getTitle() const
+    const std::string& NumericVecParam<T, N>::getTitle() const
     {
         return _title;
     }
@@ -487,12 +505,12 @@ namespace settings
      *
      * @tparam T
      * @tparam N
-     * @return std::string The description of the numeric vector
+     * @return const std::string& The description of the numeric vector
      * parameter
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::string NumericVecParam<T, N>::getDescription() const
+    const std::string& NumericVecParam<T, N>::getDescription() const
     {
         return _description;
     }

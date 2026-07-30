@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <memory>
 
 #include "config/id_types.hpp"
 
@@ -14,13 +15,17 @@ class QStackedWidget;   // Forward declaration
 
 namespace drafts
 {
-    struct AccountDraft;   // Forward declaration
+    class AccountDraft;   // Forward declaration
 }   // namespace drafts
 
-namespace app
+namespace store
 {
-    class AccountStore;   // Forward declaration
-}   // namespace app
+    class IAccountStore;       // Forward declaration
+    class IPositionStore;      // Forward declaration
+    class IStockStore;         // Forward declaration
+    class ITransactionStore;   // Forward declaration
+    class IOptionStore;        // Forward declaration
+}   // namespace store
 
 namespace ui
 {
@@ -34,6 +39,16 @@ namespace cmd
     class UndoStack;   // Forward declaration
 }   // namespace cmd
 
+namespace finance
+{
+    class PriceCache;   // Forward declaration
+}   // namespace finance
+
+namespace gateway
+{
+    class PositionGateway;   // Forward declaration
+}   // namespace gateway
+
 namespace controller
 {
     /**
@@ -45,21 +60,23 @@ namespace controller
         Q_OBJECT
 
        private:
-        /// Reference to the undo stack
-        cmd::UndoStack& _undoStack;
-        /// Reference to the account store
-        app::AccountStore& _accountStore;
-        /// Pointer to the stacked widget
-        QStackedWidget* _stackedWidget;
-        /// Pointer to the account detail view
-        QPointer<ui::AccountDetailView> _accountDetailView;
+        struct Details;
+        /// Pointer to the details struct (PIMPL idiom)
+        std::unique_ptr<Details> _details;
 
        public:
         AccountController(
-            cmd::UndoStack&    undoStack,
-            app::AccountStore& accountStore,
-            QStackedWidget*    stackedWidget
+            cmd::UndoStack&                                  undoStack,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+            const std::shared_ptr<store::IAccountStore>&     accountStore,
+            const std::shared_ptr<store::IPositionStore>&    positionStore,
+            const std::shared_ptr<store::IStockStore>&       stockStore,
+            const std::shared_ptr<store::ITransactionStore>& transactionStore,
+            const std::shared_ptr<store::IOptionStore>&      optionStore,
+            const std::shared_ptr<finance::PriceCache>&      priceCache,
+            QStackedWidget*                                  stackedWidget
         );
+        ~AccountController() override;
 
         void accountSelected(AccountId id);
     };

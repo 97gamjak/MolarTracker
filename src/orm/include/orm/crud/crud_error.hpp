@@ -15,6 +15,7 @@ namespace orm
     X(NoPrimaryKey)        \
     X(MultipleRowsUpdated) \
     X(InsertFailed)        \
+    X(UpdateFailed)        \
     X(NotFound)            \
     X(MultipleResults)     \
     X(ColumnAlreadyExists) \

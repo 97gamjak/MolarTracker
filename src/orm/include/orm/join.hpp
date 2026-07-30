@@ -81,12 +81,24 @@ namespace orm
         /// the list of JOIN clauses
         std::vector<Join> _joins;
 
+        /// whether to use DISTINCT in the query
+        bool _distinct = false;
+
        public:
         [[nodiscard]]
         Joins& add(const Join& join);
 
         [[nodiscard]]
+        Joins& add(const Joins& joins);
+
+        [[nodiscard]]
+        Joins& distinct();
+
+        [[nodiscard]]
         std::string toSQL() const;
+
+        [[nodiscard]]
+        bool isDistinct() const;
     };
 
 }   // namespace orm

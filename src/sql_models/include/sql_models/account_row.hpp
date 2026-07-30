@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "config/finance.hpp"
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"

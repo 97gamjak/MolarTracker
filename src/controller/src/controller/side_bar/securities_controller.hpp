@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "finance/stock.hpp"
+#include "finance/instrument/stock.hpp"
 #include "side_bar_category_controller.hpp"
 
 namespace ui
@@ -13,10 +13,10 @@ namespace ui
     class TickerLookupWidget;    // Forward declaration
 }   // namespace ui
 
-namespace app
+namespace store
 {
-    class StockStore;   // Forward declaration
-}   // namespace app
+    class IStockStore;   // Forward declaration
+}   // namespace store
 
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
@@ -44,16 +44,16 @@ namespace controller
         std::optional<finance::Stock> _acceptedQuote = std::nullopt;
 
         /// Reference to the stock store
-        app::StockStore& _stockStore;
+        std::shared_ptr<store::IStockStore> _stockStore;
 
         /// Pointer to the stacked widget
         QStackedWidget* _stackedWidget;
 
        public:
         explicit SecuritiesSideBarController(
-            QMainWindow*     mainWindow,
-            app::StockStore& stockStore,
-            QStackedWidget*  stackedWidget
+            QMainWindow*                               mainWindow,
+            const std::shared_ptr<store::IStockStore>& stockStore,
+            QStackedWidget*                            stackedWidget
         );
 
         void refresh() override;

@@ -5,9 +5,9 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "ui/side_bar/category.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -65,12 +65,12 @@ namespace ui
      */
     void SideBar::_buildUI()
     {
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
 
-        _model = utils::makeQChild<QStandardItemModel>(this);
-        _tree  = utils::makeQChild<QTreeView>(this);
+        _model = common::makeQChild<QStandardItemModel>(this);
+        _tree  = common::makeQChild<QTreeView>(this);
 
         _tree->setModel(_model);
         _tree->setHeaderHidden(true);
@@ -126,7 +126,7 @@ namespace ui
 
         auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
 
-        auto* menu = utils::makeQChild<QMenu>(this);
+        auto* menu = common::makeQChild<QMenu>(this);
         item->populateContextMenu(*menu);
 
         if (menu->actions().isEmpty())

@@ -5,10 +5,10 @@
 #include <memory>
 #include <utility>
 
-#include "app/store/profile/profile_store.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
-#include "drafts/profile_draft.hpp"
+#include "domain/profile.hpp"
 #include "logging/log_macros.hpp"
+#include "store/i_profile_store.hpp"
 
 REGISTER_LOG_CATEGORY("Commands.Profile.AddProfileCommand");
 
@@ -21,8 +21,8 @@ namespace cmd
      * @param profile
      */
     AddProfileCommand::AddProfileCommand(
-        app::ProfileStore&   profileStore,
-        drafts::ProfileDraft profile
+        const std::shared_ptr<store::IProfileStore>& profileStore,
+        domain::Profile                              profile
     )
         : _profileStore{profileStore}, _profile{std::move(profile)}
     {
@@ -36,13 +36,13 @@ namespace cmd
      */
     std::expected<void, CommandErrorPtr> AddProfileCommand::undo()
     {
-        const auto result = _profileStore.removeProfile(_profile);
+        const auto result = _profileStore->removeProfile(_profile);
 
-        if (result == app::ProfileStoreResult::ProfileNotFound)
+        if (result == store::ProfileStoreResult::ProfileNotFound)
         {
             const auto errorMessage = std::format(
                 "Failed to undo add profile: '{}' not found",
-                _profile.name
+                _profile.getName()
             );
 
             LOG_ERROR(errorMessage);
@@ -56,15 +56,15 @@ namespace cmd
             return std::unexpected<CommandErrorPtr>(std::move(error));
         }
 
-        if (result == app::ProfileStoreResult::Ok)
+        if (result == store::ProfileStoreResult::Ok)
         {
-            LOG_INFO(std::format("Profile removed: '{}'", _profile.name));
+            LOG_INFO(std::format("Profile removed: '{}'", _profile.getName()));
         }
         else
         {
             const auto errorMessage = std::format(
                 "Unknown error removing profile '{}'",
-                _profile.name
+                _profile.getName()
             );
 
             LOG_ERROR(errorMessage);
@@ -88,16 +88,18 @@ namespace cmd
      */
     std::expected<void, CommandErrorPtr> AddProfileCommand::redo()
     {
-        const auto result = _profileStore.addProfile(_profile);
+        const auto result = _profileStore->addProfile(_profile);
 
-        if (result == app::ProfileStoreResult::Ok)
+        if (result == store::ProfileStoreResult::Ok)
         {
-            LOG_INFO(std::format("Profile created: '{}'", _profile.name));
+            LOG_INFO(std::format("Profile created: '{}'", _profile.getName()));
         }
-        else if (result == app::ProfileStoreResult::NameAlreadyExists)
+        else if (result == store::ProfileStoreResult::NameAlreadyExists)
         {
-            const auto errorMessage =
-                std::format("Profile name '{}' already exists", _profile.name);
+            const auto errorMessage = std::format(
+                "Profile name '{}' already exists",
+                _profile.getName()
+            );
 
             LOG_ERROR(errorMessage);
 
@@ -113,7 +115,7 @@ namespace cmd
         {
             const auto errorMessage = std::format(
                 "Unknown error creating profile '{}'",
-                _profile.name
+                _profile.getName()
             );
 
             LOG_ERROR(errorMessage);
@@ -137,7 +139,7 @@ namespace cmd
      */
     std::string AddProfileCommand::getLabel() const
     {
-        return "Create Profile '" + _profile.name + "'";
+        return "Create Profile '" + _profile.getName() + "'";
     }
 
 }   // namespace cmd

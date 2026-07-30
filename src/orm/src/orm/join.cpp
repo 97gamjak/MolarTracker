@@ -53,6 +53,29 @@ namespace orm
     }
 
     /**
+     * @brief Add a collection of joins to the existing collection.
+     *
+     * @param joins The collection of joins to add.
+     * @return Joins& A reference to this Joins object.
+     */
+    Joins& Joins::add(const Joins& joins)
+    {
+        _joins.insert(_joins.end(), joins._joins.begin(), joins._joins.end());
+        return *this;
+    }
+
+    /**
+     * @brief Set the DISTINCT flag for the joins
+     *
+     * @return Joins& A reference to this Joins object.
+     */
+    Joins& Joins::distinct()
+    {
+        _distinct = true;
+        return *this;
+    }
+
+    /**
      * @brief Convert the Joins object to an SQL string.
      *
      * @return The SQL string representation of the joins.
@@ -67,5 +90,13 @@ namespace orm
         }
         return sql;
     }
+
+    /**
+     * @brief Check if the query uses DISTINCT
+     *
+     * @return true
+     * @return false
+     */
+    bool Joins::isDistinct() const { return _distinct; }
 
 }   // namespace orm

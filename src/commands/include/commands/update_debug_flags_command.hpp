@@ -19,9 +19,14 @@ namespace cmd
         logging::LogCategories _oldCategories;
         /// The new categories after the update
         logging::LogCategories _categories;
+        /// Whether to persist the changes
+        bool _persistChanges;
 
        public:
-        explicit UpdateDebugFlagsCommand(logging::LogCategories categories);
+        explicit UpdateDebugFlagsCommand(
+            logging::LogCategories categories,
+            bool                   persistChanges
+        );
         ~UpdateDebugFlagsCommand() override = default;
 
         [[nodiscard]] std::expected<void, CommandErrorPtr> undo() override;

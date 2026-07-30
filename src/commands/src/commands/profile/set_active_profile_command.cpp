@@ -5,9 +5,9 @@
 #include <memory>
 #include <utility>
 
-#include "app/store/profile/profile_store.hpp"
 #include "commands/profile/add_profile_command_error.hpp"
 #include "logging/log_macros.hpp"
+#include "store/i_profile_store.hpp"
 
 REGISTER_LOG_CATEGORY("Commands.SetActiveProfileCommand");
 
@@ -20,19 +20,25 @@ namespace cmd
      * @param profileStore
      */
     SetActiveProfileCommand::SetActiveProfileCommand(
-        std::string        profileName,
-        app::ProfileStore& profileStore
+        std::string                                  profileName,
+        const std::shared_ptr<store::IProfileStore>& profileStore
     )
         : _profileName(std::move(profileName)), _profileStore(profileStore)
     {
     }
 
+    /**
+     * @brief Undo the Set Active Profile Command
+     *
+     * @return std::expected<void, CommandErrorPtr>
+     */
     std::expected<void, CommandErrorPtr> SetActiveProfileCommand::undo()
     {
+        const std::string baseMsg = "Failed to undo set active profile: ";
+
         if (!_previousProfile.has_value())
         {
-            const auto* const errorMessage =
-                "Failed to undo set active profile: No previous active profile";
+            const auto errorMessage = baseMsg + "No previous active profile";
 
             LOG_ERROR(errorMessage);
 
@@ -45,17 +51,39 @@ namespace cmd
             return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
-        _profileStore.setActiveProfile(_previousProfile->getName());
+        const auto result =
+            _profileStore->setActiveProfile(_previousProfile->getName());
+
+        if (result != store::ProfileStoreResult::Ok)
+        {
+            const auto errorMessage = baseMsg + _previousProfile->getName();
+
+            LOG_ERROR(errorMessage);
+
+            return std::unexpected<CommandErrorPtr>(
+                std::make_unique<AddProfileCommandError>(
+                    errorMessage,
+                    AddProfileCommandErrorCode::ProfileNotFound
+                )
+            );
+        }
 
         return {};
     }
 
+    /**
+     * @brief Redo the Set Active Profile Command
+     *
+     * @return std::expected<void, CommandErrorPtr>
+     */
     std::expected<void, CommandErrorPtr> SetActiveProfileCommand::redo()
     {
-        if (!_profileStore.profileExists(_profileName))
+        const auto* baseMsg = "Failed to redo set active profile: ";
+
+        if (!_profileStore->profileExists(_profileName))
         {
             const auto errorMessage =
-                std::format("Profile '{}' not found", _profileName);
+                baseMsg + std::format("Profile '{}' not found", _profileName);
 
             LOG_ERROR(errorMessage);
 
@@ -68,9 +96,28 @@ namespace cmd
             return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
         }
 
-        _previousProfile = _profileStore.getActiveProfile();
+        _previousProfile = _profileStore->getActiveProfile();
 
-        _profileStore.setActiveProfile(_profileName);
+        const auto result = _profileStore->setActiveProfile(_profileName);
+
+        if (result != store::ProfileStoreResult::Ok)
+        {
+            LOG_ERROR(
+                baseMsg + std::format("Profile '{}' not found", _profileName)
+            );
+
+            std::unique_ptr<AddProfileCommandError> errorMessagePtr =
+                std::make_unique<AddProfileCommandError>(
+                    std::format(
+                        "Failed to redo set active profile: {}",
+                        _profileName
+                    ),
+                    AddProfileCommandErrorCode::ProfileNotFound
+                );
+
+            return std::unexpected<CommandErrorPtr>(std::move(errorMessagePtr));
+        }
+
         return {};
     }
 

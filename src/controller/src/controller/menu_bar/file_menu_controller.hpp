@@ -3,16 +3,21 @@
 
 #include <QObject>
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
 
 namespace ui
 {
     class MainWindow;   // Forward declaration
     class FileMenu;     // Forward declaration
 }   // namespace ui
+
+namespace settings
+{
+    class Settings;   // Forward declaration
+}   // namespace settings
 
 namespace controller
 {
@@ -29,8 +34,10 @@ namespace controller
         ui::MainWindow& _mainWindow;
         /// Reference to the file menu
         ui::FileMenu& _fileMenu;
-        /// Reference to the application context
-        app::AppContext& _appContext;
+        /// Reference to the store container
+        store::StoreContainer& _storeContainer;
+        /// Reference to the application settings
+        settings::Settings& _settings;
 
        private slots:
         void _onRequestSave();
@@ -38,9 +45,10 @@ namespace controller
 
        public:
         explicit FileMenuController(
-            ui::MainWindow&  mainWindow,
-            ui::FileMenu&    fileMenu,
-            app::AppContext& appContext
+            ui::MainWindow&        mainWindow,
+            ui::FileMenu&          fileMenu,
+            store::StoreContainer& storeContainer,
+            settings::Settings&    settings
         );
     };
 

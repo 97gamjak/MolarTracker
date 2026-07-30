@@ -4,10 +4,12 @@
 #include <filesystem>
 
 #include "config/signal_tags.hpp"
+#include "settings/backup_settings.hpp"
 #include "settings/general_settings.hpp"
 #include "settings/logging_settings.hpp"
 #include "settings/params/param_container.hpp"
 #include "settings/params/param_container_mixin.hpp"
+#include "settings/shortcut_settings.hpp"
 #include "settings/ui_settings.hpp"
 
 namespace settings
@@ -54,12 +56,14 @@ namespace settings
 
         /// The general settings parameters
         GeneralSettings _generalSettings;
-
         /// The UI settings parameters
         UISettings _uiSettings;
-
         /// The logging settings parameters
         LoggingSettings _loggingSettings;
+        /// The backup settings parameters
+        BackupSettings _backupSettings;
+        /// The shortcut settings parameters
+        ShortcutSettings _shortcutSettings;
 
        public:
         Settings() = delete;
@@ -77,6 +81,12 @@ namespace settings
         [[nodiscard]] LoggingSettings&       getLoggingSettings();
         [[nodiscard]] const LoggingSettings& getLoggingSettings() const;
 
+        [[nodiscard]] BackupSettings&       getBackupSettings();
+        [[nodiscard]] const BackupSettings& getBackupSettings() const;
+
+        [[nodiscard]] ShortcutSettings&       getShortcutSettings();
+        [[nodiscard]] const ShortcutSettings& getShortcutSettings() const;
+
         template <typename Func>
         void forEachParam(Func&& func) const;
         template <typename Func>
@@ -85,6 +95,13 @@ namespace settings
         Connection subscribeToSaved(OnSaved::func func, void* user);
         void       notifySaved();
         bool       isDirty() const;
+
+        static void fromJson(
+            const nlohmann::json& jsonData,
+            Settings&             settings
+        );
+        [[nodiscard]]
+        nlohmann::json toJson() const;
 
        private:
         void _toJson() const;

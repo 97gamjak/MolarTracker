@@ -3,9 +3,9 @@
 #include <QMainWindow>
 
 #include "account_controller.hpp"
-#include "app/app_context.hpp"
 #include "controller/account_controller.hpp"
 #include "logging/log_macros.hpp"
+#include "store/store_container.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
 #include "ui/side_bar/overview_category.hpp"
@@ -22,42 +22,47 @@ namespace controller
      * @brief Construct a new Side Bar Controller:: Side Bar Controller object
      *
      * @param undoStack The undo stack for the application
-     * @param appContext The application context
+     * @param storeContainer The store container for the application
      * @param mainWindow The main window of the application
      * @param sideBar
      * @param centralStack
      * @param accountController
      * @param transactionController
+     * @param positionGateway
      */
     // TODO(97gamjak): would be probably best to remove dependency on central
     // stack here
     SideBarController::SideBarController(
-        cmd::UndoStack&        undoStack,
-        app::AppContext&       appContext,
-        QMainWindow*           mainWindow,
-        ui::SideBar*           sideBar,
-        QStackedWidget*        centralStack,
-        AccountController&     accountController,
-        TransactionController& transactionController
+        cmd::UndoStack&                                  undoStack,
+        store::StoreContainer&                           storeContainer,
+        QMainWindow*                                     mainWindow,
+        ui::SideBar*                                     sideBar,
+        QStackedWidget*                                  centralStack,
+        AccountController&                               accountController,
+        TransactionController&                           transactionController,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
           _accountSideBarController(
               undoStack,
-              appContext,
+              storeContainer.getAccountStore(),
               accountController,
               mainWindow
           ),
           _securitiesSideBarController(
               mainWindow,
-              appContext.getStore().getStockStore(),
+              storeContainer.getStockStore(),
               centralStack
           ),
           _transactionSideBarController(
               undoStack,
-              appContext.getStore().getAccountStore(),
-              appContext.getStore().getTransactionStore(),
-              appContext.getStore().getStockStore(),
+              positionGateway,
+              storeContainer.getAccountStore(),
+              storeContainer.getTransactionStore(),
+              storeContainer.getStockStore(),
+              storeContainer.getOptionStore(),
+              storeContainer.getPositionStore(),
               transactionController,
               _securitiesSideBarController,
               mainWindow

@@ -1,19 +1,23 @@
 #include "logging/log_manager.hpp"
 
 #include <algorithm>
+#include <filesystem>
 #include <format>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 
+#include "common/ring_file.hpp"
+#include "common/ring_file_config.hpp"
+#include "common/timestamp.hpp"
 #include "config/logging_base.hpp"
 #include "log_categories.gen.hpp"
 #include "logging/log_categories.hpp"
 #include "logging/log_category.hpp"
+#include "logging/log_file_cleaner.hpp"
 #include "logging/log_object.hpp"
 #include "settings/logging_settings.hpp"
-#include "utils/ring_file.hpp"
-#include "utils/ring_file_config.hpp"
-#include "utils/timestamp.hpp"
 
 namespace logging
 {
@@ -30,17 +34,61 @@ namespace logging
     }
 
     /**
+     * @brief Initialize the logging system
+     *
+     * @param directory The directory where log files will be stored
+     * @param loggingSettings The logging settings to apply
+     */
+    void LogManager::initialize(
+        std::string_view                 directory,
+        const settings::LoggingSettings& loggingSettings
+    )
+    {
+        _defaultLogLevel = loggingSettings.getDefaultLogLevelParam().get();
+        _initializeCategories(directory);
+        _cleanupOldLogFiles(loggingSettings);
+        _initializeRingFileLogger(loggingSettings);
+    }
+
+    /**
      * @brief Initialize the logging categories based on the registered
      * categories and the default log level
+     *
+     * @param directory The directory where log files will be stored
      */
-    void LogManager::initializeCategories()
+    void LogManager::_initializeCategories(std::string_view directory)
     {
+        _logDirectory = directory;
+
         _categories = LogCategories{
             CategoryRegistry::getInstance().categories,
             _defaultLogLevel
         };
 
         _startupCategories = _categories;
+
+        loadOverrides();
+    }
+
+    /**
+     * @brief Deletes log files in the log directory that are older than
+     * the configured maximum age
+     *
+     * @param settings Logging settings providing directory, prefix, suffix,
+     * and max age
+     */
+    void LogManager::_cleanupOldLogFiles(
+        const settings::LoggingSettings& settings
+    )
+    {
+        const auto dir =
+            std::filesystem::path(_logDirectory) / settings.getLogDirectory();
+        LogFileCleaner::cleanByAge(
+            dir,
+            settings.getLogFilePrefix(),
+            settings.getLogFileSuffix(),
+            settings.getMaxLogAgeDays()
+        );
     }
 
     /**
@@ -48,16 +96,15 @@ namespace logging
      *
      * @param settings Logging settings containing the configuration for the
      * ring file logger
-     * @param directory Directory where the log files will be stored
      */
-    void LogManager::initializeRingFileLogger(
-        const settings::LoggingSettings& settings,
-        const std::filesystem::path&     directory
+    void LogManager::_initializeRingFileLogger(
+        const settings::LoggingSettings& settings
     )
     {
         RingFileConfig config;
 
-        config.directory = directory / settings.getLogDirectory();
+        const auto path  = std::filesystem::path(_logDirectory);
+        config.directory = path / settings.getLogDirectory();
         config.baseName  = settings.getLogFilePrefix() + Timestamp().fileSafe();
         config.extension = settings.getLogFileSuffix();
         config.maxFiles  = settings.getMaxLogFiles();
@@ -66,7 +113,7 @@ namespace logging
         config.symlinkPath = config.directory / (settings.getLogFilePrefix() +
                                                  "latest" + config.extension);
 
-        _ringFile = RingFile(config);
+        _ringFile = std::make_unique<RingFile>(config);
     }
 
     /**
@@ -91,11 +138,11 @@ namespace logging
     /**
      * @brief Get the current log file path
      *
-     * @return std::filesystem::path
+     * @return std::string
      */
-    std::filesystem::path LogManager::getCurrentLogFilePath() const
+    std::string LogManager::getCurrentLogFilePath() const
     {
-        return _ringFile.getCurrentLogFilePath();
+        return _ringFile->getCurrentLogFilePath().string();
     }
 
     /**
@@ -123,17 +170,19 @@ namespace logging
      * @brief Flush the log file
      *
      */
-    void LogManager::flush() { _ringFile.flush(); }
+    void LogManager::flush() { _ringFile->flush(); }
 
     /**
      * @brief Change the log level for a given category
      *
      * @param category
      * @param level
+     * @param withLogging
      */
     void LogManager::changeLogLevel(
         const LogCategory& category,
-        const LogLevel&    level
+        const LogLevel&    level,
+        bool               withLogging
     )
     {
         const auto categoryOpt = _categories.getCategory(category.getName());
@@ -148,22 +197,25 @@ namespace logging
 
         _categories.setLogLevel(category.getName(), level);
 
-        const auto logObject = LogObject{
-            LogLevel::Info,
-            category.getName(),
-            std::format(
-                "Log level for category '{}' changed from '{}' to '{}'",
-                std::string{_categories.getCategory(category.getName())
-                                .value()
-                                .getName()},
-                std::string{LogLevelMeta::name(previousLevel)},
-                std::string{LogLevelMeta::name(level)}
-            ),
-            __FILE__,
-            __LINE__,
-            __func__
-        };
-        log(logObject);
+        if (withLogging)
+        {
+            const auto logObject = LogObject{
+                LogLevel::Info,
+                category.getName(),
+                std::format(
+                    "Log level for category '{}' changed from '{}' to '{}'",
+                    std::string{_categories.getCategory(category.getName())
+                                    .value()
+                                    .getName()},
+                    std::string{LogLevelMeta::name(previousLevel)},
+                    std::string{LogLevelMeta::name(level)}
+                ),
+                __FILE__,
+                __LINE__,
+                __func__
+            };
+            log(logObject);
+        }
     }
 
     /**
@@ -185,9 +237,11 @@ namespace logging
             return;
 
         std::string buffer;
+        std::string prefix;
 
-        buffer += _logLevelToString(logObject.level);
-        buffer += " [" + Timestamp().iso8601TimeMs() + "] ";
+        prefix += _logLevelToString(logObject.level);
+        prefix += " [" + Timestamp().iso8601TimeMs() + "] ";
+        buffer += prefix;
         buffer += logObject.message;
         if (logObject.level >= LogLevel::Debug ||
             logObject.level == LogLevel::Error)
@@ -199,10 +253,22 @@ namespace logging
             buffer += ")";
         }
 
-        _ringFile.writeLine(buffer);
+        // replace all new lines in buffer with a new line following by n
+        // whitespaces according to the length of the prefix
+        const auto             prefixLength = prefix.length();
+        std::string::size_type pos          = 0;
+        while ((pos = buffer.find('\n', pos)) != std::string::npos)
+        {
+            buffer.insert(pos + 1, prefixLength, ' ');
+            pos += prefixLength + 1;
+        }
 
-        if (logObject.level == LogLevel::Error ||
-            logObject.level == LogLevel::Warning)
+        _ringFile->writeLine(buffer);
+
+        // Flush the log file if the log level is not Info
+        // 1) on warning or error we want always to log
+        // 2) if the user selected a debug logging we also want always to log
+        if (logObject.level != LogLevel::Info)
             flush();
     }
 
@@ -258,7 +324,92 @@ namespace logging
      */
     void LogManager::setDefaultLogLevel(const LogLevel& level)
     {
+        for (const auto& category : _categories.getCategories())
+            if (category.getLogLevel() == _defaultLogLevel)
+                _categories.setLogLevel(category.getName(), level);
+
         _defaultLogLevel = level;
+    }
+
+    /**
+     * @brief Get a log category by its name
+     *
+     * @param name The name of the log category to retrieve
+     * @return LogCategory The log category with the specified name, or a root
+     * category with the default log level if the category is not found
+     */
+    std::optional<LogCategory> LogManager::_getCategoryOpt(
+        const std::string& name
+    ) const
+    {
+        auto categoryOpt = _categories.getCategory(name);
+
+        if (!categoryOpt.has_value())
+            return std::nullopt;
+
+        return categoryOpt;
+    }
+
+    /**
+     * @brief Save log level overrides to a file
+     *
+     */
+    void LogManager::saveOverrides() const
+    {
+        nlohmann::json json;
+
+        for (const auto& category : _categories.getCategories())
+        {
+            if (category.getLogLevel() != _defaultLogLevel)
+            {
+                json[category.getName()] =
+                    static_cast<int>(category.getLogLevel());
+            }
+        }
+
+        const auto path =
+            std::filesystem::path(_logDirectory) / _persistedLogLevelFile;
+
+        std::ofstream file(path);
+
+        if (file.is_open())
+        {
+            file << json.dump(4);
+            file.close();
+        }
+    }
+
+    /**
+     * @brief Load log level overrides from a file
+     *
+     */
+    void LogManager::loadOverrides()
+    {
+        const auto path =
+            std::filesystem::path(_logDirectory) / _persistedLogLevelFile;
+
+        std::ifstream file(path);
+
+        if (file.is_open())
+        {
+            // Load the log level overrides from the file
+            nlohmann::json json;
+            file >> json;
+
+            for (const auto& [name, level] : json.items())
+            {
+                const auto category = _getCategoryOpt(name);
+
+                if (category)
+                {
+                    changeLogLevel(
+                        *category,
+                        static_cast<LogLevel>(level),
+                        false
+                    );
+                }
+            }
+        }
     }
 
 }   // namespace logging

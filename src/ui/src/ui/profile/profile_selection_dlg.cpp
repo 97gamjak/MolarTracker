@@ -6,9 +6,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "config/constants.hpp"
+#include "common/qt_helpers.hpp"
+#include "config/constants/github_constants.hpp"
 #include "logging/log_macros.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Profile.ProfileSelectionDialog");
 
@@ -31,7 +31,7 @@ namespace ui
         : Dialog{parent}, _canBeClosed{canBeClosed}
     {
         setWindowTitle("Select Profile");
-        utils::moveDialogToParentScreenCenter(this, parent);
+        common::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI(profiles);
     }
@@ -60,8 +60,8 @@ namespace ui
         const std::vector<std::string>& profiles
     )
     {
-        auto* mainLayout   = utils::makeQChild<QVBoxLayout>(this);
-        _profileListWidget = utils::makeQChild<QListWidget>(this);
+        auto* mainLayout   = common::makeQChild<QVBoxLayout>(this);
+        _profileListWidget = common::makeQChild<QListWidget>(this);
 
         for (const auto& profileName : profiles)
             _profileListWidget->addItem(QString::fromStdString(profileName));
@@ -73,7 +73,7 @@ namespace ui
                            : QDialogButtonBox::Ok;
 
         _buttonBox =
-            utils::makeQChild<QDialogButtonBox>(buttons, Qt::Horizontal, this);
+            common::makeQChild<QDialogButtonBox>(buttons, Qt::Horizontal, this);
 
         connect(
             _buttonBox,
@@ -136,8 +136,8 @@ namespace ui
      * is Ok)
      */
     void ProfileSelectionDialog::_emit(
-        const Action&      action,
-        const std::string& profileName
+        const ProfileSelectionDialogAction& action,
+        const std::string&                  profileName
     )
     {
         emit requested(action, profileName);
@@ -149,7 +149,9 @@ namespace ui
      *
      * @param action The action performed by the user (Ok or Cancel)
      */
-    void ProfileSelectionDialog::_emit(const Action& action)
+    void ProfileSelectionDialog::_emit(
+        const ProfileSelectionDialogAction& action
+    )
     {
         emit requested(action, "");
     }
@@ -169,17 +171,15 @@ namespace ui
             // profile is selected. But we check it just in case to prevent
             // crashes in case of unexpected issues.
             LOG_ERROR(
-                "No profile selected, but OK button was clicked. This should "
-                "never happen. If you see this message, please report it to "
-                "the developers under " +
-                Constants::getGithubIssuesUrl()
+                "No profile selected, but OK button was clicked. " +
+                GithubConstants::getCreateIssueError()
             );
             return;
         }
 
         const auto profileName = selectedItems.first()->text().toStdString();
 
-        _emit(Action::Ok, profileName);
+        _emit(ProfileSelectionDialogAction::Ok, profileName);
         accept();
     }
 
@@ -187,6 +187,9 @@ namespace ui
      * @brief Emit the requested signal with the Cancel action
      *
      */
-    void ProfileSelectionDialog::_emitCancel() { _emit(Action::Cancel); }
+    void ProfileSelectionDialog::_emitCancel()
+    {
+        _emit(ProfileSelectionDialogAction::Cancel);
+    }
 
 }   // namespace ui

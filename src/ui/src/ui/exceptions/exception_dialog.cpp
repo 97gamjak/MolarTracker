@@ -7,10 +7,11 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "config/logging_base.hpp"
 #include "logging/log_manager.hpp"
 #include "logging/log_object.hpp"
-#include "utils/qt_helpers.hpp"
+#include "ui/exceptions/bug_report_dialog.hpp"
 
 namespace ui
 {
@@ -31,22 +32,21 @@ namespace ui
         setWindowTitle(title);
         setModal(true);
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
 
         auto* summary = new QLabel(
             "The application encountered a fatal error and must close."
         );
         summary->setWordWrap(true);
 
-        auto* detailBox = utils::makeQChild<QPlainTextEdit>(details);
+        auto* detailBox = common::makeQChild<QPlainTextEdit>(details);
         detailBox->setReadOnly(true);
         detailBox->setVisible(false);
 
         auto* toggleButton = new QPushButton("Show details");
-        // TODO(97gamjak): make this a bug report button for GitHub later on
-        // https://97gamjak.atlassian.net/browse/MOLTRACK-53
-        auto* copyButton  = new QPushButton("Copy");
-        auto* closeButton = new QPushButton("Close");
+        auto* copyButton   = new QPushButton("Copy");
+        auto* reportButton = new QPushButton("Report Bug");
+        auto* closeButton  = new QPushButton("Close");
 
         connect(
             toggleButton,
@@ -70,12 +70,24 @@ namespace ui
             [details]() { QApplication::clipboard()->setText(details); }
         );
 
+        connect(
+            reportButton,
+            &QPushButton::clicked,
+            this,
+            [this, details]()
+            {
+                BugReportDialog dlg(details, this);
+                dlg.exec();
+            }
+        );
+
         connect(closeButton, &QPushButton::clicked, this, &QDialog::accept);
 
         layout->addWidget(summary);
         layout->addWidget(toggleButton);
         layout->addWidget(detailBox);
         layout->addWidget(copyButton);
+        layout->addWidget(reportButton);
         layout->addWidget(closeButton);
     }
 

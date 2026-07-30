@@ -15,6 +15,11 @@ namespace settings
     class Settings;   // Forward declaration
 }   // namespace settings
 
+namespace store
+{
+    class StoreContainer;   // Forward declaration
+}   // namespace store
+
 namespace controller
 {
     /**
@@ -32,15 +37,19 @@ namespace controller
         ui::SettingsMenu& _settingsMenu;
         /// Reference to the application settings
         settings::Settings& _settings;
+        /// Reference to the store container for managing application state
+        store::StoreContainer& _storeContainer;
 
        private slots:
         void _onPreferencesRequested();
+        void _onRestoreFromBackupRequested();
 
        public:
         explicit SettingsMenuController(
-            QMainWindow&        mainWindow,
-            ui::SettingsMenu&   settingsMenu,
-            settings::Settings& settings
+            QMainWindow&           mainWindow,
+            ui::SettingsMenu&      settingsMenu,
+            settings::Settings&    settings,
+            store::StoreContainer& storeContainer
         );
     };
 

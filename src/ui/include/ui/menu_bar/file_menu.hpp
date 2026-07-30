@@ -8,6 +8,8 @@ class QAction;    // Forward declaration
 class QMenu;      // Forward declaration
 class QMenuBar;   // Forward declaration
 
+class ShortcutSet;   // Forward declaration
+
 namespace ui
 {
     /**
@@ -34,7 +36,11 @@ namespace ui
         QAction* _quitAction = nullptr;
 
        public:
-        explicit FileMenu(QMenuBar& menuBar);
+        explicit FileMenu(
+            QMenuBar&          menuBar,
+            const ShortcutSet& saveShortcut,
+            const ShortcutSet& quitShortcut
+        );
     };
 
 }   // namespace ui

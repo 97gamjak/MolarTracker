@@ -3,27 +3,45 @@
 
 #include <QObject>
 #include <QPointer>
-
-#include "commands/commands.hpp"
-#include "ui/profile/add_profile_dlg.hpp"
-#include "ui/profile/profile_selection_dlg.hpp"
+#include <memory>
 
 class QMainWindow;   // Forward declaration
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
 
 namespace drafts
 {
-    struct ProfileDraft;   // Forward declaration
+    class ProfileDraft;   // Forward declaration
 }   // namespace drafts
 
 namespace cmd
 {
     class UndoStack;   // Forward declaration
 }   // namespace cmd
+
+namespace ui
+{
+    class AddProfileDialog;         // Forward declaration
+    class ProfileSelectionDialog;   // Forward declaration
+
+    enum class AddProfileDialogAction : std::uint8_t;   // Forward declaration
+    enum class ProfileSelectionDialogAction : std::uint8_t;   // Forward
+                                                              // declaration
+
+}   // namespace ui
+
+namespace cmd
+{
+    class Commands;   // Forward declaration
+}   // namespace cmd
+
+namespace settings
+{
+    class Settings;   // Forward declaration
+}   // namespace settings
 
 namespace controller
 {
@@ -42,11 +60,13 @@ namespace controller
 
        private:
         /// Reference to the main window
-        QMainWindow& _mainWindow;
-        /// Reference to the application context
-        app::AppContext& _appContext;
+        std::shared_ptr<QMainWindow> _mainWindow;
+        /// Reference to the store container
+        store::StoreContainer& _storeContainer;
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
+        /// Reference to the settings
+        settings::Settings& _settings;
 
         /// Pointer to the profile selection dialog
         QPointer<ui::ProfileSelectionDialog> _profileSelectionDialog;
@@ -56,27 +76,28 @@ namespace controller
         /// Command for ensuring profile existence, this command will contain
         /// the sub-commands for setting the default profile, setting the active
         /// profile and adding a new profile if needed
-        cmd::Commands _ensureProfileExistsCommand{
-            "Ensure Profile Exists Command"
-        };
+        std::unique_ptr<cmd::Commands> _ensureProfileExistsCommand;
 
        public:
         explicit EnsureProfileController(
-            QMainWindow&     mainWindow,
-            app::AppContext& appContext,
-            cmd::UndoStack&  undoStack
+            const std::shared_ptr<QMainWindow>& mainWindow,
+            store::StoreContainer&              storeContainer,
+            cmd::UndoStack&                     undoStack,
+            settings::Settings&                 settings
         );
+
+        ~EnsureProfileController() override;
 
         void ensureProfileExists();
 
        private slots:
         void _onProfileSelectionRequested(
-            const ui::ProfileSelectionDialog::Action& action,
-            const std::string&                        profileName
+            const ui::ProfileSelectionDialogAction& action,
+            const std::string&                      profileName
         );
         void _onAddProfileRequested(
-            const ui::AddProfileDialog::Action& action,
-            const drafts::ProfileDraft&         profileDraft
+            const ui::AddProfileDialogAction& action,
+            const drafts::ProfileDraft&       profileDraft
         );
 
        private:

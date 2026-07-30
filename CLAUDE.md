@@ -21,12 +21,13 @@ MolarTracker is a **C++23 desktop application** built with **Qt6** for dental (m
 5. AI-generated branches must follow the pattern: `claude/<short-description>-<session-id>`.
 6. Use `git push -u origin <branch-name>` when pushing a new branch.
 7. **Never amend or force-push** to shared branches.
-8. **Always fetch before branching** to ensure you start from an up-to-date base.
+8. **Always `git checkout dev` and `git pull` to update local `dev` before creating any new branch.** Do not branch directly off a stale local `dev` or off `origin/dev` without first syncing local `dev` — always update local `dev` itself first.
 
 ```bash
 # Correct workflow
-git fetch origin dev
-git checkout -b feature/MOLTRACK-XX-my-feature origin/dev
+git checkout dev
+git pull
+git checkout -b feature/MOLTRACK-XX-my-feature
 # ... make changes, commit ...
 git push -u origin feature/MOLTRACK-XX-my-feature
 # Then open a PR targeting dev
@@ -100,11 +101,11 @@ cmake -S . -B build -DMOLARTRACKER_ENABLE_DOCS=ON
 
 **Key CMake options:**
 
-| Option | Default | Description |
-|---|---|---|
-| `MOLARTRACKER_ENABLE_TESTING` | `ON` | Build unit tests |
-| `MOLARTRACKER_ENABLE_DOCS` | `OFF` | Build Doxygen documentation |
-| `BUILD_TESTING` | `ON` | CTest infrastructure |
+| Option                        | Default | Description                 |
+| ----------------------------- | ------- | --------------------------- |
+| `MOLARTRACKER_ENABLE_TESTING` | `ON`    | Build unit tests            |
+| `MOLARTRACKER_ENABLE_DOCS`    | `OFF`   | Build Doxygen documentation |
+| `BUILD_TESTING`               | `ON`    | CTest infrastructure        |
 
 ---
 
@@ -175,15 +176,15 @@ ORM / Database (SQLite3)
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---|---|---|
-| Classes / Structs | PascalCase | `ProfileFactory`, `LogManager` |
-| Functions / Methods | camelCase | `getProfile()`, `loadSettings()` |
-| Private members | `_camelCase` | `_profileRepo`, `_settings` |
-| Constants | `UPPER_CASE` or `static inline` | `MAX_RETRY`, `static inline constexpr` |
-| Namespaces | lowercase | `app`, `ui`, `db`, `orm` |
-| Header guards | `__MODULE_NAME_HPP__` | `__APP_PROFILE_HPP__` |
-| Template impls | `.tpp` files | `orm_model.tpp` |
+| Element             | Convention                      | Example                                |
+| ------------------- | ------------------------------- | -------------------------------------- |
+| Classes / Structs   | PascalCase                      | `ProfileFactory`, `LogManager`         |
+| Functions / Methods | camelCase                       | `getProfile()`, `loadSettings()`       |
+| Private members     | `_camelCase`                    | `_profileRepo`, `_settings`            |
+| Constants           | `UPPER_CASE` or `static inline` | `MAX_RETRY`, `static inline constexpr` |
+| Namespaces          | lowercase                       | `app`, `ui`, `db`, `orm`               |
+| Header guards       | `__MODULE_NAME_HPP__`           | `__APP_PROFILE_HPP__`                  |
+| Template impls      | `.tpp` files                    | `orm_model.tpp`                        |
 
 ---
 
@@ -250,15 +251,15 @@ When adding new features, add corresponding tests in `tests/` mirroring the sour
 
 All pipelines are in `.github/workflows/`:
 
-| Workflow | Trigger | Purpose |
-|---|---|---|
-| `build.yml` | PRs, push to `dev`, tags | Linux build + CTest + cppcheck |
-| `build_windows.yml` | PRs, tags | Windows build |
-| `static-analysis.yml` | PRs | DevOps style checks |
-| `doxygen.yml` | PRs | Doxygen documentation build |
-| `changelog.yml` | PRs | Verify changelog entries exist |
-| `check-pr-for-release-version.yml` | PRs | Validate release version format |
-| `create-tag.yml` | Manual | Create a release tag |
+| Workflow                           | Trigger                  | Purpose                         |
+| ---------------------------------- | ------------------------ | ------------------------------- |
+| `build.yml`                        | PRs, push to `dev`, tags | Linux build + CTest + cppcheck  |
+| `build_windows.yml`                | PRs, tags                | Windows build                   |
+| `static-analysis.yml`              | PRs                      | DevOps style checks             |
+| `doxygen.yml`                      | PRs                      | Doxygen documentation build     |
+| `changelog.yml`                    | PRs                      | Verify changelog entries exist  |
+| `check-pr-for-release-version.yml` | PRs                      | Validate release version format |
+| `create-tag.yml`                   | Manual                   | Create a release tag            |
 
 Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger release uploads.
 
@@ -271,8 +272,8 @@ Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger rele
 
 **Current tables:**
 
-| Table | Columns |
-|---|---|
+| Table     | Columns                                                                           |
+| --------- | --------------------------------------------------------------------------------- |
 | `profile` | `id` (PK, AUTOINCREMENT), `name` (TEXT NOT NULL UNIQUE), `email` (TEXT, nullable) |
 
 **ORM conventions:**
@@ -285,24 +286,24 @@ Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger rele
 
 ## Design Patterns in Use
 
-| Pattern | Where |
-|---|---|
-| MVC | `src/ui/controller/` + `src/ui/widgets/` |
-| Repository | `src/app/repos/` |
-| Service Layer | `src/app/services/` |
-| Factory | `src/app/factories/` |
-| Command (undo/redo) | `src/ui/commands/` |
-| Observable / Signal | `src/connections/` |
-| Singleton | `Constants`, `LogManager` |
-| Store (global state) | `src/app/store/` |
-| Draft / Staging | `src/drafts/` |
-| RAII | Transactions, connections, file handles |
+| Pattern              | Where                                    |
+| -------------------- | ---------------------------------------- |
+| MVC                  | `src/ui/controller/` + `src/ui/widgets/` |
+| Repository           | `src/app/repos/`                         |
+| Service Layer        | `src/service/`                           |
+| Factory              | `src/repo/factories`                     |
+| Command (undo/redo)  | `src/ui/commands/`                       |
+| Observable / Signal  | `src/connections/`                       |
+| Singleton            | `Constants`, `LogManager`                |
+| Store (global state) | `src/app/store/`                         |
+| Draft / Staging      | `src/drafts/`                            |
+| RAII                 | Transactions, connections, file handles  |
 
 ---
 
 ## Changelogs
 
-Two changelogs must be updated for every meaningful change:
+One of Two changelogs must be updated for every meaningful change:
 
 - **`CHANGELOG.md`** — User-facing, describes behavior changes and new features.
 - **`DEV-CHANGELOG.md`** — Developer-facing, describes API/internal changes.
@@ -337,6 +338,27 @@ The Dockerfile is based on **Ubuntu 24.04** and installs all build dependencies.
 
 ---
 
+## Local CI Script
+
+**Always run `scripts/custom_cpp_checks.sh` before committing.** It runs the same
+checks as CI (cppcheck + clangd-tidy) and will catch issues before they fail the
+pipeline.
+
+The full local CI reference is `scripts/local_ci.sh` (builds, runs tests, then runs
+the same linters).
+
+### Key linter rules enforced by CI
+
+- **`cppcoreguidelines-owning-memory`** — Never write `new T(...)` directly in UI
+  code. Use `common::makeQChild<T>(...)` instead; the suppression is centralized
+  there.
+- **`readability-convert-member-functions-to-static`** — If a method does not
+  access instance state, declare it `static`.
+- **Doxygen strict mode** — Every private class member needs a `///` doc comment.
+  The Doxygen build runs in strict mode and treats undocumented members as errors.
+
+---
+
 ## Summary Checklist for AI Assistants
 
 Before submitting any change:
@@ -345,8 +367,11 @@ Before submitting any change:
 - [ ] PR targets `dev` (not `main`)
 - [ ] Code formatted with `clang-format`
 - [ ] No new compiler warnings introduced
+- [ ] `scripts/custom_cpp_checks.sh` passes (cppcheck + clangd-tidy)
+- [ ] All private members have `///` doxygen doc comments
+- [ ] Qt widgets created with `common::makeQChild<T>()`, not bare `new T()`
 - [ ] Tests added or updated for changed logic
-- [ ] Both `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
+- [ ] One of `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
 - [ ] Git submodules not accidentally modified
 - [ ] No hardcoded paths — use `Constants` singleton for app paths
 - [ ] Private members prefixed with `_`

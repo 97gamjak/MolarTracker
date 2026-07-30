@@ -60,7 +60,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c2y-extensions")
+endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c2y-extensions")
 endif()
 
 add_library(json INTERFACE)
@@ -77,24 +81,31 @@ target_include_directories(mstd
         ${CMAKE_SOURCE_DIR}/external/mstd/include
 )
 
-add_subdirectory(app)
 add_subdirectory(commands)
+add_subdirectory(common)
 add_subdirectory(config)
 add_subdirectory(connections)
 add_subdirectory(controller)
 add_subdirectory(db)
+add_subdirectory(domain)
+add_subdirectory(error)
 add_subdirectory(drafts)
 add_subdirectory(exceptions)
 add_subdirectory(filter)
 add_subdirectory(finance)
+add_subdirectory(gateway)
 add_subdirectory(http)
 add_subdirectory(json)
 add_subdirectory(logging)
+add_subdirectory(mapper)
 add_subdirectory(orm)
+add_subdirectory(repo)
+add_subdirectory(service)
 add_subdirectory(settings)
 add_subdirectory(sql_models)
+add_subdirectory(store)
 add_subdirectory(ui)
-add_subdirectory(utils)
+add_subdirectory(vcs)
 
 target_link_libraries(MolarTracker
     PRIVATE 
@@ -104,6 +115,9 @@ target_link_libraries(MolarTracker
     molartracker_logging
     molartracker_exceptions
 )
+
+set(CMAKE_AUTORCC ON)
+target_sources(MolarTracker PRIVATE ${CMAKE_SOURCE_DIR}/resources/resources.qrc)
 
 set_target_properties(MolarTracker PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY

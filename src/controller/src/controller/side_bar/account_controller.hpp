@@ -7,11 +7,6 @@
 #include "controller/account_controller.hpp"
 #include "side_bar_category_controller.hpp"
 
-namespace app
-{
-    class AppContext;   // Forward declaration
-}   // namespace app
-
 namespace cmd
 {
     class UndoStack;   // Forward declaration
@@ -25,8 +20,13 @@ namespace ui
 
 namespace drafts
 {
-    struct AccountDraft;   // Forward declaration
+    class AccountDraft;   // Forward declaration
 }   // namespace drafts
+
+namespace store
+{
+    class IAccountStore;   // Forward declaration
+}   // namespace store
 
 class QAction;   // Forward declaration
 
@@ -45,8 +45,9 @@ namespace controller
        private:
         /// Reference to the undo stack
         cmd::UndoStack& _undoStack;
-        /// Reference to the application context
-        app::AppContext& _appContext;
+
+        /// Reference to the account store
+        std::shared_ptr<store::IAccountStore> _accountStore;
 
         /// Reference to the account controller
         AccountController& _accountController;
@@ -56,10 +57,10 @@ namespace controller
 
        public:
         explicit AccountSideBarController(
-            cmd::UndoStack&    undoStack,
-            app::AppContext&   appContext,
-            AccountController& accountController,
-            QMainWindow*       mainWindow
+            cmd::UndoStack&                              undoStack,
+            const std::shared_ptr<store::IAccountStore>& accountStore,
+            AccountController&                           accountController,
+            QMainWindow*                                 mainWindow
         );
 
         void refresh() override;

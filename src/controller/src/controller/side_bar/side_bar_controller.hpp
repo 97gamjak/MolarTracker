@@ -11,10 +11,10 @@ class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
 class QMainWindow;      // Forward declaration
 
-namespace app
+namespace store
 {
-    class AppContext;   // Forward declaration
-}   // namespace app
+    class StoreContainer;   // Forward declaration
+}   // namespace store
 
 namespace ui
 {
@@ -27,6 +27,11 @@ namespace cmd
 {
     class UndoStack;   // Forward declaration
 }   // namespace cmd
+
+namespace gateway
+{
+    class PositionGateway;   // Forward declaration
+}   // namespace gateway
 
 namespace controller
 {
@@ -61,12 +66,13 @@ namespace controller
        public:
         explicit SideBarController(
             cmd::UndoStack&        undoStack,
-            app::AppContext&       appContext,
+            store::StoreContainer& storeContainer,
             QMainWindow*           mainWindow,
             ui::SideBar*           sideBar,
             QStackedWidget*        centralStack,
             AccountController&     accountController,
-            TransactionController& transactionController
+            TransactionController& transactionController,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway
         );
 
         void refresh();

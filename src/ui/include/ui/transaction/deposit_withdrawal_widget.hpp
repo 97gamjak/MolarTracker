@@ -6,14 +6,18 @@
 
 #include <vector>
 
-#include "config/finance.hpp"
-#include "drafts/account_draft.hpp"
-#include "drafts/transaction_draft.hpp"
+#include "common/finance.hpp"
+#include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/base/dialog.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration
 class QPushButton;   // Forward declaration
+
+namespace drafts
+{
+    class AccountDraft;   // Forward declaration
+}   // namespace drafts
 
 namespace ui
 {
@@ -42,33 +46,22 @@ namespace ui
         /// The layout for the widget
         QFormLayout* _layout;
 
-        /// The combo box for selecting the account to deposit to or withdraw
-        /// from
-        AccountCombo* _accountCombo;
-
-        /// The field for selecting the transaction timestamp
-        TimestampField* _timestampField;
-
-        /// The row for entering the amount to deposit or withdraw
-        AmountRow* _amountRow;
-
-        /// The label for displaying the currency of the selected account
-        QLabel* _currencyLabel;
-
-        /// The field for entering an optional comment
-        CommentField* _commentField;
-
         /// The button for adding the transaction
         QPushButton* _addButton;
 
+        struct Fields;
+        /// The fields for the deposit/withdrawal widget
+        std::unique_ptr<Fields> _fields;
+
        public:
         explicit DepositWithdrawalWidget(
-            TransactionType                   type,
-            std::vector<drafts::AccountDraft> accounts,
-            QWidget*                          parent = nullptr
+            TransactionType                          type,
+            const std::vector<drafts::AccountDraft>& accounts,
+            QWidget*                                 parent = nullptr
         );
 
-        [[nodiscard]] drafts::CreateCashTransactionDraft getDraft() const;
+        ~DepositWithdrawalWidget() override;
+
         [[nodiscard]] TransactionType getTransactionType() const;
         void                          setTransactionType(TransactionType type);
 
@@ -89,6 +82,8 @@ namespace ui
         void _onAccountSelected(const drafts::AccountDraft& account);
         void _updateAddButton();
         void _emitOk();
+
+        [[nodiscard]] drafts::CreateCashTransactionDraft _getDraft() const;
     };
 
 }   // namespace ui

@@ -16,8 +16,7 @@ target_link_libraries(molartracker_commands
     PRIVATE
     Qt6::Widgets
     molartracker_logging
-    molartracker_drafts
-    molartracker_app
+    molartracker_store
     molartracker_settings
 )
 

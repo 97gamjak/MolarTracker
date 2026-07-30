@@ -1,9 +1,9 @@
 #ifndef __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__
 #define __SQL_MODELS__INCLUDE__SQL_MODELS__TRADE_LEG_ROW_HPP__
 
-#include "config/finance.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
 #include "config/id_types.hpp"
-#include "config/quantity.hpp"
 #include "orm/constraints.hpp"
 #include "orm/field.hpp"
 #include "orm/orm_model.hpp"
@@ -22,6 +22,9 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     [[nodiscard]]
     static orm::WhereExpr hasTransactionId(TransactionId transactionId);
 
+    [[nodiscard]]
+    static orm::WhereExpr hasPosition(PositionId positionId);
+
     /// The ID of the trade leg, this is the primary key for the trade_leg table
     ORM_FIELD(id, IdField<TradeLegId>)
 
@@ -30,14 +33,7 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// associate this trade leg with a specific transaction.
     ORM_FIELD(
         transactionId,
-        Field<
-            "transaction_id",
-            TransactionId,
-            orm::foreign_key_t<
-                orm::CascadeDelete,
-                TransactionRow,
-                decltype(TransactionRow::id)>,
-            orm::not_null_t>
+        TransactionRow::template ForeignId<tableName, orm::CascadeDelete>
     )
 
     /// The ID of the account associated with this trade leg, this is a foreign
@@ -60,7 +56,7 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
     /// associate this trade leg with a specific financial instrument.
     ORM_FIELD(
         instrumentId,
-        InstrumentRow::template ForeignId<orm::RestrictDelete>
+        InstrumentRow::template ForeignId<tableName, orm::RestrictDelete>
     )
 
     /// The quantity of the instrument being traded in this leg, this is a
@@ -102,7 +98,8 @@ struct TradeLegRow : public orm::ORMModel<"trade_leg">
         instrumentId,
         quantity,
         unitPrice,
-        currency
+        currency,
+        positionId
     )
 };
 
