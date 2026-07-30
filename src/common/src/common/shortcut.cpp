@@ -80,7 +80,15 @@ std::string Shortcut::toString() const
     }
     else
     {
+#ifdef __QT_ENABLED__
+        // If Qt is enabled, we can use QKeySequence to get a more accurate
+        // string representation of the key.
+        QKeySequence seq  = toQKeySequence();
+        result           += seq.toString().toStdString();
+#else
+        // If Qt is not enabled, we will just append the key as a character.
         result += static_cast<char>(_key);
+#endif
     }
 
     return result;
