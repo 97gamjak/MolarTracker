@@ -10,6 +10,7 @@
 namespace finance
 {
     class Transactions;   // Forward declaration
+    class Options;        // Forward declaration
 }   // namespace finance
 
 namespace mapper
@@ -30,6 +31,11 @@ namespace mapper
 
         static std::vector<drafts::CashTransactionOverview> toCash(
             const finance::Transactions& transactions
+        );
+
+        static std::vector<drafts::OptionTransactionOverview> toOption(
+            const finance::Transactions& transactions,
+            const finance::Options&      options
         );
     };
 

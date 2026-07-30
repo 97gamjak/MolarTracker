@@ -195,6 +195,26 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - centralize and generalize error handling approach
 
+#### Transaction overview — option transactions (MOLTRACK-316)
+
+- Add `drafts::OptionTransactionOverview` (`src/drafts/include/drafts/transaction/transaction_overview_draft.hpp`),
+  mirroring `StockTransactionOverview`, plus `mapper::TransactionOverviewMapper::toOption()`
+  resolving each option transaction's instrument ID to a display name via
+  `finance::Options::getOption()` (falls back to `"UNKNOWN"`, mirroring `toStock()`)
+- Add `ui::OptionTransactionTableModel` (`src/ui/include/ui/transaction/option_transaction_table.hpp`),
+  mirroring `StockTransactionTableModel`, with an additional `BuySell` /
+  `Action` column pair since options carry that data and stocks don't
+- `ui::TransactionsOverview` gains a third table/section for option
+  transactions; `refresh()` takes an additional
+  `std::vector<drafts::OptionTransactionOverview>` parameter
+- `TransactionController` now depends on `store::IOptionStore` and fetches
+  `_optionStore->getOptions(txs.value().getOptionInstrumentIds())` to feed
+  `TransactionOverviewMapper::toOption()`, alongside the existing cash/stock
+  mapping
+- Add `OptionTransactionTableModelTest` suite to
+  `tests/ui/test_transaction_table_models.cpp`, mirroring the existing
+  `StockTransactionTableModelTest` coverage
+
 ### CI
 
 - Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all

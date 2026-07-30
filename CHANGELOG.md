@@ -48,6 +48,7 @@ All changes and updates, that are relevant for a user will be documented here
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
 - Show option positions in account overview
+- Show option transactions in the transaction overview
 - Add possibility to make screenshots via shortcuts and menu
 - Add possibility to customize shortcuts
 
