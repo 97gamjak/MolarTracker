@@ -29,6 +29,7 @@ namespace store
     class ITransactionStore;   // Forward declaration
     class IStore;              // Forward declaration
     class IOptionStore;        // Forward declaration
+    class IWatchlistStore;     // Forward declaration
 
     /**
      * @brief Container for all stores
@@ -75,6 +76,7 @@ namespace store
         [[nodiscard]] std::shared_ptr<IPositionStore> getPositionStore() const;
         [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore(
         ) const;
+        [[nodiscard]] std::shared_ptr<IWatchlistStore> getWatchlistStore() const;
     };
 
 }   // namespace store

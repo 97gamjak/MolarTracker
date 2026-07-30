@@ -3,8 +3,8 @@
 #include <nlohmann/json.hpp>
 
 #include "config/constants/github_constants.hpp"
+#include "error/http_error.hpp"
 #include "http/http_client.hpp"
-#include "http/http_error.hpp"
 #include "http/http_request.hpp"
 
 namespace vcs
@@ -19,10 +19,9 @@ namespace vcs
      * result. Returns an error if the HTTP request fails or the response
      * cannot be parsed.
      *
-     * @return std::expected<utils::SemVer, http::HttpError>
+     * @return HttpResult<common::SemVer>
      */
-    std::expected<utils::SemVer, http::HttpError> GitHubClient::
-        fetchLatestVersion()
+    HttpResult<common::SemVer> GitHubClient::fetchLatestVersion()
     {
         const auto response = http::HttpClient::get(
             http::HttpRequest{
@@ -36,7 +35,7 @@ namespace vcs
         );
 
         if (!response)
-            return std::unexpected(response.error());
+            return response.error();
 
         try
         {
@@ -46,17 +45,11 @@ namespace vcs
             if (!tag.empty() && tag.front() == 'v')
                 tag.erase(tag.begin());
 
-            return utils::SemVer{tag};
+            return common::SemVer{tag};
         }
         catch (const std::exception& e)
         {
-            return std::unexpected(
-                http::HttpError{
-                    .kind            = http::HttpErrorKind::ParseError,
-                    .message         = e.what(),
-                    .responseHeaders = {},
-                }
-            );
+            return HttpError{HttpErrorType::ParseError, e.what()};
         }
     }
 

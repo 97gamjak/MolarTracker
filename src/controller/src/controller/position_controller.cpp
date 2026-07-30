@@ -8,9 +8,12 @@
 #include "connections/connection.hpp"
 #include "finance/price_cache.hpp"
 #include "finance/transaction/transaction_filter.hpp"
+#include "logging/log_macros.hpp"
 #include "store/i_position_store.hpp"
 #include "store/i_stock_store.hpp"
 #include "store/i_transaction_store.hpp"
+
+REGISTER_LOG_CATEGORY("Controller.PositionController");
 
 namespace controller
 {
@@ -120,8 +123,8 @@ namespace controller
         const finance::Transactions& transactions
     )
     {
-        const auto instruments   = transactions.securities();
-        const auto instrumentIds = instruments.getBaseInstrumentIds();
+        const auto& instruments   = transactions.securities();
+        const auto  instrumentIds = instruments.getBaseInstrumentIds();
 
         const auto tickers = _stockStore->getStocks(instrumentIds).getTickers();
         for (const auto& ticker : tickers)
@@ -141,10 +144,15 @@ namespace controller
         const auto ids = _positionStore->getOpenPositions().getIds();
 
         finance::TransactionFilter filter;
-        filter.setPositionIds(ids);
+        filter.positionIds = ids;
 
         const auto transactions = _transactionStore->getTransactions(filter);
-        _collectTickers(transactions);
+        if (!transactions)
+        {
+            LOG_ERROR(transactions.error().toString());
+            return;
+        }
+        _collectTickers(transactions.value());
     }
 
 }   // namespace controller

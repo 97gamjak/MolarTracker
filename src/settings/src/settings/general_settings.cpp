@@ -16,6 +16,9 @@ namespace settings
           _currentVersion(GithubConstants::getSemVer())
     {
         _version.set(GithubConstants::getSemVer());
+        _dismissedUpdateVersion.setDefault(
+            Schema::DISMISSED_UPDATE_VERSION_DEFAULT
+        );
     }
 
     /**

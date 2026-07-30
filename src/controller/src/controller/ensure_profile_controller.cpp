@@ -12,9 +12,10 @@
 #include "commands/profile/set_active_profile_command.hpp"
 #include "commands/profile/set_default_profile_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "controller/mapper/profile_mapper.hpp"
+#include "common/qt_helpers.hpp"
 #include "drafts/profile_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/profile_mapper.hpp"
 #include "settings/settings.hpp"
 #include "store/i_profile_store.hpp"   // IWYU pragma: keep
 #include "store/store_container.hpp"
@@ -23,7 +24,6 @@
 #include "ui/profile/profile_selection_dlg.hpp"
 #include "ui/utils/infos.hpp"
 #include "ui/utils/warnings.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.EnsureProfileController");
 
@@ -240,7 +240,7 @@ namespace controller
             _settings.getUISettings().getProfileUISettings().getDialogSize()
         );
 
-        _addProfileDialog = utils::makeQChild<ui::AddProfileDialog>(
+        _addProfileDialog = common::makeQChild<ui::AddProfileDialog>(
             settings,
             false,   // canBeClosed = false to disable the close button
             _mainWindow.get()
@@ -270,11 +270,12 @@ namespace controller
     {
         const auto& profileStore = _storeContainer.getProfileStore();
 
-        _profileSelectionDialog = utils::makeQChild<ui::ProfileSelectionDialog>(
-            _mainWindow.get(),
-            profileStore->getAllProfileNames(),
-            false   // canBeClosed = false to disable the close button
-        );
+        _profileSelectionDialog =
+            common::makeQChild<ui::ProfileSelectionDialog>(
+                _mainWindow.get(),
+                profileStore->getAllProfileNames(),
+                false   // canBeClosed = false to disable the close button
+            );
 
         connect(
             _profileSelectionDialog,
@@ -373,7 +374,7 @@ namespace controller
             // default/active status is managed by separate commands below.
             auto result = cmd::Commands::makeAndDo<cmd::AddProfileCommand>(
                 _storeContainer.getProfileStore(),
-                ProfileMapper::toProfile(profileDraft)
+                mapper::ProfileMapper::toProfile(profileDraft)
             );
 
             if (!result)

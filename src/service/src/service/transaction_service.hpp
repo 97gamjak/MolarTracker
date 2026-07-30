@@ -35,7 +35,6 @@ namespace service
 
         [[nodiscard]]
         std::vector<finance::DomainTransaction> getTransactions(
-            const IdSet<AccountId>&           accountIds,
             const finance::TransactionFilter& filter
         ) override;
     };

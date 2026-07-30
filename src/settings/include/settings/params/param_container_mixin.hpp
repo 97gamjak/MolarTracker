@@ -36,6 +36,7 @@ namespace settings
         static void fromJson(const nlohmann::json& jsonData, Derived& settings);
 
         void commit();
+        void resetToDefault();
 
         [[nodiscard]] bool isDirty() const;
 

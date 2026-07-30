@@ -1,8 +1,8 @@
 #include "finance/transaction/cash_transaction.hpp"
 
+#include "common/cash.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "utils/cash.hpp"
 
 namespace finance
 {
@@ -34,6 +34,7 @@ namespace finance
               status,
               cashAccount,
               externalAccount,
+              TransactionDataType::Cash,
               fees,
               std::move(comment)
           ),
@@ -97,6 +98,21 @@ namespace finance
             amount,
             TransactionEntryType::General
         };
+    }
+
+    /**
+     * @brief Get the involved accounts for the cash transaction, this will
+     * return a set of account IDs that are involved in the cash transaction,
+     * including the cash account and the external account.
+     *
+     * @return IdSet<AccountId>
+     */
+    IdSet<AccountId> CashTransaction::getInvolvedAccounts() const
+    {
+        IdSet<AccountId> accounts;
+        accounts.insert(getCashAccountId());
+        accounts.insert(getExternalAccountId());
+        return accounts;
     }
 
 }   // namespace finance

@@ -7,9 +7,6 @@
 struct ProfileTag {};
 using ProfileId = StrongId<ProfileTag>;
 
-struct SecurityTag {};
-using SecurityId = StrongId<SecurityTag>;
-
 struct InstrumentTag {};
 using InstrumentId = StrongId<InstrumentTag>;
 
@@ -41,6 +38,12 @@ using TradeLegId = StrongId<TradeLegTag>;
 
 struct PositionTag {};
 using PositionId = StrongId<PositionTag>;
+
+struct WatchlistTag {};
+using WatchlistId = StrongId<WatchlistTag>;
+
+struct WatchlistInstrumentTag {};
+using WatchlistInstrumentId = StrongId<WatchlistInstrumentTag>;
 
 // clang-format on
 

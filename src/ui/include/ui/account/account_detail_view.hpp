@@ -8,8 +8,9 @@
 
 namespace drafts
 {
-    class PositionStockDetailDraft;   // Forward declaration
-    class AccountDraft;               // Forward declaration
+    class PositionStockDetailDraft;    // Forward declaration
+    class PositionOptionDetailDraft;   // Forward declaration
+    class AccountDraft;                // Forward declaration
 }   // namespace drafts
 
 namespace ui
@@ -36,8 +37,9 @@ namespace ui
 
         void updateCashAccount(const drafts::AccountDraft& account);
         void updateSecurityAccount(
-            const drafts::AccountDraft&                          account,
-            const std::vector<drafts::PositionStockDetailDraft>& positions
+            const drafts::AccountDraft&                           account,
+            const std::vector<drafts::PositionStockDetailDraft>&  stocks,
+            const std::vector<drafts::PositionOptionDetailDraft>& options
         );
 
        private:

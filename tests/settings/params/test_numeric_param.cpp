@@ -7,7 +7,6 @@
 #include <string>
 
 #include "settings/params/numeric_param.hpp"
-#include "settings/params/param_error.hpp"
 
 // ============================================================================
 // Construction / metadata
@@ -87,6 +86,19 @@ TEST(NumericParam, SetDefaultAndGetDefault)
     EXPECT_EQ(param.getDefault().value(), value);
 }
 
+TEST(NumericParam, ResetToDefaultRestoresDefaultValue)
+{
+    settings::NumericParam<int> param("k", "T", "D");
+    const auto                  defaultValue = 100;
+    param.setDefault(std::optional<int>(defaultValue));
+    ASSERT_TRUE(param.set(5).has_value());
+
+    param.resetToDefault();
+
+    EXPECT_EQ(param.get(), defaultValue);
+    EXPECT_FALSE(param.isDirty());
+}
+
 // ============================================================================
 // Range limits
 // ============================================================================
@@ -129,7 +141,7 @@ TEST(NumericParam, SetBelowMinReturnsError)
     param.setLimits(limit1, limit2);
     auto result = param.set(value);
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(NumericParam, SetAboveMaxReturnsError)
@@ -141,7 +153,7 @@ TEST(NumericParam, SetAboveMaxReturnsError)
     param.setLimits(limit1, limit2);
     auto result = param.set(value);
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(NumericParam, SetAtMinBoundarySucceeds)

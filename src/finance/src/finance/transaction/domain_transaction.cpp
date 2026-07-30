@@ -4,10 +4,10 @@
 #include <utility>
 #include <variant>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_data.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {
@@ -59,6 +59,39 @@ namespace finance
         // clang-format on
 
         return result;
+    }
+
+    /**
+     * @brief Checks if the given account ID is involved in the transaction,
+     * this will check both the entries and the trade legs of the transaction to
+     * determine if the account is involved in any way.
+     *
+     * @param accountId The account ID to check for involvement in the
+     * transaction.
+     * @return true If the account ID is involved in the transaction.
+     * @return false If the account ID is not involved in the transaction.
+     */
+    bool DomainTransaction::isAccountInvolved(AccountId accountId) const
+    {
+        if (std::ranges::any_of(
+                _entries,
+                [&](const TransactionEntry& entry)
+                { return entry.getAccountId() == accountId; }
+            ))
+        {
+            return true;
+        }
+
+        if (std::ranges::any_of(
+                getLegs(),
+                [&](const TradeLeg& leg)
+                { return leg.getAccountId() == accountId; }
+            ))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**

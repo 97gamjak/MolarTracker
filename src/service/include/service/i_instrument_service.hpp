@@ -5,13 +5,14 @@
 #include <string>
 #include <vector>
 
+#include "common/container/set.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {
     class Stock;                    // forward declaration
     struct StockInsertionResult;    // forward declaration
+    class Options;                  // forward declaration
     class Option;                   // forward declaration
     struct OptionInsertionResult;   // forward declaration
 
@@ -53,10 +54,22 @@ namespace service
          * all options that are not marked as deleted, and will include options
          * that are new or modified but not yet saved to the database.
          *
-         * @return std::vector<finance::Option>
+         * @return finance::Options
          */
         [[nodiscard]]
-        virtual std::vector<finance::Option> getOptions() = 0;
+        virtual finance::Options getOptions() = 0;
+
+        /**
+         * @brief get a list of all options in the database for the given
+         * instrument IDs, this will return all options that are not marked as
+         * deleted, and will include options that are new or modified but not
+         * yet saved to the database.
+         *
+         * @param ids The set of instrument IDs to retrieve options for
+         * @return finance::Options
+         */
+        [[nodiscard]]
+        virtual finance::Options getOptions(const IdSet<InstrumentId>& ids) = 0;
 
         /**
          * @brief Get a stock by its ticker symbol

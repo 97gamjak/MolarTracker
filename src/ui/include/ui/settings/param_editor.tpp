@@ -8,17 +8,195 @@
 #include <qformlayout.h>
 #include <qlabel.h>
 #include <qlineedit.h>
+#include <qpushbutton.h>
 #include <qspinbox.h>
 #include <qwidget.h>
 
 #include <QGroupBox>
+#include <QKeySequenceEdit>
+#include <utility>
 
+#include "common/qt_helpers.hpp"
 #include "param_editor.hpp"
+#include "settings/params/param_concepts.hpp"
 #include "settings/params/param_utils.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
+
+    /**
+     * @brief Builds a QGroupBox containing one row per shortcut entry in a
+     *        MapParam<Shortcut>. Each row has a label (from
+     * Shortcut::getWhat()) and a QKeySequenceEdit bound to that entry's
+     * modifiers/key. Edits are validated through MapParam::set (which runs
+     * registered conflict validators); on rejection, the edit reverts to
+     * the last committed value.
+     *
+     * @param param The MapParam<Shortcut> to build an editor for
+     * @return QWidget* Un-parented QGroupBox — caller must parent/add to
+     * layout
+     */
+    inline QWidget* makeShortcutWidget(settings::MapParam<ShortcutSet>& param)
+    {
+        auto* group = common::makeQChild<QGroupBox>(
+            QString::fromStdString(param.getTitle())
+        );
+        auto* layout = common::makeQChild<QFormLayout>(group);
+        layout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+        for (const auto& [key, entry] : param.getParams())
+        {
+            auto* rowWidget = common::makeQChild<QWidget>();
+            auto* rowLayout = common::makeQChild<QHBoxLayout>(rowWidget);
+            rowLayout->setContentsMargins(0, 4, 0, 4);
+            constexpr auto spacing = 8;
+            rowLayout->setSpacing(spacing);
+
+            auto*      dirtyStripe = common::makeQChild<QWidget>();
+            const auto size        = QSize(3, 20);
+            dirtyStripe->setFixedSize(size);
+            dirtyStripe->setObjectName("dirtyStripe");
+            dirtyStripe->setProperty("dirty", false);
+            rowLayout->addWidget(dirtyStripe);
+
+            // Container for the variable-length list of keystroke edits.
+            auto* keysLayout = common::makeQChild<QHBoxLayout>();
+            keysLayout->setSpacing(spacing);
+            rowLayout->addLayout(keysLayout);
+
+            // Copied by value — range-for loop variables must never be captured
+            // by reference in a lambda that outlives this iteration.
+            const auto paramKey = key;
+            const auto forWhat  = entry.get().getWhat();
+
+            // Rebuilds the entire row's edits from the current committed
+            // ShortcutSet. Declared as a std::function so it can recursively
+            // re-invoke itself after add/remove structurally changes the row.
+            auto rebuildRow = std::make_shared<std::function<void()>>();
+
+            *rebuildRow = [=, &param]()
+            {
+                // Clear any previously built sub-widgets/layout items.
+                QLayoutItem* item = nullptr;
+                while ((item = keysLayout->takeAt(0)) != nullptr)
+                {
+                    if (auto* w = item->widget())
+                    {
+                        w->deleteLater();
+                    }
+                    delete item;
+                }
+
+                const auto currentSet = param.at(paramKey).get();
+
+                // currentSet.getShortcuts() is iterable but not indexable, so
+                // each entry is identified by its own value for update/remove,
+                // not by position.
+                for (const auto& shortcut : currentSet.getShortcuts())
+                {
+                    // Copy the loop variable — same reasoning as
+                    // paramKey/forWhat above, this lambda outlives the current
+                    // iteration.
+                    const auto originalShortcut = shortcut;
+
+                    auto* keyEdit = common::makeQChild<QKeySequenceEdit>();
+                    keyEdit->setKeySequence(originalShortcut.toQKeySequence());
+                    keysLayout->addWidget(keyEdit);
+
+                    QObject::connect(
+                        keyEdit,
+                        &QKeySequenceEdit::editingFinished,
+                        [keyEdit, &param, paramKey, originalShortcut]()
+                        {
+                            auto       updatedSet = param.at(paramKey).get();
+                            const auto newKeystroke =
+                                Shortcut::fromQKeySequence(keyEdit->keySequence(
+                                ));
+
+                            const auto result = updatedSet.updateShortcutAt(
+                                originalShortcut,
+                                newKeystroke
+                            );
+
+                            if (!result)
+                            {
+                                keyEdit->setKeySequence(
+                                    originalShortcut.toQKeySequence()
+                                );
+                                return;
+                            }
+
+                            const auto resultSet =
+                                param.setAt(paramKey, updatedSet);
+                            if (!resultSet)
+                            {
+                                keyEdit->setKeySequence(
+                                    originalShortcut.toQKeySequence()
+                                );
+                            }
+                        }
+                    );
+
+                    auto* removeButton =
+                        common::makeQChild<QPushButton>("\u2715");
+                    removeButton->setObjectName("removeShortcutButton");
+                    keysLayout->addWidget(removeButton);
+
+                    QObject::connect(
+                        removeButton,
+                        &QPushButton::clicked,
+                        [&param, paramKey, originalShortcut, rebuildRow]()
+                        {
+                            auto updatedSet = param.at(paramKey).get();
+                            updatedSet.removeShortcut(originalShortcut);
+
+                            const auto resultSet =
+                                param.setAt(paramKey, updatedSet);
+                            if (resultSet)
+                            {
+                                (*rebuildRow)();
+                            }
+                        }
+                    );
+                }
+
+                auto* addButton = common::makeQChild<QPushButton>("+");
+                addButton->setObjectName("addShortcutButton");
+                keysLayout->addWidget(addButton);
+
+                QObject::connect(
+                    addButton,
+                    &QPushButton::clicked,
+                    [&param, paramKey, rebuildRow]()
+                    {
+                        auto updatedSet = param.at(paramKey).get();
+                        updatedSet.addAlternativeShortcut(
+                            Shortcut{ShortcutModifier::None, std::uint64_t{0}}
+                        );
+
+                        const auto resultSet =
+                            param.setAt(paramKey, updatedSet);
+                        if (resultSet)
+                        {
+                            (*rebuildRow)();
+                        }
+                    }
+                );
+            };
+
+            (*rebuildRow)();
+            rowLayout->addStretch();
+
+            auto* label =
+                common::makeQChild<QLabel>(QString::fromStdString(forWhat));
+            label->setObjectName("paramLabel");
+
+            layout->addRow(label, rowWidget);
+        }
+
+        return group;
+    }
+
     template <typename TSpinBox, typename T>
     void makeNumericEditorHelper(TSpinBox* spinBox, const T& param)
     {
@@ -70,32 +248,20 @@ namespace ui
 
         if constexpr (std::floating_point<ValueType>)
         {
-            auto* spinBox = utils::makeQChild<QDoubleSpinBox>();
+            auto* spinBox = common::makeQChild<QDoubleSpinBox>();
             spinBox->setDecimals(
                 static_cast<int>(param.getPrecision().value_or(4))
             );
             makeNumericEditorHelper(spinBox, param);
-
-            QObject::connect(
-                spinBox,
-                &QDoubleSpinBox::editingFinished,
-                [spinBox, &param]()
-                { makeNumericEditorEditing(spinBox, param); }
-            );
+            makeNumericEditorEditing(spinBox, param);
 
             return spinBox;
         }
         else
         {
-            auto* spinBox = utils::makeQChild<QSpinBox>();
+            auto* spinBox = common::makeQChild<QSpinBox>();
             makeNumericEditorHelper(spinBox, param);
-
-            QObject::connect(
-                spinBox,
-                &QSpinBox::editingFinished,
-                [spinBox, &param]()
-                { makeNumericEditorEditing(spinBox, param); }
-            );
+            makeNumericEditorEditing(spinBox, param);
 
             return spinBox;
         }
@@ -107,8 +273,8 @@ namespace ui
         constexpr std::size_t spacing         = 6;
         constexpr std::size_t numberOfEntries = T::size;
 
-        auto* container = utils::makeQChild<QWidget>();
-        auto* layout    = utils::makeQChild<QHBoxLayout>(container);
+        auto* container = common::makeQChild<QWidget>();
+        auto* layout    = common::makeQChild<QHBoxLayout>(container);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(spacing);
 
@@ -142,7 +308,7 @@ namespace ui
     template <typename T>
     QWidget* makeEnumEditor(T& param)
     {
-        auto* comboBox = utils::makeQChild<QComboBox>();
+        auto* comboBox = common::makeQChild<QComboBox>();
 
         const auto& entries = T::EnumMeta::values;
 
@@ -175,15 +341,16 @@ namespace ui
 
     /**
      * @brief Creates an editor QWidget for any param type.
-     *        The returned widget is un-parented — caller must parent it or add
-     *        it to a layout (which takes ownership).
+     *        The returned widget is un-parented — caller must parent it or
+     * add it to a layout (which takes ownership).
      *
      *        Supported param types:
      *          BoolParam       → QCheckBox
      *          StringParam     → QLineEdit
      *          NumericParam    → QSpinBox / QDoubleSpinBox
      *          NumericVecParam → N inline QSpinBox / QDoubleSpinBox (x/y/z
-     * labels) EnumParam       → QComboBox VersionParam    → QLabel (read-only)
+     * labels) EnumParam       → QComboBox VersionParam    → QLabel
+     * (read-only)
      */
     template <typename TParam>
     QWidget* makeParamEditor(TParam& param)
@@ -208,7 +375,7 @@ namespace ui
         }
         else if constexpr (settings::is_version_param<P>)
         {
-            auto* lbl = utils::makeQChild<QLabel>(
+            auto* lbl = common::makeQChild<QLabel>(
                 QString::fromStdString(param.get().toString())
             );
 
@@ -217,6 +384,10 @@ namespace ui
             );
             return lbl;
         }
+        else if constexpr (settings::is_shortcut_param<P>)
+        {
+            return makeShortcutWidget(param);
+        }
 
         else
         {
@@ -224,7 +395,7 @@ namespace ui
                 std::is_same_v<P, void>,
                 "Unsupported param type in makeParamEditor"
             );
-            return nullptr;   // Unreachable, but silences compiler warning
+            std::unreachable();
         }
     }
 
@@ -239,10 +410,10 @@ namespace ui
         if constexpr (settings::IsParamContainer<TParam>)
         {
             // Sub-container → group box with its own form layout
-            auto* group = utils::makeQChild<QGroupBox>(
+            auto* group = common::makeQChild<QGroupBox>(
                 QString::fromStdString(param.getTitle())
             );
-            auto* groupLayout = utils::makeQChild<QFormLayout>(group);
+            auto* groupLayout = common::makeQChild<QFormLayout>(group);
 
             constexpr std::array<int, 4> margins = {12, 8, 12, 8};
 
@@ -269,9 +440,9 @@ namespace ui
                 return;   // Skip leaf params
 
             // Leaf param → normal editor row
-            auto* rowWidget = utils::makeQChild<QWidget>();
+            auto* rowWidget = common::makeQChild<QWidget>();
             rowWidget->setObjectName("paramRow");
-            auto* rowLayout = utils::makeQChild<QHBoxLayout>(rowWidget);
+            auto* rowLayout = common::makeQChild<QHBoxLayout>(rowWidget);
 
             constexpr std::array<int, 4> margins = {0, 6, 0, 6};
             constexpr std::size_t        spacing = 8;
@@ -283,7 +454,7 @@ namespace ui
             );
             rowLayout->setSpacing(spacing);
 
-            auto* dirtyStripe = utils::makeQChild<QWidget>();
+            auto* dirtyStripe = common::makeQChild<QWidget>();
 
             constexpr std::pair<int, int> dirtyStripeSize = {3, 20};
             dirtyStripe->setFixedSize(
@@ -309,7 +480,7 @@ namespace ui
 
             rowLayout->addStretch();
 
-            auto* label = utils::makeQChild<QLabel>(
+            auto* label = common::makeQChild<QLabel>(
                 QString::fromStdString(param.getTitle())
             );
             label->setObjectName("paramLabel");

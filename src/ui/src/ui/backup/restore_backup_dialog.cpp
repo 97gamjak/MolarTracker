@@ -10,9 +10,9 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
+#include "common/timestamp.hpp"
 #include "config/constants/constants.hpp"
-#include "utils/qt_helpers.hpp"
-#include "utils/timestamp.hpp"
 
 namespace ui
 {
@@ -78,7 +78,7 @@ namespace ui
                     if (index.column() == 1)
                     {
                         const auto bytes = std::filesystem::file_size(path);
-                        return utils::toKBString(bytes);
+                        return common::toKBString(bytes);
                     }
                 }
 
@@ -134,9 +134,9 @@ namespace ui
     {
         setWindowTitle("Restore from Backup");
 
-        auto* layout = utils::makeQChild<QVBoxLayout>(this);
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
 
-        auto* label = utils::makeQChild<QLabel>(
+        auto* label = common::makeQChild<QLabel>(
             "Select a backup to restore. The current database will be "
             "replaced and all stores will be reloaded.",
             this
@@ -144,8 +144,9 @@ namespace ui
         label->setWordWrap(true);
         layout->addWidget(label);
 
-        _tableView  = utils::makeQChild<QTableView>(this);
-        auto* model = utils::makeQChild<BackupTableModel>(_backups, _tableView);
+        _tableView = common::makeQChild<QTableView>(this);
+        auto* model =
+            common::makeQChild<BackupTableModel>(_backups, _tableView);
         _tableView->setModel(model);
         _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
         _tableView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -163,7 +164,7 @@ namespace ui
             _tableView->selectRow(0);
         layout->addWidget(_tableView);
 
-        auto* buttons = utils::makeQChild<QDialogButtonBox>(
+        auto* buttons = common::makeQChild<QDialogButtonBox>(
             QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
             this
         );

@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 #include "validators.hpp"
 
 namespace ui
@@ -13,12 +13,12 @@ namespace ui
     template <typename T>
     std::pair<T*, QWidget*> createLineEditWithLabel(QWidget* parent)
     {
-        auto* errorLabel = utils::makeQChild<QLabel>(parent);
-        auto* lineEdit   = utils::makeQChild<T>(parent);
+        auto* errorLabel = common::makeQChild<QLabel>(parent);
+        auto* lineEdit   = common::makeQChild<T>(parent);
         lineEdit->attachErrorLabel(errorLabel);
 
-        auto* container = utils::makeQChild<QWidget>(parent);
-        auto* layout    = utils::makeQChild<QVBoxLayout>(container);
+        auto* container = common::makeQChild<QWidget>(parent);
+        auto* layout    = common::makeQChild<QVBoxLayout>(container);
 
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(2);

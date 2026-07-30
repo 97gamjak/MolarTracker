@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include "utils/cash.hpp"
+#include "common/cash.hpp"
 
 namespace ui
 {

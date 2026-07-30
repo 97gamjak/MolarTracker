@@ -8,11 +8,11 @@
 
 namespace finance
 {
-    class DomainTransaction;   // forward declaration
-    class TransactionEntry;    // forward declaration
-    class TradeLeg;            // forward declaration
-    class TransactionFilter;   // forward declaration
-    class OptionData;          // forward declaration
+    class DomainTransaction;    // forward declaration
+    class TransactionEntry;     // forward declaration
+    class TradeLeg;             // forward declaration
+    struct TransactionFilter;   // forward declaration
+    class OptionData;           // forward declaration
 }   // namespace finance
 
 struct TransactionRow;         // forward declaration

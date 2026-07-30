@@ -4,10 +4,11 @@
 #include <optional>
 #include <string>
 
+#include "common/container/id_id_map.hpp"
+#include "common/container/set.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stocks.hpp"
-#include "utils/container/id_id_map.hpp"
 
 class Connection;   // Forward declaration
 

@@ -1,10 +1,8 @@
 #ifndef __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 #define __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 
-#include <expected>
-
-#include "http/http_error.hpp"
-#include "utils/version.hpp"
+#include "common/version.hpp"
+#include "error/http_error.hpp"
 
 namespace vcs
 {
@@ -21,8 +19,7 @@ namespace vcs
 
        public:
         [[nodiscard]]
-        static std::expected<utils::SemVer, http::HttpError> fetchLatestVersion(
-        );
+        static HttpResult<common::SemVer> fetchLatestVersion();
 
        private:
         [[nodiscard]]

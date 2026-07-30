@@ -7,7 +7,6 @@
 #include "finance/account/accounts.hpp"
 #include "finance/transaction/cash_transaction.hpp"
 #include "finance/transaction/domain_transaction.hpp"
-#include "finance/transaction/position_transaction.hpp"
 #include "finance/transaction/transaction_converter.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "finance/transaction/transactions.hpp"
@@ -208,9 +207,10 @@ namespace store
      * but they will not be saved to the database until the commit method is
      * called.
      *
-     * @return finance::Transactions
+     * @return FinanceResult<finance::Transactions>
      */
-    finance::Transactions TransactionStore::getTransactions() const
+    FinanceResult<finance::Transactions> TransactionStore::getTransactions(
+    ) const
     {
         return getTransactions(finance::TransactionFilter());
     }
@@ -230,18 +230,19 @@ namespace store
      * type, or any other relevant attributes of the transactions. If no filter
      * is provided, all transactions in the store will be returned.
      *
-     * @return finance::Transactions A vector of transactions
-     * currently in the store, this includes both new and existing transactions,
-     * and reflects any changes made to them in the store.
+     * @return FinanceResult<finance::Transactions>
      */
-    finance::Transactions TransactionStore::getTransactions(
-        const finance::TransactionFilter& filter
+    FinanceResult<finance::Transactions> TransactionStore::getTransactions(
+        finance::TransactionFilter filter
     ) const
     {
         const auto accountIds = _session->accountSession.getIds();
 
         if (accountIds.empty())
             return {};
+
+        if (filter.accountIds.empty())
+            filter.accountIds = accountIds;
 
         const auto options = Options{
             .filter   = filter.getPredicate(),
@@ -256,89 +257,66 @@ namespace store
         );
         auto transactions = _getEntries(options);
 
-        auto dbTransactions =
-            _transactionService->getTransactions(accountIds, filter);
-
         // Merge transactions from the database with transactions in the store
         // But check if id is already in the store, if it is, use the one in the
         // store
         IdSet<TransactionId> transactionIds;
 
         std::vector<finance::DomainTransaction> results;
-
         for (const auto& transaction : transactions)
         {
             transactionIds.insert(transaction.value.getId());
             results.push_back(transaction.value);
         }
 
+        LOG_DEBUG(
+            std::format(
+                "Transactions retrieved from store: {}, with ids: {}",
+                results.size(),
+                transactionIds.toString()
+            )
+        );
+
+        auto dbTransactions = _transactionService->getTransactions(filter);
+
+        LOG_DEBUG(
+            std::format(
+                "Transactions retrieved from database: {} with ids: {}",
+                dbTransactions.size(),
+                IdSet<TransactionId>::fromRange(
+                    dbTransactions,
+                    [](const auto& tx) { return tx.getId(); }
+                ).toString()
+            )
+        );
+
         for (const auto& transaction : dbTransactions)
             if (!transactionIds.contains(transaction.getId()))
                 results.push_back(transaction);
 
-        finance::Transactions result;
-        result.addTransactions(results, _session->accountSession);
+        finance::Transactions txs;
+        const auto&           result =
+            txs.addTransactions(results, _session->accountSession);
 
-        LOG_DEBUG(
-            std::format(
-                "Transactions retrieved: stocks({}), cash({})",
-                result.stocks().size(),
-                result.cash().size()
-            )
-        );
-        return result;
-    }
-
-    /**
-     * @brief Get stock positions based on transactions in the store, this will
-     * analyze the stock transactions in the store and group them into positions
-     * based on their position IDs, allowing the caller to easily access the
-     * current open positions for stocks based on the transactions that have
-     * been added to the store.
-     *
-     * @param filter An optional filter to apply when retrieving transactions,
-     * this allows the caller to specify criteria for which transactions to
-     * include in the analysis for determining stock positions, such as
-     * filtering by date range, transaction type, or any other relevant
-     * attributes of the transactions. If no filter is provided, all
-     * transactions in the store will be considered when determining stock
-     * positions.
-     *
-     * @return IdMap<PositionId, finance::StockPositionTransaction>
-     * A mapping of position IDs to StockPositionTransaction objects, this
-     * allows the caller to easily access the details of each open stock
-     * position based on its position ID.
-     */
-    IdMap<PositionId, finance::StockPositionTransaction> TransactionStore::
-        getStockPositions(const finance::TransactionFilter& filter) const
-    {
-        IdMap<PositionId, finance::StockPositionTransaction> stockPositions;
-
-        const auto transactions = getTransactions(filter).stocks();
-
-        for (const auto& transaction : transactions)
+        if (!result)
         {
-            const auto positionId = transaction.getPositionId();
-            if (!stockPositions.contains(positionId))
-            {
-                stockPositions.at(positionId) =
-                    finance::StockPositionTransaction(positionId);
-            }
-
-            if (!stockPositions.at(positionId).addPosition(transaction))
-            {
-                LOG_ERROR(
-                    "Failed to add stock transaction to position id: " +
-                    positionId.toString()
-                );
-            }
+            const auto& error = result.error().convert(
+                FinanceErrorType::InvalidTransaction,
+                "Failed to add transactions to Transactions object"
+            );
+            LOG_ERROR(error.toString());
+            return error;
         }
 
         LOG_DEBUG(
-            std::format("Stock positions retrieved: {}", stockPositions.size())
+            std::format(
+                "Transactions retrieved: stocks({}), cash({}), options({})",
+                txs.stocks().size(),
+                txs.cash().size(),
+                txs.options().size()
+            )
         );
-
-        return stockPositions;
+        return txs;
     }
 
     /**

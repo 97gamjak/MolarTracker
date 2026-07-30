@@ -1,16 +1,18 @@
 #ifndef __UI__INCLUDE__UI__TRANSACTION__TRANSACTIONS_OVERVIEW_HPP__
 #define __UI__INCLUDE__UI__TRANSACTION__TRANSACTIONS_OVERVIEW_HPP__
 
+#include <qlabel.h>
 #include <qsortfilterproxymodel.h>
 #include <qwidget.h>
 
+#include "common/container/id_map.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/id_map.hpp"
 
 namespace drafts
 {
-    class CashTransactionOverview;    // Forward declaration
-    class StockTransactionOverview;   // Forward declaration
+    class CashTransactionOverview;     // Forward declaration
+    class StockTransactionOverview;    // Forward declaration
+    class OptionTransactionOverview;   // Forward declaration
 }   // namespace drafts
 
 class QSortFilterProxyModel;   // Forward declaration
@@ -19,8 +21,9 @@ class QHeaderView;             // Forward declaration
 
 namespace ui
 {
-    class CashTransactionTableModel;    // Forward declaration
-    class StockTransactionTableModel;   // Forward declaration
+    class CashTransactionTableModel;     // Forward declaration
+    class StockTransactionTableModel;    // Forward declaration
+    class OptionTransactionTableModel;   // Forward declaration
 
     /**
      * @brief Widget for displaying an overview of transactions in a table view
@@ -37,19 +40,32 @@ namespace ui
         Q_OBJECT
 
        private:
+        /// The title label for the cash transactions section
+        QLabel* _cashTitle;
+        /// The title label for the stock transactions section
+        QLabel* _stockTitle;
+        /// The title label for the option transactions section
+        QLabel* _optionTitle;
         /// The model for the transaction table
         CashTransactionTableModel* _cashModel;
         /// The model for the stock transaction table
         StockTransactionTableModel* _stockModel;
+        /// The model for the option transaction table
+        OptionTransactionTableModel* _optionModel;
         /// The proxy model for sorting and filtering the transaction table
         QSortFilterProxyModel* _cashProxy;
         /// The proxy model for sorting and filtering the stock transaction
         /// table
         QSortFilterProxyModel* _stockProxy;
+        /// The proxy model for sorting and filtering the option transaction
+        /// table
+        QSortFilterProxyModel* _optionProxy;
         /// The table view for displaying the transactions
         QTableView* _cashTable;
         /// The table view for displaying the stock transactions
         QTableView* _stockTable;
+        /// The table view for displaying the option transactions
+        QTableView* _optionTable;
 
        public:
         explicit TransactionsOverview(QWidget* parent);
@@ -58,7 +74,9 @@ namespace ui
             const std::vector<drafts::CashTransactionOverview>&
                 cashTransactions,
             const std::vector<drafts::StockTransactionOverview>&
-                                                 stockTransactions,
+                stockTransactions,
+            const std::vector<drafts::OptionTransactionOverview>&
+                                                 optionTransactions,
             const IdMap<AccountId, std::string>& accountIdToName
         );
 

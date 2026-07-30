@@ -2,6 +2,7 @@
 #define __UI__INCLUDE__UI__SIDE_BAR__ACCOUNT_CATEGORY_HPP__
 
 #include "category.hpp"
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 
 class QString;   // Forward declaration
@@ -25,7 +26,7 @@ namespace ui
        public:
         explicit AccountCategory();
 
-        void addAccount(AccountId id, const QString& name);
+        void addAccount(AccountId id, const QString& name, AccountKind kind);
         void clearAccounts();
 
         [[nodiscard]] QAction* getCreateAction() const;

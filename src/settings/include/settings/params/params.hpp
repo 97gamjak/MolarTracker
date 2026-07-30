@@ -10,6 +10,7 @@
 
 // Type-specific params
 #include "settings/params/enum_param.hpp"          // IWYU pragma: export
+#include "settings/params/map_param.hpp"           // IWYU pragma: export
 #include "settings/params/numeric_param.hpp"       // IWYU pragma: export
 #include "settings/params/numeric_vec_param.hpp"   // IWYU pragma: export
 

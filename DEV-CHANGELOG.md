@@ -4,7 +4,67 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### UI -- Help Dialog
+
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
+
+<!-- insertion marker -->
+## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
+
 REVERT CACHE changes but keep error handling
+
+### Features
+
+#### Finance / Watchlist backend (MOLTRACK-285)
+
+Backend-only scaffolding for the Watchlist feature — DB migration, ORM
+rows, repo, service, and store. Sidebar UI, context menu, and
+create/rename/delete dialogs are deferred to a follow-up PR (depends on
+the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
+
+- New `watchlists` / `watchlist_instruments` tables added via
+  `_migrateV15()` (`DB_VERSION` bumped 14 → 15).
+  `watchlist_instruments` uses a surrogate `IdField<WatchlistInstrumentId>`
+  primary key plus a `getUniqueGroups()` unique constraint on
+  `(watchlistId, symbol)`, since this ORM only supports single-column
+  primary keys (no composite PK support) — functionally equivalent to
+  the ticket's literal composite-PK schema. `symbol` is a plain string,
+  not a foreign key to `instrument`, so a watchlist can reference a
+  symbol that isn't (yet) a tracked instrument.
+- Add `WatchlistId` / `WatchlistInstrumentId` strong IDs
+  (`config/id_types.hpp`), `finance::Watchlist` domain type
+  (`src/finance/include/finance/watchlist.hpp`, mirrors `finance::Position`),
+  `WatchlistRow` / `WatchlistInstrumentRow` ORM rows (`src/sql_models/`),
+  `IWatchlistRepo` / `WatchlistRepo` (create/getAll/rename/delete/
+  addSymbol/removeSymbol, mirrors `AccountRepo`), `IWatchlistService` /
+  `WatchlistService` (thin wrapper, mirrors `AccountService`), and
+  `IWatchlistStore` / `WatchlistStore` (extends
+  `BaseStore<finance::Watchlist, WatchlistId>`, mirrors `AccountStore`).
+  Like `AccountStore`, `WatchlistStore::commit()` only supports the
+  `New`/`Clean` states so far (`Modified`/`Deleted` throw
+  "not supported yet") — rename/delete/add-symbol/remove-symbol are
+  available at the repo/service layer already, to be wired into the
+  store's dirty-tracking once the UI needs them.
+- Add `finance::TradeFilterParams` (`src/finance/include/finance/instrument/`)
+  holding `std::optional<std::vector<std::string>> symbolAllowlist`.
+- Add `IInstrumentRepo::getStocksBySymbols(symbols)` /
+  `InstrumentRepo::getStocksBySymbols(symbols)` — additive method using
+  `orm::Query{}.in<StockRow::tickerField>(symbols)` (existing `.in<Field>()`
+  query-builder mechanism) to generate a `ticker IN (...)` clause; no
+  existing method signatures changed. Not yet wired into the live
+  `StockStore` → `SecuritiesController` flow.
+- Register the new repo/service/store trio in `RepoContainer`,
+  `ServiceContainer`, and `StoreContainer` (including `allStores`/`commit()`
+  wiring), so they're ready for the UI PR to consume.
+- Add `tests/app/test_watchlist_repo.cpp`, `test_watchlist_service.cpp`,
+  `tests/app/store/test_watchlist_store.cpp` (+ `MockWatchlistService` in
+  `mock_services.hpp`), and `getStocksBySymbols` coverage in
+  `test_instrument_repo.cpp`.
 
 #### Finance
 
@@ -28,6 +88,10 @@ REVERT CACHE changes but keep error handling
   `MainWindow`: checks `StoreContainer::isDirty()` and
   `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
   before allowing the close
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
 
 #### ORM
 
@@ -41,7 +105,7 @@ REVERT CACHE changes but keep error handling
 
 - Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
   - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
-    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+    and returns a `common::SemVer`; strips the `v` prefix from GitHub tags
   - `vcs::UpdateCheckService` — `QObject` that fires an async
     `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
     emits `updateAvailable(SemVer)` at most once per distinct version per
@@ -107,6 +171,26 @@ REVERT CACHE changes but keep error handling
 - `molartracker_ui` now links `molartracker_http` for
   `http::HttpClient::urlEncode`
 
+#### Settings — reset to default values (MOLTRACK-133)
+
+- Add `resetToDefault()` to `settings::ParamCore<T>` — clears `_value` (falling
+  back to `_defaultValue` via `get()`) but only if a default has been
+  configured, otherwise a no-op
+- Add `resetToDefault()` forwarding to `settings::ParamMixin<Derived, T>`,
+  `settings::NumericVecParam<T, N>` (loops its internal `NumericParam<T>`
+  elements), and `settings::ParamContainerMixin<Derived>` (loops
+  `forEachParam`, recursing into nested containers) — this gives every
+  settings container, including `Settings` itself, a working
+  `resetToDefault()` for free
+- `ui::SettingsDialog` gains a "Reset to Defaults" button in the bottom bar;
+  after a `QMessageBox` confirmation it calls `_settings.resetToDefault()`
+  then reuses the existing `saveRequested()`/`accept()` flow (same as Save),
+  since `SettingsDialog`'s param-editor widgets don't live-refresh on
+  external value changes
+- Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
+  `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+- Add `MapParam` as a new parameter type and add `Shortcutsettings` with it
+
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 
 - Add `maxLogAgeDays` setting to `LoggingSettings` (default 30, 0 = disabled,
@@ -119,14 +203,60 @@ REVERT CACHE changes but keep error handling
   constructing the `RingFile`, ensuring stale session logs are pruned at every
   startup
 
+#### Error Handling
+
+- centralize and generalize error handling approach
+
+#### Transaction overview — option transactions (MOLTRACK-316)
+
+- Add `drafts::OptionTransactionOverview` (`src/drafts/include/drafts/transaction/transaction_overview_draft.hpp`),
+  mirroring `StockTransactionOverview`, plus `mapper::TransactionOverviewMapper::toOption()`
+  resolving each option transaction's instrument ID to a display name via
+  `finance::Options::getOption()` (falls back to `"UNKNOWN"`, mirroring `toStock()`)
+- Add `ui::OptionTransactionTableModel` (`src/ui/include/ui/transaction/option_transaction_table.hpp`),
+  mirroring `StockTransactionTableModel`, with an additional `BuySell` /
+  `Action` column pair since options carry that data and stocks don't
+- `ui::TransactionsOverview` gains a third table/section for option
+  transactions; `refresh()` takes an additional
+  `std::vector<drafts::OptionTransactionOverview>` parameter
+- `TransactionController` now depends on `store::IOptionStore` and fetches
+  `_optionStore->getOptions(txs.value().getOptionInstrumentIds())` to feed
+  `TransactionOverviewMapper::toOption()`, alongside the existing cash/stock
+  mapping
+- Add `OptionTransactionTableModelTest` suite to
+  `tests/ui/test_transaction_table_models.cpp`, mirroring the existing
+  `StockTransactionTableModelTest` coverage
+
 ### CI
 
 - Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
   PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
   (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
   uploads to Codecov via `codecov/codecov-action@v5`
+- Fix drillian claude code review does not work anymore, hence, change it
+  to the official anthropic solution
 
 ### Bug Fix
+
+#### UI — numeric settings not persisting (MOLTRACK-314)
+
+- Fix `ui::makeNumericEditor` (`param_editor.tpp`) connecting
+  `editingFinished` to a lambda that called `makeNumericEditorEditing(...)`
+  — but that function's entire job is itself to establish the
+  `editingFinished → param.set(...)` connection. This meant the real
+  persist-on-edit connection was only registered the *first* time
+  `editingFinished` fired (without acting on that edit), and a duplicate
+  connection was added on every subsequent edit. `BoolParam` (`QCheckBox`),
+  `StringParam` (`QLineEdit`), and `EnumParam` (`QComboBox`) connect directly
+  and were unaffected — only `NumericParam`-backed spin boxes (and
+  `NumericVecParam` components, e.g. window/dialog sizes) were broken
+- Fix: call `makeNumericEditorEditing(spinBox, param)` directly once at
+  widget-creation time instead of wrapping it in another `editingFinished`
+  connection
+- Add `tests/ui/test_param_editor.cpp` — regression tests confirming
+  `QSpinBox`/`QDoubleSpinBox` editors persist to the underlying param on
+  `editingFinished`, including across repeated edits; `tests_ui` now links
+  `molartracker_settings`
 
 #### ORM
 
@@ -221,28 +351,11 @@ REVERT CACHE changes but keep error handling
 - move mappers from drafts into controller
 - remove `AccountSession` type and change it to `Accounts`
 - remove IdMap special type
+- replace `ParamError` with common `Error` type
 
 ### Claude
 
 - add rules for allowing and denying commands
-
-### Features
-
-#### UI
-
-- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
-  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
-  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
-  signal and `HelpMenuController`
-- `ui::HelpDialog` (MOLTRACK-313): add a "Settings" section to the help
-  content documenting the Settings dialog (where to open it from the menu
-  bar, its default General Settings view, its sidebar sections, and
-  Save/Close semantics), with three screenshots. Add
-  `src/ui/resources/help.qrc` (Qt resource collection, auto-compiled via
-  `CMAKE_AUTORCC`) bundling `src/ui/resources/help/*.png` into the binary at
-  `:/help/...`; `molartracker_ui`'s `CMakeLists.txt` now globs `resources/*.qrc`
-  into its sources. The three screenshot files are placeholders — see PR
-  description for what to capture and where to save them.
 
 <!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
@@ -475,6 +588,7 @@ REVERT CACHE changes but keep error handling
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 

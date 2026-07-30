@@ -2,9 +2,9 @@
 
 #include <QMenu>
 
+#include "common/finance.hpp"
+#include "common/qt_helpers.hpp"
 #include "ui/side_bar/category.hpp"
-#include "utils/finance.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -76,7 +76,7 @@ namespace ui
         using enum TransactionType;
 
         auto createName = [&](TransactionType type)
-        { return "Create " + utils::toQString(type) + " Transaction"; };
+        { return "Create " + common::toQString(type) + " Transaction"; };
 
         const auto depositName = createName(Deposit);
         _createDepositAction   = menu.addAction(depositName);

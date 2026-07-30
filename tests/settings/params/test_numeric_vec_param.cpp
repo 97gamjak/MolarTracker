@@ -73,7 +73,7 @@ TEST(NumericVecParam, SetOutOfRangeIndexReturnsError)
 
     auto result = vec.set(2, paramValue);   // index == N
     EXPECT_FALSE(result.has_value());
-    EXPECT_FALSE(result.error().getMessage().empty());
+    EXPECT_FALSE(result.error().toString().empty());
 }
 
 TEST(NumericVecParam, GetOutOfRangeIndexThrows)
@@ -236,6 +236,19 @@ TEST(NumericVecParam, CommitClearsDirtyForAllElements)
     ASSERT_TRUE(vec.set(2, 3).has_value());
     vec.commit();
     EXPECT_FALSE(vec.isDirty());
+}
+
+TEST(NumericVecParam, ResetToDefaultRestoresAllElements)
+{
+    settings::NumericVecParam<int, 2> vec("v", "V", "D");
+    vec.setDefaults(std::vector<int>{1, 2});
+    ASSERT_TRUE(vec.set(0, 10).has_value());
+    ASSERT_TRUE(vec.set(1, 20).has_value());
+
+    vec.resetToDefault();
+
+    EXPECT_EQ(vec.get(0), 1);
+    EXPECT_EQ(vec.get(1), 2);
 }
 
 // ============================================================================

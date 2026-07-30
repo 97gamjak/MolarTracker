@@ -3,9 +3,9 @@
 
 #include <optional>
 
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {
@@ -36,6 +36,8 @@ namespace finance
         [[nodiscard]] PositionId               getId() const;
         [[nodiscard]] Timestamp                getCreatedAt() const;
         [[nodiscard]] std::optional<Timestamp> getClosedAt() const;
+
+        [[nodiscard]] bool isOpen() const;
 
         [[nodiscard]] std::string toString() const;
     };

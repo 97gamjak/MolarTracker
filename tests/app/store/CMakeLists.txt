@@ -4,6 +4,7 @@ add_executable(tests_app_store
     test_profile_store.cpp
     test_stock_store.cpp
     test_transaction_store.cpp
+    test_watchlist_store.cpp
 )
 
 target_include_directories(tests_app_store

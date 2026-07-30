@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <concepts>
+#include <format>
 #include <limits>
 #include <optional>
 #include <string>
@@ -81,7 +82,11 @@ namespace settings
             return _defaultValue.value();
 
         throw ParamException(
-            "Parameter value is not set and no default value is provided"
+            std::format(
+                "For Parameter {}: value is not set and no default value is "
+                "provided",
+                _key
+            )
         );
     }
 
@@ -113,6 +118,19 @@ namespace settings
     {
         _value.reset();
         _notifySubscribers();
+    }
+
+    /**
+     * @brief Reset the value of the parameter to its default value, this is a
+     * no-op if no default value has been configured for the parameter
+     *
+     * @tparam T
+     */
+    template <typename T>
+    void ParamCore<T>::resetToDefault()
+    {
+        if (_defaultValue.has_value())
+            unset();
     }
 
     /**

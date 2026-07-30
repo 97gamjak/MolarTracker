@@ -4,8 +4,10 @@
 #include <cstdint>
 #include <expected>
 
+#include "common/container/id_id_map.hpp"
+#include "common/container/set.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/id_id_map.hpp"
+#include "finance/instrument/options.hpp"
 
 namespace finance
 {
@@ -64,6 +66,37 @@ namespace store
          */
         [[nodiscard]]
         virtual const IdIdMap<InstrumentId>& getInstrumentIdMap() const = 0;
+
+        /**
+         * @brief Get a list of all options in the store for the given
+         * instrument IDs, this will return all options that are not marked as
+         * deleted, and will include options that are new or modified but not
+         * yet committed.
+         *
+         * @param instrumentIds The set of instrument IDs to retrieve options
+         * for
+         * @return finance::Options
+         */
+        [[nodiscard]]
+        virtual finance::Options getOptions(
+            const IdSet<InstrumentId>& instrumentIds
+        ) const = 0;
+
+        /**
+         * @brief Get an option by its instrument ID, this allows callers to
+         * retrieve a specific option from the store based on its instrument ID,
+         * enabling access to the details of the option for further processing
+         * or analysis.
+         *
+         * @param instrumentId The instrument ID of the option to retrieve
+         * @return std::optional<finance::Option> The Option object if found, or
+         * an empty optional if no option with the given instrument ID exists in
+         * the store
+         */
+        [[nodiscard]]
+        virtual std::optional<finance::Option> getOption(
+            InstrumentId instrumentId
+        ) const = 0;
     };
 }   // namespace store
 

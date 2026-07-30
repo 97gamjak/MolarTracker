@@ -1,10 +1,10 @@
 #include "finance/instrument/stock.hpp"
 
-#include "finance/finance_error.hpp"
+#include "common/currency.hpp"
+#include "common/finance.hpp"
+#include "error/finance_error.hpp"
 #include "finance/ticker_info.hpp"
 #include "finance/yf_client.hpp"
-#include "utils/currency.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {
@@ -47,11 +47,9 @@ namespace finance
      * @brief Retrieve ticker information for a given stock ticker.
      *
      * @param ticker The stock ticker symbol
-     * @return std::expected<Stock, YahooFinanceError>
+     * @return YFinanceResult<Stock>
      */
-    std::expected<Stock, YahooFinanceError> Stock::retrieveTickerInfo(
-        const std::string& ticker
-    )
+    YFinanceResult<Stock> Stock::retrieveTickerInfo(const std::string& ticker)
     {
         const auto result = YahooFinanceClient::fetchTickerInfo(ticker);
 

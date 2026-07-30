@@ -5,14 +5,14 @@
 
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
-#include "controller/mapper/account_mapper.hpp"
+#include "common/qt_helpers.hpp"
 #include "drafts/account_draft.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.AccountSideBarController");
 
@@ -77,7 +77,8 @@ namespace controller
         {
             category->addAccount(
                 account.getId(),
-                QString::fromStdString(account.getName())
+                QString::fromStdString(account.getName()),
+                account.getKind()
             );
         }
     }
@@ -112,7 +113,7 @@ namespace controller
             LOG_DEBUG("Create Account action triggered");
 
             _createAccountDialog =
-                utils::makeQChild<ui::CreateAccountDialog>(getMainWindow());
+                common::makeQChild<ui::CreateAccountDialog>(getMainWindow());
 
             connect(
                 _createAccountDialog,
@@ -151,7 +152,7 @@ namespace controller
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
             _accountStore,
-            AccountMapper::toAccount(account)
+            mapper::AccountMapper::toAccount(account)
         );
 
         if (!result)

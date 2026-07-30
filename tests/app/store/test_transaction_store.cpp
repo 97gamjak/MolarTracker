@@ -3,6 +3,10 @@
 #include <cstdint>
 #include <memory>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/transaction_entry.hpp"
@@ -12,10 +16,6 @@
 #include "store/account/account_store.hpp"
 #include "store/position_store.hpp"
 #include "store/transaction_store.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace
 {

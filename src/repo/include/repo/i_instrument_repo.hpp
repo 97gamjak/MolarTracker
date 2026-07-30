@@ -4,15 +4,16 @@
 #include <string>
 #include <vector>
 
+#include "common/container/set.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/set.hpp"
 
 namespace finance
 {
-    class Stock;
-    struct StockInsertionResult;
-    class Option;
-    struct OptionInsertionResult;
+    class Stock;                    // forward declaration
+    struct StockInsertionResult;    // forward declaration
+    class Option;                   // forward declaration
+    class Options;                  // forward declaration
+    struct OptionInsertionResult;   // forward declaration
 }   // namespace finance
 
 namespace repo
@@ -47,12 +48,34 @@ namespace repo
         ) = 0;
 
         /**
-         * @brief get a list of all options in the database
+         * @brief Get a list of stocks whose ticker symbol is in the given
+         * allowlist (e.g. the symbols contained in a watchlist)
          *
-         * @return std::vector<finance::Option>
+         * @param symbols The ticker symbols to filter by
+         * @return std::vector<finance::Stock>
          */
         [[nodiscard]]
-        virtual std::vector<finance::Option> getOptions() = 0;
+        virtual std::vector<finance::Stock> getStocksBySymbols(
+            const std::vector<std::string>& symbols
+        ) = 0;
+
+        /**
+         * @brief get a list of all options in the database
+         *
+         * @return finance::Options
+         */
+        [[nodiscard]]
+        virtual finance::Options getOptions() = 0;
+
+        /**
+         * @brief get a list of all options in the database for the given
+         * instrument IDs
+         *
+         * @param ids The set of instrument IDs to retrieve options for
+         * @return finance::Options
+         */
+        [[nodiscard]]
+        virtual finance::Options getOptions(const IdSet<InstrumentId>& ids) = 0;
 
         /**
          * @brief Get a stock by its ticker symbol

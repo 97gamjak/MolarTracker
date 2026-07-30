@@ -4,11 +4,10 @@
 #include <QFutureWatcher>
 #include <QObject>
 #include <QTimer>
-#include <expected>
 #include <optional>
 
-#include "http/http_error.hpp"
-#include "utils/version.hpp"
+#include "common/version.hpp"
+#include "error/http_error.hpp"
 
 namespace vcs
 {
@@ -29,10 +28,10 @@ namespace vcs
         /// The timer for scheduling periodic checks
         QTimer _timer;
         /// The watcher for the async GitHub fetch operation
-        QFutureWatcher<std::expected<utils::SemVer, http::HttpError>> _watcher;
+        QFutureWatcher<HttpResult<common::SemVer>> _watcher;
         /// The last version that was notified to the user, used for
         /// deduplication of updateAvailable() signals within the same session
-        std::optional<utils::SemVer> _lastNotifiedVersion;
+        std::optional<common::SemVer> _lastNotifiedVersion;
 
         // TODO(97gamjak): make this interval configurable and also add a way to
         // trigger manual checks from the UI
@@ -51,7 +50,7 @@ namespace vcs
          *
          * @param latestVersion
          */
-        void updateAvailable(utils::SemVer latestVersion);
+        void updateAvailable(common::SemVer latestVersion);
 
        private slots:
         void _onTimerTick();

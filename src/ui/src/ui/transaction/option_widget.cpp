@@ -9,6 +9,9 @@
 #include <QComboBox>
 #include <QPointer>
 
+#include "common/cash.hpp"
+#include "common/currency.hpp"
+#include "common/qt_helpers.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/transaction/account_combo.hpp"
@@ -17,11 +20,8 @@
 #include "ui/transaction/ticker_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
-#include "utils/cash.hpp"
-#include "utils/currency.hpp"
-#include "utils/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {
@@ -38,6 +38,8 @@ namespace ui
         QPointer<AccountCombo> referenceAccountCombo = nullptr;
         /// The combo box for selecting the option type (call or put)
         QPointer<QComboBox> optionTypeCombo = nullptr;
+        /// The combo box for selecting the action (open, close, roll)
+        QPointer<QComboBox> buySellCombo = nullptr;
 
         /// The row for entering the quantity of the option
         QPointer<AmountRow> quantityRow = nullptr;
@@ -101,6 +103,7 @@ namespace ui
         : accountCombo(new AccountCombo(accounts, parent)),
           referenceAccountCombo(new AccountCombo(referenceAccounts, parent)),
           optionTypeCombo(new QComboBox(parent)),
+          buySellCombo(new QComboBox(parent)),
           quantityRow(new AmountRow(parent)),
           strikeRow(new AmountRow(parent)),
           amountRow(new AmountRow(parent)),
@@ -123,6 +126,9 @@ namespace ui
             optionTypeCombo->addItem(
                 OptionTypeMeta::toString(optionType).c_str()
             );
+
+        for (const auto& buySell : OptionBuySellMeta::values)
+            buySellCombo->addItem(OptionBuySellMeta::toString(buySell).c_str());
     }
 
     /**
@@ -136,6 +142,7 @@ namespace ui
         layout->addRow("Reference Account:", referenceAccountCombo);
         layout->addRow("Underlying:", tickerField);
         layout->addRow("Option Type:", optionTypeCombo);
+        layout->addRow("Buy/Sell:", buySellCombo);
         layout->addRow("Expiration:", expirationField);
         layout->addRow("Timestamp:", timestampField);
 
@@ -265,6 +272,7 @@ namespace ui
             ticker.value(),
             expirationField->getTimestamp(),
             static_cast<OptionType>(optionTypeCombo->currentIndex()),
+            static_cast<OptionBuySell>(buySellCombo->currentIndex()),
             quantity,
             amount,
             strikePrice,
@@ -482,7 +490,7 @@ namespace ui
      */
     void OptionWidget::updateTickers(const Set<std::string>& tickers)
     {
-        _fields->tickerField->updateTickers(utils::toQStringSet(tickers));
+        _fields->tickerField->updateTickers(common::toQStringSet(tickers));
     }
 
     /**

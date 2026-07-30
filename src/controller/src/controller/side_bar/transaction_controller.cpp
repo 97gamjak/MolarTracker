@@ -3,19 +3,22 @@
 #include <stdexcept>
 #include <string>
 
+#include "common/finance.hpp"
+#include "common/qt_helpers.hpp"
 #include "config/constants/github_constants.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
-#include "controller/mapper/account_mapper.hpp"
-#include "controller/mapper/option_mapper.hpp"
-#include "controller/mapper/transaction/transaction_create_mapper.hpp"
 #include "controller/side_bar/securities_controller.hpp"
 #include "controller/transaction_controller.hpp"
 #include "drafts/account_draft.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/position.hpp"
+#include "gateway/position_gateway.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
+#include "mapper/option_mapper.hpp"
+#include "mapper/transaction/transaction_create_mapper.hpp"
 #include "store/i_account_store.hpp"
 #include "store/i_option_store.hpp"
 #include "store/i_position_store.hpp"
@@ -27,8 +30,6 @@
 #include "ui/transaction/option_widget.hpp"
 #include "ui/transaction/stock_widget.hpp"
 #include "ui/utils/error.hpp"
-#include "utils/finance.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 
@@ -113,6 +114,7 @@ namespace controller
      * Transaction Side Bar Controller object
      *
      * @param undoStack The undo stack for the application
+     * @param positionGateway The position gateway for the application
      * @param accountStore The account store for the application
      * @param transactionStore The transaction store for the application
      * @param stockStore The stock store for the application
@@ -124,18 +126,20 @@ namespace controller
      * @param mainWindow The main window of the application
      */
     TransactionSideBarController::TransactionSideBarController(
-        cmd::UndoStack&                           undoStack,
-        const std::shared_ptr<IAccountStore>&     accountStore,
-        const std::shared_ptr<ITransactionStore>& transactionStore,
-        const std::shared_ptr<IStockStore>&       stockStore,
-        const std::shared_ptr<IOptionStore>&      optionStore,
-        const std::shared_ptr<IPositionStore>&    positionStore,
-        TransactionController&                    transactionController,
-        SecuritiesSideBarController&              stockController,
-        QMainWindow*                              mainWindow
+        cmd::UndoStack&                                  undoStack,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
+        const std::shared_ptr<IAccountStore>&            accountStore,
+        const std::shared_ptr<ITransactionStore>&        transactionStore,
+        const std::shared_ptr<IStockStore>&              stockStore,
+        const std::shared_ptr<IOptionStore>&             optionStore,
+        const std::shared_ptr<IPositionStore>&           positionStore,
+        TransactionController&                           transactionController,
+        SecuritiesSideBarController&                     stockController,
+        QMainWindow*                                     mainWindow
     )
         : SideBarCategoryController(new TransactionCategory(), mainWindow),
           _undoStack(undoStack),
+          _positionGateway(positionGateway),
           _accountStore(accountStore),
           _transactionStore(transactionStore),
           _positionStore(positionStore),
@@ -147,10 +151,11 @@ namespace controller
           _connections(std::make_unique<Connections>())
     {
         const auto cashAccounts =
-            AccountMapper::toDrafts(_accountStore->getCashAccounts());
+            mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts());
 
         const auto securityAccounts =
-            AccountMapper::toDrafts(_accountStore->getSecurityAccounts());
+            mapper::AccountMapper::toDrafts(_accountStore->getSecurityAccounts()
+            );
 
         _dialogs = std::make_unique<Dialogs>(
             cashAccounts,
@@ -243,7 +248,8 @@ namespace controller
 
             _dialogs->cash->setTransactionType(type);
             _dialogs->cash->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _dialogs->cash->refresh();
 
@@ -252,10 +258,13 @@ namespace controller
         else if (action == item->getCreateStockTransactionAction())
         {
             _dialogs->stock->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                mapper::AccountMapper::toDrafts(
+                    _accountStore->getSecurityAccounts()
+                )
             );
             _dialogs->stock->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _dialogs->stock->updateTickers(_stockStore->getAllTickers());
             _dialogs->stock->refresh();
@@ -265,10 +274,13 @@ namespace controller
         else if (action == item->getCreateOptionTransactionAction())
         {
             _dialogs->option->updateAccounts(
-                AccountMapper::toDrafts(_accountStore->getSecurityAccounts())
+                mapper::AccountMapper::toDrafts(
+                    _accountStore->getSecurityAccounts()
+                )
             );
             _dialogs->option->updateReferenceAccounts(
-                AccountMapper::toDrafts(_accountStore->getCashAccounts())
+                mapper::AccountMapper::toDrafts(_accountStore->getCashAccounts()
+                )
             );
             _dialogs->option->updateTickers(_stockStore->getAllTickers());
             _dialogs->option->refresh();
@@ -305,7 +317,7 @@ namespace controller
         LOG_ENTRY;
 
         const auto transaction =
-            TransactionCreateMapper::fromCreateCashDraft(draft);
+            mapper::TransactionCreateMapper::fromCreateCashDraft(draft);
 
         const auto result = _transactionStore->addCashTransaction(transaction);
 
@@ -344,12 +356,21 @@ namespace controller
         if (!result)
             throw std::logic_error(result.error());
 
-        auto drafts = getOpenStockPositions(
-            draft.getSecurityAccount(),
-            _positionStore,
-            _stockStore,
-            _transactionStore
-        );
+        auto draftsResult =
+            _positionGateway->getOpenStockPosition(draft.getSecurityAccount());
+
+        if (!draftsResult)
+        {
+            LOG_ERROR(draftsResult.error().toString());
+            ui::ErrorDialog::show(
+                draftsResult.error(),
+                "Failed to create stock transaction",
+                _dialogs->stock
+            );
+            return;
+        }
+
+        auto& drafts = draftsResult.value();
 
         // TODO(97gamjak): as soon as coordinators are available this will be
         // handled by them
@@ -389,7 +410,7 @@ namespace controller
         draft.setPositionId(positionId);
 
         const auto transaction =
-            TransactionCreateMapper::fromCreateStockDraft(draft);
+            mapper::TransactionCreateMapper::fromCreateStockDraft(draft);
 
         const auto txAddResult =
             _transactionStore->addStockTransaction(transaction);
@@ -432,16 +453,24 @@ namespace controller
 
         if (!stock)
         {
-            const auto msg =
-                "Failed to retrieve stock data for underlying "
-                "instrument with ID " +
-                draft.getUnderlyingInstrumentId().toString();
-
-            LOG_ERROR(msg);
-            throw std::logic_error(msg);
+            const auto error = FinanceError{
+                FinanceErrorType::InvalidStock,
+                std::format(
+                    "No stock found for underlying instrument id: {}",
+                    draft.getUnderlyingInstrumentId().toString()
+                )
+            };
+            LOG_ERROR(error.toString());
+            ui::ErrorDialog::show(
+                error,
+                "Failed to create option transaction",
+                _dialogs->option
+            );
+            return;
         }
 
-        const auto option = OptionMapper::toOption(draft, stock.value());
+        const auto option =
+            mapper::OptionMapper::toOption(draft, stock.value());
 
         const auto optionResult = _optionStore->addOption(option);
 
@@ -464,7 +493,7 @@ namespace controller
         draft.setPositionId(positionId);
 
         const auto transaction =
-            TransactionCreateMapper::fromCreateOptionDraft(draft);
+            mapper::TransactionCreateMapper::fromCreateOptionDraft(draft);
 
         const auto txAddResult =
             _transactionStore->addOptionTransaction(transaction);

@@ -10,14 +10,18 @@
 #include "commands/account/create_account_command.hpp"
 #include "commands/undo_stack.hpp"
 #include "controller/helpers.hpp"
-#include "controller/mapper/account_mapper.hpp"
-#include "drafts/position_draft.hpp"
+#include "drafts/position/position_option_draft.hpp"
+#include "drafts/position/position_stock_draft.hpp"
 #include "finance/price_cache.hpp"
+#include "gateway/position_gateway.hpp"
 #include "helpers.hpp"
 #include "logging/log_macros.hpp"
+#include "mapper/account_mapper.hpp"
 #include "side_bar/account_controller.hpp"
 #include "store/i_account_store.hpp"
+#include "store/i_option_store.hpp"
 #include "ui/account/account_detail_view.hpp"
+#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.AccountSideBarController");
 
@@ -35,6 +39,8 @@ namespace controller
 
         /// Reference to the price cache
         std::shared_ptr<finance::PriceCache> priceCache;
+        /// Reference to the position gateway for managing positions
+        std::shared_ptr<gateway::PositionGateway> positionGateway;
 
         /// Reference to the account store
         std::shared_ptr<store::IAccountStore> accountStore;
@@ -44,6 +50,8 @@ namespace controller
         std::shared_ptr<store::IStockStore> stockStore;
         /// Reference to the transaction store
         std::shared_ptr<store::ITransactionStore> transactionStore;
+        /// Reference to the option store
+        std::shared_ptr<store::IOptionStore> optionStore;
 
         /// Pointer to the stacked widget
         QStackedWidget* stackedWidget;
@@ -60,15 +68,21 @@ namespace controller
 
         /// A mapping of account IDs to their corresponding open stock position
         /// details, used for displaying the account details in the UI
-        IdMap<AccountId, std::vector<OpenStockPositionDetail>>
-            openPositionDetails;
+        IdMap<AccountId, std::vector<gateway::OpenStockPositionDetail>>
+            openStockPositions;
+        /// A mapping of account IDs to their corresponding open option position
+        /// details, used for displaying the account details in the UI
+        IdMap<AccountId, std::vector<gateway::OpenOptionPositionDetail>>
+            openOptionPositions;
 
         Details(
             const std::shared_ptr<store::IAccountStore>&     accountStore_,
             const std::shared_ptr<store::IPositionStore>&    positionStore_,
             const std::shared_ptr<store::IStockStore>&       stockStore_,
             const std::shared_ptr<store::ITransactionStore>& transactionStore_,
+            const std::shared_ptr<store::IOptionStore>&      optionStore_,
             const std::shared_ptr<finance::PriceCache>&      priceCache_,
+            const std::shared_ptr<gateway::PositionGateway>& positionGateway_,
             cmd::UndoStack&                                  undoStack_,
             QStackedWidget*                                  stackedWidget_
         );
@@ -84,29 +98,35 @@ namespace controller
     /**
      * @brief Construct a new Account Controller:: Details:: Details object
      *
-     * @param accountStore_
-     * @param positionStore_
-     * @param stockStore_
-     * @param transactionStore_
-     * @param priceCache_
-     * @param undoStack_
-     * @param stackedWidget_
+     * @param accountStore_ The account store
+     * @param positionStore_ The position store
+     * @param stockStore_ The stock store
+     * @param transactionStore_ The transaction store
+     * @param optionStore_ The option store
+     * @param priceCache_ The price cache
+     * @param positionGateway_ The position gateway
+     * @param undoStack_ The undo stack
+     * @param stackedWidget_ The stacked widget
      */
     AccountController::Details::Details(
         const std::shared_ptr<store::IAccountStore>&     accountStore_,
         const std::shared_ptr<store::IPositionStore>&    positionStore_,
         const std::shared_ptr<store::IStockStore>&       stockStore_,
         const std::shared_ptr<store::ITransactionStore>& transactionStore_,
+        const std::shared_ptr<store::IOptionStore>&      optionStore_,
         const std::shared_ptr<finance::PriceCache>&      priceCache_,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway_,
         cmd::UndoStack&                                  undoStack_,
         QStackedWidget*                                  stackedWidget_
     )
         : undoStack(undoStack_),
           priceCache(priceCache_),
+          positionGateway(positionGateway_),
           accountStore(accountStore_),
           positionStore(positionStore_),
           stockStore(stockStore_),
           transactionStore(transactionStore_),
+          optionStore(optionStore_),
           stackedWidget(stackedWidget_),
           accountDetailView(new ui::AccountDetailView(stackedWidget)),
           connections(std::make_unique<Connections>())
@@ -118,19 +138,23 @@ namespace controller
      * @brief Controller for managing account-related actions
      *
      * @param undoStack
+     * @param positionGateway
      * @param accountStore
      * @param positionStore
      * @param stockStore
      * @param transactionStore
+     * @param optionStore
      * @param priceCache
      * @param stackedWidget
      */
     AccountController::AccountController(
         cmd::UndoStack&                                  undoStack,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway,
         const std::shared_ptr<store::IAccountStore>&     accountStore,
         const std::shared_ptr<store::IPositionStore>&    positionStore,
         const std::shared_ptr<store::IStockStore>&       stockStore,
         const std::shared_ptr<store::ITransactionStore>& transactionStore,
+        const std::shared_ptr<store::IOptionStore>&      optionStore,
         const std::shared_ptr<finance::PriceCache>&      priceCache,
         QStackedWidget*                                  stackedWidget
     )
@@ -140,7 +164,9 @@ namespace controller
                   positionStore,
                   stockStore,
                   transactionStore,
+                  optionStore,
                   priceCache,
+                  positionGateway,
                   undoStack,
                   stackedWidget
               )
@@ -155,29 +181,59 @@ namespace controller
                     _details->currentAccount == nullptr)
                     return;
 
-                auto& details =
-                    _details->openPositionDetails[_details->currentAccount
-                                                      ->getId()];
+                auto& stockDetails =
+                    _details
+                        ->openStockPositions[_details->currentAccount->getId()];
                 std::vector<drafts::PositionStockDetailDraft> drafts;
-                for (auto& detail : details)
+                for (auto& detail : stockDetails)
                 {
                     const auto quote = _details->priceCache->get(detail.ticker);
                     if (quote.has_value())
                     {
-                        detail.pnl->setCurrentPrice(quote.value().getPrice());
+                        const auto pnl = finance::snapshot(
+                            detail.state,
+                            quote.value().getPrice()
+                        );
+
                         detail.positionDraft.updateUnrealizedPnL(
                             quote.value().getPrice(),
-                            detail.pnl->getMarketValue(),
-                            detail.pnl->getUnrealizedPnL(),
-                            detail.pnl->getUnrealizedPnLPercentage()
+                            pnl.getMarketValue(),
+                            pnl.unrealizedPnL,
+                            pnl.getUnrealizedPnLPercentage()
                         );
                     }
                     drafts.push_back(detail.positionDraft);
                 }
 
+                auto& optionDetails =
+                    _details->openOptionPositions[_details->currentAccount
+                                                      ->getId()];
+
+                std::vector<drafts::PositionOptionDetailDraft> optionDrafts;
+                for (auto& detail : optionDetails)
+                {
+                    const auto quote = _details->priceCache->get(detail.ticker);
+                    if (quote.has_value())
+                    {
+                        const auto pnl = finance::snapshot(
+                            detail.state,
+                            quote.value().getPrice()
+                        );
+
+                        detail.positionDraft.updateUnrealizedPnL(
+                            quote.value().getPrice(),
+                            pnl.getMarketValue(),
+                            pnl.unrealizedPnL,
+                            pnl.getUnrealizedPnLPercentage()
+                        );
+                    }
+                    optionDrafts.push_back(detail.positionDraft);
+                }
+
                 _details->accountDetailView->updateSecurityAccount(
                     *_details->currentAccount,
-                    drafts
+                    drafts,
+                    optionDrafts
                 );
             },
             this
@@ -199,13 +255,17 @@ namespace controller
 
         if (!account.has_value())
         {
-            LOG_WARNING(
-                std::format("Account with ID {} not found", id.value())
+            ui::ErrorDialog::show(
+                "Failed to retrieve account details for account with ID: " +
+                    id.toString(),
+                "Account with ID not found",
+                _details->stackedWidget
             );
             return;
         }
 
-        const auto accountDraft = AccountMapper::toDraft(account.value());
+        const auto accountDraft =
+            mapper::AccountMapper::toDraft(account.value());
 
         switch (account->getKind())
         {
@@ -214,33 +274,71 @@ namespace controller
                 break;
             case AccountKind::Security:
             {
-                _details->openPositionDetails[account->getId()] =
-                    getOpenStockPositionDetails(
-                        account->getId(),
-                        _details->positionStore,
-                        _details->stockStore,
-                        _details->transactionStore
+                const auto stocksResult =
+                    _details->positionGateway->getOpenStockPositionDetails(
+                        account->getId()
                     );
+                const auto optionsResult =
+                    _details->positionGateway->getOpenOptionPositionDetails(
+                        account->getId()
+                    );
+
+                if (!stocksResult)
+                {
+                    LOG_ERROR(stocksResult.error().toString());
+                    ui::ErrorDialog::show(
+                        stocksResult.error(),
+                        "Failed to retrieve open stock positions for account "
+                        "overview",
+                        _details->stackedWidget
+                    );
+                    return;
+                }
+
+                if (!optionsResult)
+                {
+                    LOG_ERROR(optionsResult.error().toString());
+                    ui::ErrorDialog::show(
+                        optionsResult.error(),
+                        "Failed to retrieve open option positions for account "
+                        "overview",
+                        _details->stackedWidget
+                    );
+                    return;
+                }
+
+                _details->openStockPositions[account->getId()] =
+                    stocksResult.value();
+
+                _details->openOptionPositions[account->getId()] =
+                    optionsResult.value();
 
                 LOG_DEBUG(
                     std::format(
                         "Retrieved {} open position drafts for account {}",
-                        _details->openPositionDetails[account->getId()].size(),
+                        _details->openStockPositions[account->getId()].size() +
+                            _details->openOptionPositions[account->getId()]
+                                .size(),
                         account->getName()
                     )
                 );
 
-                std::vector<drafts::PositionStockDetailDraft> details;
+                std::vector<drafts::PositionStockDetailDraft> stocks;
                 for (const auto& detail :
-                     _details->openPositionDetails[account->getId()])
+                     _details->openStockPositions[account->getId()])
                 {
-                    details.push_back(detail.positionDraft);
+                    stocks.push_back(detail.positionDraft);
                 }
 
-                _details->accountDetailView->updateSecurityAccount(
-                    accountDraft,
-                    details
-                );
+                std::vector<drafts::PositionOptionDetailDraft> options;
+                for (const auto& detail :
+                     _details->openOptionPositions[account->getId()])
+                {
+                    options.push_back(detail.positionDraft);
+                }
+
+                _details->accountDetailView
+                    ->updateSecurityAccount(accountDraft, stocks, options);
                 _details->currentAccount =
                     std::make_unique<drafts::AccountDraft>(accountDraft);
                 break;

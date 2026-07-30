@@ -11,8 +11,8 @@
 #include <QFont>
 #include <mstd/enum.hpp>
 
+#include "common/quantity.hpp"
 #include "drafts/transaction/transaction_overview_draft.hpp"
-#include "utils/quantity.hpp"
 
 namespace ui
 {

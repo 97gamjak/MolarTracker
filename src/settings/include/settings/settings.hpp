@@ -9,6 +9,7 @@
 #include "settings/logging_settings.hpp"
 #include "settings/params/param_container.hpp"
 #include "settings/params/param_container_mixin.hpp"
+#include "settings/shortcut_settings.hpp"
 #include "settings/ui_settings.hpp"
 
 namespace settings
@@ -55,15 +56,14 @@ namespace settings
 
         /// The general settings parameters
         GeneralSettings _generalSettings;
-
         /// The UI settings parameters
         UISettings _uiSettings;
-
         /// The logging settings parameters
         LoggingSettings _loggingSettings;
-
         /// The backup settings parameters
         BackupSettings _backupSettings;
+        /// The shortcut settings parameters
+        ShortcutSettings _shortcutSettings;
 
        public:
         Settings() = delete;
@@ -83,6 +83,9 @@ namespace settings
 
         [[nodiscard]] BackupSettings&       getBackupSettings();
         [[nodiscard]] const BackupSettings& getBackupSettings() const;
+
+        [[nodiscard]] ShortcutSettings&       getShortcutSettings();
+        [[nodiscard]] const ShortcutSettings& getShortcutSettings() const;
 
         template <typename Func>
         void forEachParam(Func&& func) const;

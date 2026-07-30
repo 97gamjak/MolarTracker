@@ -11,6 +11,7 @@
 #include "repo/repo_errors.hpp"
 #include "settings/backup_settings.hpp"
 #include "transaction_repo.hpp"
+#include "watchlist_repo.hpp"
 
 REGISTER_LOG_CATEGORY("Repo.Container");
 
@@ -45,9 +46,11 @@ namespace repo
         _transactionRepo = std::make_shared<TransactionRepo>(*_database);
         _instrumentRepo  = std::make_shared<InstrumentRepo>(*_database);
         _positionRepo    = std::make_shared<PositionRepo>(*_database);
+        _watchlistRepo   = std::make_shared<WatchlistRepo>(*_database);
 
         if (!_migrationRunner || !_profileRepo || !_accountRepo ||
-            !_transactionRepo || !_instrumentRepo || !_positionRepo)
+            !_transactionRepo || !_instrumentRepo || !_positionRepo ||
+            !_watchlistRepo)
         {
             const auto* const msg = "Failed to initialize repository container";
             LOG_ERROR(msg);
@@ -170,6 +173,27 @@ namespace repo
     std::shared_ptr<const IPositionRepo> RepoContainer::getPositionRepo() const
     {
         return _positionRepo;
+    }
+
+    /**
+     * @brief Get the Watchlist Repo
+     *
+     * @return std::shared_ptr<IWatchlistRepo>
+     */
+    std::shared_ptr<IWatchlistRepo> RepoContainer::getWatchlistRepo()
+    {
+        return _watchlistRepo;
+    }
+
+    /**
+     * @brief Get the Watchlist Repo (const version)
+     *
+     * @return std::shared_ptr<const IWatchlistRepo>
+     */
+    std::shared_ptr<const IWatchlistRepo> RepoContainer::getWatchlistRepo(
+    ) const
+    {
+        return _watchlistRepo;
     }
 
 }   // namespace repo

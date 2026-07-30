@@ -6,10 +6,10 @@
 
 #include "settings/params/params.hpp"
 
-namespace utils
+namespace common
 {
     class SemVer;   // Forward declaration
-}   // namespace utils
+}   // namespace common
 
 namespace settings
 {
@@ -74,6 +74,8 @@ namespace settings
         static constexpr const char* DISMISSED_UPDATE_VERSION_DESCRIPTION =
             "The version of the update that the user has chosen not to be "
             "reminded about.";
+        /// dismissed update version default value
+        static constexpr const char* DISMISSED_UPDATE_VERSION_DEFAULT = "";
     };
 
     /**
@@ -116,10 +118,10 @@ namespace settings
         };
 
         /// The current version of the application
-        std::optional<utils::SemVer> _currentVersion;
+        std::optional<common::SemVer> _currentVersion;
 
         /// The version of the application when the settings were last saved
-        std::optional<utils::SemVer> _savedVersion;
+        std::optional<common::SemVer> _savedVersion;
 
        public:
         GeneralSettings();

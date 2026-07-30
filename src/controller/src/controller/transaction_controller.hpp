@@ -10,6 +10,7 @@ namespace store
     class ITransactionStore;   // Forward declaration
     class IAccountStore;       // Forward declaration
     class IStockStore;         // Forward declaration
+    class IOptionStore;        // Forward declaration
 }   // namespace store
 
 namespace cmd
@@ -45,11 +46,15 @@ namespace controller
         std::shared_ptr<store::IAccountStore> _accountStore;
         /// Reference to the stock store
         std::shared_ptr<store::IStockStore> _stockStore;
+        /// Reference to the option store
+        std::shared_ptr<store::IOptionStore> _optionStore;
 
-        /// Pointer to the central stacked widget
-        QStackedWidget* _stackedWidget;
-        /// Pointer to the transaction detail view
-        QPointer<ui::TransactionsOverview> _transactionDetailView;
+        struct UIElements;
+        /// A unique pointer to the UI elements used by the controller,
+        /// encapsulating the stacked widget and the transaction detail view,
+        /// providing a convenient way to manage and access these UI elements
+        /// within the controller.
+        std::unique_ptr<UIElements> _uiElements;
 
        public:
         TransactionController(
@@ -57,8 +62,10 @@ namespace controller
             const std::shared_ptr<store::ITransactionStore>& transactionStore,
             const std::shared_ptr<store::IAccountStore>&     accountStore,
             const std::shared_ptr<store::IStockStore>&       stockStore,
+            const std::shared_ptr<store::IOptionStore>&      optionStore,
             QStackedWidget*                                  stackedWidget
         );
+        ~TransactionController() override;
 
         void transactionOverviewSelected(bool focus);
         void transactionOverviewSelected();

@@ -1,13 +1,12 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TICKER_INFO_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TICKER_INFO_HPP__
 
-#include <expected>
 #include <mstd/enum.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "finance/finance_error.hpp"
-#include "utils/finance.hpp"
+#include "common/finance.hpp"
+#include "error/finance_error.hpp"
 
 namespace finance
 {
@@ -46,9 +45,7 @@ namespace finance
         AssetClass assetClass{AssetClass::Unknown};
 
         [[nodiscard]]
-        static std::expected<TickerInfo, FinanceError> fromJson(
-            const nlohmann::json& json
-        );
+        static FinanceResult<TickerInfo> fromJson(const nlohmann::json& json);
     };
 
 }   // namespace finance

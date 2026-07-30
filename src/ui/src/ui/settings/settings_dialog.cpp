@@ -4,15 +4,15 @@
 #include <qlabel.h>
 #include <qstackedwidget.h>
 
+#include <QMessageBox>
 #include <QPushButton>
 
-#include "settings/params/param_utils.hpp"
+#include "common/qt_helpers.hpp"
 #include "settings/settings.hpp"
 #include "ui/settings/param_editor.hpp"
 #include "ui/settings/settings_overview.hpp"
 #include "ui/settings/settings_section.hpp"
 #include "ui/settings/settings_sidebar.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -44,26 +44,26 @@ namespace ui
     {
         // ── Root layout
         // ───────────────────────────────────────────────────────────
-        auto* root = utils::makeQChild<QVBoxLayout>(this);
+        auto* root = common::makeQChild<QVBoxLayout>(this);
         root->setContentsMargins(0, 0, 0, 0);
         root->setSpacing(0);
 
         // ── Body (sidebar + stack)
         // ────────────────────────────────────────────────
-        auto* body       = utils::makeQChild<QWidget>(this);
-        auto* bodyLayout = utils::makeQChild<QHBoxLayout>(body);
+        auto* body       = common::makeQChild<QWidget>(this);
+        auto* bodyLayout = common::makeQChild<QHBoxLayout>(body);
         bodyLayout->setContentsMargins(0, 0, 0, 0);
         bodyLayout->setSpacing(0);
 
-        _sidebar = utils::makeQChild<SettingsSidebar>(body);
+        _sidebar = common::makeQChild<SettingsSidebar>(body);
         _sidebar->setFixedWidth(_sideBarWidth);
 
-        _stack = utils::makeQChild<QStackedWidget>(body);
+        _stack = common::makeQChild<QStackedWidget>(body);
 
         bodyLayout->addWidget(_sidebar);
 
         // Vertical separator
-        auto* sep = utils::makeQChild<QFrame>(body);
+        auto* sep = common::makeQChild<QFrame>(body);
         sep->setFrameShape(QFrame::VLine);
         sep->setObjectName("bodySeparator");
         bodyLayout->addWidget(sep);
@@ -74,9 +74,9 @@ namespace ui
 
         // ── Bottom bar
         // ────────────────────────────────────────────────────────────
-        auto* bottomBar = utils::makeQChild<QWidget>(this);
+        auto* bottomBar = common::makeQChild<QWidget>(this);
         bottomBar->setObjectName("bottomBar");
-        auto* bottomLayout = utils::makeQChild<QHBoxLayout>(bottomBar);
+        auto* bottomLayout = common::makeQChild<QHBoxLayout>(bottomBar);
 
         constexpr std::array<int, 4> margins = {16, 8, 16, 8};
         constexpr std::size_t        spacing = 8;
@@ -88,19 +88,24 @@ namespace ui
         );
         bottomLayout->setSpacing(spacing);
 
-        _unsavedLabel = utils::makeQChild<QLabel>(bottomBar);
+        auto* resetBtn = common::makeQChild<QPushButton>(bottomBar);
+        resetBtn->setText("Reset to Defaults");
+        resetBtn->setObjectName("resetToDefaultsButton");
+        bottomLayout->addWidget(resetBtn);
+
+        _unsavedLabel = common::makeQChild<QLabel>(bottomBar);
         _unsavedLabel->setObjectName("unsavedLabel");
         _unsavedLabel->setText("● unsaved changes");
         _unsavedLabel->setVisible(false);
         bottomLayout->addWidget(_unsavedLabel);
         bottomLayout->addStretch();
 
-        auto* saveBtn = utils::makeQChild<QPushButton>(bottomBar);
+        auto* saveBtn = common::makeQChild<QPushButton>(bottomBar);
         saveBtn->setText("Save");
         saveBtn->setObjectName("saveButton");
         saveBtn->setDefault(true);
 
-        auto* closeBtn = utils::makeQChild<QPushButton>(bottomBar);
+        auto* closeBtn = common::makeQChild<QPushButton>(bottomBar);
         closeBtn->setText("Close");
         closeBtn->setObjectName("closeButton");
 
@@ -125,12 +130,19 @@ namespace ui
 
         connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
+        connect(
+            resetBtn,
+            &QPushButton::clicked,
+            this,
+            &SettingsDialog::_onResetToDefaultsClicked
+        );
+
         // ── Build sections
         auto addPage = [&](auto& section, SectionMode mode)
         {
             const int stackIndex = _stack->count();
 
-            auto* page = utils::makeQChild<
+            auto* page = common::makeQChild<
                 SettingsSection<std::remove_cvref_t<decltype(section)>>>(
                 section,
                 mode
@@ -183,7 +195,7 @@ namespace ui
             }
 
             // Overview page for the parent
-            auto* overview = utils::makeQChild<SettingsOverview>(groupTitle);
+            auto* overview = common::makeQChild<SettingsOverview>(groupTitle);
             overview->setOnNavigate(
                 [this](int stackIndex)
                 {
@@ -251,6 +263,34 @@ namespace ui
         const bool anyDirty = _settings.isDirty();
 
         _unsavedLabel->setVisible(anyDirty);
+    }
+
+    /**
+     * @brief Handle a click on the "Reset to Defaults" button, after user
+     * confirmation this resets every parameter with a configured default value
+     * back to it and immediately saves, mirroring the Save button's behavior
+     *
+     */
+    void SettingsDialog::_onResetToDefaultsClicked()
+    {
+        using enum QMessageBox::StandardButton;
+
+        const auto choice = QMessageBox::question(
+            this,
+            "Reset to Defaults",
+            "This will reset all settings to their default values. This "
+            "cannot be undone. Continue?",
+            Yes | No,
+            No
+        );
+
+        if (choice != Yes)
+            return;
+
+        _settings.resetToDefault();
+        _updateUnsavedLabel();
+        emit saveRequested();
+        accept();
     }
 
     /**

@@ -3,12 +3,12 @@
 
 #include <memory>
 
+#include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/option.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_option_store.hpp"
-#include "utils/container/id_id_map.hpp"
 
 namespace store
 {
@@ -56,6 +56,16 @@ namespace store
 
         [[nodiscard]]
         const IdIdMap<InstrumentId>& getInstrumentIdMap() const override;
+
+        [[nodiscard]]
+        finance::Options getOptions(
+            const IdSet<InstrumentId>& instrumentIds
+        ) const override;
+
+        [[nodiscard]]
+        std::optional<finance::Option> getOption(
+            InstrumentId instrumentId
+        ) const override;
 
         void commit(const IdIdMap<InstrumentId>& reMap);
 

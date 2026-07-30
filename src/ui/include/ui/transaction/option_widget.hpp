@@ -5,8 +5,8 @@
 
 #include <vector>
 
+#include "common/container/set.hpp"
 #include "ui/base/dialog.hpp"
-#include "utils/container/set.hpp"
 
 class QFormLayout;   // Forward declaration
 class QLabel;        // Forward declaration

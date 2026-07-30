@@ -4,10 +4,11 @@
 #include <optional>
 #include <string>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/quantity.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
-#include "utils/cash.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace drafts
 {
@@ -109,6 +110,59 @@ namespace drafts
         [[nodiscard]] const Quantity& getQuantity() const;
         [[nodiscard]] const Cash&     getUnitPrice() const;
         [[nodiscard]] const Cash&     getTotalFees() const;
+    };
+
+    /**
+     * @brief A draft representation of an option transaction overview
+     *
+     */
+    class OptionTransactionOverview : public TransactionOverviewDraft
+    {
+       private:
+        /// The quantity of the option transaction
+        Quantity _quantity;
+        /// The premium (total cash flow) of the option transaction
+        Cash _premium;
+        /// The total fees associated with the option transaction
+        Cash _fees;
+
+        /// A display name for the option contract (underlying, expiration,
+        /// call/put, strike)
+        std::string _optionName;
+
+        /// The buy/sell direction of the option transaction
+        OptionBuySell _buySell;
+        /// The action performed in the option transaction (open, close, roll)
+        TransactionOptionAction _action;
+
+        /// The security account ID associated with the option transaction
+        AccountId _securityAccount;
+        /// The cash account ID associated with the option transaction
+        AccountId _cashAccount;
+
+       public:
+        explicit OptionTransactionOverview(
+            Timestamp                  timestamp,
+            std::optional<std::string> comment,
+            Quantity                   quantity,
+            Cash                       premium,
+            Cash                       fees,
+            std::string                optionName,
+            OptionBuySell              buySell,
+            TransactionOptionAction    action,
+            AccountId                  securityAccount,
+            AccountId                  cashAccount
+        );
+
+        [[nodiscard]] std::string getOptionName() const;
+        [[nodiscard]] AccountId   getSecurityAccount() const;
+        [[nodiscard]] AccountId   getCashAccount() const;
+
+        [[nodiscard]] const Quantity&         getQuantity() const;
+        [[nodiscard]] const Cash&             getPremium() const;
+        [[nodiscard]] const Cash&             getTotalFees() const;
+        [[nodiscard]] OptionBuySell           getBuySell() const;
+        [[nodiscard]] TransactionOptionAction getAction() const;
     };
 }   // namespace drafts
 

@@ -6,8 +6,8 @@
 #include <string>
 #include <string_view>
 
+#include "common/timestamp.hpp"
 #include "orm/concepts.hpp"
-#include "utils/timestamp.hpp"
 
 namespace orm
 {

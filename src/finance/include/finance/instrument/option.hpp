@@ -1,11 +1,11 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__INSTRUMENT__OPTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__INSTRUMENT__OPTION_HPP__
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {
@@ -55,19 +55,18 @@ namespace finance
             std::int64_t contractSize
         );
 
-        [[nodiscard]] OptionId     getId() const;
-        [[nodiscard]] InstrumentId getInstrumentId() const;
-        [[nodiscard]] OptionType   getOptionType() const;
-        [[nodiscard]] Cash         getStrikePrice() const;
-        [[nodiscard]] Timestamp    getExpirationDate() const;
-        [[nodiscard]] const Stock& getUnderlying() const;
-        [[nodiscard]] std::int64_t getContractSize() const;
+        [[nodiscard]] OptionId            getId() const;
+        [[nodiscard]] InstrumentId        getInstrumentId() const;
+        [[nodiscard]] OptionType          getOptionType() const;
+        [[nodiscard]] Cash                getStrikePrice() const;
+        [[nodiscard]] Timestamp           getExpirationDate() const;
+        [[nodiscard]] const std::int64_t& getContractSize() const;
 
         [[nodiscard]] std::string getName() const;
 
+        [[nodiscard]] const Stock& getUnderlying() const;
         [[nodiscard]] bool hasUnderlying(InstrumentId underlyingId) const;
-
-        void updateUnderlying(InstrumentId underlyingId);
+        void               updateUnderlying(InstrumentId underlyingId);
 
         void setId(OptionId id);
         void setInstrumentId(InstrumentId instrumentId);

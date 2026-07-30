@@ -1,5 +1,6 @@
 #include "transaction_factory.hpp"
 
+#include "common/cash.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/domain_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
@@ -11,7 +12,6 @@
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
 #include "sql_models/transaction_row.hpp"
-#include "utils/cash.hpp"
 
 namespace repo
 {
@@ -194,8 +194,8 @@ namespace repo
         row.instrumentId  = leg.getInstrumentId();
         row.accountId     = leg.getAccountId();
         row.quantity      = leg.getQuantity().toMicroUnits();
-        row.unitPrice     = leg.getUnitPrice().getAmount();
-        row.currency      = leg.getUnitPrice().getCurrency();
+        row.unitPrice     = leg.getAmount().getAmount();
+        row.currency      = leg.getAmount().getCurrency();
         row.positionId    = leg.getPositionId();
 
         return row;
@@ -258,11 +258,11 @@ namespace repo
     {
         orm::WhereExpr where = orm::makeEmptyWhere();
 
-        if (!filter.getTransactionIds().empty())
+        if (!filter.transactionIds.empty())
         {
             orm::WhereExpr idWhere = orm::makeEmptyWhere();
 
-            for (const auto &transactionId : filter.getTransactionIds())
+            for (const auto &transactionId : filter.transactionIds)
             {
                 idWhere |= TransactionRow::hasTransactionId(transactionId);
             }
@@ -270,17 +270,20 @@ namespace repo
             where &= idWhere;
         }
 
-        if (!filter.getPositionIds().empty())
+        if (!filter.positionIds.empty())
         {
             orm::WhereExpr posIdWhere = orm::makeEmptyWhere();
 
-            for (const auto &positionId : filter.getPositionIds())
+            for (const auto &positionId : filter.positionIds)
             {
                 posIdWhere |= TradeLegRow::hasPosition(positionId);
             }
 
             where &= posIdWhere;
         }
+
+        // we do not add here account ids as they need to be handled
+        // differently! see general get function
 
         return where;
     }
@@ -301,7 +304,7 @@ namespace repo
     {
         orm::Joins join;
 
-        if (!filter.getPositionIds().empty())
+        if (!filter.positionIds.empty())
         {
             join = join.add(
                 orm::join<

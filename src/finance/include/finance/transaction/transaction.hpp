@@ -4,11 +4,11 @@
 #include <optional>
 #include <string>
 
+#include "common/cash.hpp"
+#include "common/finance.hpp"
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "utils/cash.hpp"
-#include "utils/finance.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {
@@ -67,8 +67,9 @@ namespace finance
         AccountId _cashAccount;
         /// The external account associated with the option transaction
         AccountId _externalAccount;
-
-        /// The fees associated with the option transaction
+        /// The type of the transaction (e.g., cash, security, option)
+        TransactionDataType _type;
+        /// The fees associated with the transaction
         Cash _fees;
 
        public:
@@ -78,14 +79,16 @@ namespace finance
             TransactionStatus          status,
             AccountId                  cashAccount,
             AccountId                  externalAccount,
+            TransactionDataType        type,
             Cash                       fees,
             std::optional<std::string> comment = std::nullopt
         );
         ~Transaction() override = default;
 
-        [[nodiscard]] Cash      getFees() const;
-        [[nodiscard]] AccountId getCashAccountId() const;
-        [[nodiscard]] AccountId getExternalAccountId() const;
+        [[nodiscard]] Cash                getFees() const;
+        [[nodiscard]] AccountId           getCashAccountId() const;
+        [[nodiscard]] AccountId           getExternalAccountId() const;
+        [[nodiscard]] TransactionDataType getTransactionType() const;
 
         /**
          * @brief Get the entries associated with the transaction for a given
@@ -107,6 +110,21 @@ namespace finance
         virtual TransactionEntries getEntries(
             AccountId externalAccount
         ) const = 0;
+
+        /**
+         * @brief Get the set of accounts involved in the transaction, this is
+         * used to retrieve all the accounts that are affected by the
+         * transaction, including both cash and external accounts, and can be
+         * useful for understanding the overall impact of the transaction on
+         * different accounts.
+         *
+         * @return IdSet<AccountId> The set of account IDs involved in the
+         * transaction, this is a collection of all unique account identifiers
+         * that are part of the transaction, and can be used to analyze the
+         * relationships between different accounts and transactions.
+         */
+        [[nodiscard]]
+        virtual IdSet<AccountId> getInvolvedAccounts() const = 0;
 
        protected:
         [[nodiscard]]

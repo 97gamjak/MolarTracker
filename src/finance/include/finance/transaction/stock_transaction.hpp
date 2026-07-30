@@ -1,13 +1,13 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__STOCK_TRANSACTION_HPP__
 
+#include "common/cash.hpp"
+#include "common/quantity.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/security_transaction.hpp"
 #include "finance/transaction/stock_data.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "finance/transaction/transaction_entry.hpp"
-#include "utils/cash.hpp"
-#include "utils/quantity.hpp"
 
 namespace finance
 {
@@ -46,8 +46,6 @@ namespace finance
         [[nodiscard]] StockData getStockData() const;
 
         [[nodiscard]] Cash getAmount() const;
-
-        [[nodiscard]] InstrumentId getBaseInstrumentId() const override;
 
        private:
         [[nodiscard]] TransactionEntry _getAmountEntry() const;

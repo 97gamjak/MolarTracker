@@ -4,11 +4,11 @@
 #include <format>
 #include <ranges>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
 #include "service/i_account_service.hpp"
-#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Store.AccountStore");
 

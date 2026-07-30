@@ -1,13 +1,16 @@
 #ifndef __ERROR__INCLUDE__ERROR__FINANCE_ERROR_HPP__
 #define __ERROR__INCLUDE__ERROR__FINANCE_ERROR_HPP__
 
+#include <mstd/enum.hpp>
+
 #include "error/base_error.hpp"
 #include "error/http_error.hpp"
 
 #define YFINANCE_ERROR_TYPE_LIST(X) \
     X(HttpError)                    \
     X(InvalidTicker)                \
-    X(InvalidPriceQuote)
+    X(InvalidPriceQuote)            \
+    GENERIC_ERRORS(X)
 
 #define FINANCE_ERROR_TYPE_LIST(X) \
     X(StockNotFound)               \
@@ -15,21 +18,36 @@
     X(InvalidTransaction)          \
     X(InvalidAccount)              \
     X(InvalidStock)                \
+    X(InvalidOption)               \
+    X(InvalidPosition)             \
     X(CurrencyUnknown)             \
     X(InvalidPriceString)          \
-    X(PriceOverflow)
+    X(PriceOverflow)               \
+    X(UnknownOption)               \
+    X(PnlError)                    \
+    GENERIC_ERRORS(X)
+
+#define PNL_ERROR_TYPE_LIST(X)  \
+    X(InconsistentContractSize) \
+    X(UnknownOption)            \
+    GENERIC_ERRORS(X)
 
 MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_TYPE_LIST);
 MSTD_ENUM(YFinanceErrorType, std::uint8_t, YFINANCE_ERROR_TYPE_LIST);
+MSTD_ENUM(PnLErrorType, std::uint8_t, PNL_ERROR_TYPE_LIST);
 
 using FinanceError  = Error<FinanceErrorType>;
 using YFinanceError = Error<YFinanceErrorType>;
+using PnLError      = Error<PnLErrorType>;
 
 template <typename T>
 using FinanceResult = Result<T, FinanceError>;
 
 template <typename T>
 using YFinanceResult = Result<T, YFinanceError>;
+
+template <typename T>
+using PnLResult = Result<T, PnLError>;
 
 /**
  * @brief Converts an error of type HttpError to an error of type YFinanceError,

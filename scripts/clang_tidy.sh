@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+set -o pipefail
+
+LOGFILE=".build/clang-tidy-report.log"
+exec > >(tee "$LOGFILE") 2>&1
+
 echo "Clang-Tidy:"
 
 all_files=false

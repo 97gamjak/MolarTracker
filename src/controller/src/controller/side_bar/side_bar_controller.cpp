@@ -28,17 +28,19 @@ namespace controller
      * @param centralStack
      * @param accountController
      * @param transactionController
+     * @param positionGateway
      */
     // TODO(97gamjak): would be probably best to remove dependency on central
     // stack here
     SideBarController::SideBarController(
-        cmd::UndoStack&        undoStack,
-        store::StoreContainer& storeContainer,
-        QMainWindow*           mainWindow,
-        ui::SideBar*           sideBar,
-        QStackedWidget*        centralStack,
-        AccountController&     accountController,
-        TransactionController& transactionController
+        cmd::UndoStack&                                  undoStack,
+        store::StoreContainer&                           storeContainer,
+        QMainWindow*                                     mainWindow,
+        ui::SideBar*                                     sideBar,
+        QStackedWidget*                                  centralStack,
+        AccountController&                               accountController,
+        TransactionController&                           transactionController,
+        const std::shared_ptr<gateway::PositionGateway>& positionGateway
     )
         : _sideBar(sideBar),
           _centralStack(centralStack),
@@ -55,6 +57,7 @@ namespace controller
           ),
           _transactionSideBarController(
               undoStack,
+              positionGateway,
               storeContainer.getAccountStore(),
               storeContainer.getTransactionStore(),
               storeContainer.getStockStore(),

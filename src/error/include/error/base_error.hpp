@@ -6,6 +6,7 @@
 #include <mstd/error.hpp>
 #include <mstd/type_traits.hpp>
 #include <optional>
+#include <source_location>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -33,13 +34,22 @@ struct ErrorWrapper
     const std::string& getMessage() const;
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define GENERIC_ERRORS(X) X(AssertionFailed) X(NotYetImplemented)
+
+template <typename E>
+concept ErrorTypeEnum =
+    std::is_enum_v<E> && mstd::has_enum_meta<E> && requires {
+        { E::AssertionFailed } -> std::convertible_to<E>;
+        { E::NotYetImplemented } -> std::convertible_to<E>;
+    };
+
 /**
  * @brief An error object
  *
  * @tparam EnumType
  */
-template <typename EnumType>
-requires mstd::has_enum_meta<EnumType>
+template <ErrorTypeEnum EnumType>
 class Error
 {
    public:
@@ -62,36 +72,42 @@ class Error
     /// and tracking of related errors.
     std::vector<Error> _subErrors;
 
+#ifndef NDEBUG
+    /// The source location where the error was created, used for debugging
+    std::source_location _location;
+#endif
+
    public:
     explicit Error(
         EnumType                   type,
         std::optional<std::string> message   = std::nullopt,
         std::vector<Error>         subErrors = {}
+#ifndef NDEBUG
+        ,
+        std::source_location location = std::source_location::current()
+#endif
     );
 
     virtual ~Error() = default;
 
-    /// @cond DOXYGEN_IGNORE
-    [[nodiscard]] EnumType getType() const;
-    /// @endcond
-    [[nodiscard]] std::string getTypeStr() const;
-    /// @cond DOXYGEN_IGNORE
+    [[nodiscard]] EnumType            getType() const;
+    [[nodiscard]] std::string         getTypeStr() const;
     [[nodiscard]] virtual std::string toString() const;
-    /// @endcond
 
     [[nodiscard]]
     const std::vector<Error>& getSubErrors() const;
 
     Error convert(
         const EnumType&                   newType,
-        const std::optional<std::string>& newMessage = std::nullopt
+        const std::optional<std::string>& newMessage  = std::nullopt,
+        bool                              addSubError = true
     ) const;
 
    protected:
-    /// @cond DOXYGEN_IGNORE
-    [[nodiscard]]
-    const std::string& getMessage() const;
-    /// @endcond
+    [[nodiscard]] const std::string& getMessage() const;
+
+   private:
+    bool operator==(const Error& other) const;
 };
 
 /**
@@ -176,6 +192,48 @@ class Result : public std::expected<T, E>
         return {};
     }
 };
+
+template <typename R>
+concept ResultLike = requires(const R& result) {
+    { static_cast<bool>(result) } -> std::same_as<bool>;
+    { result.error() };
+};
+
+// bool + explicit error — unchanged
+template <IsError E>
+[[nodiscard]]
+std::optional<E> mt_assert_check(bool cond, E err)
+{
+    if (!cond)
+        return err;
+    return std::nullopt;
+}
+
+// any Result-like type — works for MTResult, FinanceResult, future ones
+template <ResultLike R>
+[[nodiscard]]
+auto mt_assert_check(const R& result)
+    -> std::optional<std::decay_t<decltype(result.error())>>
+{
+    if (!result)
+        return result.error();
+    return std::nullopt;
+}
+
+template <ErrorTypeEnum EnumType>
+[[nodiscard]]
+auto mt_assert_check(bool cond, const EnumType& errorType)
+    -> std::optional<Error<EnumType>>
+{
+    if (!cond)
+        return Error<EnumType>{errorType, "Assertion failed"};
+    return std::nullopt;
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define MT_ASSERT(...)                               \
+    if (auto _mt_err = mt_assert_check(__VA_ARGS__)) \
+        return *_mt_err;
 
 #ifndef __ERROR__INCLUDE__ERROR__BASE_ERROR_TPP__
 #include "base_error.tpp"
