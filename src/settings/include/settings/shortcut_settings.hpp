@@ -47,6 +47,7 @@ namespace settings
          * Single Shortcut *
          *******************/
 
+        /// default shortcut value
         static constexpr std::tuple<ShortcutModifier, std::int64_t>
             SHORTCUT_DEFAULT = {ShortcutModifier::None, 0};
 
