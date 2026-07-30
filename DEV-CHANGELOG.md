@@ -4,6 +4,9 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
+
 REVERT CACHE changes but keep error handling
 
 ### Features
@@ -349,7 +352,6 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - add log file for clangd-tidy checks
 
-<!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
@@ -580,6 +582,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 
