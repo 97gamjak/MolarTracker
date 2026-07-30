@@ -5,7 +5,6 @@
 #include <utility>
 
 #include "bool_param.hpp"
-#include "common/shortcut.hpp"
 #include "enum_param.hpp"
 #include "map_param.hpp"
 #include "numeric_param.hpp"
@@ -141,7 +140,7 @@ namespace settings
     inline constexpr bool is_shortcut_param = false;
 
     template <>
-    inline constexpr bool is_shortcut_param<MapParam<Shortcut>> = true;
+    inline constexpr bool is_shortcut_param<MapParam<ShortcutSet>> = true;
 
 }   // namespace settings
 

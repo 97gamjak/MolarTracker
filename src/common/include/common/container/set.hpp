@@ -9,6 +9,41 @@
 #include "iterable.hpp"
 
 /**
+ * @brief Default hash function for types that do not have a custom hash
+ *        implementation. Uses std::hash<T> as the default.
+ *
+ * @tparam T The type for which the default hash is defined.
+ */
+template <typename T>
+struct DefaultHash
+{
+    /// The default hash function type for the given type T
+    using type = std::hash<T>;
+};
+
+/**
+ * @brief Concept to check if a type has a nested Hash type defined.
+ *
+ * @tparam T The type to check for the presence of a nested Hash type.
+ */
+template <typename T>
+concept HasHash = requires(T type) { typename T::Hash; };
+
+/**
+ * @brief Specialization of DefaultHash for types that have a nested Hash type.
+ *        Uses the nested Hash type as the default hash function.
+ *
+ * @tparam T The type for which the specialized default hash is defined.
+ */
+template <HasHash T>
+struct DefaultHash<T>
+{
+    /// The default hash function type for the given type T, using its nested
+    /// Hash type
+    using type = typename T::Hash;
+};
+
+/**
  * @brief A set container that stores unique elements and provides basic set
  * operations.
  *
@@ -16,7 +51,7 @@
  * @tparam Hash The hash function used for hashing the elements (default is
  * std::hash<T>).
  */
-template <typename T, typename Hash = std::hash<T>>
+template <typename T, typename Hash = typename DefaultHash<T>::type>
 class Set : public Iterable<std::unordered_set<T, Hash>>
 {
    private:
@@ -51,8 +86,18 @@ class Set : public Iterable<std::unordered_set<T, Hash>>
 
     template <std::ranges::range R, typename F>
     static Set<T, Hash> fromRange(const R& range, F&& func);
+
+    // cppcheck-suppress functionStatic -- false positive
+    bool remove(const T& value);
 };
 
+/**
+ * @brief A set container that stores unique elements and provides basic set
+ * operations, specifically for types that have a nested Hash type defined.
+ *
+ * @tparam T The type of elements stored in the set, which must have a nested
+ * Hash type.
+ */
 template <typename T>
 using IdSet = Set<T, typename T::Hash>;
 

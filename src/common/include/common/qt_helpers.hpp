@@ -13,6 +13,9 @@
 
 class QDialog;   // Forward declaration
 class QWidget;   // Forward declaration
+class QAction;   // Forward declaration
+
+class ShortcutSet;   // Forward declaration
 
 namespace common
 {
@@ -42,6 +45,8 @@ namespace common
     template <typename T, typename... Args>
     [[nodiscard]]
     T* makeQChild(Args&&... args);
+
+    void setShortcut(QAction* action, const ShortcutSet& shortcutSet);
 
 }   // namespace common
 

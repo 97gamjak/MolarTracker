@@ -24,7 +24,7 @@ namespace ui
      * @param shortcutSettings The shortcut settings to use for the menu bar
      */
     MainWindow::MainWindow(const settings::ShortcutSettings& shortcutSettings)
-        : _menuBar(new MenuBar(this, shortcutSettings)),
+        : _menuBar(new MenuBar(this, this, shortcutSettings)),
           _sideBar(new SideBar(this)),
           _centralWidget(new CentralWidget(this))
     {

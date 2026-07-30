@@ -47,6 +47,10 @@ namespace settings
          * Single Shortcut *
          *******************/
 
+        /// default shortcut value
+        static constexpr std::tuple<ShortcutModifier, std::int64_t>
+            SHORTCUT_DEFAULT = {ShortcutModifier::None, 0};
+
         /// save shortcut key
         static constexpr const char* SAVE_SHORTCUT_KEY = "saveShortcut";
         /// save shortcut title
@@ -56,8 +60,14 @@ namespace settings
             "The keyboard shortcut for saving the current state of the "
             "application.";
         /// default save shortcut value
-        static constexpr std::tuple<std::string, ShortcutModifier, char>
-            SAVE_SHORTCUT_DEFAULT = {"Save", ShortcutModifier::Control, 'S'};
+        static constexpr std::
+            tuple<std::string, ShortcutContext, ShortcutModifier, char>
+                SAVE_SHORTCUT_DEFAULT = {
+                    "Save",
+                    ShortcutContext::Default,
+                    ShortcutModifier::Control,
+                    'S'
+        };
 
         /// quit shortcut key
         static constexpr const char* QUIT_SHORTCUT_KEY = "quitShortcut";
@@ -67,8 +77,39 @@ namespace settings
         static constexpr const char* QUIT_SHORTCUT_DESCRIPTION =
             "The keyboard shortcut for quitting the application.";
         /// default quit shortcut value
-        static constexpr std::tuple<std::string, ShortcutModifier, char>
-            QUIT_SHORTCUT_DEFAULT = {"Quit", ShortcutModifier::Control, 'Q'};
+        static constexpr std::
+            tuple<std::string, ShortcutContext, ShortcutModifier, char>
+                QUIT_SHORTCUT_DEFAULT = {
+                    "Quit",
+                    ShortcutContext::Default,
+                    ShortcutModifier::Control,
+                    'Q'
+        };
+
+        /// screenshot shortcut key
+        static constexpr const char* SCREENSHOT_SHORTCUT_KEY =
+            "screenshotShortcut";
+        /// screenshot shortcut title
+        static constexpr const char* SCREENSHOT_SHORTCUT_TITLE =
+            "Screenshot Shortcut";
+        /// screenshot shortcut description
+        static constexpr const char* SCREENSHOT_SHORTCUT_DESCRIPTION =
+            "The keyboard shortcut for taking a screenshot of the application.";
+        /// default screenshot shortcut value
+        static constexpr std::
+            tuple<std::string, ShortcutContext, ShortcutModifier, FKey>
+                SCREENSHOT_SHORTCUT_DEFAULT = {
+                    "Screenshot",
+                    ShortcutContext::Global,
+                    ShortcutModifier::None,
+                    FKey::F12
+        };
+        /// alternative screenshot shortcut value
+        static constexpr std::tuple<ShortcutModifier, char>
+            SCREENSHOT_SHORTCUT_ALTERNATIVE = {
+                ShortcutModifier::ControlAlt,
+                'P'
+        };
     };
 
     /**
@@ -91,7 +132,7 @@ namespace settings
         ParamContainer _core;
 
         /// The version of the application
-        MapParam<Shortcut> _shortcuts{
+        MapParam<ShortcutSet> _shortcuts{
             Schema::SHORTCUT_LIST_KEY,
             Schema::SHORTCUT_LIST_TITLE,
             Schema::SHORTCUT_LIST_DESCRIPTION
@@ -100,8 +141,9 @@ namespace settings
        public:
         ShortcutSettings();
 
-        [[nodiscard]] Shortcut getSaveShortcut() const;
-        [[nodiscard]] Shortcut getQuitShortcut() const;
+        [[nodiscard]] ShortcutSet getSaveShortcut() const;
+        [[nodiscard]] ShortcutSet getQuitShortcut() const;
+        [[nodiscard]] ShortcutSet getScreenshotShortcut() const;
 
         template <typename Func>
         void forEachParam(Func&& func) const;
