@@ -80,7 +80,11 @@ namespace controller
         explicit Impl(settings::Settings&& settings)
             : _settings(std::move(settings)),
               _storeContainer{_settings.getBackupSettings()},
-              _mainWindow(std::make_shared<ui::MainWindow>()),
+              _mainWindow(
+                  std::make_shared<ui::MainWindow>(
+                      _settings.getShortcutSettings()
+                  )
+              ),
               _handlers(_settings),
               _priceCache(std::make_shared<finance::PriceCache>()),
               _positionGateway(
@@ -106,6 +110,7 @@ namespace controller
                   _storeContainer.getTransactionStore(),
                   _storeContainer.getAccountStore(),
                   _storeContainer.getStockStore(),
+                  _storeContainer.getOptionStore(),
                   _mainWindow->getCentralWidget()
               ),
               _positionController(

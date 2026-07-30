@@ -1,9 +1,9 @@
 #ifndef __STORE__INCLUDE__STORE__I_POSITION_STORE_HPP__
 #define __STORE__INCLUDE__STORE__I_POSITION_STORE_HPP__
 
+#include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
 #include "finance/positions.hpp"   // to avoid incomplete return type outside
-#include "utils/container/id_id_map.hpp"
 
 namespace finance
 {

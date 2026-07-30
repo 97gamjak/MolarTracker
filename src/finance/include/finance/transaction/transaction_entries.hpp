@@ -1,9 +1,9 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_ENTRIES_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRANSACTION_ENTRIES_HPP__
 
+#include "common/container/set.hpp"
+#include "common/container/vector.hpp"
 #include "finance/transaction/transaction_entry.hpp"
-#include "utils/container/set.hpp"
-#include "utils/container/vector.hpp"
 
 namespace finance
 {

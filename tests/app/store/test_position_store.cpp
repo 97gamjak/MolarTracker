@@ -3,11 +3,11 @@
 #include <cstdint>
 #include <memory>
 
+#include "common/timestamp.hpp"
 #include "finance/account/accounts.hpp"
 #include "finance/position.hpp"
 #include "mock_services.hpp"
 #include "store/position_store.hpp"
-#include "utils/timestamp.hpp"
 
 namespace
 {

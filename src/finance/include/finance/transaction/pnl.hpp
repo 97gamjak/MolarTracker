@@ -4,12 +4,11 @@
 #include <variant>
 #include <vector>
 
+#include "common/cash.hpp"
+#include "common/container/vector.hpp"
+#include "common/percentage.hpp"
+#include "common/timestamp.hpp"
 #include "error/finance_error.hpp"
-#include "utils/cash.hpp"
-#include "utils/container/vector.hpp"
-#include "utils/percentage.hpp"
-#include "utils/quantity.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {

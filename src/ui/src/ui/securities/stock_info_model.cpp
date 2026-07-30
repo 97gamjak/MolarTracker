@@ -2,8 +2,8 @@
 
 #include <mstd/enum.hpp>
 
+#include "common/finance.hpp"
 #include "drafts/stock_draft.hpp"
-#include "utils/finance.hpp"
 
 namespace ui
 {

@@ -6,9 +6,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "common/qt_helpers.hpp"
 #include "config/constants/github_constants.hpp"
 #include "logging/log_macros.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Profile.ProfileSelectionDialog");
 
@@ -31,7 +31,7 @@ namespace ui
         : Dialog{parent}, _canBeClosed{canBeClosed}
     {
         setWindowTitle("Select Profile");
-        utils::moveDialogToParentScreenCenter(this, parent);
+        common::moveDialogToParentScreenCenter(this, parent);
 
         _buildUI(profiles);
     }
@@ -60,8 +60,8 @@ namespace ui
         const std::vector<std::string>& profiles
     )
     {
-        auto* mainLayout   = utils::makeQChild<QVBoxLayout>(this);
-        _profileListWidget = utils::makeQChild<QListWidget>(this);
+        auto* mainLayout   = common::makeQChild<QVBoxLayout>(this);
+        _profileListWidget = common::makeQChild<QListWidget>(this);
 
         for (const auto& profileName : profiles)
             _profileListWidget->addItem(QString::fromStdString(profileName));
@@ -73,7 +73,7 @@ namespace ui
                            : QDialogButtonBox::Ok;
 
         _buttonBox =
-            utils::makeQChild<QDialogButtonBox>(buttons, Qt::Horizontal, this);
+            common::makeQChild<QDialogButtonBox>(buttons, Qt::Horizontal, this);
 
         connect(
             _buttonBox,

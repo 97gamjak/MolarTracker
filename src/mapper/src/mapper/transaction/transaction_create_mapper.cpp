@@ -1,8 +1,8 @@
 #include "mapper/transaction/transaction_create_mapper.hpp"
 
+#include "common/finance.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "finance/transaction/option_transaction.hpp"
-#include "utils/finance.hpp"
 
 namespace mapper
 {

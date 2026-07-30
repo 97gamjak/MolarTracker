@@ -19,9 +19,9 @@ namespace vcs
      * result. Returns an error if the HTTP request fails or the response
      * cannot be parsed.
      *
-     * @return HttpResult<utils::SemVer>
+     * @return HttpResult<common::SemVer>
      */
-    HttpResult<utils::SemVer> GitHubClient::fetchLatestVersion()
+    HttpResult<common::SemVer> GitHubClient::fetchLatestVersion()
     {
         const auto response = http::HttpClient::get(
             http::HttpRequest{
@@ -45,7 +45,7 @@ namespace vcs
             if (!tag.empty() && tag.front() == 'v')
                 tag.erase(tag.begin());
 
-            return utils::SemVer{tag};
+            return common::SemVer{tag};
         }
         catch (const std::exception& e)
         {

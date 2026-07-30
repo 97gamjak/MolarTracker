@@ -7,9 +7,9 @@
 #include <QVBoxLayout>
 #include <optional>
 
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {

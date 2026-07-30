@@ -13,7 +13,7 @@ target_link_libraries(tests_settings_params
     PRIVATE
         molartracker_settings
         molartracker_exceptions
-        molartracker_utils
+        molartracker_common
         GTest::gtest_main
 )
 

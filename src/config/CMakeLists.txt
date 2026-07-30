@@ -12,7 +12,7 @@ target_include_directories(molartracker_config
 
 target_link_libraries(molartracker_config
     PRIVATE
-    molartracker_utils
+    molartracker_common
     molartracker_exceptions
     PUBLIC
     json

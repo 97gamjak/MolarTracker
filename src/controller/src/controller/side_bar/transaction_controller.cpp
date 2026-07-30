@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "common/finance.hpp"
+#include "common/qt_helpers.hpp"
 #include "config/constants/github_constants.hpp"
 #include "connections/connection.hpp"
 #include "controller/helpers.hpp"
@@ -28,8 +30,6 @@
 #include "ui/transaction/option_widget.hpp"
 #include "ui/transaction/stock_widget.hpp"
 #include "ui/utils/error.hpp"
-#include "utils/finance.hpp"
-#include "utils/qt_helpers.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.TransactionSideBarController");
 

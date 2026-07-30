@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "finance/instrument/stock.hpp"
@@ -11,7 +12,6 @@
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
-#include "utils/container/id_id_map.hpp"
 
 namespace store
 {

@@ -4,12 +4,12 @@
 #include <optional>
 #include <string>
 
+#include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "transaction_data.hpp"
 #include "transaction_entry.hpp"
-#include "utils/timestamp.hpp"
 
 namespace finance
 {

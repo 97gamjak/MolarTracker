@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "orm/field.hpp"
 #include "orm/fixed_string.hpp"
@@ -10,7 +11,6 @@
 #include "orm/type_traits.hpp"
 #include "orm/where_expr.hpp"
 #include "profile_row.hpp"
-#include "utils/finance.hpp"
 
 /**
  * @brief Represents a row in the "account" database table, which serves as a

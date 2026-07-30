@@ -255,8 +255,11 @@ namespace controller
 
         if (!account.has_value())
         {
-            LOG_WARNING(
-                std::format("Account with ID {} not found", id.value())
+            ui::ErrorDialog::show(
+                "Failed to retrieve account details for account with ID: " +
+                    id.toString(),
+                "Account with ID not found",
+                _details->stackedWidget
             );
             return;
         }

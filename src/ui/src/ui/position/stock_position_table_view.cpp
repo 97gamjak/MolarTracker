@@ -3,8 +3,8 @@
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
 
+#include "common/qt_helpers.hpp"
 #include "ui/position/stock_position_table_model.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -39,7 +39,7 @@ namespace ui
         StockPositionTableModel* model
     )
     {
-        _proxy = utils::makeQChild<QSortFilterProxyModel>(this);
+        _proxy = common::makeQChild<QSortFilterProxyModel>(this);
         _proxy->setSourceModel(model);
         _proxy->setSortRole(Qt::DisplayRole);
 

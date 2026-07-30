@@ -1,5 +1,6 @@
 #include "watchlist_repo.hpp"
 
+#include "common/timestamp.hpp"
 #include "factories/watchlist_factory.hpp"
 #include "finance/watchlist.hpp"
 #include "logging/log_macros.hpp"
@@ -8,7 +9,6 @@
 #include "repo_errors.hpp"
 #include "sql_models/watchlist_instrument_row.hpp"
 #include "sql_models/watchlist_row.hpp"
-#include "utils/timestamp.hpp"
 
 REGISTER_LOG_CATEGORY("Repo.WatchlistRepo");
 
@@ -79,22 +79,19 @@ namespace repo
      * @param newName
      */
     void WatchlistRepo::renameWatchlist(
-        WatchlistId         id,
+        WatchlistId        id,
         const std::string& newName
     )
     {
         auto query = orm::Query{}.where(WatchlistRow::hasId(id));
 
-        const auto existing = _getCrud().getUnique<WatchlistRow>(
-            _getDb(),
-            query
-        );
+        const auto existing =
+            _getCrud().getUnique<WatchlistRow>(_getDb(), query);
 
         if (!existing.has_value())
         {
-            const auto msg =
-                "Cannot rename watchlist: no watchlist with id '" +
-                id.toString() + "' exists";
+            const auto msg = "Cannot rename watchlist: no watchlist with id '" +
+                             id.toString() + "' exists";
 
             LOG_ERROR(msg);
             throw RepositoryException(msg);
@@ -107,8 +104,8 @@ namespace repo
 
         if (!result.has_value())
         {
-            const auto msg = "Failed to rename watchlist: " +
-                              result.error().getMessage();
+            const auto msg =
+                "Failed to rename watchlist: " + result.error().getMessage();
 
             LOG_ERROR(msg);
             throw orm::CrudException(msg);
@@ -159,10 +156,7 @@ namespace repo
      * @param id
      * @param symbol
      */
-    void WatchlistRepo::removeSymbol(
-        WatchlistId         id,
-        const std::string& symbol
-    )
+    void WatchlistRepo::removeSymbol(WatchlistId id, const std::string& symbol)
     {
         auto query = orm::Query{}.where(
             WatchlistInstrumentRow::hasWatchlistIdAndSymbol(id, symbol)
@@ -183,9 +177,8 @@ namespace repo
      */
     std::vector<std::string> WatchlistRepo::_getSymbols(WatchlistId id)
     {
-        auto query = orm::Query{}.where(
-            WatchlistInstrumentRow::hasWatchlistId(id)
-        );
+        auto query =
+            orm::Query{}.where(WatchlistInstrumentRow::hasWatchlistId(id));
 
         const auto rows =
             _getCrud().get<WatchlistInstrumentRow>(_getDb(), query);

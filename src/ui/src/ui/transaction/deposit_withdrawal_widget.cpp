@@ -9,17 +9,17 @@
 #include <QPointer>
 #include <stdexcept>
 
+#include "common/currency.hpp"
+#include "common/finance.hpp"
+#include "common/qt_helpers.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
 #include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
 #include "ui/utils/error.hpp"
-#include "utils/currency.hpp"
-#include "utils/finance.hpp"
-#include "utils/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {

@@ -1,10 +1,10 @@
 #include "finance/instrument/stock.hpp"
 
+#include "common/currency.hpp"
+#include "common/finance.hpp"
 #include "error/finance_error.hpp"
 #include "finance/ticker_info.hpp"
 #include "finance/yf_client.hpp"
-#include "utils/currency.hpp"
-#include "utils/finance.hpp"
 
 namespace finance
 {

@@ -3,6 +3,7 @@
 #include <cassert>
 #include <variant>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "error/finance_error.hpp"
 #include "finance/transaction/cash_transaction.hpp"
@@ -11,7 +12,6 @@
 #include "finance/transaction/stock_transaction.hpp"
 #include "finance/transaction/transaction_entries.hpp"
 #include "logging/log_macros.hpp"
-#include "utils/finance.hpp"
 
 REGISTER_LOG_CATEGORY("Finance.Transaction.TransactionConverter")
 
@@ -44,10 +44,10 @@ namespace finance
             switch (transactionType)
             {
                 case TransactionDataType::Cash:
+                case TransactionDataType::Option:
                     validNumberOfAmountEntries = 2;
                     break;
                 case TransactionDataType::Stock:
-                case TransactionDataType::Option:
                     validNumberOfAmountEntries = 1;
                     break;
             }

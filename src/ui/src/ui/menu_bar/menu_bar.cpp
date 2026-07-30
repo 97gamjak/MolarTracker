@@ -2,6 +2,8 @@
 
 #include <QMenuBar>
 
+#include "settings/shortcut_settings.hpp"
+
 class QWidget;   // Forward declaration
 
 namespace ui
@@ -17,14 +19,29 @@ namespace ui
      * @brief Construct a new Menu Bar:: Menu Bar object
      *
      * @param parent
+     * @param mainWindow The main window to which the menu bar belongs
+     * @param shortcutSettings The shortcut settings to use for the menu bar
      */
-    MenuBar::MenuBar(QWidget* parent)
+    MenuBar::MenuBar(
+        QWidget*                          parent,
+        QMainWindow*                      mainWindow,
+        const settings::ShortcutSettings& shortcutSettings
+    )
         : QMenuBar{parent},
-          _fileMenu{*this},
+          _fileMenu{
+              *this,
+              shortcutSettings.getSaveShortcut(),
+              shortcutSettings.getQuitShortcut()
+          },
           _editMenu{*this},
           _debugMenu{*this},
           _settingsMenu{*this},
-          _helpMenu{*this}
+          _helpMenu{*this},
+          _utilitiesMenu{
+              *this,
+              mainWindow,
+              shortcutSettings.getScreenshotShortcut()
+          }
     {
     }
 
@@ -62,5 +79,12 @@ namespace ui
      * @return HelpMenu&
      */
     HelpMenu& MenuBar::getHelpMenu() { return _helpMenu; }
+
+    /**
+     * @brief Get the Utilities Menu object
+     *
+     * @return UtilitiesMenu&
+     */
+    UtilitiesMenu& MenuBar::getUtilitiesMenu() { return _utilitiesMenu; }
 
 }   // namespace ui

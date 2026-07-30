@@ -1,8 +1,8 @@
 #include "finance/transaction/cash_transaction.hpp"
 
+#include "common/cash.hpp"
 #include "config/id_types.hpp"
 #include "finance/transaction/transaction_entries.hpp"
-#include "utils/cash.hpp"
 
 namespace finance
 {

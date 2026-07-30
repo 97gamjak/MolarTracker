@@ -1,9 +1,9 @@
 #ifndef __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_LEG_HPP__
 #define __FINANCE__INCLUDE__FINANCE__TRANSACTION__TRADE_LEG_HPP__
 
+#include "common/cash.hpp"
+#include "common/container/vector.hpp"
 #include "config/id_types.hpp"
-#include "utils/cash.hpp"
-#include "utils/container/vector.hpp"
 
 namespace finance
 {

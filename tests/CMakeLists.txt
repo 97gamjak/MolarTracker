@@ -21,9 +21,9 @@ target_include_directories(molartracker_tests
 )
 
 add_subdirectory(app)
+add_subdirectory(common)
 add_subdirectory(db)
 add_subdirectory(logging)
 add_subdirectory(orm)
 add_subdirectory(ui)
-add_subdirectory(utils)
 add_subdirectory(settings)

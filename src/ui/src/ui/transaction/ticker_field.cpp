@@ -9,9 +9,9 @@
 
 #include <algorithm>
 
-#include "utils/qt_helpers.hpp"
+#include "common/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {
@@ -24,7 +24,7 @@ namespace ui
      */
     TickerField::TickerField(const Set<std::string>& tickers, QWidget* parent)
         : QWidget(parent),
-          _tickers(utils::toQStringSet(tickers)),
+          _tickers(common::toQStringSet(tickers)),
           _lineEdit(makeQChild<QLineEdit>(this)),
           _addButton(makeQChild<QPushButton>("+", this)),
           _completer(new QCompleter(this))
@@ -155,7 +155,7 @@ namespace ui
             list.append(ticker);
 
         _completer->setModel(
-            utils::makeQChild<QStringListModel>(list, _completer)
+            common::makeQChild<QStringListModel>(list, _completer)
         );
     }
 

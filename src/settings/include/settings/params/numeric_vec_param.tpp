@@ -487,11 +487,11 @@ namespace settings
      *
      * @tparam T
      * @tparam N
-     * @return std::string The title of the numeric vector parameter
+     * @return const std::string& The title of the numeric vector parameter
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::string NumericVecParam<T, N>::getTitle() const
+    const std::string& NumericVecParam<T, N>::getTitle() const
     {
         return _title;
     }
@@ -505,12 +505,12 @@ namespace settings
      *
      * @tparam T
      * @tparam N
-     * @return std::string The description of the numeric vector
+     * @return const std::string& The description of the numeric vector
      * parameter
      */
     template <typename T, std::size_t N>
     requires(N > 1)
-    std::string NumericVecParam<T, N>::getDescription() const
+    const std::string& NumericVecParam<T, N>::getDescription() const
     {
         return _description;
     }

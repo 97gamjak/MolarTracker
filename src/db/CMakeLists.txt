@@ -18,7 +18,7 @@ target_link_libraries(molartracker_db
     molartracker_config
     molartracker_logging
     molartracker_settings
-    molartracker_utils
+    molartracker_common
 )
 
 if (WIN32)

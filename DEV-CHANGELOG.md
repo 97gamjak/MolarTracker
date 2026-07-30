@@ -4,6 +4,9 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+<!-- insertion marker -->
+## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
+
 REVERT CACHE changes but keep error handling
 
 ### Features
@@ -133,6 +136,10 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
   `MainWindow`: checks `StoreContainer::isDirty()` and
   `Settings::isDirty()`; if either is true, shows `askDiscardChanges()`
   before allowing the close
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
 
 #### ORM
 
@@ -146,7 +153,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - Add new `molartracker_vcs` CMake library (`src/vcs/`) with:
   - `vcs::GitHubClient` — fetches `tag_name` from the GitHub Releases API
-    and returns a `utils::SemVer`; strips the `v` prefix from GitHub tags
+    and returns a `common::SemVer`; strips the `v` prefix from GitHub tags
   - `vcs::UpdateCheckService` — `QObject` that fires an async
     `QtConcurrent::run` check on `start()` and every 24 h via `QTimer`;
     emits `updateAvailable(SemVer)` at most once per distinct version per
@@ -230,6 +237,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
   external value changes
 - Add `ResetToDefault*` unit tests to `tests/settings/params/` covering
   `ParamCore`, `NumericParam`, `NumericVecParam`, and `ParamContainerMixin`
+- Add `MapParam` as a new parameter type and add `Shortcutsettings` with it
 
 #### Logging — age-based log file cleanup (MOLTRACK-60)
 
@@ -247,12 +255,34 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - centralize and generalize error handling approach
 
+#### Transaction overview — option transactions (MOLTRACK-316)
+
+- Add `drafts::OptionTransactionOverview` (`src/drafts/include/drafts/transaction/transaction_overview_draft.hpp`),
+  mirroring `StockTransactionOverview`, plus `mapper::TransactionOverviewMapper::toOption()`
+  resolving each option transaction's instrument ID to a display name via
+  `finance::Options::getOption()` (falls back to `"UNKNOWN"`, mirroring `toStock()`)
+- Add `ui::OptionTransactionTableModel` (`src/ui/include/ui/transaction/option_transaction_table.hpp`),
+  mirroring `StockTransactionTableModel`, with an additional `BuySell` /
+  `Action` column pair since options carry that data and stocks don't
+- `ui::TransactionsOverview` gains a third table/section for option
+  transactions; `refresh()` takes an additional
+  `std::vector<drafts::OptionTransactionOverview>` parameter
+- `TransactionController` now depends on `store::IOptionStore` and fetches
+  `_optionStore->getOptions(txs.value().getOptionInstrumentIds())` to feed
+  `TransactionOverviewMapper::toOption()`, alongside the existing cash/stock
+  mapping
+- Add `OptionTransactionTableModelTest` suite to
+  `tests/ui/test_transaction_table_models.cpp`, mirroring the existing
+  `StockTransactionTableModelTest` coverage
+
 ### CI
 
 - Add `.github/workflows/codecov.yml` — runs on push to `dev`/`main` and all
   PRs; builds with `--coverage`, runs `ctest`, generates an `lcov` report
   (stripping Qt internals, vcpkg deps, test files, and moc artefacts), and
   uploads to Codecov via `codecov/codecov-action@v5`
+- Fix drillian claude code review does not work anymore, hence, change it
+  to the official anthropic solution
 
 ### Bug Fix
 
@@ -375,16 +405,10 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - add rules for allowing and denying commands
 
-### Features
+### Building
 
-#### UI
+- add log file for clangd-tidy checks
 
-- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
-  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
-  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
-  signal and `HelpMenuController`
-
-<!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10
@@ -615,6 +639,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 ### Cleanup
 
 - Make `AppConfig` decoupled from `app` and rename it to `Settings`
+
 
 
 

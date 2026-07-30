@@ -8,7 +8,6 @@
 #include <QWidget>
 
 #include "connections/connection.hpp"
-#include "settings/params/param_utils.hpp"
 #include "ui/settings/param_editor.hpp"
 
 namespace ui

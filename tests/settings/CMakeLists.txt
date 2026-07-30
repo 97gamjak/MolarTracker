@@ -9,7 +9,7 @@ add_executable(tests_settings
 target_link_libraries(tests_settings
     PRIVATE
     molartracker_settings
-    molartracker_utils
+    molartracker_common
     molartracker_json
     json
     GTest::gtest_main

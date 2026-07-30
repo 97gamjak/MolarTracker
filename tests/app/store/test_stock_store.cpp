@@ -4,12 +4,12 @@
 #include <optional>
 #include <string>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
 #include "finance/instrument/trade_filter_params.hpp"
 #include "mock_services.hpp"
 #include "store/stock_store.hpp"
-#include "utils/finance.hpp"
 
 namespace
 {

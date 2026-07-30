@@ -4,8 +4,8 @@
 #include <functional>
 #include <optional>
 
+#include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
-#include "utils/container/id_id_map.hpp"
 
 /**
  * @brief Common signal tags used across the application, this file defines

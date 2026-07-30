@@ -3,13 +3,13 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
+#include "common/qt_helpers.hpp"
 #include "db/backup_manager.hpp"
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
 #include "ui/backup/restore_backup_dialog.hpp"
 #include "ui/menu_bar/settings_menu.hpp"
 #include "ui/settings/settings_dialog.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace controller
 {
@@ -93,7 +93,7 @@ namespace controller
         }
 
         auto* dialog =
-            utils::makeQChild<ui::RestoreBackupDialog>(backups, &_mainWindow);
+            common::makeQChild<ui::RestoreBackupDialog>(backups, &_mainWindow);
 
         if (dialog->exec() == QDialog::Accepted && dialog->selectedBackup())
         {
@@ -110,7 +110,7 @@ namespace controller
         _settings.save();
 
         auto* settingsDialog =
-            utils::makeQChild<ui::SettingsDialog>(_settings, &_mainWindow);
+            common::makeQChild<ui::SettingsDialog>(_settings, &_mainWindow);
 
         const auto snapShot = _settings.toJson();
 

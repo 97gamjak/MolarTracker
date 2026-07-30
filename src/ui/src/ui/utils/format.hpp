@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "utils/finance.hpp"
+#include "common/finance.hpp"
 
 class Cash;      // forward declaration
 class QString;   // forward declaration

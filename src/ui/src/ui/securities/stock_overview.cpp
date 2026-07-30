@@ -9,10 +9,10 @@
 #include <QMap>
 #include <QMenu>
 
+#include "common/qt_helpers.hpp"
 #include "ui/securities/stock_info_model.hpp"
-#include "utils/qt_helpers.hpp"
 
-using utils::makeQChild;
+using common::makeQChild;
 
 namespace ui
 {

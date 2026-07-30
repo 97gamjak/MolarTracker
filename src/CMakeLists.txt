@@ -82,6 +82,7 @@ target_include_directories(mstd
 )
 
 add_subdirectory(commands)
+add_subdirectory(common)
 add_subdirectory(config)
 add_subdirectory(connections)
 add_subdirectory(controller)
@@ -104,7 +105,6 @@ add_subdirectory(settings)
 add_subdirectory(sql_models)
 add_subdirectory(store)
 add_subdirectory(ui)
-add_subdirectory(utils)
 add_subdirectory(vcs)
 
 target_link_libraries(MolarTracker

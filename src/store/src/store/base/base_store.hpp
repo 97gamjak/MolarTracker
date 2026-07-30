@@ -6,6 +6,8 @@
 #include <optional>
 #include <vector>
 
+#include "common/container/id_id_map.hpp"
+#include "common/container/set.hpp"
 #include "config/logging_base.hpp"
 #include "config/signal_tags.hpp"
 #include "config/strong_id.hpp"
@@ -13,8 +15,6 @@
 #include "filter/predicate.hpp"
 #include "store/i_store.hpp"
 #include "store_state.hpp"
-#include "utils/container/id_id_map.hpp"
-#include "utils/container/set.hpp"
 
 namespace store
 {
