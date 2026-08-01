@@ -121,11 +121,21 @@ namespace store
                 }
                 case StoreState::Deleted:
                 {
-                    throw WatchlistStoreException(
-                        "Store state " +
-                        std::to_string(static_cast<int>(entry.state)) +
-                        " not supported yet"
-                    );
+                    _watchlistService->deleteWatchlist(entry.value.getId());
+
+                    if (_commitEntry(entry.value.getId(), entry) !=
+                        StoreResult::Ok)
+                    {
+                        throw WatchlistStoreException(
+                            std::format(
+                                "Failed to update cached watchlist '{}' after "
+                                "deletion",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    break;
                 }
             }
         }
@@ -192,9 +202,7 @@ namespace store
     }
 
     /**
-     * @brief Rename an existing watchlist. Persisted immediately (not
-     * staged) since the repo/service API is a single atomic operation, not a
-     * value to diff against a previous state at commit time.
+     * @brief Rename an existing watchlist.
      *
      * @param id
      * @param newName
@@ -225,18 +233,42 @@ namespace store
     }
 
     /**
-     * @brief Delete a watchlist and all of its symbol entries immediately.
+     * @brief Delete a watchlist and all of its symbol entries.
      *
      * @param id
      */
     void WatchlistStore::deleteWatchlist(WatchlistId id)
     {
-        _watchlistService->deleteWatchlist(id);
-        _removeEntry(id);
+        // TODO(07gamjak): this does not really work right now and should also
+        // not be persisted immediately
+        Options options{.filter = HasWatchlistId(id)};
+
+        auto entry = _getEntry(options);
+
+        if (!entry.has_value())
+        {
+            throw WatchlistStoreException(
+                "Watchlist not found: " + id.toString()
+            );
+        }
+
+        if (entry->state == StoreState::Deleted)
+        {
+            throw WatchlistStoreException(
+                "Watchlist already marked for deletion: " + id.toString()
+            );
+        }
+
+        if (entry->state == StoreState::Clean)
+        {
+            _removeEntry(entry->value.getId());
+        }
+
+        _updateEntry(entry->value, StoreState::Deleted);
     }
 
     /**
-     * @brief Add a symbol to a watchlist immediately.
+     * @brief Add a symbol to a watchlist.
      *
      * @param id
      * @param symbol
@@ -302,7 +334,7 @@ namespace store
     }
 
     /**
-     * @brief Remove a symbol from a watchlist immediately.
+     * @brief Remove a symbol from a watchlist.
      *
      * @param id
      * @param symbol
