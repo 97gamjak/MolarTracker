@@ -32,7 +32,7 @@ namespace
 
         [[nodiscard]] ProfileId createProfile(const domain::Profile& profile)
         {
-            return _repo.create(profile);
+            return _repo.create(profile).value();
         }
     };
 
@@ -47,18 +47,15 @@ TEST_F(ProfileRepoTest, CreateReturnsValidId)
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(ProfileRepoTest, CreateDuplicateNameThrows)
+TEST_F(ProfileRepoTest, CreateDuplicateNameReturnsError)
 {
     auto result = _repo.create(
         domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
-    EXPECT_THROW(
-        result = _repo.create(
-            domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
-        ),
-        orm::CrudException
-    );
+    EXPECT_FALSE(_repo.create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
 }
 
 TEST_F(ProfileRepoTest, CreateWithEmailPersistsEmail)
@@ -71,7 +68,7 @@ TEST_F(ProfileRepoTest, CreateWithEmailPersistsEmail)
         }
     );
 
-    const auto profile = _repo.get(id);
+    const auto profile = _repo.get(id.value());
     ASSERT_TRUE(profile.has_value());
     ASSERT_TRUE(profile->getEmail().has_value());
     EXPECT_EQ(profile->getEmail().value(), "bob@example.com");
@@ -83,7 +80,7 @@ TEST_F(ProfileRepoTest, CreateWithoutEmailEmailIsEmpty)
         domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
-    const auto profile = _repo.get(id);
+    const auto profile = _repo.get(id.value());
     ASSERT_TRUE(profile.has_value());
     EXPECT_FALSE(profile->getEmail().has_value());
 }
@@ -105,10 +102,10 @@ TEST_F(ProfileRepoTest, GetByIdReturnsCorrectProfile)
         }
     );
 
-    const auto profile = _repo.get(id);
+    const auto profile = _repo.get(id.value());
     ASSERT_TRUE(profile.has_value());
     EXPECT_EQ(profile->getName(), "Carol");
-    EXPECT_EQ(profile->getId(), id);
+    EXPECT_EQ(profile->getId(), id.value());
 }
 
 TEST_F(ProfileRepoTest, GetByNameReturnsNulloptForMissingName)
@@ -126,7 +123,7 @@ TEST_F(ProfileRepoTest, GetByNameReturnsCorrectProfile)
 
     const auto profile = _repo.get(std::string{"Dave"});
     ASSERT_TRUE(profile.has_value());
-    EXPECT_EQ(profile->getId(), id);
+    EXPECT_EQ(profile->getId(), id.value());
     EXPECT_EQ(profile->getName(), "Dave");
 }
 
@@ -168,7 +165,7 @@ TEST_F(ProfileRepoTest, GetAllReturnsCorrectProfileData)
     ASSERT_EQ(profiles.size(), 1U);
 
     EXPECT_EQ(profiles[0].getName(), "Eve");
-    EXPECT_EQ(profiles[0].getId(), id);
+    EXPECT_EQ(profiles[0].getId(), id.value());
     ASSERT_TRUE(profiles[0].getEmail().has_value());
     EXPECT_EQ(profiles[0].getEmail().value(), "eve@example.com");
 }
@@ -179,9 +176,9 @@ TEST_F(ProfileRepoTest, UpdateChangesNameAndEmail)
         domain::Profile{ProfileId::invalid(), "Frank", std::nullopt}
     );
 
-    _repo.update(id, "Franklin", std::string{"frank@example.com"});
+    _repo.update(id.value(), "Franklin", std::string{"frank@example.com"});
 
-    const auto profile = _repo.get(id);
+    const auto profile = _repo.get(id.value());
     ASSERT_TRUE(profile.has_value());
     EXPECT_EQ(profile->getName(), "Franklin");
     ASSERT_TRUE(profile->getEmail().has_value());
@@ -198,9 +195,9 @@ TEST_F(ProfileRepoTest, UpdateClearsEmail)
         }
     );
 
-    _repo.update(id, "Grace", std::nullopt);
+    _repo.update(id.value(), "Grace", std::nullopt);
 
-    const auto profile = _repo.get(id);
+    const auto profile = _repo.get(id.value());
     ASSERT_TRUE(profile.has_value());
     EXPECT_FALSE(profile->getEmail().has_value());
 }
@@ -222,7 +219,10 @@ TEST_F(ProfileRepoTest, UpdateDuplicateNameThrows)
         domain::Profile{ProfileId::invalid(), "Ivan", std::nullopt}
     ));
 
-    EXPECT_THROW(_repo.update(id1, "Ivan", std::nullopt), orm::CrudException);
+    EXPECT_THROW(
+        _repo.update(id1.value(), "Ivan", std::nullopt),
+        orm::CrudException
+    );
 }
 
 TEST_F(ProfileRepoTest, RemoveDeletesProfile)
@@ -231,9 +231,9 @@ TEST_F(ProfileRepoTest, RemoveDeletesProfile)
         domain::Profile{ProfileId::invalid(), "Judy", std::nullopt}
     );
 
-    _repo.remove(id);
+    _repo.remove(id.value());
 
-    const auto profile = _repo.get(id);
+    const auto profile = _repo.get(id.value());
     EXPECT_FALSE(profile.has_value());
 }
 
@@ -246,8 +246,8 @@ TEST_F(ProfileRepoTest, RemoveDoesNotAffectOtherProfiles)
         domain::Profile{ProfileId::invalid(), "Nina", std::nullopt}
     );
 
-    _repo.remove(id1);
+    _repo.remove(id1.value());
 
-    EXPECT_FALSE(_repo.get(id1).has_value());
-    EXPECT_TRUE(_repo.get(id2).has_value());
+    EXPECT_FALSE(_repo.get(id1.value()).has_value());
+    EXPECT_TRUE(_repo.get(id2.value()).has_value());
 }

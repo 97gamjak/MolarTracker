@@ -28,11 +28,13 @@ namespace service
             const std::shared_ptr<repo::IAccountRepo>& accountRepo
         );
 
-        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
+        [[nodiscard]]
+        std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) const override;
 
-        [[nodiscard]] AccountId createAccount(
+        [[nodiscard]]
+        CrudResult<AccountId> createAccount(
             const finance::Account& account,
             const ProfileId&        profileId
         ) override;

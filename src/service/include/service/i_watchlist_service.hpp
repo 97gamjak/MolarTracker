@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace finance
 {
@@ -28,7 +29,8 @@ namespace service
          * @param name The display name of the new watchlist
          * @return WatchlistId The ID of the newly created watchlist
          */
-        [[nodiscard]] virtual WatchlistId createWatchlist(
+        [[nodiscard]]
+        virtual CrudResult<WatchlistId> createWatchlist(
             const std::string& name
         ) = 0;
 
@@ -37,8 +39,8 @@ namespace service
          *
          * @return std::vector<finance::Watchlist>
          */
-        [[nodiscard]] virtual std::vector<finance::Watchlist> getAllWatchlists(
-        ) const = 0;
+        [[nodiscard]]
+        virtual std::vector<finance::Watchlist> getAllWatchlists() const = 0;
 
         /**
          * @brief Rename an existing watchlist

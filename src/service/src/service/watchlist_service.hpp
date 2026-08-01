@@ -27,14 +27,18 @@ namespace service
             const std::shared_ptr<repo::IWatchlistRepo>& watchlistRepo
         );
 
-        [[nodiscard]] WatchlistId createWatchlist(const std::string& name)
-            override;
+        [[nodiscard]]
+        CrudResult<WatchlistId> createWatchlist(
+            const std::string& name
+        ) override;
 
-        [[nodiscard]] std::vector<finance::Watchlist> getAllWatchlists(
-        ) const override;
+        [[nodiscard]]
+        std::vector<finance::Watchlist> getAllWatchlists() const override;
 
-        void renameWatchlist(WatchlistId id, const std::string& newName)
-            override;
+        void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) override;
 
         void deleteWatchlist(WatchlistId id) override;
 

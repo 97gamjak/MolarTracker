@@ -58,7 +58,8 @@ namespace
 
 TEST_F(InstrumentServiceTest, AddStockReturnsValidIds)
 {
-    const auto [stockId, instrumentId] = _service->addStock(makeStock());
+    const auto [stockId, instrumentId] =
+        _service->addStock(makeStock()).value();
 
     EXPECT_GT(stockId.value(), 0);
     EXPECT_GT(instrumentId.value(), 0);

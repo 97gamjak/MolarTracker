@@ -16,11 +16,13 @@ namespace repo
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
+        [[nodiscard]]
+        std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) override;
 
-        [[nodiscard]] AccountId createAccount(
+        [[nodiscard]]
+        CrudResult<AccountId> createAccount(
             const finance::Account& account,
             const ProfileId&        profileId
         ) override;

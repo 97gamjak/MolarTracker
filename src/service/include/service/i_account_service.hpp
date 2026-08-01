@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 #include "finance/account/account.hpp"
 
 namespace service
@@ -40,10 +41,10 @@ namespace service
          * @param profileId The ID of the profile to which the account
          * belongs
          *
-         * @return AccountId The ID of the newly created account
+         * @return CrudResult<AccountId> The result of the create operation
          */
         [[nodiscard]]
-        virtual AccountId createAccount(
+        virtual CrudResult<AccountId> createAccount(
             const finance::Account& account,
             const ProfileId&        profileId
         ) = 0;

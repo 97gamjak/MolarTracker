@@ -103,6 +103,8 @@ class Error
         bool                              addSubError = true
     ) const;
 
+    Error convert(const std::optional<std::string>& newMessage) const;
+
    protected:
     [[nodiscard]] const std::string& getMessage() const;
 

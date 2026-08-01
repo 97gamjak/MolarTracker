@@ -6,6 +6,7 @@
 
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
+#include "error/crud_error.hpp"
 
 class Connections;   // Forward declaration
 
@@ -62,7 +63,10 @@ namespace store
         void               clearPotentiallyDirty();
         [[nodiscard]] bool isDirty() const;
 
-        void restoreFromBackup(const std::filesystem::path& backupFile);
+        [[nodiscard]]
+        DatabaseResult<void> restoreFromBackup(
+            const std::filesystem::path& backupFile
+        );
 
         Connections subscribeToDirty(
             const OnDirtyChanged::func& func,
@@ -76,7 +80,8 @@ namespace store
         [[nodiscard]] std::shared_ptr<IPositionStore> getPositionStore() const;
         [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore(
         ) const;
-        [[nodiscard]] std::shared_ptr<IWatchlistStore> getWatchlistStore() const;
+        [[nodiscard]] std::shared_ptr<IWatchlistStore> getWatchlistStore(
+        ) const;
     };
 
 }   // namespace store

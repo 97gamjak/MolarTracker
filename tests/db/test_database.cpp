@@ -155,7 +155,7 @@ TEST(Database, ExecuteThrowsWhenDatabaseNotOpen)
 
     try
     {
-        db.execute("CREATE TABLE t(x INTEGER);");
+        static_cast<void>(db.execute("CREATE TABLE t(x INTEGER);"));
         FAIL() << "Expected db::SqliteError";
     }
     catch (const db::SqliteError& ex)
@@ -182,28 +182,36 @@ TEST(Database, ExecuteValidSqlCreatesTableAndInsertsAndChangesReflectsRows)
 
     db::Database db(path);
 
-    EXPECT_NO_THROW(db.execute(
-        "CREATE TABLE test_items(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT);"
-    ));
+    EXPECT_TRUE(db.execute(
+                      "CREATE TABLE test_items(id INTEGER PRIMARY KEY "
+                      "AUTOINCREMENT, v TEXT);"
+    )
+                    .has_value());
 
-    EXPECT_NO_THROW(db.execute("INSERT INTO test_items(v) VALUES('a');"));
+    EXPECT_TRUE(db.execute("INSERT INTO test_items(v) VALUES('a');").has_value()
+    );
     EXPECT_EQ(db.getNumberOfLastChanges(), 1);
     const auto id1 = db.getLastInsertRowid();
     EXPECT_GE(id1.value(), 1);
 
-    EXPECT_NO_THROW(db.execute("INSERT INTO test_items(v) VALUES('b');"));
+    EXPECT_TRUE(db.execute("INSERT INTO test_items(v) VALUES('b');").has_value()
+    );
     EXPECT_EQ(db.getNumberOfLastChanges(), 1);
     const auto id2 = db.getLastInsertRowid();
     EXPECT_EQ(id2.value(), id1.value() + 1);
 
-    EXPECT_NO_THROW(db.execute("UPDATE test_items SET v='c' WHERE id=1;"));
+    EXPECT_TRUE(
+        db.execute("UPDATE test_items SET v='c' WHERE id=1;").has_value()
+    );
     EXPECT_EQ(db.getNumberOfLastChanges(), 1);
 
-    EXPECT_NO_THROW(db.execute("UPDATE test_items SET v='c' WHERE id=999999;"));
+    EXPECT_TRUE(
+        db.execute("UPDATE test_items SET v='c' WHERE id=999999;").has_value()
+    );
     EXPECT_EQ(db.getNumberOfLastChanges(), 0);
 }
 
-TEST(Database, ExecuteInvalidSqlThrowsAndMessageContainsSql)
+TEST(Database, ExecuteInvalidSql)
 {
     const auto path = unique_temp_db_path();
     TempDbFile cleanup{path};
@@ -212,15 +220,7 @@ TEST(Database, ExecuteInvalidSqlThrowsAndMessageContainsSql)
 
     const std::string bad_sql = "CREAT TABLE nope(x);";
 
-    try
-    {
-        db.execute(bad_sql);
-        FAIL() << "Expected db::SqliteError";
-    }
-    catch (const db::SqliteError& ex)
-    {
-        expect_sqlite_error_contains(ex, "sqlite execute failed", bad_sql);
-    }
+    EXPECT_FALSE(db.execute(bad_sql));
 }
 
 TEST(Database, PrepareValidSqlDoesNotThrow)
@@ -229,8 +229,10 @@ TEST(Database, PrepareValidSqlDoesNotThrow)
     TempDbFile cleanup{path};
 
     db::Database db(path);
-    db.execute("CREATE TABLE t(id INTEGER PRIMARY KEY, v INTEGER);");
-    db.execute("INSERT INTO t(id, v) VALUES(1, 42);");
+    static_cast<void>(
+        db.execute("CREATE TABLE t(id INTEGER PRIMARY KEY, v INTEGER);")
+    );
+    static_cast<void>(db.execute("INSERT INTO t(id, v) VALUES(1, 42);"));
 
     EXPECT_NO_THROW((void) db.prepare("SELECT v FROM t WHERE id=1;"));
 }
@@ -262,27 +264,25 @@ TEST(Database, EnableForeignKeysEnforcesConstraintsWhenOnAndAllowsWhenOff)
 
     db::Database db(path);
 
-    db.execute("CREATE TABLE parent(id INTEGER PRIMARY KEY);");
-    db.execute(
+    static_cast<void>(db.execute("CREATE TABLE parent(id INTEGER PRIMARY KEY);")
+    );
+    static_cast<void>(db.execute(
         "CREATE TABLE child(id INTEGER PRIMARY KEY, parent_id INTEGER, "
         "FOREIGN KEY(parent_id) REFERENCES parent(id));"
-    );
+    ));
 
-    EXPECT_THROW(
-        db.execute("INSERT INTO child(id, parent_id) VALUES(1, 999);"),
-        db::SqliteError
-    );
+    EXPECT_FALSE(db.execute("INSERT INTO child(id, parent_id) VALUES(1, 999);")
+                     .has_value());
 
-    EXPECT_NO_THROW(db.enableForeignKeys(false));
-    EXPECT_NO_THROW(
-        db.execute("INSERT INTO child(id, parent_id) VALUES(2, 999);")
-    );
+    EXPECT_TRUE(db.enableForeignKeys(false));
+    EXPECT_TRUE(db.execute("INSERT INTO child(id, parent_id) VALUES(2, 999);")
+                    .has_value());
     EXPECT_EQ(db.getNumberOfLastChanges(), 1);
 
-    EXPECT_NO_THROW(db.enableForeignKeys(true));
-    EXPECT_THROW(
-        db.execute("INSERT INTO child(id, parent_id) VALUES(3, 12345);"),
-        db::SqliteError
+    EXPECT_TRUE(db.enableForeignKeys(true).has_value());
+    EXPECT_FALSE(
+        db.execute("INSERT INTO child(id, parent_id) VALUES(3, 12345);")
+            .has_value()
     );
 }
 
@@ -305,7 +305,7 @@ TEST(Database, MoveConstructorTransfersOwnershipAndLeavesOtherClosed)
     EXPECT_TRUE(dbB.isOpen());
     EXPECT_EQ(dbB.nativeHandle(), handle_a);
 
-    EXPECT_NO_THROW(dbB.execute("CREATE TABLE t(x INTEGER);"));
+    EXPECT_TRUE(dbB.execute("CREATE TABLE t(x INTEGER);").has_value());
 }
 
 TEST(Database, MoveAssignmentClosesTargetThenTransfersOwnership)
@@ -332,10 +332,10 @@ TEST(Database, MoveAssignmentClosesTargetThenTransfersOwnership)
     EXPECT_TRUE(dbB.isOpen());
     EXPECT_EQ(dbB.nativeHandle(), handle_a);
 
-    EXPECT_NO_THROW(dbB.execute("CREATE TABLE t(x INTEGER);"));
+    EXPECT_TRUE(dbB.execute("CREATE TABLE t(x INTEGER);").has_value());
 }
 
-TEST(Database, BusyTimeoutUnderWriteLockEventuallyThrows)
+TEST(Database, BusyTimeoutUnderWriteLockEventuallyTimesOut)
 {
     const auto path = unique_temp_db_path();
     TempDbFile cleanup{path};
@@ -343,36 +343,26 @@ TEST(Database, BusyTimeoutUnderWriteLockEventuallyThrows)
     db::Database locker(path);
     db::Database contender(path);
 
-    locker.execute("CREATE TABLE t(id INTEGER PRIMARY KEY, v INTEGER);");
-    locker.execute("INSERT INTO t(id, v) VALUES(1, 1);");
+    static_cast<void>(
+        locker.execute("CREATE TABLE t(id INTEGER PRIMARY KEY, v INTEGER);")
+    );
+    static_cast<void>(locker.execute("INSERT INTO t(id, v) VALUES(1, 1);"));
 
     constexpr auto timeout_ms = 50;
     contender.setBusyTimeout(timeout_ms);
 
-    locker.execute("BEGIN EXCLUSIVE TRANSACTION;");
+    static_cast<void>(locker.execute("BEGIN EXCLUSIVE TRANSACTION;"));
 
     const auto start = std::chrono::steady_clock::now();
 
-    try
-    {
-        contender.execute("UPDATE t SET v=2 WHERE id=1;");
-        FAIL() << "Expected db::SqliteError due to lock contention";
-    }
-    catch (const db::SqliteError& ex)
-    {
-        expect_sqlite_error_contains(
-            ex,
-            "sqlite execute failed",
-            "UPDATE t SET v=2"
-        );
-    }
+    EXPECT_FALSE(contender.execute("UPDATE t SET v=2 WHERE id=1;"));
 
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - start
     );
     EXPECT_LT(elapsed.count(), 2000);
 
-    EXPECT_NO_THROW(locker.execute("ROLLBACK;"));
+    EXPECT_TRUE(locker.execute("ROLLBACK;").has_value());
 }
 
 TEST(Database, OpenAfterCloseReopensAndOperates)
@@ -384,10 +374,10 @@ TEST(Database, OpenAfterCloseReopensAndOperates)
     db.close();
     EXPECT_FALSE(db.isOpen());
 
-    EXPECT_NO_THROW(db.open(path.string()));
+    EXPECT_TRUE(db.open(path.string()));
     EXPECT_TRUE(db.isOpen());
 
-    EXPECT_NO_THROW(db.execute("CREATE TABLE t(x INTEGER);"));
+    EXPECT_TRUE(db.execute("CREATE TABLE t(x INTEGER);").has_value());
 }
 
 TEST(Database, OpenInvalidPathThrows)

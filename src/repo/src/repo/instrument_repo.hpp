@@ -43,12 +43,12 @@ namespace repo
         ) override;
 
         [[nodiscard]]
-        finance::StockInsertionResult addStock(
+        CrudResult<finance::StockInsertionResult> addStock(
             const finance::Stock& stock
         ) override;
 
         [[nodiscard]]
-        finance::OptionInsertionResult addOption(
+        CrudResult<finance::OptionInsertionResult> addOption(
             const finance::Option& option
         ) override;
 
@@ -65,7 +65,9 @@ namespace repo
         );
 
         [[nodiscard]]
-        InstrumentId _addInstrument(const InstrumentRow& instrumentRow);
+        CrudResult<InstrumentId> _addInstrument(
+            const InstrumentRow& instrumentRow
+        );
 
         [[nodiscard]]
         finance::Options _getOptions(const orm::Query& query);

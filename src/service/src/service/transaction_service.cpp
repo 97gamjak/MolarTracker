@@ -22,9 +22,9 @@ namespace service
      * @brief Adds a transaction to the repository.
      *
      * @param transaction The transaction to add.
-     * @return TransactionId The ID of the added transaction.
+     * @return CrudResult<TransactionId> The result of the add operation.
      */
-    TransactionId TransactionService::addTransaction(
+    CrudResult<TransactionId> TransactionService::addTransaction(
         const finance::DomainTransaction& transaction
     )
     {

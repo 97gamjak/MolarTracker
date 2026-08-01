@@ -16,14 +16,18 @@ namespace repo
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] WatchlistId createWatchlist(const std::string& name
+        [[nodiscard]]
+        CrudResult<WatchlistId> createWatchlist(
+            const std::string& name
         ) override;
 
-        [[nodiscard]] std::vector<finance::Watchlist> getAllWatchlists(
-        ) override;
+        [[nodiscard]]
+        std::vector<finance::Watchlist> getAllWatchlists() override;
 
-        void renameWatchlist(WatchlistId id, const std::string& newName)
-            override;
+        void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) override;
 
         void deleteWatchlist(WatchlistId id) override;
 

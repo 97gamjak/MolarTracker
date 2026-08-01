@@ -39,9 +39,9 @@ namespace service
      * details of the account to be created
      * @param profileId The ID of the profile to which the account belongs
      *
-     * @return AccountId
+     * @return CrudResult<AccountId>
      */
-    AccountId AccountService::createAccount(
+    CrudResult<AccountId> AccountService::createAccount(
         const finance::Account& account,
         const ProfileId&        profileId
     )

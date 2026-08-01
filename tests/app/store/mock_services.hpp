@@ -68,7 +68,8 @@ namespace tests
             return std::nullopt;
         }
 
-        [[nodiscard]] ProfileId create(const domain::Profile& profile) override
+        [[nodiscard]]
+        CrudResult<ProfileId> create(const domain::Profile& profile) override
         {
             createCallCount++;
             auto       newProfile = profile;
@@ -128,7 +129,8 @@ namespace tests
             return preloadedAccounts;
         }
 
-        [[nodiscard]] AccountId createAccount(
+        [[nodiscard]]
+        CrudResult<AccountId> createAccount(
             const finance::Account& /*account*/,
             const ProfileId& /*profileId*/
         ) override
@@ -182,7 +184,8 @@ namespace tests
             return std::nullopt;
         }
 
-        [[nodiscard]] finance::StockInsertionResult addStock(
+        [[nodiscard]]
+        CrudResult<finance::StockInsertionResult> addStock(
             const finance::Stock& /*stock*/
         ) override
         {
@@ -193,8 +196,9 @@ namespace tests
             };
         }
 
-        [[nodiscard]] finance::OptionInsertionResult addOption(
-            const finance::Option& /*stock*/
+        [[nodiscard]]
+        CrudResult<finance::OptionInsertionResult> addOption(
+            const finance::Option& /*option*/
         ) override
         {
             addOptionCallCount++;
@@ -260,7 +264,8 @@ namespace tests
         int _nextId = 1;
 
        public:
-        [[nodiscard]] TransactionId addTransaction(
+        [[nodiscard]]
+        CrudResult<TransactionId> addTransaction(
             const finance::DomainTransaction& /*transaction*/
         ) override
         {
@@ -281,14 +286,16 @@ namespace tests
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Watchlist> preloadedWatchlists;
-        int                              createCallCount = 0;
+        int                             createCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
 
        public:
-        [[nodiscard]] WatchlistId createWatchlist(const std::string& /*name*/
+        [[nodiscard]]
+        CrudResult<WatchlistId> createWatchlist(
+            const std::string& /*name*/
         ) override
         {
             createCallCount++;
@@ -301,8 +308,10 @@ namespace tests
             return preloadedWatchlists;
         }
 
-        void renameWatchlist(WatchlistId id, const std::string& newName)
-            override
+        void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) override
         {
             for (auto& watchlist : preloadedWatchlists)
             {
@@ -315,8 +324,7 @@ namespace tests
         {
             std::erase_if(
                 preloadedWatchlists,
-                [id](const auto& watchlist)
-                { return watchlist.getId() == id; }
+                [id](const auto& watchlist) { return watchlist.getId() == id; }
             );
         }
 

@@ -46,9 +46,9 @@ namespace service
      * @brief Create a new profile
      *
      * @param profile
-     * @return ProfileId
+     * @return CrudResult<ProfileId>
      */
-    ProfileId ProfileService::create(const domain::Profile& profile)
+    CrudResult<ProfileId> ProfileService::create(const domain::Profile& profile)
     {
         return _profileRepo->create(profile);
     }
