@@ -129,9 +129,9 @@ namespace orm
             const auto transactionResult = transaction.commit();
             if (!transactionResult)
             {
-                throw orm::CrudException(
-                    "Failed to commit transaction after insert operation: " +
-                    transactionResult.error().toString()
+                return FromError<DatabaseError, CrudError>::apply(
+                    transactionResult.error(),
+                    "Failed to commit transaction after insert operation"
                 );
             }
         }

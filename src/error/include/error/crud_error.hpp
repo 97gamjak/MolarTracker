@@ -1,6 +1,7 @@
 #ifndef __ERROR__INCLUDE__ERROR__CRUD_ERROR_HPP__
 #define __ERROR__INCLUDE__ERROR__CRUD_ERROR_HPP__
 
+#include <cstdint>
 #include <mstd/enum.hpp>
 
 #include "base_error.hpp"
