@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "finance/watchlist.hpp"
 #include "service/i_watchlist_service.hpp"
 
 namespace repo
@@ -29,22 +30,18 @@ namespace service
 
         [[nodiscard]]
         CrudResult<WatchlistId> createWatchlist(
-            const std::string& name
+            const finance::Watchlist& watchlist
         ) override;
 
         [[nodiscard]]
         std::vector<finance::Watchlist> getAllWatchlists() const override;
 
-        void renameWatchlist(
-            WatchlistId        id,
-            const std::string& newName
+        [[nodiscard]]
+        CrudResult<void> updateWatchlist(
+            const finance::Watchlist& watchlist
         ) override;
 
         void deleteWatchlist(WatchlistId id) override;
-
-        void addSymbol(WatchlistId id, const std::string& symbol) override;
-
-        void removeSymbol(WatchlistId id, const std::string& symbol) override;
     };
 
 }   // namespace service

@@ -15,6 +15,7 @@ namespace finance
     class Option;                   // forward declaration
     class Options;                  // forward declaration
     struct OptionInsertionResult;   // forward declaration
+    struct SecuritiesFilter;        // forward declaration
 }   // namespace finance
 
 namespace repo
@@ -40,24 +41,13 @@ namespace repo
         /**
          * @brief get a list of all stocks in the database
          *
-         * @param ids The set of instrument IDs to retrieve stocks for
+         * @param filter The filter parameters to restrict the query to a
+         * specific set of stocks
          * @return std::vector<finance::Stock>
          */
         [[nodiscard]]
         virtual std::vector<finance::Stock> getStocks(
-            const IdSet<InstrumentId>& ids
-        ) = 0;
-
-        /**
-         * @brief Get a list of stocks whose ticker symbol is in the given
-         * allowlist (e.g. the symbols contained in a watchlist)
-         *
-         * @param symbols The ticker symbols to filter by
-         * @return std::vector<finance::Stock>
-         */
-        [[nodiscard]]
-        virtual std::vector<finance::Stock> getStocksBySymbols(
-            const std::vector<std::string>& symbols
+            const finance::SecuritiesFilter& filter
         ) = 0;
 
         /**

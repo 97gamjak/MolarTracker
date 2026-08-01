@@ -3,6 +3,7 @@
 #include "config/id_types.hpp"
 #include "finance/instrument/option.hpp"
 #include "finance/instrument/options.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
@@ -20,17 +21,26 @@ namespace repo
      * the data from the database is correctly mapped to the properties of the
      * Stock objects.
      *
-     * @param ids The set of instrument IDs to retrieve stock rows for
+     * @param filter The filter parameters to restrict the query to a specific
+     * set of stocks
      * @return std::vector<StockRow>
      */
     std::vector<StockRow> InstrumentRepo::_getStockRows(
-        const IdSet<InstrumentId>& ids
+        const finance::SecuritiesFilter& filter
     )
     {
         orm::Query query{};
 
-        if (!ids.empty())
-            query = query.in<StockRow::instrumentIdField>(ids);
+        if (filter.instrumentIds.has_value())
+            query = query.in<StockRow::instrumentIdField>(
+                filter.instrumentIds.value()
+            );
+
+        if (filter.symbols.has_value())
+            query = query.in<StockRow::tickerField>(filter.symbols.value());
+
+        if (filter.stockIds.has_value())
+            query = query.in<StockRow::idField>(filter.stockIds.value());
 
         return _getCrud().get<StockRow>(_getDb(), query);
     }
@@ -69,7 +79,7 @@ namespace repo
      */
     std::vector<std::string> InstrumentRepo::getTickers()
     {
-        auto results = _getStockRows() |
+        auto results = _getStockRows({}) |
                        std::views::transform([](const StockRow& row)
                                              { return row.ticker.value(); });
 
@@ -81,39 +91,16 @@ namespace repo
      * stocks that are not marked as deleted, and will include stocks that are
      * new or modified but not yet saved to the database.
      *
-     * @param ids The set of instrument IDs to retrieve stocks for
+     * @param filter The filter parameters to restrict the query a specific set
+     * of stocks
      * @return std::vector<finance::Stock>
      */
     std::vector<finance::Stock> InstrumentRepo::getStocks(
-        const IdSet<InstrumentId>& ids
+        const finance::SecuritiesFilter& filter
     )
     {
         auto results =
-            _getStockRows(ids) |
-            std::views::transform([](const StockRow& row)
-                                  { return InstrumentFactory::toStock(row); });
-
-        return {results.begin(), results.end()};
-    }
-
-    /**
-     * @brief get a list of stocks whose ticker symbol is in the given
-     * allowlist (e.g. the symbols contained in a watchlist)
-     *
-     * @param symbols The ticker symbols to filter by
-     * @return std::vector<finance::Stock>
-     */
-    std::vector<finance::Stock> InstrumentRepo::getStocksBySymbols(
-        const std::vector<std::string>& symbols
-    )
-    {
-        if (symbols.empty())
-            return {};
-
-        const auto query = orm::Query{}.in<StockRow::tickerField>(symbols);
-
-        auto results =
-            _getCrud().get<StockRow>(_getDb(), query) |
+            _getStockRows(filter) |
             std::views::transform([](const StockRow& row)
                                   { return InstrumentFactory::toStock(row); });
 
@@ -201,14 +188,15 @@ namespace repo
         const std::string& ticker
     )
     {
-        const auto query = orm::Query{}.where(StockRow::hasTicker(ticker));
+        finance::SecuritiesFilter filter;
+        filter.symbols = Set<std::string>{ticker};
 
-        auto result = _getCrud().getUnique<StockRow>(_getDb(), query);
+        const auto result = _getStockRows(filter);
 
-        if (!result)
+        if (result.empty())
             return std::nullopt;
 
-        return InstrumentFactory::toStock(result.value());
+        return InstrumentFactory::toStock(result.front());
     }
 
     /**
@@ -316,11 +304,7 @@ namespace repo
      */
     bool InstrumentRepo::stockExists(const std::string& ticker)
     {
-        const auto query = orm::Query{}.where(StockRow::hasTicker(ticker));
-
-        auto result = _getCrud().get<StockRow>(_getDb(), query);
-
-        return !result.empty();
+        return getStock(ticker).has_value();
     }
 
     /**

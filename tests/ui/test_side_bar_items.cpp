@@ -7,7 +7,10 @@
 #include "config/id_types.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
+#include "ui/side_bar/all_securities_item.hpp"
+#include "ui/side_bar/securities_category.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
+#include "ui/side_bar/watchlist_item.hpp"
 
 namespace
 {
@@ -157,6 +160,115 @@ namespace
             "Account",
             Qt::CaseInsensitive
         ));
+    }
+
+    // -------------------------------------------------------------------------
+    // AllSecuritiesItem
+    // -------------------------------------------------------------------------
+
+    class AllSecuritiesItemTest : public ::testing::Test
+    {
+    };
+
+    TEST_F(AllSecuritiesItemTest, GetTypeReturnsAllSecuritiesItem)
+    {
+        ui::AllSecuritiesItem item;
+        EXPECT_EQ(item.getType(), ui::SideBarItemType::AllSecuritiesItem);
+    }
+
+    TEST_F(AllSecuritiesItemTest, PopulateContextMenuAddsNoActions)
+    {
+        ui::AllSecuritiesItem item;
+        QMenu                 menu;
+        item.populateContextMenu(menu);
+        EXPECT_TRUE(menu.actions().isEmpty());
+    }
+
+    // -------------------------------------------------------------------------
+    // WatchlistItem
+    // -------------------------------------------------------------------------
+
+    class WatchlistItemTest : public ::testing::Test
+    {
+    };
+
+    TEST_F(WatchlistItemTest, GetTypeReturnsWatchlistItem)
+    {
+        ui::WatchlistItem item{WatchlistId{1}, "Tech Stocks"};
+        EXPECT_EQ(item.getType(), ui::SideBarItemType::WatchlistItem);
+    }
+
+    TEST_F(WatchlistItemTest, GetIdReturnsGivenId)
+    {
+        constexpr auto    id = 42;
+        ui::WatchlistItem item{WatchlistId{id}, "Tech Stocks"};
+        EXPECT_EQ(item.getId(), WatchlistId{id});
+    }
+
+    TEST_F(WatchlistItemTest, ActionsAreNullBeforePopulatingContextMenu)
+    {
+        ui::WatchlistItem item{WatchlistId{1}, "Tech Stocks"};
+        EXPECT_EQ(item.getRenameAction(), nullptr);
+        EXPECT_EQ(item.getDeleteAction(), nullptr);
+    }
+
+    TEST_F(WatchlistItemTest, PopulateContextMenuCreatesRenameAndDeleteActions)
+    {
+        ui::WatchlistItem item{WatchlistId{1}, "Tech Stocks"};
+        QMenu             menu;
+        item.populateContextMenu(menu);
+
+        EXPECT_NE(item.getRenameAction(), nullptr);
+        EXPECT_NE(item.getDeleteAction(), nullptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // SecuritiesCategory
+    // -------------------------------------------------------------------------
+
+    class SecuritiesCategoryTest : public ::testing::Test
+    {
+    };
+
+    TEST_F(SecuritiesCategoryTest, GetTypeReturnsSecuritiesCategory)
+    {
+        ui::SecuritiesCategory cat;
+        EXPECT_EQ(cat.getType(), ui::SideBarItemType::SecuritiesCategory);
+    }
+
+    TEST_F(SecuritiesCategoryTest, HasPermanentAllSecuritiesRowAtConstruction)
+    {
+        ui::SecuritiesCategory cat;
+        EXPECT_EQ(cat.rowCount(), 1);
+        EXPECT_NE(cat.getAllSecuritiesItem(), nullptr);
+    }
+
+    TEST_F(SecuritiesCategoryTest, AddWatchlistIncrementsRowCount)
+    {
+        ui::SecuritiesCategory cat;
+        cat.addWatchlist(WatchlistId{1}, "Tech Stocks");
+        EXPECT_EQ(cat.rowCount(), 2);
+    }
+
+    TEST_F(SecuritiesCategoryTest, ClearWatchlistsPreservesAllSecuritiesRow)
+    {
+        ui::SecuritiesCategory cat;
+        cat.addWatchlist(WatchlistId{1}, "Tech Stocks");
+        cat.addWatchlist(WatchlistId{2}, "Dividend Plays");
+        cat.clearWatchlists();
+
+        EXPECT_EQ(cat.rowCount(), 1);
+        EXPECT_NE(cat.getAllSecuritiesItem(), nullptr);
+    }
+
+    TEST_F(SecuritiesCategoryTest, PopulateContextMenuCreatesBothActions)
+    {
+        ui::SecuritiesCategory cat;
+        QMenu                  menu;
+        cat.populateContextMenu(menu);
+
+        EXPECT_NE(cat.getCreateAction(), nullptr);
+        EXPECT_NE(cat.getCreateWatchlistAction(), nullptr);
     }
 
 }   // namespace

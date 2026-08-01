@@ -21,14 +21,15 @@ namespace service
     /**
      * @brief Create a new, empty watchlist
      *
-     * @param name
+     * @param watchlist The watchlist object containing the name and other
+     * details of the new watchlist
      * @return CrudResult<WatchlistId>
      */
     CrudResult<WatchlistId> WatchlistService::createWatchlist(
-        const std::string& name
+        const finance::Watchlist& watchlist
     )
     {
-        return _watchlistRepo->createWatchlist(name);
+        return _watchlistRepo->createWatchlist(watchlist);
     }
 
     /**
@@ -42,17 +43,18 @@ namespace service
     }
 
     /**
-     * @brief Rename an existing watchlist
+     * @brief Update an existing watchlist
      *
-     * @param id
-     * @param newName
+     * @param watchlist The watchlist object containing the updated details of
+     * the watchlist
+     *
+     * @return CrudResult<void> Returns an error if the watchlist does not exist
      */
-    void WatchlistService::renameWatchlist(
-        WatchlistId        id,
-        const std::string& newName
+    CrudResult<void> WatchlistService::updateWatchlist(
+        const finance::Watchlist& watchlist
     )
     {
-        _watchlistRepo->renameWatchlist(id, newName);
+        return _watchlistRepo->updateWatchlist(watchlist);
     }
 
     /**
@@ -63,31 +65,6 @@ namespace service
     void WatchlistService::deleteWatchlist(WatchlistId id)
     {
         _watchlistRepo->deleteWatchlist(id);
-    }
-
-    /**
-     * @brief Add a symbol to a watchlist
-     *
-     * @param id
-     * @param symbol
-     */
-    void WatchlistService::addSymbol(WatchlistId id, const std::string& symbol)
-    {
-        _watchlistRepo->addSymbol(id, symbol);
-    }
-
-    /**
-     * @brief Remove a symbol from a watchlist
-     *
-     * @param id
-     * @param symbol
-     */
-    void WatchlistService::removeSymbol(
-        WatchlistId        id,
-        const std::string& symbol
-    )
-    {
-        _watchlistRepo->removeSymbol(id, symbol);
     }
 
 }   // namespace service

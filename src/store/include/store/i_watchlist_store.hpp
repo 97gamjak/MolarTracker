@@ -7,6 +7,7 @@
 
 #include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "exceptions/base.hpp"
 
 namespace finance
@@ -68,6 +69,57 @@ namespace store
          */
         [[nodiscard]]
         virtual const IdIdMap<WatchlistId>& getIdRemap() const = 0;
+
+        /**
+         * @brief Rename an existing watchlist. Unlike createWatchlist(), this
+         * is persisted immediately rather than staged, since the underlying
+         * repo/service API models it as a single atomic operation.
+         *
+         * @param id
+         * @param newName
+         */
+        virtual void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) = 0;
+
+        /**
+         * @brief Delete a watchlist and all of its symbol entries
+         * immediately.
+         *
+         * @param id
+         */
+        virtual void deleteWatchlist(WatchlistId id) = 0;
+
+        /**
+         * @brief Add a symbol to a watchlist immediately.
+         *
+         * @param id
+         * @param symbol
+         *
+         * @return WatchlistResult<void> Returns an error if the watchlist does
+         * not exist or if the symbol already exists in the watchlist.
+         */
+        [[nodiscard]]
+        virtual WatchlistResult<void> addSymbol(
+            WatchlistId        id,
+            const std::string& symbol
+        ) = 0;
+
+        /**
+         * @brief Remove a symbol from a watchlist immediately.
+         *
+         * @param id
+         * @param symbol
+         *
+         * @return WatchlistResult<void> Returns an error if the watchlist does
+         * not exist or if the symbol does not exist in the watchlist.
+         */
+        [[nodiscard]]
+        virtual WatchlistResult<void> removeSymbol(
+            WatchlistId        id,
+            const std::string& symbol
+        ) = 0;
     };
 
 }   // namespace store

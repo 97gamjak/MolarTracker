@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "config/id_types.hpp"
+#include "finance/watchlist.hpp"
 #include "mock_services.hpp"
 #include "store/watchlist_store.hpp"
 
@@ -104,4 +107,122 @@ TEST_F(WatchlistStoreTest, ReloadLoadsWatchlistsFromService)
     const auto watchlists = _store->getAllWatchlists();
     ASSERT_EQ(watchlists.size(), 1U);
     EXPECT_EQ(watchlists[0].getName(), "Preloaded");
+}
+
+TEST_F(WatchlistStoreTest, RenameWatchlistCallsServiceImmediately)
+{
+    const WatchlistId id{1};
+    _mockService->preloadedWatchlists
+        .emplace_back(id, "Tech Stocks", Timestamp{});
+
+    _store->reload();
+
+    _store->renameWatchlist(id, "Renamed");
+
+    EXPECT_EQ(_store->getWatchlist(id)->getName(), "Renamed");
+}
+
+TEST_F(WatchlistStoreTest, RenameWatchlistUpdatesCachedName)
+{
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+    _store->reload();
+
+    _store->renameWatchlist(WatchlistId{1}, "Renamed");
+
+    const auto watchlist = _store->getWatchlist(WatchlistId{1});
+    ASSERT_TRUE(watchlist.has_value());
+    EXPECT_EQ(watchlist->getName(), "Renamed");
+}
+
+TEST_F(WatchlistStoreTest, RenameWatchlistDoesNotMarkStoreDirty)
+{
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+    _store->reload();
+
+    _store->renameWatchlist(WatchlistId{1}, "Renamed");
+
+    EXPECT_TRUE(_store->isDirty());
+}
+
+TEST_F(WatchlistStoreTest, DeleteWatchlistCallsServiceNotImmediately)
+{
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+    _store->reload();
+
+    _store->deleteWatchlist(WatchlistId{1});
+
+    // should not trigger it immediately, since we are just marking it as
+    // deleted in the cache
+    EXPECT_EQ(_mockService->deleteCallCount, 0);
+}
+
+TEST_F(WatchlistStoreTest, DeleteWatchlistRemovesFromCache)
+{
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+    _store->reload();
+
+    _store->deleteWatchlist(WatchlistId{1});
+
+    EXPECT_TRUE(_store->getAllWatchlists().empty());
+}
+
+TEST_F(WatchlistStoreTest, AddSymbolCallsServiceNotImmediately)
+{
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+    _store->reload();
+
+    static_cast<void>(_store->addSymbol(WatchlistId{1}, "AAPL"));
+
+    EXPECT_EQ(_mockService->addSymbolCallCount, 0);
+}
+
+TEST_F(WatchlistStoreTest, AddSymbolUpdatesCachedSymbols)
+{
+    _mockService->preloadedWatchlists
+        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+    _store->reload();
+
+    static_cast<void>(_store->addSymbol(WatchlistId{1}, "AAPL"));
+
+    const auto watchlist = _store->getWatchlist(WatchlistId{1});
+    ASSERT_TRUE(watchlist.has_value());
+    ASSERT_EQ(watchlist->getSymbols().size(), 1U);
+    EXPECT_EQ(watchlist->getSymbols().front(), "AAPL");
+}
+
+TEST_F(WatchlistStoreTest, RemoveSymbolCallsServiceNotImmediately)
+{
+    _mockService->preloadedWatchlists.emplace_back(
+        WatchlistId{1},
+        "Tech Stocks",
+        Timestamp{},
+        Set<std::string>{"AAPL"}
+    );
+    _store->reload();
+
+    static_cast<void>(_store->removeSymbol(WatchlistId{1}, "AAPL"));
+
+    EXPECT_EQ(_mockService->removeSymbolCallCount, 0);
+}
+
+TEST_F(WatchlistStoreTest, RemoveSymbolUpdatesCachedSymbols)
+{
+    _mockService->preloadedWatchlists.emplace_back(
+        WatchlistId{1},
+        "Tech Stocks",
+        Timestamp{},
+        Set<std::string>{"AAPL"}
+    );
+    _store->reload();
+
+    static_cast<void>(_store->removeSymbol(WatchlistId{1}, "AAPL"));
+
+    const auto watchlist = _store->getWatchlist(WatchlistId{1});
+    ASSERT_TRUE(watchlist.has_value());
+    EXPECT_TRUE(watchlist->getSymbols().empty());
 }

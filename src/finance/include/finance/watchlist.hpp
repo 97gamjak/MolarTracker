@@ -2,8 +2,8 @@
 #define __FINANCE__INCLUDE__FINANCE__WATCHLIST_HPP__
 
 #include <string>
-#include <vector>
 
+#include "common/container/set.hpp"
 #include "common/timestamp.hpp"
 #include "config/id_types.hpp"
 #include "filter/predicate.hpp"
@@ -29,24 +29,29 @@ namespace finance
         Timestamp _createdAt;
 
         /// The symbols contained in this watchlist, eagerly loaded
-        std::vector<std::string> _symbols;
+        Set<std::string> _symbols;
 
        public:
         explicit Watchlist(
-            WatchlistId              id,
-            std::string              name,
-            Timestamp                createdAt,
-            std::vector<std::string> symbols = {}
+            WatchlistId      id,
+            std::string      name,
+            Timestamp        createdAt,
+            Set<std::string> symbols = {}
         );
 
         void setId(WatchlistId id);
         void setName(const std::string& name);
-        void setSymbols(const std::vector<std::string>& symbols);
 
-        [[nodiscard]] WatchlistId                     getId() const;
-        [[nodiscard]] const std::string&              getName() const;
-        [[nodiscard]] Timestamp                       getCreatedAt() const;
-        [[nodiscard]] const std::vector<std::string>& getSymbols() const;
+        [[nodiscard]] WatchlistId             getId() const;
+        [[nodiscard]] const std::string&      getName() const;
+        [[nodiscard]] Timestamp               getCreatedAt() const;
+        [[nodiscard]] const Set<std::string>& getSymbols() const;
+
+        [[nodiscard]]
+        bool addSymbol(const std::string& symbol);
+
+        [[nodiscard]]
+        bool removeSymbol(const std::string& symbol);
 
         [[nodiscard]] std::string toString() const;
     };

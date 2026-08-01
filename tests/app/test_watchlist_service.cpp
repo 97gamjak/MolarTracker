@@ -35,7 +35,12 @@ namespace
 
 TEST_F(WatchlistServiceTest, CreateWatchlistReturnsValidId)
 {
-    const auto id = _service->createWatchlist("Tech Stocks");
+    const finance::Watchlist watchlist{
+        WatchlistId::invalid(),
+        "Tech Stocks",
+        Timestamp{}
+    };
+    const auto id = _service->createWatchlist(watchlist);
 
     EXPECT_GT(id.value(), 0);
 }
@@ -47,7 +52,12 @@ TEST_F(WatchlistServiceTest, GetAllWatchlistsEmptyInitially)
 
 TEST_F(WatchlistServiceTest, GetAllWatchlistsReturnsCreatedWatchlist)
 {
-    static_cast<void>(_service->createWatchlist("Tech Stocks"));
+    finance::Watchlist watchlist{
+        WatchlistId::invalid(),
+        "Tech Stocks",
+        Timestamp{}
+    };
+    static_cast<void>(_service->createWatchlist(watchlist));
 
     const auto watchlists = _service->getAllWatchlists();
 
@@ -55,31 +65,16 @@ TEST_F(WatchlistServiceTest, GetAllWatchlistsReturnsCreatedWatchlist)
     EXPECT_EQ(watchlists[0].getName(), "Tech Stocks");
 }
 
-TEST_F(WatchlistServiceTest, RenameWatchlistUpdatesName)
-{
-    const auto id = _service->createWatchlist("Tech Stocks");
-
-    _service->renameWatchlist(id.value(), "Big Tech");
-
-    EXPECT_EQ(_service->getAllWatchlists()[0].getName(), "Big Tech");
-}
-
 TEST_F(WatchlistServiceTest, DeleteWatchlistRemovesIt)
 {
-    const auto id = _service->createWatchlist("Tech Stocks");
+    const finance::Watchlist watchlist{
+        WatchlistId::invalid(),
+        "Tech Stocks",
+        Timestamp{}
+    };
+    const auto id = _service->createWatchlist(watchlist);
 
     _service->deleteWatchlist(id.value());
 
     EXPECT_TRUE(_service->getAllWatchlists().empty());
-}
-
-TEST_F(WatchlistServiceTest, AddAndRemoveSymbolRoundTrips)
-{
-    const auto id = _service->createWatchlist("Tech Stocks");
-
-    _service->addSymbol(id.value(), "AAPL");
-    EXPECT_EQ(_service->getAllWatchlists()[0].getSymbols().size(), 1U);
-
-    _service->removeSymbol(id.value(), "AAPL");
-    EXPECT_TRUE(_service->getAllWatchlists()[0].getSymbols().empty());
 }

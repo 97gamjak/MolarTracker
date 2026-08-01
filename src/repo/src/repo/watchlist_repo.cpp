@@ -1,12 +1,10 @@
 #include "watchlist_repo.hpp"
 
-#include "common/timestamp.hpp"
 #include "factories/watchlist_factory.hpp"
 #include "finance/watchlist.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
-#include "repo_errors.hpp"
 #include "sql_models/watchlist_instrument_row.hpp"
 #include "sql_models/watchlist_row.hpp"
 
@@ -18,26 +16,47 @@ namespace repo
     /**
      * @brief Create a new, empty watchlist in the repository
      *
-     * @param name
+     * @param watchlist The watchlist object containing the name and other
+     * details of the new watchlist
      * @return CrudResult<WatchlistId> The ID of the newly created watchlist, or
      * an error if the operation failed
      */
     CrudResult<WatchlistId> WatchlistRepo::createWatchlist(
-        const std::string& name
+
+        const finance::Watchlist& watchlist
+
     )
     {
         WatchlistRow watchlistRow;
-        watchlistRow.name      = name;
-        watchlistRow.createdAt = Timestamp{};
+        watchlistRow.name      = watchlist.getName();
+        watchlistRow.createdAt = watchlist.getCreatedAt();
 
         const auto result = _getCrud().insert(_getDb(), watchlistRow);
 
         if (!result)
             return result.error().convert(
-                "Failed to create watchlist: " + name
+                "Failed to create watchlist: " + watchlist.getName()
             );
 
-        return WatchlistId(result.value());
+        const auto watchlistId = WatchlistId(result.value());
+
+        for (const auto& symbol : watchlist.getSymbols())
+        {
+            WatchlistInstrumentRow row;
+            row.watchlistId = watchlistId;
+            row.symbol      = symbol;
+
+            const auto symbolResult = _getCrud().insert(_getDb(), row);
+
+            if (!symbolResult)
+            {
+                return symbolResult.error().convert(
+                    "Failed to add symbol '" + symbol + "' to watchlist"
+                );
+            }
+        }
+
+        return watchlistId;
     }
 
     /**
@@ -64,43 +83,33 @@ namespace repo
     }
 
     /**
-     * @brief Rename an existing watchlist
+     * @brief Update an existing watchlist
      *
-     * @param id
-     * @param newName
+     * @param watchlist The watchlist object containing the updated details of
+     * the watchlist
+     *
+     * @return CrudResult<void> Returns an error if the watchlist does not exist
      */
-    void WatchlistRepo::renameWatchlist(
-        WatchlistId        id,
-        const std::string& newName
+    CrudResult<void> WatchlistRepo::updateWatchlist(
+        const finance::Watchlist& watchlist
     )
     {
-        auto query = orm::Query{}.where(WatchlistRow::hasId(id));
-
-        const auto existing =
-            _getCrud().getUnique<WatchlistRow>(_getDb(), query);
-
-        if (!existing.has_value())
-        {
-            const auto msg = "Cannot rename watchlist: no watchlist with id '" +
-                             id.toString() + "' exists";
-
-            LOG_ERROR(msg);
-            throw RepositoryException(msg);
-        }
-
-        auto watchlistRow = existing.value();
-        watchlistRow.name = newName;
+        WatchlistRow watchlistRow;
+        watchlistRow.id        = watchlist.getId();
+        watchlistRow.name      = watchlist.getName();
+        watchlistRow.createdAt = watchlist.getCreatedAt();
 
         const auto result = _getCrud().update(_getDb(), watchlistRow);
 
-        if (!result.has_value())
+        if (!result)
         {
-            const auto msg =
-                "Failed to rename watchlist: " + result.error().toString();
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
+            return result.error().convert(
+                "Failed to update watchlist with id: " +
+                watchlist.getId().toString()
+            );
         }
+
+        return {};
     }
 
     /**
@@ -115,57 +124,12 @@ namespace repo
     }
 
     /**
-     * @brief Add a symbol to a watchlist
-     *
-     * @param id
-     * @param symbol
-     */
-    void WatchlistRepo::addSymbol(WatchlistId id, const std::string& symbol)
-    {
-        WatchlistInstrumentRow row;
-        row.watchlistId = id;
-        row.symbol      = symbol;
-
-        const auto result = _getCrud().insert(_getDb(), row);
-
-        if (!result)
-        {
-            const auto msg =
-                "Failed to insert watchlist instrument for symbol '" + symbol +
-                "': " + result.error().toString();
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
-        }
-    }
-
-    /**
-     * @brief Remove a symbol from a watchlist, this is a no-op if the symbol
-     * isn't in the watchlist
-     *
-     * @param id
-     * @param symbol
-     */
-    void WatchlistRepo::removeSymbol(WatchlistId id, const std::string& symbol)
-    {
-        auto query = orm::Query{}.where(
-            WatchlistInstrumentRow::hasWatchlistIdAndSymbol(id, symbol)
-        );
-
-        const auto rows =
-            _getCrud().get<WatchlistInstrumentRow>(_getDb(), query);
-
-        for (const auto& row : rows)
-            _getCrud().deleteByPk(_getDb(), row);
-    }
-
-    /**
      * @brief Get the symbols belonging to a watchlist
      *
      * @param id
-     * @return std::vector<std::string>
+     * @return Set<std::string>
      */
-    std::vector<std::string> WatchlistRepo::_getSymbols(WatchlistId id)
+    Set<std::string> WatchlistRepo::_getSymbols(WatchlistId id)
     {
         auto query =
             orm::Query{}.where(WatchlistInstrumentRow::hasWatchlistId(id));
@@ -173,11 +137,11 @@ namespace repo
         const auto rows =
             _getCrud().get<WatchlistInstrumentRow>(_getDb(), query);
 
-        std::vector<std::string> symbols;
+        Set<std::string> symbols;
         symbols.reserve(rows.size());
 
         for (const auto& row : rows)
-            symbols.push_back(row.symbol.value());
+            symbols.insert(row.symbol.value());
 
         return symbols;
     }

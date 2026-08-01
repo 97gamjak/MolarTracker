@@ -13,10 +13,10 @@ namespace finance
      * @param symbols
      */
     Watchlist::Watchlist(
-        WatchlistId              id,
-        std::string              name,
-        Timestamp                createdAt,
-        std::vector<std::string> symbols
+        WatchlistId      id,
+        std::string      name,
+        Timestamp        createdAt,
+        Set<std::string> symbols
     )
         : _id(id),
           _name(std::move(name)),
@@ -38,16 +38,6 @@ namespace finance
      * @param name
      */
     void Watchlist::setName(const std::string& name) { _name = name; }
-
-    /**
-     * @brief Set the symbols of the watchlist.
-     *
-     * @param symbols
-     */
-    void Watchlist::setSymbols(const std::vector<std::string>& symbols)
-    {
-        _symbols = symbols;
-    }
 
     /**
      * @brief Get the ID of the watchlist.
@@ -73,11 +63,38 @@ namespace finance
     /**
      * @brief Get the symbols of the watchlist.
      *
-     * @return const std::vector<std::string>&
+     * @return const Set<std::string>&
      */
-    const std::vector<std::string>& Watchlist::getSymbols() const
+    const Set<std::string>& Watchlist::getSymbols() const { return _symbols; }
+
+    /**
+     * @brief Add a symbol to the watchlist.
+     *
+     * @param symbol
+     * @return true if the symbol was added, false if it already exists
+     */
+    bool Watchlist::addSymbol(const std::string& symbol)
     {
-        return _symbols;
+        if (_symbols.contains(symbol))
+            return false;
+
+        _symbols.insert(symbol);
+        return true;
+    }
+
+    /**
+     * @brief Remove a symbol from the watchlist.
+     *
+     * @param symbol
+     * @return true if the symbol was removed, false if it did not exist
+     */
+    bool Watchlist::removeSymbol(const std::string& symbol)
+    {
+        if (!_symbols.contains(symbol))
+            return false;
+
+        _symbols.remove(symbol);
+        return true;
     }
 
     /**
