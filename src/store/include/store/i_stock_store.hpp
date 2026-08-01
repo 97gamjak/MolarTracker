@@ -15,7 +15,7 @@ class Connection;   // Forward declaration
 namespace finance
 {
     class Stock;              // forward declaration
-    class TradeFilterParams;  // forward declaration
+    class SecuritiesFilter;   // forward declaration
 }   // namespace finance
 
 namespace store
@@ -64,17 +64,6 @@ namespace store
         ) const = 0;
 
         /**
-         * @brief Get a list of stocks by their instrument IDs
-         *
-         * @param ids The set of instrument IDs to retrieve stocks for
-         * @return finance::Stocks
-         */
-        [[nodiscard]]
-        virtual finance::Stocks getStocks(
-            const IdSet<InstrumentId>& ids
-        ) const = 0;
-
-        /**
          * @brief Get a list of all stocks in the store
          *
          * @return finance::Stocks
@@ -92,7 +81,7 @@ namespace store
          */
         [[nodiscard]]
         virtual finance::Stocks getStocks(
-            const finance::TradeFilterParams& filter
+            const finance::SecuritiesFilter& filter
         ) const = 0;
 
         /**

@@ -7,6 +7,7 @@
 
 #include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "exceptions/base.hpp"
 
 namespace finance
@@ -95,16 +96,27 @@ namespace store
          *
          * @param id
          * @param symbol
+         *
+         * @return WatchlistResult<void> Returns an error if the watchlist does
+         * not exist or if the symbol already exists in the watchlist.
          */
-        virtual void addSymbol(WatchlistId id, const std::string& symbol) = 0;
+        [[nodiscard]]
+        virtual WatchlistResult<void> addSymbol(
+            WatchlistId        id,
+            const std::string& symbol
+        ) = 0;
 
         /**
          * @brief Remove a symbol from a watchlist immediately.
          *
          * @param id
          * @param symbol
+         *
+         * @return WatchlistResult<void> Returns an error if the watchlist does
+         * not exist or if the symbol does not exist in the watchlist.
          */
-        virtual void removeSymbol(
+        [[nodiscard]]
+        virtual WatchlistResult<void> removeSymbol(
             WatchlistId        id,
             const std::string& symbol
         ) = 0;

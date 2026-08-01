@@ -5,6 +5,7 @@
 
 #include "base/base_store.hpp"
 #include "config/id_types.hpp"
+#include "error/finance_error.hpp"
 #include "finance/watchlist.hpp"
 #include "store/i_watchlist_store.hpp"
 
@@ -35,7 +36,8 @@ namespace store
         WatchlistId createWatchlist(const std::string& name) override;
 
         [[nodiscard]]
-        std::optional<finance::Watchlist> getWatchlist(WatchlistId id
+        std::optional<finance::Watchlist> getWatchlist(
+            WatchlistId id
         ) const override;
 
         [[nodiscard]]
@@ -44,11 +46,23 @@ namespace store
         [[nodiscard]]
         const IdIdMap<WatchlistId>& getIdRemap() const override;
 
-        void renameWatchlist(WatchlistId id, const std::string& newName)
-            override;
+        void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) override;
         void deleteWatchlist(WatchlistId id) override;
-        void addSymbol(WatchlistId id, const std::string& symbol) override;
-        void removeSymbol(WatchlistId id, const std::string& symbol) override;
+
+        [[nodiscard]]
+        WatchlistResult<void> addSymbol(
+            WatchlistId        id,
+            const std::string& symbol
+        ) override;
+
+        [[nodiscard]]
+        WatchlistResult<void> removeSymbol(
+            WatchlistId        id,
+            const std::string& symbol
+        ) override;
 
         void commit();
 

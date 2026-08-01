@@ -1,9 +1,8 @@
 #ifndef __CONTROLLER__SRC__CONTROLLER__SIDE_BAR__SECURITIES_CONTROLLER_HPP__
 #define __CONTROLLER__SRC__CONTROLLER__SIDE_BAR__SECURITIES_CONTROLLER_HPP__
 
-#include <optional>
-
 #include <QObject>
+#include <optional>
 
 #include "config/id_types.hpp"
 #include "finance/instrument/stock.hpp"
@@ -11,7 +10,7 @@
 
 namespace finance
 {
-    class TradeFilterParams;   // Forward declaration
+    class SecuritiesFilter;   // Forward declaration
 }   // namespace finance
 
 namespace ui
@@ -24,8 +23,8 @@ namespace ui
 
 namespace store
 {
-    class IStockStore;        // Forward declaration
-    class IWatchlistStore;    // Forward declaration
+    class IStockStore;       // Forward declaration
+    class IWatchlistStore;   // Forward declaration
 }   // namespace store
 
 class QStackedWidget;   // Forward declaration
@@ -122,7 +121,7 @@ namespace controller
             WatchlistId        target
         );
 
-        void _showSecurities(const finance::TradeFilterParams& filter);
+        void _showSecurities(const finance::SecuritiesFilter& filter);
     };
 
 }   // namespace controller

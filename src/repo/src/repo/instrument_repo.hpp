@@ -23,12 +23,7 @@ namespace repo
 
         [[nodiscard]]
         std::vector<finance::Stock> getStocks(
-            const IdSet<InstrumentId>& ids
-        ) override;
-
-        [[nodiscard]]
-        std::vector<finance::Stock> getStocksBySymbols(
-            const std::vector<std::string>& symbols
+            const finance::SecuritiesFilter& filter
         ) override;
 
         [[nodiscard]]
@@ -61,7 +56,7 @@ namespace repo
        private:
         [[nodiscard]]
         std::vector<StockRow> _getStockRows(
-            const IdSet<InstrumentId>& ids = {}
+            const finance::SecuritiesFilter& filter
         );
 
         [[nodiscard]]

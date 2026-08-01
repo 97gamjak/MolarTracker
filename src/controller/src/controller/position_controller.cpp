@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "connections/connection.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/price_cache.hpp"
 #include "finance/transaction/transaction_filter.hpp"
 #include "logging/log_macros.hpp"
@@ -126,7 +127,10 @@ namespace controller
         const auto& instruments   = transactions.securities();
         const auto  instrumentIds = instruments.getBaseInstrumentIds();
 
-        const auto tickers = _stockStore->getStocks(instrumentIds).getTickers();
+        finance::SecuritiesFilter filter;
+        filter.instrumentIds = instrumentIds;
+
+        const auto tickers = _stockStore->getStocks(filter).getTickers();
         for (const auto& ticker : tickers)
             _tickers.insert(ticker);
     }

@@ -1,13 +1,14 @@
 #include "securities_controller.hpp"
 
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QMessageBox>
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMessageBox>
+
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
-#include "finance/instrument/trade_filter_params.hpp"
 #include "finance/watchlist.hpp"
 #include "logging/log_macros.hpp"
 #include "mapper/stock_mapper.hpp"
@@ -33,10 +34,10 @@ namespace controller
      * @param stackedWidget
      */
     SecuritiesSideBarController::SecuritiesSideBarController(
-        QMainWindow*                                    mainWindow,
-        const std::shared_ptr<store::IStockStore>&      stockStore,
-        const std::shared_ptr<store::IWatchlistStore>&  watchlistStore,
-        QStackedWidget*                                 stackedWidget
+        QMainWindow*                                   mainWindow,
+        const std::shared_ptr<store::IStockStore>&     stockStore,
+        const std::shared_ptr<store::IWatchlistStore>& watchlistStore,
+        QStackedWidget*                                stackedWidget
     )
         : SideBarCategoryController(new ui::SecuritiesCategory(), mainWindow),
           _stockOverviewWidget(new ui::StockOverviewWidget()),
@@ -112,12 +113,12 @@ namespace controller
      * @param filter
      */
     void SecuritiesSideBarController::_showSecurities(
-        const finance::TradeFilterParams& filter
+        const finance::SecuritiesFilter& filter
     )
     {
-        const auto stocks =
-            mapper::StockMapper::toStockInfoDrafts(_stockStore->getStocks(filter)
-            );
+        const auto stocks = mapper::StockMapper::toStockInfoDrafts(
+            _stockStore->getStocks(filter)
+        );
 
         _stockOverviewWidget->getModel()->setRows(stocks);
         _stackedWidget->setCurrentWidget(_stockOverviewWidget);
@@ -132,8 +133,7 @@ namespace controller
     {
         _activeWatchlistId = std::nullopt;
 
-        finance::TradeFilterParams filter;
-        filter.setSymbolAllowlist(std::nullopt);
+        finance::SecuritiesFilter filter;
 
         _showSecurities(filter);
     }
@@ -155,8 +155,8 @@ namespace controller
 
         _activeWatchlistId = id;
 
-        finance::TradeFilterParams filter;
-        filter.setSymbolAllowlist(watchlist->getSymbols());
+        finance::SecuritiesFilter filter;
+        filter.symbols = watchlist->getSymbols();
 
         _showSecurities(filter);
     }
@@ -202,9 +202,7 @@ namespace controller
      *
      * @param name
      */
-    void SecuritiesSideBarController::onCreateWatchlist(
-        const std::string& name
-    )
+    void SecuritiesSideBarController::onCreateWatchlist(const std::string& name)
     {
         static_cast<void>(_watchlistStore->createWatchlist(name));
         refresh();
@@ -232,7 +230,7 @@ namespace controller
      * @param newName
      */
     void SecuritiesSideBarController::onRenameWatchlist(
-        WatchlistId         id,
+        WatchlistId        id,
         const std::string& newName
     )
     {
@@ -258,11 +256,11 @@ namespace controller
         else if (action == category->getCreateWatchlistAction())
         {
             const auto name = QInputDialog::getText(
-                                   getMainWindow(),
-                                   "Create Watchlist",
-                                   "Watchlist name:"
+                                  _stackedWidget,
+                                  "Create Watchlist",
+                                  "Watchlist name:"
             )
-                                   .trimmed();
+                                  .trimmed();
 
             if (!name.isEmpty())
                 onCreateWatchlist(name.toStdString());
@@ -291,13 +289,13 @@ namespace controller
         if (action == item->getRenameAction())
         {
             const auto newName = QInputDialog::getText(
-                                      getMainWindow(),
-                                      "Rename Watchlist",
-                                      "Watchlist name:",
-                                      QLineEdit::Normal,
-                                      item->text()
+                                     _stackedWidget,
+                                     "Rename Watchlist",
+                                     "Watchlist name:",
+                                     QLineEdit::Normal,
+                                     item->text()
             )
-                                      .trimmed();
+                                     .trimmed();
 
             if (!newName.isEmpty())
                 onRenameWatchlist(item->getId(), newName.toStdString());
@@ -305,7 +303,7 @@ namespace controller
         else if (action == item->getDeleteAction())
         {
             const auto confirmed = QMessageBox::question(
-                getMainWindow(),
+                _stackedWidget,
                 "Delete Watchlist",
                 "Delete watchlist '" + item->text() +
                     "'? This cannot be undone."
@@ -316,9 +314,7 @@ namespace controller
         }
         else
         {
-            throw std::logic_error(
-                "Watchlist context menu action not handled"
-            );
+            throw std::logic_error("Watchlist context menu action not handled");
         }
     }
 

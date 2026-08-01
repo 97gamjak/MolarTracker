@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "exceptions/out_of_range.hpp"
 #include "map.hpp"
 
 /**
@@ -183,6 +184,26 @@ template <typename Key, typename Value, typename Hash>
 void Map<Key, Value, Hash>::clear()
 {
     _items.clear();
+}
+
+/**
+ * @brief Returns the first key-value pair in the map.
+ *
+ * @details This method returns a pair consisting of the first key and its
+ * associated value in the map. If the map is empty, this method will throw an
+ * exception. The order of elements in an unordered_map is not guaranteed, so
+ * "first" refers to the first element encountered during iteration.
+ *
+ * @return A pair containing the first key and its associated value in the map.
+ */
+template <typename Key, typename Value, typename Hash>
+std::pair<Key, Value> Map<Key, Value, Hash>::front() const
+{
+    if (_items.empty())
+        throw OutOfRange("Map is empty");
+
+    const auto& firstItem = *_items.begin();
+    return {firstItem.first, firstItem.second};
 }
 
 #endif   // __COMMON__INCLUDE__COMMON__CONTAINER__MAP_TPP__

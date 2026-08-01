@@ -3,9 +3,9 @@
 #include <QMenu>
 #include <QString>
 
+#include "common/qt_helpers.hpp"
 #include "ui/side_bar/all_securities_item.hpp"
 #include "ui/side_bar/watchlist_item.hpp"
-#include "utils/qt_helpers.hpp"
 
 namespace ui
 {
@@ -17,7 +17,7 @@ namespace ui
         : Category("Securities", SideBarItemType::SecuritiesCategory),
           _createAction(nullptr),
           _createWatchlistAction(nullptr),
-          _allSecuritiesItem(utils::makeQChild<AllSecuritiesItem>())
+          _allSecuritiesItem(new AllSecuritiesItem())
     {
         // permanent row 0, always present, never rebuilt by clearWatchlists()
         appendRow(_allSecuritiesItem);
@@ -32,7 +32,7 @@ namespace ui
      */
     void SecuritiesCategory::addWatchlist(WatchlistId id, const QString& name)
     {
-        auto* watchlistItem = utils::makeQChild<WatchlistItem>(id, name);
+        auto* watchlistItem = common::makeQChild<WatchlistItem>(id, name);
         appendRow(watchlistItem);
     }
 

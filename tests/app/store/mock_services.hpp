@@ -154,35 +154,44 @@ namespace tests
         int _nextInstrumentId = 1;
 
        public:
-        [[nodiscard]] std::vector<std::string> getTickers() override
+        [[nodiscard]]
+        std::vector<std::string> getTickers() override
         {
             return {};
         }
 
-        [[nodiscard]] std::vector<finance::Stock> getStocks(
+        [[nodiscard]]
+        std::vector<finance::Stock> getStocks(
+            const finance::SecuritiesFilter& /*filter*/
+        ) override
+        {
+            return {};
+        }
+
+        [[nodiscard]]
+        finance::Options getOptions() override
+        {
+            return {};
+        }
+
+        [[nodiscard]]
+        finance::Options getOptions(
             const IdSet<InstrumentId>& /*ids*/
         ) override
         {
             return {};
         }
 
-        [[nodiscard]] finance::Options getOptions() override { return {}; }
-
-        [[nodiscard]] finance::Options getOptions(
-            const IdSet<InstrumentId>& /*ids*/
-        ) override
-        {
-            return {};
-        }
-
-        [[nodiscard]] std::optional<finance::Stock> getStock(
+        [[nodiscard]]
+        std::optional<finance::Stock> getStock(
             const std::string& /*ticker*/
         ) override
         {
             return std::nullopt;
         }
 
-        [[nodiscard]] finance::StockInsertionResult addStock(
+        [[nodiscard]]
+        finance::StockInsertionResult addStock(
             const finance::Stock& /*stock*/
         ) override
         {
@@ -193,7 +202,8 @@ namespace tests
             };
         }
 
-        [[nodiscard]] finance::OptionInsertionResult addOption(
+        [[nodiscard]]
+        finance::OptionInsertionResult addOption(
             const finance::Option& /*stock*/
         ) override
         {
@@ -204,12 +214,14 @@ namespace tests
             };
         }
 
-        [[nodiscard]] bool stockExists(const std::string& ticker) override
+        [[nodiscard]]
+        bool stockExists(const std::string& ticker) override
         {
             return stocksInDb.contains(ticker);
         }
 
-        [[nodiscard]] bool optionExists(const finance::Option& option) override
+        [[nodiscard]]
+        bool optionExists(const finance::Option& option) override
         {
             return optionsInDb.contains(option.getName());
         }
@@ -281,18 +293,19 @@ namespace tests
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Watchlist> preloadedWatchlists;
-        int                              createCallCount     = 0;
-        int                              renameCallCount     = 0;
-        int                              deleteCallCount     = 0;
-        int                              addSymbolCallCount  = 0;
-        int                              removeSymbolCallCount = 0;
+        int                             createCallCount       = 0;
+        int                             renameCallCount       = 0;
+        int                             deleteCallCount       = 0;
+        int                             addSymbolCallCount    = 0;
+        int                             removeSymbolCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
         int _nextId = 1;
 
        public:
-        [[nodiscard]] WatchlistId createWatchlist(const std::string& /*name*/
+        [[nodiscard]] WatchlistId createWatchlist(
+            const std::string& /*name*/
         ) override
         {
             createCallCount++;
@@ -305,8 +318,10 @@ namespace tests
             return preloadedWatchlists;
         }
 
-        void renameWatchlist(WatchlistId id, const std::string& newName)
-            override
+        void renameWatchlist(
+            WatchlistId        id,
+            const std::string& newName
+        ) override
         {
             renameCallCount++;
             for (auto& watchlist : preloadedWatchlists)
@@ -321,8 +336,7 @@ namespace tests
             deleteCallCount++;
             std::erase_if(
                 preloadedWatchlists,
-                [id](const auto& watchlist)
-                { return watchlist.getId() == id; }
+                [id](const auto& watchlist) { return watchlist.getId() == id; }
             );
         }
 

@@ -7,8 +7,8 @@
 #include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
-#include "finance/instrument/trade_filter_params.hpp"
 #include "service/i_instrument_service.hpp"
 #include "store/base/base_store.hpp"
 #include "store/i_stock_store.hpp"
@@ -52,15 +52,11 @@ namespace store
         StockStoreResult addStock(finance::Stock stock) override;
 
         [[nodiscard]]
-        finance::Stocks getStocks(
-            const IdSet<InstrumentId>& ids
-        ) const override;
-
-        [[nodiscard]]
         finance::Stocks getStocks() const override;
 
         [[nodiscard]]
-        finance::Stocks getStocks(const finance::TradeFilterParams& filter
+        finance::Stocks getStocks(
+            const finance::SecuritiesFilter& filter
         ) const override;
 
         [[nodiscard]]

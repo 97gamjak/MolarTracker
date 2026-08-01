@@ -10,6 +10,11 @@ namespace repo
     class IInstrumentRepo;   // forward declaration
 }   // namespace repo
 
+namespace finance
+{
+    struct SecuritiesFilter;   // forward declaration
+}   // namespace finance
+
 namespace service
 {
 
@@ -32,7 +37,7 @@ namespace service
 
         [[nodiscard]]
         std::vector<finance::Stock> getStocks(
-            const IdSet<InstrumentId>& ids
+            const finance::SecuritiesFilter& filter
         ) override;
 
         [[nodiscard]]

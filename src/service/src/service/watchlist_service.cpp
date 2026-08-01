@@ -21,12 +21,15 @@ namespace service
     /**
      * @brief Create a new, empty watchlist
      *
-     * @param name
+     * @param watchlist The watchlist object containing the name and other
+     * details of the new watchlist
      * @return WatchlistId
      */
-    WatchlistId WatchlistService::createWatchlist(const std::string& name)
+    WatchlistId WatchlistService::createWatchlist(
+        const finance::Watchlist& watchlist
+    )
     {
-        return _watchlistRepo->createWatchlist(name);
+        return _watchlistRepo->createWatchlist(watchlist);
     }
 
     /**
@@ -40,17 +43,14 @@ namespace service
     }
 
     /**
-     * @brief Rename an existing watchlist
+     * @brief Update an existing watchlist
      *
-     * @param id
-     * @param newName
+     * @param watchlist The watchlist object containing the updated details of
+     * the watchlist
      */
-    void WatchlistService::renameWatchlist(
-        WatchlistId         id,
-        const std::string& newName
-    )
+    void WatchlistService::updateWatchlist(const finance::Watchlist& watchlist)
     {
-        _watchlistRepo->renameWatchlist(id, newName);
+        _watchlistRepo->updateWatchlist(watchlist);
     }
 
     /**
@@ -61,31 +61,6 @@ namespace service
     void WatchlistService::deleteWatchlist(WatchlistId id)
     {
         _watchlistRepo->deleteWatchlist(id);
-    }
-
-    /**
-     * @brief Add a symbol to a watchlist
-     *
-     * @param id
-     * @param symbol
-     */
-    void WatchlistService::addSymbol(WatchlistId id, const std::string& symbol)
-    {
-        _watchlistRepo->addSymbol(id, symbol);
-    }
-
-    /**
-     * @brief Remove a symbol from a watchlist
-     *
-     * @param id
-     * @param symbol
-     */
-    void WatchlistService::removeSymbol(
-        WatchlistId         id,
-        const std::string& symbol
-    )
-    {
-        _watchlistRepo->removeSymbol(id, symbol);
     }
 
 }   // namespace service

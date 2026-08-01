@@ -32,13 +32,22 @@
     X(UnknownOption)            \
     GENERIC_ERRORS(X)
 
+#define WATCHLIST_ERROR_TYPE_LIST(X) \
+    X(WatchlistNotFound)             \
+    X(WatchlistAlreadyExists)        \
+    X(WatchlistSymbolAlreadyExists)  \
+    X(WatchlistSymbolNotFound)       \
+    GENERIC_ERRORS(X)
+
 MSTD_ENUM(FinanceErrorType, std::uint8_t, FINANCE_ERROR_TYPE_LIST);
 MSTD_ENUM(YFinanceErrorType, std::uint8_t, YFINANCE_ERROR_TYPE_LIST);
 MSTD_ENUM(PnLErrorType, std::uint8_t, PNL_ERROR_TYPE_LIST);
+MSTD_ENUM(WatchlistErrorType, std::uint8_t, WATCHLIST_ERROR_TYPE_LIST);
 
-using FinanceError  = Error<FinanceErrorType>;
-using YFinanceError = Error<YFinanceErrorType>;
-using PnLError      = Error<PnLErrorType>;
+using FinanceError   = Error<FinanceErrorType>;
+using YFinanceError  = Error<YFinanceErrorType>;
+using PnLError       = Error<PnLErrorType>;
+using WatchlistError = Error<WatchlistErrorType>;
 
 template <typename T>
 using FinanceResult = Result<T, FinanceError>;
@@ -48,6 +57,9 @@ using YFinanceResult = Result<T, YFinanceError>;
 
 template <typename T>
 using PnLResult = Result<T, PnLError>;
+
+template <typename T>
+using WatchlistResult = Result<T, WatchlistError>;
 
 /**
  * @brief Converts an error of type HttpError to an error of type YFinanceError,

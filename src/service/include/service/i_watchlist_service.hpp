@@ -28,8 +28,9 @@ namespace service
          * @param name The display name of the new watchlist
          * @return WatchlistId The ID of the newly created watchlist
          */
-        [[nodiscard]] virtual WatchlistId createWatchlist(
-            const std::string& name
+        [[nodiscard]]
+        virtual WatchlistId createWatchlist(
+            const finance::Watchlist& watchlist
         ) = 0;
 
         /**
@@ -37,19 +38,15 @@ namespace service
          *
          * @return std::vector<finance::Watchlist>
          */
-        [[nodiscard]] virtual std::vector<finance::Watchlist> getAllWatchlists(
-        ) const = 0;
+        [[nodiscard]]
+        virtual std::vector<finance::Watchlist> getAllWatchlists() const = 0;
 
         /**
-         * @brief Rename an existing watchlist
+         * @brief Update an existing watchlist
          *
-         * @param id
-         * @param newName
+         * @param watchlist The watchlist to update
          */
-        virtual void renameWatchlist(
-            WatchlistId        id,
-            const std::string& newName
-        ) = 0;
+        virtual void updateWatchlist(const finance::Watchlist& watchlist) = 0;
 
         /**
          * @brief Delete a watchlist and all of its symbol entries
@@ -57,25 +54,6 @@ namespace service
          * @param id
          */
         virtual void deleteWatchlist(WatchlistId id) = 0;
-
-        /**
-         * @brief Add a symbol to a watchlist
-         *
-         * @param id
-         * @param symbol
-         */
-        virtual void addSymbol(WatchlistId id, const std::string& symbol) = 0;
-
-        /**
-         * @brief Remove a symbol from a watchlist
-         *
-         * @param id
-         * @param symbol
-         */
-        virtual void removeSymbol(
-            WatchlistId        id,
-            const std::string& symbol
-        ) = 0;
     };
 
 }   // namespace service

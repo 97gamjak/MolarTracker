@@ -133,7 +133,7 @@ namespace ui
         if (!index.isValid())
             return;
 
-        const auto sourceIndex = _proxy->mapToSource(index);
+        const auto    sourceIndex = _proxy->mapToSource(index);
         const QString ticker =
             _model
                 ->data(
@@ -151,7 +151,7 @@ namespace ui
         // before the menu below is built
         emit aboutToShowContextMenuForSymbol(symbol);
 
-        auto* menu    = utils::makeQChild<QMenu>(this);
+        auto* menu    = common::makeQChild<QMenu>(this);
         auto* addMenu = menu->addMenu("Add to Watchlist");
 
         QMap<QAction*, WatchlistId> addActions;
@@ -205,9 +205,7 @@ namespace ui
      * @param id The active watchlist, or nullopt if "All Securities" is
      * active.
      */
-    void StockOverviewWidget::setActiveWatchlist(
-        std::optional<WatchlistId> id
-    )
+    void StockOverviewWidget::setActiveWatchlist(std::optional<WatchlistId> id)
     {
         _activeWatchlistId = id;
     }

@@ -8,6 +8,7 @@
 #include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
 #include "repo/instrument_repo.hpp"
 #include "repo/migration/migration_runner.hpp"

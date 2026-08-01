@@ -16,23 +16,21 @@ namespace repo
        public:
         using BaseRepo::BaseRepo;
 
-        [[nodiscard]] WatchlistId createWatchlist(const std::string& name
+        [[nodiscard]]
+        WatchlistId createWatchlist(
+            const finance::Watchlist& watchlist
         ) override;
 
-        [[nodiscard]] std::vector<finance::Watchlist> getAllWatchlists(
-        ) override;
+        [[nodiscard]]
+        std::vector<finance::Watchlist> getAllWatchlists() override;
 
-        void renameWatchlist(WatchlistId id, const std::string& newName)
-            override;
+        void updateWatchlist(const finance::Watchlist& watchlist) override;
 
         void deleteWatchlist(WatchlistId id) override;
 
-        void addSymbol(WatchlistId id, const std::string& symbol) override;
-
-        void removeSymbol(WatchlistId id, const std::string& symbol) override;
-
        private:
-        [[nodiscard]] std::vector<std::string> _getSymbols(WatchlistId id);
+        [[nodiscard]]
+        std::vector<std::string> _getSymbols(WatchlistId id);
     };
 
 }   // namespace repo

@@ -6,8 +6,8 @@
 
 #include "common/finance.hpp"
 #include "config/id_types.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
-#include "finance/instrument/trade_filter_params.hpp"
 #include "mock_services.hpp"
 #include "store/stock_store.hpp"
 
@@ -140,10 +140,7 @@ TEST_F(StockStoreTest, GetStocksWithNulloptAllowlistReturnsAll)
     static_cast<void>(_store->addStock(makeStock("AAPL")));
     static_cast<void>(_store->addStock(makeStock("MSFT")));
 
-    finance::TradeFilterParams filter;
-    filter.setSymbolAllowlist(std::nullopt);
-
-    EXPECT_EQ(_store->getStocks(filter).size(), _store->getStocks().size());
+    EXPECT_EQ(_store->getStocks({}).size(), _store->getStocks().size());
 }
 
 TEST_F(StockStoreTest, GetStocksWithAllowlistReturnsOnlyMatchingSymbols)
@@ -151,8 +148,8 @@ TEST_F(StockStoreTest, GetStocksWithAllowlistReturnsOnlyMatchingSymbols)
     static_cast<void>(_store->addStock(makeStock("AAPL")));
     static_cast<void>(_store->addStock(makeStock("MSFT")));
 
-    finance::TradeFilterParams filter;
-    filter.setSymbolAllowlist(std::vector<std::string>{"AAPL"});
+    finance::SecuritiesFilter filter;
+    filter.symbols = std::vector<std::string>{"AAPL"};
 
     const auto stocks = _store->getStocks(filter);
 
@@ -164,8 +161,8 @@ TEST_F(StockStoreTest, GetStocksWithAllowlistOfUnknownSymbolsReturnsEmpty)
 {
     static_cast<void>(_store->addStock(makeStock("AAPL")));
 
-    finance::TradeFilterParams filter;
-    filter.setSymbolAllowlist(std::vector<std::string>{"UNKNOWN"});
+    finance::SecuritiesFilter filter;
+    filter.symbols = std::vector<std::string>{"UNKNOWN"};
 
     EXPECT_TRUE(_store->getStocks(filter).empty());
 }
@@ -174,8 +171,8 @@ TEST_F(StockStoreTest, GetStocksWithEmptyAllowlistVectorReturnsEmpty)
 {
     static_cast<void>(_store->addStock(makeStock("AAPL")));
 
-    finance::TradeFilterParams filter;
-    filter.setSymbolAllowlist(std::vector<std::string>{});
+    finance::SecuritiesFilter filter;
+    filter.symbols = std::vector<std::string>{};
 
     EXPECT_TRUE(_store->getStocks(filter).empty());
 }

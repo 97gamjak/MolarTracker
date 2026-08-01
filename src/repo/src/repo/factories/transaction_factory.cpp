@@ -263,9 +263,7 @@ namespace repo
             orm::WhereExpr idWhere = orm::makeEmptyWhere();
 
             for (const auto &transactionId : filter.transactionIds)
-            {
                 idWhere |= TransactionRow::hasTransactionId(transactionId);
-            }
 
             where &= idWhere;
         }
@@ -275,9 +273,7 @@ namespace repo
             orm::WhereExpr posIdWhere = orm::makeEmptyWhere();
 
             for (const auto &positionId : filter.positionIds)
-            {
                 posIdWhere |= TradeLegRow::hasPosition(positionId);
-            }
 
             where &= posIdWhere;
         }
