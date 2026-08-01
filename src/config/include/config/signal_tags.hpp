@@ -64,8 +64,6 @@ struct OnStoreItemRemoved
  * event when a store is committed, allowing other parts of the application to
  * react to the commit event, such as updating the UI or saving changes to the
  * database.
- *
- * @tparam IdType
  */
 struct OnStoreCommit
 {
