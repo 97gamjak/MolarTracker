@@ -1,5 +1,6 @@
 #include "ui/help/help_dialog.hpp"
 
+#include <QFile>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -9,6 +10,9 @@
 #include <QVBoxLayout>
 
 #include "common/qt_helpers.hpp"
+#include "logging/log_macros.hpp"
+
+REGISTER_LOG_CATEGORY("UI.Help.HelpDialog")
 
 using common::makeQChild;
 
@@ -22,8 +26,13 @@ namespace
     QString buildHelpHtml()
     {
         QFile file(":/help/settings.html");
-        file.open(QIODevice::ReadOnly);
-        return QString::fromUtf8(file.readAll());
+        if (file.open(QIODevice::ReadOnly))
+            return QString::fromUtf8(file.readAll());
+
+        LOG_ERROR("Failed to load help content from resource file.");
+        return "<html><body><h1>Help Content Not Found</h1><p>The help content "
+               "could not be loaded. Please ensure that the resource file is "
+               "available.</p></body></html>";
     }
 }   // namespace
 
