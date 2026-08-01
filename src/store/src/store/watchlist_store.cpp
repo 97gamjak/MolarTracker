@@ -262,6 +262,7 @@ namespace store
         if (entry->state == StoreState::Clean)
         {
             _removeEntry(entry->value.getId());
+            return;
         }
 
         _updateEntry(entry->value, StoreState::Deleted);
