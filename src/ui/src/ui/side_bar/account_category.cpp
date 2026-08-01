@@ -71,9 +71,6 @@ namespace ui
      *
      * @return QAction*
      */
-    [[nodiscard]] QAction* AccountCategory::getCreateAction() const
-    {
-        return _createAction;
-    }
+    QAction* AccountCategory::getCreateAction() const { return _createAction; }
 
 }   // namespace ui
