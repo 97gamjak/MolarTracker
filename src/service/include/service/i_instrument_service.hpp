@@ -16,6 +16,7 @@ namespace finance
     class Options;                  // forward declaration
     class Option;                   // forward declaration
     struct OptionInsertionResult;   // forward declaration
+    struct SecuritiesFilter;        // forward declaration
 
 }   // namespace finance
 
@@ -42,12 +43,13 @@ namespace service
         /**
          * @brief get a list of all stocks in the database
          *
-         * @param ids The set of instrument IDs to retrieve stocks for
+         * @param filter The filter parameters to restrict the query a specific
+         * set of stocks
          * @return std::vector<finance::Stock>
          */
         [[nodiscard]]
         virtual std::vector<finance::Stock> getStocks(
-            const IdSet<InstrumentId>& ids
+            const finance::SecuritiesFilter& filter
         ) = 0;
 
         /**

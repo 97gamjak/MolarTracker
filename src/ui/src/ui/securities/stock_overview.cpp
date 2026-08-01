@@ -6,6 +6,8 @@
 #include <qtableview.h>
 
 #include <QLineEdit>
+#include <QMap>
+#include <QMenu>
 
 #include "common/qt_helpers.hpp"
 #include "ui/securities/stock_info_model.hpp"
@@ -64,6 +66,7 @@ namespace ui
         _table->setEditTriggers(QAbstractItemView::NoEditTriggers);
         _table->setAlternatingRowColors(true);
         _table->verticalHeader()->hide();
+        _table->setContextMenuPolicy(Qt::CustomContextMenu);
 
         auto* hdr = _table->horizontalHeader();
         hdr->setSortIndicatorShown(true);
@@ -80,6 +83,13 @@ namespace ui
             &QItemSelectionModel::selectionChanged,
             this,
             &StockOverviewWidget::_onSelectionChanged
+        );
+
+        connect(
+            _table,
+            &QTableView::customContextMenuRequested,
+            this,
+            &StockOverviewWidget::_showContextMenu
         );
     }
 
@@ -108,6 +118,64 @@ namespace ui
     }
 
     /**
+     * @brief Show the context menu for a right-clicked security row, letting
+     * the user add/remove the symbol to/from a watchlist. Watchlist data is
+     * never fetched from a store here — the widget only ever consumes data
+     * the controller supplies via setAvailableWatchlists()/
+     * setActiveWatchlist(), keeping the widget store-agnostic.
+     *
+     * @param pos The position of the right-click, in the table's viewport
+     * coordinates.
+     */
+    void StockOverviewWidget::_showContextMenu(const QPoint& pos)
+    {
+        const auto index = _table->indexAt(pos);
+        if (!index.isValid())
+            return;
+
+        const auto    sourceIndex = _proxy->mapToSource(index);
+        const QString ticker =
+            _model
+                ->data(
+                    _model->index(
+                        sourceIndex.row(),
+                        StockInfoTableModel::getTickerColumn()
+                    ),
+                    Qt::DisplayRole
+                )
+                .toString();
+        const auto symbol = ticker.toStdString();
+
+        // synchronous "pull": lets the controller refresh
+        // _availableWatchlists/_activeWatchlistId with up-to-date data
+        // before the menu below is built
+        emit aboutToShowContextMenuForSymbol(symbol);
+
+        auto* menu    = common::makeQChild<QMenu>(this);
+        auto* addMenu = menu->addMenu("Add to Watchlist");
+
+        QMap<QAction*, WatchlistId> addActions;
+        for (const auto& [id, name] : _availableWatchlists)
+            addActions[addMenu->addAction(name)] = id;
+
+        QAction* removeAction = nullptr;
+        if (_activeWatchlistId)
+            removeAction = menu->addAction("Remove from current watchlist");
+
+        if (menu->actions().isEmpty())
+            return;
+
+        QAction* chosen = menu->exec(_table->viewport()->mapToGlobal(pos));
+        if (chosen == nullptr)
+            return;
+
+        if (addActions.contains(chosen))
+            emit addToWatchlistRequested(symbol, addActions[chosen]);
+        else if (chosen == removeAction && _activeWatchlistId)
+            emit removeFromWatchlistRequested(symbol, *_activeWatchlistId);
+    }
+
+    /**
      * @brief Get the model for displaying stock information.
      *
      * @return StockInfoTableModel* The model for displaying stock information.
@@ -115,6 +183,31 @@ namespace ui
     StockInfoTableModel* StockOverviewWidget::getModel() const
     {
         return _model;
+    }
+
+    /**
+     * @brief Set the watchlists available in the "Add to Watchlist" context
+     * menu submenu.
+     *
+     * @param watchlists Pairs of (id, display name)
+     */
+    void StockOverviewWidget::setAvailableWatchlists(
+        const std::vector<std::pair<WatchlistId, QString>>& watchlists
+    )
+    {
+        _availableWatchlists = watchlists;
+    }
+
+    /**
+     * @brief Set the watchlist currently filtering the view, controlling
+     * whether "Remove from current watchlist" is shown in the context menu.
+     *
+     * @param id The active watchlist, or nullopt if "All Securities" is
+     * active.
+     */
+    void StockOverviewWidget::setActiveWatchlist(std::optional<WatchlistId> id)
+    {
+        _activeWatchlistId = id;
     }
 
 }   // namespace ui

@@ -15,8 +15,8 @@ namespace repo
      * @return finance::Watchlist
      */
     finance::Watchlist WatchlistFactory::toWatchlistDomain(
-        const WatchlistRow&             watchlistRow,
-        const std::vector<std::string>& symbols
+        const WatchlistRow&     watchlistRow,
+        const Set<std::string>& symbols
     )
     {
         finance::Watchlist watchlist{

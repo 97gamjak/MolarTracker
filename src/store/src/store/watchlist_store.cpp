@@ -57,24 +57,20 @@ namespace store
                 {
                     auto       newEntry = entry;
                     const auto oldId    = newEntry.value.getId();
-                    const auto idResult = _watchlistService->createWatchlist(
-                        newEntry.value.getName()
-                    );
+                    const auto id =
+                        _watchlistService->createWatchlist(newEntry.value);
 
-                    if (!idResult)
+                    if (!id)
                     {
                         throw WatchlistStoreException(
                             std::format(
-                                "Failed to add watchlist '{}' to database: {}",
-                                newEntry.value.getName(),
-                                idResult.error().toString()
+                                "Failed to create watchlist '{}' in database",
+                                newEntry.value.getName()
                             )
                         );
                     }
 
-                    const auto id = idResult.value();
-
-                    newEntry.value.setId(id);
+                    newEntry.value.setId(id.value());
 
                     const auto result = _commitEntry(oldId, newEntry);
 
@@ -95,13 +91,51 @@ namespace store
                     break;
                 }
                 case StoreState::Modified:
+                {
+                    const auto result =
+                        _watchlistService->updateWatchlist(entry.value);
+
+                    if (!result)
+                    {
+                        throw WatchlistStoreException(
+                            std::format(
+                                "Failed to update watchlist '{}' in database",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    if (_commitEntry(entry.value.getId(), entry) !=
+                        StoreResult::Ok)
+                    {
+                        throw WatchlistStoreException(
+                            std::format(
+                                "Failed to update cached watchlist '{}' after "
+                                "update",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    break;
+                }
                 case StoreState::Deleted:
                 {
-                    throw WatchlistStoreException(
-                        "Store state " +
-                        std::to_string(static_cast<int>(entry.state)) +
-                        " not supported yet"
-                    );
+                    _watchlistService->deleteWatchlist(entry.value.getId());
+
+                    if (_commitEntry(entry.value.getId(), entry) !=
+                        StoreResult::Ok)
+                    {
+                        throw WatchlistStoreException(
+                            std::format(
+                                "Failed to update cached watchlist '{}' after "
+                                "deletion",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    break;
                 }
             }
         }
@@ -165,6 +199,202 @@ namespace store
     const IdIdMap<WatchlistId>& WatchlistStore::getIdRemap() const
     {
         return _getIdRemap();
+    }
+
+    /**
+     * @brief Rename an existing watchlist.
+     *
+     * @param id
+     * @param newName
+     */
+    void WatchlistStore::renameWatchlist(
+        WatchlistId        id,
+        const std::string& newName
+    )
+    {
+        auto watchlist = getWatchlist(id);
+        if (!watchlist)
+            throw WatchlistStoreException(
+                "Watchlist not found: " + id.toString()
+            );
+
+        watchlist->setName(newName);
+
+        const auto newState = watchlist->getId() == WatchlistId::invalid()
+                                  ? StoreState::New
+                                  : StoreState::Modified;
+
+        if (_updateEntry(watchlist.value(), newState) != StoreResult::Ok)
+        {
+            throw WatchlistStoreException(
+                "Failed to update cached watchlist after rename"
+            );
+        }
+    }
+
+    /**
+     * @brief Delete a watchlist and all of its symbol entries.
+     *
+     * @param id
+     */
+    void WatchlistStore::deleteWatchlist(WatchlistId id)
+    {
+        // TODO(07gamjak): this does not really work right now and should also
+        // not be persisted immediately
+        Options options{.filter = HasWatchlistId(id)};
+
+        auto entry = _getEntry(options);
+
+        if (!entry.has_value())
+        {
+            throw WatchlistStoreException(
+                "Watchlist not found: " + id.toString()
+            );
+        }
+
+        if (entry->state == StoreState::Deleted)
+        {
+            throw WatchlistStoreException(
+                "Watchlist already marked for deletion: " + id.toString()
+            );
+        }
+
+        if (entry->state == StoreState::Clean)
+        {
+            _removeEntry(entry->value.getId());
+            return;
+        }
+
+        _updateEntry(entry->value, StoreState::Deleted);
+    }
+
+    /**
+     * @brief Add a symbol to a watchlist.
+     *
+     * @param id
+     * @param symbol
+     *
+     * @return WatchlistResult<void> Returns an error if the watchlist does not
+     * exist or if the symbol already exists in the watchlist.
+     */
+    WatchlistResult<void> WatchlistStore::addSymbol(
+        WatchlistId        id,
+        const std::string& symbol
+    )
+    {
+        Options options{
+            .filter   = HasWatchlistId(id),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        auto entry = _getEntry(options);
+
+        if (!entry.has_value())
+        {
+            const auto error = WatchlistError(
+                WatchlistErrorType::WatchlistNotFound,
+                "Watchlist not found: " + id.toString()
+            );
+
+            LOG_ERROR(error.toString());
+            return error;
+        }
+
+        if (!entry->value.addSymbol(symbol))
+        {
+            const auto error = WatchlistError(
+                WatchlistErrorType::WatchlistSymbolAlreadyExists,
+                "Symbol '" + symbol + "' already exists in watchlist '" +
+                    entry->value.getName() + "'"
+            );
+
+            LOG_ERROR(error.toString());
+            return error;
+        }
+
+        // only update the entries state if it was previously clean, otherwise
+        // it is already marked as modified or new and will be committed. If it
+        // is deleted, we should never reach this point since we exclude deleted
+        // entries in the options above.
+        const auto newState = entry->state == StoreState::Clean
+                                  ? StoreState::Modified
+                                  : entry->state;
+
+        if (_updateEntry(entry->value, newState) != StoreResult::Ok)
+        {
+            const auto error = WatchlistError(
+                WatchlistErrorType::WatchlistSymbolAlreadyExists,
+                "Failed to update cached watchlist after addSymbol"
+            );
+
+            LOG_ERROR(error.toString());
+            return error;
+        }
+
+        return {};
+    }
+
+    /**
+     * @brief Remove a symbol from a watchlist.
+     *
+     * @param id
+     * @param symbol
+     *
+     * @return WatchlistResult<void> Returns an error if the watchlist does not
+     * exist or if the symbol does not exist in the watchlist.
+     */
+    WatchlistResult<void> WatchlistStore::removeSymbol(
+        WatchlistId        id,
+        const std::string& symbol
+    )
+    {
+        const auto options = Options{
+            .filter   = HasWatchlistId(id),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        auto watchlist = _getEntry(options);
+
+        if (!watchlist.has_value())
+        {
+            const auto error = WatchlistError(
+                WatchlistErrorType::WatchlistNotFound,
+                "Watchlist not found: " + id.toString()
+            );
+            LOG_ERROR(error.toString());
+            return error;
+        }
+
+        if (!watchlist->value.removeSymbol(symbol))
+        {
+            const auto error = WatchlistError(
+                WatchlistErrorType::WatchlistSymbolNotFound,
+                "Symbol '" + symbol + "' not found in watchlist '" +
+                    watchlist->value.getName() + "'"
+            );
+            LOG_ERROR(error.toString());
+            return error;
+        }
+
+        // only update the entries state if it was previously clean, otherwise
+        // it is already marked as modified or new and will be committed. If it
+        // is deleted, we should never reach this point since we exclude deleted
+        // entries in the options above.
+        const auto newState = watchlist->state == StoreState::Clean
+                                  ? StoreState::Modified
+                                  : watchlist->state;
+
+        if (_updateEntry(watchlist->value, newState) != StoreResult::Ok)
+        {
+            const auto error = WatchlistError(
+                WatchlistErrorType::WatchlistSymbolNotFound,
+                "Failed to update cached watchlist after removeSymbol"
+            );
+            LOG_ERROR(error.toString());
+            return error;
+        }
+
+        return {};
     }
 
     /**

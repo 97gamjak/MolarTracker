@@ -15,6 +15,8 @@ namespace finance
     class Stocks : public IdObjectMap<Stock>
     {
        public:
+        using IdObjectMap<Stock>::IdObjectMap;
+
         [[nodiscard]] Set<std::string> getTickers() const;
     };
 }   // namespace finance

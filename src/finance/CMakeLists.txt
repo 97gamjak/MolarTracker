@@ -34,7 +34,7 @@ add_library(molartracker_finance STATIC
     ${SOURCE_DIR}/instrument/options.cpp
     ${SOURCE_DIR}/instrument/stock.cpp
     ${SOURCE_DIR}/instrument/stocks.cpp
-    ${SOURCE_DIR}/instrument/trade_filter_params.cpp
+    ${SOURCE_DIR}/instrument/securities_filter.cpp
 
     ${SOURCE_DIR}/account/account.cpp
     ${SOURCE_DIR}/account/accounts.cpp

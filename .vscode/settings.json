@@ -139,7 +139,8 @@
         "remappings",
         "TSLA",
         "txrepo",
-        "unpolish"
+        "unpolish",
+        "watchlists"
     ],
     "files.watcherExclude": {
         "**/.build/**": true,

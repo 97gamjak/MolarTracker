@@ -43,9 +43,11 @@ class Map : public Iterable<std::unordered_map<Key, Value, Hash>>
     [[nodiscard]] std::vector<Value>            getValues() const;
 
     void clear();
+
+    std::pair<Key, Value> front() const;
 };
 
-#ifndef __UTILS__INCLUDE__UTILS__CONTAINER__MAP_TPP__
+#ifndef __COMMON__INCLUDE__COMMON__CONTAINER__MAP_TPP__
 #include "map.tpp"
 #endif
 

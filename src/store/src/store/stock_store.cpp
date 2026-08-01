@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <format>
 #include <utility>
-#include <vector>
 
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"
@@ -191,16 +190,19 @@ namespace store
     finance::Stocks StockStore::getStocks() const { return getStocks({}); }
 
     /**
-     * @brief Get a list of all stocks in the store
+     * @brief Get a list of stocks restricted by the given filter parameters
+     * (e.g. a watchlist's symbol allowlist). A nullopt allowlist returns all
+     * stocks.
      *
-     * @param ids The set of instrument IDs to retrieve stocks for
+     * @param filter
      * @return finance::Stocks
      */
-    finance::Stocks StockStore::getStocks(const IdSet<InstrumentId>& ids) const
+    finance::Stocks StockStore::getStocks(
+        const finance::SecuritiesFilter& filter
+    ) const
     {
-        auto options = Options{.deletion = DeletionPolicy::ExcludeDelete};
-        if (!ids.empty())
-            options.filter = finance::HasInstrumentId(ids);
+        auto options   = Options{.deletion = DeletionPolicy::ExcludeDelete};
+        options.filter = filter.getStockPredicate();
 
         auto entries = _getValues(options);
 
@@ -213,7 +215,7 @@ namespace store
         {
             options.deletion = DeletionPolicy::IncludeDelete;
 
-            for (const auto& stock : _instrumentService->getStocks(ids))
+            for (const auto& stock : _instrumentService->getStocks(filter))
             {
                 const auto alreadyInStore = std::ranges::any_of(
                     _getValues(options),
@@ -237,31 +239,15 @@ namespace store
      */
     std::optional<Stock> StockStore::getStock(InstrumentId id) const
     {
-        const auto options = Options{
-            .filter   = finance::HasInstrumentId(id),
-            .deletion = DeletionPolicy::ExcludeDelete
-        };
-        auto stocksView = _getValues(options);
+        finance::SecuritiesFilter filter;
+        filter.instrumentIds = {id};
 
-        std::vector<Stock> stocks = {stocksView.begin(), stocksView.end()};
-
-        if (stocksView.empty())
-        {
-            if (isFullCache())
-                return std::nullopt;
-
-            const auto dbStocks = _instrumentService->getStocks({id});
-
-            stocks.insert(stocks.end(), dbStocks.begin(), dbStocks.end());
-
-            if (stocks.empty())
-                return std::nullopt;
-        }
+        auto stocks = getStocks(filter);
 
         if (stocks.size() > 1)
             throw std::runtime_error("Multiple stocks found");
 
-        return stocks.front();
+        return stocks.front().second;
     }
 
     /**

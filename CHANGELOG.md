@@ -17,6 +17,13 @@ All changes and updates, that are relevant for a user will be documented here
   `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
   signal and `HelpMenuController`
 
+#### Stocks - Watchlist
+
+- Add watchlists: the Securities sidebar now expands into "All Securities"
+  (shown by default) plus your saved watchlists. Right-click Securities to
+  create a watchlist, right-click a security row to add/remove it to/from a
+  watchlist, and right-click a watchlist to rename or delete it
+
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 

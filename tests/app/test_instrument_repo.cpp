@@ -8,10 +8,10 @@
 #include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "db/database.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
 #include "repo/instrument_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
-#include "repo/repo_errors.hpp"
 #include "test_fixtures.hpp"
 
 namespace
@@ -243,7 +243,9 @@ TEST_F(InstrumentRepoTest, GetStocksSpecificIdReturnsOnlyMatchingStock)
     const auto [stockId, instrId] = _repo.addStock(makeStock("GOOG")).value();
 
     const IdSet<InstrumentId> ids{instrId};
-    const auto                stocks = _repo.getStocks(ids);
+    finance::SecuritiesFilter filter;
+    filter.instrumentIds = ids;
+    const auto stocks    = _repo.getStocks(filter);
 
     ASSERT_EQ(stocks.size(), 1U);
     EXPECT_EQ(stocks[0].getTicker(), "GOOG");
@@ -256,7 +258,9 @@ TEST_F(InstrumentRepoTest, GetStocksMultipleIdsReturnsMatchingStocks)
     static_cast<void>(_repo.addStock(makeStock("MSFT")));
 
     const IdSet<InstrumentId> ids{instrId1, instrId2};
-    const auto                stocks = _repo.getStocks(ids);
+    finance::SecuritiesFilter filter;
+    filter.instrumentIds = ids;
+    const auto stocks    = _repo.getStocks(filter);
 
     ASSERT_EQ(stocks.size(), 2U);
 
@@ -267,49 +271,4 @@ TEST_F(InstrumentRepoTest, GetStocksMultipleIdsReturnsMatchingStocks)
     EXPECT_TRUE(tickers.contains("AAPL"));
     EXPECT_TRUE(tickers.contains("GOOG"));
     EXPECT_FALSE(tickers.contains("MSFT"));
-}
-
-// ---------------------------------------------------------------------------
-// getStocksBySymbols (used for watchlist symbol-allowlist filtering)
-// ---------------------------------------------------------------------------
-
-TEST_F(InstrumentRepoTest, GetStocksBySymbolsEmptyAllowlistReturnsEmpty)
-{
-    static_cast<void>(_repo.addStock(makeStock("AAPL")));
-
-    const auto stocks = _repo.getStocksBySymbols({});
-
-    EXPECT_TRUE(stocks.empty());
-}
-
-TEST_F(InstrumentRepoTest, GetStocksBySymbolsReturnsOnlyMatchingSymbols)
-{
-    static_cast<void>(_repo.addStock(makeStock("AAPL")));
-    static_cast<void>(_repo.addStock(makeStock("GOOG")));
-    static_cast<void>(_repo.addStock(makeStock("MSFT")));
-
-    const auto stocks =
-        _repo.getStocksBySymbols(std::vector<std::string>{"AAPL", "MSFT"});
-
-    ASSERT_EQ(stocks.size(), 2U);
-
-    std::set<std::string> tickers;
-    for (const auto& stock : stocks)
-        tickers.insert(stock.getTicker());
-
-    EXPECT_TRUE(tickers.contains("AAPL"));
-    EXPECT_TRUE(tickers.contains("MSFT"));
-    EXPECT_FALSE(tickers.contains("GOOG"));
-}
-
-TEST_F(InstrumentRepoTest, GetStocksBySymbolsUnknownSymbolIsIgnored)
-{
-    static_cast<void>(_repo.addStock(makeStock("AAPL")));
-
-    const auto stocks = _repo.getStocksBySymbols(
-        std::vector<std::string>{"AAPL", "DOESNOTEXIST"}
-    );
-
-    ASSERT_EQ(stocks.size(), 1U);
-    EXPECT_EQ(stocks[0].getTicker(), "AAPL");
 }

@@ -2,8 +2,8 @@
 #define __REPO__SRC__REPO__FACTORIES__WATCHLIST_FACTORY_HPP__
 
 #include <string>
-#include <vector>
 
+#include "common/container/set.hpp"
 #include "sql_models/watchlist_row.hpp"
 
 namespace finance
@@ -23,8 +23,8 @@ namespace repo
     {
        public:
         [[nodiscard]] static finance::Watchlist toWatchlistDomain(
-            const WatchlistRow&             watchlistRow,
-            const std::vector<std::string>& symbols
+            const WatchlistRow&     watchlistRow,
+            const Set<std::string>& symbols
         );
 
         [[nodiscard]] static WatchlistRow toWatchlistRow(

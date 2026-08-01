@@ -18,7 +18,9 @@ namespace ui
     X(OverviewCategory)            \
     X(TransactionCategory)         \
     X(SecuritiesCategory)          \
-    X(AccountsItem)
+    X(AccountsItem)                \
+    X(AllSecuritiesItem)           \
+    X(WatchlistItem)
 
     MSTD_ENUM(SideBarItemType, std::uint8_t, SIDE_BAR_ITEM_TYPE_LIST);
 

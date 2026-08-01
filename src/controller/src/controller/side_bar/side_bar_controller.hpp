@@ -81,6 +81,9 @@ namespace controller
         [[nodiscard]] const AccountSideBarController& getAccountSideBarController(
         ) const;
 
+        [[nodiscard]] SecuritiesSideBarController&
+        getSecuritiesSideBarController();
+
        private:
         void _onItemClicked(ui::SideBarItem* item);
         void _onContextMenuRequested(ui::SideBarItem* item, QAction* action);

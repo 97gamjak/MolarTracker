@@ -18,25 +18,22 @@ namespace repo
 
         [[nodiscard]]
         CrudResult<WatchlistId> createWatchlist(
-            const std::string& name
+            const finance::Watchlist& watchlist
         ) override;
 
         [[nodiscard]]
         std::vector<finance::Watchlist> getAllWatchlists() override;
 
-        void renameWatchlist(
-            WatchlistId        id,
-            const std::string& newName
+        [[nodiscard]]
+        CrudResult<void> updateWatchlist(
+            const finance::Watchlist& watchlist
         ) override;
 
         void deleteWatchlist(WatchlistId id) override;
 
-        void addSymbol(WatchlistId id, const std::string& symbol) override;
-
-        void removeSymbol(WatchlistId id, const std::string& symbol) override;
-
        private:
-        [[nodiscard]] std::vector<std::string> _getSymbols(WatchlistId id);
+        [[nodiscard]]
+        Set<std::string> _getSymbols(WatchlistId id);
     };
 
 }   // namespace repo

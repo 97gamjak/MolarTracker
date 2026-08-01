@@ -6,6 +6,7 @@
 
 #include "common/finance.hpp"
 #include "config/id_types.hpp"
+#include "finance/instrument/securities_filter.hpp"
 #include "finance/instrument/stock.hpp"
 #include "mock_services.hpp"
 #include "store/stock_store.hpp"
@@ -132,4 +133,46 @@ TEST_F(StockStoreTest, IsDirtyTrueAfterAddStock)
     static_cast<void>(_store->addStock(makeStock("AAPL")));
 
     EXPECT_TRUE(_store->isDirty());
+}
+
+TEST_F(StockStoreTest, GetStocksWithNulloptAllowlistReturnsAll)
+{
+    static_cast<void>(_store->addStock(makeStock("AAPL")));
+    static_cast<void>(_store->addStock(makeStock("MSFT")));
+
+    EXPECT_EQ(_store->getStocks({}).size(), _store->getStocks().size());
+}
+
+TEST_F(StockStoreTest, GetStocksWithAllowlistReturnsOnlyMatchingSymbols)
+{
+    static_cast<void>(_store->addStock(makeStock("AAPL")));
+    static_cast<void>(_store->addStock(makeStock("MSFT")));
+
+    finance::SecuritiesFilter filter;
+    filter.symbols = Set<std::string>{"AAPL"};
+
+    const auto stocks = _store->getStocks(filter);
+
+    ASSERT_EQ(stocks.size(), 1U);
+    EXPECT_EQ(stocks.getTickers().front(), "AAPL");
+}
+
+TEST_F(StockStoreTest, GetStocksWithAllowlistOfUnknownSymbolsReturnsEmpty)
+{
+    static_cast<void>(_store->addStock(makeStock("AAPL")));
+
+    finance::SecuritiesFilter filter;
+    filter.symbols = Set<std::string>{"UNKNOWN"};
+
+    EXPECT_TRUE(_store->getStocks(filter).empty());
+}
+
+TEST_F(StockStoreTest, GetStocksWithEmptyAllowlistVectorReturnsEmpty)
+{
+    static_cast<void>(_store->addStock(makeStock("AAPL")));
+
+    finance::SecuritiesFilter filter;
+    filter.symbols = Set<std::string>{};
+
+    EXPECT_TRUE(_store->getStocks(filter).empty());
 }

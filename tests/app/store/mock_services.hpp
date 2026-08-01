@@ -156,28 +156,36 @@ namespace tests
         int _nextInstrumentId = 1;
 
        public:
-        [[nodiscard]] std::vector<std::string> getTickers() override
+        [[nodiscard]]
+        std::vector<std::string> getTickers() override
         {
             return {};
         }
 
-        [[nodiscard]] std::vector<finance::Stock> getStocks(
+        [[nodiscard]]
+        std::vector<finance::Stock> getStocks(
+            const finance::SecuritiesFilter& /*filter*/
+        ) override
+        {
+            return {};
+        }
+
+        [[nodiscard]]
+        finance::Options getOptions() override
+        {
+            return {};
+        }
+
+        [[nodiscard]]
+        finance::Options getOptions(
             const IdSet<InstrumentId>& /*ids*/
         ) override
         {
             return {};
         }
 
-        [[nodiscard]] finance::Options getOptions() override { return {}; }
-
-        [[nodiscard]] finance::Options getOptions(
-            const IdSet<InstrumentId>& /*ids*/
-        ) override
-        {
-            return {};
-        }
-
-        [[nodiscard]] std::optional<finance::Stock> getStock(
+        [[nodiscard]]
+        std::optional<finance::Stock> getStock(
             const std::string& /*ticker*/
         ) override
         {
@@ -208,12 +216,14 @@ namespace tests
             };
         }
 
-        [[nodiscard]] bool stockExists(const std::string& ticker) override
+        [[nodiscard]]
+        bool stockExists(const std::string& ticker) override
         {
             return stocksInDb.contains(ticker);
         }
 
-        [[nodiscard]] bool optionExists(const finance::Option& option) override
+        [[nodiscard]]
+        bool optionExists(const finance::Option& option) override
         {
             return optionsInDb.contains(option.getName());
         }
@@ -286,7 +296,11 @@ namespace tests
        public:
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Watchlist> preloadedWatchlists;
-        int                             createCallCount = 0;
+        int                             createCallCount       = 0;
+        int                             renameCallCount       = 0;
+        int                             deleteCallCount       = 0;
+        int                             addSymbolCallCount    = 0;
+        int                             removeSymbolCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
@@ -295,7 +309,7 @@ namespace tests
        public:
         [[nodiscard]]
         CrudResult<WatchlistId> createWatchlist(
-            const std::string& /*name*/
+            const finance::Watchlist& /*watchlist*/
         ) override
         {
             createCallCount++;
@@ -308,50 +322,22 @@ namespace tests
             return preloadedWatchlists;
         }
 
-        void renameWatchlist(
-            WatchlistId        id,
-            const std::string& newName
-        ) override
-        {
-            for (auto& watchlist : preloadedWatchlists)
-            {
-                if (watchlist.getId() == id)
-                    watchlist.setName(newName);
-            }
-        }
-
         void deleteWatchlist(WatchlistId id) override
         {
+            deleteCallCount++;
             std::erase_if(
                 preloadedWatchlists,
                 [id](const auto& watchlist) { return watchlist.getId() == id; }
             );
         }
 
-        void addSymbol(WatchlistId id, const std::string& symbol) override
+        [[nodiscard]]
+        CrudResult<void> updateWatchlist(
+            const finance::Watchlist& /*watchlist*/
+        ) override
         {
-            for (auto& watchlist : preloadedWatchlists)
-            {
-                if (watchlist.getId() != id)
-                    continue;
-
-                auto symbols = watchlist.getSymbols();
-                symbols.push_back(symbol);
-                watchlist.setSymbols(symbols);
-            }
-        }
-
-        void removeSymbol(WatchlistId id, const std::string& symbol) override
-        {
-            for (auto& watchlist : preloadedWatchlists)
-            {
-                if (watchlist.getId() != id)
-                    continue;
-
-                auto symbols = watchlist.getSymbols();
-                std::erase(symbols, symbol);
-                watchlist.setSymbols(symbols);
-            }
+            renameCallCount++;
+            return {};
         }
     };
 
