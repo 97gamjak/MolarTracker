@@ -48,6 +48,7 @@ All changes and updates, that are relevant for a user will be documented here
 - Add possibility to persist different log levels for different categories
 - Show full exception stack trace when an exception occurs
 - Add Help page accessible from Help → Help menu item, with PDF export
+- Add a "Settings" section to the Help page documenting the Settings dialog
 - show open positions in security accounts overview pages
 - Make it possible to open (create) option transactions
 - Show option positions in account overview

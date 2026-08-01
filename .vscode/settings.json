@@ -135,6 +135,7 @@
         "MSTD",
         "NOMINMAX",
         "noquote",
+        "qresource",
         "remappings",
         "TSLA",
         "txrepo",
@@ -152,7 +153,6 @@
     },
     "workbench.editor.enablePreview": false,
     "workbench.editor.enablePreviewFromQuickOpen": false,
-    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
     "testMate.cpp.test.advancedExecutables": [
         {
             "pattern": ".build/**/*{test,Test,TEST}*",

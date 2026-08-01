@@ -2,4 +2,10 @@
     <qresource prefix="/styles">
         <file>styles/app.qss</file>
     </qresource>
+    <qresource prefix="/help">
+        <file alias="settings.html">help/settings.html</file>
+        <file alias="settings_menu_location.png">help/settings_menu_location.png</file>
+        <file alias="settings_dialog_general.png">help/settings_dialog_general.png</file>
+        <file alias="settings_dialog_ui_overview.png">help/settings_dialog_ui_overview.png</file>
+    </qresource>
 </RCC>
