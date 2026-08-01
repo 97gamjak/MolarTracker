@@ -19,6 +19,7 @@
 #include "ui/securities/ticker_lookup.hpp"
 #include "ui/side_bar/securities_category.hpp"
 #include "ui/side_bar/watchlist_item.hpp"
+#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.SecuritiesSideBarController");
 
@@ -173,7 +174,18 @@ namespace controller
         WatchlistId        target
     )
     {
-        _watchlistStore->addSymbol(target, symbol);
+        const auto result = _watchlistStore->addSymbol(target, symbol);
+
+        if (!result)
+        {
+            LOG_ERROR(result.error().toString());
+            ui::ErrorDialog::show(
+                result.error(),
+                "Failed to add symbol to watchlist",
+                _stackedWidget
+            );
+            return;
+        }
 
         if (_activeWatchlistId == target)
             onWatchlistSelected(target);
@@ -191,7 +203,18 @@ namespace controller
         WatchlistId        target
     )
     {
-        _watchlistStore->removeSymbol(target, symbol);
+        const auto result = _watchlistStore->removeSymbol(target, symbol);
+
+        if (!result)
+        {
+            LOG_ERROR(result.error().toString());
+            ui::ErrorDialog::show(
+                result.error(),
+                "Failed to remove symbol from watchlist",
+                _stackedWidget
+            );
+            return;
+        }
 
         if (_activeWatchlistId == target)
             onWatchlistSelected(target);

@@ -189,7 +189,7 @@ namespace repo
     )
     {
         finance::SecuritiesFilter filter;
-        filter.symbols = std::vector<std::string>{ticker};
+        filter.symbols = Set<std::string>{ticker};
 
         const auto result = _getStockRows(filter);
 

@@ -26,9 +26,7 @@ namespace service
      * @return CrudResult<WatchlistId>
      */
     CrudResult<WatchlistId> WatchlistService::createWatchlist(
-
         const finance::Watchlist& watchlist
-
     )
     {
         return _watchlistRepo->createWatchlist(watchlist);
@@ -49,10 +47,14 @@ namespace service
      *
      * @param watchlist The watchlist object containing the updated details of
      * the watchlist
+     *
+     * @return CrudResult<void> Returns an error if the watchlist does not exist
      */
-    void WatchlistService::updateWatchlist(const finance::Watchlist& watchlist)
+    CrudResult<void> WatchlistService::updateWatchlist(
+        const finance::Watchlist& watchlist
+    )
     {
-        _watchlistRepo->updateWatchlist(watchlist);
+        return _watchlistRepo->updateWatchlist(watchlist);
     }
 
     /**

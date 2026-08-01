@@ -149,7 +149,7 @@ TEST_F(StockStoreTest, GetStocksWithAllowlistReturnsOnlyMatchingSymbols)
     static_cast<void>(_store->addStock(makeStock("MSFT")));
 
     finance::SecuritiesFilter filter;
-    filter.symbols = std::vector<std::string>{"AAPL"};
+    filter.symbols = Set<std::string>{"AAPL"};
 
     const auto stocks = _store->getStocks(filter);
 
@@ -162,7 +162,7 @@ TEST_F(StockStoreTest, GetStocksWithAllowlistOfUnknownSymbolsReturnsEmpty)
     static_cast<void>(_store->addStock(makeStock("AAPL")));
 
     finance::SecuritiesFilter filter;
-    filter.symbols = std::vector<std::string>{"UNKNOWN"};
+    filter.symbols = Set<std::string>{"UNKNOWN"};
 
     EXPECT_TRUE(_store->getStocks(filter).empty());
 }
@@ -172,7 +172,7 @@ TEST_F(StockStoreTest, GetStocksWithEmptyAllowlistVectorReturnsEmpty)
     static_cast<void>(_store->addStock(makeStock("AAPL")));
 
     finance::SecuritiesFilter filter;
-    filter.symbols = std::vector<std::string>{};
+    filter.symbols = Set<std::string>{};
 
     EXPECT_TRUE(_store->getStocks(filter).empty());
 }

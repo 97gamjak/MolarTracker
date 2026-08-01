@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "common/container/set.hpp"
 #include "config/id_types.hpp"
@@ -23,7 +22,7 @@ namespace finance
     struct SecuritiesFilter
     {
         /// The symbols to restrict the query to, nullopt means no filtering
-        std::optional<std::vector<std::string>> symbols = std::nullopt;
+        std::optional<Set<std::string>> symbols = std::nullopt;
 
         /// The instrument IDs corresponding to the symbols in the allowlist,
         std::optional<Set<StockId>> stockIds = std::nullopt;

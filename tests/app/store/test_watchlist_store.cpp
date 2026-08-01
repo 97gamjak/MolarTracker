@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "finance/watchlist.hpp"
 #include "mock_services.hpp"
 #include "store/watchlist_store.hpp"
 
@@ -171,7 +172,7 @@ TEST_F(WatchlistStoreTest, AddSymbolCallsServiceImmediately)
         .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
     _store->reload();
 
-    _store->addSymbol(WatchlistId{1}, "AAPL");
+    static_cast<void>(_store->addSymbol(WatchlistId{1}, "AAPL"));
 
     EXPECT_EQ(_mockService->addSymbolCallCount, 1);
 }
@@ -182,12 +183,12 @@ TEST_F(WatchlistStoreTest, AddSymbolUpdatesCachedSymbols)
         .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
     _store->reload();
 
-    _store->addSymbol(WatchlistId{1}, "AAPL");
+    static_cast<void>(_store->addSymbol(WatchlistId{1}, "AAPL"));
 
     const auto watchlist = _store->getWatchlist(WatchlistId{1});
     ASSERT_TRUE(watchlist.has_value());
     ASSERT_EQ(watchlist->getSymbols().size(), 1U);
-    EXPECT_EQ(watchlist->getSymbols()[0], "AAPL");
+    EXPECT_EQ(watchlist->getSymbols().front(), "AAPL");
 }
 
 TEST_F(WatchlistStoreTest, RemoveSymbolCallsServiceImmediately)
@@ -196,11 +197,11 @@ TEST_F(WatchlistStoreTest, RemoveSymbolCallsServiceImmediately)
         WatchlistId{1},
         "Tech Stocks",
         Timestamp{},
-        std::vector<std::string>{"AAPL"}
+        Set<std::string>{"AAPL"}
     );
     _store->reload();
 
-    _store->removeSymbol(WatchlistId{1}, "AAPL");
+    static_cast<void>(_store->removeSymbol(WatchlistId{1}, "AAPL"));
 
     EXPECT_EQ(_mockService->removeSymbolCallCount, 1);
 }
@@ -211,11 +212,11 @@ TEST_F(WatchlistStoreTest, RemoveSymbolUpdatesCachedSymbols)
         WatchlistId{1},
         "Tech Stocks",
         Timestamp{},
-        std::vector<std::string>{"AAPL"}
+        Set<std::string>{"AAPL"}
     );
     _store->reload();
 
-    _store->removeSymbol(WatchlistId{1}, "AAPL");
+    static_cast<void>(_store->removeSymbol(WatchlistId{1}, "AAPL"));
 
     const auto watchlist = _store->getWatchlist(WatchlistId{1});
     ASSERT_TRUE(watchlist.has_value());

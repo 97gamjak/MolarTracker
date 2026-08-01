@@ -3,14 +3,13 @@
 
 #include "category.hpp"
 #include "config/id_types.hpp"
+#include "ui/side_bar/all_securities_item.hpp"
 
 class QAction;   // Forward declaration
 class QString;   // Forward declaration
 
 namespace ui
 {
-    class AllSecuritiesItem;   // Forward declaration
-
     /**
      * @brief Category for managing securities-related UI components.
      *
@@ -36,8 +35,8 @@ namespace ui
 
         void populateContextMenu(QMenu& menu) override;
 
-        [[nodiscard]] QAction* getCreateAction() const;
-        [[nodiscard]] QAction* getCreateWatchlistAction() const;
+        [[nodiscard]] QAction*           getCreateAction() const;
+        [[nodiscard]] QAction*           getCreateWatchlistAction() const;
         [[nodiscard]] AllSecuritiesItem* getAllSecuritiesItem() const;
     };
 }   // namespace ui

@@ -59,7 +59,18 @@ namespace store
                     const auto oldId    = newEntry.value.getId();
                     const auto id =
                         _watchlistService->createWatchlist(newEntry.value);
-                    newEntry.value.setId(id);
+
+                    if (!id)
+                    {
+                        throw WatchlistStoreException(
+                            std::format(
+                                "Failed to create watchlist '{}' in database",
+                                newEntry.value.getName()
+                            )
+                        );
+                    }
+
+                    newEntry.value.setId(id.value());
 
                     const auto result = _commitEntry(oldId, newEntry);
 
@@ -84,7 +95,7 @@ namespace store
                     const auto result =
                         _watchlistService->updateWatchlist(entry.value);
 
-                    if (result != WatchlistResult<void>::Ok)
+                    if (!result)
                     {
                         throw WatchlistStoreException(
                             std::format(
@@ -199,13 +210,18 @@ namespace store
                 "Watchlist not found: " + id.toString()
             );
 
-        _watchlistService->renameWatchlist(id, newName);
         watchlist->setName(newName);
 
-        if (_updateEntry(*watchlist, StoreState::Clean) != StoreResult::Ok)
+        const auto newState = watchlist->getId() == WatchlistId::invalid()
+                                  ? StoreState::New
+                                  : StoreState::Modified;
+
+        if (_updateEntry(watchlist.value(), newState) != StoreResult::Ok)
+        {
             throw WatchlistStoreException(
                 "Failed to update cached watchlist after rename"
             );
+        }
     }
 
     /**

@@ -36,7 +36,10 @@ namespace service
         [[nodiscard]]
         std::vector<finance::Watchlist> getAllWatchlists() const override;
 
-        void updateWatchlist(const finance::Watchlist& watchlist) override;
+        [[nodiscard]]
+        CrudResult<void> updateWatchlist(
+            const finance::Watchlist& watchlist
+        ) override;
 
         void deleteWatchlist(WatchlistId id) override;
     };

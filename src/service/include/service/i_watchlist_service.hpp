@@ -1,7 +1,6 @@
 #ifndef __SERVICE__INCLUDE__SERVICE__I_WATCHLIST_SERVICE_HPP__
 #define __SERVICE__INCLUDE__SERVICE__I_WATCHLIST_SERVICE_HPP__
 
-#include <string>
 #include <vector>
 
 #include "config/id_types.hpp"
@@ -26,7 +25,8 @@ namespace service
         /**
          * @brief Create a new, empty watchlist
          *
-         * @param name The display name of the new watchlist
+         * @param watchlist The watchlist object containing the name and other
+         * details of the new watchlist
          * @return WatchlistId The ID of the newly created watchlist
          */
         [[nodiscard]]
@@ -47,8 +47,14 @@ namespace service
          * @brief Update an existing watchlist
          *
          * @param watchlist The watchlist to update
+         *
+         * @return CrudResult<void> Returns an error if the watchlist does not
+         * exist
          */
-        virtual void updateWatchlist(const finance::Watchlist& watchlist) = 0;
+        [[nodiscard]]
+        virtual CrudResult<void> updateWatchlist(
+            const finance::Watchlist& watchlist
+        ) = 0;
 
         /**
          * @brief Delete a watchlist and all of its symbol entries

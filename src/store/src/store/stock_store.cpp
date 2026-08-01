@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <format>
 #include <utility>
-#include <vector>
 
 #include "exceptions/not_yet_implemented.hpp"
 #include "finance/instrument/instrument_predicates.hpp"

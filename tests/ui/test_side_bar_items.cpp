@@ -200,8 +200,9 @@ namespace
 
     TEST_F(WatchlistItemTest, GetIdReturnsGivenId)
     {
-        ui::WatchlistItem item{WatchlistId{42}, "Tech Stocks"};
-        EXPECT_EQ(item.getId(), WatchlistId{42});
+        constexpr auto    id = 42;
+        ui::WatchlistItem item{WatchlistId{id}, "Tech Stocks"};
+        EXPECT_EQ(item.getId(), WatchlistId{id});
     }
 
     TEST_F(WatchlistItemTest, ActionsAreNullBeforePopulatingContextMenu)

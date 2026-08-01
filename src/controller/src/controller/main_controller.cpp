@@ -21,7 +21,6 @@
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
 #include "ui/main_window.hpp"
-#include "ui/side_bar/all_securities_item.hpp"
 #include "ui/side_bar/securities_category.hpp"
 #include "ui/side_bar/side_bar.hpp"
 

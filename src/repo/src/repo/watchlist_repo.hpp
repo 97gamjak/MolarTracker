@@ -24,13 +24,16 @@ namespace repo
         [[nodiscard]]
         std::vector<finance::Watchlist> getAllWatchlists() override;
 
-        void updateWatchlist(const finance::Watchlist& watchlist) override;
+        [[nodiscard]]
+        CrudResult<void> updateWatchlist(
+            const finance::Watchlist& watchlist
+        ) override;
 
         void deleteWatchlist(WatchlistId id) override;
 
        private:
         [[nodiscard]]
-        std::vector<std::string> _getSymbols(WatchlistId id);
+        Set<std::string> _getSymbols(WatchlistId id);
     };
 
 }   // namespace repo

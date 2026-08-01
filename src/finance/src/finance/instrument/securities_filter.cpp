@@ -16,9 +16,7 @@ namespace finance
          * @return filter::Predicate<Stock> A predicate function that can be
          * used to filter stocks based on the specified symbols
          */
-        filter::Predicate<Stock> HasSymbol(
-            const std::vector<std::string>& symbols
-        )
+        filter::Predicate<Stock> HasSymbol(const Set<std::string>& symbols)
         {
             return filter::makePredicate<Stock>(
                 [symbols](const Stock& stock)

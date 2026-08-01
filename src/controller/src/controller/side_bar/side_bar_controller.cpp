@@ -1,5 +1,7 @@
 #include "side_bar_controller.hpp"
 
+#include <qstackedwidget.h>
+
 #include <QMainWindow>
 
 #include "account_controller.hpp"
@@ -14,6 +16,7 @@
 #include "ui/side_bar/side_bar_item.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/side_bar/watchlist_item.hpp"
+#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.SideBarController");
 
@@ -153,11 +156,24 @@ namespace controller
                     dynamic_cast<ui::WatchlistItem*>(item);
 
                 if (watchlistItem != nullptr)
+                {
                     _securitiesSideBarController.onWatchlistSelected(
                         watchlistItem->getId()
                     );
+                }
                 else
-                    LOG_ERROR("Watchlist item clicked but not found");
+                {
+                    const std::string msg =
+                        "Watchlist item clicked but not found";
+                    LOG_ERROR(msg);
+
+                    ui::ErrorDialog::show(
+                        std::string("Failed to select watchlist: "),
+                        msg,
+                        _centralStack->currentWidget()
+                    );
+                    return;
+                }
 
                 break;
             }
@@ -252,8 +268,6 @@ namespace controller
                 break;
             }
             case ui::SideBarItemType::AllSecuritiesItem:
-                // permanent, immutable node — no context menu
-                break;
             case ui::SideBarItemType::OverviewCategory:
                 // Handle overview item click
                 break;
@@ -289,8 +303,8 @@ namespace controller
      * @return SecuritiesSideBarController& Reference to the securities side
      * bar controller
      */
-    SecuritiesSideBarController&
-    SideBarController::getSecuritiesSideBarController()
+    SecuritiesSideBarController& SideBarController::
+        getSecuritiesSideBarController()
     {
         return _securitiesSideBarController;
     }

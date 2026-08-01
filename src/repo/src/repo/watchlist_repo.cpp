@@ -5,7 +5,6 @@
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
-#include "repo_errors.hpp"
 #include "sql_models/watchlist_instrument_row.hpp"
 #include "sql_models/watchlist_row.hpp"
 
@@ -88,8 +87,12 @@ namespace repo
      *
      * @param watchlist The watchlist object containing the updated details of
      * the watchlist
+     *
+     * @return CrudResult<void> Returns an error if the watchlist does not exist
      */
-    void WatchlistRepo::updateWatchlist(const finance::Watchlist& watchlist)
+    CrudResult<void> WatchlistRepo::updateWatchlist(
+        const finance::Watchlist& watchlist
+    )
     {
         WatchlistRow watchlistRow;
         watchlistRow.id        = watchlist.getId();
@@ -98,15 +101,15 @@ namespace repo
 
         const auto result = _getCrud().update(_getDb(), watchlistRow);
 
-        if (!result.has_value())
+        if (!result)
         {
-            const auto msg = "Failed to rename watchlist with id: " +
-                             watchlist.getId().toString() +
-                             ", error: " + result.error().toString();
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
+            return result.error().convert(
+                "Failed to update watchlist with id: " +
+                watchlist.getId().toString()
+            );
         }
+
+        return {};
     }
 
     /**
@@ -124,9 +127,9 @@ namespace repo
      * @brief Get the symbols belonging to a watchlist
      *
      * @param id
-     * @return std::vector<std::string>
+     * @return Set<std::string>
      */
-    std::vector<std::string> WatchlistRepo::_getSymbols(WatchlistId id)
+    Set<std::string> WatchlistRepo::_getSymbols(WatchlistId id)
     {
         auto query =
             orm::Query{}.where(WatchlistInstrumentRow::hasWatchlistId(id));
@@ -134,11 +137,11 @@ namespace repo
         const auto rows =
             _getCrud().get<WatchlistInstrumentRow>(_getDb(), query);
 
-        std::vector<std::string> symbols;
+        Set<std::string> symbols;
         symbols.reserve(rows.size());
 
         for (const auto& row : rows)
-            symbols.push_back(row.symbol.value());
+            symbols.insert(row.symbol.value());
 
         return symbols;
     }

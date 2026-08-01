@@ -322,19 +322,6 @@ namespace tests
             return preloadedWatchlists;
         }
 
-        void renameWatchlist(
-            WatchlistId        id,
-            const std::string& newName
-        ) override
-        {
-            renameCallCount++;
-            for (auto& watchlist : preloadedWatchlists)
-            {
-                if (watchlist.getId() == id)
-                    watchlist.setName(newName);
-            }
-        }
-
         void deleteWatchlist(WatchlistId id) override
         {
             deleteCallCount++;
@@ -344,32 +331,13 @@ namespace tests
             );
         }
 
-        void addSymbol(WatchlistId id, const std::string& symbol) override
+        [[nodiscard]]
+        CrudResult<void> updateWatchlist(
+            const finance::Watchlist& /*watchlist*/
+        ) override
         {
-            addSymbolCallCount++;
-            for (auto& watchlist : preloadedWatchlists)
-            {
-                if (watchlist.getId() != id)
-                    continue;
-
-                auto symbols = watchlist.getSymbols();
-                symbols.push_back(symbol);
-                watchlist.setSymbols(symbols);
-            }
-        }
-
-        void removeSymbol(WatchlistId id, const std::string& symbol) override
-        {
-            removeSymbolCallCount++;
-            for (auto& watchlist : preloadedWatchlists)
-            {
-                if (watchlist.getId() != id)
-                    continue;
-
-                auto symbols = watchlist.getSymbols();
-                std::erase(symbols, symbol);
-                watchlist.setSymbols(symbols);
-            }
+            renameCallCount++;
+            return {};
         }
     };
 

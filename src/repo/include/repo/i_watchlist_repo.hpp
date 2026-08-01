@@ -1,7 +1,6 @@
 #ifndef __REPO__INCLUDE__REPO__I_WATCHLIST_REPO_HPP__
 #define __REPO__INCLUDE__REPO__I_WATCHLIST_REPO_HPP__
 
-#include <string>
 #include <vector>
 
 #include "config/id_types.hpp"
@@ -48,8 +47,14 @@ namespace repo
          *
          * @param watchlist The watchlist object containing the updated details
          * of the watchlist
+         *
+         * @return CrudResult<void> Returns an error if the watchlist does not
+         * exist
          */
-        virtual void updateWatchlist(const finance::Watchlist& watchlist) = 0;
+        [[nodiscard]]
+        virtual CrudResult<void> updateWatchlist(
+            const finance::Watchlist& watchlist
+        ) = 0;
 
         /**
          * @brief Delete a watchlist and all of its symbol entries
