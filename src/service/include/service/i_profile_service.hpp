@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace domain
 {
@@ -48,9 +49,9 @@ namespace service
          * retrieve or modify the profile later on.
          *
          * @param profile The profile to create
-         * @return ProfileId The ID of the newly created profile
+         * @return CrudResult<ProfileId> The ID of the newly created profile
          */
-        [[nodiscard]] virtual ProfileId create(
+        [[nodiscard]] virtual CrudResult<ProfileId> create(
             const domain::Profile& profile
         ) = 0;
 

@@ -18,8 +18,10 @@ namespace
 
     void create_schema(db::Database& db)
     {
-        db.execute("CREATE TABLE IF NOT EXISTS t(v INTEGER NOT NULL);");
-        db.execute("DELETE FROM t;");
+        static_cast<void>(
+            db.execute("CREATE TABLE IF NOT EXISTS t(v INTEGER NOT NULL);")
+        );
+        static_cast<void>(db.execute("DELETE FROM t;"));
     }
 
     std::int64_t scalar_int64(db::Database& db, const std::string& sql)
@@ -55,10 +57,10 @@ TEST(TransactionTest, CommitPersistsChanges)
         db::Transaction transaction{db, false};
         EXPECT_TRUE(transaction.isActive());
 
-        db.execute("INSERT INTO t(v) VALUES(1);");
-        db.execute("INSERT INTO t(v) VALUES(2);");
+        static_cast<void>(db.execute("INSERT INTO t(v) VALUES(1);"));
+        static_cast<void>(db.execute("INSERT INTO t(v) VALUES(2);"));
 
-        transaction.commit();
+        static_cast<void>(transaction.commit());
         EXPECT_FALSE(transaction.isActive());
     }
 
@@ -76,10 +78,10 @@ TEST(TransactionTest, RollbackDiscardsChanges)
         db::Transaction transaction{db, false};
         EXPECT_TRUE(transaction.isActive());
 
-        db.execute("INSERT INTO t(v) VALUES(1);");
-        db.execute("INSERT INTO t(v) VALUES(2);");
+        static_cast<void>(db.execute("INSERT INTO t(v) VALUES(1);"));
+        static_cast<void>(db.execute("INSERT INTO t(v) VALUES(2);"));
 
-        transaction.rollback();
+        static_cast<void>(transaction.rollback());
         EXPECT_FALSE(transaction.isActive());
     }
 
@@ -97,7 +99,7 @@ TEST(TransactionTest, DestructorRollsBackIfStillActive)
         db::Transaction transaction{db, false};
         EXPECT_TRUE(transaction.isActive());
 
-        db.execute("INSERT INTO t(v) VALUES(123);");
+        static_cast<void>(db.execute("INSERT INTO t(v) VALUES(123);"));
         // no commit/rollback -> destructor should rollback
     }
 
@@ -114,13 +116,13 @@ TEST(TransactionTest, CommitIsIdempotentAfterFirstCommit)
     db::Transaction transaction{db, false};
     EXPECT_TRUE(transaction.isActive());
 
-    db.execute("INSERT INTO t(v) VALUES(1);");
+    static_cast<void>(db.execute("INSERT INTO t(v) VALUES(1);"));
 
-    transaction.commit();
+    static_cast<void>(transaction.commit());
     EXPECT_FALSE(transaction.isActive());
 
-    EXPECT_NO_THROW(transaction.commit());     // no-op
-    EXPECT_NO_THROW(transaction.rollback());   // no-op
+    EXPECT_TRUE(transaction.commit().has_value());     // no-op
+    EXPECT_TRUE(transaction.rollback().has_value());   // no-op
 
     EXPECT_EQ(count_rows(db), 1);
 }
@@ -135,13 +137,13 @@ TEST(TransactionTest, RollbackIsIdempotentAfterFirstRollback)
     db::Transaction transaction{db, false};
     EXPECT_TRUE(transaction.isActive());
 
-    db.execute("INSERT INTO t(v) VALUES(1);");
+    static_cast<void>(db.execute("INSERT INTO t(v) VALUES(1);"));
 
-    transaction.rollback();
+    static_cast<void>(transaction.rollback());
     EXPECT_FALSE(transaction.isActive());
 
-    EXPECT_NO_THROW(transaction.rollback());   // no-op
-    EXPECT_NO_THROW(transaction.commit());     // no-op
+    EXPECT_TRUE(transaction.rollback().has_value());   // no-op
+    EXPECT_TRUE(transaction.commit().has_value());     // no-op
 
     EXPECT_EQ(count_rows(db), 0);
 }
@@ -156,13 +158,13 @@ TEST(TransactionTest, MoveConstructorTransfersActivityAndDisarmsSource)
     db::Transaction transactionA{db, false};
     EXPECT_TRUE(transactionA.isActive());
 
-    db.execute("INSERT INTO t(v) VALUES(7);");
+    static_cast<void>(db.execute("INSERT INTO t(v) VALUES(7);"));
 
     db::Transaction transactionB{std::move(transactionA)};
     EXPECT_TRUE(transactionB.isActive());
     EXPECT_FALSE(transactionA.isActive());
 
-    transactionB.commit();
+    static_cast<void>(transactionB.commit());
     EXPECT_FALSE(transactionB.isActive());
 
     EXPECT_EQ(count_rows(db), 1);
@@ -178,20 +180,20 @@ TEST(TransactionTest, MoveAssignmentTransfersActivityAndDisarmsSource)
     // b must be inactive before move-assign (and must not start while a is
     // active)
     db::Transaction transactionB{db, false};
-    transactionB.rollback();
+    static_cast<void>(transactionB.rollback());
     EXPECT_FALSE(transactionB.isActive());
 
     db::Transaction transactionA{db, false};
     EXPECT_TRUE(transactionA.isActive());
 
-    db.execute("INSERT INTO t(v) VALUES(9);");
+    static_cast<void>(db.execute("INSERT INTO t(v) VALUES(9);"));
 
     transactionB = std::move(transactionA);
 
     EXPECT_TRUE(transactionB.isActive());
     EXPECT_FALSE(transactionA.isActive());
 
-    transactionB.rollback();
+    static_cast<void>(transactionB.rollback());
     EXPECT_FALSE(transactionB.isActive());
 
     EXPECT_EQ(count_rows(db), 0);
@@ -208,9 +210,9 @@ TEST(TransactionTest, ImmediateTransactionBehavesLikeTransaction)
         db::Transaction transaction{db, true};   // BEGIN IMMEDIATE
         EXPECT_TRUE(transaction.isActive());
 
-        db.execute("INSERT INTO t(v) VALUES(1);");
+        static_cast<void>(db.execute("INSERT INTO t(v) VALUES(1);"));
 
-        transaction.rollback();
+        static_cast<void>(transaction.rollback());
         EXPECT_FALSE(transaction.isActive());
     }
 

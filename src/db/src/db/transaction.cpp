@@ -1,6 +1,7 @@
 #include "db/transaction.hpp"
 
 #include "db/database.hpp"
+#include "db/db_exception.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("DB.Transaction");
@@ -18,7 +19,11 @@ namespace db
     {
         if (!_db->isTransactionStarted())
         {
-            _db->begin(immediate);
+            const auto result = _db->begin(immediate);
+
+            if (!result)
+                throw SqliteError(result.error().toString());
+
             _isActive = true;
         }
         else
@@ -45,7 +50,16 @@ namespace db
         {
             try
             {
-                rollback();
+                const auto result = rollback();
+                if (!result)
+                {
+                    LOG_ERROR(
+                        std::format(
+                            "Failed to rollback transaction in destructor: {}",
+                            result.error().toString()
+                        )
+                    );
+                }
             }
             catch (const std::exception& e)
             {
@@ -95,27 +109,37 @@ namespace db
     /**
      * @brief commit the transaction
      *
+     * @return DatabaseResult<void>
      */
-    void Transaction::commit()
+    DatabaseResult<void> Transaction::commit()
     {
         if (!_isActive || _db == nullptr)
-            return;
+            return {};
 
-        _db->commit();
+        const auto result = _db->commit();
+        if (!result)
+            return result.error();
+
         _isActive = false;
+        return {};
     }
 
     /**
      * @brief rollback the transaction
      *
+     * @return DatabaseResult<void>
      */
-    void Transaction::rollback()
+    DatabaseResult<void> Transaction::rollback()
     {
         if (!_isActive || _db == nullptr)
-            return;
+            return {};
 
-        _db->rollback();
+        const auto result = _db->rollback();
+        if (!result)
+            return result.error();
+
         _isActive = false;
+        return {};
     }
 
     //

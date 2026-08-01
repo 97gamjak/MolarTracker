@@ -112,17 +112,12 @@ TEST_F(AccountServiceTest, GetAllAccountsIsolatedByProfile)
     EXPECT_TRUE(accounts.empty());
 }
 
-TEST_F(AccountServiceTest, CreateAccountDuplicateNameAndKindThrows)
+TEST_F(AccountServiceTest, CreateAccountDuplicateNameAndKindReturnsError)
 {
     const auto profileId = insertProfile("User");
 
     static_cast<void>(_service->createAccount(makeAccount("Savings"), profileId)
     );
 
-    EXPECT_THROW(
-        static_cast<void>(
-            _service->createAccount(makeAccount("Savings"), profileId)
-        ),
-        orm::CrudException
-    );
+    EXPECT_FALSE(_service->createAccount(makeAccount("Savings"), profileId));
 }

@@ -333,8 +333,11 @@ namespace store
      *    re-fetch from the restored database.
      *
      * @param backupFile Path to the backup file to restore from
+     *
+     * @return DatabaseResult<void> Returns a DatabaseResult indicating success
+     * or failure.
      */
-    void StoreContainer::restoreFromBackup(
+    DatabaseResult<void> StoreContainer::restoreFromBackup(
         const std::filesystem::path& backupFile
     )
     {
@@ -348,7 +351,14 @@ namespace store
             std::filesystem::copy_options::overwrite_existing
         );
 
-        _serviceContainer->reopenDb();
+        const auto result = _serviceContainer->reopenDb();
+        if (!result)
+        {
+            return result.error().convert(
+                DatabaseErrorType::RestoreFromBackupFailed,
+                "Failed to reopen database after restoring from backup"
+            );
+        }
 
         for (auto* store : _stores->allStores)
         {
@@ -357,6 +367,8 @@ namespace store
         }
 
         LOG_INFO("Database restore complete");
+
+        return {};
     }
 
     /**

@@ -14,6 +14,8 @@ target_include_directories(molartracker_db
 )
 
 target_link_libraries(molartracker_db
+    PUBLIC
+    molartracker_error # For error handling as return types in database operations
     PRIVATE
     molartracker_config
     molartracker_logging

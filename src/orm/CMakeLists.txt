@@ -23,6 +23,7 @@ target_link_libraries(molartracker_orm
     molartracker_logging
     molartracker_filter
     molartracker_db
+    molartracker_error
     PRIVATE
     mstd
 )

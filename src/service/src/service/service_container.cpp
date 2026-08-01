@@ -196,7 +196,13 @@ namespace service
 
     /**
      * @brief Reopen the database connection.
+     *
+     * @return DatabaseResult<void> Returns a DatabaseResult indicating success
+     * or failure.
      */
-    void ServiceContainer::reopenDb() { _repoContainer->reopenDb(); }
+    DatabaseResult<void> ServiceContainer::reopenDb()
+    {
+        return _repoContainer->reopenDb();
+    }
 
 }   // namespace service

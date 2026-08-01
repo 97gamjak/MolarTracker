@@ -201,7 +201,10 @@ class CrudTest : public ::testing::Test
     orm::Crud _crud;
     // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-    void SetUp() override { _crud.createTable<ItemRow>(_db.db); }
+    void SetUp() override
+    {
+        static_cast<void>(_crud.createTable<ItemRow>(_db.db));
+    }
 };
 
 class FkCrudTest : public ::testing::Test
@@ -214,8 +217,8 @@ class FkCrudTest : public ::testing::Test
 
     void SetUp() override
     {
-        _crud.createTable<CategoryRow>(_db.db);
-        _crud.createTable<TaggedItemRow>(_db.db);
+        static_cast<void>(_crud.createTable<CategoryRow>(_db.db));
+        static_cast<void>(_crud.createTable<TaggedItemRow>(_db.db));
     }
 };
 
@@ -229,8 +232,8 @@ class RestrictFkCrudTest : public ::testing::Test
 
     void SetUp() override
     {
-        _crud.createTable<CategoryRow>(_db.db);
-        _crud.createTable<RestrictedItemRow>(_db.db);
+        static_cast<void>(_crud.createTable<CategoryRow>(_db.db));
+        static_cast<void>(_crud.createTable<RestrictedItemRow>(_db.db));
     }
 };
 
@@ -242,14 +245,14 @@ TEST(CreateTable, CreatesTableWithoutThrow)
 {
     TempDb    tdb;
     orm::Crud crud;
-    EXPECT_NO_THROW(crud.createTable<ItemRow>(tdb.db));
+    EXPECT_TRUE(crud.createTable<ItemRow>(tdb.db).has_value());
 }
 
 TEST(CreateTable, SqlIsTrackedAfterCreate)
 {
     TempDb    tdb;
     orm::Crud crud;
-    crud.createTable<ItemRow>(tdb.db);
+    static_cast<void>(crud.createTable<ItemRow>(tdb.db));
 
     const auto& executions = crud.getExecutedSQL();
     ASSERT_FALSE(executions.empty());
@@ -259,7 +262,7 @@ TEST(CreateTable, ExecutedSqlContainsTableName)
 {
     TempDb    tdb;
     orm::Crud crud;
-    crud.createTable<ItemRow>(tdb.db);
+    static_cast<void>(crud.createTable<ItemRow>(tdb.db));
 
     const auto& executions = crud.getExecutedSQL();
     ASSERT_FALSE(executions.empty());
@@ -270,7 +273,7 @@ TEST(CreateTable, ExecutedSqlContainsAllColumnNames)
 {
     TempDb    tdb;
     orm::Crud crud;
-    crud.createTable<ItemRow>(tdb.db);
+    static_cast<void>(crud.createTable<ItemRow>(tdb.db));
 
     const auto& sql = crud.getExecutedSQL().front();
     EXPECT_NE(sql.find("label"), std::string::npos);
@@ -283,16 +286,16 @@ TEST(CreateTable, IfNotExistsAllowsDoubleCreate)
 {
     TempDb    tdb;
     orm::Crud crud;
-    EXPECT_NO_THROW(crud.createTable<ItemRow>(tdb.db));
-    EXPECT_NO_THROW(crud.createTable<ItemRow>(tdb.db));
+    EXPECT_TRUE(crud.createTable<ItemRow>(tdb.db).has_value());
+    EXPECT_TRUE(crud.createTable<ItemRow>(tdb.db).has_value());
 }
 
 TEST(CreateTable, ForeignKeyConstraintInSql)
 {
     TempDb    tdb;
     orm::Crud crud;
-    crud.createTable<CategoryRow>(tdb.db);
-    crud.createTable<TaggedItemRow>(tdb.db);
+    static_cast<void>(crud.createTable<CategoryRow>(tdb.db));
+    static_cast<void>(crud.createTable<TaggedItemRow>(tdb.db));
 
     bool foundFk = false;
     for (const auto& sql : crud.getExecutedSQL())
@@ -585,7 +588,7 @@ TEST_F(CrudTest, UpdateModifiesExistingRow)
     row.score = score;
 
     const auto result = _crud.update(_db.db, row);
-    ASSERT_TRUE(result.has_value()) << result.error().getMessage();
+    ASSERT_TRUE(result.has_value()) << result.error().toString();
 
     const auto updated = _crud.get<ItemRow>(_db.db);
     ASSERT_EQ(updated.size(), 1U);
@@ -605,7 +608,7 @@ TEST_F(CrudTest, UpdateNonExistentRowReturnsNoRowsUpdated)
 
     const auto result = _crud.update(_db.db, row);
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error().getType(), orm::CrudErrorType::NoRowsUpdated);
+    EXPECT_EQ(result.error().getType(), CrudErrorType::NoRowsUpdated);
 }
 
 TEST_F(CrudTest, UpdateChangesArePersistedCorrectly)
@@ -790,7 +793,7 @@ TEST_F(CrudTest, AddColumnSucceeds)
     const NewField defaultField{0};
 
     const auto result = _crud.addColumn(_db.db, defaultField);
-    EXPECT_TRUE(result.has_value()) << result.error().getMessage();
+    EXPECT_TRUE(result.has_value()) << result.error().toString();
 }
 
 TEST_F(CrudTest, AddDuplicateColumnReturnsError)
@@ -802,17 +805,14 @@ TEST_F(CrudTest, AddDuplicateColumnReturnsError)
     result      = _crud.addColumn(_db.db, defaultField);
 
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(
-        result.error().getType(),
-        orm::CrudErrorType::ColumnAlreadyExists
-    );
+    EXPECT_EQ(result.error().getType(), CrudErrorType::ColumnAlreadyExists);
 }
 
 TEST_F(CrudTest, DropNonExistentColumnReturnsError)
 {
     const auto result = _crud.dropColumn<ItemRow>(_db.db, "nonexistent_col");
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error().getType(), orm::CrudErrorType::ColumnDoesNotExist);
+    EXPECT_EQ(result.error().getType(), CrudErrorType::ColumnDoesNotExist);
 }
 
 TEST_F(CrudTest, AddThenDropColumnSucceeds)
@@ -824,7 +824,7 @@ TEST_F(CrudTest, AddThenDropColumnSucceeds)
     ASSERT_TRUE(addResult.has_value());
 
     const auto dropResult = _crud.dropColumn<ItemRow>(_db.db, "temp_col");
-    EXPECT_TRUE(dropResult.has_value()) << dropResult.error().getMessage();
+    EXPECT_TRUE(dropResult.has_value()) << dropResult.error().toString();
 }
 
 // ===========================================================================
@@ -901,7 +901,7 @@ TEST(ExecutedSql, TracksSqlForAllOperations)
     TempDb    tdb;
     orm::Crud crud;
 
-    crud.createTable<ItemRow>(tdb.db);
+    static_cast<void>(crud.createTable<ItemRow>(tdb.db));
     EXPECT_EQ(crud.getExecutedSQL().size(), 1U);
 
     const auto insertResult = crud.insert(tdb.db, makeItem("track_me"));

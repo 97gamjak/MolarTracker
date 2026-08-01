@@ -79,7 +79,7 @@ TEST_F(AccountRepoTest, CreateAccountPersistsAccountInDatabase)
 
     const auto accounts = _repo.getAllAccounts(profileId);
     ASSERT_EQ(accounts.size(), 1U);
-    EXPECT_EQ(accounts[0].getId(), returnedId);
+    EXPECT_EQ(accounts[0].getId(), returnedId.value());
     EXPECT_EQ(accounts[0].getName(), "Checking");
 }
 
@@ -90,10 +90,7 @@ TEST_F(AccountRepoTest, CreateAccountDuplicateUniqueKeyThrows)
 
     static_cast<void>(_repo.createAccount(account, profileId));
 
-    EXPECT_THROW(
-        const auto result = _repo.createAccount(account, profileId),
-        orm::CrudException
-    );
+    EXPECT_FALSE(_repo.createAccount(account, profileId));
 }
 
 TEST_F(AccountRepoTest, CreateAccountSameNameDifferentKindSucceeds)

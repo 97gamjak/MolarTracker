@@ -7,7 +7,6 @@
 #include "orm/crud.hpp"
 #include "orm/query_options.hpp"
 #include "repo/factories/instrument_factory.hpp"
-#include "repo_errors.hpp"
 #include "sql_models/option_row.hpp"
 #include "sql_models/stock_row.hpp"
 
@@ -44,19 +43,19 @@ namespace repo
      * correct relationships between the tables.
      *
      * @param instrumentRow
-     * @return InstrumentId
+     * @return CrudResult<InstrumentId>
      */
-    InstrumentId InstrumentRepo::_addInstrument(
+    CrudResult<InstrumentId> InstrumentRepo::_addInstrument(
         const InstrumentRow& instrumentRow
     )
     {
-        auto result = _getCrud().insert(_getDb(), instrumentRow);
+        const auto result = _getCrud().insert(_getDb(), instrumentRow);
 
-        if (!result)
+        if (!result.has_value())
         {
-            throw RepositoryException(
-                "Failed to insert instrument row: " +
-                result.error().getMessage()
+            return result.error().convert(
+                "Failed to insert instrument row for instrument with symbol '" +
+                instrumentRow.toString() + "'"
             );
         }
 
@@ -111,8 +110,7 @@ namespace repo
         if (symbols.empty())
             return {};
 
-        const auto query =
-            orm::Query{}.in<StockRow::tickerField>(symbols);
+        const auto query = orm::Query{}.in<StockRow::tickerField>(symbols);
 
         auto results =
             _getCrud().get<StockRow>(_getDb(), query) |
@@ -222,28 +220,36 @@ namespace repo
      * @param stock The Stock object containing the details of the stock to be
      * added to the database
      *
-     * @return A struct containing the StockId and InstrumentId of the newly
-     * added stock
+     * @return CrudResult<finance::StockInsertionResult> The IDs of the newly
+     * added stock and its underlying instrument, or an error if the insertion
+     * failed
      */
-    finance::StockInsertionResult InstrumentRepo::addStock(
+    CrudResult<finance::StockInsertionResult> InstrumentRepo::addStock(
         const finance::Stock& stock
     )
     {
         auto [instrumentRow, stockRow] = InstrumentFactory::fromStock(stock);
 
-        const auto instrumentId = _addInstrument(instrumentRow);
+        const auto instrumentIdResult = _addInstrument(instrumentRow);
 
-        stockRow.instrumentId = instrumentId;
+        if (!instrumentIdResult.has_value())
+        {
+            return instrumentIdResult.error().convert(
+                "Failed to add instrument for stock: " + stock.getTicker()
+            );
+        }
+
+        stockRow.instrumentId = instrumentIdResult.value();
         const auto result     = _getCrud().insert(_getDb(), stockRow);
 
         if (!result)
         {
-            throw RepositoryException(
-                "Failed to insert stock row: " + result.error().getMessage()
+            return result.error().convert(
+                "Failed to insert stock row for stock: " + stock.getTicker()
             );
         }
 
-        return {
+        return finance::StockInsertionResult{
             .stockId      = StockId(result.value()),
             .instrumentId = stockRow.instrumentId.value()
         };
@@ -259,10 +265,11 @@ namespace repo
      * @param option The Option object containing the details of the option to
      * be added to the database
      *
-     * @return A struct containing the OptionId and InstrumentId of the newly
-     * added option
+     * @return CrudResult<finance::OptionInsertionResult> The IDs of the newly
+     * added option and its underlying instrument, or an error if the insertion
+     * failed
      */
-    finance::OptionInsertionResult InstrumentRepo::addOption(
+    CrudResult<finance::OptionInsertionResult> InstrumentRepo::addOption(
         const finance::Option& option
     )
     {
@@ -274,19 +281,26 @@ namespace repo
 
         auto [instrumentRow, optionRow] = InstrumentFactory::fromOption(option);
 
-        const auto instrumentId = _addInstrument(instrumentRow);
+        const auto instrumentIdResult = _addInstrument(instrumentRow);
 
-        optionRow.instrumentId = instrumentId;
+        if (!instrumentIdResult.has_value())
+        {
+            return instrumentIdResult.error().convert(
+                "Failed to add instrument for option: " + option.getName()
+            );
+        }
+
+        optionRow.instrumentId = instrumentIdResult.value();
         const auto result      = _getCrud().insert(_getDb(), optionRow);
 
         if (!result)
         {
-            throw RepositoryException(
-                "Failed to insert option row: " + result.error().getMessage()
+            return result.error().convert(
+                "Failed to insert option row for option: " + option.getName()
             );
         }
 
-        return {
+        return finance::OptionInsertionResult{
             .optionId     = OptionId(result.value()),
             .instrumentId = optionRow.instrumentId.value()
         };

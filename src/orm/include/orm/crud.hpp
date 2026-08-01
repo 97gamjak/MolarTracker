@@ -1,14 +1,13 @@
 #ifndef __ORM__INCLUDE__ORM__CRUD_HPP__
 #define __ORM__INCLUDE__ORM__CRUD_HPP__
 
-#include <expected>
 #include <mstd/error.hpp>
 #include <optional>
 #include <vector>
 
-#include "crud/crud_error.hpp"
 #include "db/database.hpp"
 #include "db/transaction.hpp"
+#include "error/crud_error.hpp"
 #include "join.hpp"
 #include "orm/type_traits.hpp"
 #include "query_options.hpp"
@@ -33,23 +32,30 @@ namespace orm
          ******************/
 
         template <db_model Model>
-        void createTable(db::Database& database);
+        [[nodiscard]]
+        CrudResult<void> createTable(db::Database& database);
 
         template <db_model Model>
-        void createTable(db::Database& database, std::string_view tableName);
+        [[nodiscard]]
+        CrudResult<void> createTable(
+            db::Database&    database,
+            std::string_view tableName
+        );
 
         /******************
          * INSERT METHODS *
          ******************/
 
         template <db_model Model>
-        [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
+        [[nodiscard]]
+        CrudResult<std::int64_t> insert(
             db::Database& database,
             const Model&  row
         );
 
         template <db_model Model>
-        [[nodiscard]] std::expected<std::int64_t, CrudError> insert(
+        [[nodiscard]]
+        CrudResult<std::int64_t> insert(
             db::Database& database,
             const db::Transaction& /*transaction*/,
             const Model& row
@@ -57,7 +63,8 @@ namespace orm
 
         template <typename... Models>
         requires(db_model<Models> && ...)
-        [[nodiscard]] std::expected<std::vector<std::int64_t>, CrudError> batchInsert(
+        [[nodiscard]]
+        CrudResult<std::vector<std::int64_t>> batchInsert(
             db::Database& database,
             const Models&... rows
         );
@@ -67,13 +74,12 @@ namespace orm
          ******************/
 
         template <db_model Model>
-        [[nodiscard]] std::expected<void, CrudError> update(
-            db::Database& database,
-            const Model&  row
-        );
+        [[nodiscard]]
+        CrudResult<void> update(db::Database& database, const Model& row);
 
         template <typename Field>
-        [[nodiscard]] std::expected<void, CrudError> updateField(
+        [[nodiscard]]
+        CrudResult<void> updateField(
             db::Database& database,
             const Field&  field
         );
@@ -123,13 +129,12 @@ namespace orm
          ******************/
 
         template <typename Field>
-        std::expected<void, CrudError> addColumn(
-            db::Database& database,
-            const Field&  field
-        );
+        [[nodiscard]]
+        CrudResult<void> addColumn(db::Database& database, const Field& field);
 
         template <typename Model>
-        std::expected<void, CrudError> dropColumn(
+        [[nodiscard]]
+        CrudResult<void> dropColumn(
             db::Database&      database,
             const std::string& columnName
         );

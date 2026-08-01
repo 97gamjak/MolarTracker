@@ -114,11 +114,23 @@ namespace store
                     );
 
                     const auto oldId = entry.value.getId();
-                    const auto id =
+                    const auto idResult =
                         _transactionService->addTransaction(entry.value);
 
+                    if (!idResult)
+                    {
+                        throw std::runtime_error(
+                            std::format(
+                                "Failed to add transaction '{}' to database: "
+                                "{}",
+                                entry.value.toString(),
+                                idResult.error().toString()
+                            )
+                        );
+                    }
+
                     auto persisted = entry.value;
-                    persisted.setId(id);
+                    persisted.setId(idResult.value());
                     _commitEntry(
                         oldId,
                         Entry{.value = persisted, .state = entry.state}

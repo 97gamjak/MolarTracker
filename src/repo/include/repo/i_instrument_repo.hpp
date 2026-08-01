@@ -6,6 +6,7 @@
 
 #include "common/container/set.hpp"
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace finance
 {
@@ -97,11 +98,12 @@ namespace repo
          * @param stock The Stock object containing the details of the stock to
          * be added to the database
          *
-         * @return A struct containing the StockId and InstrumentId of the newly
-         * added stock
+         * @return CrudResult<finance::StockInsertionResult> A struct containing
+         * the StockId and InstrumentId of the newly added stock, or an error if
+         * the insertion failed
          */
         [[nodiscard]]
-        virtual finance::StockInsertionResult addStock(
+        virtual CrudResult<finance::StockInsertionResult> addStock(
             const finance::Stock& stock
         ) = 0;
 
@@ -114,11 +116,12 @@ namespace repo
          * @param option The Option object containing the details of the option
          * to be added to the database
          *
-         * @return A struct containing the OptionId and InstrumentId of the
-         * newly added option
+         * @return CrudResult<finance::OptionInsertionResult> The IDs of the
+         * newly added option and its underlying instrument, or an error if the
+         * insertion failed
          */
         [[nodiscard]]
-        virtual finance::OptionInsertionResult addOption(
+        virtual CrudResult<finance::OptionInsertionResult> addOption(
             const finance::Option& option
         ) = 0;
 

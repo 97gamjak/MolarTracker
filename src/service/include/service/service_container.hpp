@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "error/crud_error.hpp"
+
 namespace repo
 {
     class RepoContainer;   // Forward declaration
@@ -77,8 +79,8 @@ namespace service
         [[nodiscard]] std::shared_ptr<const IWatchlistService> getWatchlistService(
         ) const;
 
-        void closeDb();
-        void reopenDb();
+        void                               closeDb();
+        [[nodiscard]] DatabaseResult<void> reopenDb();
     };
 
 }   // namespace service

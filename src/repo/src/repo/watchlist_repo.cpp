@@ -19,32 +19,23 @@ namespace repo
      * @brief Create a new, empty watchlist in the repository
      *
      * @param name
-     * @return WatchlistId The ID of the newly created watchlist
+     * @return CrudResult<WatchlistId> The ID of the newly created watchlist, or
+     * an error if the operation failed
      */
-    WatchlistId WatchlistRepo::createWatchlist(const std::string& name)
+    CrudResult<WatchlistId> WatchlistRepo::createWatchlist(
+        const std::string& name
+    )
     {
-        db::Transaction transaction{_getDb()};
-
         WatchlistRow watchlistRow;
         watchlistRow.name      = name;
         watchlistRow.createdAt = Timestamp{};
 
         const auto result = _getCrud().insert(_getDb(), watchlistRow);
 
-        if (!result.has_value())
-        {
-            transaction.rollback();
-
-            const auto msg = getInsertError(
-                result.error(),
-                "watchlist with name '" + name + "'"
+        if (!result)
+            return result.error().convert(
+                "Failed to create watchlist: " + name
             );
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
-        }
-
-        transaction.commit();
 
         return WatchlistId(result.value());
     }
@@ -105,7 +96,7 @@ namespace repo
         if (!result.has_value())
         {
             const auto msg =
-                "Failed to rename watchlist: " + result.error().getMessage();
+                "Failed to rename watchlist: " + result.error().toString();
 
             LOG_ERROR(msg);
             throw orm::CrudException(msg);
@@ -137,12 +128,11 @@ namespace repo
 
         const auto result = _getCrud().insert(_getDb(), row);
 
-        if (!result.has_value())
+        if (!result)
         {
-            const auto msg = getInsertError(
-                result.error(),
-                "watchlist instrument for symbol '" + symbol + "'"
-            );
+            const auto msg =
+                "Failed to insert watchlist instrument for symbol '" + symbol +
+                "': " + result.error().toString();
 
             LOG_ERROR(msg);
             throw orm::CrudException(msg);

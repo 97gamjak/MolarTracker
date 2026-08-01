@@ -10,6 +10,7 @@
 #include "ui/backup/restore_backup_dialog.hpp"
 #include "ui/menu_bar/settings_menu.hpp"
 #include "ui/settings/settings_dialog.hpp"
+#include "ui/utils/error.hpp"
 
 namespace controller
 {
@@ -26,13 +27,17 @@ namespace controller
          * @param storeContainer The StoreContainer instance managing the
          * application state.
          * @param backupFile The path to the backup file to restore from.
+         *
+         * @return DatabaseResult<void> Returns a DatabaseResult indicating
+         * success or failure.
          */
-        void _restoreFromBackup(
+        [[nodiscard]]
+        DatabaseResult<void> _restoreFromBackup(
             store::StoreContainer&       storeContainer,
             const std::filesystem::path& backupFile
         )
         {
-            storeContainer.restoreFromBackup(backupFile);
+            return storeContainer.restoreFromBackup(backupFile);
             // TODO(97gamjak): restart app
         }
     }   // namespace
@@ -97,7 +102,18 @@ namespace controller
 
         if (dialog->exec() == QDialog::Accepted && dialog->selectedBackup())
         {
-            _restoreFromBackup(_storeContainer, *dialog->selectedBackup());
+            const auto result =
+                _restoreFromBackup(_storeContainer, *dialog->selectedBackup());
+
+            if (!result)
+            {
+                ui::ErrorDialog::show(
+                    result.error(),
+                    "Restore from Backup Failed",
+                    &_mainWindow
+                );
+            }
+            return;
         }
     }
 

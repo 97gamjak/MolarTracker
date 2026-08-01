@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace finance
 {
@@ -31,9 +32,11 @@ namespace repo
          * details of the account to be created
          * @param profileId The ID of the profile to which the account
          * belongs
-         * @return AccountId The ID of the newly created account
+         * @return CrudResult<AccountId> The ID of the newly created account, or
+         * an error if the operation failed
          */
-        [[nodiscard]] virtual AccountId createAccount(
+        [[nodiscard]]
+        virtual CrudResult<AccountId> createAccount(
             const finance::Account& account,
             const ProfileId&        profileId
         ) = 0;
@@ -48,7 +51,8 @@ namespace repo
          * @return std::vector<finance::Account> A vector containing all
          * accounts in the repository
          */
-        [[nodiscard]] virtual std::vector<finance::Account> getAllAccounts(
+        [[nodiscard]]
+        virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) = 0;
     };
