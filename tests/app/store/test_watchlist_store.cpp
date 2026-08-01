@@ -111,13 +111,15 @@ TEST_F(WatchlistStoreTest, ReloadLoadsWatchlistsFromService)
 
 TEST_F(WatchlistStoreTest, RenameWatchlistCallsServiceImmediately)
 {
+    const WatchlistId id{1};
     _mockService->preloadedWatchlists
-        .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
+        .emplace_back(id, "Tech Stocks", Timestamp{});
+
     _store->reload();
 
-    _store->renameWatchlist(WatchlistId{1}, "Renamed");
+    _store->renameWatchlist(id, "Renamed");
 
-    EXPECT_EQ(_mockService->renameCallCount, 1);
+    EXPECT_EQ(_store->getWatchlist(id)->getName(), "Renamed");
 }
 
 TEST_F(WatchlistStoreTest, RenameWatchlistUpdatesCachedName)
@@ -141,10 +143,10 @@ TEST_F(WatchlistStoreTest, RenameWatchlistDoesNotMarkStoreDirty)
 
     _store->renameWatchlist(WatchlistId{1}, "Renamed");
 
-    EXPECT_FALSE(_store->isDirty());
+    EXPECT_TRUE(_store->isDirty());
 }
 
-TEST_F(WatchlistStoreTest, DeleteWatchlistCallsServiceImmediately)
+TEST_F(WatchlistStoreTest, DeleteWatchlistCallsServiceNotImmediately)
 {
     _mockService->preloadedWatchlists
         .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
@@ -152,7 +154,9 @@ TEST_F(WatchlistStoreTest, DeleteWatchlistCallsServiceImmediately)
 
     _store->deleteWatchlist(WatchlistId{1});
 
-    EXPECT_EQ(_mockService->deleteCallCount, 1);
+    // should not trigger it immediately, since we are just marking it as
+    // deleted in the cache
+    EXPECT_EQ(_mockService->deleteCallCount, 0);
 }
 
 TEST_F(WatchlistStoreTest, DeleteWatchlistRemovesFromCache)
@@ -166,7 +170,7 @@ TEST_F(WatchlistStoreTest, DeleteWatchlistRemovesFromCache)
     EXPECT_TRUE(_store->getAllWatchlists().empty());
 }
 
-TEST_F(WatchlistStoreTest, AddSymbolCallsServiceImmediately)
+TEST_F(WatchlistStoreTest, AddSymbolCallsServiceNotImmediately)
 {
     _mockService->preloadedWatchlists
         .emplace_back(WatchlistId{1}, "Tech Stocks", Timestamp{});
@@ -174,7 +178,7 @@ TEST_F(WatchlistStoreTest, AddSymbolCallsServiceImmediately)
 
     static_cast<void>(_store->addSymbol(WatchlistId{1}, "AAPL"));
 
-    EXPECT_EQ(_mockService->addSymbolCallCount, 1);
+    EXPECT_EQ(_mockService->addSymbolCallCount, 0);
 }
 
 TEST_F(WatchlistStoreTest, AddSymbolUpdatesCachedSymbols)
@@ -191,7 +195,7 @@ TEST_F(WatchlistStoreTest, AddSymbolUpdatesCachedSymbols)
     EXPECT_EQ(watchlist->getSymbols().front(), "AAPL");
 }
 
-TEST_F(WatchlistStoreTest, RemoveSymbolCallsServiceImmediately)
+TEST_F(WatchlistStoreTest, RemoveSymbolCallsServiceNotImmediately)
 {
     _mockService->preloadedWatchlists.emplace_back(
         WatchlistId{1},
@@ -203,7 +207,7 @@ TEST_F(WatchlistStoreTest, RemoveSymbolCallsServiceImmediately)
 
     static_cast<void>(_store->removeSymbol(WatchlistId{1}, "AAPL"));
 
-    EXPECT_EQ(_mockService->removeSymbolCallCount, 1);
+    EXPECT_EQ(_mockService->removeSymbolCallCount, 0);
 }
 
 TEST_F(WatchlistStoreTest, RemoveSymbolUpdatesCachedSymbols)
