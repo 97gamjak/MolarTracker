@@ -29,7 +29,7 @@ namespace service
         );
 
         [[nodiscard]]
-        TransactionId addTransaction(
+        CrudResult<TransactionId> addTransaction(
             const finance::DomainTransaction& transaction
         ) override;
 

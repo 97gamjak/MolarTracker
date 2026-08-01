@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace finance
 {
@@ -27,10 +28,10 @@ namespace service
          *
          * @param transaction The transaction to add.
          *
-         * @return The ID of the added transaction.
+         * @return CrudResult<TransactionId> The result of the add operation.
          */
         [[nodiscard]]
-        virtual TransactionId addTransaction(
+        virtual CrudResult<TransactionId> addTransaction(
             const finance::DomainTransaction& transaction
         ) = 0;
 

@@ -22,9 +22,11 @@ namespace service
      * @brief Create a new, empty watchlist
      *
      * @param name
-     * @return WatchlistId
+     * @return CrudResult<WatchlistId>
      */
-    WatchlistId WatchlistService::createWatchlist(const std::string& name)
+    CrudResult<WatchlistId> WatchlistService::createWatchlist(
+        const std::string& name
+    )
     {
         return _watchlistRepo->createWatchlist(name);
     }
@@ -46,7 +48,7 @@ namespace service
      * @param newName
      */
     void WatchlistService::renameWatchlist(
-        WatchlistId         id,
+        WatchlistId        id,
         const std::string& newName
     )
     {
@@ -81,7 +83,7 @@ namespace service
      * @param symbol
      */
     void WatchlistService::removeSymbol(
-        WatchlistId         id,
+        WatchlistId        id,
         const std::string& symbol
     )
     {

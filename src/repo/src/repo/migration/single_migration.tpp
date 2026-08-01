@@ -35,14 +35,22 @@ namespace repo
      *
      * @tparam Model
      * @param db
+     *
+     * @return CrudResult<void>
      */
     template <orm::db_model Model>
-    void CreateTableMigration<Model>::applyMigration(db::Database& db)
+    CrudResult<void> CreateTableMigration<Model>::applyMigration(
+        db::Database& db
+    )
     {
-        orm::Crud crud;
-        crud.createTable<Model>(db, _tableName);
+        orm::Crud  crud;
+        const auto result = crud.createTable<Model>(db, _tableName);
+
+        if (!result)
+            return result.error();
 
         setSQLStatements(crud.getExecutedSQL());
+        return {};
     }
 
     /**
@@ -62,15 +70,21 @@ namespace repo
      * @brief Apply the migration to add a column to the database
      *
      * @param db The database to apply the migration to
+     *
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <typename Field>
-    void AddColumnMigration<Field>::applyMigration(db::Database& db)
+    CrudResult<void> AddColumnMigration<Field>::applyMigration(db::Database& db)
     {
         orm::Crud crud;
 
-        crud.addColumn(db, _defaultValue);
+        const auto result = crud.addColumn(db, _defaultValue);
+        if (!result)
+            return result.error();
 
         setSQLStatements(crud.getExecutedSQL());
+        return {};
     }
 
     /**
@@ -90,16 +104,25 @@ namespace repo
     /**
      * @brief Apply the migration to drop a column from the database
      *
+     * @tparam Model
      * @param db The database to apply the migration to
+     *
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <typename Model>
-    void DropColumnMigration<Model>::applyMigration(db::Database& db)
+    CrudResult<void> DropColumnMigration<Model>::applyMigration(
+        db::Database& db
+    )
     {
         orm::Crud crud;
 
-        crud.dropColumn<Model>(db, _columnName);
+        const auto result = crud.dropColumn<Model>(db, _columnName);
+        if (!result)
+            return result.error();
 
         setSQLStatements(crud.getExecutedSQL());
+        return {};
     }
 
 }   // namespace repo

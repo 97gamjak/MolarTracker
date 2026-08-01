@@ -240,8 +240,21 @@ namespace store
      */
     void ProfileStore::_commitNewProfile(Entry entry)
     {
-        const auto oldId = entry.value.getId();
-        const auto newId = _profileService->create(entry.value);
+        const auto oldId       = entry.value.getId();
+        const auto newIdResult = _profileService->create(entry.value);
+
+        if (!newIdResult)
+        {
+            throw ProfileStoreException(
+                std::format(
+                    "Failed to commit new profile {} with error {}",
+                    entry.value.getName(),
+                    newIdResult.error().toString()
+                )
+            );
+        }
+
+        const auto newId = newIdResult.value();
 
         entry.value.setId(newId);
 

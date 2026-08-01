@@ -59,13 +59,25 @@ namespace repo
      * @brief Apply the custom migration
      *
      * @param db
+     *
+     * @return CrudResult<void>
      */
-    void CustomMigration::applyMigration(db::Database& db)
+    CrudResult<void> CustomMigration::applyMigration(db::Database& db)
     {
         // Apply the custom migration using the SQL statement
-        db.execute(_sql);
+        const auto result = db.execute(_sql);
+
+        if (!result)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                result.error(),
+                "Failed to apply custom migration with SQL: " + _sql
+            );
+        }
 
         setSQLStatements(std::vector<std::string>{_sql});
+
+        return {};
     }
 
     /**
@@ -82,16 +94,29 @@ namespace repo
      * @brief Apply the change foreign key pragma migration
      *
      * @param db
+     *
+     * @return CrudResult<void>
      */
-    void ChangeForeignKeyPragma::applyMigration(db::Database& db)
+    CrudResult<void> ChangeForeignKeyPragma::applyMigration(db::Database& db)
     {
         // Apply the change foreign key pragma migration
         std::string sql =
             std::format("PRAGMA foreign_keys = {}", _enable ? "ON" : "OFF");
 
-        db.execute(sql);
+        const auto result = db.execute(sql);
+
+        if (!result)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                result.error(),
+                "Failed to apply change foreign key pragma migration to '" +
+                    std::string(_enable ? "ON" : "OFF") + "'"
+            );
+        }
 
         setSQLStatements(std::vector<std::string>{sql});
+
+        return {};
     }
 
     /**
@@ -109,15 +134,27 @@ namespace repo
      * @brief Apply the drop table migration
      *
      * @param db
+     *
+     * @return CrudResult<void>
      */
-    void DropTableMigration::applyMigration(db::Database& db)
+    CrudResult<void> DropTableMigration::applyMigration(db::Database& db)
     {
         // Apply the drop table migration
         std::string sql = std::format("DROP TABLE {}", _tableName);
 
-        db.execute(sql);
+        const auto result = db.execute(sql);
+
+        if (!result)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                result.error(),
+                "Failed to apply drop table migration for table: " + _tableName
+            );
+        }
 
         setSQLStatements(std::vector<std::string>{sql});
+
+        return {};
     }
 
     /**
@@ -140,8 +177,10 @@ namespace repo
      * @brief Apply the copy table migration
      *
      * @param db
+     *
+     * @return CrudResult<void>
      */
-    void CopyTableMigration::applyMigration(db::Database& db)
+    CrudResult<void> CopyTableMigration::applyMigration(db::Database& db)
     {
         // Apply the copy table migration
         std::string sql = std::format(
@@ -150,9 +189,20 @@ namespace repo
             _sourceTable
         );
 
-        db.execute(sql);
+        const auto result = db.execute(sql);
+
+        if (!result)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                result.error(),
+                "Failed to apply copy table migration from '" + _sourceTable +
+                    "' to '" + _destinationTable + "'"
+            );
+        }
 
         setSQLStatements(std::vector<std::string>{sql});
+
+        return {};
     }
 
     /**
@@ -175,16 +225,29 @@ namespace repo
      * @brief Apply the rename table migration
      *
      * @param db
+     *
+     * @return CrudResult<void>
      */
-    void RenameTableMigration::applyMigration(db::Database& db)
+    CrudResult<void> RenameTableMigration::applyMigration(db::Database& db)
     {
         // Apply the rename table migration
         std::string sql =
             std::format("ALTER TABLE {} RENAME TO {}", _oldName, _newName);
 
-        db.execute(sql);
+        const auto result = db.execute(sql);
+
+        if (!result)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                result.error(),
+                "Failed to apply rename table migration from '" + _oldName +
+                    "' to '" + _newName + "'"
+            );
+        }
 
         setSQLStatements(std::vector<std::string>{sql});
+
+        return {};
     }
 
 }   // namespace repo

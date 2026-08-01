@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 #include "finance/watchlist.hpp"
 
 namespace repo
@@ -23,10 +24,13 @@ namespace repo
          * @brief Create a new, empty watchlist
          *
          * @param name The display name of the new watchlist
-         * @return WatchlistId The ID of the newly created watchlist
+         * @return CrudResult<WatchlistId> The ID of the newly created
+         * watchlist, or an error if the operation failed
          */
         [[nodiscard]]
-        virtual WatchlistId createWatchlist(const std::string& name) = 0;
+        virtual CrudResult<WatchlistId> createWatchlist(
+            const std::string& name
+        ) = 0;
 
         /**
          * @brief Get all watchlists, including their symbols

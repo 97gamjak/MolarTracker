@@ -158,10 +158,24 @@ namespace store
                 {
                     auto       newEntry = entry;
                     const auto oldId    = newEntry.value.getId();
-                    auto       id       = _accountService->createAccount(
+                    auto       idResult = _accountService->createAccount(
                         newEntry.value,
                         _activeProfileId
                     );
+
+                    if (!idResult)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to add account '{}' to database: {}",
+                                newEntry.value.getName(),
+                                idResult.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto id = idResult.value();
+
                     newEntry.value.setId(id);
 
                     const auto result = _commitEntry(oldId, newEntry);

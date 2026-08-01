@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "error/crud_error.hpp"
 #include "orm/type_traits.hpp"
 
 namespace db
@@ -59,8 +60,10 @@ namespace repo
          * to be implemented by all concrete single migrations
          *
          * @param db
+         *
+         * @return CrudResult<void>
          */
-        virtual void applyMigration(db::Database& db) = 0;
+        virtual CrudResult<void> applyMigration(db::Database& db) = 0;
     };
 
     /**
@@ -78,7 +81,7 @@ namespace repo
         explicit CreateTableMigration();
         explicit CreateTableMigration(std::string tableName);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -95,7 +98,7 @@ namespace repo
         explicit CustomMigration(std::string sql);
         explicit CustomMigration(std::string sql, MigrationType type);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -111,7 +114,7 @@ namespace repo
        public:
         explicit ChangeForeignKeyPragma(bool enable);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -127,7 +130,7 @@ namespace repo
        public:
         explicit DropTableMigration(std::string tableName);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -149,7 +152,7 @@ namespace repo
             std::string destinationTable
         );
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -168,7 +171,7 @@ namespace repo
        public:
         RenameTableMigration(std::string oldName, std::string newName);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -185,7 +188,7 @@ namespace repo
        public:
         explicit AddColumnMigration(Field defaultValue);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
     /**
@@ -202,7 +205,7 @@ namespace repo
        public:
         explicit DropColumnMigration(std::string columnName);
 
-        void applyMigration(db::Database& db) override;
+        CrudResult<void> applyMigration(db::Database& db) override;
     };
 
 }   // namespace repo

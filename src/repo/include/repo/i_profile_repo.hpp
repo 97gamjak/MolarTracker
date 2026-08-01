@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace domain
 {
@@ -62,10 +63,13 @@ namespace repo
          * profile could not be created.
          *
          * @param profile The profile to create
-         * @return ProfileId The ID of the newly created profile
+         * @return CrudResult<ProfileId> The ID of the newly created profile, or
+         * an error if the creation failed
          */
         [[nodiscard]]
-        virtual ProfileId create(const domain::Profile& profile) = 0;
+        virtual CrudResult<ProfileId> create(
+            const domain::Profile& profile
+        ) = 0;
 
         /**
          * @brief Update an existing profile with the given ID, changing its

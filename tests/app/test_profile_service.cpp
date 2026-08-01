@@ -78,10 +78,10 @@ TEST_F(ProfileServiceTest, GetByIdReturnsCorrectProfile)
         }
     );
 
-    const auto profile = _service->get(id);
+    const auto profile = _service->get(id.value());
     ASSERT_TRUE(profile.has_value());
     EXPECT_EQ(profile->getName(), "Bob");
-    EXPECT_EQ(profile->getId(), id);
+    EXPECT_EQ(profile->getId(), id.value());
 }
 
 TEST_F(ProfileServiceTest, GetAllEmptyWhenNoProfiles)
@@ -111,9 +111,9 @@ TEST_F(ProfileServiceTest, UpdateChangesNameAndEmail)
         domain::Profile{ProfileId::invalid(), "Carol", std::nullopt}
     );
 
-    _service->update(id, "Caroline", std::string{"carol@example.com"});
+    _service->update(id.value(), "Caroline", std::string{"carol@example.com"});
 
-    const auto profile = _service->get(id);
+    const auto profile = _service->get(id.value());
     ASSERT_TRUE(profile.has_value());
     EXPECT_EQ(profile->getName(), "Caroline");
     ASSERT_TRUE(profile->getEmail().has_value());
@@ -134,9 +134,9 @@ TEST_F(ProfileServiceTest, RemoveDeletesProfile)
         domain::Profile{ProfileId::invalid(), "Dave", std::nullopt}
     );
 
-    _service->remove(id);
+    _service->remove(id.value());
 
-    EXPECT_FALSE(_service->get(id).has_value());
+    EXPECT_FALSE(_service->get(id.value()).has_value());
 }
 
 TEST_F(ProfileServiceTest, RemoveDoesNotAffectOtherProfiles)
@@ -148,8 +148,8 @@ TEST_F(ProfileServiceTest, RemoveDoesNotAffectOtherProfiles)
         domain::Profile{ProfileId::invalid(), "Frank", std::nullopt}
     );
 
-    _service->remove(id1);
+    _service->remove(id1.value());
 
-    EXPECT_FALSE(_service->get(id1).has_value());
-    EXPECT_TRUE(_service->get(id2).has_value());
+    EXPECT_FALSE(_service->get(id1.value()).has_value());
+    EXPECT_TRUE(_service->get(id2.value()).has_value());
 }

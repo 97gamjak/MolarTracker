@@ -63,16 +63,20 @@ namespace
         void SetUp() override
         {
             // Raw SQL bypasses requires_paired_insert_t ORM policy.
-            _db.execute(
+            static_cast<void>(_db.execute(
                 "INSERT INTO profile (name, email) "
                 "VALUES ('TestProfile', NULL)"
-            );
-            _db.execute(
+            ));
+            static_cast<void>(_db.execute(
                 "INSERT INTO account (kind, profile_id, name, status, "
                 "currency) VALUES (0, 1, 'TestAccount', 0, 0)"
+            ));
+            static_cast<void>(
+                _db.execute("INSERT INTO instrument (id) VALUES (NULL)")
             );
-            _db.execute("INSERT INTO instrument (id) VALUES (NULL)");
-            _db.execute("INSERT INTO position (opened_at) VALUES (1)");
+            static_cast<void>(
+                _db.execute("INSERT INTO position (opened_at) VALUES (1)")
+            );
         }
 
         [[nodiscard]] finance::DomainTransaction makeCashTx(
@@ -150,8 +154,8 @@ TEST_F(TransactionRepoFixture, AddTransactionCashReturnsPositiveId)
 {
     const auto id = _repo.addTransaction(makeCashTx());
 
-    EXPECT_TRUE(id.isValid());
-    EXPECT_GT(id.value(), 0);
+    EXPECT_TRUE(id.value().isValid());
+    EXPECT_GT(id.value().value(), 0);
 }
 
 TEST_F(
@@ -163,7 +167,7 @@ TEST_F(
     const auto id2 = _repo.addTransaction(makeCashTx());
 
     EXPECT_NE(id1, id2);
-    EXPECT_LT(id1.value(), id2.value());
+    EXPECT_LT(id1.value().value(), id2.value().value());
 }
 
 // ---------------------------------------------------------------------------
@@ -172,7 +176,7 @@ TEST_F(
 
 TEST_F(TransactionRepoFixture, AddTransactionCashSingleTransactionRetrieved)
 {
-    const auto result = _repo.addTransaction(makeCashTx());
+    const auto result = _repo.addTransaction(makeCashTx()).value();
 
     finance::TransactionFilter filter;
     filter.accountIds.insert(_accountId);

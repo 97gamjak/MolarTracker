@@ -47,12 +47,12 @@ namespace service
         ) override;
 
         [[nodiscard]]
-        finance::StockInsertionResult addStock(
+        CrudResult<finance::StockInsertionResult> addStock(
             const finance::Stock& stock
         ) override;
 
         [[nodiscard]]
-        finance::OptionInsertionResult addOption(
+        CrudResult<finance::OptionInsertionResult> addOption(
             const finance::Option& option
         ) override;
 

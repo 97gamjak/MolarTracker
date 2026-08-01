@@ -119,19 +119,32 @@ namespace store
                     const auto insertionResult =
                         _instrumentService->addStock(entry.value);
 
+                    if (!insertionResult)
+                    {
+                        throw std::runtime_error(
+                            std::format(
+                                "Failed to add stock '{}' to database: {}",
+                                entry.value.getTicker(),
+                                insertionResult.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto& insertion = insertionResult.value();
+
                     LOG_DEBUG(
                         std::format(
                             "Added new stock: {} with ID: {} and Instrument "
                             "ID: {}",
                             entry.value.toString(),
-                            insertionResult.stockId.toString(),
-                            insertionResult.instrumentId.toString()
+                            insertion.stockId.toString(),
+                            insertion.instrumentId.toString()
                         )
                     );
 
                     auto stock = entry.value;
-                    stock.setId(insertionResult.stockId);
-                    stock.setInstrumentId(insertionResult.instrumentId);
+                    stock.setId(insertion.stockId);
+                    stock.setInstrumentId(insertion.instrumentId);
                     const auto oldInstrumentId = entry.value.getInstrumentId();
 
                     const auto result = _commitEntry(
@@ -146,9 +159,9 @@ namespace store
                         );
                     }
 
-                    if (oldInstrumentId != insertionResult.instrumentId)
+                    if (oldInstrumentId != insertion.instrumentId)
                         _instrumentIdMap[oldInstrumentId] =
-                            insertionResult.instrumentId;
+                            insertion.instrumentId;
 
                     break;
                 }

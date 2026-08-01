@@ -8,6 +8,8 @@
 #include <string_view>
 #include <vector>
 
+#include "error/crud_error.hpp"
+
 struct sqlite3;   // Forward declaration
 
 namespace db
@@ -45,13 +47,14 @@ namespace db
         Database(Database&& other) noexcept;
         Database& operator=(Database&& other) noexcept;
 
-        void open(const std::string& dbPath);
-        void close();
+        [[nodiscard]] DatabaseResult<void> open(const std::string& dbPath);
+        void                               close();
 
         [[nodiscard]] bool     isOpen() const;
         [[nodiscard]] sqlite3* nativeHandle() const;
 
-        void execute(std::string_view sql);
+        [[nodiscard]]
+        DatabaseResult<void> execute(std::string_view sql);
 
         [[nodiscard]] Statement prepare(std::string_view sql);
 
@@ -59,17 +62,18 @@ namespace db
         [[nodiscard]] std::int64_t getNumberOfLastChanges() const;
 
         void setBusyTimeout(int timeout_milliseconds);
-        void enableForeignKeys(bool enabled);
+        [[nodiscard]] DatabaseResult<void> enableForeignKeys(bool enabled);
 
         [[nodiscard]] int queryInt(std::string_view sql);
 
         void makeBackup();
 
-        void begin(bool immediate);
+        [[nodiscard]]
+        DatabaseResult<void> begin(bool immediate);
 
-        [[nodiscard]] bool isTransactionStarted() const;
-        void               commit();
-        void               rollback();
+        [[nodiscard]] bool                 isTransactionStarted() const;
+        [[nodiscard]] DatabaseResult<void> commit();
+        [[nodiscard]] DatabaseResult<void> rollback();
 
         [[nodiscard]] std::string getDBPath() const;
 

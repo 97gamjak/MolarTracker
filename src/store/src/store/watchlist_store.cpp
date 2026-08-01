@@ -57,9 +57,23 @@ namespace store
                 {
                     auto       newEntry = entry;
                     const auto oldId    = newEntry.value.getId();
-                    const auto id       = _watchlistService->createWatchlist(
+                    const auto idResult = _watchlistService->createWatchlist(
                         newEntry.value.getName()
                     );
+
+                    if (!idResult)
+                    {
+                        throw WatchlistStoreException(
+                            std::format(
+                                "Failed to add watchlist '{}' to database: {}",
+                                newEntry.value.getName(),
+                                idResult.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto id = idResult.value();
+
                     newEntry.value.setId(id);
 
                     const auto result = _commitEntry(oldId, newEntry);
