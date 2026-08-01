@@ -47,18 +47,15 @@ TEST_F(ProfileRepoTest, CreateReturnsValidId)
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(ProfileRepoTest, CreateDuplicateNameThrows)
+TEST_F(ProfileRepoTest, CreateDuplicateNameReturnsError)
 {
     auto result = _repo.create(
         domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
-    EXPECT_THROW(
-        result = _repo.create(
-            domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
-        ),
-        orm::CrudException
-    );
+    EXPECT_FALSE(_repo.create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
 }
 
 TEST_F(ProfileRepoTest, CreateWithEmailPersistsEmail)

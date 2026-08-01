@@ -83,14 +83,11 @@ TEST_F(InstrumentRepoTest, AddStockTwoStocksIdsAreDistinct)
 // addStock — duplicate ticker
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, AddStockDuplicateTickerThrows)
+TEST_F(InstrumentRepoTest, AddStockDuplicateTickerReturnsFalse)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
-    EXPECT_THROW(
-        static_cast<void>(_repo.addStock(makeStock("AAPL"))),
-        repo::RepositoryException
-    );
+    EXPECT_FALSE(_repo.addStock(makeStock("AAPL")));
 }
 
 // ---------------------------------------------------------------------------

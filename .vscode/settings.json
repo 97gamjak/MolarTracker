@@ -152,5 +152,13 @@
     },
     "workbench.editor.enablePreview": false,
     "workbench.editor.enablePreviewFromQuickOpen": false,
-    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "testMate.cpp.test.advancedExecutables": [
+        {
+            "pattern": ".build/**/*{test,Test,TEST}*",
+            "env": {
+                "QT_QPA_PLATFORM": "offscreen"
+            }
+        }
+    ]
 }

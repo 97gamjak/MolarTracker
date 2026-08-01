@@ -44,21 +44,19 @@ TEST_F(ProfileServiceTest, CreateReturnsValidId)
         domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     );
 
+    ASSERT_TRUE(id.has_value());
     EXPECT_GT(id.value(), 0);
 }
 
-TEST_F(ProfileServiceTest, CreateDuplicateNameThrows)
+TEST_F(ProfileServiceTest, CreateDuplicateNameReturnsError)
 {
     static_cast<void>(_service->create(
         domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
     ));
 
-    EXPECT_THROW(
-        static_cast<void>(_service->create(
-            domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
-        )),
-        orm::CrudException
-    );
+    EXPECT_FALSE(_service->create(
+        domain::Profile{ProfileId::invalid(), "Alice", std::nullopt}
+    ));
 }
 
 TEST_F(ProfileServiceTest, GetByIdReturnsNulloptForMissingId)

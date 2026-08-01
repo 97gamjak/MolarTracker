@@ -166,7 +166,7 @@ TEST_F(
     const auto id1 = _repo.addTransaction(makeCashTx());
     const auto id2 = _repo.addTransaction(makeCashTx());
 
-    EXPECT_NE(id1, id2);
+    EXPECT_NE(id1.value(), id2.value());
     EXPECT_LT(id1.value().value(), id2.value().value());
 }
 
@@ -235,7 +235,7 @@ TEST_F(TransactionRepoFixture, AddTransactionCashAssignedIdMatchesReturnedId)
     const auto txs = _repo.getTransactions(filter);
 
     ASSERT_EQ(txs.size(), 1U);
-    EXPECT_EQ(txs[0].getId(), insertedId);
+    EXPECT_EQ(txs[0].getId(), insertedId.value());
 }
 
 // ---------------------------------------------------------------------------

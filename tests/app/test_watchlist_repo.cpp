@@ -45,7 +45,7 @@ TEST_F(WatchlistRepoTest, CreateWatchlistPersistsWithEmptySymbols)
 
     const auto watchlists = _repo.getAllWatchlists();
     ASSERT_EQ(watchlists.size(), 1U);
-    EXPECT_EQ(watchlists[0].getId(), id);
+    EXPECT_EQ(watchlists[0].getId(), id.value());
     EXPECT_EQ(watchlists[0].getName(), "Tech Stocks");
     EXPECT_TRUE(watchlists[0].getSymbols().empty());
 }
@@ -134,7 +134,7 @@ TEST_F(WatchlistRepoTest, AddDuplicateSymbolThrows)
     const auto id = _repo.createWatchlist("Tech Stocks");
     _repo.addSymbol(id.value(), "AAPL");
 
-    EXPECT_NO_THROW(_repo.addSymbol(id.value(), "AAPL"));
+    EXPECT_THROW(_repo.addSymbol(id.value(), "AAPL"), orm::CrudException);
 }
 
 TEST_F(WatchlistRepoTest, SameSymbolInDifferentWatchlistsSucceeds)

@@ -107,5 +107,5 @@ TEST_F(TransactionServiceTest, AddMultipleTransactionsIdsAreDistinct)
     const auto id1 = _service->addTransaction(makeCashTx());
     const auto id2 = _service->addTransaction(makeCashTx());
 
-    EXPECT_NE(id1, id2);
+    EXPECT_NE(id1.value(), id2.value());
 }
