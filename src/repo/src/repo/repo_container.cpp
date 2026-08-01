@@ -40,6 +40,9 @@ namespace repo
             );
         }
 
+        // Attention: the MigrationRunner does already apply migrations to the
+        // database in its constructor, so it must be created after the database
+        // is opened.
         _migrationRunner = std::make_unique<MigrationRunner>(*_database);
         _profileRepo     = std::make_shared<ProfileRepo>(*_database);
         _accountRepo     = std::make_shared<AccountRepo>(*_database);
@@ -65,10 +68,15 @@ namespace repo
 
     /**
      * @brief Reopen the database connection at the original path.
+     *
+     * @return DatabaseResult<void> Returns a DatabaseResult indicating success
+     * or failure.
      */
-    void RepoContainer::reopenDb()
+    DatabaseResult<void> RepoContainer::reopenDb()
     {
-        _database->open(Constants::getInstance().getDatabasePath().string());
+        return _database->open(
+            Constants::getInstance().getDatabasePath().string()
+        );
     }
 
     RepoContainer::~RepoContainer() = default;

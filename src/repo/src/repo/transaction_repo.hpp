@@ -17,7 +17,7 @@ namespace repo
         using BaseRepo::BaseRepo;
 
         [[nodiscard]]
-        TransactionId addTransaction(
+        CrudResult<TransactionId> addTransaction(
             const finance::DomainTransaction& transaction
         ) override;
 

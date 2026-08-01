@@ -36,7 +36,7 @@ namespace repo
         ) const override;
 
         [[nodiscard]]
-        ProfileId create(const domain::Profile& profile) override;
+        CrudResult<ProfileId> create(const domain::Profile& profile) override;
 
         void update(
             ProfileId                         id,

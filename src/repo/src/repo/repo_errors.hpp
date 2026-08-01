@@ -4,15 +4,9 @@
 #include <string>
 
 #include "exceptions/base.hpp"
-#include "orm/crud/crud_error.hpp"
 
 namespace repo
 {
-    std::string getInsertError(
-        const orm::CrudError& error,
-        const std::string&    what
-    );
-
     /**
      * @brief Exception class for repository errors.
      */

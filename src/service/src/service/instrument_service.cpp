@@ -97,10 +97,11 @@ namespace service
      * @param stock The Stock object containing the details of the stock to be
      * added to the database
      *
-     * @return A struct containing the StockId and InstrumentId of the newly
-     * added stock
+     * @return CrudResult<finance::StockInsertionResult> The result of the add
+     * operation, containing the StockId and InstrumentId of the newly added
+     * stock
      */
-    finance::StockInsertionResult InstrumentService::addStock(
+    CrudResult<finance::StockInsertionResult> InstrumentService::addStock(
         const finance::Stock& stock
     )
     {
@@ -111,16 +112,16 @@ namespace service
      * @brief add an option instrument to the database, this involves inserting
      * a new row into the instrument table and a corresponding row into the
      * option table, ensuring that the relationships between the tables are
-     * maintained correctly, and that the underlying stock information is also
-     * added to the database if it does not already exist.
+     * maintained correctly.
      *
      * @param option The Option object containing the details of the option to
      * be added to the database
      *
-     * @return A struct containing the OptionId and InstrumentId of the newly
-     * added option
+     * @return CrudResult<finance::OptionInsertionResult> The result of the add
+     * operation, containing the OptionId and InstrumentId of the newly added
+     * option
      */
-    finance::OptionInsertionResult InstrumentService::addOption(
+    CrudResult<finance::OptionInsertionResult> InstrumentService::addOption(
         const finance::Option& option
     )
     {

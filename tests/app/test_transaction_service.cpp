@@ -42,15 +42,15 @@ namespace
               _service{std::make_shared<service::TransactionService>(_repo)}
         {
             auto runner = repo::MigrationRunner{_db};
-            _db.execute(
+            static_cast<void>(_db.execute(
                 "INSERT INTO profile (name, email) "
                 "VALUES ('TestProfile', NULL)"
-            );
-            _db.execute(
+            ));
+            static_cast<void>(_db.execute(
                 "INSERT INTO account "
                 "(kind, profile_id, name, status, currency) "
                 "VALUES (0, 1, 'TestAccount', 0, 0)"
-            );
+            ));
         }
 
         [[nodiscard]] finance::DomainTransaction makeCashTx(
@@ -107,5 +107,5 @@ TEST_F(TransactionServiceTest, AddMultipleTransactionsIdsAreDistinct)
     const auto id1 = _service->addTransaction(makeCashTx());
     const auto id2 = _service->addTransaction(makeCashTx());
 
-    EXPECT_NE(id1, id2);
+    EXPECT_NE(id1.value(), id2.value());
 }

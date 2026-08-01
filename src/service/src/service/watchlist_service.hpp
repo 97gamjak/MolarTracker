@@ -29,7 +29,7 @@ namespace service
         );
 
         [[nodiscard]]
-        WatchlistId createWatchlist(
+        CrudResult<WatchlistId> createWatchlist(
             const finance::Watchlist& watchlist
         ) override;
 

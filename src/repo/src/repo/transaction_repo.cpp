@@ -12,7 +12,6 @@
 #include "orm/crud.hpp"
 #include "orm/join.hpp"
 #include "repo/factories/transaction_factory.hpp"
-#include "repo_errors.hpp"
 #include "sql_models/trade_leg_row.hpp"
 #include "sql_models/transaction_entry_row.hpp"
 #include "sql_models/transaction_option_row.hpp"
@@ -32,8 +31,12 @@ namespace repo
          * @param dbTx
          * @param crud
          * @param db
+         *
+         * @return CrudResult<void> An empty expected on success, or an error on
+         * failure
          */
-        void addLegs(
+        [[nodiscard]]
+        CrudResult<void> addLegs(
             const finance::TradeLegs& legs,
             TransactionId             txId,
             const db::Transaction&    dbTx,
@@ -49,13 +52,13 @@ namespace repo
 
                 if (!legResult.has_value())
                 {
-                    const auto msg =
-                        getInsertError(legResult.error(), "trade leg");
-
-                    LOG_ERROR(msg);
-                    throw orm::CrudException(msg);
+                    return legResult.error().convert(
+                        "Failed to insert trade leg for transaction ID: " +
+                        txId.toString()
+                    );
                 }
             }
+            return {};
         }
 
         /**
@@ -126,9 +129,10 @@ namespace repo
      * @brief add a transaction to the database
      *
      * @param transaction
-     * @return TransactionId
+     * @return CrudResult<TransactionId> The ID of the newly added transaction,
+     * or an error if the operation failed.
      */
-    TransactionId TransactionRepo::addTransaction(
+    CrudResult<TransactionId> TransactionRepo::addTransaction(
         const finance::DomainTransaction& transaction
     )
     {
@@ -139,11 +143,10 @@ namespace repo
 
         if (!transactionResult.has_value())
         {
-            const auto msg =
-                getInsertError(transactionResult.error(), "transaction");
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
+            return transactionResult.error().convert(
+                "Failed to insert transaction with ID '" +
+                txRow.id.value().toString() + "'"
+            );
         }
 
         const auto txId = TransactionId(transactionResult.value());
@@ -158,11 +161,10 @@ namespace repo
 
             if (!entryResult.has_value())
             {
-                const auto msg =
-                    getInsertError(entryResult.error(), "transaction entry");
-
-                LOG_ERROR(msg);
-                throw orm::CrudException(msg);
+                return entryResult.error().convert(
+                    "Failed to insert transaction entry with ID '" +
+                    entryRow.id.value().toString() + "'"
+                );
             }
         }
 
@@ -173,13 +175,20 @@ namespace repo
                 const auto data =
                     std::get<finance::StockData>(transaction.getData());
 
-                addLegs(
+                const auto readLegsResult = addLegs(
                     data.getLegs(),
                     TransactionId(transactionResult.value()),
                     dbTx,
                     _getCrud(),
                     _getDb()
                 );
+                if (!readLegsResult.has_value())
+                {
+                    return readLegsResult.error().convert(
+                        "Failed to insert trade legs for transaction ID: " +
+                        txId.toString()
+                    );
+                }
                 break;
             }
             case TransactionDataType::Option:
@@ -187,13 +196,20 @@ namespace repo
                 const auto data =
                     std::get<finance::OptionData>(transaction.getData());
 
-                addLegs(
+                const auto optionLegsResult = addLegs(
                     data.getLegs(),
                     TransactionId(transactionResult.value()),
                     dbTx,
                     _getCrud(),
                     _getDb()
                 );
+                if (!optionLegsResult.has_value())
+                {
+                    return optionLegsResult.error().convert(
+                        "Failed to insert trade legs for transaction ID: " +
+                        txId.toString()
+                    );
+                }
 
                 const auto optionResult = _getCrud().insert(
                     _getDb(),
@@ -203,13 +219,11 @@ namespace repo
 
                 if (!optionResult.has_value())
                 {
-                    const auto msg = getInsertError(
-                        optionResult.error(),
-                        "transaction option"
+                    return optionResult.error().convert(
+                        "Failed to insert transaction option data for "
+                        "transaction with ID '" +
+                        txRow.id.value().toString() + "'"
                     );
-
-                    LOG_ERROR(msg);
-                    throw orm::CrudException(msg);
                 }
                 break;
             }
@@ -217,7 +231,14 @@ namespace repo
                 break;
         }
 
-        dbTx.commit();
+        const auto commitResult = dbTx.commit();
+        if (!commitResult)
+        {
+            const auto msg = "Failed to commit transaction: " +
+                             commitResult.error().toString();
+            LOG_ERROR(msg);
+            throw orm::CrudException(msg);
+        }
 
         return TransactionId(transactionResult.value());
     }

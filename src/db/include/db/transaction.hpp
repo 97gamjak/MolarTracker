@@ -1,6 +1,8 @@
 #ifndef __DB__INCLUDE__DB__TRANSACTION_HPP__
 #define __DB__INCLUDE__DB__TRANSACTION_HPP__
 
+#include "error/crud_error.hpp"
+
 namespace db
 {
     class Database;
@@ -31,8 +33,8 @@ namespace db
 
         [[nodiscard]] bool isActive() const;
 
-        void commit();
-        void rollback();
+        [[nodiscard]] DatabaseResult<void> commit();
+        [[nodiscard]] DatabaseResult<void> rollback();
 
        private:   // PRIVATE HELPER METHODS
         void _moveFrom(Transaction&& other);

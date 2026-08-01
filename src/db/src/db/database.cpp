@@ -13,6 +13,7 @@
 #include "config/constants/constants.hpp"
 #include "db/db_exception.hpp"
 #include "db/statement.hpp"
+#include "error/crud_error.hpp"
 #include "logging/log_macros.hpp"
 
 REGISTER_LOG_CATEGORY("DB.Database");
@@ -46,7 +47,18 @@ namespace db
             }
         }
 
-        open(path.string());
+        const auto error = open(path.string());
+
+        if (!error)
+        {
+            throw SqliteError(
+                std::format(
+                    "Failed to open database at path: {} | Error: {}",
+                    path.string(),
+                    error.error().toString()
+                )
+            );
+        }
     }
 
     /**
@@ -125,16 +137,19 @@ namespace db
      * @brief open the database at the specified path
      *
      * @param dbPath
+     *
+     * @return DatabaseResult<void>
      */
-    void Database::open(const std::string& dbPath)
+    DatabaseResult<void> Database::open(const std::string& dbPath)
     {
         close();
 
         if (!std::filesystem::exists(dbPath))
         {
-            throw SqliteError(
+            return DatabaseError{
+                DatabaseErrorType::OpeningFailed,
                 std::format("Database file does not exist at path: {}", dbPath)
-            );
+            };
         }
 
         _db     = _open(dbPath);
@@ -142,8 +157,17 @@ namespace db
 
         LOG_DEBUG("Opened database at path: " + dbPath);
 
-        enableForeignKeys(true);
+        const auto fkResult = enableForeignKeys(true);
+        if (!fkResult)
+        {
+            return fkResult.error().convert(
+                DatabaseErrorType::OpeningFailed,
+                "Failed to enable foreign keys"
+            );
+        }
+
         setBusyTimeout(Constants::getDbBusyTimeoutMs());
+        return {};
     }
 
     /**
@@ -191,8 +215,10 @@ namespace db
      * @brief execute a SQL statement
      *
      * @param sql
+     *
+     * @return DatabaseResult<void>
      */
-    void Database::execute(std::string_view sql)
+    DatabaseResult<void> Database::execute(std::string_view sql)
     {
         _ensureOpen();
 
@@ -225,7 +251,7 @@ namespace db
             msg += " | sql: ";
             msg += std::string(sql);
 
-            throw SqliteError(msg);
+            return DatabaseError{DatabaseErrorType::SqliteError, msg};
         }
 
         constexpr size_t MAX_EXECUTIONS_HISTORY = 1000;
@@ -241,39 +267,82 @@ namespace db
                     ))
             );
         }
+
+        LOG_DEBUG(std::format("Executed SQL statement: {}", sql));
+
+        return {};
     }
 
     /**
      * @brief Begins a database transaction.
      *
      * @param immediate If true, starts an immediate transaction.
+     *
+     * @return DatabaseResult<void> Returns a DatabaseResult indicating success
+     * or failure.
      */
-    void Database::begin(bool immediate)
+    DatabaseResult<void> Database::begin(bool immediate)
     {
+        DatabaseResult<void> result;
+        const char*          statement = "BEGIN;";
+
         if (immediate)
-            execute("BEGIN IMMEDIATE;");
-        else
-            execute("BEGIN;");
+            statement = "BEGIN IMMEDIATE;";
+
+        result = execute(statement);
+
+        if (!result)
+        {
+            return result.error().convert(
+                DatabaseErrorType::BeginTransactionFailed,
+                "Failed to begin transaction"
+            );
+        }
 
         _transactionStarted = true;
+
+        return {};
     }
 
     /**
      * @brief Commits the current transaction.
+     *
+     * @return DatabaseResult<void> Returns a DatabaseResult indicating success
+     * or failure.
      */
-    void Database::commit()
+    DatabaseResult<void> Database::commit()
     {
-        execute("COMMIT;");
+        const auto result = execute("COMMIT;");
+        if (!result)
+        {
+            return result.error().convert(
+                DatabaseErrorType::CommitTransactionFailed,
+                "Failed to commit transaction"
+            );
+        }
+
         _transactionStarted = false;
+        return {};
     }
 
     /**
      * @brief Rolls back the current transaction.
+     *
+     * @return DatabaseResult<void> Returns a DatabaseResult indicating success
      */
-    void Database::rollback()
+    DatabaseResult<void> Database::rollback()
     {
-        execute("ROLLBACK;");
+        const auto result = execute("ROLLBACK;");
+        if (!result)
+        {
+            return result.error().convert(
+                DatabaseErrorType::RollbackTransactionFailed,
+                "Failed to rollback transaction"
+            );
+        }
+
         _transactionStarted = false;
+        return {};
     }
 
     /**
@@ -367,13 +436,25 @@ namespace db
      * @brief enable or disable foreign key support
      *
      * @param enabled
+     *
+     * @return DatabaseResult<void>
      */
-    void Database::enableForeignKeys(bool enabled)
+    DatabaseResult<void> Database::enableForeignKeys(bool enabled)
     {
-        if (enabled)
-            execute("PRAGMA foreign_keys = ON;");
-        else
-            execute("PRAGMA foreign_keys = OFF;");
+        const auto statement =
+            std::format("PRAGMA foreign_keys = {};", enabled ? "ON" : "OFF");
+
+        const auto result = execute(statement);
+
+        if (!result)
+        {
+            return result.error().convert(
+                DatabaseErrorType::ForeignKeyPragmaChangeFailed,
+                "Failed to enable foreign keys"
+            );
+        }
+
+        return {};
     }
 
     /**

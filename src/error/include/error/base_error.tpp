@@ -177,6 +177,26 @@ Error<EnumType> Error<EnumType>::convert(
 }
 
 /**
+ * @brief Converts the error to a new error type, preserving the error message
+ * and sub-errors. This function creates a new Error object of the specified
+ * newType, with the same error message and sub-errors as the original error.
+ *
+ * @tparam EnumType
+ * @param newMessage An optional new error message to use for the converted
+ * error. If not provided, the original error message will be used.
+ *
+ * @return Error<EnumType> A new Error object of the specified newType, with
+ * the same error message and sub-errors as the original error.
+ */
+template <ErrorTypeEnum EnumType>
+Error<EnumType> Error<EnumType>::convert(
+    const std::optional<std::string>& newMessage
+) const
+{
+    return convert(getType(), newMessage);
+}
+
+/**
  * @brief Converts the error to a string representation.
  *
  * @return std::string

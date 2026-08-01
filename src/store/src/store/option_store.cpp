@@ -162,22 +162,35 @@ namespace store
                     const auto insertionResult =
                         _instrumentService->addOption(entry.value);
 
+                    if (!insertionResult)
+                    {
+                        throw std::runtime_error(
+                            std::format(
+                                "Failed to add option '{}' to database: {}",
+                                entry.value.getName(),
+                                insertionResult.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto& insertion = insertionResult.value();
+
                     LOG_DEBUG(
                         std::format(
                             "Added new option: {} with ID: {} and "
                             "Instrument "
                             "ID: {}",
                             entry.value.toString(),
-                            insertionResult.optionId.toString(),
-                            insertionResult.instrumentId.toString()
+                            insertion.optionId.toString(),
+                            insertion.instrumentId.toString()
                         )
                     );
 
                     const auto oldInstrumentId = entry.value.getInstrumentId();
 
                     auto option = entry.value;
-                    option.setId(insertionResult.optionId);
-                    option.setInstrumentId(insertionResult.instrumentId);
+                    option.setId(insertion.optionId);
+                    option.setInstrumentId(insertion.instrumentId);
 
                     const auto result = _commitEntry(
                         entry.value.getId(),
@@ -191,9 +204,9 @@ namespace store
                         );
                     }
 
-                    if (oldInstrumentId != insertionResult.instrumentId)
+                    if (oldInstrumentId != insertion.instrumentId)
                         _instrumentIdMap[oldInstrumentId] =
-                            insertionResult.instrumentId;
+                            insertion.instrumentId;
 
                     break;
                 }

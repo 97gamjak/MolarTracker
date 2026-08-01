@@ -51,9 +51,27 @@ namespace repo
 
         _migrations.migrate(db);
 
-        db.execute("PRAGMA user_version = " + std::to_string(DB_VERSION));
+        const auto stmt   = std::format("PRAGMA user_version = {}", DB_VERSION);
+        const auto result = db.execute(stmt);
+        if (!result)
+        {
+            throw MigrationException(
+                "Failed to set user_version to " + std::to_string(DB_VERSION) +
+                    " after migration with SQL: " + stmt +
+                    " | Error: " + result.error().toString(),
+                db.getDBPath()
+            );
+        }
 
-        transaction.commit();
+        const auto commitResult = transaction.commit();
+        if (!commitResult)
+        {
+            throw MigrationException(
+                "Failed to commit transaction after migration: " +
+                    commitResult.error().toString(),
+                db.getDBPath()
+            );
+        }
     }
 
 }   // namespace repo

@@ -19,32 +19,25 @@ namespace repo
      *
      * @param watchlist The watchlist object containing the name and other
      * details of the new watchlist
-     * @return WatchlistId The ID of the newly created watchlist
+     * @return CrudResult<WatchlistId> The ID of the newly created watchlist, or
+     * an error if the operation failed
      */
-    WatchlistId WatchlistRepo::createWatchlist(
+    CrudResult<WatchlistId> WatchlistRepo::createWatchlist(
+
         const finance::Watchlist& watchlist
+
     )
     {
-        db::Transaction transaction{_getDb()};
-
         WatchlistRow watchlistRow;
         watchlistRow.name      = watchlist.getName();
         watchlistRow.createdAt = watchlist.getCreatedAt();
 
         const auto result = _getCrud().insert(_getDb(), watchlistRow);
 
-        if (!result.has_value())
-        {
-            transaction.rollback();
-
-            const auto msg = getInsertError(
-                result.error(),
-                "watchlist with name '" + watchlist.getName() + "'"
+        if (!result)
+            return result.error().convert(
+                "Failed to create watchlist: " + watchlist.getName()
             );
-
-            LOG_ERROR(msg);
-            throw orm::CrudException(msg);
-        }
 
         const auto watchlistId = WatchlistId(result.value());
 
@@ -56,19 +49,13 @@ namespace repo
 
             const auto symbolResult = _getCrud().insert(_getDb(), row);
 
-            if (!result.has_value())
+            if (!symbolResult)
             {
-                const auto msg = getInsertError(
-                    result.error(),
-                    "watchlist instrument for symbol '" + symbol + "'"
+                return symbolResult.error().convert(
+                    "Failed to add symbol '" + symbol + "' to watchlist"
                 );
-
-                LOG_ERROR(msg);
-                throw orm::CrudException(msg);
             }
         }
-
-        transaction.commit();
 
         return watchlistId;
     }
@@ -113,10 +100,9 @@ namespace repo
 
         if (!result.has_value())
         {
-            const auto msg = getUpdateError(
-                result.error(),
-                "watchlist with ID '" + watchlist.getId().toString() + "'"
-            );
+            const auto msg = "Failed to rename watchlist with id: " +
+                             watchlist.getId().toString() +
+                             ", error: " + result.error().toString();
 
             LOG_ERROR(msg);
             throw orm::CrudException(msg);

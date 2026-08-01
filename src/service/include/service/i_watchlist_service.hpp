@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/id_types.hpp"
+#include "error/crud_error.hpp"
 
 namespace finance
 {
@@ -29,7 +30,8 @@ namespace service
          * @return WatchlistId The ID of the newly created watchlist
          */
         [[nodiscard]]
-        virtual WatchlistId createWatchlist(
+
+        virtual CrudResult<WatchlistId> createWatchlist(
             const finance::Watchlist& watchlist
         ) = 0;
 

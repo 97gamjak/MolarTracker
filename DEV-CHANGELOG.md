@@ -4,6 +4,20 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
+### Features
+
+#### UI -- Help Dialog
+
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
+
+### Cleanup
+
+- remove `orm::CrudError` and exchange it with generalized base `Error`
+- remove a lot of early exceptions in crud approach to hopefully be able to avoid all exceptions in the future :D
+
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 
@@ -405,10 +419,7 @@ the still-unimplemented MOLTRACK-284 "All Securities" sidebar node).
 
 - add rules for allowing and denying commands
 
-### Building
-
-- add log file for clangd-tidy checks
-
+<!-- insertion marker -->
 ## [0.2.3](https://github.com/repo/owner/releases/tag/0.2.3) - 2026-05-17
 
 ## [0.2.2](https://github.com/repo/owner/releases/tag/0.2.2) - 2026-05-10

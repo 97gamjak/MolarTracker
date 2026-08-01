@@ -23,10 +23,12 @@ namespace service
      *
      * @param watchlist The watchlist object containing the name and other
      * details of the new watchlist
-     * @return WatchlistId
+     * @return CrudResult<WatchlistId>
      */
-    WatchlistId WatchlistService::createWatchlist(
+    CrudResult<WatchlistId> WatchlistService::createWatchlist(
+
         const finance::Watchlist& watchlist
+
     )
     {
         return _watchlistRepo->createWatchlist(watchlist);

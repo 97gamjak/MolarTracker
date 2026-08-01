@@ -59,22 +59,22 @@ namespace
 
 TEST_F(InstrumentRepoTest, AddStockReturnsValidStockId)
 {
-    const auto [stockId, instrumentId] = _repo.addStock(makeStock());
+    const auto [stockId, instrumentId] = _repo.addStock(makeStock()).value();
 
     EXPECT_GT(stockId.value(), 0);
 }
 
 TEST_F(InstrumentRepoTest, AddStockReturnsValidInstrumentId)
 {
-    const auto [stockId, instrumentId] = _repo.addStock(makeStock());
+    const auto [stockId, instrumentId] = _repo.addStock(makeStock()).value();
 
     EXPECT_GT(instrumentId.value(), 0);
 }
 
 TEST_F(InstrumentRepoTest, AddStockTwoStocksIdsAreDistinct)
 {
-    const auto [stockId1, instrId1] = _repo.addStock(makeStock("AAPL"));
-    const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG"));
+    const auto [stockId1, instrId1] = _repo.addStock(makeStock("AAPL")).value();
+    const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG")).value();
 
     EXPECT_NE(stockId1, stockId2);
     EXPECT_NE(instrId1, instrId2);
@@ -84,14 +84,11 @@ TEST_F(InstrumentRepoTest, AddStockTwoStocksIdsAreDistinct)
 // addStock — duplicate ticker
 // ---------------------------------------------------------------------------
 
-TEST_F(InstrumentRepoTest, AddStockDuplicateTickerThrows)
+TEST_F(InstrumentRepoTest, AddStockDuplicateTickerReturnsFalse)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
 
-    EXPECT_THROW(
-        static_cast<void>(_repo.addStock(makeStock("AAPL"))),
-        repo::RepositoryException
-    );
+    EXPECT_FALSE(_repo.addStock(makeStock("AAPL")));
 }
 
 // ---------------------------------------------------------------------------
@@ -244,7 +241,7 @@ TEST_F(InstrumentRepoTest, GetStocksEmptyIdSetReturnsAllStocks)
 TEST_F(InstrumentRepoTest, GetStocksSpecificIdReturnsOnlyMatchingStock)
 {
     static_cast<void>(_repo.addStock(makeStock("AAPL")));
-    const auto [stockId, instrId] = _repo.addStock(makeStock("GOOG"));
+    const auto [stockId, instrId] = _repo.addStock(makeStock("GOOG")).value();
 
     const IdSet<InstrumentId> ids{instrId};
     finance::SecuritiesFilter filter;
@@ -257,8 +254,8 @@ TEST_F(InstrumentRepoTest, GetStocksSpecificIdReturnsOnlyMatchingStock)
 
 TEST_F(InstrumentRepoTest, GetStocksMultipleIdsReturnsMatchingStocks)
 {
-    const auto [stockId1, instrId1] = _repo.addStock(makeStock("AAPL"));
-    const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG"));
+    const auto [stockId1, instrId1] = _repo.addStock(makeStock("AAPL")).value();
+    const auto [stockId2, instrId2] = _repo.addStock(makeStock("GOOG")).value();
     static_cast<void>(_repo.addStock(makeStock("MSFT")));
 
     const IdSet<InstrumentId> ids{instrId1, instrId2};

@@ -17,7 +17,7 @@ namespace repo
         using BaseRepo::BaseRepo;
 
         [[nodiscard]]
-        WatchlistId createWatchlist(
+        CrudResult<WatchlistId> createWatchlist(
             const finance::Watchlist& watchlist
         ) override;
 

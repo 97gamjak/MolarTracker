@@ -10,7 +10,6 @@
 #include "orm/crud/crud_error.hpp"
 #include "orm/query_options.hpp"
 #include "repo/factories/profile_factory.hpp"
-#include "repo_errors.hpp"
 #include "sql_models/profile_row.hpp"
 
 REGISTER_LOG_CATEGORY("Repo.ProfileRepo");
@@ -83,9 +82,9 @@ namespace repo
      * @brief Create a new profile in the database
      *
      * @param profile
-     * @return ProfileId
+     * @return CrudResult<ProfileId>
      */
-    ProfileId ProfileRepo::create(const domain::Profile& profile)
+    CrudResult<ProfileId> ProfileRepo::create(const domain::Profile& profile)
     {
         const auto rowId =
             orm::Crud().insert(_getDb(), ProfileFactory::toRow(profile));
@@ -93,11 +92,9 @@ namespace repo
         if (rowId.has_value())
             return ProfileId::from(rowId.value());
 
-        const auto whatFailed = "profile with name '" + profile.getName() + "'";
-        const auto msg        = getInsertError(rowId.error(), whatFailed);
-
-        LOG_ERROR(msg);
-        throw orm::CrudException(msg);
+        return rowId.error().convert(
+            "Failed to create profile with name '" + profile.getName() + "'"
+        );
     }
 
     /**
@@ -134,11 +131,8 @@ namespace repo
 
         if (!result)
         {
-            const auto msg =
-                "Updating profile with ID '" + std::to_string(id.value()) +
-                "' failed: " + result.error().getMessage() + " (type: " +
-                orm::CrudErrorTypeMeta::toString(result.error().getType()) +
-                ")";
+            const auto msg = "Updating profile with ID '" + id.toString() +
+                             "' failed: " + result.error().toString();
 
             LOG_ERROR(msg);
             throw orm::CrudException(msg);

@@ -59,7 +59,7 @@ TEST_F(WatchlistServiceTest, RenameWatchlistUpdatesName)
 {
     const auto id = _service->createWatchlist("Tech Stocks");
 
-    _service->renameWatchlist(id, "Big Tech");
+    _service->renameWatchlist(id.value(), "Big Tech");
 
     EXPECT_EQ(_service->getAllWatchlists()[0].getName(), "Big Tech");
 }
@@ -68,7 +68,7 @@ TEST_F(WatchlistServiceTest, DeleteWatchlistRemovesIt)
 {
     const auto id = _service->createWatchlist("Tech Stocks");
 
-    _service->deleteWatchlist(id);
+    _service->deleteWatchlist(id.value());
 
     EXPECT_TRUE(_service->getAllWatchlists().empty());
 }
@@ -77,9 +77,9 @@ TEST_F(WatchlistServiceTest, AddAndRemoveSymbolRoundTrips)
 {
     const auto id = _service->createWatchlist("Tech Stocks");
 
-    _service->addSymbol(id, "AAPL");
+    _service->addSymbol(id.value(), "AAPL");
     EXPECT_EQ(_service->getAllWatchlists()[0].getSymbols().size(), 1U);
 
-    _service->removeSymbol(id, "AAPL");
+    _service->removeSymbol(id.value(), "AAPL");
     EXPECT_TRUE(_service->getAllWatchlists()[0].getSymbols().empty());
 }

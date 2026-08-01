@@ -2,7 +2,6 @@
 #define __ORM__INCLUDE__ORM__CRUD_TPP__
 
 #include <cstdint>
-#include <expected>
 #include <mstd/error.hpp>
 #include <mstd/string.hpp>
 #include <optional>
@@ -13,6 +12,7 @@
 #include "db/db_exception.hpp"
 #include "db/statement.hpp"
 #include "db/transaction.hpp"
+#include "error/crud_error.hpp"
 #include "filter/expr_node.hpp"
 #include "logging/log_macros.hpp"
 #include "orm/crud.hpp"
@@ -37,11 +37,15 @@ namespace orm
      *
      * @tparam Model
      * @param database
+     *
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <db_model Model>
-    void Crud::createTable(db::Database& database)
+    [[nodiscard]]
+    CrudResult<void> Crud::createTable(db::Database& database)
     {
-        createTable<Model>(database, std::string_view(Model::tableName));
+        return createTable<Model>(database, std::string_view(Model::tableName));
     }
 
     /**
@@ -50,9 +54,15 @@ namespace orm
      * @tparam Model
      * @param database
      * @param tableName
+     *
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <db_model Model>
-    void Crud::createTable(db::Database& database, std::string_view tableName)
+    CrudResult<void> Crud::createTable(
+        db::Database&    database,
+        std::string_view tableName
+    )
     {
         std::string sqlText  = "CREATE TABLE IF NOT EXISTS ";
         sqlText             += tableName;
@@ -78,9 +88,19 @@ namespace orm
             )
         );
 
-        database.execute(sqlText);
+        const auto result = database.execute(sqlText);
+
+        if (!result)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                result.error(),
+                "Failed to create table '" + std::string(tableName) + "'"
+            );
+        }
 
         _sqlExecutions.push_back(sqlText);
+
+        return {};
     }
 
     /******************
@@ -93,11 +113,10 @@ namespace orm
      * @tparam Model
      * @param database
      * @param row
-     * @return std::expected<std::int64_t, CrudError> The ID of the inserted
-     * row or an error
+     * @return CrudResult<std::int64_t> The ID of the inserted row or an error
      */
     template <db_model Model>
-    std::expected<std::int64_t, CrudError> Crud::insert(
+    CrudResult<std::int64_t> Crud::insert(
         db::Database& database,
         const Model&  row
     )
@@ -106,7 +125,16 @@ namespace orm
         auto            result = insert(database, transaction, row);
 
         if (result.has_value())
-            transaction.commit();
+        {
+            const auto transactionResult = transaction.commit();
+            if (!transactionResult)
+            {
+                return FromError<DatabaseError, CrudError>::apply(
+                    transactionResult.error(),
+                    "Failed to commit transaction after insert operation"
+                );
+            }
+        }
 
         return result;
     }
@@ -123,11 +151,10 @@ namespace orm
      * it will only use it to ensure that the insert operation is performed
      * within the context of the provided transaction.
      * @param row
-     * @return std::expected<std::int64_t, CrudError> The ID of the inserted
-     * row or an error
+     * @return CrudResult<std::int64_t> The ID of the inserted row or an error
      */
     template <db_model Model>
-    std::expected<std::int64_t, CrudError> Crud::insert(
+    CrudResult<std::int64_t> Crud::insert(
         db::Database& database,
         const db::Transaction& /*transaction*/,
         const Model& row
@@ -211,9 +238,10 @@ namespace orm
         }
         catch (const db::SqliteError& e)
         {
-            return std::unexpected(
-                CrudError{CrudErrorType::InsertFailed, e.what()}
-            );
+            return CrudError{
+                CrudErrorType::InsertFailed,
+                "Insert failed: " + std::string(e.what())
+            };
         }
 
         const auto lastInsertId = database.getLastInsertRowid();
@@ -225,7 +253,7 @@ namespace orm
             "Failed to retrieve last insert ID after insert operation"
         };
 
-        return std::unexpected(error);
+        return (error);
     }
 
     /**
@@ -235,11 +263,12 @@ namespace orm
      * @param database
      * @param rows
      *
-     * @return std::expected<std::vector<std::int64_t>, CrudError>
+     * @return CrudResult<std::vector<std::int64_t>> The IDs of the inserted
+     * rows or an error
      */
     template <typename... Models>
     requires(db_model<Models> && ...)
-    std::expected<std::vector<std::int64_t>, CrudError> Crud::batchInsert(
+    CrudResult<std::vector<std::int64_t>> Crud::batchInsert(
         db::Database& database,
         const Models&... rows
     )
@@ -249,7 +278,7 @@ namespace orm
 
         db::Transaction transaction{database};
 
-        std::expected<void, CrudError> batchResult;
+        CrudResult<std::vector<std::int64_t>> batchResult;
 
         (
             [&](const auto& row)
@@ -260,7 +289,10 @@ namespace orm
                 auto result = insert(database, transaction, row);
                 if (!result.has_value())
                 {
-                    batchResult = std::unexpected(result.error());
+                    batchResult = result.error().convert(
+                        "Failed to insert row into table '" +
+                        std::string(row.tableName) + "'"
+                    );
                     return;
                 }
 
@@ -270,9 +302,18 @@ namespace orm
         );
 
         if (!batchResult.has_value())
-            return std::unexpected(batchResult.error());
+            return (batchResult.error());
 
-        transaction.commit();
+        const auto commitResult = transaction.commit();
+
+        if (!commitResult)
+        {
+            return FromError<DatabaseError, CrudError>::apply(
+                commitResult.error(),
+                "Failed to commit transaction after batch insert operation"
+            );
+        }
+
         return insertedIds;
     }
 
@@ -282,14 +323,12 @@ namespace orm
      * @tparam Model
      * @param database
      * @param row
-     * @return std::expected<void, CrudError> An empty expected on success,
-     * or an error on failure
+     *
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <db_model Model>
-    std::expected<void, CrudError> Crud::update(
-        db::Database& database,
-        const Model&  row
-    )
+    CrudResult<void> Crud::update(db::Database& database, const Model& row)
     {
         LOG_DEBUG(
             std::format(
@@ -321,7 +360,7 @@ namespace orm
 
         if (filter::isEmpty(where))
         {
-            return std::unexpected(CrudError(
+            return (CrudError(
                 CrudErrorType::NoPrimaryKey,
                 "orm::update requires a model with at least one primary key "
                 "field"
@@ -363,29 +402,27 @@ namespace orm
         }
         catch (const db::SqliteError& e)
         {
-            return std::unexpected(
-                CrudError{CrudErrorType::UpdateFailed, e.what()}
-            );
+            return CrudError{CrudErrorType::UpdateFailed, e.what()};
         }
 
         const auto changes = database.getNumberOfLastChanges();
 
         if (changes == 0)
         {
-            return std::unexpected(CrudError(
+            return CrudError(
                 CrudErrorType::NoRowsUpdated,
                 "orm::update did not update any rows. This may be because the "
                 "primary key value(s) did not match any existing row."
-            ));
+            );
         }
 
         if (changes > 1)
         {
-            return std::unexpected(CrudError(
+            return CrudError(
                 CrudErrorType::MultipleRowsUpdated,
                 "orm::update updated multiple rows. This should never happen, "
                 "as updates are performed by matching primary key values."
-            ));
+            );
         }
 
         return {};
@@ -397,11 +434,11 @@ namespace orm
      * @tparam Field
      * @param database
      * @param field
-     * @return std::expected<void, CrudError> An empty expected on success,
-     * or an error on failure
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <typename Field>
-    std::expected<void, CrudError> Crud::updateField(
+    CrudResult<void> Crud::updateField(
         db::Database& database,
         const Field&  field
     )
@@ -433,20 +470,20 @@ namespace orm
 
         if (changes == 0)
         {
-            return std::unexpected(CrudError(
+            return CrudError(
                 CrudErrorType::NoRowsUpdated,
                 "orm::update did not update any rows. This may be because the "
                 "primary key value(s) did not match any existing row."
-            ));
+            );
         }
 
         if (changes > 1)
         {
-            return std::unexpected(CrudError(
+            return CrudError(
                 CrudErrorType::MultipleRowsUpdated,
                 "orm::update updated multiple rows. This should never happen, "
                 "as updates are performed by matching primary key values."
-            ));
+            );
         }
 
         return {};
@@ -669,14 +706,11 @@ namespace orm
      * @tparam Field
      * @param database
      * @param field
-     * @return std::expected<void, CrudError> An empty expected on success,
-     * or an error on failure
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <typename Field>
-    std::expected<void, CrudError> Crud::addColumn(
-        db::Database& database,
-        const Field&  field
-    )
+    CrudResult<void> Crud::addColumn(db::Database& database, const Field& field)
     {
         const auto columnExist = _columnExists(
             database,
@@ -686,10 +720,10 @@ namespace orm
 
         if (columnExist)
         {
-            return std::unexpected(CrudError(
+            return CrudError(
                 CrudErrorType::ColumnAlreadyExists,
                 "Column already exists"
-            ));
+            );
         }
 
         std::string sql;
@@ -721,21 +755,21 @@ namespace orm
      * @tparam Model
      * @param database
      * @param columnName
-     * @return std::expected<void, CrudError> An empty expected on success,
-     * or an error on failure
+     * @return CrudResult<void> An empty expected on success, or an error on
+     * failure
      */
     template <typename Model>
-    std::expected<void, CrudError> Crud::dropColumn(
+    CrudResult<void> Crud::dropColumn(
         db::Database&      database,
         const std::string& columnName
     )
     {
         if (!_columnExists(database, columnName, std::string(Model::tableName)))
         {
-            return std::unexpected(CrudError(
+            return CrudError(
                 CrudErrorType::ColumnDoesNotExist,
                 "Column does not exist"
-            ));
+            );
         }
 
         std::string sql;

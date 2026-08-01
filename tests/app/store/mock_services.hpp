@@ -68,7 +68,8 @@ namespace tests
             return std::nullopt;
         }
 
-        [[nodiscard]] ProfileId create(const domain::Profile& profile) override
+        [[nodiscard]]
+        CrudResult<ProfileId> create(const domain::Profile& profile) override
         {
             createCallCount++;
             auto       newProfile = profile;
@@ -128,7 +129,8 @@ namespace tests
             return preloadedAccounts;
         }
 
-        [[nodiscard]] AccountId createAccount(
+        [[nodiscard]]
+        CrudResult<AccountId> createAccount(
             const finance::Account& /*account*/,
             const ProfileId& /*profileId*/
         ) override
@@ -191,7 +193,7 @@ namespace tests
         }
 
         [[nodiscard]]
-        finance::StockInsertionResult addStock(
+        CrudResult<finance::StockInsertionResult> addStock(
             const finance::Stock& /*stock*/
         ) override
         {
@@ -203,8 +205,8 @@ namespace tests
         }
 
         [[nodiscard]]
-        finance::OptionInsertionResult addOption(
-            const finance::Option& /*stock*/
+        CrudResult<finance::OptionInsertionResult> addOption(
+            const finance::Option& /*option*/
         ) override
         {
             addOptionCallCount++;
@@ -272,7 +274,8 @@ namespace tests
         int _nextId = 1;
 
        public:
-        [[nodiscard]] TransactionId addTransaction(
+        [[nodiscard]]
+        CrudResult<TransactionId> addTransaction(
             const finance::DomainTransaction& /*transaction*/
         ) override
         {
@@ -304,8 +307,9 @@ namespace tests
         int _nextId = 1;
 
        public:
-        [[nodiscard]] WatchlistId createWatchlist(
-            const std::string& /*name*/
+        [[nodiscard]]
+        CrudResult<WatchlistId> createWatchlist(
+            const finance::Watchlist& /*watchlist*/
         ) override
         {
             createCallCount++;
