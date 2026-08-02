@@ -8,4 +8,7 @@
         <file alias="settings_dialog_general.png">help/settings_dialog_general.png</file>
         <file alias="settings_dialog_ui_overview.png">help/settings_dialog_ui_overview.png</file>
     </qresource>
+    <qresource prefix="/changelog">
+        <file alias="CHANGELOG.md">../CHANGELOG.md</file>
+    </qresource>
 </RCC>

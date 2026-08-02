@@ -25,6 +25,12 @@ All changes and updates, that are relevant for a user will be documented here
   create a watchlist, right-click a security row to add/remove it to/from a
   watchlist, and right-click a watchlist to rename or delete it
 
+#### UI -- Changelog Dialog
+
+- Add a "Changelog" page accessible from Help → Changelog, showing the
+  contents of the app's changelog with the same "Export to PDF…" option as
+  the Help page
+
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 
