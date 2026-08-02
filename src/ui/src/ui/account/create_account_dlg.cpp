@@ -4,7 +4,6 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <string>
 
 #include "common/finance.hpp"
 #include "common/qt_helpers.hpp"
