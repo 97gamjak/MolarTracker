@@ -4,27 +4,6 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
-### Bug Fix
-
-- Account was not found anymore when creating a new one and then saving. Only after restarting of the app it was again visible.
-- Remove unknown currency selection when creating a new account
-
-### Features
-
-#### UI -- Help Dialog
-
-- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
-  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
-  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
-  signal and `HelpMenuController`
-
-#### Stocks - Watchlist
-
-- Add watchlists: the Securities sidebar now expands into "All Securities"
-  (shown by default) plus your saved watchlists. Right-click Securities to
-  create a watchlist, right-click a security row to add/remove it to/from a
-  watchlist, and right-click a watchlist to rename or delete it
-
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 

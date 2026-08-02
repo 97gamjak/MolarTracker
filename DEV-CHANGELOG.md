@@ -4,11 +4,6 @@ All changes and updates, that are relevant for developers will be documented her
 
 ## Next Release
 
-### Cleanup
-
-- remove `orm::CrudError` and exchange it with generalized base `Error`
-- remove a lot of early exceptions in crud approach to hopefully be able to avoid all exceptions in the future :D
-
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 

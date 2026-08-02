@@ -257,7 +257,7 @@ All pipelines are in `.github/workflows/`:
 | `build_windows.yml`                | PRs, tags                | Windows build                   |
 | `static-analysis.yml`              | PRs                      | DevOps style checks             |
 | `doxygen.yml`                      | PRs                      | Doxygen documentation build     |
-| `changelog.yml`                    | PRs                      | Verify changelog entries exist  |
+| `changelog.yml`                    | PRs                      | Verify a changelog fragment exists |
 | `check-pr-for-release-version.yml` | PRs                      | Validate release version format |
 | `create-tag.yml`                   | Manual                   | Create a release tag            |
 
@@ -303,12 +303,29 @@ Artifact packaging produces versioned `.tar.gz` files (Linux). Tags trigger rele
 
 ## Changelogs
 
-One of Two changelogs must be updated for every meaningful change:
+MolarTracker uses a **fragment-based changelog**. Never hand-edit
+`CHANGELOG.md` or `DEV-CHANGELOG.md` directly — the `changelog.yml` CI check
+rejects PRs that touch them. Instead, every meaningful change adds a small
+Markdown fragment file:
 
-- **`CHANGELOG.md`** — User-facing, describes behavior changes and new features.
-- **`DEV-CHANGELOG.md`** — Developer-facing, describes API/internal changes.
+```text
+changes/user/<category>.<title>.md
+changes/developer/<category>.<title>.md
+```
 
-Both use `<!-- insertion marker -->` to indicate where new entries should be inserted. The `changelog.yml` CI check enforces that changelogs are updated in every PR.
+`user` fragments describe behavior changes and new features
+(`enhancement`, `change`, `bugfix`, `performance`, `compatibility`,
+`documentation` categories); `developer` fragments describe API/internal
+changes (`enhancement`, `bugfix`, `performance`, `build`, `ci`, `test`,
+`internal`, `documentation` categories). See `changes/README.md` for the
+full format (one or more `- ` bullets, optionally wrapped onto indented
+continuation lines) and naming rules.
+
+At release time, `scripts/update_changelog.py <version>` (run from
+`create-tag.yml`) routes every fragment into the right changelog section,
+stamps a dated release header, and deletes the consumed fragments — both
+changelogs still use `<!-- insertion marker -->` to mark where the next
+release will be inserted.
 
 ---
 
@@ -371,7 +388,7 @@ Before submitting any change:
 - [ ] All private members have `///` doxygen doc comments
 - [ ] Qt widgets created with `common::makeQChild<T>()`, not bare `new T()`
 - [ ] Tests added or updated for changed logic
-- [ ] One of `CHANGELOG.md` and `DEV-CHANGELOG.md` updated if applicable
+- [ ] Added a changelog fragment under `changes/user/` or `changes/developer/` (never edit `CHANGELOG.md`/`DEV-CHANGELOG.md` directly)
 - [ ] Git submodules not accidentally modified
 - [ ] No hardcoded paths — use `Constants` singleton for app paths
 - [ ] Private members prefixed with `_`
