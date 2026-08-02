@@ -76,9 +76,14 @@ namespace ui
         formLayout->addRow("Account Name:", nameContainer);
 
         _currency = common::makeQChild<QComboBox>(this);
-        for (const auto& type : CurrencyMeta::names)
+        for (const auto& type : CurrencyMeta::values_view())
         {
-            _currency->addItem(QString::fromStdString(std::string(type)));
+            if (type == Currency::Unknown)
+                continue;
+
+            _currency->addItem(
+                QString::fromStdString(CurrencyMeta::toString(type))
+            );
         }
         formLayout->addRow("Currency:", _currency);
     }
