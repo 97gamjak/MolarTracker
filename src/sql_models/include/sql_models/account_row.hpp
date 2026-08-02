@@ -80,4 +80,30 @@ struct AccountRow : orm::ORMModel<"account">
     );
 };
 
+/**
+ * @brief Represents a row in the "linked_security_account" database table,
+ * which is used to link security accounts to their corresponding cash
+ * accounts. This table includes foreign keys referencing both the account and
+ * security tables, allowing for the establishment of a relationship between
+ * these two types of accounts.
+ */
+struct LinkedSecurityAccountRow : orm::ORMModel<"linked_security_account">
+{
+    using insert_policy = orm::requires_paired_insert_t;
+
+    ORM_FIELD(accountId, IdField<AccountId>)
+    ORM_FIELD(
+        securityId,
+        Field<
+            "security_id",
+            AccountId,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                AccountRow,
+                decltype(AccountRow::id)>>
+    )
+
+    ORM_FIELDS(LinkedSecurityAccountRow, accountId, securityId)
+};
+
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__
