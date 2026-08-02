@@ -9,6 +9,22 @@ All changes and updates, that are relevant for developers will be documented her
 - remove `orm::CrudError` and exchange it with generalized base `Error`
 - remove a lot of early exceptions in crud approach to hopefully be able to avoid all exceptions in the future :D
 
+### Features
+
+#### UI -- Changelog Dialog (MOLTRACK-228)
+
+- Add `ui::ChangelogDialog` (`src/ui/changelog/`), mirroring `HelpDialog` —
+  `QTextBrowser` content area rendering `CHANGELOG.md` via
+  `QTextBrowser::setMarkdown()`, plus the same "Export to PDF…" button
+  backed by `Qt6::PrintSupport` / `QPrinter`
+- Embed the repo-root `CHANGELOG.md` as a Qt resource
+  (`resources/resources.qrc`, `/changelog` prefix) so the dialog always
+  shows the same content as the shipped changelog, with no separate
+  hand-maintained copy
+- `HelpMenu` gains a `&Changelog` action / `requestChangelog()` signal
+  between `&Help` and `&About`; `HelpMenuController::_onChangelogRequested()`
+  execs the new dialog, mirroring `_onHelpPageRequested()`
+
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 
