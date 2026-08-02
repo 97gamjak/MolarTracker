@@ -3,6 +3,8 @@
 
 #include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
+#include "config/signal_tags.hpp"
+#include "connections/connection.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
@@ -132,6 +134,22 @@ namespace store
          */
         [[nodiscard]]
         virtual const finance::Accounts& getAccountSession() const = 0;
+
+        /**
+         * @brief subscribe to the account store commit signal, this will allow
+         * the caller to be notified when the account store is committed,
+         * allowing them to react to the commit event, such as updating the UI
+         * or saving changes to the database
+         *
+         * @param func
+         * @param user
+         * @return Connection
+         */
+        [[nodiscard]]
+        virtual Connection subscribeToAccountStoreCommit(
+            OnStoreCommit::func func,
+            void*               user
+        ) = 0;
     };
 
 }   // namespace store

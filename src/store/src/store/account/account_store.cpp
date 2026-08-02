@@ -520,4 +520,19 @@ namespace store
         }
     }
 
+    /**
+     * @brief Subscribe to the account store commit signal
+     *
+     * @param func
+     * @param user
+     * @return Connection
+     */
+    Connection AccountStore::subscribeToAccountStoreCommit(
+        OnStoreCommit::func func,
+        void*               user
+    )
+    {
+        return subscribeToStoreCommit(func, user);
+    }
+
 }   // namespace store

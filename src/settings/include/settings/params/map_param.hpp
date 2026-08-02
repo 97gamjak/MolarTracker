@@ -1,6 +1,7 @@
 #ifndef __SETTINGS__INCLUDE__SETTINGS__PARAMS__MAP_PARAM_HPP__
 #define __SETTINGS__INCLUDE__SETTINGS__PARAMS__MAP_PARAM_HPP__
 
+#include "common/container/map.hpp"
 #include "error/param_error.hpp"
 #include "param_core.hpp"
 #include "settings/params/i_param.hpp"

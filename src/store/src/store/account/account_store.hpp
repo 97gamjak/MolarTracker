@@ -82,6 +82,12 @@ namespace store
 
         void reload() override;
 
+        [[nodiscard]]
+        Connection subscribeToAccountStoreCommit(
+            OnStoreCommit::func func,
+            void*               user
+        ) override;
+
        private:
         void _refresh();
     };

@@ -28,7 +28,8 @@ namespace store
     class IAccountStore;   // Forward declaration
 }   // namespace store
 
-class QAction;   // Forward declaration
+class QAction;       // Forward declaration
+class Connections;   // Forward declaration
 
 namespace controller
 {
@@ -55,6 +56,10 @@ namespace controller
         /// Pointer to the create account dialog
         QPointer<ui::CreateAccountDialog> _createAccountDialog;
 
+        /// Pointer to the connections object for managing signal-slot
+        /// connections
+        std::unique_ptr<Connections> _connections;
+
        public:
         explicit AccountSideBarController(
             cmd::UndoStack&                              undoStack,
@@ -62,6 +67,7 @@ namespace controller
             AccountController&                           accountController,
             QMainWindow*                                 mainWindow
         );
+        ~AccountSideBarController() override;
 
         void refresh() override;
 

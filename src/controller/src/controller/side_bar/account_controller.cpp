@@ -53,9 +53,16 @@ namespace controller
         : SideBarCategoryController(new ui::AccountCategory(), mainWindow),
           _undoStack(undoStack),
           _accountStore(accountStore),
-          _accountController(accountController)
+          _accountController(accountController),
+          _connections(std::make_unique<Connections>())
     {
+        _connections->add(_accountStore->subscribeToAccountStoreCommit(
+            [this]() { this->refresh(); },
+            this
+        ));
     }
+
+    AccountSideBarController::~AccountSideBarController() = default;
 
     /**
      * @brief Refresh the account category in the side bar, this will clear all

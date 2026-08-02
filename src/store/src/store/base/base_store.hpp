@@ -100,8 +100,8 @@ namespace store
                           OnStoreItemAdded<T>,
                           OnStoreItemUpdated<T>,
                           OnStoreItemRemoved<IdType>,
-                          OnIdRemap<IdType>,
-                          StoreChanged<IdType>>
+                          StoreChanged<IdType>,
+                          OnStoreCommit>
 
     {
        public:
@@ -111,8 +111,8 @@ namespace store
             OnStoreItemAdded<T>,
             OnStoreItemUpdated<T>,
             OnStoreItemRemoved<IdType>,
-            OnIdRemap<IdType>,
-            StoreChanged<IdType>>;
+            StoreChanged<IdType>,
+            OnStoreCommit>;
 
         /// Type alias for filter options used when querying entries in the
         /// store.
@@ -157,40 +157,43 @@ namespace store
 
         void clearPotentiallyDirty() override;
 
-        [[nodiscard]] Connection subscribeToDirty(
+        [[nodiscard]]
+        Connection subscribeToDirty(
             OnDirtyChanged::func func,
             void*                user
         ) override;
 
         // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToIdRemap(
-            OnIdRemap<IdType>::func func,
-            void*                   user
-        );
-
-        // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToEntryRemoved(
+        [[nodiscard]]
+        Connection subscribeToEntryRemoved(
             OnStoreItemRemoved<IdType>::func func,
             void*                            user
         );
 
         // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToEntryAdded(
+        [[nodiscard]]
+        Connection subscribeToEntryAdded(
             OnStoreItemAdded<T>::func func,
             void*                     user
         );
 
         // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToEntryUpdated(
+        [[nodiscard]]
+        Connection subscribeToEntryUpdated(
             OnStoreItemUpdated<T>::func func,
             void*                       user
         );
 
         // cppcheck-suppress functionConst -- false positive
-        [[nodiscard]] Connection subscribeToStoreChange(
+        [[nodiscard]]
+        Connection subscribeToStoreChange(
             StoreChanged<IdType>::func func,
             void*                      user
         );
+
+        // cppcheck-suppress functionConst -- false positive
+        [[nodiscard]]
+        Connection subscribeToStoreCommit(OnStoreCommit::func func, void* user);
 
         [[nodiscard]]
         bool isFullCache() const;

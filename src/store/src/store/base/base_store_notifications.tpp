@@ -62,6 +62,7 @@ namespace store
         _notifyAdded(true);
         _notifyRemoved(true);
         _notifyUpdated(true);
+        this->template notify<OnStoreCommit>();
         _alreadyNotified = false;
     }
 

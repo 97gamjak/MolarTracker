@@ -4,7 +4,18 @@ All changes and updates, that are relevant for a user will be documented here
 
 ## Next Release
 
-### Feature
+### Bug Fix
+
+- Account was not found anymore when creating a new one and then saving. Only after restarting of the app it was again visible.
+
+### Features
+
+#### UI -- Help Dialog
+
+- Add `ui::HelpDialog` (`src/ui/help/`) — empty help page framework with title
+  label, `QTextBrowser` content area, and "Export to PDF…" button backed by
+  `Qt6::PrintSupport` / `QPrinter`; wired through `HelpMenu::requestHelpPage`
+  signal and `HelpMenuController`
 
 #### Stocks - Watchlist
 

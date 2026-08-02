@@ -4,7 +4,6 @@
 #include <functional>
 #include <optional>
 
-#include "common/container/id_id_map.hpp"
 #include "config/id_types.hpp"
 
 /**
@@ -61,16 +60,15 @@ struct OnStoreItemRemoved
 };
 
 /**
- * @brief Signal tag for when an id is remapped, this can be used to emit an
- * event when an id is remapped, allowing other parts of the application to
- * react to the remapping of the id.
- *
+ * @brief Signal tag for when a store is committed, this can be used to emit an
+ * event when a store is committed, allowing other parts of the application to
+ * react to the commit event, such as updating the UI or saving changes to the
+ * database.
  */
-template <typename IdType>
-struct OnIdRemap
+struct OnStoreCommit
 {
     /// Type alias for the remap callback function
-    using func = std::function<void(const IdIdMap<IdType>& remap)>;
+    using func = std::function<void()>;
 };
 
 /**
