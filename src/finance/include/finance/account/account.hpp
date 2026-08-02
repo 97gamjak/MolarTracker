@@ -15,8 +15,28 @@ enum class AccountStatus : std::uint8_t;   // Forward declaration
 namespace finance
 {
 
+    /**
+     * @brief Represents the different kinds of financial accounts that can be
+     * created in the application, this is used to distinguish between different
+     * types of accounts (e.g., cash accounts, security accounts, external
+     * accounts, etc.), and allows the application to handle each type of
+     * account in a specific way based on its kind.
+     *
+     */
     class CashAccount
     {
+       private:
+        /// The ID of the linked security account, if any, this is an optional
+        /// field
+        std::optional<AccountId> _linkedSecurityAccountId;
+
+       public:
+        CashAccount() = default;
+
+        void setLinkedSecurityAccountId(AccountId id);
+
+        [[nodiscard]]
+        std::optional<AccountId> getLinkedSecurityAccountId() const;
     };
 
     class SecurityAccount
