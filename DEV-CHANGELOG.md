@@ -9,6 +9,62 @@ All changes and updates, that are relevant for developers will be documented her
 - remove `orm::CrudError` and exchange it with generalized base `Error`
 - remove a lot of early exceptions in crud approach to hopefully be able to avoid all exceptions in the future :D
 
+### Features
+
+#### Auto-download and self-install updates (MOLTRACK-102)
+
+- `vcs::GitHubClient::fetchLatestReleaseAssets()` fetches the `assets` array
+  of the latest GitHub release (name + `browser_download_url` per asset);
+  `fetchLatestVersion()` is unchanged and keeps driving the existing 24h
+  poll.
+- `vcs::selectAssetForCurrentPlatform()` (`src/vcs/asset_selector.*`) picks
+  `MolarTracker-linux-*.tar.gz` / `MolarTracker-windows-*.zip` from that
+  list; covered by `tests/vcs/test_asset_selector.cpp`.
+- `http::HttpClient::downloadToFile()` streams a GET response straight to
+  disk via a `std::ofstream` write callback instead of buffering in memory,
+  with `CURLOPT_XFERINFOFUNCTION` progress reporting and cooperative
+  cancellation via an `std::atomic<bool>*`; uses
+  `CURLOPT_LOW_SPEED_LIMIT`/`_TIME` (stall detection) instead of a fixed
+  wall-clock timeout, since downloads can be large and slow. Verified
+  end-to-end against the real `97gamjak/MolarTracker` release asset API
+  (51 MB Windows zip, correct final size and progress reporting).
+- `ui::DownloadProgressDialog` (`src/ui/update/`) runs the fetch-assets +
+  download sequence via `QtConcurrent::run` + `QFutureWatcher` (mirroring
+  `UpdateCheckService`'s async pattern), with a progress bar and Cancel
+  button; cross-thread progress updates are marshaled via a Qt signal
+  emitted from the worker thread.
+- `vcs::UpdateInstaller` (`src/vcs/update_installer.*`) extracts the
+  downloaded archive into `Constants::getUpdateStagingPath()`
+  (`stageDownloadedAsset()`, shelling out to system `tar`/`Expand-Archive`
+  rather than adding an archive-library dependency) and applies it in place
+  of the running installation (`applyUpdateAndRestart()`):
+  - **Linux**: backs up the running executable to `<path>.old` (same
+    directory/filesystem — atomic, safe while the process is still running
+    from it), swaps in the staged binary, `chmod +x`s it, and relaunches;
+    any failure before the final rename rolls back from the backup. Verified
+    end-to-end against the real `MolarTracker-linux-0.0.2.tar.gz` asset,
+    applied to a throwaway copy of the built binary — confirmed extraction,
+    backup, atomic swap, permissions, and successful relaunch.
+  - **Windows**: since a running `.exe`/its DLLs are locked, hands off to a
+    generated helper batch script that waits for the process to exit,
+    `robocopy`s the staged tree over the install directory, relaunches, then
+    deletes itself. Implemented to the same design as the Linux path but
+    **not executed on a real Windows machine** — there is no Windows
+    environment available for testing here; verify manually before this
+    ships in a release.
+  - New `UpdateErrorType` (`error/update_error.hpp`) covers
+    `NoCompatibleAsset`/`DownloadFailed`/`Cancelled`/`ExtractionFailed`/
+    `StagingVerificationFailed`/`ApplyFailed`.
+- `ui::UpdateAvailableDialog` gains a "Download Update" button /
+  `downloadRequested()` signal; `VCSController::_handleDownloadRequested()`
+  orchestrates download → stage → confirm (`QMessageBox`) → apply →
+  `QCoreApplication::quit()`, surfacing every failure stage via
+  `QMessageBox::warning` rather than failing silently.
+- Noted, not fixed by this ticket: `create-tag.yml`'s GitHub Release step
+  currently only uploads the Windows `.zip`, not a Linux `.tar.gz` — verified
+  against the real releases API (only release `0.0.2` ever had a Linux
+  asset). The "no compatible asset" error path handles this gracefully today.
+
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 

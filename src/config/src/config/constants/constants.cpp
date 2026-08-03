@@ -112,6 +112,17 @@ std::filesystem::path Constants::getImagesPath() const
 }
 
 /**
+ * @brief Get the staging directory path used while downloading and preparing
+ * a self-update, before it is applied to the running installation
+ *
+ * @return std::filesystem::path
+ */
+std::filesystem::path Constants::getUpdateStagingPath() const
+{
+    return _dataPath / "updates";
+}
+
+/**
  * @brief Get the application name
  *
  * @return const std::string

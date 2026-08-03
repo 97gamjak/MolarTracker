@@ -25,12 +25,11 @@ namespace vcs
     {
         const auto response = http::HttpClient::get(
             http::HttpRequest{
-                .url = _getLatestReleaseUrl(),
-                .headers =
-                    {
-                        {"User-Agent", _userAgent},
-                        {"Accept", "application/vnd.github+json"},
-                    },
+                .url     = _getLatestReleaseUrl(),
+                .headers = {
+                    {"User-Agent", _userAgent},
+                    {"Accept", "application/vnd.github+json"},
+                },
             }
         );
 
@@ -46,6 +45,56 @@ namespace vcs
                 tag.erase(tag.begin());
 
             return common::SemVer{tag};
+        }
+        catch (const std::exception& e)
+        {
+            return HttpError{HttpErrorType::ParseError, e.what()};
+        }
+    }
+
+    /**
+     * @brief Fetch the assets attached to the latest GitHub release.
+     *
+     * Calls the same GitHub Releases endpoint as fetchLatestVersion() but
+     * parses the `assets` array instead, returning each asset's file name
+     * and direct download URL. Returns an error if the HTTP request fails or
+     * the response cannot be parsed.
+     *
+     * @return HttpResult<std::vector<ReleaseAsset>>
+     */
+    HttpResult<std::vector<ReleaseAsset>> GitHubClient::
+        fetchLatestReleaseAssets()
+    {
+        const auto response = http::HttpClient::get(
+            http::HttpRequest{
+                .url     = _getLatestReleaseUrl(),
+                .headers = {
+                    {"User-Agent", _userAgent},
+                    {"Accept", "application/vnd.github+json"},
+                },
+            }
+        );
+
+        if (!response)
+            return response.error();
+
+        try
+        {
+            const auto json = nlohmann::json::parse(response->body);
+            std::vector<ReleaseAsset> assets;
+
+            for (const auto& asset : json.at("assets"))
+            {
+                assets.push_back(
+                    ReleaseAsset{
+                        .name = asset.at("name").get<std::string>(),
+                        .downloadUrl =
+                            asset.at("browser_download_url").get<std::string>(),
+                    }
+                );
+            }
+
+            return assets;
         }
         catch (const std::exception& e)
         {

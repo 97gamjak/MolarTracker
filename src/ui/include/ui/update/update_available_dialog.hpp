@@ -37,6 +37,10 @@ namespace ui
         );
 
         [[nodiscard]] bool isDismissedForVersion() const;
+
+       signals:
+        /// Emitted when the user clicks "Download Update"
+        void downloadRequested();
     };
 
 }   // namespace ui

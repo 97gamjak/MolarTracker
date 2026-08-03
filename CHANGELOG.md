@@ -25,6 +25,13 @@ All changes and updates, that are relevant for a user will be documented here
   create a watchlist, right-click a security row to add/remove it to/from a
   watchlist, and right-click a watchlist to rename or delete it
 
+#### Auto-Update — Download and Install
+
+- The "Update Available" dialog now has a "Download Update" button: it
+  downloads the matching release package with a progress bar, then asks to
+  restart and install it in place. Windows support for this button has not
+  been tested on a real Windows machine yet — please report any issues.
+
 <!-- insertion marker -->
 ## [0.3.0](https://github.com/repo/owner/releases/tag/0.3.0) - 2026-07-30
 

@@ -1,3 +1,5 @@
+find_package(Qt6 REQUIRED COMPONENTS Concurrent)
+
 file(GLOB_RECURSE SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
@@ -22,8 +24,10 @@ target_link_libraries(molartracker_ui
     PRIVATE
     Qt6::Widgets                # for QApplication
     Qt6::PrintSupport           # for QPrinter / PDF export
+    Qt6::Concurrent             # for QtConcurrent::run in DownloadProgressDialog
     molartracker_config         # for constants
     molartracker_http           # for HttpClient::urlEncode
+    molartracker_vcs            # for GitHubClient / asset selection
     molartracker_common
     molartracker_logging
     molartracker_drafts

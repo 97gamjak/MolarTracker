@@ -54,6 +54,17 @@ namespace ui
         );
         layout->addWidget(releasesButton);
 
+        auto* downloadButton =
+            common::makeQChild<QPushButton>("Download Update", this);
+
+        connect(
+            downloadButton,
+            &QPushButton::clicked,
+            this,
+            &UpdateAvailableDialog::downloadRequested
+        );
+        layout->addWidget(downloadButton);
+
         _dismissCheckBox = common::makeQChild<QCheckBox>(
             "Don't show again for this version",
             this
