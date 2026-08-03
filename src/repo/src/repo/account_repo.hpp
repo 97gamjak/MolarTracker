@@ -2,6 +2,7 @@
 #define __REPO__SRC__REPO__ACCOUNT_REPO_HPP__
 
 #include "base_repo.hpp"
+#include "finance/account/account.hpp"
 #include "repo/i_account_repo.hpp"
 
 namespace repo
@@ -26,6 +27,9 @@ namespace repo
             const finance::Account& account,
             const ProfileId&        profileId
         ) override;
+
+        [[nodiscard]]
+        bool accountExists(const AccountId& accountId) override;
     };
 
 }   // namespace repo

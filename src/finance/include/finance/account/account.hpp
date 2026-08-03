@@ -86,6 +86,7 @@ namespace finance
         );
 
         void setId(AccountId id);
+        void setLinkedSecurityAccountId(AccountId id);
 
         [[nodiscard]] AccountId     getId() const;
         [[nodiscard]] AccountStatus getStatus() const;
@@ -93,6 +94,10 @@ namespace finance
         [[nodiscard]] Currency      getCurrency() const;
         [[nodiscard]] AccountKind   getKind() const;
         [[nodiscard]] bool          isExternal() const;
+        [[nodiscard]]
+        std::optional<AccountId> getLinkedSecurityAccountId() const;
+
+        [[nodiscard]] const AccountDetails& getDetails() const;
 
         [[nodiscard]] std::string toString() const;
     };

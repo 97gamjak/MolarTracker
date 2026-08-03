@@ -55,6 +55,17 @@ namespace repo
         virtual std::vector<finance::Account> getAllAccounts(
             const ProfileId& profileId
         ) = 0;
+
+        /**
+         * @brief Check if an account exists in the repository, this method
+         * checks if an account with the given ID exists in the database
+         *
+         * @param accountId The ID of the account to check for existence
+         * @return true If the account exists in the repository
+         * @return false If the account does not exist in the repository
+         */
+        [[nodiscard]]
+        virtual bool accountExists(const AccountId& accountId) = 0;
     };
 
 }   // namespace repo
