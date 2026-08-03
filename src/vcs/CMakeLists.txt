@@ -26,6 +26,7 @@ target_link_libraries(molartracker_vcs
     molartracker_common
     molartracker_error
     PRIVATE
+    molartracker_config
     molartracker_logging
     Qt6::Core
     Qt6::Concurrent

@@ -50,6 +50,9 @@ namespace controller
         ~VCSController();
 
         void start();
+
+       private:
+        void _handleDownloadRequested();
     };
 }   //  namespace controller
 

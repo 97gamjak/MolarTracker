@@ -1,8 +1,11 @@
 #ifndef __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 #define __VCS__INCLUDE__VCS__GITHUB_CLIENT_HPP__
 
+#include <vector>
+
 #include "common/version.hpp"
 #include "error/http_error.hpp"
+#include "vcs/release_asset.hpp"
 
 namespace vcs
 {
@@ -20,6 +23,9 @@ namespace vcs
        public:
         [[nodiscard]]
         static HttpResult<common::SemVer> fetchLatestVersion();
+
+        [[nodiscard]]
+        static HttpResult<std::vector<ReleaseAsset>> fetchLatestReleaseAssets();
 
        private:
         [[nodiscard]]
