@@ -1,6 +1,5 @@
-// account_combo.hpp
-#ifndef __UI__INCLUDE__UI__TRANSACTION__ACCOUNT_COMBO_HPP__
-#define __UI__INCLUDE__UI__TRANSACTION__ACCOUNT_COMBO_HPP__
+#ifndef __UI__SRC__UI__UTILS__ACCOUNT_COMBO_HPP__
+#define __UI__SRC__UI__UTILS__ACCOUNT_COMBO_HPP__
 
 #include <qwidget.h>
 
@@ -54,4 +53,4 @@ namespace ui
 
 }   // namespace ui
 
-#endif   // __UI__INCLUDE__UI__TRANSACTION__ACCOUNT_COMBO_HPP__
+#endif   // __UI__SRC__UI__UTILS__ACCOUNT_COMBO_HPP__
