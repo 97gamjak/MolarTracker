@@ -1,10 +1,14 @@
 #ifndef __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
 #define __UI__INCLUDE__UI__ACCOUNT__CREATE_ACCOUNT_DLG_HPP__
 
+#include <optional>
+
+#include "config/id_types.hpp"
 #include "ui/base/dialog.hpp"
 
 class QVBoxLayout;   // Forward declaration
 class QComboBox;     // Forward declaration
+class QLabel;        // Forward declaration
 
 namespace drafts
 {
@@ -14,6 +18,7 @@ namespace drafts
 namespace ui
 {
     class NameLineEdit;   // Forward declaration
+    class AccountCombo;   // Forward declaration
 
     /**
      * @brief Dialog for creating a new account, this dialog will be used to
@@ -37,14 +42,26 @@ namespace ui
         QComboBox* _accountType = nullptr;
         /// Combo box for the account currency
         QComboBox* _currency = nullptr;
+        /// Combo box for selecting a reference account
+        AccountCombo* _referenceAccount = nullptr;
+        /// Label for the reference account combo box
+        QLabel* _referenceAccountLabel = nullptr;
 
         /// Button to confirm the creation of the account
         QPushButton* _addButton = nullptr;
         /// Button to cancel the creation of the account
         QPushButton* _cancelButton = nullptr;
 
+        /// The list of available accounts
+        std::vector<drafts::AccountDraft> _availableCashAccounts;
+        /// The list of available security accounts
+        std::vector<drafts::AccountDraft> _availableSecurityAccounts;
+
        public:
-        explicit CreateAccountDialog(QWidget* parent);
+        explicit CreateAccountDialog(
+            const std::vector<drafts::AccountDraft>& availableAccounts,
+            QWidget*                                 parent
+        );
 
        signals:
         /**
@@ -53,7 +70,10 @@ namespace ui
          *
          * @param account
          */
-        void requested(const drafts::AccountDraft& account);
+        void requested(
+            const drafts::AccountDraft& account,
+            std::optional<AccountId>    referenceAccount
+        );
 
        private:
         void _buildUI();
@@ -63,7 +83,12 @@ namespace ui
 
         void _emitOk();
 
-        drafts::AccountDraft _getAccount();
+        [[nodiscard]]
+        drafts::AccountDraft _getAccount() const;
+        [[nodiscard]]
+        std::optional<AccountId> _getSelectedReferenceAccount() const;
+
+        void _updateReferenceAccountVisibility();
     };
 
 }   // namespace ui

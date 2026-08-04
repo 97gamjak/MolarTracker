@@ -5,6 +5,7 @@
 #include "config/id_types.hpp"
 #include "config/signal_tags.hpp"
 #include "connections/connection.hpp"
+#include "error/finance_error.hpp"
 #include "exceptions/base.hpp"
 #include "finance/account/account.hpp"
 #include "finance/account/accounts.hpp"
@@ -149,6 +150,23 @@ namespace store
         virtual Connection subscribeToAccountStoreCommit(
             OnStoreCommit::func func,
             void*               user
+        ) = 0;
+
+        /**
+         * @brief Link two accounts together, this will establish a relationship
+         * between the two accounts, allowing them to be treated as linked for
+         * certain operations (e.g. cash and security accounts that are linked
+         * together)
+         *
+         * @param id1 The ID of the first account to link
+         * @param id2 The ID of the second account to link
+         * @return FinanceResult<void> Result of the operation, indicating
+         * success or failure
+         */
+        [[nodiscard]]
+        virtual FinanceResult<void> linkAccounts(
+            AccountId id1,
+            AccountId id2
         ) = 0;
     };
 

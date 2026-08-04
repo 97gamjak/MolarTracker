@@ -24,11 +24,14 @@ namespace cmd
         std::shared_ptr<store::IAccountStore> _accountStore;
         /// The account to create
         finance::Account _account;
+        /// The reference account ID, if any
+        std::optional<AccountId> _referenceAccount;
 
        public:
         CreateAccountCommand(
             const std::shared_ptr<store::IAccountStore>& accountStore,
-            finance::Account                             account
+            finance::Account                             account,
+            std::optional<AccountId>                     referenceAccount
         );
 
         ~CreateAccountCommand() override                             = default;

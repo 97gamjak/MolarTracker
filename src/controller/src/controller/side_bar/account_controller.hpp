@@ -88,7 +88,10 @@ namespace controller
         void accountSelected(AccountId id);
 
        private slots:
-        void _onCreateAccountRequested(const drafts::AccountDraft& account);
+        void _onCreateAccountRequested(
+            const drafts::AccountDraft& account,
+            std::optional<AccountId>    referenceAccount
+        );
     };
 
 }   // namespace controller

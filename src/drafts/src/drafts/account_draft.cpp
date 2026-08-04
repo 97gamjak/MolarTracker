@@ -13,19 +13,22 @@ namespace drafts
      * @param kind
      * @param currency
      * @param status
+     * @param linkedSecurityAccountId
      */
     AccountDraft::AccountDraft(
         AccountId                    id,
         std::optional<AccountStatus> status,
         std::string                  name,
         Currency                     currency,
-        AccountKind                  kind
+        AccountKind                  kind,
+        std::optional<AccountId>     linkedSecurityAccountId
     )
         : _id(id),
           _status(status),
           _name(std::move(name)),
           _currency(currency),
-          _kind(kind)
+          _kind(kind),
+          _linkedSecurityAccountId(linkedSecurityAccountId)
     {
     }
 
@@ -65,5 +68,15 @@ namespace drafts
      * @return Currency
      */
     Currency AccountDraft::getCurrency() const { return _currency; }
+
+    /**
+     * @brief get the linked security account ID of the account draft
+     *
+     * @return std::optional<AccountId>
+     */
+    std::optional<AccountId> AccountDraft::getLinkedSecurityAccountId() const
+    {
+        return _linkedSecurityAccountId;
+    }
 
 }   // namespace drafts

@@ -88,6 +88,9 @@ namespace store
             void*               user
         ) override;
 
+        [[nodiscard]]
+        FinanceResult<void> linkAccounts(AccountId id1, AccountId id2) override;
+
        private:
         void _refresh();
     };

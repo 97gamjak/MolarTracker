@@ -535,4 +535,82 @@ namespace store
         return subscribeToStoreCommit(func, user);
     }
 
+    /**
+     * @brief Link two accounts together, this will establish a relationship
+     * between the two accounts, allowing them to be treated as linked for
+     * certain operations (e.g. cash and security accounts that are linked
+     * together)
+     *
+     * @param id1 The ID of the first account to link
+     * @param id2 The ID of the second account to link
+     * @return FinanceResult<void> Result of the operation, if successful, the
+     * result will be empty, otherwise it will contain an error indicating why
+     * the linking failed.
+     */
+    FinanceResult<void> AccountStore::linkAccounts(AccountId id1, AccountId id2)
+    {
+        auto entry1 = _getEntry(
+            {.filter   = HasAccountId(id1),
+             .deletion = DeletionPolicy::ExcludeDelete}
+        );
+        auto entry2 = _getEntry(
+            {.filter   = HasAccountId(id2),
+             .deletion = DeletionPolicy::ExcludeDelete}
+        );
+
+        if (!entry1 || !entry2)
+        {
+            return FinanceError{
+                FinanceErrorType::AccountNotFound,
+                "One or both accounts not found in the store: id1 = " +
+                    id1.toString() + ", id2 = " + id2.toString()
+            };
+        }
+
+        switch (entry1->value.getKind())
+        {
+            case AccountKind::Cash:
+                if (entry2->value.getKind() == AccountKind::Security)
+                {
+                    entry1->value.setLinkedSecurityAccountId(
+                        entry2->value.getId()
+                    );
+
+                    const auto newState = entry1->state == StoreState::New
+                                              ? StoreState::New
+                                              : StoreState::Modified;
+
+                    _updateEntry(entry1->value, newState);
+
+                    return {};
+                }
+                break;
+            case AccountKind::Security:
+                if (entry2->value.getKind() == AccountKind::Cash)
+                {
+                    entry2->value.setLinkedSecurityAccountId(
+                        entry1->value.getId()
+                    );
+
+                    const auto newState = entry2->state == StoreState::New
+                                              ? StoreState::New
+                                              : StoreState::Modified;
+
+                    _updateEntry(entry2->value, newState);
+
+                    return {};
+                }
+                break;
+            case AccountKind::External:
+                break;
+        }
+
+        return FinanceError{
+            FinanceErrorType::InvalidAccountType,
+            "Cannot link accounts of types: " +
+                AccountKindMeta::toString(entry1->value.getKind()) + " and " +
+                AccountKindMeta::toString(entry2->value.getKind())
+        };
+    }
+
 }   // namespace store

@@ -17,12 +17,16 @@ namespace cmd
      *
      * @param accountStore
      * @param account
+     * @param referenceAccount
      */
     CreateAccountCommand::CreateAccountCommand(
         const std::shared_ptr<store::IAccountStore>& accountStore,
-        finance::Account                             account
+        finance::Account                             account,
+        std::optional<AccountId>                     referenceAccount
     )
-        : _accountStore(accountStore), _account(std::move(account))
+        : _accountStore(accountStore),
+          _account(std::move(account)),
+          _referenceAccount(referenceAccount)
     {
     }
 
@@ -74,6 +78,34 @@ namespace cmd
                 );
 
             return std::unexpected<CommandErrorPtr>(std::move(error));
+        }
+
+        if (_referenceAccount.has_value())
+        {
+            const auto linkResult = _accountStore->linkAccounts(
+                _account.getId(),
+                _referenceAccount.value()
+            );
+
+            if (!linkResult)
+            {
+                const auto errorMessage = std::format(
+                    "Failed to link account '{}' to reference account '{}'",
+                    _account.getName(),
+                    _referenceAccount.value().value()
+                );
+
+                LOG_ERROR(errorMessage);
+
+                // TODO(97gamjak): create specific error types for account
+                // linking errors
+                std::unique_ptr<CommandError> error =
+                    std::make_unique<CommandError>(
+                        CommandErrorType::InvalidCommand
+                    );
+
+                return std::unexpected<CommandErrorPtr>(std::move(error));
+            }
         }
 
         return {};

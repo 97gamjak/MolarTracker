@@ -15,11 +15,11 @@
 #include "common/qt_helpers.hpp"
 #include "drafts/account_draft.hpp"
 #include "drafts/transaction/transaction_create_draft.hpp"
-#include "ui/transaction/account_combo.hpp"
 #include "ui/transaction/amount_row.hpp"
 #include "ui/transaction/comment_field.hpp"
 #include "ui/transaction/ticker_field.hpp"
 #include "ui/transaction/timestamp_field.hpp"
+#include "ui/utils/account_combo.hpp"
 #include "ui/utils/error.hpp"
 
 using common::makeQChild;

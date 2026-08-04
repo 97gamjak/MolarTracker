@@ -33,6 +33,7 @@ namespace ui
         QComboBox* _combo;
 
        public:
+        explicit AccountCombo(QWidget* parent = nullptr);
         explicit AccountCombo(
             std::vector<drafts::AccountDraft> accounts,
             QWidget*                          parent = nullptr

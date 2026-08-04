@@ -1,5 +1,5 @@
 // account_combo.cpp
-#include "ui/transaction/account_combo.hpp"
+#include "account_combo.hpp"
 
 #include <qboxlayout.h>
 #include <qcombobox.h>
@@ -13,6 +13,13 @@ using common::makeQChild;
 
 namespace ui
 {
+
+    /**
+     * @brief Construct a new Account Combo:: Account Combo object
+     *
+     * @param parent
+     */
+    AccountCombo::AccountCombo(QWidget* parent) : AccountCombo({}, parent) {}
 
     /**
      * @brief Construct a new Account Combo:: Account Combo object
