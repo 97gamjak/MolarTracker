@@ -1,0 +1,2 @@
+- remove `orm::CrudError` and exchange it with generalized base `Error`
+- remove a lot of early exceptions in crud approach to hopefully be able to avoid all exceptions in the future :D

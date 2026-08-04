@@ -1,0 +1,2 @@
+- Account was not found anymore when creating a new one and then saving. Only after restarting of the app it was again visible.
+- Remove unknown currency selection when creating a new account
