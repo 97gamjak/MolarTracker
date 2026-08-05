@@ -324,8 +324,20 @@ std::string microUnitsToString(
 {
     const auto factor   = static_cast<int64_t>(std::pow(10, scale));
     const auto intPart  = std::abs(value / factor);
-    const auto fracPart = std::abs(value % factor);
+    auto       fracPart = std::abs(value % factor);
     const char sign     = value < 0 ? '-' : '\0';
+
+    // fracPart is expressed at `scale` decimal digits; rescale it to
+    // `precision` digits (truncating, matching microUnitsFromString's
+    // truncate-rather-than-round policy) before formatting it with a field
+    // width of `precision` — otherwise a fracPart with more digits than
+    // `precision` prints in full instead of being reduced, e.g. "1.05" at
+    // scale 6 (fracPart 50000) formatted with precision 2 would render as
+    // "1.50000" instead of "1.05".
+    if (precision < scale)
+        fracPart /= static_cast<int64_t>(std::pow(10, scale - precision));
+    else if (precision > scale)
+        fracPart *= static_cast<int64_t>(std::pow(10, precision - scale));
 
     auto result = std::format(
         "{}{}.{:0{}d}",
