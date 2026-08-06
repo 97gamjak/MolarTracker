@@ -87,7 +87,8 @@ namespace controller
 
         _helpMenuController = std::make_unique<HelpMenuController>(
             *mainWindow,
-            menuBar.getHelpMenu()
+            menuBar.getHelpMenu(),
+            storeContainer.getMigrationLogService()
         );
     }
 

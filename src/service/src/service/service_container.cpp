@@ -3,6 +3,7 @@
 #include "account_service.hpp"
 #include "instrument_service.hpp"
 #include "logging/log_macros.hpp"
+#include "migration_log_service.hpp"
 #include "position_service.hpp"
 #include "profile_service.hpp"
 #include "repo/exceptions.hpp"
@@ -26,12 +27,12 @@ namespace service
     )
     try
         : _repoContainer{std::make_unique<repo::RepoContainer>(backupSettings)},
-          _profileService{
-              std::make_shared<ProfileService>(_repoContainer->getProfileRepo()
-              )},
-          _accountService{
-              std::make_shared<AccountService>(_repoContainer->getAccountRepo()
-              )},
+          _profileService{std::make_shared<ProfileService>(
+              _repoContainer->getProfileRepo()
+          )},
+          _accountService{std::make_shared<AccountService>(
+              _repoContainer->getAccountRepo()
+          )},
           _transactionService{std::make_shared<TransactionService>(
               _repoContainer->getTransactionRepo()
           )},
@@ -43,6 +44,9 @@ namespace service
           )},
           _watchlistService{std::make_shared<WatchlistService>(
               _repoContainer->getWatchlistRepo()
+          )},
+          _migrationLogService{std::make_shared<MigrationLogService>(
+              _repoContainer->getMigrationLogRepo()
           )}
 
     {
@@ -77,8 +81,8 @@ namespace service
      *
      * @return std::shared_ptr<const IProfileService>
      */
-    std::shared_ptr<const IProfileService> ServiceContainer::getProfileService(
-    ) const
+    std::shared_ptr<const IProfileService> ServiceContainer::
+        getProfileService() const
     {
         return _profileService;
     }
@@ -98,8 +102,8 @@ namespace service
      *
      * @return std::shared_ptr<const IAccountService>
      */
-    std::shared_ptr<const IAccountService> ServiceContainer::getAccountService(
-    ) const
+    std::shared_ptr<const IAccountService> ServiceContainer::
+        getAccountService() const
     {
         return _accountService;
     }
@@ -187,6 +191,28 @@ namespace service
         getWatchlistService() const
     {
         return _watchlistService;
+    }
+
+    /**
+     * @brief Get the Migration Log Service
+     *
+     * @return std::shared_ptr<IMigrationLogService>
+     */
+    std::shared_ptr<IMigrationLogService> ServiceContainer::
+        getMigrationLogService()
+    {
+        return _migrationLogService;
+    }
+
+    /**
+     * @brief Get the Migration Log Service (const version)
+     *
+     * @return std::shared_ptr<const IMigrationLogService>
+     */
+    std::shared_ptr<const IMigrationLogService> ServiceContainer::
+        getMigrationLogService() const
+    {
+        return _migrationLogService;
     }
 
     /**

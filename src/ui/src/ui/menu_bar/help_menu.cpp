@@ -24,6 +24,14 @@ namespace ui
             &HelpMenu::requestHelpPage
         );
 
+        _migrationHistoryAction = _helpMenu->addAction("&Migration History");
+        connect(
+            _migrationHistoryAction,
+            &QAction::triggered,
+            this,
+            &HelpMenu::requestMigrationHistory
+        );
+
         _helpMenu->addSeparator();
 
         _aboutAction = _helpMenu->addAction("&About");

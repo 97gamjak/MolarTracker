@@ -5,6 +5,7 @@
 #include "db/backup_manager.hpp"
 #include "instrument_repo.hpp"
 #include "logging/log_macros.hpp"
+#include "migration_log_repo.hpp"
 #include "position_repo.hpp"
 #include "profile_repo.hpp"
 #include "repo/migration/migration_runner.hpp"
@@ -43,17 +44,18 @@ namespace repo
         // Attention: the MigrationRunner does already apply migrations to the
         // database in its constructor, so it must be created after the database
         // is opened.
-        _migrationRunner = std::make_unique<MigrationRunner>(*_database);
-        _profileRepo     = std::make_shared<ProfileRepo>(*_database);
-        _accountRepo     = std::make_shared<AccountRepo>(*_database);
-        _transactionRepo = std::make_shared<TransactionRepo>(*_database);
-        _instrumentRepo  = std::make_shared<InstrumentRepo>(*_database);
-        _positionRepo    = std::make_shared<PositionRepo>(*_database);
-        _watchlistRepo   = std::make_shared<WatchlistRepo>(*_database);
+        _migrationRunner  = std::make_unique<MigrationRunner>(*_database);
+        _profileRepo      = std::make_shared<ProfileRepo>(*_database);
+        _accountRepo      = std::make_shared<AccountRepo>(*_database);
+        _transactionRepo  = std::make_shared<TransactionRepo>(*_database);
+        _instrumentRepo   = std::make_shared<InstrumentRepo>(*_database);
+        _positionRepo     = std::make_shared<PositionRepo>(*_database);
+        _watchlistRepo    = std::make_shared<WatchlistRepo>(*_database);
+        _migrationLogRepo = std::make_shared<MigrationLogRepo>(*_database);
 
         if (!_migrationRunner || !_profileRepo || !_accountRepo ||
             !_transactionRepo || !_instrumentRepo || !_positionRepo ||
-            !_watchlistRepo)
+            !_watchlistRepo || !_migrationLogRepo)
         {
             const auto* const msg = "Failed to initialize repository container";
             LOG_ERROR(msg);
@@ -136,8 +138,8 @@ namespace repo
      *
      * @return std::shared_ptr<const ITransactionRepo>
      */
-    std::shared_ptr<const ITransactionRepo> RepoContainer::getTransactionRepo(
-    ) const
+    std::shared_ptr<const ITransactionRepo> RepoContainer::
+        getTransactionRepo() const
     {
         return _transactionRepo;
     }
@@ -157,8 +159,8 @@ namespace repo
      *
      * @return std::shared_ptr<const IInstrumentRepo>
      */
-    std::shared_ptr<const IInstrumentRepo> RepoContainer::getInstrumentRepo(
-    ) const
+    std::shared_ptr<const IInstrumentRepo> RepoContainer::
+        getInstrumentRepo() const
     {
         return _instrumentRepo;
     }
@@ -198,10 +200,31 @@ namespace repo
      *
      * @return std::shared_ptr<const IWatchlistRepo>
      */
-    std::shared_ptr<const IWatchlistRepo> RepoContainer::getWatchlistRepo(
-    ) const
+    std::shared_ptr<const IWatchlistRepo> RepoContainer::
+        getWatchlistRepo() const
     {
         return _watchlistRepo;
+    }
+
+    /**
+     * @brief Get the Migration Log Repo
+     *
+     * @return std::shared_ptr<IMigrationLogRepo>
+     */
+    std::shared_ptr<IMigrationLogRepo> RepoContainer::getMigrationLogRepo()
+    {
+        return _migrationLogRepo;
+    }
+
+    /**
+     * @brief Get the Migration Log Repo (const version)
+     *
+     * @return std::shared_ptr<const IMigrationLogRepo>
+     */
+    std::shared_ptr<const IMigrationLogRepo> RepoContainer::
+        getMigrationLogRepo() const
+    {
+        return _migrationLogRepo;
     }
 
 }   // namespace repo

@@ -22,6 +22,10 @@ namespace ui
         /// Signal emitted when the user requests to open the help page
         void requestHelpPage();
 
+        /// Signal emitted when the user requests to see the migration
+        /// history
+        void requestMigrationHistory();
+
         /// Signal emitted when the user requests to see the about dialog
         void requestAbout();
 
@@ -31,6 +35,9 @@ namespace ui
 
         /// The action to open the help page
         QAction* _helpPageAction = nullptr;
+
+        /// The action to open the migration history dialog
+        QAction* _migrationHistoryAction = nullptr;
 
         /// The about action in the help menu
         QAction* _aboutAction = nullptr;
