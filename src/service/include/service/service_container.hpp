@@ -18,12 +18,13 @@ namespace settings
 namespace service
 {
 
-    class IProfileService;       // Forward declaration
-    class IAccountService;       // Forward declaration
-    class ITransactionService;   // Forward declaration
-    class IInstrumentService;    // Forward declaration
-    class IPositionService;      // Forward declaration
-    class IWatchlistService;     // Forward declaration
+    class IProfileService;        // Forward declaration
+    class IAccountService;        // Forward declaration
+    class ITransactionService;    // Forward declaration
+    class IInstrumentService;     // Forward declaration
+    class IPositionService;       // Forward declaration
+    class IWatchlistService;      // Forward declaration
+    class IMigrationLogService;   // Forward declaration
 
     /**
      * @brief Container for all services
@@ -46,6 +47,8 @@ namespace service
         std::shared_ptr<IPositionService> _positionService;
         /// The Watchlist service
         std::shared_ptr<IWatchlistService> _watchlistService;
+        /// The migration log service
+        std::shared_ptr<IMigrationLogService> _migrationLogService;
 
        public:
         explicit ServiceContainer(
@@ -54,30 +57,25 @@ namespace service
         ~ServiceContainer();
 
         [[nodiscard]] std::shared_ptr<IProfileService> getProfileService();
-        [[nodiscard]] std::shared_ptr<const IProfileService> getProfileService(
-        ) const;
+        [[nodiscard]] std::shared_ptr<const IProfileService> getProfileService() const;
 
         [[nodiscard]] std::shared_ptr<IAccountService> getAccountService();
-        [[nodiscard]] std::shared_ptr<const IAccountService> getAccountService(
-        ) const;
+        [[nodiscard]] std::shared_ptr<const IAccountService> getAccountService() const;
 
-        [[nodiscard]] std::shared_ptr<ITransactionService> getTransactionService(
-        );
-        [[nodiscard]] std::shared_ptr<const ITransactionService> getTransactionService(
-        ) const;
+        [[nodiscard]] std::shared_ptr<ITransactionService> getTransactionService();
+        [[nodiscard]] std::shared_ptr<const ITransactionService> getTransactionService() const;
 
-        [[nodiscard]] std::shared_ptr<IInstrumentService> getInstrumentService(
-        );
-        [[nodiscard]] std::shared_ptr<const IInstrumentService> getInstrumentService(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IInstrumentService> getInstrumentService();
+        [[nodiscard]] std::shared_ptr<const IInstrumentService> getInstrumentService() const;
 
         [[nodiscard]] std::shared_ptr<IPositionService> getPositionService();
-        [[nodiscard]] std::shared_ptr<const IPositionService> getPositionService(
-        ) const;
+        [[nodiscard]] std::shared_ptr<const IPositionService> getPositionService() const;
 
         [[nodiscard]] std::shared_ptr<IWatchlistService> getWatchlistService();
-        [[nodiscard]] std::shared_ptr<const IWatchlistService> getWatchlistService(
-        ) const;
+        [[nodiscard]] std::shared_ptr<const IWatchlistService> getWatchlistService() const;
+
+        [[nodiscard]] std::shared_ptr<IMigrationLogService> getMigrationLogService();
+        [[nodiscard]] std::shared_ptr<const IMigrationLogService> getMigrationLogService() const;
 
         void                               closeDb();
         [[nodiscard]] DatabaseResult<void> reopenDb();

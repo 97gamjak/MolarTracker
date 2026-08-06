@@ -55,6 +55,7 @@ target_link_libraries(molartracker_controller
     molartracker_logging
     molartracker_mapper
     molartracker_settings
+    molartracker_service
     molartracker_store
     molartracker_ui
     molartracker_db

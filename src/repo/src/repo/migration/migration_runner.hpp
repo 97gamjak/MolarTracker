@@ -17,13 +17,19 @@ namespace repo
     {
        private:
         /// current db version
-        constexpr static std::size_t DB_VERSION = 16;
+        constexpr static std::size_t DB_VERSION = 17;
 
         /// The migration states for the application
         Migrations _migrations;
 
        public:
         explicit MigrationRunner(db::Database& db);
+
+        /// The schema version this app version migrates the database to
+        [[nodiscard]] constexpr static std::size_t getTargetVersion()
+        {
+            return DB_VERSION;
+        }
 
        private:
         void migrate(db::Database& db);
