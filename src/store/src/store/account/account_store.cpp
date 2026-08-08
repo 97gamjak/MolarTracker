@@ -203,6 +203,45 @@ namespace store
                     break;
                 }
                 case StoreState::Modified:
+                {
+                    const auto result = _accountService->updateAccount(
+                        entry.value,
+                        _activeProfileId
+                    );
+
+                    if (!result)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to update account '{}' in database: {}",
+                                entry.value.getName(),
+                                result.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto commitResult =
+                        _commitEntry(entry.value.getId(), entry);
+
+                    if (commitResult != StoreResult::Ok)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to commit changes for account '{}' in "
+                                "database",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    LOG_INFO(
+                        std::format(
+                            "Account '{}' updated in database",
+                            entry.value.getName()
+                        )
+                    );
+                    break;
+                }
                 case StoreState::Deleted:
                 {
                     throw AccountStoreException(

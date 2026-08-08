@@ -66,4 +66,37 @@ namespace service
         return _accountRepo->createAccount(account, profileId);
     }
 
+    /**
+     * @brief Update an existing account
+     *
+     * @param account The Account domain object containing the updated
+     * details of the account to be updated
+     *
+     * @return CrudResult<void>
+     */
+    CrudResult<void> AccountService::updateAccount(
+        const finance::Account& account,
+        const ProfileId&        profileId
+    )
+    {
+        const auto linkedSecurityAccountId =
+            account.getLinkedSecurityAccountId();
+        if (linkedSecurityAccountId.has_value())
+        {
+            if (!_accountRepo->accountExists(linkedSecurityAccountId.value()))
+            {
+                return CrudError{
+                    CrudErrorType::NotFound,
+                    "When updating account with name '" + account.getName() +
+                        "' for profile with ID '" + profileId.toString() +
+                        "', linked security account with ID '" +
+                        linkedSecurityAccountId.value().toString() +
+                        "' does not exist"
+                };
+            };
+        }
+
+        return _accountRepo->updateAccount(account, profileId);
+    }
+
 }   // namespace service

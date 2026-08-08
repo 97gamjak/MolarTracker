@@ -66,6 +66,23 @@ namespace repo
          */
         [[nodiscard]]
         virtual bool accountExists(const AccountId& accountId) = 0;
+
+        /**
+         * @brief Update an existing account in the repository, this method
+         * takes an Account domain object as input and updates the
+         * corresponding entry in the database, it returns a CrudResult
+         * indicating the success or failure of the operation
+         *
+         * @param account The Account domain object containing the
+         * updated details of the account to be updated
+         * @return CrudResult<void> A result indicating success or failure
+         * of the update operation
+         */
+        [[nodiscard]]
+        virtual CrudResult<void> updateAccount(
+            const finance::Account& account,
+            const ProfileId&        profileId
+        ) = 0;
     };
 
 }   // namespace repo

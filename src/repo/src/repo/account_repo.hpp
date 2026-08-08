@@ -30,6 +30,12 @@ namespace repo
 
         [[nodiscard]]
         bool accountExists(const AccountId& accountId) override;
+
+        [[nodiscard]]
+        CrudResult<void> updateAccount(
+            const finance::Account& account,
+            const ProfileId&        profileId
+        ) override;
     };
 
 }   // namespace repo

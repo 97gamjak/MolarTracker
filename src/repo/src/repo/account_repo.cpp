@@ -162,4 +162,66 @@ namespace repo
         return result.has_value();
     }
 
+    /**
+     * @brief Update an existing account in the repository
+     *
+     * This method takes an Account domain object as input and updates the
+     * corresponding entry in the database. It returns a CrudResult indicating
+     * the success or failure of the operation.
+     *
+     * @param account The Account domain object containing the updated details
+     * of the account to be updated
+     * @return CrudResult<void> A result indicating success or failure of the
+     * update operation
+     */
+    CrudResult<void> AccountRepo::updateAccount(
+        const finance::Account& account,
+        const ProfileId&        profileId
+    )
+    {
+        const auto result = _getCrud().update(
+            _getDb(),
+            AccountFactory::toAccountRow(account, profileId)
+        );
+
+        if (!result.has_value())
+        {
+            return result.error().convert(
+                "Failed to update account with ID '" +
+                account.getId().toString() + "' and name '" +
+                account.getName() + "'"
+            );
+        }
+
+        switch (account.getKind())
+        {
+            case AccountKind::Cash:
+            {
+                const auto cashResult = _getCrud().update(
+                    _getDb(),
+                    AccountFactory::toCashAccountDetailRow(
+                        std::get<finance::CashAccount>(account.getDetails()),
+                        account.getId()
+                    )
+                );
+
+                if (!cashResult.has_value())
+                {
+                    return cashResult.error().convert(
+                        "Failed to update cash account details for account "
+                        "with ID '" +
+                        account.getId().toString() + "' and name '" +
+                        account.getName() + "'"
+                    );
+                }
+                break;
+            }
+            case AccountKind::Security:
+            case AccountKind::External:
+                break;
+        }
+
+        return {};
+    }
+
 }   // namespace repo
