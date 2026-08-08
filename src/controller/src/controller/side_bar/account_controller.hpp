@@ -16,6 +16,7 @@ namespace ui
 {
     class AccountCategory;       // Forward declaration
     class CreateAccountDialog;   // Forward declaration
+    class AccountItem;           // Forward declaration
 }   // namespace ui
 
 namespace drafts
@@ -71,10 +72,7 @@ namespace controller
 
         void refresh() override;
 
-        void handleContextMenuAction(
-            const ui::AccountCategory* item,
-            const QAction*             action
-        );
+        void renameAccount(ui::AccountItem* item, const QString& newName);
 
        public slots:
         void onAccountSelected(AccountId id);
@@ -91,6 +89,18 @@ namespace controller
         void _onCreateAccountRequested(
             const drafts::AccountDraft& account,
             std::optional<AccountId>    referenceAccount
+        );
+
+       private:
+        void _onItemClicked(ui::SideBarItem* item) override;
+        void _onContextMenuRequested(
+            ui::SideBarItem* item,
+            const QAction*   action
+        ) override;
+
+        void _handleContextMenuAction(
+            const ui::AccountCategory* item,
+            const QAction*             action
         );
     };
 

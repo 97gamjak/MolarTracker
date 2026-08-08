@@ -13,12 +13,19 @@ namespace ui
      * selected when the itemSelected signal is emitted
      * @param name The name of the account to display in the side bar
      */
-    AccountItem::AccountItem(AccountId id, const QString& name)
-        : SideBarItem(name, SideBarItemType::AccountsItem),
+    AccountItem::AccountItem(
+        AccountId      id,
+        const QString& symbol,
+        const QString& name
+    )
+        : SideBarItem(SideBarItemType::AccountsItem),
           _accountId(id),
           _openAction(nullptr),
           _deleteAction(nullptr)
     {
+        setFlags(flags() | Qt::ItemIsEditable);
+        setData(symbol + " " + name);
+        setData(name, Qt::EditRole);
     }
 
     /**

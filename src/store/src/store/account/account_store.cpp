@@ -613,4 +613,49 @@ namespace store
         };
     }
 
+    FinanceResult<void> AccountStore::renameAccount(
+        AccountId          id,
+        const std::string& newName
+    )
+    {
+        const auto account = getAccount(id);
+
+        if (!account)
+        {
+            return FinanceError{
+                FinanceErrorType::AccountNotFound,
+                "Account not found in the store: id = " + id.toString()
+            };
+        }
+
+        const auto options = Options{
+            .filter   = HasName(newName),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        if (_get(options).has_value())
+        {
+            return FinanceError{
+                FinanceErrorType::AccountNameConflict,
+                "Account with name '" + newName +
+                    "' already exists: " + _get(options).value().toString()
+            };
+        }
+
+        auto entry = _getEntry(
+            {.filter   = HasAccountId(id),
+             .deletion = DeletionPolicy::ExcludeDelete}
+        );
+
+        entry->value.rename(newName);
+
+        const auto newState = entry->state == StoreState::New
+                                  ? StoreState::New
+                                  : StoreState::Modified;
+
+        _updateEntry(entry->value, newState);
+
+        return {};
+    }
+
 }   // namespace store

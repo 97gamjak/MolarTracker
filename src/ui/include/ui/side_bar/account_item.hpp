@@ -29,7 +29,11 @@ namespace ui
         QAction* _deleteAction;
 
        public:
-        explicit AccountItem(AccountId id, const QString& name);
+        explicit AccountItem(
+            AccountId      id,
+            const QString& symbol,
+            const QString& name
+        );
 
         [[nodiscard]] AccountId getId() const;
 

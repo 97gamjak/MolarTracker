@@ -66,6 +66,47 @@ namespace finance
     }   // namespace
 
     /**
+     * @brief Get a string representation of the SecuritiesFilter, this will
+     * include the symbols, stock IDs, and instrument IDs that are set in the
+     * filter, and will be used for logging and debugging purposes to provide
+     * insight into the current state of the filter.
+     *
+     * @return std::string A string representation of the SecuritiesFilter
+     */
+    std::string SecuritiesFilter::toString() const
+    {
+        std::string result = "SecuritiesFilter(";
+
+        if (symbols.has_value())
+        {
+            result += "symbols: {";
+            for (const auto& symbol : symbols.value())
+                result += symbol + ", ";
+            result += "}, ";
+        }
+
+        if (stockIds.has_value())
+        {
+            result += "stockIds: {";
+            for (const auto& stockId : stockIds.value())
+                result += std::to_string(stockId.value()) + ", ";
+            result += "}, ";
+        }
+
+        if (instrumentIds.has_value())
+        {
+            result += "instrumentIds: {";
+            for (const auto& instrumentId : instrumentIds.value())
+                result += std::to_string(instrumentId.value()) + ", ";
+            result += "}, ";
+        }
+
+        result += ")";
+
+        return result;
+    }
+
+    /**
      * @brief Get a predicate function that can be used to filter stocks based
      * on the criteria set in this filter, this function generates a predicate
      * that can be applied to a collection of stocks to filter them according to
@@ -77,7 +118,7 @@ namespace finance
      */
     filter::Predicate<Stock> SecuritiesFilter::getStockPredicate() const
     {
-        filter::Predicate<Stock> predicate;
+        auto predicate = filter::makeEmptyPredicate<Stock>();
 
         if (symbols.has_value())
             predicate &= HasSymbol(symbols.value());

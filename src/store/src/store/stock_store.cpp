@@ -228,6 +228,14 @@ namespace store
             }
         }
 
+        LOG_DEBUG(
+            std::format(
+                "Retrieved {} stocks from store with filter: {}",
+                stocks.size(),
+                filter.toString()
+            )
+        );
+
         return stocks;
     }
 

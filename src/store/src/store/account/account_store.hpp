@@ -91,6 +91,12 @@ namespace store
         [[nodiscard]]
         FinanceResult<void> linkAccounts(AccountId id1, AccountId id2) override;
 
+        [[nodiscard]]
+        FinanceResult<void> renameAccount(
+            AccountId          id,
+            const std::string& newName
+        ) override;
+
        private:
         void _refresh();
     };

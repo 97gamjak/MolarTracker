@@ -16,7 +16,6 @@
 #include "ui/side_bar/side_bar_item.hpp"
 #include "ui/side_bar/transaction_category.hpp"
 #include "ui/side_bar/watchlist_item.hpp"
-#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("UI.Controller.SideBarController");
 
@@ -83,14 +82,53 @@ namespace controller
             _sideBar,
             &ui::SideBar::itemClicked,
             this,
-            &SideBarController::_onItemClicked
+            [this](ui::SideBarItem* item)
+            { _onActionTriggered(item, SideBarAction::ItemClicked, nullptr); }
+        );
+
+        connect(
+            _sideBar,
+            &ui::SideBar::itemDoubleClicked,
+            this,
+            [this](ui::SideBarItem* item)
+            {
+                _onActionTriggered(
+                    item,
+                    SideBarAction::ItemDoubleClicked,
+                    nullptr
+                );
+            }
         );
 
         connect(
             _sideBar,
             &ui::SideBar::contextMenuRequested,
             this,
-            &SideBarController::_onContextMenuRequested
+            [this](ui::SideBarItem* item, QAction* action)
+            {
+                _onActionTriggered(
+                    item,
+                    SideBarAction::ContextMenuRequested,
+                    action
+                );
+            }
+        );
+
+        connect(
+            _sideBar,
+            &ui::SideBar::itemRenameCommitted,
+            this,
+            [this](ui::SideBarItem* item, const QString& newName)
+            {
+                if (item->getType() == ui::SideBarItemType::AccountsItem)
+                {
+                    auto* accountItem = dynamic_cast<ui::AccountItem*>(item);
+                    _accountSideBarController.renameAccount(
+                        accountItem,
+                        newName
+                    );
+                }
+            }
         );
 
         refresh();
@@ -110,105 +148,16 @@ namespace controller
         _securitiesSideBarController.refresh();
     }
 
-    /**
-     * @brief Handle an item being clicked in the side bar, this will determine
-     * which item was clicked and perform the appropriate action, such as
-     * opening the corresponding page in the central stack
-     *
-     * @param item The item that was clicked, this should be a pointer to a
-     * SideBarItem that is currently in the side bar, and will be used to
-     * determine which item was clicked and what action to perform
-     */
-    void SideBarController::_onItemClicked(ui::SideBarItem* item)
-    {
-        LOG_TRACE(
-            "Side bar item with type " +
-            ui::SideBarItemTypeMeta::toString(item->getType())
-        );
-
-        switch (item->getType())
-        {
-            case ui::SideBarItemType::AccountsItem:
-            {
-                const auto* account = dynamic_cast<ui::AccountItem*>(item);
-
-                if (account != nullptr)
-                    _accountSideBarController.onAccountSelected(account->getId()
-                    );
-                else
-                    LOG_ERROR("Account item clicked but not found");
-
-                break;
-            }
-            case ui::SideBarItemType::TransactionCategory:
-            {
-                _transactionSideBarController.onTransactionsSelected();
-                break;
-            }
-            case ui::SideBarItemType::AllSecuritiesItem:
-            {
-                _securitiesSideBarController.onAllSecuritiesSelected();
-                break;
-            }
-            case ui::SideBarItemType::WatchlistItem:
-            {
-                const auto* watchlistItem =
-                    dynamic_cast<ui::WatchlistItem*>(item);
-
-                if (watchlistItem != nullptr)
-                {
-                    _securitiesSideBarController.onWatchlistSelected(
-                        watchlistItem->getId()
-                    );
-                }
-                else
-                {
-                    const std::string msg =
-                        "Watchlist item clicked but not found";
-                    LOG_ERROR(msg);
-
-                    ui::ErrorDialog::show(
-                        std::string("Failed to select watchlist: "),
-                        msg,
-                        _centralStack->currentWidget()
-                    );
-                    return;
-                }
-
-                break;
-            }
-            case ui::SideBarItemType::OverviewCategory:
-            case ui::SideBarItemType::AccountCategory:
-            case ui::SideBarItemType::SecuritiesCategory:
-                // Handle overview, account and securities category clicks if
-                // needed (categories themselves are non-selectable)
-                break;
-        }
-    }
-
-    /**
-     * @brief Handle a context menu action being triggered for an item in the
-     * side bar, this will determine which item the action was triggered for and
-     * which action was triggered, and perform the appropriate action based on
-     * that information
-     *
-     * @param item The item for which the context menu action was triggered,
-     * this should be a pointer to a SideBarItem that is currently in the side
-     * bar, and will be used to determine which item the action was triggered
-     * for
-     * @param action The action that was triggered, this should be a pointer to
-     * a QAction that is currently in the context menu for the item, and will be
-     * used to determine which action was triggered
-     */
-    void SideBarController::_onContextMenuRequested(
+    void SideBarController::_onActionTriggered(
         ui::SideBarItem* item,
-        QAction*         action
+        SideBarAction    action,
+        QAction*         qaction
     )
     {
-        if (item == nullptr || action == nullptr)
+        if (item == nullptr)
         {
             LOG_WARNING(
-                "Context menu requested with null item or action, ignoring"
+                "Context menu action triggered with null item, ignoring"
             );
             return;
         }
@@ -216,97 +165,30 @@ namespace controller
         switch (item->getType())
         {
             case ui::SideBarItemType::AccountsItem:
-            {
-                const auto* accountItem = dynamic_cast<ui::AccountItem*>(item);
-                if (action == accountItem->getOpenAction())
-                // NOLINTNEXTLINE(bugprone-branch-clone)
-                {
-                    // _openAccount(accountItem->getId());
-                }
-                else if (action == accountItem->getDeleteAction())
-                {
-                    //_deleteAccount(accountItem->getId());
-                }
-                break;
-            }
             case ui::SideBarItemType::AccountCategory:
             {
-                const auto* acc = dynamic_cast<ui::AccountCategory*>(item);
-
-                _accountSideBarController.handleContextMenuAction(acc, action);
-
+                _accountSideBarController
+                    .handleTriggeredAction(item, action, qaction);
                 break;
             }
             case ui::SideBarItemType::TransactionCategory:
             {
-                const auto* transaction =
-                    dynamic_cast<ui::TransactionCategory*>(item);
-                _transactionSideBarController.handleContextMenuAction(
-                    transaction,
-                    action
-                );
+                _transactionSideBarController
+                    .handleTriggeredAction(item, action, qaction);
                 break;
             }
             case ui::SideBarItemType::SecuritiesCategory:
-            {
-                const auto* securities =
-                    dynamic_cast<ui::SecuritiesCategory*>(item);
-                _securitiesSideBarController.handleContextMenuAction(
-                    securities,
-                    action
-                );
-                break;
-            }
             case ui::SideBarItemType::WatchlistItem:
+            case ui::SideBarItemType::AllSecuritiesItem:
             {
-                const auto* watchlistItem =
-                    dynamic_cast<ui::WatchlistItem*>(item);
-                _securitiesSideBarController.handleWatchlistContextMenuAction(
-                    watchlistItem,
-                    action
-                );
+                _securitiesSideBarController
+                    .handleTriggeredAction(item, action, qaction);
                 break;
             }
-            case ui::SideBarItemType::AllSecuritiesItem:
             case ui::SideBarItemType::OverviewCategory:
-                // Handle overview item click
+                // Handle overview and all securities item click if needed
                 break;
         }
-    }
-
-    /**
-     * @brief Get the account side bar controller
-     *
-     * @return AccountSideBarController& Reference to the account side bar
-     * controller
-     */
-    AccountSideBarController& SideBarController::getAccountSideBarController()
-    {
-        return _accountSideBarController;
-    }
-
-    /**
-     * @brief Get the account side bar controller
-     *
-     * @return const AccountSideBarController& Reference to the account side bar
-     * controller
-     */
-    const AccountSideBarController& SideBarController::
-        getAccountSideBarController() const
-    {
-        return _accountSideBarController;
-    }
-
-    /**
-     * @brief Get the securities side bar controller
-     *
-     * @return SecuritiesSideBarController& Reference to the securities side
-     * bar controller
-     */
-    SecuritiesSideBarController& SideBarController::
-        getSecuritiesSideBarController()
-    {
-        return _securitiesSideBarController;
     }
 
 }   // namespace controller

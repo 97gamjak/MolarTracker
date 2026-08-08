@@ -13,6 +13,7 @@
 #include "ui/account/create_account_dlg.hpp"
 #include "ui/side_bar/account_category.hpp"
 #include "ui/side_bar/account_item.hpp"
+#include "ui/utils/error.hpp"
 
 REGISTER_LOG_CATEGORY("Controller.SideBar.AccountSideBarController");
 
@@ -90,6 +91,78 @@ namespace controller
         }
     }
 
+    void AccountSideBarController::_onItemClicked(ui::SideBarItem* item)
+    {
+        if (item == nullptr)
+        {
+            LOG_ERROR("Clicked item is null, ignoring");
+            return;
+        }
+
+        switch (item->getType())
+        {
+            case ui::SideBarItemType::AccountsItem:
+            {
+                const auto* accountItem = dynamic_cast<ui::AccountItem*>(item);
+                if (accountItem != nullptr)
+                    onAccountSelected(accountItem->getId());
+                else
+                    LOG_ERROR("Account item clicked but not found");
+                break;
+            }
+            case ui::SideBarItemType::AccountCategory:
+                // Handle account category click if needed
+                break;
+            case ui::SideBarItemType::TransactionCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
+            case ui::SideBarItemType::WatchlistItem:
+            case ui::SideBarItemType::AllSecuritiesItem:
+            case ui::SideBarItemType::OverviewCategory:
+                LOG_ERROR(
+                    "Clicked item is not an account item or category, "
+                    "ignoring"
+                );
+                break;
+        }
+    }
+
+    void AccountSideBarController::_onContextMenuRequested(
+        ui::SideBarItem* item,
+        const QAction*   action
+    )
+    {
+        if (item == nullptr || action == nullptr)
+        {
+            LOG_ERROR(
+                "AccountSideBarController::_onContextMenuRequested called "
+                "with null item or action"
+            );
+            return;
+        }
+
+        switch (item->getType())
+        {
+            case ui::SideBarItemType::AccountCategory:
+            {
+                const auto* category = dynamic_cast<ui::AccountCategory*>(item);
+                _handleContextMenuAction(category, action);
+                break;
+            }
+            case ui::SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::TransactionCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
+            case ui::SideBarItemType::WatchlistItem:
+            case ui::SideBarItemType::AllSecuritiesItem:
+            case ui::SideBarItemType::OverviewCategory:
+                LOG_ERROR(
+                    "AccountSideBarController::_onContextMenuRequested "
+                    "called with unexpected item type: " +
+                    ui::SideBarItemTypeMeta::toString(item->getType())
+                );
+                break;
+        }
+    }
+
     /**
      * @brief Handle a context menu action triggered for the account category,
      * this will be called when an action in the context menu of the account
@@ -101,7 +174,7 @@ namespace controller
      * was triggered
      * @param action The action that was triggered
      */
-    void AccountSideBarController::handleContextMenuAction(
+    void AccountSideBarController::_handleContextMenuAction(
         const ui::AccountCategory* item,
         const QAction*             action
     )
@@ -200,5 +273,42 @@ namespace controller
         LOG_DEBUG(std::format("Account with ID {} selected", id.value()));
 
         _accountController.accountSelected(id);
+    }
+
+    void AccountSideBarController::renameAccount(
+        ui::AccountItem* item,
+        const QString&   newName
+    )
+    {
+        if (item == nullptr)
+        {
+            LOG_WARNING("Attempted to rename a null account item, ignoring");
+            return;
+        }
+
+        const auto accountId = item->getId();
+
+        LOG_DEBUG(
+            std::format(
+                "Renaming account with ID {} to new name: {}",
+                accountId.value(),
+                newName.toStdString()
+            )
+        );
+
+        auto result =
+            _accountStore->renameAccount(accountId, newName.toStdString());
+
+        if (!result)
+        {
+            ui::ErrorDialog::show(
+                result.error(),
+                "Failed to rename account",
+                getMainWindow()
+            );
+            return;
+        }
+
+        item->setName(newName);
     }
 }   // namespace controller

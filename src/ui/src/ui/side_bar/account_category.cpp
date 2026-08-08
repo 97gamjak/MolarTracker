@@ -42,7 +42,7 @@ namespace ui
                                    ? QString::fromUtf8(securitySymbol)
                                    : QString::fromUtf8(cashSymbol);
 
-        auto* accountItem = common::makeQChild<AccountItem>(id, prefix + name);
+        auto* accountItem = common::makeQChild<AccountItem>(id, prefix, name);
         appendRow(accountItem);
     }
 

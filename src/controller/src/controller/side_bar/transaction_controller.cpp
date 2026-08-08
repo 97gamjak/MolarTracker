@@ -109,6 +109,70 @@ namespace controller
     {
     }
 
+    void TransactionSideBarController::_onItemClicked(ui::SideBarItem* item)
+    {
+        if (item == nullptr)
+        {
+            LOG_ERROR("Clicked item is null, ignoring");
+            return;
+        }
+
+        switch (item->getType())
+        {
+            case ui::SideBarItemType::TransactionCategory:
+                _onTransactionsSelected();
+                break;
+            case ui::SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::AccountCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
+            case ui::SideBarItemType::WatchlistItem:
+            case ui::SideBarItemType::AllSecuritiesItem:
+            case ui::SideBarItemType::OverviewCategory:
+                LOG_ERROR(
+                    "Clicked item with unexpected type: " +
+                    ui::SideBarItemTypeMeta::toString(item->getType())
+                );
+                break;
+        }
+    }
+
+    void TransactionSideBarController::_onContextMenuRequested(
+        ui::SideBarItem* item,
+        const QAction*   action
+    )
+    {
+        if (item == nullptr || action == nullptr)
+        {
+            LOG_ERROR(
+                "Context menu requested with null item or action, ignoring"
+            );
+            return;
+        }
+
+        switch (item->getType())
+        {
+            case ui::SideBarItemType::TransactionCategory:
+            {
+                const auto* category =
+                    dynamic_cast<ui::TransactionCategory*>(item);
+                _handleContextMenuAction(category, action);
+                break;
+            }
+            case ui::SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::AccountCategory:
+            case ui::SideBarItemType::SecuritiesCategory:
+            case ui::SideBarItemType::WatchlistItem:
+            case ui::SideBarItemType::AllSecuritiesItem:
+            case ui::SideBarItemType::OverviewCategory:
+                LOG_ERROR(
+                    "TransactionSideBarController::_onContextMenuRequested "
+                    "called with unexpected item type: " +
+                    ui::SideBarItemTypeMeta::toString(item->getType())
+                );
+                break;
+        }
+    }
+
     /**
      * @brief Construct a new Transaction Side Bar Controller::
      * Transaction Side Bar Controller object
@@ -223,7 +287,7 @@ namespace controller
      * @param item The transaction category item
      * @param action The action that was triggered
      */
-    void TransactionSideBarController::handleContextMenuAction(
+    void TransactionSideBarController::_handleContextMenuAction(
         const TransactionCategory* item,
         const QAction*             action
     )
@@ -514,7 +578,7 @@ namespace controller
      * selected.
      *
      */
-    void TransactionSideBarController::onTransactionsSelected()
+    void TransactionSideBarController::_onTransactionsSelected()
     {
         _transactionController.transactionOverviewSelected();
     }
@@ -528,7 +592,7 @@ namespace controller
         const std::string& ticker
     )
     {
-        _stockController.createStock(ticker);
+        _stockController.onCreateStock(ticker);
     }
 
     /**

@@ -111,14 +111,19 @@ namespace controller
 
         void refresh() override;
 
-        void handleContextMenuAction(
+       private:
+        void _onItemClicked(ui::SideBarItem* item) override;
+        void _onContextMenuRequested(
+            ui::SideBarItem* item,
+            const QAction*   action
+        ) override;
+
+        void _handleContextMenuAction(
             const ui::TransactionCategory* item,
             const QAction*                 action
         );
 
-        void onTransactionsSelected();
-
-       private:
+        void _onTransactionsSelected();
         void _onCreateCashTransactionRequested(
             const drafts::CreateCashTransactionDraft& draft
         );
