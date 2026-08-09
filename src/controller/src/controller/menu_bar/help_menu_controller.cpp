@@ -6,8 +6,10 @@
 #include <QString>
 
 #include "config/constants/github_constants.hpp"
+#include "service/i_migration_log_service.hpp"
 #include "ui/help/help_dialog.hpp"
 #include "ui/menu_bar/help_menu.hpp"
+#include "ui/migration/migration_history_dialog.hpp"
 
 namespace controller
 {
@@ -17,18 +19,30 @@ namespace controller
      *
      * @param mainWindow
      * @param helpMenu
+     * @param migrationLogService
      */
     HelpMenuController::HelpMenuController(
         QMainWindow&  mainWindow,
-        ui::HelpMenu& helpMenu
+        ui::HelpMenu& helpMenu,
+        const std::shared_ptr<service::IMigrationLogService>&
+            migrationLogService
     )
-        : QObject{&mainWindow}, _mainWindow(mainWindow), _helpMenu(helpMenu)
+        : QObject{&mainWindow},
+          _mainWindow(mainWindow),
+          _helpMenu(helpMenu),
+          _migrationLogService(migrationLogService)
     {
         connect(
             &_helpMenu,
             &ui::HelpMenu::requestHelpPage,
             this,
             &HelpMenuController::_onHelpPageRequested
+        );
+        connect(
+            &_helpMenu,
+            &ui::HelpMenu::requestMigrationHistory,
+            this,
+            &HelpMenuController::_onMigrationHistoryRequested
         );
         connect(
             &_helpMenu,
@@ -45,6 +59,38 @@ namespace controller
     void HelpMenuController::_onHelpPageRequested()
     {
         ui::HelpDialog dlg(&_mainWindow);
+        dlg.exec();
+    }
+
+    /**
+     * @brief Handle migration history request
+     *
+     */
+    void HelpMenuController::_onMigrationHistoryRequested()
+    {
+        std::vector<ui::MigrationHistoryEntry> entries;
+        for (const auto& entry : _migrationLogService->getAll())
+        {
+            entries.push_back(
+                ui::MigrationHistoryEntry{
+                    .fromVersion    = entry.fromVersion,
+                    .toVersion      = entry.toVersion,
+                    .releaseVersion = entry.releaseVersion,
+                    .appliedAt      = entry.appliedAt,
+                }
+            );
+        }
+        // (entry here is a service::MigrationLogEntry, mapped to the UI's
+        // own MigrationHistoryEntry — each layer keeps its own plain DTO
+        // rather than leaking repo:: types up through service's public
+        // interface)
+
+        ui::MigrationHistoryDialog dlg(
+            std::move(entries),
+            _migrationLogService->getCurrentDbVersion(),
+            _migrationLogService->getTargetDbVersion(),
+            &_mainWindow
+        );
         dlg.exec();
     }
 

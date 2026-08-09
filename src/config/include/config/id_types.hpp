@@ -45,6 +45,9 @@ using WatchlistId = StrongId<WatchlistTag>;
 struct WatchlistInstrumentTag {};
 using WatchlistInstrumentId = StrongId<WatchlistInstrumentTag>;
 
+struct MigrationLogTag {};
+using MigrationLogId = StrongId<MigrationLogTag>;
+
 // clang-format on
 
 template <typename T>

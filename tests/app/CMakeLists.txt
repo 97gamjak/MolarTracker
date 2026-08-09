@@ -3,6 +3,7 @@ add_executable(tests_app
     test_account_service.cpp
     test_instrument_repo.cpp
     test_instrument_service.cpp
+    test_migration_log_repo.cpp
     test_position_service.cpp
     test_profile_repo.cpp
     test_profile_service.cpp

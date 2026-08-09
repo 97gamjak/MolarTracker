@@ -40,6 +40,9 @@ namespace repo
         void migrate(db::Database& db) const;
         void addMigration(std::unique_ptr<SingleMigration> migration);
         void addMigration(std::unique_ptr<MultiMigration> migration);
+
+        /// The release version this migration is targeting
+        [[nodiscard]] const common::SemVer& getVersion() const;
     };
 
     /**
@@ -86,6 +89,15 @@ namespace repo
         void _migrateV15();
         void _migrate_0_3_0();
         void _migrateV16();
+        void _migrateV17();
+
+        /// Record one applied migration step in the migration_log table
+        void _logMigrationStep(
+            db::Database&         db,
+            std::size_t           fromVersion,
+            std::size_t           toVersion,
+            const common::SemVer& releaseVersion
+        ) const;
     };
 
 }   // namespace repo

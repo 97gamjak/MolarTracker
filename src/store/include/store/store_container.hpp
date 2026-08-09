@@ -12,7 +12,8 @@ class Connections;   // Forward declaration
 
 namespace service
 {
-    class ServiceContainer;   // Forward declaration
+    class ServiceContainer;       // Forward declaration
+    class IMigrationLogService;   // Forward declaration
 }   // namespace service
 
 namespace settings
@@ -78,10 +79,13 @@ namespace store
         [[nodiscard]] std::shared_ptr<IStockStore>    getStockStore() const;
         [[nodiscard]] std::shared_ptr<IOptionStore>   getOptionStore() const;
         [[nodiscard]] std::shared_ptr<IPositionStore> getPositionStore() const;
-        [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore(
-        ) const;
-        [[nodiscard]] std::shared_ptr<IWatchlistStore> getWatchlistStore(
-        ) const;
+        [[nodiscard]] std::shared_ptr<ITransactionStore> getTransactionStore() const;
+        [[nodiscard]] std::shared_ptr<IWatchlistStore> getWatchlistStore() const;
+
+        /// Passthrough to the underlying service container — migration
+        /// history is read-only diagnostic data with no dirty-tracking, so
+        /// it doesn't need its own Store.
+        [[nodiscard]] std::shared_ptr<service::IMigrationLogService> getMigrationLogService() const;
     };
 
 }   // namespace store

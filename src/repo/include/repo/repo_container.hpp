@@ -18,13 +18,14 @@ namespace settings
 namespace repo
 {
 
-    class IProfileRepo;       // Forward declaration
-    class IAccountRepo;       // Forward declaration
-    class ITransactionRepo;   // Forward declaration
-    class IInstrumentRepo;    // Forward declaration
-    class IPositionRepo;      // Forward declaration
-    class IWatchlistRepo;     // Forward declaration
-    class MigrationRunner;    // Forward declaration
+    class IProfileRepo;        // Forward declaration
+    class IAccountRepo;        // Forward declaration
+    class ITransactionRepo;    // Forward declaration
+    class IInstrumentRepo;     // Forward declaration
+    class IPositionRepo;       // Forward declaration
+    class IWatchlistRepo;      // Forward declaration
+    class IMigrationLogRepo;   // Forward declaration
+    class MigrationRunner;     // Forward declaration
 
     /**
      * @brief Container for all repositories
@@ -51,34 +52,33 @@ namespace repo
         std::shared_ptr<IPositionRepo> _positionRepo;
         /// The Watchlist repository
         std::shared_ptr<IWatchlistRepo> _watchlistRepo;
+        /// The migration log repository
+        std::shared_ptr<IMigrationLogRepo> _migrationLogRepo;
 
        public:
         explicit RepoContainer(const settings::BackupSettings& backupSettings);
         ~RepoContainer();
 
-        [[nodiscard]] std::shared_ptr<IProfileRepo>       getProfileRepo();
-        [[nodiscard]] std::shared_ptr<const IProfileRepo> getProfileRepo(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IProfileRepo> getProfileRepo();
+        [[nodiscard]] std::shared_ptr<const IProfileRepo> getProfileRepo() const;
 
-        [[nodiscard]] std::shared_ptr<IAccountRepo>       getAccountRepo();
-        [[nodiscard]] std::shared_ptr<const IAccountRepo> getAccountRepo(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IAccountRepo> getAccountRepo();
+        [[nodiscard]] std::shared_ptr<const IAccountRepo> getAccountRepo() const;
 
         [[nodiscard]] std::shared_ptr<ITransactionRepo> getTransactionRepo();
-        [[nodiscard]] std::shared_ptr<const ITransactionRepo> getTransactionRepo(
-        ) const;
+        [[nodiscard]] std::shared_ptr<const ITransactionRepo> getTransactionRepo() const;
 
         [[nodiscard]] std::shared_ptr<IInstrumentRepo> getInstrumentRepo();
-        [[nodiscard]] std::shared_ptr<const IInstrumentRepo> getInstrumentRepo(
-        ) const;
+        [[nodiscard]] std::shared_ptr<const IInstrumentRepo> getInstrumentRepo() const;
 
-        [[nodiscard]] std::shared_ptr<IPositionRepo>       getPositionRepo();
-        [[nodiscard]] std::shared_ptr<const IPositionRepo> getPositionRepo(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IPositionRepo> getPositionRepo();
+        [[nodiscard]] std::shared_ptr<const IPositionRepo> getPositionRepo() const;
 
-        [[nodiscard]] std::shared_ptr<IWatchlistRepo>       getWatchlistRepo();
-        [[nodiscard]] std::shared_ptr<const IWatchlistRepo> getWatchlistRepo(
-        ) const;
+        [[nodiscard]] std::shared_ptr<IWatchlistRepo> getWatchlistRepo();
+        [[nodiscard]] std::shared_ptr<const IWatchlistRepo> getWatchlistRepo() const;
+
+        [[nodiscard]] std::shared_ptr<IMigrationLogRepo> getMigrationLogRepo();
+        [[nodiscard]] std::shared_ptr<const IMigrationLogRepo> getMigrationLogRepo() const;
 
         void                               closeDb();
         [[nodiscard]] DatabaseResult<void> reopenDb();

@@ -69,12 +69,14 @@ namespace store
         InstrumentIdSeq&           instrumentIdSeq
     )
         : profileStore(
-              std::make_shared<ProfileStore>(serviceContainer.getProfileService(
-              ))
+              std::make_shared<ProfileStore>(
+                  serviceContainer.getProfileService()
+              )
           ),
           accountStore(
-              std::make_shared<AccountStore>(serviceContainer.getAccountService(
-              ))
+              std::make_shared<AccountStore>(
+                  serviceContainer.getAccountService()
+              )
           ),
           stockStore(
               std::make_shared<StockStore>(
@@ -169,8 +171,9 @@ namespace store
         const auto& accountIdRemap  = _stores->accountStore->getIdRemap();
         const auto& positionIdRemap = _stores->positionStore->getIdRemap();
 
-        if (!instrumentIdRemap.combine(_stores->optionStore->getInstrumentIdMap(
-            )))
+        if (!instrumentIdRemap.combine(
+                _stores->optionStore->getInstrumentIdMap()
+            ))
         {
             throw std::runtime_error(
                 "Failed to combine instrument ID remaps from stock and option "
@@ -286,8 +289,8 @@ namespace store
      *
      * @return std::shared_ptr<ITransactionStore>
      */
-    std::shared_ptr<ITransactionStore> StoreContainer::getTransactionStore(
-    ) const
+    std::shared_ptr<ITransactionStore> StoreContainer::
+        getTransactionStore() const
     {
         return _stores->transactionStore;
     }
@@ -379,6 +382,18 @@ namespace store
     std::shared_ptr<IWatchlistStore> StoreContainer::getWatchlistStore() const
     {
         return _stores->watchlistStore;
+    }
+
+    /**
+     * @brief Get the migration log service, passed straight through from the
+     * underlying service container
+     *
+     * @return std::shared_ptr<service::IMigrationLogService>
+     */
+    std::shared_ptr<service::IMigrationLogService> StoreContainer::
+        getMigrationLogService() const
+    {
+        return _serviceContainer->getMigrationLogService();
     }
 
 }   // namespace store

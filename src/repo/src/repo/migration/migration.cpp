@@ -11,9 +11,11 @@
 #include "db/database.hpp"
 #include "multi_migration.hpp"
 #include "orm/constraints.hpp"
+#include "repo/exceptions.hpp"
 #include "single_migration.hpp"
 #include "sql_models/account_row.hpp"
 #include "sql_models/instrument_row.hpp"
+#include "sql_models/migration_log_row.hpp"
 #include "sql_models/option_row.hpp"
 #include "sql_models/position_row.hpp"
 #include "sql_models/profile_row.hpp"
@@ -74,6 +76,13 @@ namespace repo
     }
 
     /**
+     * @brief Get the release version this migration is targeting
+     *
+     * @return const common::SemVer&
+     */
+    const common::SemVer& Migration::getVersion() const { return _version; }
+
+    /**
      * @brief Construct a new Migrations object
      *
      * @param fromVersion The version the migration is being applied from
@@ -89,19 +98,41 @@ namespace repo
         _migrate_0_1_0();
         _migrate_0_2_3();
         _migrate_0_3_0();
+        _migrateV17();
 
         assert(_migrations.size() == toVersion);
     }
 
     /**
-     * @brief apply all migration steps
+     * @brief The schema version from which migration steps are recorded in
+     * the migration_log table (introduced by _migrateV17()). Steps before
+     * this version predate the audit log and cannot be logged retroactively.
+     */
+    constexpr std::size_t MIGRATION_LOG_INTRODUCED_AT_VERSION = 17;
+
+    /**
+     * @brief apply all migration steps, recording each one (from the point
+     * migration_log was introduced onward) in the migration_log table
      *
      * @param db
      */
     void Migrations::migrate(db::Database& db)
     {
         for (std::size_t i = _fromVersion; i < _toVersion; ++i)
+        {
             _migrations[i].migrate(db);
+
+            const auto toVersion = i + 1;
+            if (toVersion >= MIGRATION_LOG_INTRODUCED_AT_VERSION)
+            {
+                _logMigrationStep(
+                    db,
+                    i,
+                    toVersion,
+                    _migrations[i].getVersion()
+                );
+            }
+        }
     }
 
     /**
@@ -606,5 +637,69 @@ namespace repo
         );
 
         _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate to version 17
+     *
+     * @details This handles the migration from v16 to v17. It creates the
+     * migration_log table, which records every migration step applied from
+     * this version onward (from_version, to_version, the app release it
+     * shipped with, and when it was applied) — earlier migrations cannot be
+     * recorded retroactively since the table didn't exist yet.
+     */
+    void Migrations::_migrateV17()
+    {
+        constexpr std::size_t currentVersion = 16;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<MigrationLogRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Record one applied migration step in the migration_log table
+     *
+     * @param db
+     * @param fromVersion The schema version this step was applied from
+     * @param toVersion The schema version this step was applied to
+     * @param releaseVersion The app release version this step shipped with
+     */
+    void Migrations::_logMigrationStep(
+        db::Database&         db,
+        std::size_t           fromVersion,
+        std::size_t           toVersion,
+        const common::SemVer& releaseVersion
+    ) const
+    {
+        const auto sql = std::format(
+            R"(
+                INSERT INTO {0} ({1}, {2}, {3}, {4})
+                VALUES ({5}, {6}, '{7}', datetime('now'))
+            )",
+            MigrationLogRow::tableName,
+            MigrationLogRow::fromVersionField::name,
+            MigrationLogRow::toVersionField::name,
+            MigrationLogRow::releaseVersionField::name,
+            MigrationLogRow::appliedAtField::name,
+            fromVersion,
+            toVersion,
+            releaseVersion.toString()
+        );
+
+        const auto result = db.execute(sql);
+        if (!result)
+        {
+            throw MigrationException(
+                "Failed to record migration_log entry for " +
+                    std::to_string(fromVersion) + " -> " +
+                    std::to_string(toVersion) +
+                    " | Error: " + result.error().toString(),
+                db.getDBPath()
+            );
+        }
     }
 }   // namespace repo
