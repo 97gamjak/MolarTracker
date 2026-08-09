@@ -24,34 +24,34 @@ namespace
 
     TEST_F(AccountItemTest, GetTypeReturnsAccountsItem)
     {
-        ui::AccountItem item{AccountId{1}, "●", "Savings "};
+        ui::AccountItem item{AccountId{1}, AccountKind::Cash, "Savings "};
         EXPECT_EQ(item.getType(), ui::SideBarItemType::AccountsItem);
     }
 
     TEST_F(AccountItemTest, GetIdReturnsGivenId)
     {
         const auto      id = 42;
-        ui::AccountItem item{AccountId{id}, "●", "Savings"};
+        ui::AccountItem item{AccountId{id}, AccountKind::Cash, "Savings"};
         EXPECT_EQ(item.getId(), AccountId{id});
     }
 
     TEST_F(AccountItemTest, GetIdDifferentiatesBetweenItems)
     {
-        ui::AccountItem item1{AccountId{1}, "●", "Alpha"};
-        ui::AccountItem item2{AccountId{2}, "●", "Beta"};
+        ui::AccountItem item1{AccountId{1}, AccountKind::Cash, "Alpha"};
+        ui::AccountItem item2{AccountId{2}, AccountKind::Cash, "Beta"};
         EXPECT_NE(item1.getId(), item2.getId());
     }
 
     TEST_F(AccountItemTest, ActionsAreNullBeforePopulatingContextMenu)
     {
-        ui::AccountItem item{AccountId{1}, "●", "Savings"};
+        ui::AccountItem item{AccountId{1}, AccountKind::Cash, "Savings"};
         EXPECT_EQ(item.getOpenAction(), nullptr);
         EXPECT_EQ(item.getDeleteAction(), nullptr);
     }
 
     TEST_F(AccountItemTest, PopulateContextMenuCreatesOpenAndDeleteActions)
     {
-        ui::AccountItem item{AccountId{1}, "●", "Savings"};
+        ui::AccountItem item{AccountId{1}, AccountKind::Cash, "Savings"};
         QMenu           menu;
         item.populateContextMenu(menu);
 
@@ -61,7 +61,7 @@ namespace
 
     TEST_F(AccountItemTest, OpenActionTextIsOpen)
     {
-        ui::AccountItem item{AccountId{1}, "●", "Savings"};
+        ui::AccountItem item{AccountId{1}, AccountKind::Cash, "Savings"};
         QMenu           menu;
         item.populateContextMenu(menu);
 
@@ -70,7 +70,7 @@ namespace
 
     TEST_F(AccountItemTest, DeleteActionTextIsDelete)
     {
-        ui::AccountItem item{AccountId{1}, "●", "Savings"};
+        ui::AccountItem item{AccountId{1}, AccountKind::Cash, "Savings"};
         QMenu           menu;
         item.populateContextMenu(menu);
 
@@ -79,7 +79,7 @@ namespace
 
     TEST_F(AccountItemTest, OpenAndDeleteActionsAreDifferent)
     {
-        ui::AccountItem item{AccountId{1}, "●", "Savings"};
+        ui::AccountItem item{AccountId{1}, AccountKind::Cash, "Savings"};
         QMenu           menu;
         item.populateContextMenu(menu);
 

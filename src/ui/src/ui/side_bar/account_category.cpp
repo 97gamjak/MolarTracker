@@ -35,14 +35,7 @@ namespace ui
         AccountKind    kind
     )
     {
-        static constexpr auto* cashSymbol     = "● ";
-        static constexpr auto* securitySymbol = "▲ ";
-
-        const QString prefix = kind == AccountKind::Security
-                                   ? QString::fromUtf8(securitySymbol)
-                                   : QString::fromUtf8(cashSymbol);
-
-        auto* accountItem = common::makeQChild<AccountItem>(id, prefix, name);
+        auto* accountItem = common::makeQChild<AccountItem>(id, kind, name);
         appendRow(accountItem);
     }
 

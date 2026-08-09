@@ -8,4 +8,8 @@
         <file alias="settings_dialog_general.png">help/settings_dialog_general.png</file>
         <file alias="settings_dialog_ui_overview.png">help/settings_dialog_ui_overview.png</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file alias="account_cash.svg">icons/account_cash.svg</file>
+        <file alias="account_security.svg">icons/account_security.svg</file>
+    </qresource>
 </RCC>

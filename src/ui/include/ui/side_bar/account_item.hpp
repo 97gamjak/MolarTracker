@@ -3,6 +3,7 @@
 
 #include <qtmetamacros.h>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "side_bar_item.hpp"
 
@@ -31,7 +32,7 @@ namespace ui
        public:
         explicit AccountItem(
             AccountId      id,
-            const QString& symbol,
+            AccountKind    kind,
             const QString& name
         );
 
