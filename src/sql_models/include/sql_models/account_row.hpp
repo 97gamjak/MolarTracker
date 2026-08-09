@@ -75,9 +75,56 @@ struct AccountRow : orm::ORMModel<"account">
         );
     }
 
-    [[nodiscard]] static orm::WhereExpr hasProfileId(
-        const ProfileId& profileId
-    );
+    [[nodiscard]]
+    static orm::WhereExpr hasProfileId(const ProfileId& profileId);
+
+    [[nodiscard]]
+    static orm::WhereExpr hasId(const AccountId& accountId);
+};
+
+/**
+ * @brief Represents a row in the "cash_account_detail" database table, which
+ * stores additional details specific to cash accounts. This table has a
+ * one-to-one relationship with the "account" table, and includes a foreign key
+ * referencing the "account" table's primary key. It also includes a field for
+ * the linked security account ID, which is optional and can be used to link a
+ * cash account to a security account.
+ *
+ */
+struct CashAccountDetailRow : orm::ORMModel<"cash_account_detail">
+{
+    /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
+    /// disallow inserting an AccountRow without a corresponding CashAccountRow
+
+    ORM_FIELD(
+        id,
+        Field<
+            "account_id",
+            AccountId,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                AccountRow,
+                decltype(AccountRow::id)>,
+            orm::not_null_t,
+            orm::unique_t,
+            orm::primary_key_t>
+    )
+
+    ORM_FIELD(
+        securityId,
+        Field<
+            "security_id",
+            std::optional<AccountId>,
+            orm::foreign_key_t<
+                orm::RestrictDelete,
+                AccountRow,
+                decltype(AccountRow::id)>>
+    )
+
+    ORM_FIELDS(CashAccountDetailRow, id, securityId)
+
+    [[nodiscard]]
+    static orm::WhereExpr hasId(const AccountId& accountId);
 };
 
 #endif   // __SQL_MODELS__INCLUDE__SQL_MODELS__ACCOUNT_ROW_HPP__

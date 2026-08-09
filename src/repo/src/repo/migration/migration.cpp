@@ -88,6 +88,7 @@ namespace repo
         _migrate_0_0_3();
         _migrate_0_1_0();
         _migrate_0_2_3();
+        _migrate_0_3_0();
 
         assert(_migrations.size() == toVersion);
     }
@@ -551,6 +552,57 @@ namespace repo
         );
         migration.addMigration(
             std::make_unique<CreateTableMigration<WatchlistInstrumentRow>>()
+        );
+
+        _migrations.push_back(std::move(migration));
+    }
+
+    /**
+     * @brief Migrate from version 0.3.0
+     *
+     */
+    void Migrations::_migrate_0_3_0()
+    {
+        _lastReleaseVersion = common::SemVer(0, 3, 0);
+
+        _migrateV16();
+    }
+
+    /**
+     * @brief Migrate to version 16
+     *
+     * @details This handles the migration from v15 to v16. It creates the
+     * cash_account_detail table, which has a one-to-one relationship with the
+     * account table. This allows for storing additional details specific to
+     * cash accounts, such as a linked security account ID, while maintaining a
+     * common base for all account types in the account table.
+     */
+    void Migrations::_migrateV16()
+    {
+        constexpr std::size_t currentVersion = 15;
+        Migration             migration(currentVersion, _lastReleaseVersion);
+
+        migration.addMigration(
+            std::make_unique<CreateTableMigration<CashAccountDetailRow>>()
+        );
+
+        // now we can add empty cash account details for all existing cash
+        // accounts
+        std::string sql = std::format(
+            R"(
+                INSERT INTO {0} ({1})
+                SELECT {2} FROM {3} WHERE {4} = '{5}'
+            )",
+            CashAccountDetailRow::tableName,
+            CashAccountDetailRow::idField::name,
+            AccountRow::idField::name,
+            AccountRow::tableName,
+            AccountRow::kindField::name,
+            AccountKindMeta::toString(AccountKind::Cash)
+        );
+
+        migration.addMigration(
+            std::make_unique<CustomMigration>(std::move(sql))
         );
 
         _migrations.push_back(std::move(migration));

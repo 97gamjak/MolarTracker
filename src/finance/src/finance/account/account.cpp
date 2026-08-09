@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "common/finance.hpp"
+#include "config/id_types.hpp"
 
 namespace finance
 {
@@ -209,6 +210,75 @@ namespace finance
         return filter::makePredicate<Account>(
             [name](const Account& account) { return account.getName() == name; }
         );
+    }
+
+    /**
+     * @brief Get the account details of the account, which can be a
+     * CashAccount, ExternalAccount, or SecurityAccount
+     *
+     * @return const finance::AccountDetails&
+     */
+    const finance::AccountDetails& Account::getDetails() const
+    {
+        return _details;
+    }
+
+    /**
+     * @brief Set the linked security account ID for a cash account
+     *
+     * @param id The ID of the linked security account
+     *
+     * @throws std::logic_error if the account is not a cash account
+     */
+    void Account::setLinkedSecurityAccountId(AccountId id)
+    {
+        if (std::holds_alternative<CashAccount>(_details))
+        {
+            std::get<CashAccount>(_details).setLinkedSecurityAccountId(id);
+        }
+        else
+        {
+            throw std::logic_error(
+                "Attempted to set linked security account ID on a non-cash "
+                "account"
+            );
+        }
+    }
+
+    /**
+     * @brief Set the linked security account ID for a cash account
+     *
+     * @param id The ID of the linked security account
+     */
+    void CashAccount::setLinkedSecurityAccountId(AccountId id)
+    {
+        _linkedSecurityAccountId = id;
+    }
+
+    /**
+     * @brief Get the linked security account ID for a cash account, if any
+     *
+     * @return std::optional<AccountId> The ID of the linked security account,
+     * or std::nullopt if there is no linked security account
+     */
+    std::optional<AccountId> CashAccount::getLinkedSecurityAccountId() const
+    {
+        return _linkedSecurityAccountId;
+    }
+
+    /**
+     * @brief Get the linked security account ID for a cash account, if any
+     *
+     * @return std::optional<AccountId> The ID of the linked security account,
+     * or std::nullopt if there is no linked security account
+     */
+    std::optional<AccountId> Account::getLinkedSecurityAccountId() const
+    {
+        if (std::holds_alternative<CashAccount>(_details))
+        {
+            return std::get<CashAccount>(_details).getLinkedSecurityAccountId();
+        }
+        return std::nullopt;
     }
 
 }   // namespace finance

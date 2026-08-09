@@ -71,4 +71,24 @@ namespace repo
         return accountRow;
     }
 
+    /**
+     * @brief Convert an account domain model to a CashAccountDetailRow
+     *
+     * @param account
+     * @param accountId
+     * @return CashAccountDetailRow
+     */
+    CashAccountDetailRow AccountFactory::toCashAccountDetailRow(
+        const finance::CashAccount& account,
+        const AccountId&            accountId
+    )
+    {
+        CashAccountDetailRow cashAccountDetailRow;
+
+        cashAccountDetailRow.id         = accountId;
+        cashAccountDetailRow.securityId = account.getLinkedSecurityAccountId();
+
+        return cashAccountDetailRow;
+    }
+
 }   // namespace repo

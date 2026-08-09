@@ -1,5 +1,6 @@
 add_executable(tests_common
   test_paths.cpp
+  test_quantity.cpp
   test_version.cpp
 )
 

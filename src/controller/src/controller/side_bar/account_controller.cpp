@@ -115,12 +115,18 @@ namespace controller
             return;
         }
 
+        const auto accounts = _accountStore->getAllAccounts();
+
+        const auto& accountDrafts = mapper::AccountMapper::toDrafts(accounts);
+
         if (action == item->getCreateAction())
         {
             LOG_DEBUG("Create Account action triggered");
 
-            _createAccountDialog =
-                common::makeQChild<ui::CreateAccountDialog>(getMainWindow());
+            _createAccountDialog = common::makeQChild<ui::CreateAccountDialog>(
+                accountDrafts,
+                getMainWindow()
+            );
 
             connect(
                 _createAccountDialog,
@@ -148,9 +154,15 @@ namespace controller
      * create a new account, this includes details such as the name, currency,
      * and kind of account to create, and should be used by the controller to
      * create a new account in the underlying data.
+     * @param referenceAccount An optional reference account ID, this is used as
+     * a reference for linking the new account to an existing account (e.g. for
+     * cash accounts that are linked to a security account), and should be used
+     * by the controller to establish any necessary relationships between the
+     * accounts.
      */
     void AccountSideBarController::_onCreateAccountRequested(
-        const drafts::AccountDraft& account
+        const drafts::AccountDraft& account,
+        std::optional<AccountId>    referenceAccount
     )
     {
         LOG_INFO("Create Account requested with name: " + account.getName());
@@ -159,7 +171,8 @@ namespace controller
 
         auto result = cmd::Commands::makeAndDo<cmd::CreateAccountCommand>(
             _accountStore,
-            mapper::AccountMapper::toAccount(account)
+            mapper::AccountMapper::toAccount(account),
+            referenceAccount
         );
 
         if (!result)

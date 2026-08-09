@@ -25,7 +25,8 @@ namespace mapper
             account.getStatus(),
             account.getName(),
             account.getCurrency(),
-            account.getKind()
+            account.getKind(),
+            account.getLinkedSecurityAccountId()
         };
     }
 
@@ -74,6 +75,12 @@ namespace mapper
             draft.getCurrency(),
             draft.getKind()
         };
+
+        if (draft.getLinkedSecurityAccountId().has_value())
+            account.setLinkedSecurityAccountId(
+                draft.getLinkedSecurityAccountId().value()
+            );
+
         return account;
     }
 

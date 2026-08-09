@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check PR Title, Description, or Hotfix Branch
         run: |
           title="${{ github.event.pull_request.title }}"
@@ -39,3 +42,9 @@ jobs:
             echo "   OR the branch must start with: hotfix/"
             exit 1
           fi
+
+      - name: Test changelog tooling
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+
+      - name: Check release changelog entries
+        run: python3 scripts/update_changelog.py --check

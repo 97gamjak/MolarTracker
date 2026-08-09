@@ -1,0 +1,1 @@
+- Add possibility to link exactly one security account to a cash account (a single security account can have multiple linked cash accounts)

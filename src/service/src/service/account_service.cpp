@@ -46,6 +46,23 @@ namespace service
         const ProfileId&        profileId
     )
     {
+        const auto linkedSecurityAccountId =
+            account.getLinkedSecurityAccountId();
+        if (linkedSecurityAccountId.has_value())
+        {
+            if (!_accountRepo->accountExists(linkedSecurityAccountId.value()))
+            {
+                return CrudError{
+                    CrudErrorType::NotFound,
+                    "When creating account with name '" + account.getName() +
+                        "' for profile with ID '" + profileId.toString() +
+                        "', linked security account with ID '" +
+                        linkedSecurityAccountId.value().toString() +
+                        "' does not exist"
+                };
+            };
+        }
+
         return _accountRepo->createAccount(account, profileId);
     }
 

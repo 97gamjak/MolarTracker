@@ -22,7 +22,7 @@ namespace drafts
 
         /// The status of the account, this is optional because it may not be
         /// set
-        std::optional<AccountStatus> _status = std::nullopt;
+        std::optional<AccountStatus> _status;
 
         /// The name of the account (required)
         std::string _name;
@@ -33,13 +33,17 @@ namespace drafts
         /// The kind of the account (required)
         AccountKind _kind;
 
+        /// The ID of the linked security account
+        std::optional<AccountId> _linkedSecurityAccountId;
+
        public:
         explicit AccountDraft(
             AccountId                    id,
             std::optional<AccountStatus> status,
             std::string                  name,
             Currency                     currency,
-            AccountKind                  kind
+            AccountKind                  kind,
+            std::optional<AccountId>     linkedSecurityAccountId
         );
 
         [[nodiscard]] AccountId                    getId() const;
@@ -47,6 +51,9 @@ namespace drafts
         [[nodiscard]] const std::string&           getName() const;
         [[nodiscard]] AccountKind                  getKind() const;
         [[nodiscard]] Currency                     getCurrency() const;
+
+        [[nodiscard]]
+        std::optional<AccountId> getLinkedSecurityAccountId() const;
     };
 
 }   // namespace drafts

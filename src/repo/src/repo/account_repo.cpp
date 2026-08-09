@@ -43,7 +43,38 @@ namespace repo
             );
         }
 
-        return AccountId(result.value());
+        const auto accountId = AccountId(result.value());
+
+        switch (account.getKind())
+        {
+            case AccountKind::Cash:
+            {
+                const auto cashResult = _getCrud().insert(
+                    _getDb(),
+                    AccountFactory::toCashAccountDetailRow(
+                        std::get<finance::CashAccount>(account.getDetails()),
+                        accountId
+                    )
+                );
+
+                if (!cashResult.has_value())
+                {
+                    return cashResult.error().convert(
+                        "Failed to create cash account details for account "
+                        "with "
+                        "name '" +
+                        account.getName() + "' for profile with ID '" +
+                        profileId.toString() + "'"
+                    );
+                }
+                break;
+            }
+            case AccountKind::Security:
+            case AccountKind::External:
+                break;
+        }
+
+        return accountId;
     }
 
     /**
@@ -52,7 +83,7 @@ namespace repo
      * @param profileId
      * @return std::vector<finance::Account>
      */
-    [[nodiscard]] std::vector<finance::Account> AccountRepo::getAllAccounts(
+    std::vector<finance::Account> AccountRepo::getAllAccounts(
         const ProfileId& profileId
     )
     {
@@ -60,7 +91,75 @@ namespace repo
 
         const auto accountRows = _getCrud().get<AccountRow>(_getDb(), query);
 
-        return AccountFactory::toAccountDomains(accountRows);
+        auto accounts = AccountFactory::toAccountDomains(accountRows);
+
+        for (auto& account : accounts)
+        {
+            LOG_DEBUG(
+                "Retrieved account with ID '" + account.getId().toString() +
+                "' for profile with ID '" + profileId.toString() + "'"
+            );
+
+            switch (account.getKind())
+            {
+                case AccountKind::Cash:
+                {
+                    const auto cashAccountRow =
+                        _getCrud().getUnique<CashAccountDetailRow>(
+                            _getDb(),
+                            orm::Query{}.where(
+                                CashAccountDetailRow::hasId(account.getId())
+                            )
+                        );
+
+                    if (!cashAccountRow.has_value())
+                    {
+                        LOG_ERROR(
+                            "Failed to retrieve cash account details for "
+                            "account "
+                            "with ID '" +
+                            account.getId().toString() +
+                            "' for profile with ID '" + profileId.toString() +
+                            "'"
+                        );
+
+                        continue;
+                    }
+
+                    if (cashAccountRow.value().securityId.value().has_value())
+                    {
+                        account.setLinkedSecurityAccountId(
+                            cashAccountRow.value().securityId.value().value()
+                        );
+                    }
+                    break;
+                }
+                case AccountKind::Security:
+                case AccountKind::External:
+                    break;
+            }
+        }
+
+        return accounts;
+    }
+
+    /**
+     * @brief Check if an account exists in the repository
+     *
+     * This method checks if an account with the given ID exists in the
+     * database. It returns true if the account exists, false otherwise.
+     *
+     * @param accountId The ID of the account to check for existence
+     * @return bool True if the account exists, false otherwise
+     */
+    bool AccountRepo::accountExists(const AccountId& accountId)
+    {
+        const auto result = _getCrud().getUnique<AccountRow>(
+            _getDb(),
+            orm::Query{}.where(AccountRow::hasId(accountId))
+        );
+
+        return result.has_value();
     }
 
 }   // namespace repo
