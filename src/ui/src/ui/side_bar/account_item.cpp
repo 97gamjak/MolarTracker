@@ -37,6 +37,8 @@ namespace ui
      *
      * @param id The id of the account, used to identify which account is
      * selected when the itemSelected signal is emitted
+     * @param kind The kind of the account, used to determine which icon to
+     * display for the account item in the side bar
      * @param name The name of the account to display in the side bar
      */
     AccountItem::AccountItem(

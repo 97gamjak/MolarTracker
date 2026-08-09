@@ -42,9 +42,37 @@ namespace ui
         void selectItem(SideBarItem* item);
 
        signals:
+        /**
+         * @brief Emitted when an item in the side bar is clicked
+         *
+         * @param item
+         */
         void itemClicked(SideBarItem* item);
+
+        /**
+         * @brief Emitted when an item in the side bar is double clicked
+         *
+         * @param item
+         */
         void itemDoubleClicked(SideBarItem* item);
+
+        /**
+         * @brief Emitted when a context menu action is triggered for an item in
+         * the side bar
+         *
+         * @param item The item for which the context menu action was triggered
+         * @param action The action that was triggered
+         */
         void contextMenuRequested(SideBarItem* item, QAction* action);
+
+        /**
+         * @brief Emitted when an item in the side bar is renamed, this will be
+         * emitted after the rename is committed, and will provide the new name
+         * of the item
+         *
+         * @param item The item that was renamed
+         * @param newName The new name of the item
+         */
         void itemRenameCommitted(SideBarItem* item, const QString& newName);
 
        private:

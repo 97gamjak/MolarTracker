@@ -275,6 +275,19 @@ namespace controller
         _accountController.accountSelected(id);
     }
 
+    /**
+     * @brief Rename an account in the side bar and update the store with the
+     * new name, this will be called when the user renames an account in the
+     * side bar, and should handle updating the account's name in the store and
+     * refreshing the side bar to reflect the change.
+     *
+     * @param item The account item that was renamed, this should be a pointer
+     * to a SideBarItem that represents the account being renamed, and will be
+     * used to determine which account's name is being changed.
+     * @param newName The new name for the account, this is the name that the
+     * user has entered for the account, and should be used to update the
+     * account's name in the store.
+     */
     void AccountSideBarController::renameAccount(
         ui::AccountItem* item,
         const QString&   newName

@@ -211,6 +211,17 @@ namespace ui
             emit contextMenuRequested(item, selectedAction);
     }
 
+    /**
+     * @brief Handle the dataChanged signal of the model, this will emit the
+     * itemRenameCommitted signal with the new name of the item that was
+     * renamed
+     *
+     * @param topLeft The index of the top-left item that was changed, this can
+     * be used to identify which item was renamed and emit the appropriate
+     * itemRenameCommitted signal
+     * @param bottomRight The index of the bottom-right item that was changed,
+     * this is unused in this implementation, but is provided for completeness
+     */
     void SideBar::_onDataChanged(
         const QModelIndex& topLeft,
         const QModelIndex& /*bottomRight*/

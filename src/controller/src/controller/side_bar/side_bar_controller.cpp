@@ -148,6 +148,24 @@ namespace controller
         _securitiesSideBarController.refresh();
     }
 
+    /**
+     * @brief Handle an action being triggered for an item in the side bar, this
+     * will determine which item the action was triggered for and which action
+     * was triggered, and perform the appropriate action based on that
+     * information
+     *
+     * @param item The item for which the action was triggered, this should be a
+     * pointer to a SideBarItem that is currently in the side bar, and will be
+     * used to determine which item the action was triggered for
+     * @param action The action that was triggered, this should be a value from
+     * the SideBarAction enum that indicates which action was triggered, and
+     * will be used to determine which action to perform
+     * @param qaction The QAction that was triggered, this should be a pointer
+     * to a QAction that is currently in the context menu for the item, and will
+     * be used to determine which action was triggered, this will be nullptr if
+     * the action was not triggered from a context menu (e.g. if it was
+     * triggered by a click or double click)
+     */
     void SideBarController::_onActionTriggered(
         ui::SideBarItem* item,
         SideBarAction    action,

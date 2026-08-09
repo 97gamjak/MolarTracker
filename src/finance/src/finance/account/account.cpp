@@ -281,6 +281,11 @@ namespace finance
         return std::nullopt;
     }
 
+    /**
+     * @brief Rename the account with a new name
+     *
+     * @param newName The new name for the account
+     */
     void Account::rename(const std::string& newName) { _name = newName; }
 
 }   // namespace finance

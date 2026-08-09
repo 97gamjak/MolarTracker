@@ -79,9 +79,6 @@ namespace controller
         void refresh();
 
        private:
-        void _onItemClicked(ui::SideBarItem* item);
-        void _onContextMenuRequested(ui::SideBarItem* item, QAction* action);
-
         void _onActionTriggered(
             ui::SideBarItem* item,
             SideBarAction    action,

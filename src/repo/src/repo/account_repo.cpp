@@ -171,6 +171,7 @@ namespace repo
      *
      * @param account The Account domain object containing the updated details
      * of the account to be updated
+     * @param profileId The ID of the profile to which the account belongs
      * @return CrudResult<void> A result indicating success or failure of the
      * update operation
      */

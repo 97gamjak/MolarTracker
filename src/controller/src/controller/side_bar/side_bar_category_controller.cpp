@@ -55,16 +55,13 @@ namespace controller
     }
 
     /**
-     * @brief Handle a triggered action for an item in the category, this will
-     * determine which item the action was triggered for and which action was
-     * triggered, and perform the appropriate action based on that information
+     * @brief Handle an item being clicked in the category, this will determine
+     * which item was clicked and perform the appropriate action, such as
+     * opening the corresponding page in the central stack
      *
-     * @param item The item for which the action was triggered, this should be a
-     * pointer to a SideBarItem that is currently in the category, and will be
-     * used to determine which item the action was triggered for
-     * @param action The action that was triggered, this should be a pointer to
-     * a QAction that is currently in the context menu for the item, and will be
-     * used to determine which action was triggered
+     * @param item
+     * @param action
+     * @param qaction
      */
     void SideBarCategoryController::handleTriggeredAction(
         ui::SideBarItem* item,
