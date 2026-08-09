@@ -140,6 +140,9 @@ namespace ui
 
         auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
 
+        if (item == nullptr)
+            return;
+
         LOG_DEBUG(
             std::format(
                 "SideBar::_onClicked called with side bar type: {}",

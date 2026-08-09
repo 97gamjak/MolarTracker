@@ -672,13 +672,23 @@ namespace store
             .deletion = DeletionPolicy::ExcludeDelete
         };
 
-        if (_get(options).has_value())
+        const auto existingAccount = _get(options);
+
+        if (existingAccount.has_value() &&
+            existingAccount.value().getId() != id)
         {
             return FinanceError{
                 FinanceErrorType::AccountNameConflict,
                 "Account with name '" + newName +
-                    "' already exists: " + _get(options).value().toString()
+                    "' already exists: " + existingAccount.value().toString()
             };
+        }
+
+        if (existingAccount.has_value() &&
+            existingAccount.value().getId() == id)
+        {
+            // The account already has the desired name, no action needed
+            return {};
         }
 
         auto entry = _getEntry(

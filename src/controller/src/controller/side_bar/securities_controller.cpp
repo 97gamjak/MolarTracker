@@ -115,6 +115,16 @@ namespace controller
             {
                 const auto* watchlistItem =
                     dynamic_cast<ui::WatchlistItem*>(item);
+
+                if (watchlistItem == nullptr)
+                {
+                    LOG_ERROR(
+                        "SecuritiesSideBarController::_onItemClicked called "
+                        "with item type WatchlistItem but dynamic_cast failed"
+                    );
+                    return;
+                }
+
                 _onWatchlistSelected(watchlistItem->getId());
                 break;
             }
