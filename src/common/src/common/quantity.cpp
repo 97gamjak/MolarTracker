@@ -322,7 +322,13 @@ std::string microUnitsToString(
     bool         withDecimalPoint
 )
 {
-    const auto factor   = static_cast<int64_t>(std::pow(10, scale));
+    auto pow10 = [](double exponent) -> double
+    {
+        const auto base = 10;
+        return std::pow(base, exponent);
+    };
+
+    const auto factor   = static_cast<int64_t>(pow10(scale));
     const auto intPart  = std::abs(value / factor);
     auto       fracPart = std::abs(value % factor);
     const char sign     = value < 0 ? '-' : '\0';
@@ -335,9 +341,9 @@ std::string microUnitsToString(
     // scale 6 (fracPart 50000) formatted with precision 2 would render as
     // "1.50000" instead of "1.05".
     if (precision < scale)
-        fracPart /= static_cast<int64_t>(std::pow(10, scale - precision));
+        fracPart /= static_cast<int64_t>(pow10(scale - precision));
     else if (precision > scale)
-        fracPart *= static_cast<int64_t>(std::pow(10, precision - scale));
+        fracPart *= static_cast<int64_t>(pow10(precision - scale));
 
     auto result = std::format(
         "{}{}.{:0{}d}",
