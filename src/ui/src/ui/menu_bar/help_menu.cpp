@@ -24,6 +24,14 @@ namespace ui
             &HelpMenu::requestHelpPage
         );
 
+        _changelogAction = _helpMenu->addAction("&Changelog");
+        connect(
+            _changelogAction,
+            &QAction::triggered,
+            this,
+            &HelpMenu::requestChangelog
+        );
+
         _helpMenu->addSeparator();
 
         _aboutAction = _helpMenu->addAction("&About");

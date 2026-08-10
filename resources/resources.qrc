@@ -12,4 +12,7 @@
         <file alias="account_cash.svg">icons/account_cash.svg</file>
         <file alias="account_security.svg">icons/account_security.svg</file>
     </qresource>
+    <qresource prefix="/changelog">
+        <file alias="CHANGELOG.md">../CHANGELOG.md</file>
+    </qresource>
 </RCC>

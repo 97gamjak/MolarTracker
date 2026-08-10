@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "config/constants/github_constants.hpp"
+#include "ui/changelog/changelog_dialog.hpp"
 #include "ui/help/help_dialog.hpp"
 #include "ui/menu_bar/help_menu.hpp"
 
@@ -32,6 +33,12 @@ namespace controller
         );
         connect(
             &_helpMenu,
+            &ui::HelpMenu::requestChangelog,
+            this,
+            &HelpMenuController::_onChangelogRequested
+        );
+        connect(
+            &_helpMenu,
             &ui::HelpMenu::requestAbout,
             this,
             &HelpMenuController::_onAboutRequested
@@ -45,6 +52,16 @@ namespace controller
     void HelpMenuController::_onHelpPageRequested()
     {
         ui::HelpDialog dlg(&_mainWindow);
+        dlg.exec();
+    }
+
+    /**
+     * @brief Handle changelog page request
+     *
+     */
+    void HelpMenuController::_onChangelogRequested()
+    {
+        ui::ChangelogDialog dlg(&_mainWindow);
         dlg.exec();
     }
 

@@ -28,6 +28,7 @@ namespace controller
 
        private slots:
         void _onHelpPageRequested();
+        void _onChangelogRequested();
         void _onAboutRequested();
 
        public:
