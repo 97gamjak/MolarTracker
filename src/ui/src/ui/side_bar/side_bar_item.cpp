@@ -19,6 +19,13 @@ namespace ui
     }
 
     /**
+     * @brief Construct a new Side Bar Item:: Side Bar Item object
+     *
+     * @param type
+     */
+    SideBarItem::SideBarItem(SideBarItemType type) : SideBarItem("", type) {}
+
+    /**
      * @brief Get the type of the item
      *
      * @return SideBarItemType The type of the item, used to identify which item
@@ -34,8 +41,15 @@ namespace ui
      */
     void SideBarItem::setName(const QString& name)
     {
-        _name = name;
-        setText(name);
+        if (auto* modelPtr = model(); modelPtr != nullptr)
+        {
+            QSignalBlocker blocker(modelPtr);
+            setText(name);
+        }
+        else
+        {
+            setText(name);
+        }
     }
 
 }   // namespace ui

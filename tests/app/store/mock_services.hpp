@@ -122,7 +122,8 @@ namespace tests
         int _nextId = 1;
 
        public:
-        [[nodiscard]] std::vector<finance::Account> getAllAccounts(
+        [[nodiscard]]
+        std::vector<finance::Account> getAllAccounts(
             const ProfileId& /*profileId*/
         ) const override
         {
@@ -137,6 +138,15 @@ namespace tests
         {
             createCallCount++;
             return AccountId{_nextId++};
+        }
+
+        [[nodiscard]]
+        CrudResult<void> updateAccount(
+            const finance::Account& /*account*/,
+            const ProfileId& /*profileId*/
+        ) override
+        {
+            return {};
         }
     };
 

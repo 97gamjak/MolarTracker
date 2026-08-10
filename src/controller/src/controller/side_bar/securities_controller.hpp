@@ -74,30 +74,7 @@ namespace controller
 
         void refresh() override;
 
-        void onAllSecuritiesSelected();
-        void onWatchlistSelected(WatchlistId id);
-
-        void onAddToWatchlist(const std::string& symbol, WatchlistId target);
-        void onRemoveFromWatchlist(
-            const std::string& symbol,
-            WatchlistId        target
-        );
-
-        void onCreateWatchlist(const std::string& name);
-        void onDeleteWatchlist(WatchlistId id);
-        void onRenameWatchlist(WatchlistId id, const std::string& newName);
-
-        void handleContextMenuAction(
-            const ui::SecuritiesCategory* category,
-            QAction*                      action
-        );
-
-        void handleWatchlistContextMenuAction(
-            const ui::WatchlistItem* item,
-            QAction*                 action
-        );
-
-        void createStock(const std::string& ticker);
+        void onCreateStock(const std::string& ticker);
 
        signals:
         /**
@@ -108,6 +85,35 @@ namespace controller
         void stockCreated(const finance::Stock& stock);
 
        private:
+        void _onItemClicked(ui::SideBarItem* item) override;
+        void _onContextMenuRequested(
+            ui::SideBarItem* item,
+            const QAction*   action
+        ) override;
+
+        void _onAllSecuritiesSelected();
+        void _onWatchlistSelected(WatchlistId id);
+
+        void _onAddToWatchlist(const std::string& symbol, WatchlistId target);
+        void _onRemoveFromWatchlist(
+            const std::string& symbol,
+            WatchlistId        target
+        );
+
+        void _onCreateWatchlist(const std::string& name);
+        void _onDeleteWatchlist(WatchlistId id);
+        void _onRenameWatchlist(WatchlistId id, const std::string& newName);
+
+        void _handleContextMenuAction(
+            const ui::SecuritiesCategory* category,
+            const QAction*                action
+        );
+
+        void _handleWatchlistContextMenuAction(
+            const ui::WatchlistItem* item,
+            const QAction*           action
+        );
+
         void _onFindTickerButtonClicked();
         void _onAcceptTickerButtonClicked();
 

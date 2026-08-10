@@ -203,6 +203,45 @@ namespace store
                     break;
                 }
                 case StoreState::Modified:
+                {
+                    const auto result = _accountService->updateAccount(
+                        entry.value,
+                        _activeProfileId
+                    );
+
+                    if (!result)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to update account '{}' in database: {}",
+                                entry.value.getName(),
+                                result.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto commitResult =
+                        _commitEntry(entry.value.getId(), entry);
+
+                    if (commitResult != StoreResult::Ok)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to commit changes for account '{}' in "
+                                "database",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    LOG_INFO(
+                        std::format(
+                            "Account '{}' updated in database",
+                            entry.value.getName()
+                        )
+                    );
+                    break;
+                }
                 case StoreState::Deleted:
                 {
                     throw AccountStoreException(
@@ -611,6 +650,61 @@ namespace store
                 AccountKindMeta::toString(entry1->value.getKind()) + " and " +
                 AccountKindMeta::toString(entry2->value.getKind())
         };
+    }
+
+    FinanceResult<void> AccountStore::renameAccount(
+        AccountId          id,
+        const std::string& newName
+    )
+    {
+        const auto account = getAccount(id);
+
+        if (!account)
+        {
+            return FinanceError{
+                FinanceErrorType::AccountNotFound,
+                "Account not found in the store: id = " + id.toString()
+            };
+        }
+
+        const auto options = Options{
+            .filter   = HasName(newName),
+            .deletion = DeletionPolicy::ExcludeDelete
+        };
+
+        const auto existingAccount = _get(options);
+
+        if (existingAccount.has_value() &&
+            existingAccount.value().getId() != id)
+        {
+            return FinanceError{
+                FinanceErrorType::AccountNameConflict,
+                "Account with name '" + newName +
+                    "' already exists: " + existingAccount.value().toString()
+            };
+        }
+
+        if (existingAccount.has_value() &&
+            existingAccount.value().getId() == id)
+        {
+            // The account already has the desired name, no action needed
+            return {};
+        }
+
+        auto entry = _getEntry(
+            {.filter   = HasAccountId(id),
+             .deletion = DeletionPolicy::ExcludeDelete}
+        );
+
+        entry->value.rename(newName);
+
+        const auto newState = entry->state == StoreState::New
+                                  ? StoreState::New
+                                  : StoreState::Modified;
+
+        _updateEntry(entry->value, newState);
+
+        return {};
     }
 
 }   // namespace store

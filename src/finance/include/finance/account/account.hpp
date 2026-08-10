@@ -87,6 +87,7 @@ namespace finance
 
         void setId(AccountId id);
         void setLinkedSecurityAccountId(AccountId id);
+        void rename(const std::string& newName);
 
         [[nodiscard]] AccountId     getId() const;
         [[nodiscard]] AccountStatus getStatus() const;

@@ -48,6 +48,25 @@ namespace service
             const finance::Account& account,
             const ProfileId&        profileId
         ) = 0;
+
+        /**
+         * @brief Update an existing account, this method takes a Account
+         * domain object as input and updates the corresponding entry in the
+         * database. It returns a CrudResult indicating the success or failure
+         * of the operation.
+         *
+         * @param account The Account domain object containing the updated
+         * details of the account to be updated
+         * @param profileId The ID of the profile to which the account belongs
+         *
+         * @return CrudResult<void> A result indicating success or failure of
+         * the update operation
+         */
+        [[nodiscard]]
+        virtual CrudResult<void> updateAccount(
+            const finance::Account& account,
+            const ProfileId&        profileId
+        ) = 0;
     };
 
 }   // namespace service

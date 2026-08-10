@@ -168,6 +168,22 @@ namespace store
             AccountId id1,
             AccountId id2
         ) = 0;
+
+        /**
+         * @brief Rename an account, this will change the name of the account
+         * with the given ID to the new name provided, allowing the user to
+         * update the account's name as needed
+         *
+         * @param id The ID of the account to rename
+         * @param newName The new name for the account
+         * @return FinanceResult<void> Result of the operation, indicating
+         * success or failure
+         */
+        [[nodiscard]]
+        virtual FinanceResult<void> renameAccount(
+            AccountId          id,
+            const std::string& newName
+        ) = 0;
     };
 
 }   // namespace store

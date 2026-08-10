@@ -6,10 +6,29 @@
 
 namespace filter
 {
+    /**
+     * @brief Creates a predicate from a given function.
+     *
+     * @tparam T The type of the input value.
+     * @param func The function to create the predicate from.
+     * @return Predicate<T> A predicate that evaluates the given function.
+     */
     template <typename T>
     Predicate<T> makePredicate(PredicateFunc<T> func)
     {
         return Predicate<T>{std::move(func)};
+    }
+
+    /**
+     * @brief Creates an empty predicate that matches all inputs.
+     *
+     * @tparam T The type of the input value.
+     * @return Predicate<T> An empty predicate that matches all inputs.
+     */
+    template <typename T>
+    Predicate<T> makeEmptyPredicate()
+    {
+        return Predicate<T>{EmptyNode<PredicateFunc<T>>{}};
     }
 
     /**

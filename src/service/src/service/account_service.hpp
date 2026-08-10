@@ -38,6 +38,12 @@ namespace service
             const finance::Account& account,
             const ProfileId&        profileId
         ) override;
+
+        [[nodiscard]]
+        CrudResult<void> updateAccount(
+            const finance::Account& account,
+            const ProfileId&        profileId
+        ) override;
     };
 
 }   // namespace service

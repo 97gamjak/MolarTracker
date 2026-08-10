@@ -21,8 +21,6 @@
 #include "settings/settings.hpp"
 #include "store/store_container.hpp"
 #include "ui/main_window.hpp"
-#include "ui/side_bar/securities_category.hpp"
-#include "ui/side_bar/side_bar.hpp"
 
 namespace controller
 {
@@ -200,18 +198,6 @@ namespace controller
         controller.ensureProfileExists();
 
         _impl->_sideBarController.refresh();
-
-        auto& securitiesController =
-            _impl->_sideBarController.getSecuritiesSideBarController();
-        securitiesController.onAllSecuritiesSelected();
-
-        auto* securitiesCategory = dynamic_cast<ui::SecuritiesCategory*>(
-            securitiesController.getCategory()
-        );
-        if (securitiesCategory != nullptr)
-            _impl->_mainWindow->getSideBar().selectItem(
-                securitiesCategory->getAllSecuritiesItem()
-            );
 
         _impl->_vcsController.start();
     }

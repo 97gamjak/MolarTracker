@@ -6,11 +6,15 @@
 #include <QVBoxLayout>
 
 #include "common/qt_helpers.hpp"
+#include "logging/log_macros.hpp"
 #include "ui/side_bar/category.hpp"
 #include "ui/side_bar/side_bar_item.hpp"
 
+REGISTER_LOG_CATEGORY("UI.SideBar");
+
 namespace ui
 {
+
     /**
      * @brief Construct a new Side Bar:: Side Bar object
      *
@@ -23,6 +27,55 @@ namespace ui
           _model(new QStandardItemModel(this))
     {
         _buildUI();
+    }
+
+    /**
+     * @brief Build the UI of the side bar, this will create the tree view and
+     * set up the model for the side bar
+     *
+     */
+    void SideBar::_buildUI()
+    {
+        auto* layout = common::makeQChild<QVBoxLayout>(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
+
+        _model = common::makeQChild<QStandardItemModel>(this);
+        _tree  = common::makeQChild<QTreeView>(this);
+
+        _tree->setModel(_model);
+        _tree->setHeaderHidden(true);
+        _tree->setRootIsDecorated(false);
+        _tree->setItemsExpandable(true);
+        // _tree->setExpandsOnDoubleClick(true);
+        _tree->setContextMenuPolicy(Qt::CustomContextMenu);
+
+        layout->addWidget(_tree);
+
+        _tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+        connect(_tree, &QTreeView::clicked, this, &SideBar::_onClicked);
+
+        connect(
+            _tree,
+            &QTreeView::customContextMenuRequested,
+            this,
+            &SideBar::_showContextMenu
+        );
+
+        connect(
+            _tree,
+            &QTreeView::doubleClicked,
+            this,
+            &SideBar::_onDoubleClicked
+        );
+
+        connect(
+            _model,
+            &QStandardItemModel::dataChanged,
+            this,
+            &SideBar::_onDataChanged
+        );
     }
 
     /**
@@ -73,39 +126,6 @@ namespace ui
     }
 
     /**
-     * @brief Build the UI of the side bar, this will create the tree view and
-     * set up the model for the side bar
-     *
-     */
-    void SideBar::_buildUI()
-    {
-        auto* layout = common::makeQChild<QVBoxLayout>(this);
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(0);
-
-        _model = common::makeQChild<QStandardItemModel>(this);
-        _tree  = common::makeQChild<QTreeView>(this);
-
-        _tree->setModel(_model);
-        _tree->setHeaderHidden(true);
-        _tree->setRootIsDecorated(false);
-        _tree->setItemsExpandable(true);
-        // _tree->setExpandsOnDoubleClick(true);
-        _tree->setContextMenuPolicy(Qt::CustomContextMenu);
-
-        layout->addWidget(_tree);
-
-        connect(_tree, &QTreeView::clicked, this, &SideBar::_onClicked);
-
-        connect(
-            _tree,
-            &QTreeView::customContextMenuRequested,
-            this,
-            &SideBar::_showContextMenu
-        );
-    }
-
-    /**
      * @brief Handle the clicked signal of the tree view, this will emit the
      * itemSelected signal with the type of the item that was clicked
      *
@@ -119,9 +139,47 @@ namespace ui
             return;
 
         auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
-        emit  itemClicked(item);
+
+        if (item == nullptr)
+            return;
+
+        LOG_DEBUG(
+            std::format(
+                "SideBar::_onClicked called with side bar type: {}",
+                SideBarItemTypeMeta::toString(item->getType())
+            )
+        );
+
+        emit itemClicked(item);
     }
 
+    /**
+     * @brief Handle the doubleClicked signal of the tree view, this will emit
+     * the itemDoubleClicked signal with the type of the item that was
+     * double-clicked
+     *
+     * @param index The index of the item that was double-clicked, this can be
+     * used to identify which item was double-clicked and emit the appropriate
+     * itemDoubleClicked signal
+     */
+    void SideBar::_onDoubleClicked(const QModelIndex& index)
+    {
+        if (!index.isValid())
+            return;
+
+        auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(index));
+        if (item == nullptr)
+            return;
+
+        if ((item->flags() & Qt::ItemIsEditable) != 0U)
+        {
+            _pendingRenameOldText = item->text();
+            _tree->edit(index);
+            return;
+        }
+
+        emit itemDoubleClicked(item);
+    }
     /**
      * @brief Show the context menu of the tree view, this will emit the
      * itemContextMenuRequested signal with the type of the item that was
@@ -151,6 +209,40 @@ namespace ui
 
         if (selectedAction != nullptr)
             emit contextMenuRequested(item, selectedAction);
+    }
+
+    /**
+     * @brief Handle the dataChanged signal of the model, this will emit the
+     * itemRenameCommitted signal with the new name of the item that was
+     * renamed
+     *
+     * @param topLeft The index of the top-left item that was changed, this can
+     * be used to identify which item was renamed and emit the appropriate
+     * itemRenameCommitted signal
+     * @param bottomRight The index of the bottom-right item that was changed,
+     * this is unused in this implementation, but is provided for completeness
+     */
+    void SideBar::_onDataChanged(
+        const QModelIndex& topLeft,
+        const QModelIndex& /*bottomRight*/
+    )
+    {
+        auto* item = dynamic_cast<SideBarItem*>(_model->itemFromIndex(topLeft));
+        if (item == nullptr || !(item->flags() & Qt::ItemIsEditable))
+            return;
+
+        const auto newName = item->text().trimmed();
+        const auto oldName = _pendingRenameOldText;
+
+        {
+            QSignalBlocker blocker(_model);
+            item->setText(oldName);   // revert; controller decides if it sticks
+        }
+
+        if (newName.isEmpty() || newName == oldName)
+            return;
+
+        emit itemRenameCommitted(item, newName);
     }
 
 }   // namespace ui

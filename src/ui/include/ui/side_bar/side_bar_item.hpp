@@ -40,6 +40,7 @@ namespace ui
         QString _name;
 
        public:
+        explicit SideBarItem(SideBarItemType type);
         explicit SideBarItem(const QString& name, SideBarItemType type);
 
         [[nodiscard]] SideBarItemType getType() const;

@@ -3,6 +3,7 @@
 
 #include <qtmetamacros.h>
 
+#include "common/finance.hpp"
 #include "config/id_types.hpp"
 #include "side_bar_item.hpp"
 
@@ -29,7 +30,11 @@ namespace ui
         QAction* _deleteAction;
 
        public:
-        explicit AccountItem(AccountId id, const QString& name);
+        explicit AccountItem(
+            AccountId      id,
+            AccountKind    kind,
+            const QString& name
+        );
 
         [[nodiscard]] AccountId getId() const;
 

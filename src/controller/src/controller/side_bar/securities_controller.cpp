@@ -18,6 +18,7 @@
 #include "ui/securities/stock_overview.hpp"
 #include "ui/securities/ticker_lookup.hpp"
 #include "ui/side_bar/securities_category.hpp"
+#include "ui/side_bar/side_bar_item.hpp"
 #include "ui/side_bar/watchlist_item.hpp"
 #include "ui/utils/error.hpp"
 
@@ -86,6 +87,120 @@ namespace controller
     }
 
     /**
+     * @brief Handle an item being clicked in the securities category, this will
+     * determine which item was clicked and perform the appropriate action, such
+     * as opening the corresponding page in the central stack
+     *
+     * @param item The item that was clicked, this should be a pointer to a
+     * SideBarItem that is currently in the category, and will be used to
+     * determine which item was clicked and what action to perform
+     */
+    void SecuritiesSideBarController::_onItemClicked(ui::SideBarItem* item)
+    {
+        if (item == nullptr)
+        {
+            LOG_ERROR(
+                "SecuritiesSideBarController::_onItemClicked called with null "
+                "item"
+            );
+            return;
+        }
+
+        switch (item->getType())
+        {
+            case ui::SideBarItemType::AllSecuritiesItem:
+                _onAllSecuritiesSelected();
+                break;
+            case ui::SideBarItemType::WatchlistItem:
+            {
+                const auto* watchlistItem =
+                    dynamic_cast<ui::WatchlistItem*>(item);
+
+                if (watchlistItem == nullptr)
+                {
+                    LOG_ERROR(
+                        "SecuritiesSideBarController::_onItemClicked called "
+                        "with item type WatchlistItem but dynamic_cast failed"
+                    );
+                    return;
+                }
+
+                _onWatchlistSelected(watchlistItem->getId());
+                break;
+            }
+            case ui::SideBarItemType::SecuritiesCategory:
+            case ui::SideBarItemType::OverviewCategory:
+            case ui::SideBarItemType::TransactionCategory:
+            case ui::SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::AccountCategory:
+                LOG_ERROR(
+                    "SecuritiesSideBarController::_onItemClicked called with "
+                    "unexpected item type: " +
+                    ui::SideBarItemTypeMeta::toString(item->getType())
+                );
+                break;
+        }
+    }
+
+    /**
+     * @brief Handle a context menu action being triggered for an item in the
+     * securities category, this will determine which item the action was
+     * triggered for and which action was triggered, and perform the appropriate
+     * action based on that information
+     *
+     * @param item The item for which the context menu action was triggered,
+     * this should be a pointer to a SideBarItem that is currently in the
+     * category, and will be used to determine which item the action was
+     * triggered for
+     * @param action The action that was triggered, this should be a pointer to
+     * a QAction that is currently in the context menu for the item, and will be
+     * used to determine which action was triggered
+     */
+    void SecuritiesSideBarController::_onContextMenuRequested(
+        ui::SideBarItem* item,
+        const QAction*   action
+    )
+    {
+        if (item == nullptr || action == nullptr)
+        {
+            LOG_ERROR(
+                "SecuritiesSideBarController::_onContextMenuRequested called "
+                "with null item or action"
+            );
+            return;
+        }
+
+        switch (item->getType())
+        {
+            case ui::SideBarItemType::SecuritiesCategory:
+            {
+                const auto* category =
+                    dynamic_cast<ui::SecuritiesCategory*>(item);
+                _handleContextMenuAction(category, action);
+                break;
+            }
+            case ui::SideBarItemType::WatchlistItem:
+            {
+                const auto* watchlistItem =
+                    dynamic_cast<ui::WatchlistItem*>(item);
+                _handleWatchlistContextMenuAction(watchlistItem, action);
+                break;
+            }
+            case ui::SideBarItemType::AllSecuritiesItem:
+            case ui::SideBarItemType::OverviewCategory:
+            case ui::SideBarItemType::TransactionCategory:
+            case ui::SideBarItemType::AccountsItem:
+            case ui::SideBarItemType::AccountCategory:
+                LOG_ERROR(
+                    "SecuritiesSideBarController::_onContextMenuRequested "
+                    "called with unexpected item type: " +
+                    ui::SideBarItemTypeMeta::toString(item->getType())
+                );
+                break;
+        }
+    }
+
+    /**
      * @brief Refresh the securities overview, rebuilding the sidebar's
      * watchlist child rows from the watchlist store.
      *
@@ -108,8 +223,8 @@ namespace controller
     }
 
     /**
-     * @brief Show securities matching the given filter in the stock overview
-     * widget.
+     * @brief Show securities matching the given filter in the stock
+     * overview widget.
      *
      * @param filter
      */
@@ -130,7 +245,7 @@ namespace controller
      * active watchlist filter.
      *
      */
-    void SecuritiesSideBarController::onAllSecuritiesSelected()
+    void SecuritiesSideBarController::_onAllSecuritiesSelected()
     {
         _activeWatchlistId = std::nullopt;
 
@@ -145,7 +260,7 @@ namespace controller
      *
      * @param id
      */
-    void SecuritiesSideBarController::onWatchlistSelected(WatchlistId id)
+    void SecuritiesSideBarController::_onWatchlistSelected(WatchlistId id)
     {
         const auto watchlist = _watchlistStore->getWatchlist(id);
         if (!watchlist)
@@ -169,7 +284,7 @@ namespace controller
      * @param symbol
      * @param target
      */
-    void SecuritiesSideBarController::onAddToWatchlist(
+    void SecuritiesSideBarController::_onAddToWatchlist(
         const std::string& symbol,
         WatchlistId        target
     )
@@ -188,7 +303,7 @@ namespace controller
         }
 
         if (_activeWatchlistId == target)
-            onWatchlistSelected(target);
+            _onWatchlistSelected(target);
     }
 
     /**
@@ -198,7 +313,7 @@ namespace controller
      * @param symbol
      * @param target
      */
-    void SecuritiesSideBarController::onRemoveFromWatchlist(
+    void SecuritiesSideBarController::_onRemoveFromWatchlist(
         const std::string& symbol,
         WatchlistId        target
     )
@@ -217,7 +332,7 @@ namespace controller
         }
 
         if (_activeWatchlistId == target)
-            onWatchlistSelected(target);
+            _onWatchlistSelected(target);
     }
 
     /**
@@ -225,7 +340,9 @@ namespace controller
      *
      * @param name
      */
-    void SecuritiesSideBarController::onCreateWatchlist(const std::string& name)
+    void SecuritiesSideBarController::_onCreateWatchlist(
+        const std::string& name
+    )
     {
         static_cast<void>(_watchlistStore->createWatchlist(name));
         refresh();
@@ -237,10 +354,10 @@ namespace controller
      *
      * @param id
      */
-    void SecuritiesSideBarController::onDeleteWatchlist(WatchlistId id)
+    void SecuritiesSideBarController::_onDeleteWatchlist(WatchlistId id)
     {
         if (_activeWatchlistId == id)
-            onAllSecuritiesSelected();
+            _onAllSecuritiesSelected();
 
         _watchlistStore->deleteWatchlist(id);
         refresh();
@@ -252,7 +369,7 @@ namespace controller
      * @param id
      * @param newName
      */
-    void SecuritiesSideBarController::onRenameWatchlist(
+    void SecuritiesSideBarController::_onRenameWatchlist(
         WatchlistId        id,
         const std::string& newName
     )
@@ -267,14 +384,14 @@ namespace controller
      * @param category The securities category
      * @param action The action triggered
      */
-    void SecuritiesSideBarController::handleContextMenuAction(
+    void SecuritiesSideBarController::_handleContextMenuAction(
         const ui::SecuritiesCategory* category,
-        QAction*                      action
+        const QAction*                action
     )
     {
         if (action == category->getCreateAction())
         {
-            createStock("");
+            onCreateStock("");
         }
         else if (action == category->getCreateWatchlistAction())
         {
@@ -286,7 +403,7 @@ namespace controller
                                   .trimmed();
 
             if (!name.isEmpty())
-                onCreateWatchlist(name.toStdString());
+                _onCreateWatchlist(name.toStdString());
         }
         else
         {
@@ -301,9 +418,9 @@ namespace controller
      * @param item The watchlist item
      * @param action The action triggered
      */
-    void SecuritiesSideBarController::handleWatchlistContextMenuAction(
+    void SecuritiesSideBarController::_handleWatchlistContextMenuAction(
         const ui::WatchlistItem* item,
-        QAction*                 action
+        const QAction*           action
     )
     {
         if (item == nullptr)
@@ -321,7 +438,7 @@ namespace controller
                                      .trimmed();
 
             if (!newName.isEmpty())
-                onRenameWatchlist(item->getId(), newName.toStdString());
+                _onRenameWatchlist(item->getId(), newName.toStdString());
         }
         else if (action == item->getDeleteAction())
         {
@@ -333,7 +450,7 @@ namespace controller
             );
 
             if (confirmed == QMessageBox::Yes)
-                onDeleteWatchlist(item->getId());
+                _onDeleteWatchlist(item->getId());
         }
         else
         {
@@ -390,7 +507,7 @@ namespace controller
      *
      * @param ticker The ticker symbol of the stock to create
      */
-    void SecuritiesSideBarController::createStock(const std::string& ticker)
+    void SecuritiesSideBarController::onCreateStock(const std::string& ticker)
     {
         _tickerLookupWidget->setTicker(ticker);
         _tickerLookupWidget->show();
@@ -400,8 +517,8 @@ namespace controller
      * @brief Slot called just before the securities table's context menu is
      * shown, refreshing the widget's watchlist data from the store.
      *
-     * @param symbol The ticker symbol of the right-clicked row (unused here,
-     * the menu itself carries it back via the widget's signals).
+     * @param symbol The ticker symbol of the right-clicked row (unused
+     * here, the menu itself carries it back via the widget's signals).
      */
     void SecuritiesSideBarController::_onAboutToShowTableContextMenu(
         const std::string& /*symbol*/
@@ -432,7 +549,7 @@ namespace controller
         WatchlistId        target
     )
     {
-        onAddToWatchlist(symbol, target);
+        _onAddToWatchlist(symbol, target);
     }
 
     /**
@@ -447,7 +564,7 @@ namespace controller
         WatchlistId        target
     )
     {
-        onRemoveFromWatchlist(symbol, target);
+        _onRemoveFromWatchlist(symbol, target);
     }
 
 }   // namespace controller

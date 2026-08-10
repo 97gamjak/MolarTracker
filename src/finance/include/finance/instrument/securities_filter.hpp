@@ -33,6 +33,9 @@ namespace finance
         SecuritiesFilter() = default;
 
         [[nodiscard]]
+        std::string toString() const;
+
+        [[nodiscard]]
         filter::Predicate<Stock> getStockPredicate() const;
     };
 

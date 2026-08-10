@@ -3,9 +3,10 @@
 
 #include <QObject>
 
-#include "controller/side_bar/account_controller.hpp"
-#include "controller/side_bar/securities_controller.hpp"
-#include "controller/side_bar/transaction_controller.hpp"
+#include "account_controller.hpp"
+#include "securities_controller.hpp"
+#include "side_bar_action.hpp"
+#include "transaction_controller.hpp"
 
 class QStackedWidget;   // Forward declaration
 class QAction;          // Forward declaration
@@ -77,16 +78,12 @@ namespace controller
 
         void refresh();
 
-        [[nodiscard]] AccountSideBarController& getAccountSideBarController();
-        [[nodiscard]] const AccountSideBarController& getAccountSideBarController(
-        ) const;
-
-        [[nodiscard]] SecuritiesSideBarController&
-        getSecuritiesSideBarController();
-
        private:
-        void _onItemClicked(ui::SideBarItem* item);
-        void _onContextMenuRequested(ui::SideBarItem* item, QAction* action);
+        void _onActionTriggered(
+            ui::SideBarItem* item,
+            SideBarAction    action,
+            QAction*         qaction = nullptr
+        );
     };
 
 }   // namespace controller

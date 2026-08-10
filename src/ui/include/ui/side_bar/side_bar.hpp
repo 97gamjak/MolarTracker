@@ -2,6 +2,7 @@
 #define __UI__INCLUDE__UI__SIDE_BAR__SIDE_BAR_HPP__
 
 #include <QWidget>
+#include <mstd/enum.hpp>
 
 class QTreeView;            // Forward declaration
 class QStandardItemModel;   // Forward declaration
@@ -29,6 +30,10 @@ namespace ui
         /// side bar
         QStandardItemModel* _model;
 
+        /// The old text of the item being renamed, used to restore the text if
+        /// the rename is cancelled
+        QString _pendingRenameOldText;
+
        public:
         explicit SideBar(QWidget* parent);
 
@@ -37,17 +42,49 @@ namespace ui
         void selectItem(SideBarItem* item);
 
        signals:
-        /// Emitted when an item in the side bar is clicked
+        /**
+         * @brief Emitted when an item in the side bar is clicked
+         *
+         * @param item
+         */
         void itemClicked(SideBarItem* item);
-        /// Emitted when a context menu action is triggered for an item in the
-        /// side bar
+
+        /**
+         * @brief Emitted when an item in the side bar is double clicked
+         *
+         * @param item
+         */
+        void itemDoubleClicked(SideBarItem* item);
+
+        /**
+         * @brief Emitted when a context menu action is triggered for an item in
+         * the side bar
+         *
+         * @param item The item for which the context menu action was triggered
+         * @param action The action that was triggered
+         */
         void contextMenuRequested(SideBarItem* item, QAction* action);
+
+        /**
+         * @brief Emitted when an item in the side bar is renamed, this will be
+         * emitted after the rename is committed, and will provide the new name
+         * of the item
+         *
+         * @param item The item that was renamed
+         * @param newName The new name of the item
+         */
+        void itemRenameCommitted(SideBarItem* item, const QString& newName);
 
        private:
         void _buildUI();
 
         void _onClicked(const QModelIndex& index);
+        void _onDoubleClicked(const QModelIndex& index);
         void _showContextMenu(const QPoint& pos);
+        void _onDataChanged(
+            const QModelIndex& topLeft,
+            const QModelIndex& bottomRight
+        );
     };
 
 }   // namespace ui

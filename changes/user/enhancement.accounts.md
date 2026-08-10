@@ -1,1 +1,3 @@
 - Add possibility to link exactly one security account to a cash account (a single security account can have multiple linked cash accounts)
+- Add option to rename accounts by double clicking them
+- Change icons next to accounts so that they actual look good
