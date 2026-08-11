@@ -36,6 +36,9 @@ namespace repo
             const finance::Account& account,
             const ProfileId&        profileId
         ) override;
+
+        [[nodiscard]]
+        CrudResult<void> deleteAccount(const AccountId& accountId) override;
     };
 
 }   // namespace repo

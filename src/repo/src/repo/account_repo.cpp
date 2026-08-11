@@ -1,5 +1,6 @@
 #include "account_repo.hpp"
 
+#include "db/db_exception.hpp"
 #include "factories/account_factory.hpp"
 #include "finance/account/account.hpp"
 #include "logging/log_macros.hpp"
@@ -220,6 +221,39 @@ namespace repo
             case AccountKind::Security:
             case AccountKind::External:
                 break;
+        }
+
+        return {};
+    }
+
+    /**
+     * @brief Delete an account from the repository
+     *
+     * This method removes the account with the given ID from the database,
+     * along with its paired detail row if it is a cash account. The database
+     * rejects the deletion if the account is still referenced by existing
+     * transactions, trade legs, or a linked account.
+     *
+     * @param accountId The ID of the account to delete
+     * @return CrudResult<void> A result indicating success or failure of the
+     * delete operation
+     */
+    CrudResult<void> AccountRepo::deleteAccount(const AccountId& accountId)
+    {
+        try
+        {
+            _getCrud().deleteByPk(_getDb(), CashAccountDetailRow{accountId});
+            _getCrud().deleteByPk(_getDb(), AccountRow{accountId});
+        }
+        catch (const db::SqliteError& e)
+        {
+            return CrudError{
+                CrudErrorType::DatabaseError,
+                "Failed to delete account with ID '" + accountId.toString() +
+                    "': account is still referenced by existing "
+                    "transactions or a linked account (" +
+                    e.what() + ")"
+            };
         }
 
         return {};

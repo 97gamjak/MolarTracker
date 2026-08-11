@@ -1,5 +1,9 @@
 #include "sql_models/account_row.hpp"
 
+AccountRow::AccountRow(AccountId _id) : id{_id} {}
+
+CashAccountDetailRow::CashAccountDetailRow(AccountId _id) : id{_id} {}
+
 /**
  * @brief Get a WhereExpr for filtering accounts by profile ID
  *

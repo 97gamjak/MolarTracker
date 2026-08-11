@@ -244,11 +244,42 @@ namespace store
                 }
                 case StoreState::Deleted:
                 {
-                    throw AccountStoreException(
-                        "Store state " +
-                        std::to_string(static_cast<int>(entry.state)) +
-                        " not supported yet"
+                    const auto result =
+                        _accountService->deleteAccount(entry.value.getId());
+
+                    if (!result)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to delete account '{}' from "
+                                "database: {}",
+                                entry.value.getName(),
+                                result.error().toString()
+                            )
+                        );
+                    }
+
+                    const auto commitResult =
+                        _commitEntry(entry.value.getId(), entry);
+
+                    if (commitResult != StoreResult::Ok)
+                    {
+                        throw AccountStoreException(
+                            std::format(
+                                "Failed to remove cached account '{}' after "
+                                "deletion",
+                                entry.value.getName()
+                            )
+                        );
+                    }
+
+                    LOG_INFO(
+                        std::format(
+                            "Account '{}' deleted from database",
+                            entry.value.getName()
+                        )
                     );
+                    break;
                 }
             }
         }
@@ -703,6 +734,33 @@ namespace store
                                   : StoreState::Modified;
 
         _updateEntry(entry->value, newState);
+
+        return {};
+    }
+
+    /**
+     * @brief Delete an account, this will stage the account with the given ID
+     * for deletion. The account is removed from the store immediately (so it
+     * no longer shows up in getAllAccounts() etc.) but is only removed from
+     * the database once the store is committed.
+     *
+     * @param id The ID of the account to delete
+     * @return FinanceResult<void> Result of the operation, indicating success
+     * or failure
+     */
+    FinanceResult<void> AccountStore::deleteAccount(AccountId id)
+    {
+        const auto account = getAccount(id);
+
+        if (!account)
+        {
+            return FinanceError{
+                FinanceErrorType::AccountNotFound,
+                "Account not found in the store: id = " + id.toString()
+            };
+        }
+
+        _deleteEntry(id);
 
         return {};
     }

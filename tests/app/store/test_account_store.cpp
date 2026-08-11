@@ -185,3 +185,61 @@ TEST_F(AccountStoreTest, IsDirtyTrueAfterCreateAccount)
 
     EXPECT_TRUE(_store->isDirty());
 }
+
+TEST_F(AccountStoreTest, DeleteAccountNotFoundReturnsError)
+{
+    const auto result = _store->deleteAccount(AccountId{999});
+
+    EXPECT_FALSE(result);
+}
+
+TEST_F(AccountStoreTest, DeleteNewAccountRemovesItWithoutCallingService)
+{
+    setActiveProfile();
+    static_cast<void>(_store->createAccount(makeAccount("Savings")));
+    const auto id = _store->getAllAccounts().at(0).getId();
+
+    const auto result = _store->deleteAccount(id);
+
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(_store->getAllAccounts().empty());
+
+    _store->commit();
+
+    EXPECT_EQ(_mockService->deleteCallCount, 0);
+}
+
+TEST_F(AccountStoreTest, DeletePersistedAccountExcludesItFromGetAllAccounts)
+{
+    _mockService->preloadedAccounts.emplace_back(
+        AccountId{1},
+        AccountStatus::Active,
+        "LoadedAcc",
+        Currency::EUR,
+        AccountKind::Security
+    );
+    setActiveProfile();
+
+    const auto result = _store->deleteAccount(AccountId{1});
+
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(_store->getAllAccounts().empty());
+}
+
+TEST_F(AccountStoreTest, CommitDeletedAccountCallsServiceAndRemovesEntry)
+{
+    _mockService->preloadedAccounts.emplace_back(
+        AccountId{1},
+        AccountStatus::Active,
+        "LoadedAcc",
+        Currency::EUR,
+        AccountKind::Security
+    );
+    setActiveProfile();
+    static_cast<void>(_store->deleteAccount(AccountId{1}));
+
+    _store->commit();
+
+    EXPECT_EQ(_mockService->deleteCallCount, 1);
+    EXPECT_FALSE(_store->isDirty());
+}

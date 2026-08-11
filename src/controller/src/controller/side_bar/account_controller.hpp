@@ -102,6 +102,11 @@ namespace controller
             const ui::AccountCategory* item,
             const QAction*             action
         );
+
+        void _handleAccountItemContextMenuAction(
+            ui::AccountItem* item,
+            const QAction*   action
+        );
     };
 
 }   // namespace controller

@@ -85,6 +85,20 @@ namespace repo
             const finance::Account& account,
             const ProfileId&        profileId
         ) = 0;
+
+        /**
+         * @brief Delete an account from the repository, this method removes
+         * the account with the given ID from the database, along with any
+         * paired detail row (e.g. a cash account's details). Deletion is
+         * rejected by the database if the account is still referenced by
+         * existing transactions, trade legs, or a linked account.
+         *
+         * @param accountId The ID of the account to delete
+         * @return CrudResult<void> A result indicating success or failure of
+         * the delete operation
+         */
+        [[nodiscard]]
+        virtual CrudResult<void> deleteAccount(const AccountId& accountId) = 0;
     };
 
 }   // namespace repo
