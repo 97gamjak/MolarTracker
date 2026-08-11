@@ -116,6 +116,7 @@ namespace tests
         // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
         std::vector<finance::Account> preloadedAccounts;
         int                           createCallCount = 0;
+        int                           deleteCallCount = 0;
         // NOLINTEND(misc-non-private-member-variables-in-classes)
 
        private:
@@ -146,6 +147,13 @@ namespace tests
             const ProfileId& /*profileId*/
         ) override
         {
+            return {};
+        }
+
+        [[nodiscard]]
+        CrudResult<void> deleteAccount(const AccountId& /*accountId*/) override
+        {
+            deleteCallCount++;
             return {};
         }
     };

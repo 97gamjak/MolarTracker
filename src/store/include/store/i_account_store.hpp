@@ -184,6 +184,19 @@ namespace store
             AccountId          id,
             const std::string& newName
         ) = 0;
+
+        /**
+         * @brief Delete an account, this will stage the account with the
+         * given ID for deletion, the account will be removed from the store
+         * immediately but will only be removed from the database once the
+         * store is committed
+         *
+         * @param id The ID of the account to delete
+         * @return FinanceResult<void> Result of the operation, indicating
+         * success or failure
+         */
+        [[nodiscard]]
+        virtual FinanceResult<void> deleteAccount(AccountId id) = 0;
     };
 
 }   // namespace store

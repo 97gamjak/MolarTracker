@@ -26,6 +26,9 @@ struct AccountRow : orm::ORMModel<"account">
     /// disallow inserting an AccountRow without a corresponding CashAccountRow
     using insert_policy = orm::requires_paired_insert_t;
 
+    AccountRow() = default;
+    explicit AccountRow(AccountId _id);
+
     /// The id field, this is the primary key of the table and is
     /// auto-incremented
     ORM_FIELD(id, IdField<AccountId>)
@@ -95,6 +98,9 @@ struct CashAccountDetailRow : orm::ORMModel<"cash_account_detail">
 {
     /// as we have a 1:1 relationship between AccountRow and CashAccountRow, we
     /// disallow inserting an AccountRow without a corresponding CashAccountRow
+
+    CashAccountDetailRow() = default;
+    explicit CashAccountDetailRow(AccountId _id);
 
     ORM_FIELD(
         id,

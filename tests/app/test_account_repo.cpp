@@ -158,9 +158,11 @@ TEST_F(AccountRepoTest, GetAllAccountsIsolatesAccountsByProfile)
     const auto profileId1 = insertProfile("User1");
     const auto profileId2 = insertProfile("User2");
 
-    static_cast<void>(_repo.createAccount(makeAccount("P1Account"), profileId1)
+    static_cast<void>(
+        _repo.createAccount(makeAccount("P1Account"), profileId1)
     );
-    static_cast<void>(_repo.createAccount(makeAccount("P2Account"), profileId2)
+    static_cast<void>(
+        _repo.createAccount(makeAccount("P2Account"), profileId2)
     );
 
     const auto accounts1 = _repo.getAllAccounts(profileId1);
@@ -194,4 +196,67 @@ TEST_F(AccountRepoTest, GetAllAccountsReturnsCorrectAccountData)
     EXPECT_EQ(retrieved.getKind(), AccountKind::Cash);
     EXPECT_EQ(retrieved.getStatus(), AccountStatus::Active);
     EXPECT_GT(retrieved.getId().value(), 0);
+}
+
+TEST_F(AccountRepoTest, DeleteAccountRemovesAccountFromDatabase)
+{
+    const auto profileId = insertProfile("User");
+    const auto id        = _repo
+                        .createAccount(
+                            makeAccount("ToDelete", AccountKind::Security),
+                            profileId
+                        )
+                        .value();
+
+    const auto result = _repo.deleteAccount(id);
+
+    EXPECT_TRUE(result.has_value());
+    EXPECT_TRUE(_repo.getAllAccounts(profileId).empty());
+}
+
+TEST_F(AccountRepoTest, DeleteCashAccountAlsoRemovesCashAccountDetail)
+{
+    const auto profileId = insertProfile("User");
+    const auto id        = _repo
+                        .createAccount(
+                            makeAccount("CashToDelete", AccountKind::Cash),
+                            profileId
+                        )
+                        .value();
+
+    const auto result = _repo.deleteAccount(id);
+
+    EXPECT_TRUE(result.has_value());
+    EXPECT_TRUE(_repo.getAllAccounts(profileId).empty());
+}
+
+TEST_F(AccountRepoTest, DeleteNonExistentAccountIsANoOp)
+{
+    const auto result = _repo.deleteAccount(AccountId{999});
+
+    EXPECT_TRUE(result.has_value());
+}
+
+TEST_F(AccountRepoTest, DeleteSecurityAccountLinkedFromCashAccountReturnsError)
+{
+    const auto profileId = insertProfile("User");
+
+    const auto securityId =
+        _repo
+            .createAccount(
+                makeAccount("Broker", AccountKind::Security),
+                profileId
+            )
+            .value();
+
+    auto       cashAccount = makeAccount("Cash", AccountKind::Cash);
+    const auto cashId = _repo.createAccount(cashAccount, profileId).value();
+
+    cashAccount.setId(cashId);
+    cashAccount.setLinkedSecurityAccountId(securityId);
+    ASSERT_TRUE(_repo.updateAccount(cashAccount, profileId).has_value());
+
+    const auto result = _repo.deleteAccount(securityId);
+
+    EXPECT_FALSE(result.has_value());
 }

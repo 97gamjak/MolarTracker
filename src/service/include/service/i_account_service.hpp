@@ -67,6 +67,19 @@ namespace service
             const finance::Account& account,
             const ProfileId&        profileId
         ) = 0;
+
+        /**
+         * @brief Delete an existing account, this method removes the account
+         * with the given ID from the database. It returns a CrudResult
+         * indicating the success or failure of the operation.
+         *
+         * @param accountId The ID of the account to delete
+         *
+         * @return CrudResult<void> A result indicating success or failure of
+         * the delete operation
+         */
+        [[nodiscard]]
+        virtual CrudResult<void> deleteAccount(const AccountId& accountId) = 0;
     };
 
 }   // namespace service

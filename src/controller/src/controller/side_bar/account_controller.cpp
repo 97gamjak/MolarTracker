@@ -1,6 +1,7 @@
 #include "account_controller.hpp"
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include <format>
 
 #include "commands/account/create_account_command.hpp"
@@ -149,6 +150,11 @@ namespace controller
                 break;
             }
             case ui::SideBarItemType::AccountsItem:
+            {
+                auto* accountItem = dynamic_cast<ui::AccountItem*>(item);
+                _handleAccountItemContextMenuAction(accountItem, action);
+                break;
+            }
             case ui::SideBarItemType::TransactionCategory:
             case ui::SideBarItemType::SecuritiesCategory:
             case ui::SideBarItemType::WatchlistItem:
@@ -210,6 +216,61 @@ namespace controller
 
             if (auto* dialog = _createAccountDialog.data())
                 dialog->exec();
+        }
+    }
+
+    /**
+     * @brief Handle a context menu action triggered for a single account item
+     * (currently only Delete is wired up)
+     *
+     * @param item The account item for which the context menu action was
+     * triggered
+     * @param action The action that was triggered
+     */
+    void AccountSideBarController::_handleAccountItemContextMenuAction(
+        ui::AccountItem* item,
+        const QAction*   action
+    )
+    {
+        if (item == nullptr || action == nullptr)
+        {
+            LOG_WARNING(
+                "Account item context menu action triggered with null item "
+                "or action, ignoring"
+            );
+            return;
+        }
+
+        if (action == item->getDeleteAction())
+        {
+            const auto confirmed = QMessageBox::question(
+                getMainWindow(),
+                "Delete Account",
+                "Delete account '" + item->text() + "'? This cannot be undone."
+            );
+
+            if (confirmed != QMessageBox::Yes)
+                return;
+
+            const auto accountId = item->getId();
+
+            LOG_DEBUG(
+                std::format("Deleting account with ID {}", accountId.value())
+            );
+
+            auto result = _accountStore->deleteAccount(accountId);
+
+            if (!result)
+            {
+                ui::ErrorDialog::show(
+                    result.error(),
+                    "Failed to delete account",
+                    getMainWindow()
+                );
+                return;
+            }
+
+            refresh();
         }
     }
 

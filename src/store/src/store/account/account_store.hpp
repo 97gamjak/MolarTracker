@@ -97,6 +97,9 @@ namespace store
             const std::string& newName
         ) override;
 
+        [[nodiscard]]
+        FinanceResult<void> deleteAccount(AccountId id) override;
+
        private:
         void _refresh();
     };

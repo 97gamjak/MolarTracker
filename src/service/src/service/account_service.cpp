@@ -100,4 +100,16 @@ namespace service
         return _accountRepo->updateAccount(account, profileId);
     }
 
+    /**
+     * @brief Delete an existing account
+     *
+     * @param accountId The ID of the account to delete
+     *
+     * @return CrudResult<void>
+     */
+    CrudResult<void> AccountService::deleteAccount(const AccountId& accountId)
+    {
+        return _accountRepo->deleteAccount(accountId);
+    }
+
 }   // namespace service

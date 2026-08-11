@@ -116,8 +116,21 @@ TEST_F(AccountServiceTest, CreateAccountDuplicateNameAndKindReturnsError)
 {
     const auto profileId = insertProfile("User");
 
-    static_cast<void>(_service->createAccount(makeAccount("Savings"), profileId)
+    static_cast<void>(
+        _service->createAccount(makeAccount("Savings"), profileId)
     );
 
     EXPECT_FALSE(_service->createAccount(makeAccount("Savings"), profileId));
+}
+
+TEST_F(AccountServiceTest, DeleteAccountRemovesAccountFromDatabase)
+{
+    const auto profileId = insertProfile("User");
+    const auto id =
+        _service->createAccount(makeAccount("ToDelete"), profileId).value();
+
+    const auto result = _service->deleteAccount(id);
+
+    EXPECT_TRUE(result.has_value());
+    EXPECT_TRUE(_service->getAllAccounts(profileId).empty());
 }
